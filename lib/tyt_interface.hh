@@ -11,7 +11,7 @@
  *
  * @section tytif TyT protocol
  * The communication with the device is kind of weird. It all happens through memory reads and
- * writes. This is not unusual as such, but they implemented a weird memory mapping. Everyhing
+ * writes. This is not unusual as such, but they implemented a weird memory mapping. Everything
  * written to block 0 (i.e., memory address 0x00000000) is a command to the radio. Responses to
  * these commands are read back from the same address/block.
  *
@@ -30,7 +30,7 @@
  * | 0x91 | 0x01 |
  * +------+------+
  * @endcode
- * There is no explict response read back.
+ * There is no explicit response read back.
  *
  * @subsubsection tytiferb Reboot
  * The request written is
@@ -39,7 +39,7 @@
  * | 0x91 | 0x05 |
  * +------+------+
  * @endcode
- * There is no explict response read back.
+ * There is no explicit response read back.
  *
  * @subsubsection tyifid Identify/Get Info
  * The request written is
@@ -48,7 +48,7 @@
  * | 0xa2 | What |
  * +------+------+
  * @endcode
- * There is always some response read back. The size varies whith whatever is read back.
+ * There is always some response read back. The size varies with whatever is read back.
  * <table>
  *  <tr><th>WhatCode</th> <th>Resp. Len.</th> <th>Description></th></tr>
  *  <tr><td>0x01</td>     <td>32</td>         <td>The radio identifier as a string + some unknown
@@ -65,33 +65,42 @@ class TyTInterface : public DFUSEDevice, public RadioInterface
   Q_OBJECT
 
 public:
-  /** Costructor. Opens an interface to the specified vendor and product ID. */
-  TyTInterface(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  /** Constructor. Opens an interface to the specified interface. */
+  TyTInterface(const USBDeviceDescriptor &descr,
+               const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
   /** Destructor. */
   ~TyTInterface();
 
   bool isOpen() const;
-  RadioInfo identifier();
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
   void close();
 
-  bool read_start(uint32_t bank, uint32_t addr);
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool read_finish();
-  bool write_start(uint32_t bank, uint32_t addr);
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes);
-  bool write_finish();
-  bool reboot();
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool read_finish(const ErrorStack &err=ErrorStack());
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool write_finish(const ErrorStack &err=ErrorStack());
+  bool reboot(const ErrorStack &err=ErrorStack());
 
   /** Erases a memory section at @c start of size @c size. */
-  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr);
+  bool erase(unsigned start, unsigned size, void (*progress)(unsigned, void *)=nullptr, void *ctx=nullptr, const ErrorStack &err=ErrorStack());
 
-  const QString &errorMessage() const;
+public:
+  /** Returns some information about the interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected TyT radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
-  /** Internal used function to send a controll command to the device. */
-  int md380_command(uint8_t a, uint8_t b);
+  /** Internal used function to send a control command to the device. */
+  int md380_command(uint8_t a, uint8_t b, const ErrorStack &err=ErrorStack());
+  /** Internal used function to set the current I/O address. */
+  int set_address(uint32_t address, const ErrorStack &err=ErrorStack());
+  /** Internal used function to erase a specific block. */
+  int erase_block(uint32_t address, const ErrorStack &err=ErrorStack());
   /** Internal used function to read the device identifier. */
-  const char *identify();
+  const char *identify(const ErrorStack &err=ErrorStack());
 
 protected:
   /** Read identifier. */

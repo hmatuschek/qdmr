@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>492</width>
+    <height>306</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="addContact">
+      <widget class="QPushButton" name="addDMRContact">
        <property name="toolTip">
         <string>Adds a contact to the list.</string>
        </property>
@@ -35,10 +35,17 @@
         <string>Add contact button</string>
        </property>
        <property name="text">
-        <string>Add Contact</string>
+        <string>Add Digital Contact</string>
        </property>
        <property name="shortcut">
         <string>Alt++</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addDTMFContact">
+       <property name="text">
+        <string>Add DTMF Contact</string>
        </property>
       </widget>
      </item>

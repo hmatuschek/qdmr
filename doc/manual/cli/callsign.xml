@@ -11,7 +11,7 @@
 
 <para>
   The command line interface also allows to write a call-sign DB (also known as <glossterm>Talker 
-  Alias</glossterm>)to the radio if the radio supports it. This can be done with the 
+  Alias</glossterm>) to the radio if the radio supports it. This can be done with the 
   <command>write-db</command> command. This command behaves similar to the call-sign DB upload in 
   <application>qdmr</application>. That is, it tries to select the call-signs being written 
   automatically.
@@ -19,7 +19,7 @@
 
 <para>
   Although many radios provide a huge amount of memory for the call-sign DB, they cannot hold the 
-  entire list of assigned DMR IDs. Therefore a selection of relevant call-signs must be done. 
+  entire list of assigned DMR IDs. Therefore, a selection of relevant call-signs must be done. 
   <application>qdmr</application> and <command>dmrconf</command> do that based on the DMR ID of
   the radio. DMR IDs are not random. They follow a pattern similar to land-line phone numbers. DMR
   IDs within a certain continent, country and region share a common prefix. This way, it is 
@@ -28,7 +28,7 @@
 </para>
 
 <para>
-  <application>qdmr</application> and <command>dmrconf</command> therefore uses the default DMR ID
+  <application>qdmr</application> and <command>dmrconf</command> use the default DMR ID
   of the radio to select the call-signs to be written. This ID is obtained by 
   <application>qdmr</application> from the codeplug. <command>dmrconf</command> does not require a
   codeplug to be present for the upload. Consequently, it requires the explicit specification 
@@ -45,7 +45,7 @@
   region Berlin/Brandenburg in Germany). The radio will fill the available space with as many 
   call-signs as possible. So for the previous example, <command>dmrconf</command> will not only
   program all IDs with the prefix 2621 but as many as possible starting with those 
-  <emphasis>close</emphasis> to that prefix. It is possible to limit the number of call-sign 
+  <emphasis>close</emphasis> to that prefix. It is possible to limit the number of call-signs 
   encoded using the <option>--limit</option> or <option>-n</option> option.
 </para>
 

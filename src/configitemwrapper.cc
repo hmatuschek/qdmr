@@ -2,6 +2,8 @@
 #include <cmath>
 #include "logger.hh"
 #include <QColor>
+#include <QPalette>
+#include <QWidget>
 
 
 /* ********************************************************************************************* *
@@ -21,6 +23,7 @@ GenericListWrapper::GenericListWrapper(AbstractConfigObjectList *list, QObject *
 
 int
 GenericListWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();
@@ -28,6 +31,7 @@ GenericListWrapper::rowCount(const QModelIndex &index) const {
 
 int
 GenericListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return 1;
@@ -94,7 +98,7 @@ GenericListWrapper::onItemAdded(int idx) {
 void
 GenericListWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
-  logDebug() << "Signal removal of item at idx=" << idx;
+  //logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 
@@ -121,6 +125,7 @@ GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject
 
 int
 GenericTableWrapper::rowCount(const QModelIndex &index) const {
+  Q_UNUSED(index)
   if (nullptr == _list)
     return 0;
   return _list->count();
@@ -186,7 +191,7 @@ GenericTableWrapper::onItemAdded(int idx) {
 void
 GenericTableWrapper::onItemRemoved(int idx) {
   beginRemoveRows(QModelIndex(), idx, idx);
-  logDebug() << "Signal removal of item at idx=" << idx;
+  //logDebug() << "Signal removal of item at idx=" << idx;
   endRemoveRows();
 }
 
@@ -223,19 +228,23 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   if ((! index.isValid()) || (index.row()>=_list->count()))
     return QVariant();
+
   if (Qt::ForegroundRole == role) {
+    const QPalette &palette = qobject_cast<QWidget *>(QObject::parent())->palette();
+    QColor active   = palette.color(QPalette::Active, QPalette::Text);
+    QColor inactive = palette.color(QPalette::Inactive, QPalette::Text);
     bool isDigital = dynamic_cast<ChannelList *>(_list)->channel(index.row())->is<DigitalChannel>();
     switch(index.column()) {
     case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-      return QColor(Qt::black);
+      return active;
     case 9: case 10: case 11: case 12: case 13:
-      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+      return (isDigital ? active : inactive);
     case 14:
-      return QColor(Qt::black);
+      return active;
     case 15:
-      return (isDigital ? QColor(Qt::black) : QColor(Qt::lightGray));
+      return (isDigital ? active : inactive);
     case 16: case 17: case 18: case 19:
-      return (isDigital ? QColor(Qt::lightGray) : QColor(Qt::black));
+      return (isDigital ? inactive : active);
     }
   }
 
@@ -263,11 +272,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->defaultPower())
       return tr("[Default]");
     switch (channel->power()) {
-    case Channel::Power::Max: return tr("Max");
-    case Channel::Power::High: return tr("High");
-    case Channel::Power::Mid: return tr("Mid");
-    case Channel::Power::Low: return tr("Low");
-    case Channel::Power::Min: return tr("Min");
+    case Channel::Power::Max: return tr("Max"); break;
+    case Channel::Power::High: return tr("High"); break;
+    case Channel::Power::Mid: return tr("Mid"); break;
+    case Channel::Power::Low: return tr("Low"); break;
+    case Channel::Power::Min: return tr("Min"); break;
     }
   case 5:
     if (channel->defaultTimeout())
@@ -280,21 +289,21 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 7:
     if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
       switch (digi->admit()) {
-      case DigitalChannel::Admit::Always: return tr("Always");
-      case DigitalChannel::Admit::Free: return tr("Free");
-      case DigitalChannel::Admit::ColorCode: return tr("Color");
+      case DigitalChannel::Admit::Always: return tr("Always"); break;
+      case DigitalChannel::Admit::Free: return tr("Free"); break;
+      case DigitalChannel::Admit::ColorCode: return tr("Color"); break;
       }
     } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
       switch (analog->admit()) {
-      case AnalogChannel::Admit::Always: return tr("Always");
-      case AnalogChannel::Admit::Free: return tr("Free");
-      case AnalogChannel::Admit::Tone: return tr("Tone");
+      case AnalogChannel::Admit::Always: return tr("Always"); break;
+      case AnalogChannel::Admit::Free: return tr("Free"); break;
+      case AnalogChannel::Admit::Tone: return tr("Tone"); break;
       }
     }
     break;
   case 8:
-    if (channel->scanListObj()) {
-      return channel->scanListObj()->name();
+    if (channel->scanList()) {
+      return channel->scanList()->name();
     } else {
       return tr("-");
     }
@@ -779,7 +788,7 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  RadioID *id = _list->get(index.row())->as<RadioID>();
+  DMRRadioID *id = _list->get(index.row())->as<DMRRadioID>();
 
   switch (index.column()) {
   case 0:

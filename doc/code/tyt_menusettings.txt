@@ -2,7 +2,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 | Menu hang time (sec)          |RDS|REN|RMO|RCK|MDL|CED|CAL|TXT|ToA|TlA|CLO|CLA|CLM|ESL|SCN| 1 |VOX| 0 |SQL|LED|KPL|INS|BKL|PWR|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04 | 1 | 1 | 1 |GPI| 1 |PRG|DSM|PWD| Unused, set to 0xff                                                                        ...
+04 | 1 | 1 | 1 | 1 | 1 |PRG|DSM|PWD| Unused, set to 0xff                                                                        ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0c  ...                                                                                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -12,7 +12,6 @@ where:
  CLO = Show call-log outgoing, CLA = Show call-log answered; CLM = Show call-log missed; ESL = Show edit scan list;
  SCN = Show scan menu; VOX = Show VOX settings; SQL = Show squelch settings; LED = Show LED indicator menu;
  KPL = Show keypad lock; INS = Show intro screen; BKL = Show backlight; PWR = Show power settings; RSW = Show record switch;
- GPI = Hide GPS information; GPS = Hide GPS settings; PRG = Hide radio program menu; DSM = Show Display mode settings;
- PWD = Show password settings; NWZ = Show new zone menu; ZNS = Show zone settings; TXM = Show TX mode settings;
- MHT = Show menu hang time; PCM = Show private-call match settings; GCM = Show group-call match settings;
- NSL = Show new scan list menu; EDZ = Show edit zone menu;
+ PRG = Hide radio program menu; DSM = Show Display mode settings; PWD = Show password settings; NWZ = Show new zone menu;
+ ZNS = Show zone settings; TXM = Show TX mode settings; MHT = Show menu hang time; PCM = Show private-call match settings;
+ GCM = Show group-call match settings; NSL = Show new scan list menu; EDZ = Show edit zone menu;

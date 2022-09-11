@@ -8,23 +8,22 @@
 #include "codeplug.hh"
 #include "config.h"
 #include "settings.hh"
+#include "radiolimits.hh"
 #include "verifydialog.hh"
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
-#include "contactdialog.hh"
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
 #include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
-#include "repeaterdatabase.hh"
+#include "repeaterbookcompleter.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
 #include "contactselectiondialog.hh"
 #include "configitemwrapper.hh"
-#include "configreader.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"
@@ -34,10 +33,15 @@
 #include "scanlistsview.hh"
 #include "positioningsystemlistview.hh"
 #include "roamingzonelistview.hh"
+#include "errormessageview.hh"
+#include "extensionview.hh"
+#include "deviceselectiondialog.hh"
+#include "radioselectiondialog.hh"
 
 
 Application::Application(int &argc, char *argv[])
-  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr)
+  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr),
+    _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -47,8 +51,14 @@ Application::Application(int &argc, char *argv[])
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
+  // Register icon themes
+  QStringList iconPaths = QIcon::themeSearchPaths();
+  iconPaths.prepend(":/icons");
+  QIcon::setThemeSearchPaths(iconPaths);
+  onPaletteChanged(palette());
+
   Settings settings;
-  _repeater   = new RepeaterDatabase(settings.position(), 7, this);
+  _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _config = new Config(this);
@@ -67,10 +77,10 @@ Application::Application(int &argc, char *argv[])
         return;
       }
     } else if ("yaml" == info.suffix()) {
-      ConfigReader reader;
-      if (! reader.read(_config, argv[1])) {
+      ErrorStack err;
+      if (! _config->readYAML(argv[1], err)) {
         logError() << "Cannot read yaml codeplug file '" << argv[1]
-                   << "': " << reader.errorMessage();
+                   << "': " << err.format();
         return;
       }
     }
@@ -91,13 +101,25 @@ Application::Application(int &argc, char *argv[])
   _releaseNotes.checkForUpdate();
 
   logDebug() << "Last known position: " << _currentPosition.toString();
-  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModifed()));
+  connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModifed()));
 }
 
 Application::~Application() {
   if (_mainWindow)
     delete _mainWindow;
   _mainWindow = nullptr;
+}
+
+bool
+Application::isDarkMode() const {
+  return isDarkMode(palette());
+}
+
+bool
+Application::isDarkMode(const QPalette &palette) const {
+  int text_hsv_value = palette.color(QPalette::WindowText).value(),
+      bg_hsv_value = palette.color(QPalette::Background).value();
+  return text_hsv_value > bg_hsv_value;
 }
 
 
@@ -119,8 +141,7 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterDatabase *
-Application::repeater() const{
+RepeaterBookList *Application::repeater() const{
   return _repeater;
 }
 
@@ -131,6 +152,7 @@ Application::createMainWindow() {
     return _mainWindow;
 
   Settings settings;
+  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
 
   QUiLoader loader;
   QFile uiFile("://ui/mainwindow.ui");
@@ -156,7 +178,6 @@ Application::createMainWindow() {
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-  QAction *refreshRepeaterDB  = _mainWindow->findChild<QAction*>("actionRefreshRepeaterDB");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -173,7 +194,6 @@ Application::createMainWindow() {
 
   connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-  connect(refreshRepeaterDB, SIGNAL(triggered()), _repeater, SLOT(download()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -188,6 +208,13 @@ Application::createMainWindow() {
   tabs->addTab(_generalSettings, tr("Settings"));
   if (settings.showCommercialFeatures()) {
     _generalSettings->hideDMRID(true);
+  } else {
+    _generalSettings->hideDMRID(false);
+  }
+  if (settings.showExtensions()) {
+    _generalSettings->hideExtensions(false);
+  } else {
+    _generalSettings->hideExtensions(true);
   }
 
   // Wire-up "Radio IDs" view
@@ -222,9 +249,18 @@ Application::createMainWindow() {
   _roamingZoneList = new RoamingZoneListView(_config);
   tabs->addTab(_roamingZoneList, tr("Roaming"));
 
+  // Wire-up "extension view"
+  _extensionView = new ExtensionView();
+  _extensionView->setObject(_config, _config);
+  tabs->addTab(_extensionView, tr("Extensions"));
+
   if (! settings.showCommercialFeatures()) {
     tabs->removeTab(tabs->indexOf(_radioIdTab));
     _radioIdTab->setHidden(true);
+  }
+  if (! settings.showExtensions()) {
+    tabs->removeTab(tabs->indexOf(_extensionView));
+    _extensionView->setHidden(true);
   }
 
   _mainWindow->restoreGeometry(settings.mainWindowState());
@@ -278,18 +314,18 @@ Application::loadCodeplug() {
   QFileInfo info(filename);
   settings.setLastDirectoryDir(info.absoluteDir());
 
-  QString errorMessage;
   if ("yaml" == info.suffix()){
-    ConfigReader reader;
-    if (reader.read(_config, filename)) {
+    ErrorStack err;
+    if (_config->readYAML(filename, err)) {
       _mainWindow->setWindowModified(false);
     } else {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(reader.errorMessage()));
+                            .arg(filename).arg(err.format()));
       _config->clear();
     }
   } else {
+    QString errorMessage;
     QTextStream stream(&file);
     if (_config->readCSV(stream, errorMessage)) {
       _mainWindow->setWindowModified(false);
@@ -318,7 +354,7 @@ Application::saveCodeplug() {
 
   if (filename.endsWith(".conf") || filename.endsWith("csv")){
     QMessageBox::critical(nullptr, tr("Please use new YAML format."),
-                          tr("Saveing in the old table-based conf format was disabled with 0.9.0. "
+                          tr("Saving in the old table-based conf format was disabled with 0.9.0. "
                              "Reading these files still works."));
     return;
   }
@@ -368,42 +404,75 @@ Application::quitApplication() {
 }
 
 
+Radio *
+Application::autoDetect(const ErrorStack &err) {
+  // If the last detected device is still valid
+  //  -> skip interface detection and selection
+  if (! _lastDevice.isValid()) {
+    logDebug() << "Last device is invalid, search for new one.";
+    // First get all devices that are known by VID/PID
+    QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
+    if (interfaces.isEmpty()) {
+      errMsg(err) << tr("No matching devices found.");
+      return nullptr;
+    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave())) {
+      // More than one device found, or device not save -> select by user
+      DeviceSelectionDialog dialog(interfaces);
+      if (QDialog::Accepted != dialog.exec()) {
+        return nullptr;
+      }
+      _lastDevice = dialog.device();
+    } else {
+      _lastDevice = interfaces.first();
+    }
+  }
+
+  // Check if device supports identification
+  RadioInfo radioInfo;
+  if (! _lastDevice.isIdentifiable()) {
+    RadioSelectionDialog dialog(_lastDevice);
+    if (QDialog::Accepted != dialog.exec()) {
+      return nullptr;
+    }
+    radioInfo = dialog.radioInfo();
+  }
+
+  Radio *radio = Radio::detect(_lastDevice, radioInfo, err);
+  if (nullptr == radio) {
+    QMessageBox::critical(nullptr, tr("Cannot connect to radio"),
+                          tr("Cannot connect to radio: %1").arg(err.format()));
+    return nullptr;
+  }
+
+  return radio;
+}
+
 void
 Application::detectRadio() {
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
-  if (radio) {
+  if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
-  } else {
-    QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("No known radio detected. Check connection?\nError: %1").arg(errorMessage));
   }
-  radio->deleteLater();
 }
 
 
 bool
-Application::verifyCodeplug(Radio *radio, bool showSuccess, const VerifyFlags &flags) {
+Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   Radio *myRadio = radio;
-  QString errorMessage;
 
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
-    myRadio = Radio::detect(errorMessage);
-  if (nullptr == myRadio) {
-    QMessageBox::information(nullptr, tr("No Radio found."),
-                             tr("Cannot verify codeplug: No known radio detected.\nError: ")
-                             + errorMessage);
+    myRadio = autoDetect();
+  if (nullptr == myRadio)
     return false;
-  }
 
+  Settings settings;
+  RadioLimitContext ctx(settings.ignoreFrequencyLimits());
+  myRadio->limits().verifyConfig(_config, ctx);
   bool verified = true;
-  QList<VerifyIssue> issues;
-  VerifyIssue::Type maxIssue = myRadio->verifyConfig(_config, issues, flags);
-  if ( (flags.ignoreWarnings && (maxIssue>VerifyIssue::WARNING)) ||
-       ((!flags.ignoreWarnings) && (maxIssue>=VerifyIssue::WARNING)) ) {
-    VerifyDialog dialog(issues, (nullptr != radio));
+  if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
+       ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
+    VerifyDialog dialog(ctx, (nullptr != radio));
     if (QDialog::Accepted != dialog.exec())
       verified = false;
   } else if (showSuccess) {
@@ -433,26 +502,22 @@ Application::downloadCodeplug() {
       return;
   }
 
-  QString errorMessage;
-  Radio *radio = Radio::detect(errorMessage);
-  if (nullptr == radio) {
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not read codeplug from device: No radio found.\nError: ")
-                          + errorMessage);
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
   connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
-  if (radio->startDownload(false)) {
+
+  ErrorStack err;
+  if (radio->startDownload(false, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot Read codeplug."),
-                          tr("Cannot read codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -460,9 +525,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  QMessageBox::critical(0, tr("Read error"),
-                        tr("Cannot read codeplug from device. "
-                           "An error occurred during read: %1").arg(radio->errorMessage()));
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -477,15 +540,13 @@ void
 Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->clear();
   _mainWindow->setWindowModified(false);
-  if (codeplug->decode(_config)) {
+  ErrorStack err;
+  if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
-
     _config->setModified(false);
   } else {
-    QMessageBox::critical(
-          nullptr, tr("Cannot decode code-plug"),
-          tr("Cannot decode code-plug: %2").arg(codeplug->errorMessage()));
+    ErrorMessageView(err).show();
   }
   _mainWindow->setEnabled(true);
 
@@ -497,24 +558,12 @@ void
 Application::uploadCodeplug() {
   // Start upload
   Settings settings;
-  QString errorMessage;
 
-  Radio *radio = Radio::detect(errorMessage);
-  if (nullptr == radio) {
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not write codeplug to device: No radio found.\nError: ")
-                          + errorMessage);
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
 
-  // Verify codeplug against the detected radio before uploading,
-  // but do not show a message on success.
-  VerifyFlags flags = {
-    settings.ignoreVerificationWarning(),
-    settings.ignoreFrequencyLimits()
-  };
-
-  if (! verifyCodeplug(radio, false, flags)) {
+  if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
     return;
   }
@@ -528,12 +577,12 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUpload(_config, false, settings.codePlugFlags())) {
+  ErrorStack err;
+  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    QMessageBox::critical(nullptr, tr("Cannot write codeplug."),
-                          tr("Cannot write codeplug: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -541,20 +590,11 @@ Application::uploadCodeplug() {
 void
 Application::uploadCallsignDB() {
   // Start upload
-  QString errorMessage;
-
-  logDebug() << "Detect radio...";
-  Radio *radio = Radio::detect(errorMessage);
-  if (nullptr == radio) {
-    logDebug() << "No matching radio found.";
-    QMessageBox::critical(nullptr, tr("No Radio found."),
-                          tr("Can not write call-sign DB to device: No radio found.\nError: ")
-                          + errorMessage);
+  Radio *radio = autoDetect();
+  if (nullptr == radio)
     return;
-  }
-  logDebug() << "Found radio " << radio->name() << ".";
 
-  if (! radio->features().hasCallsignDB) {
+  if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
     QMessageBox::information(nullptr, tr("Cannot write call-sign DB."),
                              tr("The detected radio '%1' does not support "
@@ -563,7 +603,7 @@ Application::uploadCallsignDB() {
     radio->deleteLater();
     return;
   }
-  if (! radio->features().callsignDBImplemented) {
+  if (! radio->limits().callSignDBImplemented()) {
     logDebug() << "Radio " << radio->name()
                << " does support call-sign DB but it is not implemented yet.";
     QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
@@ -612,14 +652,13 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  if (radio->startUploadCallsignDB(_users, false, css)) {
+  ErrorStack err;
+  if (radio->startUploadCallsignDB(_users, false, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    logDebug() << "Cannot write call-sign DB.";
-    QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
-                          tr("Cannot write call-sign DB: %1").arg(radio->errorMessage()));
+    ErrorMessageView(err).show();
     progress->setVisible(false);
   }
 }
@@ -628,11 +667,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  QMessageBox::critical(
-        nullptr, tr("Write error"),
-        tr("Cannot write codeplug or call-sign DB to device. "
-           "An error occurred during write: %1").arg(radio->errorMessage()));
-  logError() << "Write error: " << radio->errorMessage() << ".";
+  ErrorMessageView(radio->errorStack()).show();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -647,7 +682,7 @@ Application::onCodeplugUploaded(Radio *radio) {
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
-  logError() << "Write complete.";
+  logDebug() << "Write complete.";
 
   if (radio->wait(250))
     radio->deleteLater();
@@ -672,8 +707,7 @@ Application::showSettings() {
     QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
     if (settings.showCommercialFeatures()) {
       if (-1 == tabs->indexOf(_radioIdTab)) {
-        QWidget *genSet = _mainWindow->findChild<QWidget*>("GeneralSettingsView");
-        tabs->insertTab(tabs->indexOf(genSet)+1, _radioIdTab, tr("Radio IDs"));
+        tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(true);
@@ -683,6 +717,20 @@ Application::showSettings() {
         _mainWindow->update();
       }
       _generalSettings->hideDMRID(false);
+    }
+    // Handle extensions
+    if (settings.showExtensions()) {
+      if (-1 == tabs->indexOf(_extensionView)) {
+        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
+        _mainWindow->update();
+      }
+      _generalSettings->hideExtensions(false);
+    } else {
+      if (-1 != tabs->indexOf(_extensionView)) {
+        tabs->removeTab(tabs->indexOf(_extensionView));
+        _mainWindow->update();
+      }
+      _generalSettings->hideExtensions(true);
     }
   }
 }
@@ -695,6 +743,27 @@ Application::showAbout() {
   QDialog *dialog = qobject_cast<QDialog *>(loader.load(&uiFile));
   QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
   text->setHtml(text->toHtml().arg(VERSION_STRING));
+
+  QTreeWidget *radioTab = dialog->findChild<QTreeWidget *>("radioTable");
+  radioTab->setColumnCount(1);
+  QHash<QString, QTreeWidgetItem*> items;
+  foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
+    if (! items.contains(radio.manufactuer()))
+      items.insert(radio.manufactuer(),
+                   new QTreeWidgetItem(QStringList(radio.manufactuer())));
+    items[radio.manufactuer()]->addChild(
+          new QTreeWidgetItem(QStringList(radio.name())));
+    foreach (RadioInfo alias, radio.alias()) {
+      if (! items.contains(alias.manufactuer()))
+        items.insert(alias.manufactuer(),
+                     new QTreeWidgetItem(QStringList(alias.manufactuer())));
+      items[alias.manufactuer()]->addChild(
+            new QTreeWidgetItem(QStringList(tr("%1 (alias for %2 %3)").arg(alias.name())
+                                            .arg(radio.manufactuer()).arg(radio.name()))));
+    }
+  }
+  radioTab->insertTopLevelItems(0, items.values());
+  radioTab->sortByColumn(0,Qt::AscendingOrder);
 
   if (dialog) {
     dialog->exec();
@@ -732,5 +801,16 @@ Application::position() const {
   return _currentPosition;
 }
 
+void
+Application::onPaletteChanged(const QPalette &palette) {
+  // Set theme based on UI mode (light vs. dark).
+  if (isDarkMode(palette)) {
+    QIcon::setThemeName("dark");
+    logDebug() << "Set icon theme to 'dark'.";
+  } else {
+    QIcon::setThemeName("light");
+    logDebug() << "Set icon theme to 'light'.";
+  }
+}
 
 

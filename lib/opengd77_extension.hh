@@ -7,7 +7,6 @@
 #define OPENGD77EXTENSION_HH
 
 #include "configobject.hh"
-#include "configreader.hh"
 
 /** Implements the channel extensions for the OpenGD77 radios.
  * @since 0.9.0
@@ -18,6 +17,15 @@ class OpenGD77ChannelExtension: public ConfigExtension
 
   /** The channel transmit power. Overrides the common power settings. */
   Q_PROPERTY(Power power READ power WRITE setPower)
+  /** The zone skip flag. */
+  Q_PROPERTY(bool scanZoneSkip READ scanZoneSkip WRITE enableScanZoneSkip)
+  /** The all skip flag. */
+  Q_PROPERTY(bool scanAllSkip READ scanAllSkip WRITE enableScanAllSkip)
+
+  Q_CLASSINFO("description", "Channel settings for OpenGD77 radios.")
+  Q_CLASSINFO("longDescription", "This extension implements all channel settings specific to radios "
+              "running the OpenGD77 firmware. As the OpenGD77 codeplug is derived from the "
+              "Radioddity GD77 codeplug, all Radioddity extension also apply.")
 
 public:
   /** All possible power settings. */
@@ -38,36 +46,31 @@ public:
 
 public:
   /** Constructor. */
-  explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
+  Q_INVOKABLE explicit OpenGD77ChannelExtension(QObject *parent=nullptr);
 
-public:
+  ConfigItem *clone() const;
+
   /** Returns the power settings for the channel. */
   Power power() const;
   /** Sets the power setting. */
   void setPower(Power power);
 
+  /** Returns @c true if the zone skip flag is set. */
+  bool scanZoneSkip() const;
+  /** Enables/disables zone skip. */
+  void enableScanZoneSkip(bool enable);
+  /** Returns @c true if the all-skip flag is set. */
+  bool scanAllSkip() const;
+  /** Enables/disables all skip. */
+  void enableScanAllSkip(bool enable);
+
 protected:
   /** Holds the power setting. */
   Power _power;
-};
-
-/** Implements the config reader for OpenGD77 channel extensions.
- * @since 0.9.0
- * @ingroup ogd77ex */
-class OpenGD77ChannelExtensionReader: public ExtensionReader
-{
-  Q_OBJECT
-  Q_CLASSINFO("name", "openGD77")
-
-public:
-  /** Constructor. */
-  explicit OpenGD77ChannelExtensionReader(QObject *parent=nullptr);
-
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-
-private:
-  /** Holds the instance of the config reader. */
-  static AbstractConfigReader *instance;
+  /** Holds the zone skip flag. */
+  bool _zoneSkip;
+  /** Holds the all skip flag. */
+  bool _allSkip;
 };
 
 
@@ -78,11 +81,23 @@ class OpenGD77ContactExtension: public ConfigExtension
 {
   Q_OBJECT
 
+  Q_CLASSINFO("description", "DMR contact settings for OpenGD77 radios.")
+  Q_CLASSINFO("longDescription", "This extension implements all contact settings specific to radios "
+              "running the OpenGD77 firmware. As the OpenGD77 codeplug is derived from the "
+              "Radioddity GD77 codeplug, all Radioddity extension also apply.")
+
   /** If set, overrides the channel time slot if this contact is selected as the transmit contact. */
   Q_PROPERTY(TimeSlotOverride timeSlotOverride READ timeSlotOverride WRITE setTimeSlotOverride)
+  Q_CLASSINFO("timeSlotOverrideDescription", "If set, overrides the channels timeslot.")
+  Q_CLASSINFO("timeSlotOverrideLongDescription",
+              "The OpenGD77 firmware allows contacts to override the channel time slot if the "
+              "contact is selected as the current destination contact for that channel. This allows "
+              "to assign a specific time slot to a contact, rather than creating a particular "
+              "channel for that contact that only differs in the time slot.")
 
 public:
-  /** Possible values for the time-slot override option. */
+  /** Possible values for the time-slot override option.
+   * Encoded values are correct for firmware 2022-02-28 (0118581D). */
   enum class TimeSlotOverride {
     None = 0x01,                  ///< Do not override time-slot of channel.
     TS1  = 0x00,                  ///< Force time-slot to TS1.
@@ -92,7 +107,9 @@ public:
 
 public:
   /** Constructor. */
-  explicit OpenGD77ContactExtension(QObject *parent=nullptr);
+  Q_INVOKABLE explicit OpenGD77ContactExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
 
   /** Returns the time slot override. */
   TimeSlotOverride timeSlotOverride() const;
@@ -103,27 +120,6 @@ protected:
   /** Holds the time slot override. */
   TimeSlotOverride _timeSlotOverride;
 };
-
-/** Implements the config reader for OpenGD77 contact extensions.
- * @since 0.9.0
- * @ingroup ogd77ex */
-class OpenGD77ContactExtensionReader: public ExtensionReader
-{
-  Q_OBJECT
-  Q_CLASSINFO("name", "openGD77")
-
-public:
-  /** Constructor. */
-  explicit OpenGD77ContactExtensionReader(QObject *parent=nullptr);
-
-  ConfigObject *allocate(const YAML::Node &node, const ConfigObject::Context &ctx);
-
-private:
-  /** Holds the instance of the config reader. */
-  static AbstractConfigReader *instance;
-};
-
-
 
 
 #endif // OPENGD77EXTENSION_HH

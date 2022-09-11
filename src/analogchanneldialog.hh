@@ -28,6 +28,7 @@ protected slots:
 
 protected:
   Config *_config;
+  AnalogChannel *_myChannel;
   AnalogChannel *_channel;
 };
 

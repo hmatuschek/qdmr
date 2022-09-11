@@ -8,7 +8,7 @@
 #define CALLSIGN_INDEX_BANK_OFFSET  0x00040000  // Offset between index banks
 #define CALLSIGN_INDEX_BANK_SIZE    0x0001f400  // Size of each callsign index bank
 
-#define CALLSIGN_BANK0              0x04500000  // Start address of the actuall call sign entries
+#define CALLSIGN_BANK0              0x04500000  // Start address of the actual call sign entries
 #define CALLSIGN_BANK_OFFSET        0x00040000  // Offset between callsign entry bank
 #define CALLSIGN_BANK_SIZE          0x000186a0  // Size of each callsign entry bank
 
@@ -144,7 +144,9 @@ D868UVCallsignDB::D868UVCallsignDB(QObject *parent)
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection) {
+bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Determine size of call-sign DB in memory
   qint64 n = std::min(db->count(), qint64(MAX_CALLSIGNS));
   // If DB size is limited by settings

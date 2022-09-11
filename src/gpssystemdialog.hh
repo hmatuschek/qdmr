@@ -21,6 +21,7 @@ protected:
 
 protected:
   Config *_config;
+  GPSSystem *_myGPSSystem;
   GPSSystem *_gpsSystem;
 };
 

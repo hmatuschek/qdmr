@@ -35,13 +35,10 @@ def hexDump(s):
   return( h + " | " + t)
 
 # parameters?
-if len(sys.argv) == 3:
-   filebase = sys.argv[1]
-   comport = sys.argv[2]
-elif len(sys.argv) == 2:
-   filebase = sys.argv[1]
-elif len(sys.argv) >3:
-   print("Usage: " + sys.argv[0] + ' filebase [comport]')
+if len(sys.argv) == 2:
+   comport = sys.argv[1]
+elif len(sys.argv) >= 3:
+   print("Usage: " + sys.argv[0] + ' [comport]')
    exit()
 
 

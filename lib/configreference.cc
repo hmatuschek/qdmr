@@ -7,6 +7,7 @@
 #include "radioid.hh"
 #include "rxgrouplist.hh"
 #include "roaming.hh"
+#include "encryptionextension.hh"
 
 
 /* ********************************************************************************************* *
@@ -65,14 +66,31 @@ ConfigObjectReference::set(ConfigObject *object) {
 }
 
 bool
+ConfigObjectReference::copy(const ConfigObjectReference *ref) {
+  clear();
+  if (nullptr == ref)
+    return true;
+  return set(ref->_object);
+}
+
+bool
 ConfigObjectReference::allow(const QMetaObject *elementType) {
   if (! _elementTypes.contains(elementType->className()))
     _elementTypes.append(elementType->className());
   return true;
 }
 
+const QStringList &
+ConfigObjectReference::elementTypeNames() const {
+  return _elementTypes;
+}
+
 void
 ConfigObjectReference::onReferenceDeleted(QObject *obj) {
+  // Check if destroyed obj is referenced one.
+  if (_object != reinterpret_cast<ConfigObject*>(obj))
+    return;
+  // If it is
   _object = nullptr;
   emit modified();
 }
@@ -226,7 +244,7 @@ GPSSystemReference::GPSSystemReference(QObject *parent)
  * Implementation of RadioIDReference
  * ********************************************************************************************* */
 RadioIDReference::RadioIDReference(QObject *parent)
-  : ConfigObjectReference(RadioID::staticMetaObject, parent)
+  : ConfigObjectReference(DMRRadioID::staticMetaObject, parent)
 {
   // pass...
 }
@@ -247,6 +265,16 @@ GroupListReference::GroupListReference(QObject *parent)
  * ********************************************************************************************* */
 RoamingZoneReference::RoamingZoneReference(QObject *parent)
   : ConfigObjectReference(RoamingZone::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of EncryptionKeyReference
+ * ********************************************************************************************* */
+EncryptionKeyReference::EncryptionKeyReference(QObject *parent)
+  : ConfigObjectReference(EncryptionKey::staticMetaObject, parent)
 {
   // pass...
 }

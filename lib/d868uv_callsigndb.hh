@@ -30,10 +30,10 @@ public:
    * number, call-type etc. All strings, that is contact name, city, callsign, state, country and
    * comment are 0x00 terminated strings in a lists.
    *
-   * Max lenghth for name is 16, city is 16, callsign is 8, state is 16, country is 16 and
+   * Max length for name is 16, city is 16, callsign is 8, state is 16, country is 16 and
    * comment is 16, excluding terminating 0x00.
    *
-   * Memmory layout of encoded Callsign/User database entry (variable size, min 0x000c-0x0064):
+   * Memory layout of encoded Callsign/User database entry (variable size, min 0x000c-0x0064):
    * @verbinclude d868uv_callsigndbentry.txt
    */
   class EntryElement: public Codeplug::Element
@@ -78,7 +78,7 @@ public:
 
   /** Stores some basic limits of the callsign db.
    *
-   * Memmory layout of encoded Callsign/User database entry (size 0x0010 bytes):
+   * Memory layout of encoded Callsign/User database entry (size 0x0010 bytes):
    * @verbinclude d868uv_callsigndblimit.txt */
   class LimitsElement: public Codeplug::Element
   {
@@ -93,12 +93,12 @@ public:
     /** Resets the limits. */
     void clear();
 
-    /** Retuns the number of entries in the DB. */
+    /** Returns the number of entries in the DB. */
     virtual unsigned count() const;
     /** Sets the number of entries. */
     virtual void setCount(unsigned count);
 
-    /** Retunrs the end-of-db address. */
+    /** Returns the end-of-db address. */
     virtual unsigned endOfDB() const;
     /** Sets the end-of-db address. */
     virtual void setEndOfDB(unsigned addr);
@@ -116,7 +116,8 @@ public:
   explicit D868UVCallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db, const Selection &selection=Selection());
+  bool encode(UserDatabase *db, const Selection &selection=Selection(),
+              const ErrorStack &err=ErrorStack());
 };
 
 #endif // D868UVCALLSIGNDB_HH

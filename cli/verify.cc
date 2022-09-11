@@ -9,8 +9,8 @@
 #include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
-#include "configreader.hh"
 #include "dfufile.hh"
+#include "radiolimits.hh"
 #include "rd5r.hh"
 #include "uv390.hh"
 #include "md2017.hh"
@@ -38,7 +38,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
 
   Config config;
 
-  // Determin type by ending or flag
+  // Determine type by ending or flag
   if (parser.isSet("csv") || (filename.endsWith(".conf") || filename.endsWith(".csv"))) {
     QTextStream stream(&file);
     QString errorMessage;
@@ -51,9 +51,10 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     logError() << "Verification of binary code-plugs makes no sense.";
     return -1;
   } else if (parser.isSet("yaml") || (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
-    ConfigReader reader;
-    if (! reader.read(&config, filename)) {
-      logError() << "Cannot read config file '" << filename << ": " << reader.errorMessage();
+    ErrorStack err;
+    if (! config.readYAML(filename,err)) {
+      logError() << "Cannot read codeplug file '" << filename
+                 << "': " << err.format();
       return -1;
     }
   } else {
@@ -67,45 +68,47 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     return 0;
   }
 
-  QList<VerifyIssue> issues;
+  RadioLimitContext ctx;
   QString radio = parser.value("radio").toLower();
   if ("rd5r" == radio) {
-    RD5R radio; radio.verifyConfig(&config, issues);
+    RD5R radio; radio.limits().verifyConfig(&config, ctx);
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
-    UV390 radio; radio.verifyConfig(&config, issues);
+    UV390 radio; radio.limits().verifyConfig(&config, ctx);
   } else if (("md2017" == radio) || ("rt82" == radio)) {
-    MD2017 radio; radio.verifyConfig(&config, issues);
+    MD2017 radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("gd77" == radio) {
-    GD77 radio; radio.verifyConfig(&config, issues);
+    GD77 radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("opengd77" == radio) {
-    OpenGD77 radio; radio.verifyConfig(&config, issues);
+    OpenGD77 radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("d868uv" == radio) {
-    D868UV radio; radio.verifyConfig(&config, issues);
+    D868UV radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("d878uv" == radio) {
-    D878UV radio; radio.verifyConfig(&config, issues);
+    D878UV radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("d878uv2" == radio) {
-    D878UV2 radio; radio.verifyConfig(&config, issues);
+    D878UV2 radio; radio.limits().verifyConfig(&config, ctx);
   } else if ("d578uv" == radio) {
-    D578UV radio; radio.verifyConfig(&config, issues);
+    D578UV radio; radio.limits().verifyConfig(&config, ctx);
   } else {
     logError() << "Cannot verify code-plug against unknown radio '" << radio << "'.";
     return -1;
   }
 
   bool valid = true;
-  if (0 == issues.size()) {
-    logInfo() << "No issues found for code-plug '" << filename
-              << "' with radio '" << radio << "'.";
-  } else {
-    logInfo() << "Some issues found for code-plug '" << filename
-              << "' with radio '" << radio << "'.";
-    foreach (const VerifyIssue &issue, issues) {
-      if (VerifyIssue::WARNING == issue.type()) {
-        logWarn() << issue.message();
-      } else if (VerifyIssue::ERROR == issue.type()) {
-        logError() << issue.message();
-        valid = false;
-      }
+  for (int i=0; i<ctx.count(); i++) {
+    switch (ctx.message(i).severity()) {
+    case RadioLimitIssue::Silent:
+      logDebug() << ctx.message(i).format();
+      break;
+    case RadioLimitIssue::Hint:
+      logInfo() << ctx.message(i).format();
+      break;
+    case RadioLimitIssue::Warning:
+      logWarn() << ctx.message(i).format();
+      break;
+    case RadioLimitIssue::Critical:
+      logError() << ctx.message(i).format();
+      valid = false;
+      break;
     }
   }
 

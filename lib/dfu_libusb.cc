@@ -34,37 +34,90 @@ enum {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DFUDevice::Descriptor
+ * ********************************************************************************************* */
+DFUDevice::Descriptor::Descriptor(const USBDeviceInfo &info, uint8_t bus, uint8_t device)
+  : USBDeviceDescriptor(info, USBDeviceHandle(bus, device))
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DFUDevice
  * ********************************************************************************************* */
-DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
+DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
   : QObject(parent), _ctx(nullptr), _dev(nullptr)
 {
-  logDebug() << "Try to detect USB DFU interface " << QString::number(vid,16)
-             << ":" << QString::number(pid,16) << ".";
-
-  int error = libusb_init(&_ctx);
-  if (error < 0) {
-    _errorMessage = tr("%1 Libusb init failed: %2 %3").arg(__func__).arg(error)
-        .arg(libusb_strerror((enum libusb_error) error));
+  if (USBDeviceInfo::Class::DFU != descr.interfaceClass()) {
+    errMsg(err) << "Cannot connect to DFU device using a non DFU descriptor: "
+                << descr.description() << ".";
     return;
   }
 
-  if (! (_dev = libusb_open_device_with_vid_pid(_ctx, vid, pid))) {
-    _errorMessage = tr("%1 Cannot open device %2, %3: %4 %5").arg(__func__).arg(vid,0,16).arg(pid,0,16)
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+  int error = libusb_init(&_ctx);
+  if (error < 0) {
+    errMsg(err) << "Libusb init failed (" << error << "): "
+                << libusb_strerror((enum libusb_error) error) << ".";
+    return;
+  }
+
+  int num=0;
+  libusb_device **lst;
+  libusb_device *dev=nullptr;
+  if (0 > (num = libusb_get_device_list(_ctx, &lst))) {
+    errMsg(err) << "Cannot obtain list of USB devices.";
     libusb_exit(_ctx);
     _ctx = nullptr;
     return;
   }
 
+  logDebug() << "Try to detect USB DFU interface " << descr.description() << ".";
+  USBDeviceHandle addr = descr.device().value<USBDeviceHandle>();
+  for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
+    if (addr.bus != libusb_get_bus_number(lst[i]))
+      continue;
+    if (addr.device != libusb_get_device_address(lst[i]))
+      continue;
+    libusb_device_descriptor usb_descr;
+    if (0 > libusb_get_device_descriptor(lst[i],&usb_descr))
+      continue;
+    if (descr.vendorId() != usb_descr.idVendor)
+      continue;
+    if (descr.productId() != usb_descr.idProduct)
+      continue;
+    logDebug() << "Matching device found at bus " << addr.bus << ", device " << addr.device
+               << " with vendor ID " << QString::number(usb_descr.idVendor, 16)
+               << " and product ID " << QString::number(usb_descr.idProduct, 16) << ".";
+    libusb_ref_device(lst[i]); dev = lst[i];
+  }
+  // Unref all devices and free list, matching device was referenced earlier
+  libusb_free_device_list(lst, 1);
+
+  if (nullptr == dev) {
+    errMsg(err) << "No matching device found: " << descr.description() << ".";
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+    return;
+  }
+
+  if (0 > (error = libusb_open(dev, &_dev))) {
+    errMsg(err) << "Cannot open device " << descr.description()
+                << ": " << libusb_strerror((enum libusb_error) error) << ".";
+    libusb_unref_device(dev);
+    libusb_exit(_ctx);
+    _ctx = nullptr;
+  }
+
+
   if (libusb_kernel_driver_active(_dev, 0) && libusb_detach_kernel_driver(_dev, 0)) {
-    logWarn() << tr("Cannot detatch kernel driver for device %1:%2. "
-                    "Interface claim will likely fail.").arg(vid,0,16).arg(pid,0,16);
+    errMsg(err) << "Cannot detach kernel driver for device " << descr.description()
+                << ". Interface claim will likely fail.";
   }
 
   if (0 > (error = libusb_claim_interface(_dev, 0))) {
-    _errorMessage = tr("%1 Failed to claim USB interface: %2 %3").arg(__func__).arg(error)
-        .arg(libusb_strerror((enum libusb_error) error));
+    errMsg(err) << "Failed to claim USB interface "  << descr.description()
+                << ": " << libusb_strerror((enum libusb_error) error) << ".";
     libusb_close(_dev);
     _dev = nullptr;
     libusb_exit(_ctx);
@@ -72,13 +125,52 @@ DFUDevice::DFUDevice(unsigned vid, unsigned pid, QObject *parent)
     return;
   }
 
-  logDebug() << "Connected to DFU device " << QString::number(vid,16)
-             << ":" << QString::number(pid,16) << ".";
+  logDebug() << "Connected to DFU device " << descr.description() << ".";
 }
-
 
 DFUDevice::~DFUDevice() {
   close();
+}
+
+QList<USBDeviceDescriptor>
+DFUDevice::detect(uint16_t vid, uint16_t pid)
+{
+  QList<USBDeviceDescriptor> res;
+
+  int error, num;
+  libusb_context *ctx;
+  if (0 > (error = libusb_init(&ctx))) {
+    logError() << "Libusb init failed (" << error << "): "
+               << libusb_strerror((enum libusb_error) error) << ".";
+    return res;
+  }
+
+  libusb_device **lst;
+  if (0 == (num = libusb_get_device_list(ctx, &lst))) {
+    logDebug() << "No USB devices found at all.";
+    // unref devices and free list
+    libusb_free_device_list(lst, 1);
+    return res;
+  }
+
+  logDebug() << "Search for DFU devices matching VID:PID "
+             << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
+  for (int i=0; (i<num)&&(nullptr!=lst[i]); i++) {
+    libusb_device_descriptor descr;
+    libusb_get_device_descriptor(lst[i], &descr);
+    if ((vid == descr.idVendor) && (pid == descr.idProduct)) {
+      logDebug() << "Found device on bus=" << libusb_get_bus_number(lst[i])
+                 << ", device=" << libusb_get_device_address(lst[i])
+                 << " with " << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ".";
+      res.append(DFUDevice::Descriptor(
+                   USBDeviceInfo(USBDeviceInfo::Class::DFU, vid, pid),
+                   libusb_get_bus_number(lst[i]),
+                   libusb_get_device_address(lst[i])));
+    }
+  }
+
+  libusb_free_device_list(lst, 1);
+  return res;
 }
 
 bool
@@ -98,110 +190,104 @@ DFUDevice::close() {
   _dev = nullptr;
 }
 
-const QString &
-DFUDevice::errorMessage() const {
-  return _errorMessage;
-}
-
 
 int
-DFUDevice::download(unsigned block, uint8_t *data, unsigned len) {
+DFUDevice::download(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err) {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DNLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    _errorMessage = tr("Cannot write to device: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-    return 1;
+    errMsg(err) << "Cannot write to device: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
   }
 
   return get_status();
 }
 
 int
-DFUDevice::upload(unsigned block, uint8_t *data, unsigned len) {
+DFUDevice::upload(unsigned block, uint8_t *data, unsigned len, const ErrorStack &err) {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_UPLOAD, block, 0, data, len, 0);
 
   if (error < 0) {
-    _errorMessage = tr("Cannot read block: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-    return false;
+    errMsg(err) << "Cannot read block: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
   }
 
   return get_status();
 }
 
 int
-DFUDevice::detach(int timeout)
+DFUDevice::detach(int timeout, const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_DETACH, timeout, 0, nullptr, 0, 0);
-  if (0 > error)
-    _errorMessage = tr("Cannot detatch device: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-  return error;
-}
-
-int
-DFUDevice::get_status()
-{
-  int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
   if (0 > error) {
-    _errorMessage = tr("Cannot get status: %1 %2. Recv: %3, %4, %5, %6")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error))
-        .arg(_status.status).arg(_status.poll_timeout).arg(_status.state)
-        .arg(_status.string_index);
+    errMsg(err) << "Cannot detach device: " << libusb_strerror((enum libusb_error) error) << ".";
     return error;
   }
   return 0;
 }
 
 int
-DFUDevice::clear_status()
+DFUDevice::get_status(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
-        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
-  if (0 > error)
-    _errorMessage = tr("Cannot clear status: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+        _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATUS, 0, 0, (unsigned char*)&_status, 6, 0);
+  if (0 > error) {
+    errMsg(err) << "Cannot get status: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
+  }
   return 0;
 }
 
 int
-DFUDevice::get_state(int &pstate)
+DFUDevice::clear_status(const ErrorStack &err)
+{
+  int error = libusb_control_transfer(
+        _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_CLRSTATUS, 0, 0, NULL, 0, 0);
+  if (0 > error) {
+    errMsg(err) << "Cannot clear status: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
+  }
+  return 0;
+}
+
+int
+DFUDevice::get_state(int &pstate, const ErrorStack &err)
 {
   unsigned char state;
 
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_HOST, REQUEST_GETSTATE, 0, 0, &state, 1, 0);
   pstate = state;
-  if (error < 0)
-    _errorMessage = tr("Cannot get state: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
+  if (error < 0) {
+    errMsg(err) << "Cannot get state: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
+  }
   return 0;
 }
 
 int
-DFUDevice::abort()
+DFUDevice::abort(const ErrorStack &err)
 {
   int error = libusb_control_transfer(
         _dev, REQUEST_TYPE_TO_DEVICE, REQUEST_ABORT, 0, 0, NULL, 0, 0);
-  if (error < 0)
-    _errorMessage = tr("Cannot abort: %1 %2")
-        .arg(error).arg(libusb_strerror((enum libusb_error) error));
-  return error;
+  if (error < 0) {
+    errMsg(err) << "Cannot abort: " << libusb_strerror((enum libusb_error) error) << ".";
+    return error;
+  }
+  return 0;
 }
 
 
 int
-DFUDevice::wait_idle()
+DFUDevice::wait_idle(const ErrorStack &err)
 {
   int state, error;
 
   for (;;) {
-    if (0 > (error = get_state(state)))
+    if (0 > (error = get_state(state, err)))
       return 1;
 
     switch (state) {
@@ -209,11 +295,11 @@ DFUDevice::wait_idle()
         return 0;
 
       case appIDLE:
-        error = detach(1000);
+        error = detach(1000, err);
         break;
 
       case dfuERROR:
-        error = clear_status();
+        error = clear_status(err);
         break;
 
       case appDETACH:
@@ -223,7 +309,7 @@ DFUDevice::wait_idle()
         continue;
 
       default:
-        error = abort();
+        error = abort(err);
         break;
     }
 
@@ -236,8 +322,8 @@ DFUDevice::wait_idle()
 /* ********************************************************************************************* *
  * Implementation of DFUSEDevice
  * ********************************************************************************************* */
-DFUSEDevice::DFUSEDevice(unsigned vid, unsigned pid, uint16_t blocksize, QObject *parent)
-  : DFUDevice(vid, pid, parent), _blocksize(blocksize)
+DFUSEDevice::DFUSEDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, uint16_t blocksize, QObject *parent)
+  : DFUDevice(descr, err, parent), _blocksize(blocksize)
 {
   // pass...
 }
@@ -254,93 +340,95 @@ DFUSEDevice::blocksize() const {
 }
 
 bool
-DFUSEDevice::setAddress(uint32_t address) {
+DFUSEDevice::setAddress(uint32_t address, const ErrorStack &err) {
   uint8_t cmd[5] ={
     0x21, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
   };
 
-  if (int error = download(0, cmd, 5)) {
-    _errorMessage = tr("Cannot set address to %1: %2").arg(address, 0, 16).arg(_errorMessage);
+  if (int error = download(0, cmd, 5, err)) {
+    errMsg(err) << "Cannot set address to " << QString::number(address, 16) << ".";
     return error;
   }
 
-  if (wait_idle()) {
-    _errorMessage = tr("Set address command failed: %1").arg(_errorMessage);
+  if (wait_idle(err)) {
+    errMsg(err) << "Set address command failed.";
     return false;
   }
   return true;
 }
 
 bool
-DFUSEDevice::readBlock(unsigned block, uint8_t *data) {
-  return 0 == upload(block+2, data, _blocksize);
+DFUSEDevice::readBlock(unsigned block, uint8_t *data, const ErrorStack &err) {
+  return 0 == upload(block+2, data, _blocksize, err);
 }
 
 bool
-DFUSEDevice::writeBlock(unsigned block, const uint8_t *data) {
-  if(download(block+2, (uint8_t *)data, _blocksize))
+DFUSEDevice::writeBlock(unsigned block, const uint8_t *data, const ErrorStack &err) {
+  if (download(block+2, (uint8_t *)data, _blocksize, err)) {
     return false;
+  }
 
-  if (wait_idle())
+  if (wait_idle(err)) {
     return false;
+  }
 
   return true;
 }
 
 bool
-DFUSEDevice::erasePage(uint32_t address) {
+DFUSEDevice::erasePage(uint32_t address, const ErrorStack &err) {
   uint8_t cmd[5] ={
     0x41, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
   };
 
-  if (int error = download(0, cmd, 5)) {
-    _errorMessage = tr("Cannot erase page at address %1: %2").arg(address, 0, 16).arg(_errorMessage);
+  if (int error = download(0, cmd, 5, err)) {
+    errMsg(err) << "Cannot erase page at address " << QString::number(address, 16) << ".";
     return error;
   }
 
-  if (wait_idle()) {
-    _errorMessage = tr("Erase page command failed: %1").arg(_errorMessage);
+  if (wait_idle(err)) {
+    errMsg(err) << "Erase page command failed.";
     return false;
   }
   return true;
 }
 
 bool
-DFUSEDevice::eraseAll() {
+DFUSEDevice::eraseAll(const ErrorStack &err) {
   uint8_t cmd[1] ={0x41};
 
-  if (int error = download(0, cmd, 1)) {
-    _errorMessage = tr("Cannot erase entire memory: %1").arg(_errorMessage);
+  if (int error = download(0, cmd, 1, err)) {
+    errMsg(err) << "Cannot erase entire memory.";
     return error;
   }
 
-  if (wait_idle()) {
-    _errorMessage = tr("Erase memory command failed: %1").arg(_errorMessage);
+  if (wait_idle(err)) {
+    errMsg(err) << "Erase memory command failed.";
     return false;
   }
   return true;
 }
 
 bool
-DFUSEDevice::releaseReadLock() {
+DFUSEDevice::releaseReadLock(const ErrorStack &err) {
   uint8_t cmd[1] ={0x92};
 
-  if (int error = download(0, cmd, 1)) {
-    _errorMessage = tr("Cannot unlock memory: %1").arg(_errorMessage);
+  if (int error = download(0, cmd, 1, err)) {
+    errMsg(err) << "Cannot unlock memory.";
     return error;
   }
 
-  if (wait_idle()) {
-    _errorMessage = tr("Unlock memory command failed: %1").arg(_errorMessage);
+  if (wait_idle(err)) {
+    errMsg(err) << "Unlock memory command failed.";
     return false;
   }
   return true;
 }
 
 bool
-DFUSEDevice::leaveDFU() {
+DFUSEDevice::leaveDFU(const ErrorStack &err) {
   if (int error = download(0, nullptr, 0)) {
-    _errorMessage = tr("Cannot leave DFU mode: %1").arg(_errorMessage);
+    errMsg(err) << "Cannot leave DFU mode.";
     return error;
   }
 

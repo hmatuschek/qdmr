@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extTyTRadioSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Radio settings extension</title>  
+</info>
+
+<para>
+  This extension allows to set the device-specific general settings for TyT/Retevis radios. It 
+  extends the <token>settings</token> section of the codeplug. 
+</para>
+
+<example>
+  <title>TyT radio settings extension showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  tyt:
+    montitorType: Open
+    allLEDsDisabled: false
+    talkPermitToneDigital: false
+    talkPermitToneAnalog: false
+    passwordAndLock: false
+    channelFreeIndicationTone: true
+    allTonesDisabled: false
+    powerSaveMode: true
+    wakeupPreamble: true
+    bootPicture: true
+    channelMode: true
+    channelModeA: true
+    channelModeB: true
+    txPreambleDuration: 600
+    channelHangTime: 3000
+    groupCallHangTime: 3000
+    privateCallHangTime: 3000
+    lowBatteryWarnInterval: 120
+    callAlertToneContinuous: false
+    callAlertToneDuration: 0
+    loneWorkerResponseTime: 1
+    loneWorkerReminderTime: 10
+    digitalScanHangTime: 1000
+    analogScanHangTime: 1000
+    backlightAlwaysOn: false
+    backlightDuration: 10
+    keypadLockManual: true
+    keypadLockTime: 60
+    powerOnPasswordEnabled: false
+    powerOnPassword: 0
+    radioProgPasswordEnabled: false
+    radioProgPassword: 0
+    pcProgPassword: null
+    privateCallMatch: true
+    groupCallMatch: true
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Radio settings fields</title>
+  <varlistentry>
+    <term><token>montitorType</token></term>
+    <listitem>
+      <para>
+        Specifies the monitor type. Possible values are <token>Open</token> and 
+        <token>Silent</token>. This setting only affects analog channels. If 
+        <token>Open</token> is specified, the squelch will open if monitoring
+        is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allLEDsDisabled</token></term>
+    <listitem>
+      <para>If enabled, all LEDs are disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>talkPermitToneDigital</token></term>
+    <listitem>
+      <para>If enabled, a talk-permit tone will sound on digital channels.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>talkPermitToneAnalog</token></term>
+    <listitem>
+      <para>If enabled, a talk-permit tone will sound on analog channels.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>passwordAndLock</token></term>
+    <listitem>
+      <para>Enables and disables the passwords and keypad locks globally. They can also be 
+        enabled/disabled individually below.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelFreeIndicationTone</token></term>
+    <listitem>
+      <para>If enabled, a tone will sound after a transmission has ended to indicate that the 
+        channel is free again.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allTonesDisabled</token></term>
+    <listitem>
+      <para>If enabled, all tones (talk permit, channel free, etc.) are disabled globally.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSaveMode</token></term>
+    <listitem>
+      <para>Puts the radio is a sleep mode when in idle state (no traffic on the channels). This 
+        allows for some power saving. However, the radio will need some time to wake up. 
+        Consequently, all other radios in the network need to transmit a wake-up preamble. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>wakeupPreamble</token></term>
+    <listitem>
+      <para>Enables the transmission of a short wake-up preamble allowing receiving radios to 
+        wake-up in time for the actual transmission. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootPicture</token></term>
+    <listitem>
+      <para>
+        If enabled, a picture is shown during boot rather than the boot text (see 
+        <token>introLine1</token> and <token>introLine2</token> in the general settings section).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelMode, channelModeA, channelModeB</token></term>
+    <listitem>
+      <para>
+        Controls the mode of the radio, VFO A and VFO B. If <token>channelMode</token>
+        is <token>true</token>, the entire radio operates in channel mode (memory mode). This also
+        overrides the <token>channelModeA</token> and <token>channelModeB</token> settings. If 
+        <token>channelMode</token> is set to <token>false</token>, the <token>channelModeA</token> 
+        and <token>channelModeB</token> specify the mode for the VFO A and B, respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txPreambleDuration</token></term>
+    <listitem>
+      <para>Specifies the transmit preamble duration in milliseconds. If this preamble is the 
+        wake-up preamble, is unknown. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelHangTime</token></term>
+    <listitem>
+      <para>
+        Specifies the channel hang time in milliseconds.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>groupCallHangTime</token></term>
+    <listitem>
+      <para>
+        Specifies the group-call hang time in milliseconds. This is the time a group call can be 
+        answered directly even if that group call is not the default contact of the channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallHangTime</token></term>
+    <listitem>
+      <para>
+        Specifies the private-call hang time in milliseconds. This is the time a private call can 
+        be answered directly even if that private call is not the default contact of the channel.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>lowBatteryWarnInterval</token></term>
+    <listitem>
+      <para>Specifies the period of the low-battery warn tone in seconds.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callAlertToneContinuous</token></term>
+    <listitem>
+      <para>If enabled, a call-alert tone will sound until the operator reacts. This setting 
+        overrides the <token>callAlertToneDuration</token> setting.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callAlertToneDuration</token></term>
+    <listitem>
+      <para>Specifies the call alert-tone duration in seconds. If 
+        <token>callAlertToneContinuous</token> is enabled, the alert tone will be continuous 
+        irrespective of this setting. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerResponseTime</token></term>
+    <listitem>
+      <para>Sets the lone-worker response time in minutes.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerReminderTime</token></term>
+    <listitem>
+      <para>Sets the lone-worker reminder time in minutes.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>digitalScanHangTime</token></term>
+    <listitem>
+      <para>Specifies the time in milliseconds, the radio will continue monitoring a digital 
+        channel after the transmission on that channel ended. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>analogScanHangTime</token></term>
+    <listitem>
+      <para>Specifies the time in milliseconds, the radio will continue monitoring an analog
+        channel after the transmission on that channel ended. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlightAlwaysOn</token></term>
+    <listitem>
+      <para>If enabled, the backlight will stay on.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlightDuration</token></term>
+    <listitem>
+      <para>Specifies the backlight duration in seconds.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keypadLockManual</token></term>
+    <listitem>
+      <para>If enabled, the keypad lock is enabled manually. If not, the keypad lock gets enabled 
+        automatically after a specified period (see <token>keypadLockTime</token>). </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keypadLockTime</token></term>
+    <listitem>
+      <para>Specifies the time, after which the keypad lock is engaged automatically unless 
+        <token>keypadLockManual</token> is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerOnPasswordEnabled</token></term>
+    <listitem>
+      <para>Enables the power-on password. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerOnPassword</token></term>
+    <listitem>
+      <para>Specifies the power-on password. An 8-digit number. This password must then be entered 
+        when booting the radio.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>radioProgPasswordEnabled</token></term>
+    <listitem>
+      <para>Enables the radio-programming password.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>radioProgPassword</token></term>
+    <listitem>
+      <para>Sets the radio-programming password. An 8-digit number. This password must then be 
+        entered when making any changes to the radio/channel settings through the keypad. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>pcProgPassword</token></term>
+    <listitem>
+      <para>Specifies the PC programming password. This password is then needed when programming 
+        the radio through the CPS. An empty string disables this password. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallMatch</token>, <token>groupCallMatch</token></term>
+    <listitem>
+      <para>If <token>true</token>, the private and group call IDs must match.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</section>

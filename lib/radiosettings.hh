@@ -3,10 +3,13 @@
 
 #include "configobject.hh"
 #include "channel.hh"
+#include "tyt_extensions.hh"
+#include "radioddity_extensions.hh"
+
 
 /** Represents the common radio-global settings.
  * @ingroup conf */
-class RadioSettings : public ConfigObject
+class RadioSettings : public ConfigItem
 {
   Q_OBJECT
   /** The first intro line. */
@@ -26,9 +29,17 @@ class RadioSettings : public ConfigObject
   /** The default transmit timeout */
   Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
 
+  /** The settings extension for TyT devices. */
+  Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
+  /** The settings extension for Radioddity devices. */
+  Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
+
 public:
   /** Default constructor. */
   explicit RadioSettings(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Resets the settings. */
   void clear();
@@ -63,7 +74,7 @@ public:
   /** Sets the default channel power. */
   void setPower(Channel::Power power);
 
-  /** Retuns @c true if VOX is disabled by default. */
+  /** Returns @c true if VOX is disabled by default. */
   bool voxDisabled() const;
   /** Returns the default VOX level [0-10], 0=disabled. */
   unsigned vox() const;
@@ -80,6 +91,20 @@ public:
   void setTOT(unsigned sec);
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
+
+  /** Returns the TyT device specific radio settings. */
+  TyTSettingsExtension *tytExtension() const;
+  /** Sets the TyT device specific radio settings. */
+  void setTyTExtension(TyTSettingsExtension *ext);
+
+  /** Returns the Radioddity device specific radio settings. */
+  RadiodditySettingsExtension *radioddityExtension() const;
+  /** Sets the Radioddity device specific radio settings. */
+  void setRadioddityExtension(RadiodditySettingsExtension *ext);
+
+protected slots:
+  /** Internal used callback whenever an extension is modified. */
+  void onExtensionModified();
 
 protected:
   /** Holds the first intro line. */
@@ -98,6 +123,10 @@ protected:
   unsigned _vox;
   /** Holds the global transmit timeout. */
   unsigned _transmitTimeOut;
+  /** Device specific settings extension for TyT devices. */
+  TyTSettingsExtension *_tytExtension;
+  /** Device specific settings extension for Radioddity devices. */
+  RadiodditySettingsExtension *_radioddityExtension;
 };
 
 #endif // RADIOCONFIG_HH

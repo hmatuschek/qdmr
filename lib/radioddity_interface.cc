@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include "logger.hh"
 
+#define USB_VID 0x15a2
+#define USB_PID 0x0073
+#define MAX_RETRY 10
+
 static const unsigned char CMD_PRG[]   = "\2PROGRA";
 static const unsigned char CMD_PRG2[]  = "M\2";
 static const unsigned char CMD_ACK[]   = "A";
@@ -17,8 +21,8 @@ static const unsigned char CMD_CWB1[]  = "CWB\4\0\1\0\0";
 static const unsigned char CMD_CWB3[]  = "CWB\4\0\3\0\0";
 static const unsigned char CMD_CWB4[]  = "CWB\4\0\4\0\0";
 
-RadioddityInterface::RadioddityInterface(int vid, int pid, QObject *parent)
-  : HIDevice(vid, pid, parent), _current_bank(MEMBANK_NONE), _identifier()
+RadioddityInterface::RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
+  : HIDevice(descr, err, parent), _current_bank(MEMBANK_NONE), _identifier()
 {
   if (isOpen())
     identifier();
@@ -29,6 +33,15 @@ RadioddityInterface::~RadioddityInterface() {
     close();
 }
 
+USBDeviceInfo
+RadioddityInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::HID, USB_VID, USB_PID);
+}
+
+QList<USBDeviceDescriptor>
+RadioddityInterface::detect() {
+  return HIDevice::detect(USB_VID, USB_PID);
+}
 
 bool
 RadioddityInterface::isOpen() const {
@@ -43,7 +56,7 @@ RadioddityInterface::close() {
 }
 
 RadioInfo
-RadioddityInterface::identifier() {
+RadioddityInterface::identifier(const ErrorStack &err) {
   static unsigned char reply[38];
   unsigned char ack;
 
@@ -52,35 +65,30 @@ RadioddityInterface::identifier() {
 
   logDebug() << "Radioddity HID interface: Enter program mode.";
 
-  if (! hid_send_recv(CMD_PRG, 7, &ack, 1)) {
-    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+  if (! hid_send_recv(CMD_PRG, 7, &ack, 1, err)) {
+    errMsg(err) << "Cannot identify radio.";
     return RadioInfo();
   }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("Cannot identify radio: Wrong PRD acknowledge %1, expected %2.")
-        .arg(ack,0,10).arg(CMD_ACK[0], 0, 16);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot identify radio: Wrong PRD acknowledge " << (int)ack <<
+                ", expected "<< int(CMD_ACK[0]) << ".";
     return RadioInfo();
   }
 
-  if (! hid_send_recv(CMD_PRG2, 2, reply, 16)) {
-    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+  if (! hid_send_recv(CMD_PRG2, 2, reply, 16, err)) {
+    errMsg(err) << "Cannot identify radio.";
     return RadioInfo();
   }
 
-  if (! hid_send_recv(CMD_ACK, 1, &ack, 1)) {
-    _errorMessage = tr("Cannot identify radio: %1").arg(_errorMessage);
-    logError() << _errorMessage;
+  if (! hid_send_recv(CMD_ACK, 1, &ack, 1, err)) {
+    errMsg(err) << "Cannot identify radio.";
     return RadioInfo();
   }
 
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("Cannot identify radio: Wrong PRG2 acknowledge %1, expected %2.")
-        .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot identify radio: Wrong PRG2 acknowledge "
+                << (int) ack << ", expected " << (int)CMD_ACK[0] << ".";
     return RadioInfo();
   }
 
@@ -98,7 +106,7 @@ RadioddityInterface::identifier() {
   } else if (0 == strcmp((char*)reply, "MD-760P")) {
     _identifier = RadioInfo::byID(RadioInfo::GD77);
   } else {
-    logError() << "Unknown Radioddity device '" << (char*)reply << "'.";
+    errMsg(err) << "Unknown Radioddity device '" << (char*)reply << "'.";
     return RadioInfo();
   }
 
@@ -108,9 +116,11 @@ RadioddityInterface::identifier() {
 
 
 bool
-RadioddityInterface::read_start(uint32_t bank, uint32_t addr) {
-  if (! selectMemoryBank(MemoryBank(bank))) {
-    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+RadioddityInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
+  Q_UNUSED(addr)
+
+  if (! selectMemoryBank(MemoryBank(bank), err)) {
+    errMsg(err) << "Cannot select memory bank " << bank << ".";
     return false;
   }
 
@@ -118,13 +128,13 @@ RadioddityInterface::read_start(uint32_t bank, uint32_t addr) {
 }
 
 bool
-RadioddityInterface::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
+RadioddityInterface::read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes, const ErrorStack &err)
 {
   unsigned char cmd[4], reply[32+4];
   int n;
 
-  if (! selectMemoryBank(MemoryBank(bank))) {
-    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+  if (! selectMemoryBank(MemoryBank(bank), err)) {
+    errMsg(err) << "Cannot select memory bank " << bank << ".";
     return false;
   }
 
@@ -134,7 +144,7 @@ RadioddityInterface::read(uint32_t bank, uint32_t addr, unsigned char *data, int
     cmd[1] = (addr + n) >> 8;
     cmd[2] = addr + n;
     cmd[3] = 32;
-    if (! hid_send_recv(cmd, 4, reply, sizeof(reply)))
+    if (! hid_send_recv(cmd, 4, reply, sizeof(reply), err))
       return false;
     else
       memcpy(data + n, reply + 4, 32);
@@ -144,17 +154,17 @@ RadioddityInterface::read(uint32_t bank, uint32_t addr, unsigned char *data, int
 }
 
 bool
-RadioddityInterface::read_finish()
+RadioddityInterface::read_finish(const ErrorStack &err)
 {
   unsigned char ack;
 
-  if (! hid_send_recv(CMD_ENDR, 4, &ack, 1)) {
-    _errorMessage = tr("%1: Cannot finish read(): %2").arg(__func__).arg(_errorMessage);
+  if (! hid_send_recv(CMD_ENDR, 4, &ack, 1, err)) {
+    errMsg(err) << "Cannot finish read().";
     return false;
   }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Cannot finish read(): Wrong acknowledge %2, expected %3.")
-        .arg(__func__).arg(ack).arg(CMD_ACK[0]);
+    errMsg(err) << "Cannot finish read(): Wrong acknowledge "
+                << (int)ack << ", expected " << (int)CMD_ACK[0] << ".";
     return false;
   }
 
@@ -167,9 +177,11 @@ RadioddityInterface::read_finish()
 
 
 bool
-RadioddityInterface::write_start(uint32_t bank, uint32_t addr) {
-  if (! selectMemoryBank(MemoryBank(bank))) {
-    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+RadioddityInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
+  Q_UNUSED(addr)
+
+  if (! selectMemoryBank(MemoryBank(bank), err)) {
+    errMsg(err) << "Cannot select memory bank " << bank << ".";
     return false;
   }
 
@@ -177,28 +189,36 @@ RadioddityInterface::write_start(uint32_t bank, uint32_t addr) {
 }
 
 bool
-RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes)
+RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes, const ErrorStack &err)
 {
   unsigned char ack, cmd[4+32];
 
-  if (! selectMemoryBank(MemoryBank(bank))) {
-    _errorMessage = tr("Cannot select memory bank %1: %2").arg(bank).arg(_errorMessage);
+  if (! selectMemoryBank(MemoryBank(bank), err)) {
+    errMsg(err) << "Cannot select memory bank " << bank << ".";
     return false;
   }
 
   // send data
+  unsigned int count=0;
   for (int n=0; n<nbytes; n+=32) {
     cmd[0] = CMD_WRITE[0];
     cmd[1] = (addr + n) >> 8;
     cmd[2] = addr + n;
     cmd[3] = 32;
     memcpy(cmd + 4, data + n, 32);
-    if (! hid_send_recv(cmd, 4+32, &ack, 1))
+    if (! hid_send_recv(cmd, 4+32, &ack, 1, err))
       return false;
     else if (ack != CMD_ACK[0]) {
-      _errorMessage = tr("%1: Cannot write block: Wrong acknowledge %2, expected %3.")
-          .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+      errMsg(err) << "Cannot write block: Wrong acknowledge " << (int)ack
+                  << ", expected " << (int)CMD_ACK[0] << ".";
       n-=32;
+
+      if ((++count) > MAX_RETRY) {
+        errMsg(err) << "Maximum retry count reached. Abort.";
+        return false;
+      }
+    } else {
+      count = 0;
     }
   }
 
@@ -206,17 +226,17 @@ RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, in
 }
 
 bool
-RadioddityInterface::write_finish()
+RadioddityInterface::write_finish(const ErrorStack &err)
 {
   unsigned char ack;
 
-  if (! hid_send_recv(CMD_ENDW, 4, &ack, 1)) {
-    _errorMessage = tr("%1: Cannot finish write(): %2").arg(__func__).arg(_errorMessage);
+  if (! hid_send_recv(CMD_ENDW, 4, &ack, 1, err)) {
+    errMsg(err) << "Cannot finish write().";
     return false;
   }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("%1: Cannot finish write(): Wrong acknowledge %2, expected %3.")
-        .arg(__func__).arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    errMsg(err) << "Cannot finish write(): Wrong acknowledge "
+                << (int)ack << ", expected " << (int)CMD_ACK[0] << ".";
     return false;
   }
 
@@ -227,7 +247,7 @@ RadioddityInterface::write_finish()
 }
 
 bool
-RadioddityInterface::selectMemoryBank(MemoryBank bank) {
+RadioddityInterface::selectMemoryBank(MemoryBank bank, const ErrorStack &err) {
   unsigned char ack;
   const uint8_t *cmd = nullptr;
 
@@ -241,20 +261,20 @@ RadioddityInterface::selectMemoryBank(MemoryBank bank) {
   case MEMBANK_CALLSIGN_LOWER : cmd = CMD_CWB3; break;
   case MEMBANK_CALLSIGN_UPPER : cmd = CMD_CWB4; break;
   default:
-    _errorMessage = tr("Cannot set memory bank: Unknown bank %1").arg(bank);
+    errMsg(err) << "Cannot set memory bank: Unknown bank " << bank << ".";
     return false;
   }
 
   logDebug() << "Selecting memory bank " << bank << "...";
 
   // select memory bank
-  if (! hid_send_recv(cmd, 8, &ack, 1)) {
-    _errorMessage = tr("Cannot send command: %1").arg(_errorMessage);
+  if (! hid_send_recv(cmd, 8, &ack, 1, err)) {
+    errMsg(err) << "Cannot send memory bank select command.";
     return false;
   }
   if (ack != CMD_ACK[0]) {
-    _errorMessage = tr("Cannot select memory bank: Wrong acknowledge %1, expected %2.")
-        .arg(ack, 0, 16).arg(CMD_ACK[0], 0, 16);
+    errMsg(err) << "Cannot select memory bank: Wrong acknowledge "
+                << (int)ack << ", expected " << (int)CMD_ACK[0] << ".";
     return false;
   }
 

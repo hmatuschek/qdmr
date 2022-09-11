@@ -1,5 +1,7 @@
 #include "aprssystemdialog.hh"
 #include "ui_aprssystemdialog.h"
+#include "settings.hh"
+
 
 static QVector<QPair<APRSSystem::Icon, QString>> aprsIconTable{
   {APRSSystem::Icon::None, QObject::tr("[None]")},
@@ -94,16 +96,22 @@ static QVector<QPair<APRSSystem::Icon, QString>> aprsIconTable{
 
 
 APRSSystemDialog::APRSSystemDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _aprs(nullptr), ui(new Ui::aprssystemdialog),
-    _icons0(":/icons/aprs/table0.png")
+  : QDialog(parent), _config(config), _myAPRS(new APRSSystem()), _aprs(nullptr),
+    ui(new Ui::aprssystemdialog), _icons0(":/icons/aprs/table0.png")
 {
+  setWindowTitle(tr("Create APRS system"));
   construct();
 }
 
 APRSSystemDialog::APRSSystemDialog(Config *config, APRSSystem *aprs, QWidget *parent)
-  : QDialog(parent), _config(config), _aprs(aprs), ui(new Ui::aprssystemdialog),
-    _icons0(":/icons/aprs/table0.png")
+  : QDialog(parent), _config(config), _myAPRS(new APRSSystem()), _aprs(aprs),
+    ui(new Ui::aprssystemdialog), _icons0(":/icons/aprs/table0.png")
 {
+  setWindowTitle(tr("Edit APRS system"));
+
+  if (_aprs)
+    _myAPRS->copy(*_aprs);
+
   construct();
 }
 
@@ -116,10 +124,10 @@ void
 APRSSystemDialog::construct() {
   // Construct UI
   ui->setupUi(this);
+  Settings settings;
 
   // Setup name
-  if (_aprs)
-    ui->name->setText(_aprs->name());
+  ui->name->setText(_myAPRS->name());
 
   // Setup analog channels
   for (int i=0, j=0; i<_config->channelList()->count(); i++) {
@@ -127,67 +135,53 @@ APRSSystemDialog::construct() {
       continue;
     AnalogChannel *ch = _config->channelList()->channel(i)->as<AnalogChannel>();
     ui->channel->addItem(ch->name(), QVariant::fromValue(ch));
-    if (_aprs && (_aprs->revertChannel() == ch))
+    if (_myAPRS->revertChannel() == ch)
       ui->channel->setCurrentIndex(j);
     j++;
   }
 
-  // Setup source
-  if (_aprs) {
-    ui->source->setText(_aprs->source());
-    ui->srcSSID->setValue(_aprs->srcSSID());
-  } else if (_config->radioIDs()->defaultId()) {
-    ui->source->setText(_config->radioIDs()->defaultId()->name());
-  }
-
-  // Setup dest
-  if (_aprs) {
-    ui->destination->setText(_aprs->destination());
-    ui->destSSID->setValue(_aprs->destSSID());
-  }
-
-  // Setup path
-  if (_aprs) {
-    ui->path->setText(_aprs->path());
-  }
+  ui->source->setText(_myAPRS->source());
+  ui->srcSSID->setValue(_myAPRS->srcSSID());
+  ui->destination->setText(_myAPRS->destination());
+  ui->destSSID->setValue(_myAPRS->destSSID());
+  ui->path->setText(_myAPRS->path());
 
   // Setup icons
   for (int i=0; i<aprsIconTable.size(); i++) {
     const QPair<APRSSystem::Icon, QString> &item = aprsIconTable[i];
     ui->icon->addItem(aprsIcon(item.first), item.second, unsigned(item.first));
-    if (_aprs && (_aprs->icon() == item.first))
+    if (_myAPRS->icon() == item.first)
       ui->icon->setCurrentIndex(i);
   }
 
-  // Setup update period
-  if (_aprs)
-    ui->updatePeriod->setValue(_aprs->period());
+  ui->updatePeriod->setValue(_myAPRS->period());
+  ui->message->setText(_myAPRS->message());
 
-  // Setup message
-  if (_aprs)
-    ui->message->setText(_aprs->message());
+  ui->extensionView->setObjectName("aprsSystemExtension");
+  ui->extensionView->setObject(_myAPRS, _config);
+  if (! settings.showExtensions())
+    ui->tabWidget->tabBar()->hide();
 }
 
 APRSSystem *
 APRSSystemDialog::aprsSystem() {
-  if (_aprs) {
-    _aprs->setName(ui->name->text().simplified());
-    _aprs->setRevertChannel(ui->channel->currentData().value<AnalogChannel*>());
-    _aprs->setSource(ui->source->text().simplified(), ui->srcSSID->value());
-    _aprs->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
-    _aprs->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));
-    _aprs->setPeriod(ui->updatePeriod->value());
-    _aprs->setMessage(ui->message->text().simplified());
+  _myAPRS->setName(ui->name->text().simplified());
+  _myAPRS->setRevertChannel(ui->channel->currentData().value<AnalogChannel*>());
+  _myAPRS->setSource(ui->source->text().simplified(), ui->srcSSID->value());
+  _myAPRS->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
+  _myAPRS->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));
+  _myAPRS->setPeriod(ui->updatePeriod->value());
+  _myAPRS->setMessage(ui->message->text().simplified());
 
-    return _aprs;
+  APRSSystem *system = _myAPRS;
+  if (_aprs) {
+    _aprs->copy(*_myAPRS);
+    system = _aprs;
+  } else {
+    _myAPRS->setParent(nullptr);
   }
 
-  return new APRSSystem(ui->name->text().simplified(), ui->channel->currentData().value<AnalogChannel *>(),
-                        ui->destination->text().simplified(), ui->destSSID->value(),
-                        ui->source->text().simplified(), ui->srcSSID->value(),
-                        ui->path->text().simplified(),
-                        APRSSystem::Icon(ui->icon->currentData().toUInt()),
-                        ui->message->text().simplified());
+  return system;
 }
 
 QIcon

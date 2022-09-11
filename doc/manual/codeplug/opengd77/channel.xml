@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xmlid="extOpenGD77Channel"
+<section xml:id="extOpenGD77Channel"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -36,11 +36,11 @@
 
 <section>
 <info>
-  <title>Attributes</title>
+  <title>Channel attributes</title>
 </info>
 
 <para>
-  For now, there is only one attribute specifying the more detailed power settings for the 
+  For now, there are only few attributes specifying more detailed power settings and scan behavior for the 
   channel.
 </para>
 
@@ -55,7 +55,22 @@
         <token>P4W</token>, , <token>P5W</token>, <token>Max</token>. Where <token>Global</token> 
         implies that the global power settings is used and <token>Max</token> the maximal possible 
         power is used (usually 7W on VHF and 5.5W on UHF). This power setting overrides the 
-        common channel power setting.</para>
+        common channel power setting. See <xref linkend="cpChannels"/>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>
+      <token>scanZoneSkip</token>
+      <token>scanAllSkip</token>
+    </term>
+    <listitem>
+      <para>
+        In contrast to the original GD-77 firmware, OpenGD77 does not implement scanning by scan 
+        lists. Instead, either all channels defined in the radio or all channels within the current
+        zone can be scanned. To exclude some channels from these scans, the 
+        <token>scanZoneSkip</token> and <token>scanAllSkip</token> flags can be used. When enabled,
+        the channel will be excluded from the respective scan.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>

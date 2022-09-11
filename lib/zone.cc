@@ -1,6 +1,7 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "config.hh"
+#include "anytone_extension.hh"
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -14,9 +15,17 @@
 /* ********************************************************************************************* *
  * Implementation of Zone
  * ********************************************************************************************* */
+Zone::Zone(QObject *parent)
+  : ConfigObject("zone", parent), _A(), _B(), _anytone(nullptr)
+{
+  connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
+  connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
+  connect(&_B, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
+  connect(&_B, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
+}
+
 Zone::Zone(const QString &name, QObject *parent)
-  : ConfigObject("zone", parent), _name(name),
-    _A(), _B()
+  : ConfigObject(name, "zone", parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -26,13 +35,18 @@ Zone::Zone(const QString &name, QObject *parent)
 
 Zone &
 Zone::operator =(const Zone &other) {
-  clear();
-  _name = other._name;
-  for (int i=0; i<other._A.count(); i++)
-    _A.add(other._A.get(i));
-  for (int i=0; i<other._B.count(); i++)
-    _B.add(other._B.get(i));
+  copy(other);
   return *this;
+}
+
+ConfigItem *
+Zone::clone() const {
+  Zone *z = new Zone();
+  if (! z->copy(*this)) {
+    z->deleteLater();
+    return nullptr;
+  }
+  return z;
 }
 
 void
@@ -42,32 +56,41 @@ Zone::clear() {
   _B.clear();
 }
 
-const QString &
-Zone::name() const {
-  return _name;
-}
-bool
-Zone::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified();
-  return true;
-}
-
 const ChannelRefList *
 Zone::A() const {
   return &_A;
 }
-ChannelRefList *Zone::A() {
+ChannelRefList *
+Zone::A() {
   return &_A;
 }
 
-const ChannelRefList *Zone::B() const {
+const ChannelRefList *
+Zone::B() const {
   return &_B;
 }
-ChannelRefList *Zone::B() {
+ChannelRefList *
+Zone::B() {
   return &_B;
+}
+
+AnytoneZoneExtension *
+Zone::anytoneExtension() const {
+  return _anytone;
+}
+void
+Zone::setAnytoneExtension(AnytoneZoneExtension *ext) {
+  if (_anytone == ext)
+    return;
+  if (_anytone) {
+    disconnect(_anytone, SIGNAL(modified(ConfigItem*)), this, SIGNAL(modified(ConfigItem*)));
+    _anytone->deleteLater();
+  }
+  _anytone = ext;
+  if (_anytone) {
+    _anytone->setParent(this);
+    connect(_anytone, SIGNAL(modified(ConfigItem*)), this, SIGNAL(modified(ConfigItem*)));
+  }
 }
 
 
@@ -82,7 +105,7 @@ ZoneList::ZoneList(QObject *parent)
 
 Zone *
 ZoneList::zone(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<Zone>();
   return nullptr;
 }
@@ -94,3 +117,17 @@ ZoneList::add(ConfigObject *obj, int row) {
   return -1;
 }
 
+ConfigItem *
+ZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create zone: Expected object.";
+    return nullptr;
+  }
+
+  return new Zone();
+}

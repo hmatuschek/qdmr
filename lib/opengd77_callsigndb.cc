@@ -65,7 +65,7 @@ OpenGD77CallsignDB::userdb_t::clear() {
   size = 0x5d; // <- 19 byte entries, 15byte name
   memcpy(version, "001", 3);
   count = 0;
-  unused6 = unused9 = 0;
+  unused6 = 0;
 }
 
 void
@@ -88,7 +88,9 @@ OpenGD77CallsignDB::~OpenGD77CallsignDB() {
 }
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
+OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Limit entries to USERDB_NUM_ENTRIES
   qint64 n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
   if (selection.hasCountLimit())

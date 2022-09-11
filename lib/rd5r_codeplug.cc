@@ -10,6 +10,9 @@
 #define ADDR_BUTTONS              0x000108
 #define ADDR_MESSAGES             0x000128
 
+#define ADDR_ENCRYPTION           0x001370
+#define ENCRYPTION_SIZE               0x88
+
 #define NUM_CONTACTS                   256
 #define ADDR_CONTACTS             0x001788
 #define CONTACT_SIZE              0x000018
@@ -66,12 +69,12 @@ RD5RCodeplug::ChannelElement::clear() {
 
 unsigned
 RD5RCodeplug::ChannelElement::squelch() const {
-  return std::min(getUInt8(0x0037), uint8_t(9))+1;
+  return getUInt8(0x0037);
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
-  level = std::max(std::min(10u, level), 1u);
-  setUInt8(0x0037, level-1);
+  level = std::min(9u, level);
+  setUInt8(0x0037, level);
 }
 
 bool
@@ -81,7 +84,15 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
   if (c->is<AnalogChannel>()) {
     const AnalogChannel *ac = c->as<AnalogChannel>();
-    setSquelch(ac->squelch());
+    if (ac->defaultSquelch())
+      setSquelch(ctx.config()->settings()->squelch());
+    else if (ac->squelchDisabled())
+      setSquelch(0);
+    else
+      setSquelch(ac->squelch());
+  } else {
+    // If digital channel, reuse global quelch setting
+    setSquelch(ctx.config()->settings()->squelch());
   }
 
   return true;
@@ -101,6 +112,20 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
+bool
+RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+  /*
+  if (c->is<AnalogChannel>()) {
+    AnalogChannel *ac = c->as<AnalogChannel>();
+    if (ctx.config()->settings()->squelch() == ac->squelch()) {
+      ac->setSquelchDefault();
+    }
+  }
+  */
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of RD5RCodeplug::TimestampElement
@@ -142,6 +167,39 @@ RD5RCodeplug::TimestampElement::set(const QDateTime &ts) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of RD5RCodeplug::EncryptionElement
+ * ******************************************************************************************** */
+RD5RCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
+  : RadioddityCodeplug::EncryptionElement(ptr)
+{
+  // pass...
+}
+
+bool
+RD5RCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
+  if (n>0)
+    return false;
+  return RadioddityCodeplug::EncryptionElement::isBasicKeySet(n);
+}
+
+QByteArray
+RD5RCodeplug::EncryptionElement::basicKey(unsigned n) const {
+  if (n>0)
+    return QByteArray();
+  return QByteArray("\x53\x47\x4c\x39");
+}
+
+void
+RD5RCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
+  if ((0 != n) || (key != "\x53\x47\x4c\x39")){
+    logError() << "The RD5R only supports a single fixed DMR basic key '53474c39'.";
+    return;
+  }
+  RD5RCodeplug::EncryptionElement::setBasicKey(n, key);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of RD5RCodeplug
  * ******************************************************************************************** */
 RD5RCodeplug::RD5RCodeplug(QObject *parent)
@@ -159,13 +217,13 @@ RD5RCodeplug::clear() {
 }
 
 bool
-RD5RCodeplug::encodeElements(const Flags &flags, Context &ctx) {
-  if (! RadioddityCodeplug::encodeElements(flags, ctx))
+RD5RCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! RadioddityCodeplug::encodeElements(flags, ctx, err))
     return false;
 
   // Set timestamp
-  if (! this->encodeTimestamp()) {
-    _errorMessage = tr("Cannot encode time-stamp: %1").arg(_errorMessage);
+  if (! this->encodeTimestamp(err)) {
+    errMsg(err) << "Cannot encode time-stamp.";
     return false;
   }
 
@@ -173,8 +231,8 @@ RD5RCodeplug::encodeElements(const Flags &flags, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::decodeElements(Context &ctx) {
-  if (! RadioddityCodeplug::decodeElements(ctx))
+RD5RCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! RadioddityCodeplug::decodeElements(ctx, err))
     return false;
   return true;
 }
@@ -185,7 +243,8 @@ RD5RCodeplug::clearTimestamp() {
 }
 
 bool
-RD5RCodeplug::encodeTimestamp() {
+RD5RCodeplug::encodeTimestamp(const ErrorStack &err) {
+  Q_UNUSED(err)
   TimestampElement(data(ADDR_TIMESTMP)).set();
   return true;
 }
@@ -196,7 +255,8 @@ RD5RCodeplug::clearGeneralSettings() {
 }
 
 bool
-RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   GeneralSettingsElement el(data(ADDR_SETTINGS));
   if (! flags.updateCodePlug)
     el.clear();
@@ -204,7 +264,8 @@ RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context 
 }
 
 bool
-RD5RCodeplug::decodeGeneralSettings(Config *config, Context &ctx) {
+RD5RCodeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config, ctx);
 }
 
@@ -225,7 +286,8 @@ RD5RCodeplug::clearContacts() {
 }
 
 bool
-RD5RCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
     el.clear();
@@ -237,7 +299,8 @@ RD5RCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::createContacts(Config *config, Context &ctx) {
+RD5RCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   /* Unpack Contacts */
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
@@ -257,7 +320,8 @@ RD5RCodeplug::clearDTMFContacts() {
 }
 
 bool
-RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
     el.clear();
@@ -269,7 +333,8 @@ RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ct
 }
 
 bool
-RD5RCodeplug::createDTMFContacts(Config *config, Context &ctx) {
+RD5RCodeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS+i*DTMF_CONTACT_SIZE));
     // If contact is disabled
@@ -294,7 +359,8 @@ RD5RCodeplug::clearChannels() {
 }
 
 bool
-RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
@@ -318,7 +384,8 @@ RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::createChannels(Config *config, Context &ctx) {
+RD5RCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
@@ -335,7 +402,8 @@ RD5RCodeplug::createChannels(Config *config, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::linkChannels(Config *config, Context &ctx) {
+RD5RCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(err)
   for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
@@ -367,13 +435,15 @@ RD5RCodeplug::clearBootText() {
 }
 
 bool
-RD5RCodeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   BootTextElement(data(ADDR_BOOT_TEXT)).fromConfig(config);
   return true;
 }
 
 bool
-RD5RCodeplug::decodeBootText(Config *config, Context &ctx) {
+RD5RCodeplug::decodeBootText(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   BootTextElement(data(ADDR_BOOT_TEXT)).updateConfig(config);
   return true;
 }
@@ -393,7 +463,9 @@ RD5RCodeplug::clearZones() {
 }
 
 bool
-RD5RCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
 
   // Pack Zones
@@ -428,7 +500,9 @@ next:
 }
 
 bool
-RD5RCodeplug::createZones(Config *config, Context &ctx) {
+RD5RCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
@@ -461,7 +535,9 @@ RD5RCodeplug::createZones(Config *config, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::linkZones(Config *config, Context &ctx) {
+RD5RCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
+
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
@@ -485,8 +561,7 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx) {
       last_zone = ctx.get<Zone>(i+1);
     }
     if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
-      _errorMessage = QString("%1(): Cannot unpack codeplug: Cannot link zone at index %2")
-          .arg(__func__).arg(i);
+      errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
   }
@@ -502,7 +577,9 @@ RD5RCodeplug::clearScanLists() {
 }
 
 bool
-RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
   ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
   for (int i=0; i<NUM_SCAN_LISTS; i++) {
     if (i >= config->scanlists()->count()) {
@@ -515,7 +592,9 @@ RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-RD5RCodeplug::createScanLists(Config *config, Context &ctx) {
+RD5RCodeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
   for (int i=0; i<NUM_SCAN_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -528,7 +607,9 @@ RD5RCodeplug::createScanLists(Config *config, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::linkScanLists(Config *config, Context &ctx) {
+RD5RCodeplug::linkScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(err)
+
   ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
   for (int i=0; i<NUM_SCAN_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -547,20 +628,29 @@ RD5RCodeplug::clearGroupLists() {
 }
 
 bool
-RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
       continue;
     GroupListElement el(bank.get(i));
     el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
-    bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+    // Only group calls are encoded
+    int count = 0;
+    for (int j=0; j<config->rxGroupLists()->list(i)->count(); j++)
+      if (DigitalContact::GroupCall == config->rxGroupLists()->list(i)->contact(j)->type())
+        count++;
+    bank.setContactCount(i, count);
   }
   return true;
 }
 
 bool
-RD5RCodeplug::createGroupLists(Config *config, Context &ctx) {
+RD5RCodeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -573,7 +663,9 @@ RD5RCodeplug::createGroupLists(Config *config, Context &ctx) {
 }
 
 bool
-RD5RCodeplug::linkGroupLists(Config *config, Context &ctx) {
+RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
+
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
@@ -582,9 +674,39 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx) {
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
     if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = tr("Cannot link group list '%1'.").arg(ctx.get<RXGroupList>(i+1)->name());
+      errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }
   }
+  return true;
+}
+
+
+void
+RD5RCodeplug::clearEncryption() {
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  enc.clear();
+}
+
+bool
+RD5RCodeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  clearEncryption();
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  return enc.fromCommercialExt(config->commercialExtension(), ctx);
+}
+
+bool
+RD5RCodeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(err);
+  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  if (EncryptionElement::PrivacyType::None == enc.privacyType())
+    return true;
+  return enc.updateCommercialExt(ctx);
+}
+
+bool
+RD5RCodeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err);
   return true;
 }

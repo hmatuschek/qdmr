@@ -2,35 +2,41 @@
 #include "application.hh"
 #include <QCompleter>
 #include "ctcssbox.hh"
-#include "repeaterdatabase.hh"
 #include "utils.hh"
-
+#include "settings.hh"
+#include "repeaterbookcompleter.hh"
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
  * ********************************************************************************************* */
 AnalogChannelDialog::AnalogChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(nullptr)
+  : QDialog(parent), _config(config), _myChannel(new AnalogChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
 AnalogChannelDialog::AnalogChannelDialog(Config *config, AnalogChannel *channel, QWidget *parent)
-  : QDialog(parent), _config(config), _channel(channel)
+  : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
+  if (nullptr == _channel)
+    _myChannel = new AnalogChannel();
+  else
+    _myChannel = _channel->clone()->as<AnalogChannel>();
+  _myChannel->setParent(this);
+
   construct();
 }
 
 void
 AnalogChannelDialog::construct() {
   setupUi(this);
+  Settings settings;
 
   Application *app = qobject_cast<Application *>(qApp);
-  FMRepeaterFilter *filter = new FMRepeaterFilter(this);
+  FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new QCompleter(filter, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->setCompletionColumn(0);
+  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
@@ -49,15 +55,15 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->scanlists()->count(); i++) {
     ScanList *lst = _config->scanlists()->scanlist(i);
     scanList->addItem(lst->name(),QVariant::fromValue(lst));
-    if (_channel && (_channel->scanListObj() == lst) )
+    if (_myChannel && (_myChannel->scanList() == lst) )
       scanList->setCurrentIndex(i+1);
   }
   txAdmit->setItemData(0, unsigned(AnalogChannel::Admit::Always));
   txAdmit->setItemData(1, unsigned(AnalogChannel::Admit::Free));
   txAdmit->setItemData(2, unsigned(AnalogChannel::Admit::Tone));
   squelchDefault->setChecked(true); squelchValue->setValue(1); squelchValue->setEnabled(false);
-  populateCTCSSBox(rxTone, (nullptr != _channel ? _channel->rxTone() : Signaling::SIGNALING_NONE));
-  populateCTCSSBox(txTone, (nullptr != _channel ? _channel->txTone() : Signaling::SIGNALING_NONE));
+  populateCTCSSBox(rxTone, (nullptr != _myChannel ? _myChannel->rxTone() : Signaling::SIGNALING_NONE));
+  populateCTCSSBox(txTone, (nullptr != _myChannel ? _myChannel->txTone() : Signaling::SIGNALING_NONE));
   bandwidth->setItemData(0, unsigned(AnalogChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(AnalogChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
@@ -65,48 +71,52 @@ AnalogChannelDialog::construct() {
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
     APRSSystem *sys = _config->posSystems()->aprsSystem(i);
     aprsList->addItem(sys->name(),QVariant::fromValue(sys));
-    if (_channel && (_channel->aprsSystem() == sys))
+    if (_myChannel && (_myChannel->aprsSystem() == sys))
       aprsList->setCurrentIndex(i+1);
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
-  if (_channel) {
-    channelName->setText(_channel->name());
-    rxFrequency->setText(format_frequency(_channel->rxFrequency()));
-    txFrequency->setText(format_frequency(_channel->txFrequency()));
-    if (! _channel->defaultPower()) {
-      powerDefault->setChecked(false); powerValue->setEnabled(true);
-      switch (_channel->power()) {
-      case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
-      case Channel::Power::High: powerValue->setCurrentIndex(1); break;
-      case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
-      case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
-      case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
-      }
-    }
-    if (! _channel->defaultTimeout()) {
-      totDefault->setChecked(false); totValue->setEnabled(true);
-      totValue->setValue(_channel->timeout());
-    }
-    rxOnly->setChecked(_channel->rxOnly());
-    switch (_channel->admit()) {
-      case AnalogChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
-      case AnalogChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
-      case AnalogChannel::Admit::Tone: txAdmit->setCurrentIndex(2); break;
-    }
-    if (! _channel->defaultSquelch()) {
-      squelchDefault->setChecked(false); squelchValue->setEnabled(true);
-      squelchValue->setValue(_channel->squelch());
-    }
-    if (AnalogChannel::Bandwidth::Narrow == _channel->bandwidth())
-      bandwidth->setCurrentIndex(0);
-    else if (AnalogChannel::Bandwidth::Wide == _channel->bandwidth())
-      bandwidth->setCurrentIndex(1);
-    if (! _channel->defaultVOX()) {
-      voxDefault->setChecked(false); voxValue->setEnabled(true);
-      voxValue->setValue(_channel->vox());
+  channelName->setText(_myChannel->name());
+  rxFrequency->setText(format_frequency(_myChannel->rxFrequency()));
+  txFrequency->setText(format_frequency(_myChannel->txFrequency()));
+  if (! _myChannel->defaultPower()) {
+    powerDefault->setChecked(false); powerValue->setEnabled(true);
+    switch (_myChannel->power()) {
+    case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
+    case Channel::Power::High: powerValue->setCurrentIndex(1); break;
+    case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
+    case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
+    case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
+  if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_myChannel->timeout());
+  }
+  rxOnly->setChecked(_myChannel->rxOnly());
+  switch (_myChannel->admit()) {
+  case AnalogChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
+  case AnalogChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
+  case AnalogChannel::Admit::Tone: txAdmit->setCurrentIndex(2); break;
+  }
+  if (! _myChannel->defaultSquelch()) {
+    squelchDefault->setChecked(false); squelchValue->setEnabled(true);
+    squelchValue->setValue(_myChannel->squelch());
+  }
+  if (AnalogChannel::Bandwidth::Narrow == _myChannel->bandwidth())
+    bandwidth->setCurrentIndex(0);
+  else if (AnalogChannel::Bandwidth::Wide == _myChannel->bandwidth())
+    bandwidth->setCurrentIndex(1);
+  if (! _myChannel->defaultVOX()) {
+    voxDefault->setChecked(false); voxValue->setEnabled(true);
+    voxValue->setValue(_myChannel->vox());
+  }
+
+  if (! settings.showExtensions())
+    tabWidget->tabBar()->hide();
+
+  extensionView->setObjectName("AnalogChannelExtension");
+  extensionView->setObject(_myChannel, _config);
 
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
@@ -119,41 +129,42 @@ AnalogChannelDialog::construct() {
 AnalogChannel *
 AnalogChannelDialog::channel()
 {
-  AnalogChannel *channel = nullptr;
-  if (_channel) {
-    channel = _channel;
-  } else {
-    channel = new AnalogChannel();
-  }
-
-  channel->setName(channelName->text());
-  channel->setRXFrequency(rxFrequency->text().toDouble());
-  channel->setTXFrequency(txFrequency->text().toDouble());
+  _myChannel->setName(channelName->text());
+  _myChannel->setRXFrequency(rxFrequency->text().toDouble());
+  _myChannel->setTXFrequency(txFrequency->text().toDouble());
   if (powerDefault->isChecked()) {
-    channel->setDefaultPower();
+    _myChannel->setDefaultPower();
   } else {
-    channel->setPower(Channel::Power(powerValue->currentData().toUInt()));
+    _myChannel->setPower(Channel::Power(powerValue->currentData().toUInt()));
   }
   if (totDefault->isChecked())
-    channel->setDefaultTimeout();
+    _myChannel->setDefaultTimeout();
   else
-    channel->setTimeout(totValue->value());
-  channel->setRXOnly(rxOnly->isChecked());
-  channel->setAdmit(AnalogChannel::Admit(txAdmit->currentData().toUInt()));
+    _myChannel->setTimeout(totValue->value());
+  _myChannel->setRXOnly(rxOnly->isChecked());
+  _myChannel->setAdmit(AnalogChannel::Admit(txAdmit->currentData().toUInt()));
   if (squelchDefault->isChecked())
-    channel->setSquelchDefault();
+    _myChannel->setSquelchDefault();
   else
-    channel->setSquelch(squelchValue->value());
-  channel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
-  channel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
-  channel->setBandwidth(AnalogChannel::Bandwidth(bandwidth->currentData().toUInt()));
-  channel->setScanListObj(scanList->currentData().value<ScanList *>());
-  channel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
+    _myChannel->setSquelch(squelchValue->value());
+  _myChannel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
+  _myChannel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
+  _myChannel->setBandwidth(AnalogChannel::Bandwidth(bandwidth->currentData().toUInt()));
+  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
+  _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
   if (voxDefault->isChecked())
-    channel->setVOXDefault();
+    _myChannel->setVOXDefault();
   else
-    channel->setVOX(voxValue->value());
+    _myChannel->setVOX(voxValue->value());
 
+  AnalogChannel *channel = _myChannel;
+  if (nullptr == _channel) {
+    _myChannel->setParent(nullptr);
+    _myChannel = nullptr;
+  } else {
+    _channel->copy(*_myChannel);
+    channel = _channel;
+  }
   return channel;
 }
 
@@ -165,8 +176,14 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row()).value("tx").toDouble();
-  double tx = app->repeater()->repeater(src.row()).value("rx").toDouble();
+  double rx = app->repeater()->repeater(src.row())->rxFrequency();
+  double tx = app->repeater()->repeater(src.row())->txFrequency();
+  int idx = rxTone->findData(app->repeater()->repeater(src.row())->rxTone());
+  if (0 <= idx)
+    rxTone->setCurrentIndex(idx);
+  idx = txTone->findData(app->repeater()->repeater(src.row())->txTone());
+  if (0 <= idx)
+    txTone->setCurrentIndex(idx);
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

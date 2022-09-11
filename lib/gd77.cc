@@ -1,4 +1,5 @@
 #include "gd77.hh"
+#include "gd77_limits.hh"
 
 #include "logger.hh"
 #include "config.hh"
@@ -6,55 +7,7 @@
 
 #define BSIZE           32
 
-static Radio::Features _gd77_features = {
-  .betaWarning = true,
-
-  .hasDigital = true,
-  .hasAnalog = true,
-
-  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
-
-  .maxRadioIDs        = 1,
-  .needsDefaultRadioID = true,
-  .maxIntroLineLength = 16,
-
-  .maxChannels = 1024,
-  .maxChannelNameLength = 16,
-  .allowChannelNoDefaultContact = true,
-
-  .maxZones = 250,
-  .maxZoneNameLength = 16,
-  .maxChannelsInZone = 16,
-  .hasABZone = false,
-
-  .hasScanlists = true,
-  .maxScanlists = 64,
-  .maxScanlistNameLength = 15,
-  .maxChannelsInScanlist = 32,
-  .scanListNeedsPriority = true,
-
-  .maxContacts = 1024,
-  .maxContactNameLength = 16,
-
-  .maxGrouplists = 76,
-  .maxGrouplistNameLength = 16,
-  .maxContactsInGrouplist = 32,
-
-  .hasGPS = false,
-  .maxGPSSystems = 0,
-
-  .hasAPRS = false,
-  .maxAPRSSystems = 0,
-
-  .hasRoaming = false,
-  .maxRoamingChannels = 0,
-  .maxRoamingZones = 0,
-  .maxChannelsInRoamingZone = 0,
-
-  .hasCallsignDB = true,
-  .callsignDBImplemented = true,
-  .maxCallsignsInDB = 10920
-};
+RadioLimits * GD77::_limits = nullptr;
 
 
 GD77::GD77(RadioddityInterface *device, QObject *parent)
@@ -68,9 +21,11 @@ GD77::name() const {
   return _name;
 }
 
-const Radio::Features &
-GD77::features() const {
-  return _gd77_features;
+const RadioLimits &
+GD77::limits() const {
+  if (nullptr == _limits)
+    _limits = new GD77Limits();
+  return *_limits;
 }
 
 const Codeplug &
@@ -86,16 +41,17 @@ GD77::codeplug() {
 RadioInfo
 GD77::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::GD77, "gd77", "GD-77", "Radioddity");
+        RadioInfo::GD77, "gd77", "GD-77", "Radioddity", RadioddityInterface::interfaceInfo());
 }
 
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
   logDebug() << "Start call-sign DB upload to " << name() << "...";
+  _errorStack = err;
 
   if (StatusIdle != _task) {
-    logError() << "Cannot upload to radio, radio is not idle.";
+    errMsg(err) << "Cannot upload to radio, radio is not idle.";
     return false;
   }
 
@@ -127,9 +83,7 @@ GD77::uploadCallsigns()
 
   // Check every segment in the codeplug
   if (! _callsigns.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload call-sign DB:\n\t "
-                            "Not aligned with block-size!").arg(__func__);
-    logError() << _errorMessage;
+    errMsg(_errorStack) << "Cannot upload call-sign DB: Not aligned with block-size " << BSIZE << ".";
     return false;
   }
 
@@ -137,25 +91,23 @@ GD77::uploadCallsigns()
 
   size_t totb = _callsigns.memSize();
   unsigned bcount = 0;
-  // Then upload callsign DB
   for (int n=0; n<_callsigns.image(0).numElements(); n++) {
     unsigned addr = _callsigns.image(0).element(n).address();
     unsigned size = _callsigns.image(0).element(n).data().size();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
-    RadioddityInterface::MemoryBank bank = (
-          (0x10000 > addr) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-      if (! _dev->write(bank, (b0+b)*BSIZE,
-                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE))
+      RadioddityInterface::MemoryBank bank = (
+            (0x10000 > (b0+b)*BSIZE) ? RadioddityInterface::MEMBANK_CALLSIGN_LOWER : RadioddityInterface::MEMBANK_CALLSIGN_UPPER );
+      if (! _dev->write(bank, ((b0+b)*BSIZE)&0xffff,
+                        _callsigns.data((b0+b)*BSIZE, 0), BSIZE, _errorStack))
       {
-        _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-            .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-        logError() << _errorMessage;
+        errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
         return false;
       }
       emit uploadProgress(float(bcount*100)/totb);
     }
   }
+
 
   _dev->write_finish();
   return true;

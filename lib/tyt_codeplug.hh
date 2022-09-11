@@ -14,7 +14,6 @@ class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
-class CodeplugContext;
 
 
 /** Base class of all TyT codeplugs. This class implements the majority of all codeplug elements
@@ -51,14 +50,7 @@ public:
     enum PrivacyType {
       PRIV_NONE = 0,                ///< No privacy.
       PRIV_BASIC = 1,               ///< Basic privacy.
-      PRIV_ENHANCED = 2             ///< Enhenced privacy.
-    };
-
-    /** I have absolutely no idea what this means. */
-    enum RefFrequency {
-      REF_LOW = 0,
-      REF_MEDIUM = 1,
-      REF_HIGH = 2
+      PRIV_ENHANCED = 2             ///< Enhanced privacy.
     };
 
     /** TX Admit criterion. */
@@ -89,7 +81,7 @@ public:
     /** Sets the mode of the channel. */
     virtual void setMode(Mode setMode);
 
-    /** Retuns the bandwidth of the (analog) channel. */
+    /** Returns the bandwidth of the (analog) channel. */
     virtual AnalogChannel::Bandwidth bandwidth() const;
     /** Sets the bandwidth of the (analog) channel. */
     virtual void setBandwidth(AnalogChannel::Bandwidth bw);
@@ -144,13 +136,13 @@ public:
     virtual void enableDataCallConfirm(bool enable);
 
     /** Returns some weird reference frequency setting for reception. */
-    virtual RefFrequency rxRefFrequency() const;
+    virtual TyTChannelExtension::RefFrequency rxRefFrequency() const;
     /** Sets some weird reference frequency setting for reception. */
-    virtual void setRXRefFrequency(RefFrequency ref);
+    virtual void setRXRefFrequency(TyTChannelExtension::RefFrequency ref);
     /** Returns some weird reference frequency setting for transmission. */
-    virtual RefFrequency txRefFrequency() const;
+    virtual TyTChannelExtension::RefFrequency txRefFrequency() const;
     /** Sets some weird reference frequency setting for transmission. */
-    virtual void setTXRefFrequency(RefFrequency ref);
+    virtual void setTXRefFrequency(TyTChannelExtension::RefFrequency ref);
 
     /** Returns @c true if the channel has alarm confirmation enabled. */
     virtual bool emergencyAlarmACK() const;
@@ -313,11 +305,11 @@ public:
   class ZoneElement: public Codeplug::Element
   {
   protected:
-    /** Construtor. */
+    /** Constructor. */
     ZoneElement(uint8_t *ptr, size_t size);
 
   public:
-    /** Construtor. */
+    /** Constructor. */
     ZoneElement(uint8_t *ptr);
     /** Desturctor. */
     virtual ~ZoneElement();
@@ -399,7 +391,7 @@ public:
     bool isValid() const;
     void clear();
 
-    /** Retruns the name of the scan list. */
+    /** Returns the name of the scan list. */
     virtual QString name() const;
     /** Sets the name of the scan list. */
     virtual void setName(const QString &nm);
@@ -448,13 +440,6 @@ public:
    * @verbinclude tyt_settings.txt */
   class GeneralSettingsElement: public Codeplug::Element
   {
-  public:
-    /** Defines all possible squelch modes. */
-    enum MonitorType {
-      MONITOR_SILENT       = 0,
-      MONITOR_OPEN_SQUELCH = 1
-    };
-
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, size_t size);
@@ -477,9 +462,9 @@ public:
     virtual void setIntroLine2(const QString line);
 
     /** Returns the monitor type. */
-    virtual MonitorType monitorType() const;
+    virtual TyTSettingsExtension::MonitorType monitorType() const;
     /** Sets the monitor type. */
-    virtual void setMonitorType(MonitorType type);
+    virtual void setMonitorType(TyTSettingsExtension::MonitorType type);
 
     /** Returns @c true if all LEDs are disabled. */
     virtual bool allLEDsDisabled() const;
@@ -566,13 +551,13 @@ public:
     /** Returns the scan digital hang time. */
     virtual unsigned scanDigitalHangTime() const;
     /** Sets the scan digital hang time. */
-    virtual void setCcanDigitalHangTime(unsigned ms);
+    virtual void setScanDigitalHangTime(unsigned ms);
     /** Returns the scan analog hang time. */
     virtual unsigned scanAnalogHangTime() const;
     /** Sets the scan analog hang time. */
     virtual void setScanAnalogHangTime(unsigned ms);
 
-    /** Retuns @c true if the backlight is always on. */
+    /** Returns @c true if the backlight is always on. */
     virtual bool backlightIsAlways() const;
     /** Returns the backlight time. */
     virtual unsigned backlightTime() const;
@@ -581,7 +566,7 @@ public:
     /** Turns the backlight always on. */
     virtual void backlightTimeSetAlways();
 
-    /** Retuns @c true if the keypad lock is manual. */
+    /** Returns @c true if the keypad lock is manual. */
     virtual bool keypadLockIsManual() const;
     /** Returns the keypad lock time. */
     virtual unsigned keypadLockTime() const;
@@ -707,7 +692,7 @@ public:
 
   /** Represents all menu settings within the codeplug on the radio.
    *
-   * Memory representaion of the menu settings:
+   * Memory representation of the menu settings:
    * @verbinclude tyt_menusettings.txt */
   class MenuSettingsElement: public Codeplug::Element
   {
@@ -749,30 +734,30 @@ public:
     /** Enables/disables manual dial. */
     virtual void enableManualDial(bool enable);
     /** Returns @c true if contact radio-check menu is enabled. */
-    virtual bool contactRadioCheck() const;
+    virtual bool remoteRadioCheck() const;
     /** Enables/disables contact radio-check menu. */
-    virtual void enableContactRadioCheck(bool enable);
+    virtual void enableRemoteRadioCheck(bool enable);
     /** Returns @c true if remote monitor menu is enabled. */
     virtual bool remoteMonitor() const;
     /** Enables/disables remote monitor menu. */
     virtual void enableRemoteMonitor(bool enable);
     /** Returns @c true if radio enable menu is enabled. */
-    virtual bool radioEnable() const;
+    virtual bool remoteRadioEnable() const;
     /** Enables/disables radio enable menu. */
-    virtual void enableRadioEnable(bool enable);
+    virtual void enableRemoteRadioEnable(bool enable);
     /** Returns @c true if radio disable menu is enabled. */
-    virtual bool radioDisable() const;
+    virtual bool remoteRadioDisable() const;
     /** Enables/disables radio disable menu. */
-    virtual void enableRadioDisable(bool enable);
+    virtual void enableRemoteRadioDisable(bool enable);
 
     /** Returns @c true if scan menu is enabled. */
     virtual bool scan() const;
     /** Enables/disables scan menu. */
     virtual void enableScan(bool enable);
     /** Returns @c true if edit scan-list menu is enabled. */
-    virtual bool editScanlist() const;
+    virtual bool scanListEditing() const;
     /** Enables/disables edit scan-list menu. */
-    virtual void enableEditScanlist(bool enable);
+    virtual void enableScanListEditing(bool enable);
     /** Returns @c true if call-log missed menu is enabled. */
     virtual bool callLogMissed() const;
     /** Enables/disables call-log missed menu. */
@@ -790,9 +775,9 @@ public:
     /** Enables/disables talkaround menu. */
     virtual void enableTalkaround(bool enable);
     /** Returns @c true if tone/alert menu is enabled. */
-    virtual bool toneAlert() const;
+    virtual bool alertTone() const;
     /** Enables/disables tone/alert  menu. */
-    virtual void enableToneAlert(bool enable);
+    virtual void enableAlertTone(bool enable);
 
     /** Returns @c true if power menu is enabled. */
     virtual bool power() const;
@@ -803,9 +788,9 @@ public:
     /** Enables/disables backlight menu. */
     virtual void enableBacklight(bool enable);
     /** Returns @c true if intro screen menu is enabled. */
-    virtual bool introScreen() const;
+    virtual bool bootScreen() const;
     /** Enables/disables intro screen menu. */
-    virtual void enableIntroScreen(bool enable);
+    virtual void enableBootScreen(bool enable);
     /** Returns @c true if keypad lock menu is enabled. */
     virtual bool keypadLock() const;
     /** Enables/disables keypad lock menu. */
@@ -832,13 +817,14 @@ public:
     /** Enables/disables display mode menu. */
     virtual void enableDisplayMode(bool enable);
     /** Returns @c true if program radio menu is enabled. */
-    virtual bool programRadio() const;
+    virtual bool radioProgramming() const;
     /** Enables/disables program radio menu. */
-    virtual void enableProgramRadio(bool enable);
-    /** Returns @c true if GPS information is enabled. */
-    virtual bool gpsInformation() const;
-    /** Enables/disables GPS information menu. */
-    virtual void enableGPSInformation(bool enable);
+    virtual void enableRadioProgramming(bool enable);
+
+    /** Encodes the menu settings. */
+    virtual bool fromConfig(const Config *config);
+    /** Updates config from menu settings. */
+    virtual bool updateConfig(Config *config);
   };
 
   /** Represents all button settings within the codeplug on the radio.
@@ -921,7 +907,7 @@ public:
     OneTouchSettingElement(uint8_t *ptr, size_t size);
 
   public:
-    /** Constuctor. */
+    /** Constructor. */
     explicit OneTouchSettingElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~OneTouchSettingElement();
@@ -952,7 +938,7 @@ public:
 
   /** Represents the emergency settings within the codeplug on the radio.
    *
-   * Memory representation of the emergency settings:
+   * Memory representation of the emergency settings (size 0x0010 bytes):
    * @verbinclude tyt_emergencysettings.txt */
   class EmergencySettingsElement: public Codeplug::Element
   {
@@ -999,7 +985,7 @@ public:
 
   /** Represents a single emergency system within the radio.
    *
-   * Memory representation of emergency system:
+   * Memory representation of emergency system (size 0x0028 bytes):
    * @verbinclude tyt_emergencysystem.txt */
   class EmergencySystemElement: public Codeplug::Element
   {
@@ -1088,14 +1074,34 @@ public:
 
     void clear();
 
+    /** Returns @c true if the n-th "enhanced" key (128bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isEnhancedKeySet(unsigned n) const;
     /** Returns the n-th "enhanced" key (128bit). */
-    virtual QByteArray enhancedKey(unsigned n);
+    virtual QByteArray enhancedKey(unsigned n) const;
     /** Sets the n-th "enhanced" key (128bit). */
     virtual void setEnhancedKey(unsigned n, const QByteArray &key);
+
+    /** Returns @c true if the n-th "basic" key (16bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isBasicKeySet(unsigned n) const;
     /** Returns the n-th "basic" key (16bit). */
-    virtual QByteArray basicKey(unsigned n);
+    virtual QByteArray basicKey(unsigned n) const;
     /** Sets the n-th "basic" key (16bit). */
     virtual void setBasicKey(unsigned n, const QByteArray &key);
+
+    /** Encodes given commercial extension. */
+    virtual bool fromCommercialExt(CommercialExtension *encr, Context &ctx);
+    /** Updates the commercial extension. */
+    virtual bool updateCommercialExt(Context &ctx);
+    /** Links the given encryption extension. */
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+
+  protected:
+    /** Number of enhanced keys. */
+    unsigned _numEnhancedKeys;
+    /** Number of basic keys. */
+    unsigned _numBasicKeys;
   };
 
 protected:
@@ -1109,19 +1115,19 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
-  bool index(Config *config, Context &ctx) const;
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears the time-stamp in the codeplug. */
   virtual void clearTimestamp() = 0;
@@ -1131,75 +1137,80 @@ public:
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config) = 0;
+  virtual bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx) = 0;
+  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all RX group lists in the codeplug. */
   virtual void clearGroupLists() = 0;
   /** Encodes all group lists in the configuration into the codeplug. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a RX group list to the configuration for each one in the codeplug. */
-  virtual bool createGroupLists(Config *config, Context &ctx) = 0;
+  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added RX group lists within the configuration. */
-  virtual bool linkGroupLists(Context &ctx) = 0;
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all channels in the codeplug. */
   virtual void clearChannels() = 0;
   /** Encodes all channels in the configuration into the codeplug. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a channel to the configuration for each one in the codeplug. */
-  virtual bool createChannels(Config *config, Context &ctx) = 0;
+  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added channels within the configuration. */
-  virtual bool linkChannels(Context &ctx) = 0;
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all zones in the codeplug. */
   virtual void clearZones() = 0;
   /** Encodes all zones in the configuration into the codeplug. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a zone to the configuration for each one in the codeplug. */
-  virtual bool createZones(Config *config, Context &ctx) = 0;
+  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added zones within the configuration. */
-  virtual bool linkZones(Context &ctx) = 0;
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all scan lists in the codeplug. */
   virtual void clearScanLists() = 0;
   /** Encodes all scan lists in the configuration into the codeplug. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a scan list to the configuration for each one in the codeplug. */
-  virtual bool createScanLists(Config *config, Context &ctx) = 0;
+  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added scan lists within the configuration. */
-  virtual bool linkScanLists(Context &ctx) = 0;
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all positioning systems in the codeplug. */
   virtual void clearPositioningSystems() = 0;
   /** Encodes all DMR positioning systems in the configuration into the codeplug. */
-  virtual bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a GPS positioning system to the configuration for each one in the codeplug. */
-  virtual bool createPositioningSystems(Config *config, Context &ctx) = 0;
+  virtual bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all added positioning systems within the configuration. */
-  virtual bool linkPositioningSystems(Context &ctx) = 0;
+  virtual bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the button settings in the codeplug. */
   virtual void clearButtonSettings() = 0;
   /** Encodes the button settings. */
-  virtual bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Decodes the button settings. */
-  virtual bool decodeButtonSetttings(Config *config) = 0;
+  virtual bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all encryption keys in the codeplug. */
+  virtual void clearPrivacyKeys() = 0;
+  /** Encodes the encryption keys. */
+  virtual bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the encryption keys. */
+  virtual bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;
   /** Clears all text messages in the codeplug. */
   virtual void clearTextMessages() = 0;
-  /** Clears all encryption keys in the codeplug. */
-  virtual void clearPrivacyKeys() = 0;
   /** Clears all emergency systems in the codeplug. */
   virtual void clearEmergencySystems() = 0;
 };

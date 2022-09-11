@@ -145,7 +145,9 @@ TyTCallsignDB::~TyTCallsignDB() {
 }
 
 bool
-TyTCallsignDB::encode(UserDatabase *db, const Selection &selection) {
+TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Allocate space for callsign db
   size_t n = db->count();
   if (selection.hasCountLimit())

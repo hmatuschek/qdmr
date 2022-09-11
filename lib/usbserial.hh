@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSerialPort>
 #include "radiointerface.hh"
+#include "errorstack.hh"
 
 /** Implements a serial connection to a radio via USB.
  *
@@ -15,16 +16,24 @@ class USBSerial : public QSerialPort, public RadioInterface
 {
   Q_OBJECT
 
+public:
+  /** Specialization of radio interface info for serial ports. */
+  class Descriptor: public USBDeviceDescriptor {
+  public:
+    /** Constructor from VID, PID and device path. */
+    Descriptor(uint16_t vid, uint16_t pid, const QString &device);
+  };
+
 protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
    * product IDs.
-   * @param vid Vendor ID of device.
-   * @param pid Product ID of device.
+   * @param descriptor Specifies the device to open.
+   * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(unsigned vid, unsigned pid, QObject *parent=nullptr);
+  explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
-  /** Destrutor. */
+  /** Destructor. */
   virtual ~USBSerial();
 
   /** If @c true, the device has been found and is open. */
@@ -32,18 +41,15 @@ public:
   /** Closes the interface to the device. */
   void close();
 
-  /** Returns the last error message. */
-  const QString &errorMessage() const;
+public:
+  /** Searches for all USB serial ports with the specified VID/PID. */
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
 
 protected slots:
   /** Callback for serial interface errors. */
   void onError(QSerialPort::SerialPortError error_t);
   /** Callback when closing interface. */
   void onClose();
-
-protected:
-  /** Holds the last error message. */
-  QString _errorMessage;
 };
 
 #endif // USBSERIAL_HH

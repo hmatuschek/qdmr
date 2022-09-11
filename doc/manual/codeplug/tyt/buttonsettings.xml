@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xmlid="extTyTButtonSettings"
+<section xml:id="extTyTButtonSettings"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -12,18 +12,25 @@
 
 <para>
   This extension to the codeplug allows to specify the function for each of the programmable 
-  buttons on the radio. Please note that not all Radioddity radios have all buttons described 
+  buttons on the radio. Please note that not all TyT radios have all buttons described 
   here. 
 </para>
 
 <example>
   <title></title>
-  <programlisting><![CDATA[tytButtonSettings:
-  sideButton1Short: Disabled
-  sideButton1Long: Tone1750Hz
-  sideButton2Short: MonitorToggle
-  sideButton2Long: Disabled
-  longPressDuration: 1000 
+  <programlisting><![CDATA[tytExtension:
+  buttonSettings:
+    longPressDuration: 1000 
+    sideButton1Short: Disabled
+    sideButton1Long: Tone1750Hz
+    sideButton2Short: MonitorToggle
+    sideButton2Long: Disabled
+    sideButton3Short: Disabled
+    sideButton3Long: Disabled
+    progButton1Short: Disabled
+    progButton1Long: Disabled
+    progButton2Short: Disabled
+    progButton2Long: Disabled
 ]]></programlisting>
 </example>
 
@@ -34,6 +41,12 @@
     <term><token>sideButton1Long</token></term>
     <term><token>sideButton2Short</token></term>
     <term><token>sideButton2Long</token></term>
+    <term><token>sideButton3Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>sideButton3Long</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton1Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton1Long</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton2Short</token> (Retevis RT84, Baofeng DM-1701)</term>
+    <term><token>progButton2Long</token> (Retevis RT84, Baofeng DM-1701)</term>
     <listitem>
       <para>Specifies the different functions for each button press. Must be one of:
         <token>Disabled</token>, <token>ToggleAllAlertTones</token>, <token>EmergencyOn</token>, 

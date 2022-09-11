@@ -26,7 +26,6 @@
 #include "radioddity_radio.hh"
 #include "rd5r_codeplug.hh"
 
-
 /** Implements an interface to the Baofeng/Radioddity RD-5R VHF/UHF 5W DMR (Tier I/II) radio.
  *
  * The Baofeng/Radioddity RD-5R radio uses a weird HID (human-interface device, see @c HID and
@@ -47,7 +46,7 @@ public:
   virtual ~RD5R();
 
 	const QString &name() const;
-	const Radio::Features &features() const;
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -59,6 +58,10 @@ private:
 	QString _name;
   /** Current device specific codeplug. */
 	RD5RCodeplug _codeplug;
+
+private:
+  /** Holds the singleton instance of the radio limits. */
+  static RadioLimits *_limits;
 };
 
 #endif // RD5R_HH

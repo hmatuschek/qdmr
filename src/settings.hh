@@ -1,6 +1,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <QDir>
 #include <QSettings>
 #include <QDateTime>
 #include <QGeoPositionInfoSource>
@@ -61,6 +62,9 @@ public:
   bool showCommercialFeatures() const;
   void setShowCommercialFeatures(bool show);
 
+  bool showExtensions() const;
+  void setShowExtensions(bool show);
+
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
 
@@ -76,17 +80,8 @@ public:
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);
 
-  QByteArray radioIdListHeaderState() const;
-  void setRadioIdListHeaderState(const QByteArray &state);
-
-  QByteArray contactListHeaderState() const;
-  void setContactListHeaderState(const QByteArray &state);
-
-  QByteArray channelListHeaderState() const;
-  void setChannelListHeaderState(const QByteArray &state);
-
-  QByteArray positioningHeaderState() const;
-  void setPositioningHeaderState(const QByteArray &state);
+  QByteArray headerState(const QString &objName) const;
+  void setHeaderState(const QString &objName, const QByteArray &state);
 
   bool isUpdated() const;
   void markUpdated();

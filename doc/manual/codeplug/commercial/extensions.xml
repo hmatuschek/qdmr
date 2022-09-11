@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xml:id="extCom"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Commercial Codeplug Extensions</title>
+</info>
+
+<para>
+  This section collects all extensions that configure commercial features present in all radios.
+</para>
+
+<para>
+  DMR was developed as a digital replacement of the analog trunked radio systems used in commercial
+  context. To this end, there are many features of that are irrelevant or outright forbidden in an
+  amateur radio context. However, some HAM operators use their hand-held radios also for their 
+  day job and thus may need to configure some features that are only applicable in a commercial
+  context. To this end, qdmr allows to set some of the commercial features through extensions.
+</para>
+
+<warning>
+  <para>
+    Some commercial features defined within the DMR standard are illegal to use in an amateur 
+    radio context. Check your local regulations!
+  </para>  
+</warning>
+
+<example>
+  <title>Example commercial extension defining an encryption key.</title>
+  <programlisting><![CDATA[commercial:
+  encryptionKeys:
+    - aes:
+      id: key1
+      name: Example key 1
+      key: 01234567890123456789012345678901
+]]></programlisting>
+</example>
+
+<para>
+  All commercial extensions are held under the <token>commercial</token> key within the codeplug.
+  For now, there is only one extension, the encryption extension listing the encryption keys 
+  described below.
+</para>
+
+<xi:include href="channel.xml"/>
+<xi:include href="encryption.xml"/>
+
+</chapter>

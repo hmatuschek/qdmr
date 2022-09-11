@@ -35,12 +35,12 @@ class MD390 : public TyTRadio
 public:
   /** Constructor.
    * @param device Specifies the DFU device to use for communication with the device.
+   * @param err Passes an error stack to put error messages on.
    * @param parent The QObject parent. */
-  MD390(TyTInterface *device=nullptr, QObject *parent=nullptr);
+  MD390(TyTInterface *device=nullptr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
   const QString &name() const;
-  const Features &features() const;
-
+  const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -56,8 +56,11 @@ private:
   QString _name;
   /** The codeplug object. */
   MD390Codeplug _codeplug;
-  /** Dynamic features, includes frequency range of channels read from device. */
-  Features _features;
+
+private:
+  /** Instance of limits for this radio. Gets intantiated for every radio as it depends on the
+   * radio variant. */
+  RadioLimits *_limits;
 };
 
 #endif // MD2017_HH

@@ -1,7 +1,7 @@
 #include "openrtx_interface.hh"
 
-OpenRTXInterface::OpenRTXInterface(QObject *parent)
-  : DFUDevice(0x0000, 0x0000, parent), RadioInterface()
+OpenRTXInterface::OpenRTXInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
+  : DFUDevice(descr, err, parent), RadioInterface()
 {
   // pass...
 }
@@ -17,50 +17,46 @@ OpenRTXInterface::close() {
   DFUDevice::close();
 }
 
-const QString &
-OpenRTXInterface::errorMessage() const {
-  return DFUDevice::errorMessage();
-}
-
 
 RadioInfo
-OpenRTXInterface::identifier() {
+OpenRTXInterface::identifier(const ErrorStack &err) {
+  Q_UNUSED(err)
   return RadioInfo();
 }
 
 
 bool
-OpenRTXInterface::read_start(uint32_t bank, uint32_t addr) {
+OpenRTXInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+OpenRTXInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXInterface::read_finish() {
+OpenRTXInterface::read_finish(const ErrorStack &err) {
   return false;
 }
 
 
 bool
-OpenRTXInterface::write_start(uint32_t bank, uint32_t addr) {
+OpenRTXInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+OpenRTXInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXInterface::write_finish() {
+OpenRTXInterface::write_finish(const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXInterface::reboot() {
+OpenRTXInterface::reboot(const ErrorStack &err) {
   return false;
 }

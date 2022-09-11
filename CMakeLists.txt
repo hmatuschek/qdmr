@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.9.0)
+project(qdmr VERSION 0.10.3)
 
-set(RELEASE_SUFFIX "-alpha4")
+set(RELEASE_SUFFIX "")
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
 option(INSTALL_UDEV_RULES "Install udev rules file." ON)
+option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
+option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applications")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -67,7 +69,7 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 

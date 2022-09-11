@@ -33,8 +33,8 @@ protected:
 
 protected:
 	Config *_config;
-  Zone _zone;
-  Zone *_editZone;
+  Zone *_myZone;
+  Zone *_zone;
 };
 
 

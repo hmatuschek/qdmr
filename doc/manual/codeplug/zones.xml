@@ -10,9 +10,9 @@
 
 <para>
   The <token>zones</token> element collects all zones defined within the codeplug. It is just a 
-  list of zone definitions. Each zone has an ID (not needed), name and one or two lists of channels. 
-  One for VFO A and one for VFO B. Depending on the radio, a zone will be split into two lists (if 
-  defined) if the radio handles separate zones for each VFO. 
+  list of zone definitions. Each zone has an ID, name and one or two lists of channels. 
+  One for VFO A and one for VFO B. Depending on the radio, a zone will be split automatically into
+  two zones if the radio handles separate zones for each VFO. 
 </para>  
 
 <para>

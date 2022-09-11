@@ -28,8 +28,8 @@ protected:
 
 protected:
 	Config *_config;
-  ScanList _scanList;
-  ScanList *_editScanlist;
+  ScanList *_myScanList;
+  ScanList *_scanlist;
 };
 
 

@@ -43,7 +43,7 @@ else (YAMLCPP_LIBRARIES AND YAMLCPP_INCLUDE_DIRS)
 
   if (YAMLCPP_FOUND)
     if (NOT YAMLCPP_FIND_QUIETLY)
-      message(STATUS "Found yalm-cpp:")
+      message(STATUS "Found yaml-cpp:")
       message(STATUS " - Includes: ${YAMLCPP_INCLUDE_DIRS}")
       message(STATUS " - Libraries: ${YAMLCPP_LIBRARIES}")
     endif (NOT YAMLCPP_FIND_QUIETLY)

@@ -40,7 +40,7 @@ GroupListsView::onAddRxGroup() {
 
 void
 GroupListsView::onRemRxGroup() {
-  // Check if there is any groups seleced
+  // Check if there is any groups selected
   if (! ui->listView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete RX group list"),

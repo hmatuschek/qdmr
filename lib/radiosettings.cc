@@ -1,10 +1,33 @@
 #include "radiosettings.hh"
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigObject("", parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0)
+  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
+    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr),
+    _radioddityExtension(nullptr)
 {
   // pass
+}
+
+bool
+RadioSettings::copy(const ConfigItem &other) {
+  const RadioSettings *set = other.as<RadioSettings>();
+  if ((nullptr==set) || (!ConfigItem::copy(other)))
+    return false;
+  if (set->voxDisabled())
+    disableVOX();
+  if (set->totDisabled())
+    disableTOT();
+  return true;
+}
+
+ConfigItem *
+RadioSettings::clone() const {
+  RadioSettings *set = new RadioSettings();
+  if (! set->copy(*this)) {
+    set->deleteLater();
+    return nullptr;
+  }
+  return set;
 }
 
 void
@@ -17,6 +40,9 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
+
+  setTyTExtension(nullptr);
+  setRadioddityExtension(nullptr);
 }
 
 const QString &
@@ -116,3 +142,43 @@ RadioSettings::disableTOT() {
   setTOT(0);
 }
 
+TyTSettingsExtension *
+RadioSettings::tytExtension() const {
+  return _tytExtension;
+}
+void
+RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
+  if (_tytExtension) {
+    disconnect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _tytExtension->deleteLater();
+  }
+  _tytExtension = ext;
+  if (_tytExtension) {
+    _tytExtension->setParent(this);
+    connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+RadiodditySettingsExtension *
+RadioSettings::radioddityExtension() const {
+  return _radioddityExtension;
+}
+void
+RadioSettings::setRadioddityExtension(RadiodditySettingsExtension *ext) {
+  if (_radioddityExtension) {
+    disconnect(_radioddityExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _radioddityExtension->deleteLater();
+  }
+  _radioddityExtension = ext;
+  if (_radioddityExtension) {
+    _radioddityExtension->setParent(this);
+    connect(_radioddityExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+void
+RadioSettings::onExtensionModified() {
+  emit modified(this);
+}

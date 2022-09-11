@@ -1,6 +1,7 @@
 #include "codeplug.hh"
 #include "config.hh"
 #include <QtEndian>
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -43,13 +44,38 @@ Codeplug::Element::clear() {
 }
 
 bool
+Codeplug::Element::fill(uint8_t value, unsigned offset, int size) {
+  if (0 > size)
+    size = _size-offset;
+  if ((offset+size) > _size) {
+    logFatal() << "Cannot fill codeplug element from " << QString::number(offset,16)
+               << " size " << QString::number(size, 16) << ": overflow.";
+    return false;
+  }
+  memset(_data+offset, value, size);
+  return true;
+}
+
+bool
 Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get bit at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return false;
+  }
+
   uint8_t *ptr = (_data+offset);
   return (1<<bit) & (*ptr);
 }
 
 void
 Codeplug::Element::setBit(unsigned offset, unsigned bit, bool value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set bit at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   uint8_t *ptr = (_data+offset);
   if (value)
     (*ptr) |= (1<<bit);
@@ -59,111 +85,231 @@ Codeplug::Element::setBit(unsigned offset, unsigned bit, bool value) {
 
 void
 Codeplug::Element::clearBit(unsigned offset, unsigned bit) {
+  if (offset >= _size) {
+    logFatal() << "Cannot clear bit at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   uint8_t *ptr = (_data+offset);
   (*ptr) &= ~(1<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt2(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint2 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return 0;
+  }
+
   return (((*(_data+offset)) >> bit) & 0b11);
 }
 void
 Codeplug::Element::setUInt2(unsigned offset, unsigned bit, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set uint2 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   *(_data+offset) &= ~(0b11 << bit);
   *(_data+offset) |= ((value & 0b11)<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt3(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint3 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return 0;
+  }
+
   return (((*(_data+offset)) >> bit) & 0b111);
 }
 void
 Codeplug::Element::setUInt3(unsigned offset, unsigned bit, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set uint3 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   *(_data+offset) &= ~(0b111 << bit);
   *(_data+offset) |= ((value & 0b111)<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt4(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint4 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return 0;
+  }
+
   return (((*(_data+offset)) >> bit) & 0b1111);
 }
 void
 Codeplug::Element::setUInt4(unsigned offset, unsigned bit, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set uint4 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   *(_data+offset) &= ~(0b1111 << bit);
   *(_data+offset) |= ((value & 0b1111)<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt5(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint5 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return 0;
+  }
+
   return (((*(_data+offset)) >> bit) & 0b11111);
 }
 void
 Codeplug::Element::setUInt5(unsigned offset, unsigned bit, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint5 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   *(_data+offset) &= ~(0b11111 << bit);
   *(_data+offset) |= ((value & 0b11111)<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt6(unsigned offset, unsigned bit) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint6 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return 0;
+  }
+
   return (((*(_data+offset)) >> bit) & 0b111111);
 }
 void
 Codeplug::Element::setUInt6(unsigned offset, unsigned bit, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set uint6 at " << QString::number(offset, 16)
+               << " bit " << bit << ": Overflow.";
+    return;
+  }
+
   *(_data+offset) &= ~(0b111111 << bit);
   *(_data+offset) |= ((value & 0b111111)<<bit);
 }
 
 uint8_t
 Codeplug::Element::getUInt8(unsigned offset) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get uint8 at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   return _data[offset];
 }
 void
 Codeplug::Element::setUInt8(unsigned offset, uint8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set uint8 at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   _data[offset] = value;
 }
 
 int8_t
 Codeplug::Element::getInt8(unsigned offset) const {
+  if (offset >= _size) {
+    logFatal() << "Cannot get int8 at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
   return ((int8_t *)_data)[offset];
 }
 void
 Codeplug::Element::setInt8(unsigned offset, int8_t value) {
+  if (offset >= _size) {
+    logFatal() << "Cannot set int8 at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   ((int8_t *)_data)[offset] = value;
 }
 
 uint16_t
 Codeplug::Element::getUInt16_be(unsigned offset) const {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot get int16 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint16_t *ptr = (uint16_t *)(_data+offset);
   return qFromBigEndian(*ptr);
 }
 uint16_t
 Codeplug::Element::getUInt16_le(unsigned offset) const {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot get int16 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint16_t *ptr = (uint16_t *)(_data+offset);
   return qFromLittleEndian(*ptr);
 }
 void
 Codeplug::Element::setUInt16_be(unsigned offset, uint16_t value) {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot set int16 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint16_t *ptr = (uint16_t *)(_data+offset);
   (*ptr) = qToBigEndian(value);
 }
 void
 Codeplug::Element::setUInt16_le(unsigned offset, uint16_t value) {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot set int16 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint16_t *ptr = (uint16_t *)(_data+offset);
   (*ptr) = qToLittleEndian(value);
 }
 
 uint32_t
 Codeplug::Element::getUInt24_be(unsigned offset) const {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot get int24 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint8_t *ptr = _data+offset;
   return uint32_t(ptr[2]) + (uint32_t(ptr[1])<<8) + (uint32_t(ptr[0])<<16);
 }
 uint32_t
 Codeplug::Element::getUInt24_le(unsigned offset) const {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot get int24 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint8_t *ptr = _data+offset;
   return uint32_t(ptr[0]) + (uint32_t(ptr[1])<<8) + (uint32_t(ptr[2])<<16);
 }
 void
 Codeplug::Element::setUInt24_be(unsigned offset, uint32_t value) {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot set int24 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint8_t *ptr = _data+offset;
   ptr[0] = ((value >> 16) & 0xff);
   ptr[1] = ((value >> 8)  & 0xff);
@@ -171,6 +317,11 @@ Codeplug::Element::setUInt24_be(unsigned offset, uint32_t value) {
 }
 void
 Codeplug::Element::setUInt24_le(unsigned offset, uint32_t value) {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot set int24 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint8_t *ptr = _data+offset;
   ptr[0] = ((value >> 0)  & 0xff);
   ptr[1] = ((value >> 8)  & 0xff);
@@ -179,32 +330,62 @@ Codeplug::Element::setUInt24_le(unsigned offset, uint32_t value) {
 
 uint32_t
 Codeplug::Element::getUInt32_be(unsigned offset) const {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot get int32 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t *ptr = (uint32_t *)(_data+offset);
   return qFromBigEndian(*ptr);
 }
 uint32_t
 Codeplug::Element::getUInt32_le(unsigned offset) const {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot get int32 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t *ptr = (uint32_t *)(_data+offset);
   return qFromLittleEndian(*ptr);
 }
 void
 Codeplug::Element::setUInt32_be(unsigned offset, uint32_t value) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set int32 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t *ptr = (uint32_t *)(_data+offset);
   (*ptr) = qToBigEndian(value);
 }
 void
 Codeplug::Element::setUInt32_le(unsigned offset, uint32_t value) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set int32 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t *ptr = (uint32_t *)(_data+offset);
   (*ptr) = qToLittleEndian(value);
 }
 
 uint8_t
 Codeplug::Element::getBCD2(unsigned offset) const {
+  if ((offset+1) > _size) {
+    logFatal() << "Cannot get BCD2 at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint8_t val = getUInt8(offset);
   return (val & 0xf) + ((val>>4) & 0xf)*10;
 }
 void
 Codeplug::Element::setBCD2(unsigned offset, uint8_t val) {
+  if ((offset+1) > _size) {
+    logFatal() << "Cannot get BCD2 at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint8_t a  = (val / 10) % 10;
   uint8_t b  = (val /  1) % 10;
   setUInt8(offset, (a << 4) + b);
@@ -212,11 +393,21 @@ Codeplug::Element::setBCD2(unsigned offset, uint8_t val) {
 
 uint16_t
 Codeplug::Element::getBCD4_be(unsigned offset) const {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot get BCD4 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t val = getUInt16_be(offset);
   return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000;
 }
 void
 Codeplug::Element::setBCD4_be(unsigned offset, uint16_t val) {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot set BCD4 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t a  = (val / 1000) % 10;
   uint32_t b  = (val /  100) % 10;
   uint32_t c  = (val /   10) % 10;
@@ -225,11 +416,21 @@ Codeplug::Element::setBCD4_be(unsigned offset, uint16_t val) {
 }
 uint16_t
 Codeplug::Element::getBCD4_le(unsigned offset) const {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot get BCD4 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t val = getUInt16_le(offset);
   return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000;
 }
 void
 Codeplug::Element::setBCD4_le(unsigned offset, uint16_t val) {
+  if ((offset+2) > _size) {
+    logFatal() << "Cannot set BCD4 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t a  = (val / 1000) % 10;
   uint32_t b  = (val /  100) % 10;
   uint32_t c  = (val /   10) % 10;
@@ -239,6 +440,11 @@ Codeplug::Element::setBCD4_le(unsigned offset, uint16_t val) {
 
 uint32_t
 Codeplug::Element::getBCD8_be(unsigned offset) const {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot get BCD8 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t val = getUInt32_be(offset);
   return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000 +
       ((val>>16) & 0xf)*10000 + ((val>>20) & 0xf)*100000 + ((val>>24) & 0xf)*1000000 +
@@ -246,6 +452,11 @@ Codeplug::Element::getBCD8_be(unsigned offset) const {
 }
 void
 Codeplug::Element::setBCD8_be(unsigned offset, uint32_t val) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set BCD8 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t a  = (val / 10000000) % 10;
   uint32_t b  = (val /  1000000) % 10;
   uint32_t c  = (val /   100000) % 10;
@@ -258,6 +469,11 @@ Codeplug::Element::setBCD8_be(unsigned offset, uint32_t val) {
 }
 uint32_t
 Codeplug::Element::getBCD8_le(unsigned offset) const {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot get BCD8 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
   uint32_t val = getUInt32_le(offset);
   return (val & 0xf) + ((val>>4) & 0xf)*10 + ((val>>8) & 0xf)*100 + ((val>>12) & 0xf)*1000 +
       ((val>>16) & 0xf)*10000 + ((val>>20) & 0xf)*100000 + ((val>>24) & 0xf)*1000000 +
@@ -265,6 +481,11 @@ Codeplug::Element::getBCD8_le(unsigned offset) const {
 }
 void
 Codeplug::Element::setBCD8_le(unsigned offset, uint32_t val) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set BCD8 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
   uint32_t a  = (val / 10000000) % 10;
   uint32_t b  = (val /  1000000) % 10;
   uint32_t c  = (val /   100000) % 10;
@@ -324,7 +545,7 @@ Codeplug::Context::Context(Config *config)
   : _config(config), _tables()
 {
   // Add tables for common elements
-  addTable(&RadioID::staticMetaObject);
+  addTable(&DMRRadioID::staticMetaObject);
   addTable(&DigitalContact::staticMetaObject);
   addTable(&DTMFContact::staticMetaObject);
   addTable(&RXGroupList::staticMetaObject);
@@ -366,7 +587,7 @@ Codeplug::Context::addTable(const QMetaObject *obj) {
   return true;
 }
 
-ConfigObject *
+ConfigItem *
 Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {
   if (! hasTable(elementType))
     return nullptr;
@@ -374,7 +595,7 @@ Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {
 }
 
 int
-Codeplug::Context::index(ConfigObject *obj) {
+Codeplug::Context::index(ConfigItem *obj) {
   if (nullptr == obj)
     return -1;
   if (! hasTable(obj->metaObject()))
@@ -383,7 +604,7 @@ Codeplug::Context::index(ConfigObject *obj) {
 }
 
 bool
-Codeplug::Context::add(ConfigObject *obj, unsigned idx) {
+Codeplug::Context::add(ConfigItem *obj, unsigned idx) {
   if (!hasTable(obj->metaObject()))
     return false;
   if (getTable(obj->metaObject()).indices.contains(obj))

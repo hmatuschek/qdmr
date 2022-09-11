@@ -8,7 +8,8 @@
  *
  * The call-sign DB gets stored at a separate memory bank (no. 3) at address @c 0x0000. The encoded
  * DB consists of the DB header followed by the DB entries. The number of entries is limited to
- * 10920 leading to a max DB size of 0x20000 bytes.
+ * 10920 leading to a max DB size of 0x20000 bytes. These 0x20000 bytes are organized into two banks
+ * bank 3 contains 0x00000-0x0ffff and bank 4 contains 0x10000-0x1ffff.
  *
  * The header is encoded as:
  * @verbinclude gd77_callsign_db_header.txt
@@ -28,7 +29,7 @@ public:
   /** Represents a user-db entry within the binary codeplug. */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
-    char name[8];                       ///< Call or name, upto 8 ASCII chars, 0x00 padded.
+    char name[8];                       ///< Call or name, up to 8 ASCII chars, 0x00 padded.
 
     /** Constructor. */
     userdb_entry_t();
@@ -75,7 +76,8 @@ public:
   virtual ~GD77CallsignDB();
 
   /** Encodes as many entries as possible of the given user-database. */
-  virtual bool encode(UserDatabase *calldb, const Selection &selection=Selection());
+  virtual bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
+                      const ErrorStack &err=ErrorStack());
 };
 
 #endif // GD77CALLSIGNDB_HH

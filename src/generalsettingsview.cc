@@ -31,11 +31,14 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
 
-  ui->squelchValue->setValue(config->settings()->squelch());
-  ui->totValue->setValue(config->settings()->tot());
-  ui->voxValue->setValue(config->settings()->vox());
+  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->totValue->setValue(_config->settings()->tot());
+  ui->voxValue->setValue(_config->settings()->vox());
 
-  connect(_config, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  ui->extensionView->setObjectName("radioSettingsExtension");
+  ui->extensionView->setObject(_config->settings(), _config);
+
+  connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->dmrID, SIGNAL(textEdited(QString)), this, SLOT(onDMRIDChanged()));
   connect(ui->radioName, SIGNAL(textEdited(QString)), this, SLOT(onNameChanged()));
   connect(ui->introLine1, SIGNAL(textEdited(QString)), this, SLOT(onIntroLine1Changed()));
@@ -58,6 +61,11 @@ GeneralSettingsView::hideDMRID(bool hidden) {
 }
 
 void
+GeneralSettingsView::hideExtensions(bool hidden) {
+  ui->extensionBox->setHidden(hidden);
+}
+
+void
 GeneralSettingsView::onConfigModified() {
   if (_config->radioIDs()->defaultId()) {
     ui->dmrID->setText(QString::number(_config->radioIDs()->defaultId()->number()));
@@ -70,6 +78,16 @@ GeneralSettingsView::onConfigModified() {
   ui->introLine2->setText(_config->settings()->introLine2());
   ui->mic->setValue(_config->settings()->micLevel());
   ui->speech->setChecked(_config->settings()->speech());
+  switch(_config->settings()->power()) {
+  case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;
+  case Channel::Power::High: ui->powerValue->setCurrentIndex(1); break;
+  case Channel::Power::Mid: ui->powerValue->setCurrentIndex(2); break;
+  case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
+  case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
+  }
+  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->totValue->setValue(_config->settings()->tot());
+  ui->voxValue->setValue(_config->settings()->vox());
 }
 
 void

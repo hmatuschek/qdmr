@@ -1,27 +1,32 @@
 #include "config.hh"
 #include "config.h"
+
 #include "rxgrouplist.hh"
 #include "channel.hh"
+#include "encryptionextension.hh"
+#include "csvreader.hh"
+#include "userdatabase.hh"
+#include "logger.hh"
+
 #include <QTextStream>
 #include <QDateTime>
 #include <QFile>
+#include <QMetaProperty>
 #include <cmath>
-#include "csvreader.hh"
-#include "csvwriter.hh"
-#include "userdatabase.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of Config
  * ********************************************************************************************* */
 Config::Config(QObject *parent)
-  : ConfigObject("", parent), _modified(false), _settings(new RadioSettings(this)),
+  : ConfigItem(parent), _modified(false), _settings(new RadioSettings(this)),
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this))
+    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
+    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
 {
-  connect(_settings, SIGNAL(modified(ConfigObject*)), this, SLOT(onConfigModified()));
+  connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
@@ -46,6 +51,37 @@ Config::Config(QObject *parent)
   connect(_roaming, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+
+  connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+}
+
+bool
+Config::copy(const ConfigItem &other) {
+  const Config *conf = other.as<Config>();
+  if ((nullptr==conf) || (! ConfigItem::copy(other)))
+    return false;
+
+  _settings->copy(*conf->settings());
+  _radioIDs->copy(*conf->radioIDs());
+  _contacts->copy(*conf->contacts());
+  _rxGroupLists->copy(*conf->rxGroupLists());
+  _channels->copy(*conf->channelList());
+  _zones->copy(*conf->zones());
+  _scanlists->copy(*conf->scanlists());
+  _gpsSystems->copy(*conf->posSystems());
+  _roaming->copy(*conf->roaming());
+
+  return true;
+}
+
+ConfigItem *
+Config::clone() const {
+  Config *conf = new Config();
+  if (! conf->copy(*this)) {
+    conf->deleteLater();
+    return nullptr;
+  }
+  return conf;
 }
 
 bool
@@ -55,45 +91,19 @@ Config::isModified() const {
 void
 Config::setModified(bool modified) {
   _modified = modified;
-  if (_modified)
-    emit this->modified(this);
 }
 
 bool
-Config::label(Context &context) {
-  if (! ConfigObject::label(context))
+Config::toYAML(QTextStream &stream, const ErrorStack &err) {
+  ConfigItem::Context context;
+  // Label all codeplug elements
+  if (! this->label(context, err))
     return false;
-
-  if (! _settings->label(context))
-    return false;
-  if (! _radioIDs->label(context))
-    return false;
-  if (! _contacts->label(context))
-    return false;
-  if (! _rxGroupLists->label(context))
-    return false;
-  if (! _channels->label(context))
-    return false;
-  if (! _zones->label(context))
-    return false;
-  if (! _scanlists->label(context))
-    return false;
-  if (! _gpsSystems->label(context))
-    return false;
-  if (! _roaming->label(context))
-    return false;
-
-  return true;
-}
-
-bool
-Config::toYAML(QTextStream &stream) {
-  ConfigObject::Context context;
-  if (! this->label(context))
-    return false;
-  YAML::Node doc = serialize(context);
+  // Serialize into YAML
+  YAML::Node doc = serialize(context, err);
   if (doc.IsNull())
     return false;
+  // Print YAML
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc << doc << YAML::EndDoc;
   stream << emitter.c_str();
@@ -101,47 +111,47 @@ Config::toYAML(QTextStream &stream) {
 }
 
 bool
-Config::populate(YAML::Node &node, const Context &context)
+Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err)
 {
   node["version"] = VERSION_STRING;
 
-  if ((node["settings"]= _settings->serialize(context)).IsNull())
+  if ((node["settings"]= _settings->serialize(context, err)).IsNull())
     return false;
 
   if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
     node["settings"]["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
 
-  if ((node["radioIDs"] = _radioIDs->serialize(context)).IsNull())
+  if ((node["radioIDs"] = _radioIDs->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["contacts"] = _contacts->serialize(context)).IsNull())
+  if ((node["contacts"] = _contacts->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["groupLists"] = _rxGroupLists->serialize(context)).IsNull())
+  if ((node["groupLists"] = _rxGroupLists->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["channels"] = _channels->serialize(context)).IsNull())
+  if ((node["channels"] = _channels->serialize(context, err)).IsNull())
     return false;
 
-  if ((node["zones"] = _zones->serialize(context)).IsNull())
+  if ((node["zones"] = _zones->serialize(context, err)).IsNull())
     return false;
 
   if (_scanlists->count()) {
-    if ((node["scanLists"] = _scanlists->serialize(context)).IsNull())
+    if ((node["scanLists"] = _scanlists->serialize(context, err)).IsNull())
       return false;
   }
 
   if (_gpsSystems->count()) {
-    if ((node["positioning"] = _gpsSystems->serialize(context)).IsNull())
+    if ((node["positioning"] = _gpsSystems->serialize(context, err)).IsNull())
       return false;
   }
 
   if (_roaming->count()) {
-    if ((node["roaming"] = _roaming->serialize(context)).IsNull())
+    if ((node["roaming"] = _roaming->serialize(context, err)).IsNull())
       return false;
   }
 
-  if (! ConfigObject::populate(node, context))
+  if (! ConfigItem::populate(node, context, err))
     return false;
 
   return true;
@@ -225,10 +235,9 @@ Config::requiresGPS() const {
   return chHasGPS;
 }
 
-
 void
 Config::clear() {
-  ConfigObject::clear();
+  ConfigItem::clear();
 
   // Reset lists
   _settings->clear();
@@ -242,6 +251,34 @@ Config::clear() {
   _roaming->clear();
 
   emit modified(this);
+}
+
+const Config *
+Config::config() const {
+  return this;
+}
+
+
+CommercialExtension *
+Config::commercialExtension() const {
+  return _commercialExtension;
+}
+
+TyTConfigExtension *
+Config::tytExtension() const {
+  return _tytExtension;
+}
+void
+Config::setTyTExtension(TyTConfigExtension *ext) {
+  if (_tytExtension == ext)
+    return;
+  if (_tytExtension)
+    _tytExtension->deleteLater();
+  _tytExtension = ext;
+  if (_tytExtension) {
+    _tytExtension->setParent(this);
+    connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+  }
 }
 
 void
@@ -269,3 +306,124 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
   return true;
 }
 
+bool
+Config::readYAML(const QString &filename, const ErrorStack &err) {
+  YAML::Node node;
+  try {
+     node = YAML::LoadFile(filename.toStdString());
+  } catch (const YAML::Exception &exc) {
+    errMsg(err) << "Cannot read YAML codeplug from file '"<< filename
+                << "': " << QString::fromStdString(exc.msg) << ".";
+    return false;
+  }
+
+  if (! node) {
+    errMsg(err) << "Cannot read YAML codeplug from file '" << filename << "'.";
+    return false;
+  }
+
+  clear();
+  ConfigItem::Context context;
+
+  if (! parse(node, context, err))
+    return false;
+
+  if (! link(node, context, err))
+    return false;
+
+  return true;
+}
+
+bool
+Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
+{
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot read configuration"
+                << ": Element is not a map.";
+    return false;
+  }
+
+  if (node["version"] && node["version"].IsScalar()) {
+    ctx.setVersion(QString::fromStdString(node["version"].as<std::string>()));
+    logDebug() << "Using format version " << ctx.version() << ".";
+  } else {
+    logWarn() << "No version string set, assuming 0.9.0.";
+    ctx.setVersion("0.9.0");
+  }
+
+  if (node["settings"] && (! _settings->parse(node["settings"], ctx, err)))
+    return false;
+  if (node["radioIDs"] && (! _radioIDs->parse(node["radioIDs"], ctx, err)))
+    return false;
+  if (node["contacts"] && (! _contacts->parse(node["contacts"], ctx, err)))
+    return false;
+  if (node["groupLists"] && (! _rxGroupLists->parse(node["groupLists"], ctx, err)))
+    return false;
+  if (node["channels"] && (! _channels->parse(node["channels"], ctx, err)))
+    return false;
+  if (node["zones"] && (! _zones->parse(node["zones"], ctx, err)))
+    return false;
+  if (node["scanLists"] && (! _scanlists->parse(node["scanLists"], ctx, err)))
+    return false;
+  if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx, err)))
+    return false;
+  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
+    return false;
+
+  // also parses extensions
+  if (! ConfigItem::parse(node, ctx, err))
+    return false;
+
+  return true;
+}
+
+bool
+Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  // radio IDs must be linked before settings, as they may refer to the default DMR ID
+
+  if (! _radioIDs->link(node["radioIDs"], ctx, err))
+    return false;
+
+  if (! _settings->link(node["settings"], ctx, err))
+    return false;
+
+  // Link default radio ID separately as it is not a property of the settings but defined there
+  if (node["settings"] && node["settings"]["defaultID"] && node["settings"]["defaultID"].IsScalar()) {
+    YAML::Node defIDNode = node["settings"]["defaultID"];
+    QString id = QString::fromStdString(defIDNode.as<std::string>());
+    if (ctx.contains(id) && ctx.getObj(id)->is<DMRRadioID>()) {
+      DMRRadioID *def = ctx.getObj(id)->as<DMRRadioID>();
+      radioIDs()->setDefaultId(radioIDs()->indexOf(def));
+      logDebug() << "Set default radio ID to '" << def->name() << "'.";
+    } else {
+      errMsg(err) << defIDNode.Mark().line << ":" << defIDNode.Mark().column
+                  << "Default radio ID '" << id << " does not refer to a radio ID.";
+      return false;
+    }
+  } else if (radioIDs()->count()) {
+    // If no default is set, use first one.
+    radioIDs()->setDefaultId(0);
+  }
+
+  if (node["contacts"] && (! _contacts->link(node["contacts"], ctx, err)))
+    return false;
+  if (node["groupLists"] && (! _rxGroupLists->link(node["groupLists"], ctx, err)))
+    return false;
+  if (node["channels"] && (! _channels->link(node["channels"], ctx, err)))
+    return false;
+  if (node["zones"] && (! _zones->link(node["zones"], ctx, err)))
+    return false;
+  if (node["scanLists"] && (! _scanlists->link(node["scanLists"], ctx, err)))
+    return false;
+  if (node["positioning"] && (! _gpsSystems->link(node["positioning"], ctx, err)))
+    return false;
+  if (node["roaming"] && (! _roaming->link(node["roaming"], ctx, err)))
+    return false;
+
+  // also links extensions
+  if (! ConfigItem::link(node, ctx, err))
+    return false;
+
+  return true;
+}

@@ -16,58 +16,41 @@ class PositioningSystem: public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the system. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The update period in seconds. */
   Q_PROPERTY(unsigned period READ period WRITE setPeriod)
 
 protected:
+  /** Default constructor. */
+  explicit PositioningSystem(QObject *parent=nullptr);
   /** Hidden constructor.
    * The PositioningSystem class is not instantiated directly, use either @c GPSSystem or
    * @c APRSSystem instead.
    * @param name Specifies the name of the system.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specified the QObject parent object. */
-  explicit PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
+  PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
   virtual ~PositioningSystem();
-
-  using ConfigObject::serialize;
-
-  /** Returns @c true if this positioning system is an instance of the specified system. */
-  template <class System>
-  bool is() const { return nullptr != dynamic_cast<const System *>(this); }
-
-  /** Casts this positioning system to an instance of the specified system. */
-  template <class System>
-  System *as() { return dynamic_cast<System *>(this); }
-
-  /** Casts this positioning system to an instance of the specified system. */
-  template <class System>
-  const System *as() const { return dynamic_cast<const System *>(this); }
-
-  /** Returns the name of the GPS system. */
-  const QString &name() const;
-  /** Sets the name of the GPS system. */
-  void setName(const QString &name);
 
   /** Returns the update period in seconds. */
   unsigned period() const;
   /** Sets the update period in seconds. */
   void setPeriod(unsigned period);
 
+public:
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  bool populate(YAML::Node &node, const ConfigObject::Context &context);
+  bool populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called, whenever a reference is modified. */
   void onReferenceModified();
 
 protected:
-  /** Holds the name of the GPS system. */
-  QString _name;
   /** Holds the update period in seconds. */
   unsigned _period;
 };
@@ -80,11 +63,13 @@ class GPSSystem : public PositioningSystem
   Q_OBJECT
 
   /** References the destination contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
   /** References the revert channel. */
-  Q_PROPERTY(DigitalChannelReference* revert READ revert)
+  Q_PROPERTY(DigitalChannelReference* revert READ revert WRITE setRevert)
 
 public:
+  /** Default constructor. */
+  explicit GPSSystem(QObject *parent=nullptr);
   /** Constructor.
    *
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
@@ -99,18 +84,20 @@ public:
             DigitalChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
-  YAML::Node serialize(const Context &context);
+  ConfigItem *clone() const;
 
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
   DigitalContact *contactObj() const;
   /** Sets the destination contact for the GPS information. */
-  void setContact(DigitalContact *contactObj);
+  void setContactObj(DigitalContact *contactObj);
   /** Returns the reference to the destination contact. */
   const DigitalContactReference *contact() const;
   /** Returns the reference to the destination contact. */
   DigitalContactReference *contact();
+  /** Sets the reference to the destination contact for the GPS information. */
+  void setContact(DigitalContactReference *contactObj);
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
    * be send on the current channel. */
@@ -123,6 +110,11 @@ public:
   const DigitalChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DigitalChannelReference *revert();
+  /** Sets the revert channel for the GPS information to be send on. */
+  void setRevert(DigitalChannelReference *channel);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the destination contact for the GPS information. */
@@ -132,14 +124,14 @@ protected:
 };
 
 
-/** Represents an APRS system wihtin the generic config.
+/** Represents an APRS system within the generic config.
  * @ingroup conf */
 class APRSSystem: public PositioningSystem
 {
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(AnalogChannelReference* revert READ revert)
+  Q_PROPERTY(AnalogChannelReference* revert READ revert WRITE setRevert)
   /** The APRS icon. */
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
@@ -167,6 +159,8 @@ public:
   Q_ENUM(Icon)
 
 public:
+  /** Default constructor. */
+  explicit APRSSystem(QObject *parent=nullptr);
   /** Constructor for a APRS system.
    * @param name Specifies the name of the APRS system. This property is just a name, it does not
    *        affect the radio configuration.
@@ -182,12 +176,12 @@ public:
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  explicit APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
-                      const QString &src, unsigned srcSSID,
-                      const QString &path="", Icon icon=Icon::Jogger,
-                      const QString &message="", unsigned period=300, QObject *parent=nullptr);
+  APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+             const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
+             const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Returns the transmit channel of the APRS system. */
   AnalogChannel *revertChannel() const;
@@ -197,8 +191,10 @@ public:
   const AnalogChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   AnalogChannelReference *revert();
+  /** Sets the revert channel reference. */
+  void setRevert(AnalogChannelReference *ref);
 
-  /** Retruns the destination call. */
+  /** Returns the destination call. */
   const QString &destination() const;
   /** Returns the destination SSID. */
   unsigned destSSID() const;
@@ -212,7 +208,7 @@ public:
   /** Sets the source call and SSID. */
   void setSource(const QString &call, unsigned ssid);
 
-  /** Retruns the APRS path. */
+  /** Returns the APRS path. */
   const QString &path() const;
   /** Sets the APRS path. */
   void setPath(const QString &path);
@@ -222,13 +218,17 @@ public:
   /** Sets the map icon. */
   void setIcon(Icon icon);
 
-  /** Retunrs the optional message. */
+  /** Returns the optional message. */
   const QString &message() const;
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** A weak reference to the transmit channel. */
@@ -282,6 +282,9 @@ public:
   /** Returns the APRS system at index @c idx.
    * That index is only within all defined APRS systems. */
   APRSSystem *aprsSystem(int idx) const;
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

@@ -12,7 +12,7 @@
  * the memory layout (see below) and almost all of the single components of the codeplug are encoded in
  * exactly the same way. Obviously, when Baofeng and Radioddity joint to create the RD5R,
  * Radioddity provided the firmware. However, there are some small subtile differences between
- * these two codeplug formats, requireing a separate class for the GD-77. For example, the contacts
+ * these two codeplug formats, requiring a separate class for the GD-77. For example, the contacts
  * and scan-lists swapped the addresses and the @c channel_t encoding analog and digital channels
  * for the codeplugs are identical except for the squelch settings. Thanks for that!
  *
@@ -40,7 +40,7 @@
  *  <tr><td>0x02dd0</td> <td>0x02f88</td> <td>0x01b8</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>DTMF contacts, see RadioddityCodeplug::DTMFContactElement.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RadioddityCodeplug::ChannelBankElement and GD77Codeplug::ChannelElement</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 channels (bank 0), see @c RadioddityCodeplug::ChannelBankElement and GD77Codeplug::ChannelElement</td></tr>
  *  <tr><td>0x05390</td> <td>0x07518</td> <td>0x2188</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x07518</td> <td>0x07538</td> <td>0x0020</td> <td>Boot settings, see @c RadioddityCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>0x07538</td> <td>0x07540</td> <td>0x0008</td> <td>Menu settings, see @c RadioddityCodeplug::MenuSettingsElement.</td></tr>
@@ -54,7 +54,7 @@
  *  <tr><td>0x08000</td> <td>0x08010</td> <td>0x0010</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x08010</td> <td>0x0af10</td> <td>0x2f00</td> <td>68 zones of 80 channels each, see @c RadioddityCodeplug::ZoneBankElement @c RadioddityCodeplug::ZoneElement.</td></tr>
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement, @c GD77Codeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement, @c GD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x17620</td> <td>0x1d620</td> <td>0x6000</td> <td>1024 contacts, see @c GD77Codeplug::ContactElement.</td></tr>
  *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c GD77Codeplug::GroupListBankElement, @c GD77Codeplug::GroupListElement.</td></tr>
  *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
@@ -106,12 +106,12 @@ public:
 
     void clear();
 
-    /** Retruns the ARTS mode. */
+    /** Returns the ARTS mode. */
     virtual ARTSMode artsMode() const;
     /** Sets the ARTS mode. */
     virtual void setARTSMode(ARTSMode mode);
 
-    /** Retunrs the STE angle. */
+    /** Returns the STE angle. */
     virtual STEAngle steAngle() const;
     /** Sets the STE angle. */
     virtual void setSTEAngle(STEAngle angle);
@@ -139,7 +139,7 @@ public:
 
   /** Specific codeplug representation of a DMR contact for the GD77.
    *
-   * Memmory layout of the contact (0x18b):
+   * Memory layout of the contact (0x18b):
    * @verbinclude gd77_contact.txt
    */
   class ContactElement: public RadioddityCodeplug::ContactElement
@@ -242,48 +242,53 @@ public:
 
 public:
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Config *config, Context &ctx);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
   void clearMessages();
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
-  bool createScanLists(Config *config, Context &ctx);
-  bool linkScanLists(Config *config, Context &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createContacts(Config *config, Context &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearDTMFContacts();
-  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createDTMFContacts(Config *config, Context &ctx);
+  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
-  bool createChannels(Config *config, Context &ctx);
-  bool linkChannels(Config *config, Context &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
   void clearMenuSettings();
 
   void clearBootText();
-  bool encodeBootText(Config *config, const Flags &flags, Context &ctx);
-  bool decodeBootText(Config *config, Context &ctx);
+  bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
-  bool createZones(Config *config, Context &ctx);
-  bool linkZones(Config *config, Context &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
-  bool createGroupLists(Config *config, Context &ctx);
-  bool linkGroupLists(Config *config, Context &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void clearEncryption();
+  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
 };
 
 #endif // GD77_CODEPLUG_HH

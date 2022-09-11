@@ -272,7 +272,7 @@ OpenRTXCodeplug::clear() {
 }
 
 bool
-OpenRTXCodeplug::index(Config *config, Context &ctx) const {
+OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
@@ -321,52 +321,52 @@ OpenRTXCodeplug::index(Config *config, Context &ctx) const {
 }
 
 bool
-OpenRTXCodeplug::encode(Config *config, const Flags &flags) {
+OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
   if (nullptr == config->radioIDs()->defaultId()) {
-    _errorMessage = tr("Cannot encode TyT codeplug: No default radio ID specified.");
+    errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
     return false;
   }
 
   // Create index<->object table.
   Context ctx(config);
-  if (! index(config, ctx))
+  if (! index(config, ctx, err))
     return false;
 
-  return this->encodeElements(flags, ctx);
+  return this->encodeElements(flags, ctx, err);
 }
 
 bool
-OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx) {
+OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode general settings: %1").arg(_errorMessage);
+  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode contacts: %1").arg(_errorMessage);
+  if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
-  if (! this->encodeChannels(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode channels: %1").arg(_errorMessage);
+  if (! this->encodeChannels(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
-  if (! this->encodeZones(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode zones: %1").arg(_errorMessage);
+  if (! this->encodeZones(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
-  if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode scan lists: %1").arg(_errorMessage);
+  if (! this->encodeScanLists(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
-  if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
-    _errorMessage = tr("Cannot encode group lists: %1").arg(_errorMessage);
+  if (! this->encodeGroupLists(ctx.config(), flags, ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
@@ -374,65 +374,65 @@ OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx) {
 }
 
 bool
-OpenRTXCodeplug::decode(Config *config) {
+OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
   config->clear();
 
   // Create index<->object table.
   Context ctx(config);
 
-  return this->decodeElements(ctx);
+  return this->decodeElements(ctx, err);
 }
 
 bool
-OpenRTXCodeplug::decodeElements(Context &ctx) {
-  if (! this->decodeGeneralSettings(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot decode general settings: %1").arg(_errorMessage);
+OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! this->decodeGeneralSettings(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
-  if (! this->createContacts(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create contacts: %1").arg(_errorMessage);
+  if (! this->createContacts(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
-  if (! this->createChannels(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create channels: %1").arg(_errorMessage);
+  if (! this->createChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create channels.";
     return false;
   }
 
-  if (! this->createZones(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create zones: %1").arg(_errorMessage);
+  if (! this->createZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create zones.";
     return false;
   }
 
-  if (! this->createScanLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create scan lists: %1").arg(_errorMessage);
+  if (! this->createScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
-  if (! this->createGroupLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot create group lists: %1").arg(_errorMessage);
+  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
-  if (! this->linkChannels(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot link channels: %1").arg(_errorMessage);
+  if (! this->linkChannels(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
     return false;
   }
 
-  if (! this->linkZones(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot link zones: %1").arg(_errorMessage);
+  if (! this->linkZones(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
     return false;
   }
 
-  if (! this->linkScanLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot link scan lists: %1").arg(_errorMessage);
+  if (! this->linkScanLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
-  if (! this->linkGroupLists(ctx.config(), ctx)) {
-    _errorMessage = tr("Cannot link group lists: %1").arg(_errorMessage);
+  if (! this->linkGroupLists(ctx.config(), ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
@@ -441,110 +441,110 @@ OpenRTXCodeplug::decodeElements(Context &ctx) {
 
 
 void
-OpenRTXCodeplug::clearGeneralSettings() {
+OpenRTXCodeplug::clearGeneralSettings(const ErrorStack &err) {
 }
 
 bool
-OpenRTXCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+OpenRTXCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::decodeGeneralSettings(Config *config, Context &ctx) {
-  return false;
-}
-
-
-void
-OpenRTXCodeplug::clearContacts() {
-}
-
-bool
-OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::createContacts(Config *config, Context &ctx) {
+OpenRTXCodeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 
 void
-OpenRTXCodeplug::clearChannels() {
+OpenRTXCodeplug::clearContacts(const ErrorStack &err) {
 }
 
 bool
-OpenRTXCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::createChannels(Config *config, Context &ctx) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::linkChannels(Config *config, Context &ctx) {
+OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 
 void
-OpenRTXCodeplug::clearZones() {
+OpenRTXCodeplug::clearChannels(const ErrorStack &err) {
 }
 
 bool
-OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+OpenRTXCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::createZones(Config *config, Context &ctx) {
+OpenRTXCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::linkZones(Config *config, Context &ctx) {
-  return false;
-}
-
-
-void
-OpenRTXCodeplug::clearGroupLists() {
-}
-
-bool
-OpenRTXCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::createGroupLists(Config *config, Context &ctx) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::linkGroupLists(Config *config, Context &ctx) {
+OpenRTXCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 
 void
-OpenRTXCodeplug::clearScanLists() {
+OpenRTXCodeplug::clearZones(const ErrorStack &err) {
 }
 
 bool
-OpenRTXCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::createScanLists(Config *config, Context &ctx) {
+OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }
 
 bool
-OpenRTXCodeplug::linkScanLists(Config *config, Context &ctx) {
+OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+
+void
+OpenRTXCodeplug::clearGroupLists(const ErrorStack &err) {
+}
+
+bool
+OpenRTXCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+bool
+OpenRTXCodeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+bool
+OpenRTXCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+
+void
+OpenRTXCodeplug::clearScanLists(const ErrorStack &err) {
+}
+
+bool
+OpenRTXCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+bool
+OpenRTXCodeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+  return false;
+}
+
+bool
+OpenRTXCodeplug::linkScanLists(Config *config, Context &ctx, const ErrorStack &err) {
   return false;
 }

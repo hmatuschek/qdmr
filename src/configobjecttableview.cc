@@ -72,7 +72,7 @@ ConfigObjectTableView::onMoveItemUp() {
     return;
   }
 
-  // Get selection range assuming only continious selection mode
+  // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
   if ((0>rows.first) || (0>rows.second))
@@ -96,7 +96,7 @@ ConfigObjectTableView::onMoveItemDown() {
     return;
   }
 
-  // Get selection range assuming only continious selection mode
+  // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
   if ((0>rows.first) || (0>rows.second))

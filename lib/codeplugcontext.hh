@@ -28,7 +28,7 @@ public:
   /** Adds the given radio ID at the given index to the list. */
   bool addRadioId(uint32_t id, int index, const QString &name="");
   /** Maps the given index to the associated radio ID. */
-  RadioID *getRadioId(int idx) const;
+  DMRRadioID *getRadioId(int idx) const;
 
   /** Returns @c true, if the given channel index has been defined before. */
   bool hasChannel(int index) const;
@@ -79,7 +79,7 @@ public:
   /** Gets an APRS system for the specified index or @c nullptr if not defined. */
   APRSSystem *getAPRSSystem(int index) const;
 
-  /** Retruns @c true if the given roaming zone index is defined. */
+  /** Returns @c true if the given roaming zone index is defined. */
   bool hasRoamingZone(int index) const;
   /** Associates the given roaming zone with the given index. */
   bool addRoamingZone(RoamingZone *zone, int index);

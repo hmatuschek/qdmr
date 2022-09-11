@@ -29,8 +29,8 @@ public:
   };
 
 public:
-  /** Connects to the radio with given vendor and product ID. */
-  explicit RadioddityInterface(int vid, int pid, QObject *parent = nullptr);
+  /** Connects to the radio via the given descriptor. */
+  explicit RadioddityInterface(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
   /** Destructor. */
   virtual ~RadioddityInterface();
 
@@ -40,38 +40,43 @@ public:
   void close();
 
   /** Returns radio identifier string. */
-  RadioInfo identifier();
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
 
-  bool read_start(uint32_t bank, uint32_t addr);
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
 
   /** Reads a block of data from the device at the given block number.
    * @param bank The memory bank to read from.
    * @param addr The address to read from within the memory bank.
    * @param data Pointer to memory where the read data is stored.
    * @param nbytes The number of bytes to read.
+   * @param err The error stack, messages are put onto.
    * @returns @c true on success. */
-  bool read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes);
+  bool read(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes, const ErrorStack &err=ErrorStack());
 
-  bool read_finish();
+  bool read_finish(const ErrorStack &err=ErrorStack());
 
-  bool write_start(uint32_t bank, uint32_t addr);
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
 
   /** Writes a block of data to the device at the given block number.
    * @param bank The memory bank to read from.
    * @param addr The address to read from within the memory bank.
    * @param data Pointer to memory where the read data is stored.
    * @param nbytes The number of bytes to read.
+   * @param err The error stack, messages are put onto.
    * @returns @c true on success. */
-  bool write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes);
+  bool write(uint32_t bank, uint32_t addr, unsigned char *data, int nbytes, const ErrorStack &err=ErrorStack());
 
-  bool write_finish();
+  bool write_finish(const ErrorStack &err=ErrorStack());
 
-  /** Retruns the last error message. */
-  inline const QString &errorMessage() const { return _errorMessage; }
+public:
+  /** Returns some information about the interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
 
 protected:
   /** Internal used function to select a memory bank. */
-  bool selectMemoryBank(MemoryBank bank);
+  bool selectMemoryBank(MemoryBank bank, const ErrorStack &err=ErrorStack());
 
 private:
   /** The currently selected memory bank. */

@@ -5,6 +5,7 @@
 #include "signaling.hh"
 #include "channel.hh"
 #include "contact.hh"
+#include "radioddity_extensions.hh"
 
 class DigitalContact;
 class Zone;
@@ -89,7 +90,7 @@ public:
     /** Sets the transmit time-out re-key delay in seconds. */
     virtual void setTXTimeOutRekeyDelay(unsigned delay);
 
-    /** Retunrs the admit criterion. */
+    /** Returns the admit criterion. */
     virtual Admit admitCriterion() const;
     /** Sets the admit criterion. */
     virtual void setAdmitCriterion(Admit admit);
@@ -228,7 +229,7 @@ public:
     ChannelBankElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constrcutor. */
+    /** Constructor. */
     explicit ChannelBankElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelBankElement();
@@ -236,7 +237,7 @@ public:
     /** Clears the bank. */
     void clear();
 
-    /** Retruns @c true if the channel is enabled. */
+    /** Returns @c true if the channel is enabled. */
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
@@ -355,10 +356,10 @@ public:
 
   /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
    *
-   * Memmory layout of the DTMF contact:
+   * Memory layout of the DTMF contact:
    * @verbinclude radioddity_dtmfcontact.txt
    */
-  class DTMFContactElement: Element
+  class DTMFContactElement: public Element
   {
   protected:
     /** Hidden constructor. */
@@ -393,10 +394,10 @@ public:
 
   /** Represents a zone within Radioddity codeplugs.
    *
-   * Memmory layout of the zone:
+   * Memory layout of the zone:
    * @verbinclude radioddity_zone.txt
    */
-  class ZoneElement: Element
+  class ZoneElement: public Element
   {
   protected:
     /** Hidden constructor. */
@@ -440,7 +441,7 @@ public:
 
   /** Implements the base class for all zone banks of Radioddity codeplugs.
    *
-   * Memmory layout of the zone table/bank:
+   * Memory layout of the zone table/bank:
    * @verbinclude radioddity_zonebank.txt
    */
   class ZoneBankElement: public Element
@@ -450,7 +451,7 @@ public:
     ZoneBankElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constuctor. */
+    /** Constructor. */
     explicit ZoneBankElement(uint8_t *ptr);
     /** Destructor. */
     ~ZoneBankElement();
@@ -458,7 +459,7 @@ public:
     /** Resets the bank. */
     void clear();
 
-    /** Retruns @c true if the channel is enabled. */
+    /** Returns @c true if the channel is enabled. */
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
@@ -468,7 +469,7 @@ public:
 
   /** Represents a base class for all group lists within Radioddity codeplugs.
    *
-   * Memmory layout of the RX group list:
+   * Memory layout of the RX group list:
    * @verbinclude radioddity_grouplist.txt
    */
   class GroupListElement: public Element
@@ -511,7 +512,7 @@ public:
 
   /** Implements a base class of group list memory banks for all Radioddity codeplugs.
    *
-   * Memmory layout of the group list table:
+   * Memory layout of the group list table:
    * @verbinclude radioddity_grouplistbank.txt
    */
   class GroupListBankElement: public Element
@@ -545,7 +546,7 @@ public:
 
   /** Implements the base class for scan lists of all Radioddity codeplugs.
    *
-   * Memmory layout of the scan list.
+   * Memory layout of the scan list.
    * @verbinclude radioddity_scanlist.txt
    */
   class ScanListElement: public Element
@@ -596,7 +597,7 @@ public:
     virtual bool hasMember(unsigned n) const;
     /** Returns @c true if the n-th member is selected channel. */
     virtual bool isSelected(unsigned n) const;
-    /** Retunrs the n-th member index. */
+    /** Returns the n-th member index. */
     virtual unsigned member(unsigned n) const;
     /** Sets the n-th member index. */
     virtual void setMember(unsigned n, unsigned idx);
@@ -650,12 +651,12 @@ public:
     /** Sets the hold time in ms. */
     virtual void setHoldTime(unsigned ms);
 
-    /** Retunrs the priority sample time in ms. */
+    /** Returns the priority sample time in ms. */
     virtual unsigned prioritySampleTime() const;
     /** Sets the priority sample time in ms. */
     virtual void setPrioritySampleTime(unsigned ms);
 
-    /** Constrcuts a @c ScanList object from this codeplug representation. */
+    /** Constructs a @c ScanList object from this codeplug representation. */
     virtual ScanList *toScanListObj(Context &ctx) const;
     /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
     virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
@@ -665,7 +666,7 @@ public:
 
   /** Implements the base class of scan lists banks for all Radioddity codeplugs.
    *
-   * Memmory layout of the scan list table.
+   * Memory layout of the scan list table.
    * @verbinclude radioddity_scanlistbank.txt
    */
   class ScanListBankElement: public Element
@@ -683,41 +684,28 @@ public:
     /** Resets the scan list bank. */
     void clear();
 
-    /** Retruns @c true if the n-th scan list is enabled. */
+    /** Returns @c true if the n-th scan list is enabled. */
     virtual bool isEnabled(unsigned n) const;
     /** Enable/disable n-th scan list. */
     virtual void enable(unsigned n, bool enabled);
-    /** Retunrs a pointer to the n-th scan list. */
+    /** Returns a pointer to the n-th scan list. */
     virtual uint8_t *get(unsigned n) const;
   };
 
   /** Implements the base class of general settings for all Radioddity codeplugs.
    *
-   * Memmory layout of the general settings
+   * Memory layout of the general settings
    * @verbinclude radioddity_generalsettings.txt
    */
   class GeneralSettingsElement: public Element
   {
   public:
-    /** Possible monitor types. */
-    enum MonitorType {
-      OPEN_SQUELCH = 0,            ///< Monitoring by opening the squelch.
-      SILENT_MONITOR = 1           ///< Silent monitoring.
-    };
-
-    /** Possible ARTS tone settings. */
-    enum ARTSTone {
-      ARTS_DISABLED = 0,           ///< ARTS tone is disabled.
-      ARTS_ONCE     = 4,           ///< ARTS tone once.
-      ARTS_ALWAYS   = 8            ///< ARTS tone always.
-    };
-
-    /** Possible scan modes. */
-    enum ScanMode {
-      SCANMODE_TIME    = 0,
-      SCANMODE_CARRIER = 1,
-      SCANMODE_SEARCH  = 2
-    };
+    /** Use monitor type from extension. */
+    typedef RadiodditySettingsExtension::MonitorType MonitorType;
+    /** Use ARTS tone mode from extension. */
+    typedef RadiodditySettingsExtension::ARTSTone ARTSTone;
+    /** Use scan mode from extension. */
+    typedef RadiodditySettingsExtension::ScanMode ScanMode;
 
   protected:
     /** Hidden constructor. */
@@ -797,7 +785,7 @@ public:
     virtual bool resetTone() const;
     /** Enables/disables reset tone. */
     virtual void enableResetTone(bool enable);
-    /** Returns @c true if the uknown number tone is enabled. */
+    /** Returns @c true if the unknown number tone is enabled. */
     virtual bool unknownNumberTone() const;
     /** Enables/disables reset tone. */
     virtual void enableUnknownNumberTone(bool enable);
@@ -818,21 +806,21 @@ public:
     virtual bool selftestTone() const;
     /** Enables/disables reset tone. */
     virtual void enableSelftestTone(bool enable);
-    /** Returns @c true if the frequency indication tone is enabled. */
-    virtual bool frequencyIndicationTone() const;
-    /** Enables/disables frequency indication tone. */
-    virtual void enableFrequencyIndicationTone(bool enable);
+    /** Returns @c true if the channel free indication tone is enabled. */
+    virtual bool channelFreeIndicationTone() const;
+    /** Enables/disables channel free indication tone. */
+    virtual void enableChannelFreeIndicationTone(bool enable);
     /** Returns @c true if all tones are disabled. */
     virtual bool allTonesDisabled() const;
     /** Disables/enables all tones. */
     virtual void disableAllTones(bool disable);
-    /** Returns @c true if reception is disabled for battery saveing. */
+    /** Returns @c true if reception is disabled for battery saving. */
     virtual bool batsaveRX() const;
-    /** Enables/disables battery saveing by disabling RX. */
+    /** Enables/disables battery saving by disabling RX. */
     virtual void enableBatsaveRX(bool enable);
-    /** Returns @c true if preable is disabled for battery saveing. */
+    /** Returns @c true if preable is disabled for battery saving. */
     virtual bool batsavePreamble() const;
-    /** Enables/disables battery saveing by disabling preamble. */
+    /** Enables/disables battery saving by disabling preamble. */
     virtual void enableBatsavePreamble(bool enable);
 
     /** Returns @c true if all LEDs are disabled. */
@@ -870,10 +858,14 @@ public:
     /** Sets the repeater STE in [0-10]. */
     virtual void setRepeaterSTE(unsigned ste);
 
+    /** Returns @c true if a programming password is set. */
+    virtual bool hasProgPassword() const;
     /** Returns the programming password. */
     virtual QString progPassword() const;
     /** Sets the programming password. */
     virtual void setProgPassword(const QString &pwd);
+    /** Resets the programming password. */
+    virtual void clearProgPassword();
 
     /** Encodes the general setting from the given config. */
     virtual bool fromConfig(const Config *conf, Context &ctx);
@@ -1183,7 +1175,7 @@ public:
     /** Enables/disables boot text. */
     virtual void enableBootText(bool enable);
 
-    /** Returns @c true if the boot passowrd is enabled. */
+    /** Returns @c true if the boot password is enabled. */
     virtual bool bootPasswordEnabled() const;
     /** Enables/disables the boot password. */
     virtual void enableBootPassword(bool enable);
@@ -1200,7 +1192,7 @@ public:
   class BootTextElement: public Element
   {
   protected:
-    /** Hiddden constructor. */
+    /** Hidden constructor. */
     BootTextElement(uint8_t *ptr, unsigned size);
 
   public:
@@ -1254,6 +1246,56 @@ public:
     virtual void appendMessage(const QString msg);
   };
 
+
+  /** Represents all encryption keys and settings within the codeplug on the device.
+   *
+   * Memory representation of encryption settings:
+   * @verbinclude radioddity_privacy.txt */
+  class EncryptionElement: public Codeplug::Element
+  {
+  public:
+    /** Encodes possible privacy types. For now, only none (encryption disabled) and basic are
+     * supported. */
+    enum class PrivacyType {
+      None,   ///< No encryption at all.
+      Basic   ///< Use basic DMR encryption.
+    };
+
+  protected:
+    /** Hidden constructor. */
+    EncryptionElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit EncryptionElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~EncryptionElement();
+
+    void clear();
+
+    /** Returns the privacy type set. */
+    virtual PrivacyType privacyType() const;
+    /** Sets the privacy type. */
+    virtual void setPrivacyType(PrivacyType type);
+
+    /** Returns @c true if the n-th "basic" key (32bit) is set.
+     * That is, if it is not filled with 0xff. */
+    virtual bool isBasicKeySet(unsigned n) const;
+    /** Returns the n-th "basic" key (32bit). */
+    virtual QByteArray basicKey(unsigned n) const;
+    /** Sets the n-th "basic" key (32bit). */
+    virtual void setBasicKey(unsigned n, const QByteArray &key);
+    /** Resets the n-th basic key. */
+    virtual void clearBasicKey(unsigned n);
+
+    /** Encodes given encryption extension. */
+    virtual bool fromCommercialExt(CommercialExtension *ext, Context &ctx);
+    /** Constructs the encryption extension. */
+    virtual bool updateCommercialExt(Context &ctx);
+    /** Links the given encryption extension. */
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+  };
+
 protected:
   /** Hidden constructor, use a device specific class to instantiate. */
   explicit RadioddityCodeplug(QObject *parent=nullptr);
@@ -1265,26 +1307,26 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
-  bool index(Config *config, Context &ctx) const;
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-  bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config, Context &ctx) = 0;
+  virtual bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the button settings. */
   virtual void clearButtonSettings() = 0;
@@ -1295,25 +1337,25 @@ public:
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx) = 0;
+  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all DTMF contacts in the codeplug. */
   virtual void clearDTMFContacts() = 0;
   /** Encodes all DTMF contacts. */
-  virtual bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all DTMF contacts to the configuration. */
-  virtual bool createDTMFContacts(Config *config, Context &ctx) = 0;
+  virtual bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear all channels. */
   virtual void clearChannels() = 0;
   /** Encode all channels. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all defined channels to the configuration. */
-  virtual bool createChannels(Config *config, Context &ctx) = 0;
+  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all channels. */
-  virtual bool linkChannels(Config *config, Context &ctx) = 0;
+  virtual bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear boot settings. */
   virtual void clearBootSettings() = 0;
@@ -1324,9 +1366,9 @@ public:
   /** Clears boot text. */
   virtual void clearBootText() = 0;
   /** Encodes boot text. */
-  virtual bool encodeBootText(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the boot text settings. */
-  virtual bool decodeBootText(Config *config, Context &ctx) = 0;
+  virtual bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the VFO settings. */
   virtual void clearVFOSettings() = 0;
@@ -1334,29 +1376,38 @@ public:
   /** Clears all zones. */
   virtual void clearZones() = 0;
   /** Encodes zones. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds zones to the configuration. */
-  virtual bool createZones(Config *config, Context &ctx) = 0;
+  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all zones within the configuration. */
-  virtual bool linkZones(Config *config, Context &ctx) = 0;
+  virtual bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all scan lists. */
   virtual void clearScanLists() = 0;
   /** Encodes all scan lists. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all scan lists. */
-  virtual bool createScanLists(Config *config, Context &ctx) = 0;
+  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all scan lists. */
-  virtual bool linkScanLists(Config *config, Context &ctx) = 0;
+  virtual bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all group lists. */
   virtual void clearGroupLists() = 0;
   /** Encodes all group lists. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx) = 0;
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all group lists. */
-  virtual bool createGroupLists(Config *config, Context &ctx) = 0;
+  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all group lists. */
-  virtual bool linkGroupLists(Config *config, Context &ctx) = 0;
+  virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all encryption keys. */
+  virtual void clearEncryption() = 0;
+  /** Encodes all encryption keys defined. */
+  virtual bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Creates all encryption keys. */
+  virtual bool createEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all encryption keys. */
+  virtual bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // RADIODDITYCODEPLUG_HH

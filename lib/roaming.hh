@@ -7,27 +7,29 @@
 
 /** Represents a RoamingZone within the abstract device configuration.
  *
- * A roaming zone collects a set of repeaters that act as alternatives to eachother. When a selected
- * repeater gets out of range, another one might be found automaticall from within the roaming zone.
+ * A roaming zone collects a set of repeaters that act as alternatives to each other. When a selected
+ * repeater gets out of range, another one might be found automatically from within the roaming zone.
  *
  * @ingroup config */
 class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
-  /** The name of the roaming zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The channels in the roaming zone. */
   Q_PROPERTY(DigitalChannelRefList * channels READ channels)
 
 public:
+  /** Default constructor. */
+  explicit RoamingZone(QObject *parent=nullptr);
+
   /** Constructor.
    * @param name Specifies the name of the roaming zone.
    * @param parent Specifies the QObject parent of this zone. */
-  explicit RoamingZone(const QString &name, QObject *parent = nullptr);
+  RoamingZone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   RoamingZone &operator =(const RoamingZone &other);
+  ConfigItem *clone() const;
 
   /** Returns the number of zones. */
   int count() const;
@@ -35,12 +37,7 @@ public:
   /** Clears the zone list. */
   void clear();
 
-  /** Returns the name of the roaming zone. */
-  const QString &name() const;
-  /** Sets the name of the roaming zone. */
-  void setName(const QString &name);
-
-  /** Retunrs the digital channel, which is the member at index @c idx (0-based).
+  /** Returns the digital channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
   DigitalChannel *channel(int idx) const;
   /** Adds a channel to the roaming zone.
@@ -53,14 +50,12 @@ public:
   /** Removes the given channel from the roaming zone. */
   bool remChannel(DigitalChannel *ch);
 
-  /** Retruns the list of digital channels in this roaming zone. */
+  /** Returns the list of digital channels in this roaming zone. */
   const DigitalChannelRefList *channels() const;
-  /** Retruns the list of digital channels in this roaming zone. */
+  /** Returns the list of digital channels in this roaming zone. */
   DigitalChannelRefList *channels();
 
 protected:
-  /** Holds the name of the roaming zone. */
-  QString _name;
   /** Holds the actual channels of the roaming zone. */
   DigitalChannelRefList _channel;
 };
@@ -75,7 +70,7 @@ class DefaultRoamingZone: public RoamingZone
   Q_OBJECT
 
 protected:
-  /** Hidden consturctor.
+  /** Hidden constructor.
    * Use @c DefaultRoamingZone::get() to obtain an instance. */
   explicit DefaultRoamingZone(QObject *parent=nullptr);
 
@@ -109,6 +104,9 @@ public:
   RoamingZone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // ROAMINGZONE_HH

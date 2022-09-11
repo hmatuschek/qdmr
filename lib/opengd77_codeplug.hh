@@ -29,7 +29,7 @@
  *  <tr><td>0x02dd0</td> <td>0x02f88</td> <td>0x01b8</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x02f88</td> <td>0x03388</td> <td>0x0400</td> <td>DTMF contacts, see RadioddityCodeplug::DTMFContactElement.</td></tr>
  *  <tr><td>0x03388</td> <td>0x03780</td> <td>0x03f8</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 chanels (bank 0), see @c RadioddityCodeplug::ChannelBankElement, @c OpenGD77Codeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x03780</td> <td>0x05390</td> <td>0x1c10</td> <td>First 128 channels (bank 0), see @c RadioddityCodeplug::ChannelBankElement, @c OpenGD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x05390</td> <td>0x06000</td> <td>0x0c70</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second EEPROM segment 0x07500-0x13000</th></tr>
  *  <tr><td>0x07500</td> <td>0x07518</td> <td>0x0018</td> <td>??? Unknown ???</td></tr>
@@ -47,7 +47,7 @@
  *  <tr><td>0x00000</td> <td>0x011a0</td> <td>0x11a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><th colspan="4">Second Flash segment 0x7b000-0x8ee60</th></tr>
  *  <tr><td>0x7b000</td> <td>0x7b1b0</td> <td>0x01b0</td> <td>??? Unknown ???</td></tr>
- *  <tr><td>0x7b1b0</td> <td>0x87620</td> <td>0xc470</td> <td>Remaining 896 chanels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement and @c OpenGD77Codeplug::ChannelElement.</td></tr>
+ *  <tr><td>0x7b1b0</td> <td>0x87620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement and @c OpenGD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x87620</td> <td>0x8d620</td> <td>0x6000</td> <td>1024 contacts, see @c OpenGD77Codeplug::ContactElement.</td></tr>
  *  <tr><td>0x8d620</td> <td>0x8e2a0</td> <td>0x0c80</td> <td>76 RX group lists, see @c GD77Codeplug::GroupListBankElement, @c GD77Codeplug::GroupListElement.</td></tr>
  *  <tr><td>0x8e2a0</td> <td>0x8ee60</td> <td>0x0bc0</td> <td>??? Unknown ???</td></tr>
@@ -83,6 +83,15 @@ public:
     Channel::Power power() const;
     void setPower(Channel::Power power);
 
+    /** If @c true, the scan zone skip is enabled. */
+    virtual bool scanZoneSkip() const;
+    /** Enables/disables scan zone skip. */
+    virtual void enableScanZoneSkip(bool enable);
+    /** If @c true, the scan all skip is enabled. */
+    virtual bool scanAllSkip() const;
+    /** Enables/disables scan all skip. */
+    virtual void enableScanAllSkip(bool enable);
+
     /** Returns extended power settings. */
     virtual Power extendedPower() const;
     /** Sets extended power. */
@@ -97,8 +106,37 @@ public:
     /** Sets the squelch to radio wide default. */
     virtual void setSquelchDefault();
 
+    /** Returns @c true if the channel specific radio ID is set. */
+    virtual bool hasRadioId() const;
+    /** Returns the radio ID for the channel. Only valid if @c hasRadioId() returns @c true. */
+    virtual unsigned radioId() const;
+    /** Sets and enables the radio ID for the channel. */
+    virtual void setRadioId(unsigned id);
+    /** Clears the radio ID. */
+    virtual void clearRadioId();
+
     Channel *toChannelObj(Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const;
     bool fromChannelObj(const Channel *c, Context &ctx);
+
+    /* Reused fields in OpenGD77.
+     * The following properties are reused in the OpenGD77 firmware for other purposes.*/
+    /** Overridden, reused in OpenGD77. */
+    bool autoscan() const;
+    /** Overridden, reused in OpenGD77. */
+    void enableAutoscan(bool enable);
+    /** Overridden, reused in OpenGD77. */
+    bool loneWorker() const;
+    /** Overridden, reused in OpenGD77. */
+    void enableLoneWorker(bool enable);
+    /** Overridden, reused in OpenGD77. */
+    unsigned rxSignalingIndex() const;
+    /** Overridden, reused in OpenGD77. */
+    void setRXSignalingIndex(unsigned idx);
+    /** Overridden, reused in OpenGD77. */
+    PrivacyGroup privacyGroup() const ;
+    /** Overridden, reused in OpenGD77. */
+    void setPrivacyGroup(PrivacyGroup grp);
   };
 
   /** Implements the OpenGD77 specific zone.
@@ -110,6 +148,11 @@ public:
   public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
+
+    void clear();
+    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    void fromZoneObjA(const Zone *zone, Context &ctx);
+    void fromZoneObjB(const Zone *zone, Context &ctx);
   };
 
   /** Implements the OpenGD77 specific zone bank.
@@ -135,6 +178,13 @@ public:
   public:
     /** Reuse enum from extension. */
     typedef OpenGD77ContactExtension::TimeSlotOverride TimeSlotOverride;
+
+    /** Holds some offsets within the element. */
+    struct Offset {
+      enum {
+        TimeSlotOverride = 0x0017
+      };
+    };
 
   public:
     /** Constructor. */
@@ -162,54 +212,76 @@ public:
     void fromContactObj(const DigitalContact *c, Context &ctx);
   };
 
+  /** Implements the OpenGD77 specific group list.
+   *
+   * This class is identical to the GD77 one, but allows for private calls to be added to
+   * the group list. */
+  class GroupListElement: public GD77Codeplug::GroupListElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+  };
+
 public:
   /** Constructs an empty codeplug for the GD-77. */
   explicit OpenGD77Codeplug(QObject *parent=nullptr);
 
 public:
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
-  bool decodeGeneralSettings(Config *config, Context &ctx);
+  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
   void clearMessages();
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
-  bool createScanLists(Config *config, Context &ctx);
-  bool linkScanLists(Config *config, Context &ctx);
+  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createContacts(Config *config, Context &ctx);
+  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearDTMFContacts();
-  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx);
-  bool createDTMFContacts(Config *config, Context &ctx);
+  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
-  bool createChannels(Config *config, Context &ctx);
-  bool linkChannels(Config *config, Context &ctx);
+  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
   void clearMenuSettings();
 
   void clearBootText();
-  bool encodeBootText(Config *config, const Flags &flags, Context &ctx);
-  bool decodeBootText(Config *config, Context &ctx);
+  bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx);
-  bool createZones(Config *config, Context &ctx);
-  bool linkZones(Config *config, Context &ctx);
+  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
-  bool createGroupLists(Config *config, Context &ctx);
-  bool linkGroupLists(Config *config, Context &ctx);
+  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void clearEncryption();
+  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
 };
 
 #endif // OPENGD77_CODEPLUG_HH

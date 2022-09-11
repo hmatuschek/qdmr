@@ -8,7 +8,7 @@
 #include "config.hh"
 
 //class Config;
-class ConfigObject;
+class ConfigItem;
 
 
 /** This class defines the interface all device-specific code-plugs must implement.
@@ -41,7 +41,7 @@ public:
 
   /** Represents the abstract base class of all codeplug elements. That is a memory region within
    * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provies some helper methods to access specific members of the element.
+   * This class provides some helper methods to access specific members of the element.
    * @since 0.9.0 */
   class Element
   {
@@ -63,6 +63,9 @@ public:
      * should implement this method. */
     virtual void clear();
 
+    /** Fills the memsets the entire element to the given value. */
+    bool fill(uint8_t value, unsigned offset=0, int size=-1);
+
     /** Reads a specific bit at the given byte-offset. */
     bool getBit(unsigned offset, unsigned bit) const;
     /** Sets a specific bit at the given byte-offset. */
@@ -70,65 +73,65 @@ public:
     /** Clears a specific bit at the given byte-offset. */
     void clearBit(unsigned offset, unsigned bit);
 
-    /** Reads a 2bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 2bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt2(unsigned offset, unsigned bit) const;
-    /** Stores a 2bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 2bit unsigned integer at the given byte- and bit-offset. */
     void setUInt2(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 3bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 3bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt3(unsigned offset, unsigned bit) const;
-    /** Stores a 3bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 3bit unsigned integer at the given byte- and bit-offset. */
     void setUInt3(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 4bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 4bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt4(unsigned offset, unsigned bit) const;
-    /** Stores a 4bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 4bit unsigned integer at the given byte- and bit-offset. */
     void setUInt4(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 5bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 5bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt5(unsigned offset, unsigned bit) const;
     /** Stores a 5bit iunsinged nteger at the given byte- and bit-offset. */
     void setUInt5(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 6bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 6bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt6(unsigned offset, unsigned bit) const;
-    /** Stores a 6bit unsinged integer at the given byte- and bit-offset. */
+    /** Stores a 6bit unsigned integer at the given byte- and bit-offset. */
     void setUInt6(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt8(unsigned offset) const;
-    /** Reads a 8bit unsinged integer at the given byte- and bit-offset. */
+    /** Reads a 8bit unsigned integer at the given byte- and bit-offset. */
     void setUInt8(unsigned offset, uint8_t value);
     /** Reads a 8bit signed integer at the given byte- and bit-offset. */
     int8_t getInt8(unsigned offset) const;
     /** Reads a 8bit signed integer at the given byte- and bit-offset. */
     void setInt8(unsigned offset, int8_t value);
 
-    /** Reads a 16bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 16bit big-endian unsigned integer at the given byte-offset. */
     uint16_t getUInt16_be(unsigned offset) const;
-    /** Reads a 16bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 16bit little-endian unsigned integer at the given byte-offset. */
     uint16_t getUInt16_le(unsigned offset) const;
-    /** Stores a 16bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 16bit big-endian unsigned integer at the given byte-offset. */
     void setUInt16_be(unsigned offset, uint16_t value);
-    /** Stores a 16bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 16bit little-endian unsigned integer at the given byte-offset. */
     void setUInt16_le(unsigned offset, uint16_t value);
 
-    /** Reads a 24bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 24bit big-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt24_be(unsigned offset) const;
-    /** Reads a 24bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 24bit little-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt24_le(unsigned offset) const;
-    /** Stores a 24bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 24bit big-endian unsigned integer at the given byte-offset. */
     void setUInt24_be(unsigned offset, uint32_t value);
-    /** Stores a 24bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 24bit little-endian unsigned integer at the given byte-offset. */
     void setUInt24_le(unsigned offset, uint32_t value);
 
-    /** Reads a 32bit big-endian unsinged integer at the given byte-offset. */
+    /** Reads a 32bit big-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt32_be(unsigned offset) const;
-    /** Reads a 32bit little-endian unsinged integer at the given byte-offset. */
+    /** Reads a 32bit little-endian unsigned integer at the given byte-offset. */
     uint32_t getUInt32_le(unsigned offset) const;
-    /** Stores a 32bit big-endian unsinged integer at the given byte-offset. */
+    /** Stores a 32bit big-endian unsigned integer at the given byte-offset. */
     void setUInt32_be(unsigned offset, uint32_t value);
-    /** Stores a 32bit little-endian unsinged integer at the given byte-offset. */
+    /** Stores a 32bit little-endian unsigned integer at the given byte-offset. */
     void setUInt32_le(unsigned offset, uint32_t value);
 
     /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
@@ -154,15 +157,15 @@ public:
     /** Stores a 8-digit (4-byte/32bit) BDC value in little-endian at the given byte-offset. */
     void setBCD8_le(unsigned offset, uint32_t value);
 
-    /** Reads upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char. */
+    /** Reads up to @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char. */
     QString readASCII(unsigned offset, unsigned maxlen, uint8_t eos=0x00) const;
-    /** Stores upto @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char.
+    /** Stores up to @c maxlen ASCII chars at the given byte-offset using @c eos as the string termination char.
      * The stored string gets padded with @c eos to @c maxlen. */
     void writeASCII(unsigned offset, const QString &txt, unsigned maxlen, uint8_t eos=0x00);
 
-    /** Reads upto @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char. */
+    /** Reads up to @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char. */
     QString readUnicode(unsigned offset, unsigned maxlen, uint16_t eos=0x0000) const;
-    /** Stores upto @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char.
+    /** Stores up to @c maxlen unicode chars at the given byte-offset using @c eos as the string termination char.
      * The stored string gets padded with @c eos to @c maxlen. */
     void writeUnicode(unsigned offset, const QString &txt, unsigned maxlen, uint16_t eos=0x0000);
 
@@ -190,12 +193,12 @@ public:
 
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
-    ConfigObject *obj(const QMetaObject *elementType, unsigned idx);
+    ConfigItem *obj(const QMetaObject *elementType, unsigned idx);
     /** Returns the index for the given object.
      * @returns -1 if no index is associated with the object or its type is unknown. */
-    int index(ConfigObject *obj);
+    int index(ConfigItem *obj);
     /** Associates the given object with the given index. */
-    bool add(ConfigObject *obj, unsigned idx);
+    bool add(ConfigItem *obj, unsigned idx);
 
     /** Adds a table for the given type. */
     bool addTable(const QMetaObject *obj);
@@ -217,9 +220,9 @@ public:
     class Table {
     public:
       /** The index->object map. */
-      QHash<unsigned, ConfigObject *> objects;
+      QHash<unsigned, ConfigItem *> objects;
       /** The object->index map. */
-      QHash<ConfigObject *, unsigned> indices;
+      QHash<ConfigItem *, unsigned> indices;
     };
 
   protected:
@@ -247,14 +250,14 @@ public:
    * This method must be implemented by any device or vendor specific codeplug to map config
    * objects to indices used within the binary codeplug to address each element (e.g., channels,
    * contacts etc.). */
-  virtual bool index(Config *config, Context &ctx) const = 0;
+  virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const = 0;
 
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */
-	virtual bool decode(Config *config) = 0;
+  virtual bool decode(Config *config, const ErrorStack &err=ErrorStack()) = 0;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
-  virtual bool encode(Config *config, const Flags &flags=Flags()) = 0;
+  virtual bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // CODEPLUG_HH

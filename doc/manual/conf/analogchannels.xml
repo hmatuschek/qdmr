@@ -44,27 +44,46 @@
   Each line within the table specifies a single channel. The first column specifies the unique ID
   of the channel. This ID can by any number that is unique among analog AND digital channels. The
   second (Name) column specifies the name of the channel as a string. Any string can be used here.
+</para>
+<para>
   The third (Receive) column specifies the RX frequency of the channel in MHz. The fourth
   (Transmit) column specifies the TX frequency in MHz or alternatively, an offset relative to the
-  receive frequency in MHz by prefixing "+" or "-". The 5th (Power) column specifies the transmit
+  receive frequency in MHz by prefixing "+" or "-". 
+</para>
+<para>
+  The 5th (Power) column specifies the transmit
   power. This must be either the "High" or "Low" keyword. The 6th (Scan) column specifies the
   scan-list ID for this channel or "-" if there is no scan-list assigned to the channel. A scan-list
   (see below) is just a collection of channels that gets scanned whenever scanning is started on a
-  particular channel. The 7th (TOT) column specifies the transmit time-out in seconds or "-" if
+  particular channel. 
+</para>
+<para>
+  The 7th (TOT) column specifies the transmit time-out in seconds or "-" if
   disabled. The 8th (RO) column specifies whether this channel is receive-only with either "-"
-  meaning disabled and "+" enabled. If enabled, it is impossible to transmit on that channel. The
-  9th column specifies the admit criterion on that channel. This must be either "-" meaning that
+  meaning disabled and "+" enabled. If enabled, it is impossible to transmit on that channel. 
+</para>
+<para>
+  The 9th column specifies the admit criterion on that channel. This must be either "-" meaning that
   there is no restriction when to send on that channel, the keyword "Free" meaning that the channel
   must be free to transmit or the keyword "Tone" meaning that the channel must be free and the
-  RxTone must match. The 10th (Squelch) column specifies the squelch level for the channel. This
+  RxTone must match. 
+</para>
+<para>
+  The 10th (Squelch) column specifies the squelch level for the channel. This
   must be a number between [0-10]. The larger the value, the stronger the signal must be to open
-  the squelch. The value 0 disables the squelch. The 11th (RxTone) specifies the receive CTCSS tone
+  the squelch. The value 0 disables the squelch. 
+</para>
+<para>
+  The 11th (RxTone) specifies the receive CTCSS tone
   frequency in Hz. The squelch will then only open, if the signal is strong enough (see previous
   column) and the specified tone is received. If set "-" the RX tone is disabled and the squelch
   will open if the signal is strong enough. The 12th (TxTone) column specifies the CTCSS tone
   to transmit in Hz or "-" if disabled. This feature is used by some repeaters to open their
   squelch and to start repeating to avoid conflicts between repeaters operating on the same
-  frequency (e.g., in case of DX conditions). The 13th (Width) colum specifies the
+  frequency (e.g., in case of DX conditions). 
+</para>
+<para>
+  The 13th (Width) column specifies the
   bandwidth of the channel in kHz. This can be 12.5kHz narrow-band or 25kHz wide-band.
   Finally, the 14th column specifies the APRS system ID to use or "-" for <emphasis>APRS 
   disabled</emphasis>.

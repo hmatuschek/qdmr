@@ -106,7 +106,7 @@ cc | Auto repeater UHF min frequency in 10Hz, 8-digit BCD, big endian           
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d0 | Auto repeater UHF max frequency in 10Hz, 8-digit BCD, big endian                                                              |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d4 | Auto rep. VFO B direction     | Uknown                        | Unused set to 0x00            | Boot channel enable           |
+d4 | Auto rep. VFO B direction     | Unknown                       | Unused set to 0x00            | Boot channel enable           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d8 | VFO A default zone index      | VFO B default zone index      | VFO A default channel index   | VFO B default channel index   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

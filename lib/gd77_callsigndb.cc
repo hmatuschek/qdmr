@@ -7,6 +7,7 @@
 #define OFFSET_USERDB       0x00000
 
 #define USERDB_MAX_ENTRIES  10920
+#define USERDB_MAX_ENTRIES_PER_BANK 5460
 #define BLOCK_SIZE          32
 
 
@@ -82,7 +83,9 @@ GD77CallsignDB::~GD77CallsignDB() {
 }
 
 bool
-GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
+GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Limit entries to USERDB_NUM_ENTRIES
   qint64 n = std::min(calldb->count(), qint64(USERDB_MAX_ENTRIES));
   if (selection.hasCountLimit())
@@ -101,14 +104,14 @@ GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection) {
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // Allocate segment for user db if requested
-  unsigned size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
+  size_t size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), BLOCK_SIZE);
   logDebug() << "Allocate 0x" << QString::number(size,16) << " bytes for call-sign DB.";
   this->image(0).addElement(OFFSET_USERDB, size);
 
   // Encode user DB
   userdb_t *userdb = (userdb_t *)this->data(OFFSET_USERDB);
   userdb->clear(); userdb->setSize(n);
-  userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t));
+  userdb_entry_t *db = (userdb_entry_t *)this->data(OFFSET_USERDB+sizeof(userdb_t), 0);
   for (unsigned i=0; i<n; i++) {
     db[i].fromEntry(users[i]);
   }

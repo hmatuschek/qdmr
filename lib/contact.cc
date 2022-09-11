@@ -1,28 +1,28 @@
 #include "contact.hh"
 #include "config.hh"
 #include "utils.hh"
-
+#include "logger.hh"
+#include "opengd77_extension.hh"
 
 /* ********************************************************************************************* *
  * Implementation of Contact
  * ********************************************************************************************* */
-Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : ConfigObject("cont", parent), _name(name), _ring(rxTone)
+Contact::Contact(QObject *parent)
+  : ConfigObject("cont", parent), _ring(false)
 {
   // pass...
 }
 
-const QString &
-Contact::name() const {
-  return _name;
+Contact::Contact(const QString &name, bool rxTone, QObject *parent)
+  : ConfigObject(name, "cont", parent), _ring(rxTone)
+{
+  // pass...
 }
-bool
-Contact::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name;
-  emit modified(this);
-  return true;
+
+void
+Contact::clear() {
+  ConfigObject::clear();
+  _ring = false;
 }
 
 bool
@@ -35,14 +35,56 @@ Contact::setRing(bool enable) {
   emit modified(this);
 }
 
+bool
+Contact::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse contact: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node cnt = node.begin()->second;
+  return ConfigObject::parse(cnt, ctx, err);
+}
+
+bool
+Contact::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  return ConfigObject::link(node.begin()->second, ctx, err);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of DTMFContact
  * ********************************************************************************************* */
+DTMFContact::DTMFContact(QObject *parent)
+  : Contact(parent), _number()
+{
+  // pass...
+}
+
 DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone, QObject *parent)
   : Contact(name, rxTone, parent), _number(number.simplified())
 {
   // pass...
+}
+
+ConfigItem *
+DTMFContact::clone() const {
+  DTMFContact *c = new DTMFContact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+DTMFContact::clear() {
+  Contact::clear();
+  _number.clear();
 }
 
 const QString &
@@ -60,8 +102,8 @@ DTMFContact::setNumber(const QString &number) {
 }
 
 YAML::Node
-DTMFContact::serialize(const Context &context) {
-  YAML::Node node = ConfigObject::serialize(context);
+DTMFContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -74,10 +116,39 @@ DTMFContact::serialize(const Context &context) {
 /* ********************************************************************************************* *
  * Implementation of DigitalContact
  * ********************************************************************************************* */
-DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _type(type), _number(number)
+DigitalContact::DigitalContact(QObject *parent)
+  : Contact(parent), _type(PrivateCall), _number(0), _anytone(nullptr), _openGD77(nullptr)
 {
   // pass...
+}
+
+DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
+  : Contact(name, rxTone, parent), _type(type), _number(number), _anytone(nullptr), _openGD77(nullptr)
+{
+  // pass...
+}
+
+ConfigItem *
+DigitalContact::clone() const {
+  DigitalContact *c = new DigitalContact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+DigitalContact::clear() {
+  Contact::clear();
+  _type = PrivateCall;
+  _number = 0;
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = nullptr;
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = nullptr;
 }
 
 DigitalContact::Type
@@ -103,14 +174,49 @@ DigitalContact::setNumber(unsigned number) {
 }
 
 YAML::Node
-DigitalContact::serialize(const Context &context) {
-  YAML::Node node = ConfigObject::serialize(context);
+DigitalContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = Contact::serialize(context, err);
   if (node.IsNull())
     return node;
 
   node.SetStyle(YAML::EmitterStyle::Flow);
   YAML::Node type; type["dmr"] = node;
   return type;
+}
+
+
+OpenGD77ContactExtension *
+DigitalContact::openGD77ContactExtension() const {
+  return _openGD77;
+}
+
+void
+DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
+  if (_openGD77)
+    _openGD77->deleteLater();
+  _openGD77 = ext;
+  if (_openGD77) {
+    _openGD77->setParent(this);
+    connect(_openGD77, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
+}
+
+AnytoneContactExtension *
+DigitalContact::anytoneExtension() const {
+  return _anytone;
+}
+
+void
+DigitalContact::setAnytoneExtension(AnytoneContactExtension *ext) {
+  if (_anytone)
+    _anytone->deleteLater();
+  _anytone = ext;
+  if (_anytone) {
+    _anytone->setParent(this);
+    connect(_anytone, &OpenGD77ContactExtension::modified,
+            [this](ConfigItem*){ emit modified(this); });
+  }
 }
 
 
@@ -214,5 +320,31 @@ ContactList::dtmfContact(int idx) const {
         idx--;
     }
   }
+  return nullptr;
+}
+
+ConfigItem *
+ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create contact: Expected object with one child.";
+    return nullptr;
+  }
+
+  QString type = QString::fromStdString(node.begin()->first.as<std::string>());
+  if ("dmr" == type) {
+    return new DigitalContact();
+  } else if ("dtmf" == type) {
+    return new DTMFContact();
+  }
+
+  errMsg(err) << node.Mark().line << ":" << node.Mark().column
+              << ": Cannot create contact: Unknown type '" << type << "'.";
+
   return nullptr;
 }

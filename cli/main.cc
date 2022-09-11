@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
   // Install log handler to stderr.
   QTextStream out(stderr);
-  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING);
+  StreamLogHandler *handler = new StreamLogHandler(out, LogMessage::WARNING, true);
   Logger::get().addHandler(handler);
 
   // Instantiate core application
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   QCommandLineParser parser;
   parser.setApplicationDescription(
         QCoreApplication::translate(
-          "main", "Up- and download codeplugs for cheap Chineese DMR radios."));
+          "main", "Up- and download codeplugs for cheap Chinese DMR radios."));
 
   parser.addHelpOption();
   parser.addVersionOption();
@@ -58,6 +58,13 @@ int main(int argc, char *argv[])
                      {"m", "manufacturer"},
                      QCoreApplication::translate("main", "Given file is manufacturer codeplug file. "
                      " Can be used with 'decode'.")
+                   });
+  parser.addOption({
+                     {"D","device"},
+                     QCoreApplication::translate("main", "Specifies the device to use to talk to "
+                     "the radio. If not specified, the dmrconf will try to detect the radio "
+                     "automatically. Please note, that for some radios the device must be specified."),
+                     QCoreApplication::translate("main", "DEVICE")
                    });
   parser.addOption({
                      {"R", "radio"},
@@ -102,7 +109,7 @@ int main(int argc, char *argv[])
         "command", QCoreApplication::translate(
           "main", "Specifies the command to perform. Either detect, verify, read, write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
-          "detailed descriptoin of these commands."),
+          "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
 
   parser.addPositionalArgument(

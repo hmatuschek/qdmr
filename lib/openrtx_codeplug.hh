@@ -182,69 +182,69 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
-  bool index(Config *config, Context &ctx) const;
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-  bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:
   /** Decodes the binary codeplug and stores its content in the given generic configuration using
    * the given context. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears the general settings in the codeplug. */
-  virtual void clearGeneralSettings();
+  virtual void clearGeneralSettings(const ErrorStack &err=ErrorStack());
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config, Context &ctx);
+  virtual bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears all contacts in the codeplug. */
-  virtual void clearContacts();
+  virtual void clearContacts(const ErrorStack &err=ErrorStack());
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx);
+  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clear all channels. */
-  virtual void clearChannels();
+  virtual void clearChannels(const ErrorStack &err=ErrorStack());
   /** Encode all channels. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds all defined channels to the configuration. */
-  virtual bool createChannels(Config *config, Context &ctx);
+  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all channels. */
-  virtual bool linkChannels(Config *config, Context &ctx);
+  virtual bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears all zones. */
-  virtual void clearZones();
+  virtual void clearZones(const ErrorStack &err=ErrorStack());
   /** Encodes zones. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds zones to the configuration. */
-  virtual bool createZones(Config *config, Context &ctx);
+  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all zones within the configuration. */
-  virtual bool linkZones(Config *config, Context &ctx);
+  virtual bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears all scan lists. */
-  virtual void clearScanLists();
+  virtual void clearScanLists(const ErrorStack &err=ErrorStack());
   /** Encodes all scan lists. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Creates all scan lists. */
-  virtual bool createScanLists(Config *config, Context &ctx);
+  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all scan lists. */
-  virtual bool linkScanLists(Config *config, Context &ctx);
+  virtual bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Clears all group lists. */
-  virtual void clearGroupLists();
+  virtual void clearGroupLists(const ErrorStack &err=ErrorStack());
   /** Encodes all group lists. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx);
+  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Creates all group lists. */
-  virtual bool createGroupLists(Config *config, Context &ctx);
+  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all group lists. */
-  virtual bool linkGroupLists(Config *config, Context &ctx);
+  virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // OPENRTX_CODEPLUG_HH

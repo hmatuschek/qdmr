@@ -16,8 +16,10 @@ int infoFile(QCommandLineParser &parser, QCoreApplication &app) {
 
   QString filename = parser.positionalArguments().at(1);
   DFUFile file;
-  if (! file.read(filename)) {
-    logError() << "Cannot read codeplug file '" << filename << "': " << file.errorMessage();
+  ErrorStack err;
+  if (! file.read(filename, err)) {
+    logError() << "Cannot read codeplug file '" << filename
+               << "': " << err.format();
     return -1;
   }
 

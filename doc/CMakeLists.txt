@@ -3,6 +3,7 @@
 #
 message(STATUS "Using xsltproc: ${XSLTPROC_EXECUTABLE}")
 configure_file("dmrconf.in.xml" "dmrconf.xml")
+configure_file("qdmr.in.xml" "qdmr.xml")
 
 if(UNIX AND NOT APPLE)
   set(DOCBOOK2MAN_XSLT ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.debian.xsl)
@@ -21,12 +22,25 @@ add_custom_command(
   COMMENT "Generating man-page for dmrconf."
   VERBATIM)
 
+add_custom_command(
+  OUTPUT qdmr.1
+  COMMAND ${XSLTPROC_EXECUTABLE}
+          -o ${CMAKE_CURRENT_BINARY_DIR}/qdmr.1
+          ${DOCBOOK2MAN_XSLT}
+          ${CMAKE_CURRENT_BINARY_DIR}/qdmr.xml
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/qdmr.xml
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Generating man-page for qdmr."
+  VERBATIM)
+
 if (${BUILD_MAN})
   # Create man page from docbook
-  add_custom_target(manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1)
+  add_custom_target(dmrconf_manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1)
+  add_custom_target(qdmr_manpage ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/qdmr.1)
   # install man page on unix systems
   if (UNIX)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dmrconf.1
+                  ${CMAKE_CURRENT_BINARY_DIR}/qdmr.1
       DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man1/)
   endif (UNIX)
 endif(${BUILD_MAN})
@@ -40,6 +54,7 @@ if (${BUILD_DOCS})
   set(DOXYGEN_BRIEF_MEMBER_DESC YES)
   set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
   set(DOXYGEN_EXAMPLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/code")
+  set(DOXYGEN_DOTFILE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/fig")
   set(DOXYGEN_ENABLE_PREPROCESSING YES)
   set(DOXYGEN_MACRO_EXPANSION YES)
   set(DOXYGEN_EXPAND_ONLY_PREDEF YES)

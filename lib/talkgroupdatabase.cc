@@ -147,11 +147,13 @@ TalkGroupDatabase::load(const QString &filename) {
 
 int
 TalkGroupDatabase::rowCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
   return _talkgroups.count();
 }
 
 int
 TalkGroupDatabase::columnCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
   return 2;
 }
 

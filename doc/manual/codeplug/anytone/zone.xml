@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneZone"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Zone extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some zone attributes for AnyTone devices. 
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[zones:
+    - id: zone1
+      name: Zone Name
+      A: [ch1, ...]
+      B: [ch2, ...]
+      anytone:
+        hidden: false
+]]></programlisting>
+</example>
+
+<para>
+  The AnyTone zone extension is a mapping named <token>anytone</token>. It contains the 
+  device specific settings for that zone.
+</para>
+
+
+<section>
+<info>
+  <title>Zone attributes</title>
+</info>
+
+<para>
+  For now, there is only one attribute allowing to hide the zone from the zone list in the radio.
+</para>
+
+<variablelist>
+  <title>Zone extension fields</title>
+  <varlistentry>
+    <term><token>hidden</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the zone is hidden in the zone list on the radio.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>

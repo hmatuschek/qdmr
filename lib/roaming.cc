@@ -6,19 +6,32 @@
 /* ********************************************************************************************* *
  * Implementation of RoamingZone
  * ********************************************************************************************* */
+RoamingZone::RoamingZone(QObject *parent)
+  : ConfigObject("roam", parent), _channel()
+{
+  // pass...
+}
+
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
-  : ConfigObject("roam", parent), _name(name), _channel()
+  : ConfigObject(name, "roam", parent), _channel()
 {
   // pass...
 }
 
 RoamingZone &
 RoamingZone::operator =(const RoamingZone &other) {
-  clear();
-  _name = other._name;
-  for (int i=0; i<other._channel.count(); i++)
-    _channel.add(other._channel.get(i));
+  copy(other);
   return *this;
+}
+
+ConfigItem *
+RoamingZone::clone() const {
+  RoamingZone *z = new RoamingZone();
+  if (! z->copy(*this)) {
+    z->deleteLater();
+    return nullptr;
+  }
+  return z;
 }
 
 int
@@ -30,19 +43,6 @@ void
 RoamingZone::clear() {
   _channel.clear();
 }
-
-
-const QString &
-RoamingZone::name() const {
-  return _name;
-}
-
-void
-RoamingZone::setName(const QString &name) {
-  _name = name;
-  emit modified(this);
-}
-
 
 DigitalChannel *
 RoamingZone::channel(int idx) const {
@@ -128,7 +128,7 @@ RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
 
 RoamingZone *
 RoamingZoneList::zone(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RoamingZone>();
   return nullptr;
 }
@@ -138,4 +138,20 @@ RoamingZoneList::add(ConfigObject *obj, int row) {
   if (obj && obj->is<RoamingZone>())
     return ConfigObjectList::add(obj, row);
   return -1;
+}
+
+ConfigItem *
+RoamingZoneList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create roaming zone: Expected object.";
+    return nullptr;
+  }
+
+  return new RoamingZone();
 }

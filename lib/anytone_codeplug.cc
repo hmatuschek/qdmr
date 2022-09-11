@@ -81,6 +81,8 @@ AnytoneCodeplug::ChannelElement::clear() {
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
   setBandwidth(AnalogChannel::Bandwidth::Narrow);
+  setRXTone(Signaling::SIGNALING_NONE);
+  setTXTone(Signaling::SIGNALING_NONE);
   setBit(0x0008, 5, false); // Unused set to 0
 }
 
@@ -300,24 +302,24 @@ AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
-  if (512 < code)
+  if (512 > code)
     return Signaling::fromDCSNumber(dec_to_oct(code), false);
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
 AnytoneCodeplug::ChannelElement::setTXDCS(Code code) {
   if (Signaling::isDCSNormal(code))
-    setUInt8(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
+    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
-    setUInt8(0x000c, oct_to_dec(Signaling::toDCSNumber(code))+512);
+    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code))+512);
   else
-    setUInt8(0x000c, 0);
+    setUInt16_le(0x000c, 0);
 }
 
 Signaling::Code
 AnytoneCodeplug::ChannelElement::rxDCS() const {
   uint16_t code = getUInt16_le(0x000e);
-  if (512 < code)
+  if (512 > code)
     return Signaling::fromDCSNumber(dec_to_oct(code), false);
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
@@ -367,12 +369,12 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-AnytoneCodeplug::ChannelElement::SquelchMode
+AnytoneAnalogChannelExtension::SquelchMode
 AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (SquelchMode)getUInt3(0x0019, 4);
+  return (AnytoneAnalogChannelExtension::SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::setSquelchMode(SquelchMode mode) {
+AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode) {
   setUInt3(0x0019, 4, (unsigned)mode);
 }
 
@@ -631,6 +633,8 @@ AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Q_UNUSED(ctx)
+
   Channel *ch;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
@@ -677,7 +681,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   ch->setRXFrequency(rxFrequency()/1e6);
   ch->setTXFrequency(txFrequency()/1e6);
   ch->setPower(power());
-  ch->setDefaultTimeout();
   ch->setRXOnly(rxOnly());
 
   // No per channel vox & tot setting
@@ -714,7 +717,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
-    RadioID *rid = ctx.get<RadioID>(radioIDIndex());
+    DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
     if (rid == ctx.config()->radioIDs()->defaultId())
       dc->setRadioIdObj(DefaultRadioID::get());
     else
@@ -730,7 +733,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
   // If channel has scan list
   if (hasScanListIndex() && ctx.has<ScanList>(scanListIndex()))
-    c->setScanListObj(ctx.get<ScanList>(scanListIndex()));
+    c->setScanList(ctx.get<ScanList>(scanListIndex()));
 
   return true;
 }
@@ -752,10 +755,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setPower(c->power());
   // set tx-enable
   enableRXOnly(c->rxOnly());
-  if (nullptr == c->scanListObj())
+  if (nullptr == c->scanList())
     clearScanListIndex();
   else
-    setScanListIndex(ctx.index(c->scanListObj()));
+    setScanListIndex(ctx.index(c->scanList()));
 
   // Dispatch by channel type
   if (c->is<AnalogChannel>()) {
@@ -771,9 +774,9 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     if (Signaling::SIGNALING_NONE != ac->rxTone())
-      setSquelchMode(SquelchMode::SubTone);
+      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::SubTone);
     else
-      setSquelchMode(SquelchMode::Carrier);
+      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
   } else if (c->is<DigitalChannel>()) {
@@ -804,8 +807,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
       enableTXDigitalAPRS(true);
+      enableRXAPRS(false);
     } else {
       enableTXDigitalAPRS(false);
+      enableRXAPRS(false);
     }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
@@ -889,29 +894,62 @@ AnytoneCodeplug::ContactElement::setNumber(unsigned number) {
   setBCD8_be(0x0023, number);
 }
 
-AnytoneCodeplug::ContactElement::AlertType
+AnytoneContactExtension::AlertType
 AnytoneCodeplug::ContactElement::alertType() const {
-  return (AlertType) getUInt8(0x0027);
+  switch (getUInt8(0x0027)) {
+  case (uint8_t)AnytoneContactExtension::AlertType::None:
+    return AnytoneContactExtension::AlertType::None;
+  case (uint8_t)AnytoneContactExtension::AlertType::Ring:
+    return AnytoneContactExtension::AlertType::Ring;
+  case (uint8_t)AnytoneContactExtension::AlertType::Online:
+    return AnytoneContactExtension::AlertType::Online;
+  default:
+    break;
+  }
+  logWarn() << "Unknown value " << getUInt8(0x0027)
+            << " for alert type of AnyTone contact element. Maybe the codeplug implementation is"
+               " outdated. Consider reporting it at https://github.com/hmatuschek/qdmr.";
+  return AnytoneContactExtension::AlertType::None;
 }
 void
-AnytoneCodeplug::ContactElement::setAlertType(AlertType type) {
+AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType type) {
   setUInt8(0x0027, (unsigned)type);
 }
 
 DigitalContact *
 AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx);
-  return new DigitalContact(type(), name(), number(), AlertType::None != alertType());
+
+  // Common settings
+  DigitalContact *cont = new DigitalContact();
+  cont->setType(type());
+  cont->setName(name());
+  cont->setNumber(number());
+  cont->setRing(AnytoneContactExtension::AlertType::None != alertType());
+
+  // Create AnyTone specific extension
+  AnytoneContactExtension *ext = new AnytoneContactExtension();
+  cont->setAnytoneExtension(ext);
+  ext->setAlertType(alertType());
+
+  return cont;
 }
 
 bool
 AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+  Q_UNUSED(ctx)
+
   clear();
 
   setType(contact->type());
   setName(contact->name());
   setNumber(contact->number());
-  setAlertType(contact->ring() ? AlertType::Ring : AlertType::None);
+  setAlertType(contact->ring() ? AnytoneContactExtension::AlertType::Ring :
+                                 AnytoneContactExtension::AlertType::None);
+
+  if (AnytoneContactExtension *ext = contact->anytoneExtension()) {
+    setAlertType(ext->alertType());
+  }
 
   return true;
 }
@@ -944,7 +982,7 @@ AnytoneCodeplug::DTMFContactElement::clear() {
 QString
 AnytoneCodeplug::DTMFContactElement::number() const {
   QString number;
-  int n = getUInt8(0x0013);
+  int n = getUInt8(Offsets::DIGIT_COUNT);
   for (int i=0; i<n; i++) {
     uint8_t byte = _data[i/2];
     if (0 == (i%2))
@@ -958,8 +996,8 @@ void
 AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return;
-  memset(_data+0x0000, 0, 7);
-  setUInt8(0x0013, number.length());
+  memset(_data+Offsets::DIGITS, 0, Offsets::DIGIT_COUNT);
+  setUInt8(Offsets::DIGIT_COUNT, number.length());
   for (int i=0; i<number.length(); i++) {
     if (0 == (i%2))
       _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
@@ -970,11 +1008,11 @@ AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
 
 QString
 AnytoneCodeplug::DTMFContactElement::name() const {
-  return readASCII(0x0020, 15, 0x00);
+  return readASCII(Offsets::NAME, NAME_LEN, 0x00);
 }
 void
 AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
-  writeASCII(0x0020, name, 15, 0x00);
+  writeASCII(Offsets::NAME, name, NAME_LEN, 0x00);
 }
 
 DTMFContact *
@@ -1068,15 +1106,27 @@ AnytoneCodeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx)
 bool
 AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context &ctx) {
   clear();
+
   // set name of group list
   setName(lst->name());
+
+  int j=0;
   // set members
   for (uint8_t i=0; i<64; i++) {
-    if (i < lst->count())
-      setMemberIndex(i, ctx.index(lst->contact(i)));
-    else
+    // Skip non-private-call entries
+    while((lst->count() > j) && (DigitalContact::GroupCall != lst->contact(j)->type())) {
+      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+                << "' is not a private call. Skip entry.";
+      j++;
+    }
+
+    if (lst->count() > j) {
+      setMemberIndex(i, ctx.index(lst->contact(j))); j++;
+    } else {
       clearMemberIndex(i);
+    }
   }
+
   return true;
 }
 
@@ -1348,12 +1398,12 @@ AnytoneCodeplug::RadioIDElement::setName(const QString &name) {
   writeASCII(0x0005, name, 16, 0x00);
 }
 
-RadioID *
+DMRRadioID *
 AnytoneCodeplug::RadioIDElement::toRadioID() const {
-  return new RadioID(name(), number());
+  return new DMRRadioID(name(), number());
 }
 bool
-AnytoneCodeplug::RadioIDElement::fromRadioID(RadioID *id) {
+AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
   setName(id->name());
   setNumber(id->number());
   return true;
@@ -2067,9 +2117,18 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   }
   // Set default VOX sensitivity
   setVOXLevel(ctx.config()->settings()->vox());
-  // Set squelch level
-  setSquelchLevelA(ctx.config()->settings()->squelch());
-  setSquelchLevelB(ctx.config()->settings()->squelch());
+  // Set default squelch level
+  if (0 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(0);
+    setSquelchLevelB(0);
+  } else if (1 == ctx.config()->settings()->squelch()) {
+    setSquelchLevelA(1);
+    setSquelchLevelB(1);
+  } else {
+    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
+    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
+  }
+
   return true;
 }
 
@@ -2080,7 +2139,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setVOX(voxLevel());
-  ctx.config()->settings()->setSquelch(squelchLevelA());
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
   return true;
 }
 
@@ -2190,6 +2249,7 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
   return true;
@@ -2406,6 +2466,8 @@ AnytoneCodeplug::DMRAPRSSettingsElement::disableTimeSlotOverride() {
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags)
+
   if (1 < ctx.config()->posSystems()->gpsCount()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
   } else if (0 == ctx.config()->posSystems()->gpsCount()) {
@@ -2443,7 +2505,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
     cont = new DigitalContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
-  ctx.get<GPSSystem>(i)->setContact(cont);
+  ctx.get<GPSSystem>(i)->setContactObj(cont);
 
   // Check if there is a revert channel set
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
@@ -3874,7 +3936,9 @@ AnytoneCodeplug::~AnytoneCodeplug() {
 }
 
 bool
-AnytoneCodeplug::index(Config *config, Context &ctx) const {
+AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // Map radio IDs

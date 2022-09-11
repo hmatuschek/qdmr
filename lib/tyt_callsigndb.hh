@@ -24,7 +24,7 @@ class TyTCallsignDB : public CallsignDB
 public:
   /** Represents a search index over the complete call-sign database.
    *
-   * Memmory layout of encoded call-sign/user database:
+   * Memory layout of encoded call-sign/user database:
    * @verbinclude tytcallsigndbindex.txt
    */
   class IndexElement: public Codeplug::Element
@@ -32,7 +32,7 @@ public:
   public:
     /** Represents an index entry, a pair of DMR ID and call-sign DB index.
      *
-     * Memmory layout of encoded call-sign/user database index entry:
+     * Memory layout of encoded call-sign/user database index entry:
      * @verbinclude tytcallsigndbindexentry.txt
      */
     class Entry: public Codeplug::Element
@@ -74,7 +74,7 @@ public:
   /** Represents an entry within the call-sign database.
    * The call-sign DB entries must be ordered by their DMR IDs.
    *
-   * Memmory layout of encoded call-sign/user database index entry:
+   * Memory layout of encoded call-sign/user database index entry:
    * @verbinclude tytcallsigndbentry.txt
    */
   class EntryElement: public Codeplug::Element
@@ -102,7 +102,7 @@ public:
   /** Destructor. */
   virtual ~TyTCallsignDB();
 
-  bool encode(UserDatabase *db, const Selection &selection);
+  bool encode(UserDatabase *db, const Selection &selection,const ErrorStack &err=ErrorStack());
 
 protected:
   /** Allocates required space for index and @c n call-signs. */

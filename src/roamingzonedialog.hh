@@ -24,8 +24,8 @@ protected slots:
 
 protected:
   Config *_config;
-  RoamingZone _zone;
-  RoamingZone *_editZone;
+  RoamingZone *_myZone;
+  RoamingZone *_zone;
 };
 
 #endif // ROAMINGZONEDIALOG_HH

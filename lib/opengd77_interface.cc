@@ -1,6 +1,10 @@
 #include "opengd77_interface.hh"
 #include "logger.hh"
+#include "radioinfo.hh"
 #include <QtEndian>
+
+#define USB_VID 0x1fc9
+#define USB_PID 0x0094
 
 #define BLOCK_SIZE  32
 #define SECTOR_SIZE 4096
@@ -27,6 +31,14 @@ OpenGD77Interface::ReadRequest::initReadFlash(uint32_t addr, uint16_t length) {
   return true;
 }
 
+bool
+OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
+  this->type = 'R';
+  this->command = READ_FIRMWARE_INFO;
+  this->address = 0;
+  this->length = 0;
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::WriteRequest
@@ -155,14 +167,24 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
-OpenGD77Interface::OpenGD77Interface(QObject *parent)
-  : USBSerial(0x1fc9, 0x0094, parent), _sector(-1)
+OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
+  : USBSerial(descr, err, parent), _sector(-1)
 {
   // pass...
 }
 
 OpenGD77Interface::~OpenGD77Interface() {
   // pass...
+}
+
+USBDeviceInfo
+OpenGD77Interface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
+}
+
+QList<USBDeviceDescriptor>
+OpenGD77Interface::detect() {
+  return USBSerial::detect(USB_VID, USB_PID);
 }
 
 void
@@ -172,7 +194,8 @@ OpenGD77Interface::close() {
 }
 
 RadioInfo
-OpenGD77Interface::identifier() {
+OpenGD77Interface::identifier(const ErrorStack &err) {
+  Q_UNUSED(err);
   if (isOpen())
     return RadioInfo::byID(RadioInfo::OpenGD77);
   else
@@ -180,41 +203,41 @@ OpenGD77Interface::identifier() {
 }
 
 bool
-OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
+OpenGD77Interface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err)
 {
   logDebug() << "Send enter prog mode ...";
-  if (! sendShowCPSScreen())
+  if (! sendShowCPSScreen(err))
     return false;
   //logDebug() << "Send clear screen ...";
-  if (! sendClearScreen())
+  if (! sendClearScreen(err))
     return false;
   //logDebug() << "Send display text ...";
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
+  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Writing", 3, 1, 0))
+  if (! sendDisplay(0, 16, "Writing", 3, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
+  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
     return false;
   //logDebug() << "Send 'render CPS' ...";
-  if (! sendRenderCPS())
+  if (! sendRenderCPS(err))
     return false;
   //logDebug() << "Send 'flash red LED' ...";
-  if (! sendCommand(CommandRequest::FLASH_RED_LED))
+  if (! sendCommand(CommandRequest::FLASH_RED_LED, err))
     return false;
   //logDebug() << "Send save settings and VFOs ...";
-  if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS))
+  if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS, err))
     return false;
 
   if (EEPROM == bank) {
     if (_sector >= 0) {
-      if (! finishWriteFlash())
+      if (! finishWriteFlash(err))
         return false;
     }
     _sector = -1;
   } else if (FLASH == bank) {
     int32_t sector = addr/SECTOR_SIZE;
     if ((-1 != _sector) && (_sector != sector)) {
-      if (! finishWriteFlash())
+      if (! finishWriteFlash(err))
         return false;
     }
   }
@@ -222,13 +245,13 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr)
 }
 
 bool
-OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
+OpenGD77Interface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err)
 {
   if (EEPROM == bank) {
-    if ((0 <= _sector) && (! finishWriteFlash()))
+    if ((0 <= _sector) && (! finishWriteFlash(err)))
       return false;
     for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
-      if (! writeEEPROM(addr+i, data+i, BLOCK_SIZE)) {
+      if (! writeEEPROM(addr+i, data+i, BLOCK_SIZE, err)) {
         _sector = -1;
         return false;
       }
@@ -264,58 +287,57 @@ start:
 }
 
 bool
-OpenGD77Interface::write_finish() {
+OpenGD77Interface::write_finish(const ErrorStack &err) {
   _sector = -1;
   if (0 > _sector)
     return true;
   _sector = -1;
-  if (! finishWriteFlash())
+  if (! finishWriteFlash(err))
     return false;
-  if (! sendCloseScreen())
+  if (! sendCloseScreen(err))
     return false;
   return true;
 }
 
 bool
-OpenGD77Interface::read_start(uint32_t bank, uint32_t addr) {
-  if (! sendShowCPSScreen())
+OpenGD77Interface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
+  Q_UNUSED(bank); Q_UNUSED(addr)
+
+  if (! sendShowCPSScreen(err))
     return false;
-  if (! sendClearScreen())
+  if (! sendClearScreen(err))
     return false;
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0))
+  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Reading", 3, 1, 0))
+  if (! sendDisplay(0, 16, "Reading", 3, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0))
+  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
     return false;
-  if (! sendRenderCPS())
+  if (! sendRenderCPS(err))
     return false;
-  if (! sendCommand(CommandRequest::FLASH_GREEN_LED))
+  if (! sendCommand(CommandRequest::FLASH_GREEN_LED, err))
     return false;
-  if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS))
+  if (! sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS, err))
     return false;
 
   return true;
 }
 
 bool
-OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes) {
+OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
   if (! isOpen()) {
-    _errorMessage = "Cannot read block: Device not open!";
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read block: Device not open!";
     return false;
   }
 
   for (int i=0; i<nbytes; i+=BLOCK_SIZE) {
     bool ok;
     if (EEPROM == bank)
-      ok = readEEPROM(addr+i, data+i, BLOCK_SIZE);
+      ok = readEEPROM(addr+i, data+i, BLOCK_SIZE, err);
     else if (FLASH == bank)
-      ok = readFlash(addr+i, data+i, BLOCK_SIZE);
+      ok = readFlash(addr+i, data+i, BLOCK_SIZE, err);
     else {
-      _errorMessage = tr("%1: Cannot read from bank %2: Unknown memory bank.")
-          .arg(__func__).arg(bank);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot read from bank " << bank << ": Unknown memory bank.";
       return false;
     }
 
@@ -327,37 +349,36 @@ OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes)
 }
 
 bool
-OpenGD77Interface::read_finish() {
-  if (! sendCloseScreen())
+OpenGD77Interface::read_finish(const ErrorStack &err) {
+  if (! sendCloseScreen(err))
     return false;
 
   return true;
 }
 
 bool
-OpenGD77Interface::reboot() {
-  return sendCommand(CommandRequest::SAVE_SETTINGS_NOT_VFOS);
+OpenGD77Interface::reboot(const ErrorStack &err) {
+  return sendCommand(CommandRequest::SAVE_SETTINGS_NOT_VFOS, err);
 }
 
 
 bool
-OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
+OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err) {
+  Q_UNUSED(len)
+
   if (! isOpen()) {
-    _errorMessage = "Cannot read block: Device not open!";
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read block: Device not open!";
     return false;
   }
 
   ReadRequest req; req.initReadEEPROM(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
@@ -365,25 +386,21 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
   int retlen = QSerialPort::read((char *)&resp, sizeof(ReadResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read from serial port";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot read from serial port: Device returned empty message.");
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Device returned empty message.";
     return false;
   }
 
   if ('R' != resp.type) {
-    _errorMessage = tr("Cannot read from device: Device returned error '%1'").arg(resp.type);
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read from device: Device returned error '" << resp.type << "'.";
     return false;
   }
 
   if (qFromBigEndian(req.length) != qFromBigEndian(resp.length)) {
-    _errorMessage = tr("Cannot read from device: Device returned invalid length 0x%1.")
-        .arg(qFromBigEndian(resp.length), 4, 16);
-    logError() << __FILE__ << ": " << _errorMessage;
+    errMsg(err) << "Cannot read from device: Device returned invalid length " <<
+                qFromBigEndian(resp.length) << ".";
     return false;
   }
 
@@ -393,37 +410,33 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len) {
 
 
 bool
-OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len) {
+OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
   WriteRequest req; req.initWriteEEPROM(addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, sizeof(WriteResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot write EEPROM: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write EEPROM: Device returned empty message.";
     return false;
   }
 
   if ((req.type != resp.type) || (req.command != resp.command)) {
-    _errorMessage = tr("Cannot write EEPROM at %1: Device returned error '%2'").arg(addr, 6, 16).arg(resp.type);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write EEPROM at " << QString::number(addr, 16)
+             << ": Device returned error " << resp.type << ".";
     return false;
   }
 
@@ -432,24 +445,25 @@ OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len)
 
 
 bool
-OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
+OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err) {
+  Q_UNUSED(len)
+
   if (! isOpen()) {
-    _errorMessage = "Cannot read block: Device not open!";
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read block: Device not open!";
     return false;
   }
 
   ReadRequest req;
   req.initReadFlash(addr, BLOCK_SIZE);
   if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
@@ -457,25 +471,22 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
   int retlen = QSerialPort::read((char *)&resp, sizeof(ReadResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot read from serial port: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Device returned empty message.";
     return false;
   }
 
   if ('R' != resp.type) {
-    _errorMessage = tr("Cannot read from device: Device returned error '%1'").arg(resp.type);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from device: Device returned error " << resp.type << ".";
     return false;
   }
 
   if (qFromBigEndian(req.length) != qFromBigEndian(resp.length)) {
-    _errorMessage = tr("Cannot read from device: Device returned invalid length 0x%1.")
-        .arg(qFromBigEndian(resp.length), 4, 16);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from device: Device returned invalid length "
+                << qFromBigEndian(resp.length) << ".";
     return false;
   }
 
@@ -484,37 +495,35 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len) {
 }
 
 bool
-OpenGD77Interface::setFlashSector(uint32_t addr) {
+OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
   WriteRequest req; req.initSetFlashSector(addr);
   WriteResponse resp;
 
   if (5 != QSerialPort::write((const char *)&req, 5)) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, sizeof(WriteResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot set flash sector: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot set flash sector: Device returned empty message.";
     return false;
   }
 
   if ((req.type != resp.type) || (req.command != resp.command)) {
-    _errorMessage = tr("Cannot set flash sector: Device returned error '%1'").arg(resp.type);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot set flash sector: Device returned error " << resp.type << ".";
     return false;
   }
 
@@ -522,37 +531,36 @@ OpenGD77Interface::setFlashSector(uint32_t addr) {
 }
 
 bool
-OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) {
+OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
   WriteRequest req; req.initWriteFlash(addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, sizeof(WriteResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot write to buffer: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to buffer: Device returned empty message.";
     return false;
   }
 
   if ((req.type != resp.type) || (req.command != resp.command)) {
-    _errorMessage = tr("Cannot write to buffer at %1: Device returned error '%2'").arg(addr, 6, 16).arg(resp.type);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to buffer at " << QString::number(addr,16)
+             << ": Device returned error " << resp.type << ".";
     return false;
   }
 
@@ -560,39 +568,34 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len) 
 }
 
 bool
-OpenGD77Interface::finishWriteFlash() {
+OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
   //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
   req.initFinishWriteFlash();
   WriteResponse resp;
 
   if ((2) != QSerialPort::write((const char *)&req, 2)) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, sizeof(WriteResponse));
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot write to flash: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to flash: Device returned empty message.";
     return false;
   }
 
   if ((req.type != resp.type) || (req.command != resp.command)) {
-    _errorMessage = tr("Cannot write to flash: Device returned error '%1'").arg(resp.type);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to flash: Device returned error " << resp.type << ".";
     return false;
   }
 
@@ -600,35 +603,30 @@ OpenGD77Interface::finishWriteFlash() {
 }
 
 bool
-OpenGD77Interface::sendShowCPSScreen() {
+OpenGD77Interface::sendShowCPSScreen(const ErrorStack &err) {
   CommandRequest req;
   uint8_t resp;
   req.initShowCPSScreen();
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, 1);
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -636,36 +634,33 @@ OpenGD77Interface::sendShowCPSScreen() {
 }
 
 bool
-OpenGD77Interface::sendClearScreen() {
+OpenGD77Interface::sendClearScreen(const ErrorStack &err) {
   CommandRequest req;
   req.initClearScreen();
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -673,36 +668,31 @@ OpenGD77Interface::sendClearScreen() {
 }
 
 bool
-OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted) {
+OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted, const ErrorStack &err) {
   CommandRequest req;
   req.initDisplay(x,y, message, iSize, alignment, inverted);
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -710,19 +700,17 @@ OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_
 }
 
 bool
-OpenGD77Interface::sendRenderCPS() {
+OpenGD77Interface::sendRenderCPS(const ErrorStack &err) {
   CommandRequest req;
   req.initRenderCPS();
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
@@ -730,16 +718,13 @@ OpenGD77Interface::sendRenderCPS() {
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -747,35 +732,30 @@ OpenGD77Interface::sendRenderCPS() {
 }
 
 bool
-OpenGD77Interface::sendCloseScreen() {
+OpenGD77Interface::sendCloseScreen(const ErrorStack &err) {
   CommandRequest req; req.initCloseScreen();
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -783,35 +763,30 @@ OpenGD77Interface::sendCloseScreen() {
 }
 
 bool
-OpenGD77Interface::sendCommand(CommandRequest::Option option) {
+OpenGD77Interface::sendCommand(CommandRequest::Option option, const ErrorStack &err) {
   CommandRequest req; req.initCommand(option);
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
-    _errorMessage = tr("Cannot write to serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot write to serial port.";
     return false;
   }
 
   if (! waitForReadyRead(1000)) {
-    _errorMessage = tr("Cannot read from serial port: Timeout!");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
 
   int retlen = QSerialPort::read((char *)&resp, 1);
 
   if (0 > retlen) {
-    _errorMessage = tr("Cannot read from serial port: %1").arg(USBSerial::errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot read from serial port.";
     return false;
   } else if (0 == retlen) {
-    _errorMessage = tr("Cannot send command: Device returned empty message.");
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    _errorMessage = tr("Cannot send command: Deviced returned unexpected response '%1'").arg(resp);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 

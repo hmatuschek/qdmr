@@ -21,6 +21,9 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
+#define ADDR_HIDDEN_ZONE_MAP      0x024c1360
+#define HIDDEN_ZONE_MAP_SIZE      0x00000020
+
 #define ADDR_GENERAL_CONFIG       0x02500000
 #define GENERAL_CONFIG_SIZE       0x00000100
 
@@ -175,8 +178,10 @@ D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+
   if (nullptr == ch)
     return nullptr;
+
   // Nothing else to do
   return ch;
 }
@@ -263,52 +268,61 @@ D878UVCodeplug::RoamingChannelElement::clear() {
 
 unsigned
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
-  return getBCD8_be(0x0000)*10;
+  return getBCD8_be(Offsets::RXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setRXFrequency(unsigned hz) {
-  setBCD8_be(0x0000, hz/10);
+  setBCD8_be(Offsets::RXFrequency, hz/10);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
-  return getBCD8_be(0x0004)*10;
+  return getBCD8_be(Offsets::TXFrequency)*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
-  setBCD8_be(0x0004, hz/10);
+  setBCD8_be(Offsets::TXFrequency, hz/10);
+}
+
+bool
+D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
+  return ColorCodeValue::Disabled == getUInt8(Offsets::ColorCode);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
-  return getUInt8(0x0008);
+  return std::min(15u, (unsigned)getUInt8(Offsets::ColorCode));
 }
 void
 D878UVCodeplug::RoamingChannelElement::setColorCode(unsigned cc) {
-  setUInt8(0x0008, cc);
+  setUInt8(Offsets::ColorCode, cc);
+}
+void
+D878UVCodeplug::RoamingChannelElement::disableColorCode() {
+  setUInt8(Offsets::ColorCode, ColorCodeValue::Disabled);
 }
 
 DigitalChannel::TimeSlot
 D878UVCodeplug::RoamingChannelElement::timeSlot() const {
-  switch (getUInt8(0x0009)) {
-  case 0x00: return DigitalChannel::TimeSlot::TS1;
-  case 0x01: return DigitalChannel::TimeSlot::TS2;
+  switch (getUInt8(Offsets::TimeSlot)) {
+  case TimeSlotValue::TS1: return DigitalChannel::TimeSlot::TS1;
+  case TimeSlotValue::TS2: return DigitalChannel::TimeSlot::TS2;
   }
   return DigitalChannel::TimeSlot::TS1;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
   switch (ts) {
-  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0009, 0x00); break;
-  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0009, 0x01); break;
+  case DigitalChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
+  case DigitalChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
   }
 }
 
 QString
 D878UVCodeplug::RoamingChannelElement::name() const {
-  return readASCII(0x000a, 16, 0x00);
+  return readASCII(Offsets::Name, Offsets::NameLength, 0x00);
 }
 void
 D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(0x000a, name, 16, 0x00);
+  writeASCII(Offsets::Name, name, Offsets::NameLength, 0x00);
 }
 
 bool
@@ -1195,11 +1209,13 @@ D878UVCodeplug::GPSMessageElement::setMessage(const QString &message) {
 
 bool
 D878UVCodeplug::GPSMessageElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1329,11 +1345,13 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
   return true;
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
+  Q_UNUSED(ctx)
   return true;
 }
 
@@ -1359,6 +1377,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::clear() {
   setUInt8(0x0000, 0xff);
   setTXDelay(60);
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
+}
+
+bool
+D878UVCodeplug::AnalogAPRSSettingsElement::isValid() const {
+  if (! Codeplug::Element::isValid())
+    return false;
+  return (0 != frequency()) && (! destination().simplified().isEmpty())
+      && (! source().simplified().isEmpty());
 }
 
 unsigned
@@ -1472,7 +1498,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::disableFixedLocation() {
 
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::destination() const {
-  return readASCII(0x0016, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x0016, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
@@ -1480,12 +1507,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::destinationSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setDestination(const QString &call, unsigned ssid) {
-  writeASCII(0x0016, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x0016, call, 6, ' ');
   setUInt8(0x001c, ssid);
 }
 QString
 D878UVCodeplug::AnalogAPRSSettingsElement::source() const {
-  return readASCII(0x001d, 6, 0x00);
+  // Terminated/padded with space
+  return readASCII(0x001d, 6, ' ');
 }
 unsigned
 D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
@@ -1493,7 +1522,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::sourceSSID() const {
 }
 void
 D878UVCodeplug::AnalogAPRSSettingsElement::setSource(const QString &call, unsigned ssid) {
-  writeASCII(0x001d, call, 6, 0x00);
+  // Terminated/padded with space
+  writeASCII(0x001d, call, 6, ' ');
   setUInt8(0x0023, ssid);
 }
 
@@ -1547,17 +1577,23 @@ D878UVCodeplug::AnalogAPRSSettingsElement::setPreWaveDelay(unsigned ms) {
 }
 
 bool
-D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx) {
+D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
   clear();
+  if (! sys->revertChannel()) {
+    errMsg(err) << "Cannot encode APRS settings: "
+                << "No revert channel defined for APRS system '" << sys->name() <<"'.";
+    return false;
+  }
   setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
+  setPower(sys->revertChannel()->power());
   setManualTXInterval(sys->period());
   setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setPower(sys->revertChannel()->power());
   setPreWaveDelay(0);
   return true;
 }
@@ -1583,7 +1619,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(AnalogChannel::Bandwidth::Wide);
-    logInfo() << "No matching APRS chanel found for TX frequency " << frequency()/1e6
+    logInfo() << "No matching APRS channel found for TX frequency " << frequency()/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
@@ -1904,7 +1940,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
     ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
-  sys->setContact(cont);
+  sys->setContactObj(cont);
 
   return true;
 }
@@ -2093,6 +2129,12 @@ D878UVCodeplug::RadioInfoElement::maintainerNote() const {
 D878UVCodeplug::D878UVCodeplug(QObject *parent)
   : D868UVCodeplug(parent)
 {
+}
+
+void
+D878UVCodeplug::clear() {
+  D868UVCodeplug::clear();
+
   // Rename image
   image(0).setName("Anytone AT-D878UV Codeplug");
 
@@ -2100,11 +2142,6 @@ D878UVCodeplug::D878UVCodeplug(QObject *parent)
   image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
   // Roaming zone bitmaps
   image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
-}
-
-void
-D878UVCodeplug::clear() {
-  D868UVCodeplug::clear();
 }
 
 void
@@ -2161,13 +2198,13 @@ D878UVCodeplug::setBitmaps(Config *config)
 
 
 bool
-D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx)
+D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
   // Encode everything common between d868uv and d878uv radios.
-  if (! D868UVCodeplug::encodeElements(flags, ctx))
+  if (! D868UVCodeplug::encodeElements(flags, ctx, err))
     return false;
 
-  if (! this->encodeRoaming(flags, ctx))
+  if (! this->encodeRoaming(flags, ctx, err))
     return false;
 
   return true;
@@ -2175,16 +2212,16 @@ D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx)
 
 
 bool
-D878UVCodeplug::decodeElements(Context &ctx)
+D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 {
   // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decodeElements(ctx))
+  if (! D868UVCodeplug::decodeElements(ctx, err))
     return false;
 
-  if (! this->createRoaming(ctx))
+  if (! this->createRoaming(ctx, err))
     return false;
 
-  if (! this->linkRoaming(ctx))
+  if (! this->linkRoaming(ctx, err))
     return false;
 
   return true;
@@ -2215,7 +2252,8 @@ D878UVCodeplug::allocateChannels() {
 }
 
 bool
-D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
@@ -2227,7 +2265,9 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createChannels(Context &ctx) {
+D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Create channels
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
@@ -2244,7 +2284,9 @@ D878UVCodeplug::createChannels(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkChannels(Context &ctx) {
+D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // Link channel objects
   for (uint16_t i=0; i<NUM_CHANNELS; i++) {
     // Check if channel is enabled:
@@ -2260,6 +2302,52 @@ D878UVCodeplug::linkChannels(Context &ctx) {
 
 
 void
+D878UVCodeplug::allocateZones() {
+  D868UVCodeplug::allocateZones();
+  // Hidden zone map
+  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
+}
+
+bool
+D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, isB, flags, ctx, err))
+    return false;
+
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext)
+      return true;
+
+  if (ext->hidden()) {
+    // set bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] |= (1<<(i%8));
+  } else {
+    // clear bit
+    data(ADDR_HIDDEN_ZONE_MAP)[i/8] &= ~(1<<(i%8));
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, isB, ctx, err))
+    return false;
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneZoneExtension();
+    zone->setAnytoneExtension(ext);
+  }
+
+  if ((! isB) && (data(ADDR_HIDDEN_ZONE_MAP)[i/8] & (1<<(i%8))))
+    ext->enableHidden(true);
+  else
+    ext->enableHidden(false);
+
+  return true;
+}
+
+
+void
 D878UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
@@ -2268,17 +2356,21 @@ D878UVCodeplug::allocateGeneralSettings() {
 
 }
 bool
-D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).fromConfig(flags, ctx);
   GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).fromConfig(flags, ctx);
   return true;
 }
 bool
-D878UVCodeplug::decodeGeneralSettings(Context &ctx) {
+D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
+  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
 }
 
@@ -2293,7 +2385,8 @@ D878UVCodeplug::allocateGPSSystems() {
 }
 
 bool
-D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
   // Encode APRS system (there can only be one)
@@ -2319,10 +2412,12 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createGPSSystems(Context &ctx) {
+D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   // replaces D868UVCodeplug::createGPSSystems
 
-  // Before creating any GPS/APRS systems, get global auto TX intervall
+  // Before creating any GPS/APRS systems, get global auto TX interval
   AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
   unsigned pos_intervall = aprs.autoTXInterval();
 
@@ -2352,7 +2447,8 @@ D878UVCodeplug::createGPSSystems(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkGPSSystems(Context &ctx) {
+D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
@@ -2407,7 +2503,9 @@ D878UVCodeplug::allocateRoaming() {
 }
 
 bool
-D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
+D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
   // Encode roaming channels
   QHash<DigitalChannel *, unsigned> roaming_ch_map;
   {
@@ -2438,7 +2536,9 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx) {
 }
 
 bool
-D878UVCodeplug::createRoaming(Context &ctx) {
+D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   QHash<unsigned, DigitalChannel*> map;
   // Create or find roaming channels
   uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
@@ -2469,7 +2569,8 @@ D878UVCodeplug::createRoaming(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::linkRoaming(Context &ctx) {
+D878UVCodeplug::linkRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Pass, no need to link roaming channels.
   return true;
 }

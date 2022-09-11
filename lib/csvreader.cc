@@ -292,6 +292,7 @@ CSVHandler::handleAPRSSystem(qint64 idx, const QString &name, qint64 channelIdx,
   Q_UNUSED(srcSSID);
   Q_UNUSED(dest);
   Q_UNUSED(destSSID);
+  Q_UNUSED(path);
   Q_UNUSED(icon);
   Q_UNUSED(message);
   Q_UNUSED(line);
@@ -670,7 +671,7 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
     return false;
   }
   bool dtmf = false;
-  DigitalContact::Type type;
+  DigitalContact::Type type = DigitalContact::PrivateCall;
   if ("group" == token.value.toLower()) {
     type = DigitalContact::GroupCall;
   } else if ("private" == token.value.toLower()) {
@@ -731,9 +732,8 @@ bool
 CSVParser::_parse_rx_groups(CSVLexer &lexer) {
   // skip rest of header
   CSVLexer::Token token = lexer.next();
-  for (; CSVLexer::Token::T_KEYWORD==token.type; token=lexer.next()) {
-    // skip
-  }
+  while (CSVLexer::Token::T_KEYWORD==token.type)
+    token = lexer.next();
   if (CSVLexer::Token::T_NEWLINE != token.type) {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected newline.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1752,7 +1752,7 @@ CSVReader::handleRadioId(const QList<qint64> &ids, qint64 line, qint64 column, Q
     return true;
   logDebug() << "Got " << ids.count() << " IDs...";
   for (int i=0; i<ids.count(); i++) {
-    RadioID *id = new RadioID("", ids.at(i));
+    DMRRadioID *id = new DMRRadioID("", ids.at(i));
     _config->radioIDs()->add(id);
     _radioIDs[i+1] = id;
   }
@@ -1931,7 +1931,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setScanListObj(_scanlists[scan]);
+      _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check GPS System
@@ -2010,7 +2010,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setScanListObj(_scanlists[scan]);
+      _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check APRS system
@@ -2101,7 +2101,7 @@ CSVReader::handleGPSSystem(
       logError() << errorMessage;
       return false;
     }
-    gps->setContact(_digital_contacts[contactIdx]);
+    gps->setContactObj(_digital_contacts[contactIdx]);
 
     if (revertChannelIdx) {
       if (! _channels.contains(revertChannelIdx))  {

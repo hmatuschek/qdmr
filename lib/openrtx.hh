@@ -24,7 +24,6 @@ public:
   virtual ~OpenRTX();
 
 	const QString &name() const;
-  const Radio::Features &features() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
@@ -34,14 +33,16 @@ public:
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false);
+  bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
-                   const Codeplug::Flags &flags = Codeplug::Flags());
+                   const Codeplug::Flags &flags = Codeplug::Flags(),
+                   const ErrorStack &err=ErrorStack());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection());
+                             const CallsignDB::Selection &selection=CallsignDB::Selection(),
+                             const ErrorStack &err=ErrorStack());
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
@@ -49,11 +50,11 @@ protected:
 
   /** Connects to the radio, if a radio interface is passed to the constructor, this interface
    * instance is used. */
-  bool connect();
+  bool connect(const ErrorStack &err=ErrorStack());
   /** Implements the actual download process. */
-  bool download();
+  bool download(const ErrorStack &err=ErrorStack());
   /** Implements the actual codeplug upload process. */
-  bool upload();
+  bool upload(const ErrorStack &err=ErrorStack());
 
 protected:
   /** The device identifier. */

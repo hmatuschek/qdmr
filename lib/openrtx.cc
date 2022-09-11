@@ -7,58 +7,6 @@
 
 #define BSIZE 32
 
-static Radio::Features _open_rtx_features =
-{
-  .betaWarning = false,
-
-  .hasDigital = true,
-  .hasAnalog = true,
-
-  .frequencyLimits = QVector<Radio::Features::FrequencyRange>{ {136., 174.}, {400., 470.} },
-
-  .maxRadioIDs        = 1,
-  .needsDefaultRadioID = true,
-  .maxIntroLineLength = 16,
-
-  .maxChannels = 1024,
-  .maxChannelNameLength = 16,
-  .allowChannelNoDefaultContact = true,
-
-  .maxZones = 68,
-  .maxZoneNameLength = 16,
-  .maxChannelsInZone = 80,
-  .hasABZone = false,
-
-  .hasScanlists = false,
-  .maxScanlists = 64,
-  .maxScanlistNameLength = 16,
-  .maxChannelsInScanlist = 32,
-  .scanListNeedsPriority = true,
-
-  .maxContacts = 1024,
-  .maxContactNameLength = 16,
-
-  .maxGrouplists = 76,
-  .maxGrouplistNameLength = 16,
-  .maxContactsInGrouplist = 32,
-
-  .hasGPS = false,
-  .maxGPSSystems = 0,
-
-  .hasAPRS = false,
-  .maxAPRSSystems = 0,
-
-  .hasRoaming = false,
-  .maxRoamingChannels = 0,
-  .maxRoamingZones = 0,
-  .maxChannelsInRoamingZone = 0,
-
-  .hasCallsignDB = false,
-  .callsignDBImplemented = false,
-  .maxCallsignsInDB = 0
-};
-
-
 OpenRTX::OpenRTX(OpenRTXInterface *device, QObject *parent)
   : Radio(parent), _name("Open RTX"), _dev(device), _config(nullptr), _codeplug()
 {
@@ -85,11 +33,6 @@ OpenRTX::name() const {
   return _name;
 }
 
-const Radio::Features &
-OpenRTX::features() const {
-  return _open_rtx_features;
-}
-
 const Codeplug &
 OpenRTX::codeplug() const {
   return _codeplug;
@@ -103,14 +46,14 @@ OpenRTX::codeplug() {
 RadioInfo
 OpenRTX::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::OpenRTX, "openrtx", "OpenRTX", "OpenRTX Project");
+        RadioInfo::OpenRTX, "openrtx", "OpenRTX", USBDeviceInfo());
 }
 
 
 bool
-OpenRTX::startDownload(bool blocking) {
+OpenRTX::startDownload(bool blocking, const ErrorStack &err) {
   if (StatusIdle != _task) {
-    logError() << "Cannot download from radio, radio is not idle.";
+    errMsg(err) << "Cannot download from radio, radio is not idle.";
     return false;
   }
 
@@ -131,16 +74,18 @@ OpenRTX::startDownload(bool blocking) {
 
 
 bool
-OpenRTX::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags) {
+OpenRTX::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags)
+
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
-    logError() << "Cannot upload to radio, radio is not idle.";
+    errMsg(err) << "Cannot upload to radio, radio is not idle.";
     return false;
   }
 
   if (! (_config = config)) {
-    logError() << "Cannot upload to radio, no config given.";
+    errMsg(err) << "Cannot upload to radio, no config given.";
     return false;
   }
 
@@ -160,8 +105,11 @@ OpenRTX::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags
 }
 
 bool
-OpenRTX::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection) {
-  logError() << "OpenRTX has no call-sign DB implemented.";
+OpenRTX::startUploadCallsignDB(UserDatabase *db, bool blocking,
+                               const CallsignDB::Selection &selection,const ErrorStack &err)
+{
+  Q_UNUSED(db); Q_UNUSED(blocking); Q_UNUSED(selection)
+  errMsg(err) << "OpenRTX has no call-sign DB implemented.";
   return false;
 }
 
@@ -217,17 +165,16 @@ OpenRTX::run() {
 
 
 bool
-OpenRTX::connect() {
+OpenRTX::connect(const ErrorStack &err) {
   if (_dev && _dev->isOpen())
     return true;
   if (_dev)
     _dev->deleteLater();
 
-  _dev = new OpenRTXInterface();
+  _dev = new OpenRTXInterface(USBDeviceDescriptor());
   if (! _dev->isOpen()) {
     _task = StatusError;
-    _errorMessage = QString("Cannot connect to radio: %1").arg(_dev->errorMessage());
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot connect to radio.";
     _dev->deleteLater();
     _dev = nullptr;
     return false;
@@ -238,30 +185,26 @@ OpenRTX::connect() {
 
 
 bool
-OpenRTX::download()
+OpenRTX::download(const ErrorStack &err)
 {
   emit downloadStarted();
 
   if (_codeplug.numImages() != 2) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
-                            " Codeplug does not contain two images.").arg(__func__);
+    errMsg(err) << "Cannot download codeplug: Codeplug does not contain two images.";
     return false;
   }
 
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t "
-                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot download codeplug: Codeplug is not aligned with blocksize "
+                << BSIZE << ".";
     return false;
   }
 
   size_t totb = _codeplug.memSize();
 
-  if (! _dev->read_start(0, 0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->read_start(0, 0, err)) {
+    errMsg(err) << "Cannot start codeplug download.";
     _dev->close();
     return false;
   }
@@ -277,17 +220,15 @@ OpenRTX::download()
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, err)) {
+          errMsg(err) << "Cannot read block "<< (b0+b) <<".";
           return false;
         }
         QThread::usleep(100);
         emit downloadProgress(float(bcount*100)/totb);
       }
     }
-    _dev->read_finish();
+    _dev->read_finish(err);
   }
 
   return true;
@@ -295,31 +236,26 @@ OpenRTX::download()
 
 
 bool
-OpenRTX::upload()
+OpenRTX::upload(const ErrorStack &err)
 {
   emit uploadStarted();
 
   if (_codeplug.numImages() != 2) {
-    _errorMessage = QString("In %1(), cannot download codeplug:\n\t"
-                            " Codeplug does not contain two images.").arg(__func__);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot download codeplug: Codeplug does not contain two images.";
     return false;
   }
 
   // Check every segment in the codeplug
   if (! _codeplug.isAligned(BSIZE)) {
-    _errorMessage = QString("In %1(), cannot upload code-plug:\n\t "
-                            "Codeplug is not aligned with blocksize %5.").arg(__func__).arg(BSIZE);
-    logError() << _errorMessage;
+    errMsg(err) << "Cannot upload code-plug: Codeplug is not aligned with blocksize "
+                << BSIZE << ".";
     return false;
   }
 
   size_t totb = _codeplug.memSize();
 
-  if (! _dev->read_start(0, 0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug download:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->read_start(0, 0, err)) {
+    errMsg(err) << "Cannot start codeplug download.";
     return false;
   }
 
@@ -333,26 +269,22 @@ OpenRTX::upload()
       unsigned size = _codeplug.image(image).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot read block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->read(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, err)) {
+          errMsg(err) << "Cannot read block " << (b0+b) << ".";
           return false;
         }
         QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
-    _dev->read_finish();
+    _dev->read_finish(err);
   }
 
   // Encode config into codeplug
-  _codeplug.encode(_config);
+  _codeplug.encode(_config, Codeplug::Flags(), err);
 
-  if (! _dev->write_start(0,0)) {
-    _errorMessage = QString("in %1(), cannot start codeplug upload:\n\t %2")
-        .arg(__func__).arg(_dev->errorMessage());
-    logError() << _errorMessage;
+  if (! _dev->write_start(0,0, err)) {
+    errMsg(err) << "Cannot start codeplug upload.";
     return false;
   }
 
@@ -366,17 +298,15 @@ OpenRTX::upload()
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
 
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-        if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE)) {
-          _errorMessage = QString("In %1(), cannot write block %2:\n\t %3")
-              .arg(__func__).arg(b0+b).arg(_dev->errorMessage());
-          logError() << _errorMessage;
+        if (! _dev->write(bank, (b0+b)*BSIZE, _codeplug.data((b0+b)*BSIZE, image), BSIZE, err)) {
+          errMsg(err) << "Cannot write block " << (b0+b) << ".";
           return false;
         }
         QThread::usleep(100);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
-    _dev->write_finish();
+    _dev->write_finish(err);
   }
 
   return true;

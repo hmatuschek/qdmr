@@ -73,30 +73,28 @@ UV390Codeplug::ChannelElement::clear() {
   Element::clear();
 
   clearBit(5,0);
-  setInCallCriteria(INCALL_ALWAYS);
-  setTurnOffFreq(TURNOFF_NONE);
+  setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
+  setTurnOffFreq(TyTChannelExtension::KillTone::Off);
   setSquelch(1);
   setPower(Channel::Power::High);
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
-  enableLeaderOrMS(true);
+  enableDCDMLeader(true);
 }
 
-UV390Codeplug::ChannelElement::InCall
-UV390Codeplug::ChannelElement::inCallCriteria() const {
-  return InCall(getUInt2(5,4));
+TyTChannelExtension::InCallCriterion UV390Codeplug::ChannelElement::inCallCriteria() const {
+  return TyTChannelExtension::InCallCriterion(getUInt2(5,4));
 }
 void
-UV390Codeplug::ChannelElement::setInCallCriteria(InCall crit) {
+UV390Codeplug::ChannelElement::setInCallCriteria(TyTChannelExtension::InCallCriterion crit) {
   setUInt2(5,4, uint8_t(crit));
 }
 
-UV390Codeplug::ChannelElement::TurnOffFreq
-UV390Codeplug::ChannelElement::turnOffFreq() const {
-  return TurnOffFreq(getUInt2(5,6));
+TyTChannelExtension::KillTone UV390Codeplug::ChannelElement::turnOffFreq() const {
+  return TyTChannelExtension::KillTone(getUInt2(5,6));
 }
 void
-UV390Codeplug::ChannelElement::setTurnOffFreq(TurnOffFreq freq) {
+UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq) {
   setUInt2(5,6, uint8_t(freq));
 }
 
@@ -155,11 +153,11 @@ UV390Codeplug::ChannelElement::enableDualCapacityDirectMode(bool enable) {
 }
 
 bool
-UV390Codeplug::ChannelElement::leaderOrMS() const {
+UV390Codeplug::ChannelElement::dcdmLeader() const {
   return !getBit(31, 4);
 }
 void
-UV390Codeplug::ChannelElement::enableLeaderOrMS(bool enable) {
+UV390Codeplug::ChannelElement::enableDCDMLeader(bool enable) {
   setBit(31,4, !enable);
 }
 
@@ -180,6 +178,16 @@ UV390Codeplug::ChannelElement::toChannelObj() const {
   }
   // Common settings
   ch->setPower(power());
+
+  // assemble extension
+  if (TyTChannelExtension *ex = ch->tytChannelExtension()) {
+    ex->setKillTone(turnOffFreq());
+    ex->setInCallCriterion(inCallCriteria());
+    ex->enableAllowInterrupt(allowInterrupt());
+    ex->enableDCDM(dualCapacityDirectMode());
+    ex->enableDCDMLeader(dcdmLeader());
+  }
+
   return ch;
 }
 
@@ -199,6 +207,15 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
       setSquelch(ctx.config()->settings()->squelch());
     else
       setSquelch(achan->squelch());
+  }
+
+  // apply extensions
+  if (TyTChannelExtension *ex = chan->tytChannelExtension()) {
+    setTurnOffFreq(ex->killTone());
+    setInCallCriteria(ex->inCallCriterion());
+    enableAllowInterrupt(ex->allowInterrupt());
+    enableDualCapacityDirectMode(ex->dcdm());
+    enableDCDMLeader(ex->dcdmLeader());
   }
 }
 
@@ -228,6 +245,7 @@ UV390Codeplug::VFOChannelElement::name() const {
 }
 void
 UV390Codeplug::VFOChannelElement::setName(const QString &txt) {
+  Q_UNUSED(txt)
   // pass...
 }
 
@@ -244,102 +262,16 @@ UV390Codeplug::VFOChannelElement::setStepSize(unsigned ss_Hz) {
 
 
 /* ******************************************************************************************** *
- * Implementation of UV390Codeplug::ZoneElement
- * ******************************************************************************************** */
-UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr, size_t size)
-  : Codeplug::Element(ptr, size)
-{
-  // pass...
-}
-
-UV390Codeplug::ZoneExtElement::ZoneExtElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x00e0)
-{
-  // pass...
-}
-
-UV390Codeplug::ZoneExtElement::~ZoneExtElement() {
-  // pass...
-}
-
-void
-UV390Codeplug::ZoneExtElement::clear() {
-  memset(_data, 0x00, 0xe0);
-}
-
-uint16_t
-UV390Codeplug::ZoneExtElement::memberIndexA(unsigned n) const {
-  return getUInt16_le(0x00 + 2*n);
-}
-
-void
-UV390Codeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
-  setUInt16_le(0x00 + 2*n, idx);
-}
-
-uint16_t
-UV390Codeplug::ZoneExtElement::memberIndexB(unsigned n) const {
-  return getUInt16_le(0x60 + 2*n);
-}
-
-void
-UV390Codeplug::ZoneExtElement::setMemberIndexB(unsigned n, uint16_t idx) {
-  setUInt16_le(0x60 + 2*n, idx);
-}
-
-bool
-UV390Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
-  // Store remaining channels from list A
-  for (int i=16; i<64; i++) {
-    if (i < zone->A()->count())
-      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
-    else
-      setMemberIndexA(i-16, 0);
-  }
-  // Store channel from list B
-  for (int i=0; i<64; i++) {
-    if (i < zone->B()->count())
-      setMemberIndexB(i, ctx.index(zone->B()->get(i)));
-    else
-      setMemberIndexB(i, 0);
-  }
-
-  return true;
-}
-
-bool
-UV390Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
-  for (int i=0; (i<48) && memberIndexA(i); i++) {
-    if (! ctx.has<Channel>(memberIndexA(i))) {
-      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
-      return false;
-    }
-    zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
-  }
-
-  for (int i=0; (i<64) && memberIndexB(i); i++) {
-    if (! ctx.has<Channel>(memberIndexB(i))) {
-      logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
-      return false;
-    }
-    zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
-  }
-
-  return true;
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of UV390Codeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
-  : TyTCodeplug::GeneralSettingsElement(ptr, size)
+  : DM1701Codeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 UV390Codeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : TyTCodeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
+  : DM1701Codeplug::GeneralSettingsElement(ptr, SETTINGS_SIZE)
 {
   // pass...
 }
@@ -351,18 +283,10 @@ UV390Codeplug::GeneralSettingsElement::clear() {
   setTransmitMode(DESIGNED_AND_HAND_CH);
   enableChannelVoiceAnnounce(false);
   setBit(0x43,0, 1); setBit(0x43,1, 1);
-  enableChannelModeA(true);
   setUInt4(0x43,3, 0xf);
-  enableChannelModeB(true);
 
-  enableChannelMode(true);
-
-  enableGroupCallMatch(false);
-  enablePrivateCallMatch(false);
   setBit(0x6b, 2, 1);
-  setTimeZone(QTimeZone::systemTimeZone());
 
-  setChannelHangTime(3000);
   setUInt8(0x91, 0xff); setUInt2(0x92, 0, 0x03);
   enablePublicZone(true);
   setUInt5(0x92, 3, 0x1f);
@@ -405,69 +329,6 @@ UV390Codeplug::GeneralSettingsElement::enableKeypadTones(bool enable) {
 }
 
 bool
-UV390Codeplug::GeneralSettingsElement::channelModeA() const {
-  return getBit(0x43,3);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelModeA(bool enable) {
-  setBit(0x43,3, enable);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::channelModeB() const {
-  return getBit(0x43,7);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelModeB(bool enable) {
-  setBit(0x43,7, enable);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::channelMode() const {
-  return 0xff == getUInt8(0x57);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableChannelMode(bool enable) {
-  setUInt8(0x57, enable ? 0xff : 0x00);
-}
-
-bool
-UV390Codeplug::GeneralSettingsElement::groupCallMatch() const {
-  return getBit(0x6b, 0);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
-  setBit(0x6b, 0, enable);
-}
-bool
-UV390Codeplug::GeneralSettingsElement::privateCallMatch() const {
-  return getBit(0x6b, 1);
-}
-void
-UV390Codeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
-  setBit(0x6b, 1, enable);
-}
-
-QTimeZone
-UV390Codeplug::GeneralSettingsElement::timeZone() const {
-  return QTimeZone((int(getUInt5(0x6b, 3))-12)*3600);
-}
-void
-UV390Codeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &zone) {
-  int idx = (zone.standardTimeOffset(QDateTime::currentDateTime())/3600)+12;
-  setUInt5(0x6b, 3, uint8_t(idx));
-}
-
-unsigned
-UV390Codeplug::GeneralSettingsElement::channelHangTime() const {
-  return unsigned(getUInt8(0x90))*100;
-}
-void
-UV390Codeplug::GeneralSettingsElement::setChannelHangTime(unsigned dur) {
-  setUInt8(0x90, dur/100);
-}
-
-bool
 UV390Codeplug::GeneralSettingsElement::publicZone() const {
   return getBit(0x92, 2);
 }
@@ -505,7 +366,7 @@ UV390Codeplug::GeneralSettingsElement::enableEditRadioID(bool enable) {
 
 bool
 UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
-  if (! TyTCodeplug::GeneralSettingsElement::fromConfig(config))
+  if (! DM1701Codeplug::GeneralSettingsElement::fromConfig(config))
     return false;
 
   setTimeZone(QTimeZone::systemTimeZone());
@@ -516,7 +377,7 @@ UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
 bool
 UV390Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
+  if (! DM1701Codeplug::GeneralSettingsElement::updateConfig(config))
     return false;
   config->settings()->setMicLevel(micLevel());
   config->settings()->enableSpeech(channelVoiceAnnounce());
@@ -763,12 +624,14 @@ UV390Codeplug::clearGeneralSettings() {
 }
 
 bool
-UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
 bool
-UV390Codeplug::decodeGeneralSettings(Config *config) {
+UV390Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
 }
 
@@ -780,7 +643,8 @@ UV390Codeplug::clearChannels() {
 }
 
 bool
-UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -794,7 +658,7 @@ UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-UV390Codeplug::createChannels(Config *config, Context &ctx) {
+UV390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -802,8 +666,7 @@ UV390Codeplug::createChannels(Config *config, Context &ctx) {
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid channel at index  " << i << ".";
       return false;
     }
   }
@@ -811,14 +674,13 @@ UV390Codeplug::createChannels(Config *config, Context &ctx) {
 }
 
 bool
-UV390Codeplug::linkChannels(Context &ctx) {
+UV390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       break;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }
   }
@@ -833,7 +695,8 @@ UV390Codeplug::clearContacts() {
 }
 
 bool
-UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -846,7 +709,7 @@ UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-UV390Codeplug::createContacts(Config *config, Context &ctx) {
+UV390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
@@ -854,8 +717,7 @@ UV390Codeplug::createContacts(Config *config, Context &ctx) {
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid contact at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
     }
   }
@@ -872,7 +734,8 @@ UV390Codeplug::clearZones() {
 }
 
 bool
-UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
@@ -888,7 +751,7 @@ UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-UV390Codeplug::createZones(Config *config, Context &ctx) {
+UV390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
@@ -896,9 +759,7 @@ UV390Codeplug::createZones(Config *config, Context &ctx) {
     if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Invlaid zone at index %2.")
-          .arg(__func__).arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid zone at index " << i << ".";
       return false;
     }
   }
@@ -907,21 +768,19 @@ UV390Codeplug::createZones(Config *config, Context &ctx) {
 }
 
 bool
-UV390Codeplug::linkZones(Context &ctx) {
+UV390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       break;
     if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link zone at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
+
     ZoneExtElement zoneext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
     if (! zoneext.linkZoneObj(ctx.get<Zone>(i+1), ctx)) {
-      _errorMessage = QString("%1(): Cannot decode codeplug: Cannot link zone extension at index %2.")
-          .arg(__func__).arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link zone extension at index " << i << ".";
       return false;
     }
   }
@@ -936,7 +795,8 @@ UV390Codeplug::clearGroupLists() {
 }
 
 bool
-UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -948,7 +808,7 @@ UV390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-UV390Codeplug::createGroupLists(Config *config, Context &ctx) {
+UV390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -956,8 +816,7 @@ UV390Codeplug::createGroupLists(Config *config, Context &ctx) {
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid RX group list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid RX group list at index " << i << ".";
       return false;
     }
   }
@@ -965,14 +824,13 @@ UV390Codeplug::createGroupLists(Config *config, Context &ctx) {
 }
 
 bool
-UV390Codeplug::linkGroupLists(Context &ctx) {
+UV390Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       break;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link group-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link group-list at index " << i << ".";
       return false;
     }
   }
@@ -987,7 +845,8 @@ UV390Codeplug::clearScanLists() {
 }
 
 bool
-UV390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -1000,7 +859,7 @@ UV390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx)
 }
 
 bool
-UV390Codeplug::createScanLists(Config *config, Context &ctx) {
+UV390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -1008,8 +867,7 @@ UV390Codeplug::createScanLists(Config *config, Context &ctx) {
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid scanlist at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid scan list at index " << i << ".";
       return false;
     }
   }
@@ -1017,15 +875,14 @@ UV390Codeplug::createScanLists(Config *config, Context &ctx) {
 }
 
 bool
-UV390Codeplug::linkScanLists(Context &ctx) {
+UV390Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
 
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link scan-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link scan list at index " << i << ".";
       return false;
     }
   }
@@ -1041,7 +898,8 @@ UV390Codeplug::clearPositioningSystems() {
 }
 
 bool
-UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount()) {
@@ -1056,7 +914,7 @@ UV390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Cont
 }
 
 bool
-UV390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
+UV390Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -1064,8 +922,7 @@ UV390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid GPS system at index " << i << ".";
       return false;
     }
   }
@@ -1074,14 +931,13 @@ UV390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
 }
 
 bool
-UV390Codeplug::linkPositioningSystems(Context &ctx) {
+UV390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       break;
     if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link GPS system at index " << i << ".";
       return false;
     }
   }
@@ -1095,15 +951,47 @@ UV390Codeplug::clearButtonSettings() {
 }
 
 bool
-UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
+UV390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }
 
 bool
-UV390Codeplug::decodeButtonSetttings(Config *config) {
+UV390Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
+
+
+void
+UV390Codeplug::clearPrivacyKeys() {
+  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
+}
+
+bool
+UV390Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  // First, reset keys
+  clearPrivacyKeys();
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  return keys.fromCommercialExt(config->commercialExtension(), ctx);
+}
+
+bool
+UV390Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  // Decode element
+  if (! keys.updateCommercialExt(ctx)) {
+    errMsg(err) << "Cannot create encryption extension.";
+    return false;
+  }
+  return true;
+}
+
 
 void
 UV390Codeplug::clearBootSettings() {
@@ -1118,12 +1006,6 @@ UV390Codeplug::clearMenuSettings() {
 void
 UV390Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
-}
-
-void
-UV390Codeplug::clearPrivacyKeys() {
-  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
-
 }
 
 void

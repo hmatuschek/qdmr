@@ -6,8 +6,9 @@
 #include <QVector>
 
 #include "configreference.hh"
-class Config;
+#include "anytone_extension.hh"
 
+class Config;
 
 /** Represents a zone within the generic configuration.
  * @ingroup conf */
@@ -15,48 +16,53 @@ class Zone : public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the zone. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
   /** The B channels. */
   Q_PROPERTY(ChannelRefList* B READ B)
 
+  /** The AnyTone extensions. */
+  Q_PROPERTY(AnytoneZoneExtension* anytone READ anytoneExtension WRITE setAnytoneExtension)
+
 public:
+  /** Default constructor. */
+  explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
-	explicit Zone(const QString &name, QObject *parent = nullptr);
+  Zone(const QString &name, QObject *parent = nullptr);
 
   /** Copies the given zone. */
   Zone &operator =(const Zone &other);
 
+  ConfigItem *clone() const;
+
   /** Clears this zone. */
   void clear();
 
-  /** Returns the name of the zone. */
-	const QString &name() const;
-  /** Sets the name of the zone. */
-	bool setName(const QString &name);
-
-  /** Retruns the list of channels for VFO A in this zone. */
+  /** Returns the list of channels for VFO A in this zone. */
   const ChannelRefList *A() const;
-  /** Retruns the list of channels for VFO A in this zone. */
+  /** Returns the list of channels for VFO A in this zone. */
   ChannelRefList* A();
-  /** Retruns the list of channels for VFO B in this zone. */
+  /** Returns the list of channels for VFO B in this zone. */
   const ChannelRefList *B() const;
-  /** Retruns the list of channels for VFO B in this zone. */
+  /** Returns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
+
+  /** Returns the AnyTone extension. */
+  AnytoneZoneExtension *anytoneExtension() const;
+  /** Sets the AnyTone extension. */
+  void setAnytoneExtension(AnytoneZoneExtension *ext);
 
 signals:
   /** Gets emitted whenever the zone gets modified. */
 	void modified();
 
 protected:
-  /** Holds the name of the zone. */
-	QString _name;
   /** List of channels for VFO A. */
   ChannelRefList _A;
   /** List of channels for VFO B. */
   ChannelRefList _B;
+  /** Owns the AnyTone extensions. */
+  AnytoneZoneExtension *_anytone;
 };
 
 
@@ -74,6 +80,9 @@ public:
 	Zone *zone(int idx) const;
 
   int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 

@@ -2,6 +2,7 @@
 #include "config.hh"
 #include "contact.hh"
 #include "contactselectiondialog.hh"
+#include "settings.hh"
 
 #include <QInputDialog>
 #include <QMessageBox>
@@ -11,31 +12,33 @@
  * Implementation of RXGroupListDialog
  * ********************************************************************************************* */
 RXGroupListDialog::RXGroupListDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _groupList(""), _list(nullptr)
+  : QDialog(parent), _config(config), _myGroupList(new RXGroupList(this)), _list(nullptr)
 {
+  setWindowTitle(tr("Create Group List"));
   construct();
 }
 
 RXGroupListDialog::RXGroupListDialog(Config *config, RXGroupList *list, QWidget *parent)
-  : QDialog(parent), _config(config), _groupList(""), _list(list)
+  : QDialog(parent), _config(config), _myGroupList(new RXGroupList(this)), _list(list)
 {
+  setWindowTitle(tr("Edit Group List"));
   if (_list)
-    _groupList = *_list;
+    _myGroupList->copy(*_list);
+
   construct();
 }
 
 RXGroupList *
 RXGroupListDialog::groupList() {
-  // Select which list to modify
-  RXGroupList *list = _list;
-  if (nullptr == list)
-    list = new RXGroupList(groupListName->text().simplified());
+  _myGroupList->setName(groupListName->text().simplified());
 
-  // Apply changes to group list
-  _groupList.setName(groupListName->text().simplified());
-
-  // Copy group list to target (either new or edited group list).
-  (*list) = _groupList;
+  RXGroupList *list = _myGroupList;
+  if (_list) {
+    _list->copy(*_myGroupList);
+    list = _myGroupList;
+  } else {
+    _myGroupList->setParent(nullptr);
+  }
 
   // Return modified list.
   return list;
@@ -44,28 +47,34 @@ RXGroupListDialog::groupList() {
 void
 RXGroupListDialog::construct() {
   setupUi(this);
+  Settings settings;
 
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(addContact, SIGNAL(clicked()), this, SLOT(onAddGroup()));
   connect(remContact, SIGNAL(clicked()), this, SLOT(onRemGroup()));
 
-  groupListName->setText(_groupList.name());
-  contactListView->setModel(new GroupListWrapper(&_groupList, contactListView));
+  groupListName->setText(_myGroupList->name());
+  contactListView->setModel(new GroupListWrapper(_myGroupList, contactListView));
+
+  extensionView->setObjectName("groupListExtension");
+  extensionView->setObject(_myGroupList, _config);
+  if (! settings.showExtensions())
+    tabWidget->tabBar()->hide();
 }
 
 
 void
 RXGroupListDialog::onAddGroup() {
-  MultiGroupCallSelectionDialog dialog(_config->contacts());
+  MultiGroupCallSelectionDialog dialog(_config->contacts(), false);
   if (QDialog::Accepted != dialog.exec())
     return;
 
   QList<DigitalContact *> contacts = dialog.contacts();
   foreach (DigitalContact *contact, contacts) {
-    if (0 <= _groupList.contacts()->indexOf(contact))
+    if (0 <= _myGroupList->contacts()->indexOf(contact))
       continue;
-    _groupList.addContact(contact);
+    _myGroupList->addContact(contact);
   }
 }
 
@@ -81,10 +90,10 @@ RXGroupListDialog::onRemGroup() {
   // need to collect them first as rows change when deleting
   QList<DigitalContact *> lists;
   for (int row=selection.first; row<=selection.second; row++)
-    lists.push_back(_groupList.contact(row));
+    lists.push_back(_myGroupList->contact(row));
   // remove list
   foreach (DigitalContact *cont, lists)
-    _groupList.contacts()->del(cont);
+    _myGroupList->contacts()->del(cont);
 }
 
 

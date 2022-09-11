@@ -19,30 +19,30 @@ class GPSSystem;
  *
  * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
  * memory area. The amount of fragmentation of the codeplug is overwhelming.
- * For example, while channels are organized more or less nicely in continous banks, zones are
+ * For example, while channels are organized more or less nicely in continuous banks, zones are
  * distributed throughout the entire code-plug. That is, the names of zones are located in a
  * different memory section that the channel lists. Some lists are defined though bit-masks others
  * by byte-masks. All bit-masks are positive, that is 1 indicates an enabled item while the
  * bit-mask for contacts is inverted.
  *
  * In general the code-plug is huge and complex. Moreover, the radio provides a huge amount of
- * options and features. To this end, reverse-engeneering this code-plug was a nightmare.
+ * options and features. To this end, reverse-engineering this code-plug was a nightmare.
  *
  * More over, the binary code-plug file generate by the windows CPS does not directly relate to
  * the data being written to the radio. To this end the code-plug has been reverse-engineered
- * using wireshark to monitor the USB communication between the windows CPS (running in a vritual
- * box) and the device. The latter makes the reverse-engineering particularily cumbersome.
+ * using wireshark to monitor the USB communication between the windows CPS (running in a virtual
+ * box) and the device. The latter makes the reverse-engineering particularly cumbersome.
  *
  * @section d868uvcpl Codeplug structure within radio
  * <table>
  *  <tr><th colspan="3">Channels</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00, 0x00 padded.</td></tr>
- *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of upto 128 channels,
+ *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of up to 128 channels,
  *   see @c AnytoneCodeplug::ChannelElement 64 b each. </td></tr>
- *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of upto 128 channels.</td></tr>
+ *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of up to 128 channels.</td></tr>
  *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
- *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, upto 32 channels.</td></tr>
+ *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, up to 32 channels.</td></tr>
  *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings,
  *    see @c AnytoneCodeplug::ChannelElement.</td></tr>
  *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings,
@@ -54,24 +54,24 @@ class GPSSystem;
  *  <tr><td>01000000</td> <td>max. 01f400</td> <td>250 zones channel lists of 250 16bit indices each.
  *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200, size of each list 0x1f4.</td></tr>
  *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
- *    Each zone name is upto 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
+ *    Each zone name is up to 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
  *
  *  <tr><th colspan="3">Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
  *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
  *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted, default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts,
+ *  <tr><td>02680000</td> <td>max. 0186a0</td> <td>Bank 1 of 1000 contacts,
  *    see @c AnytoneCodeplug::ContactElement. As each contact is 100b, they do not align with the
  *    16b blocks being transferred to the device. Hence contacts are organized internally in groups
- *    of 4 contacts forming a "bank". </td></tr>
+ *    of 4 contacts. There are 10 banks, each containing 1000 contacts. The offset between banks is 0x40000. </td></tr>
  *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map,
  *    see @c AnytoneCodeplug::ContactMapElement. Sorted by ID, empty entries set to
  *    @c 0xffffffffffffffff.</td>
  *
  *  <tr><th colspan="3">Analog Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid ananlog contacts.</td></tr>
+ *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid analog contacts.</td></tr>
  *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
  *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts.
  *    See @c AnytoneCodeplug::DTMFContactElement. As each analog contact is 24b, they do not align
@@ -141,7 +141,7 @@ class GPSSystem;
  *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings.
  *   See @c AnytoneCodeplug::AnalogQuickCallElement.</td>
  *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
- *  <tr><td>025C0100</td> <td>000400</td> <td>Upto 32 status messages.
+ *  <tr><td>025C0100</td> <td>000400</td> <td>Up to 32 status messages.
  *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
  *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings,
  *    see @c AnytoneCodeplug::HotKeyElement</td></tr>
@@ -193,10 +193,10 @@ class D868UVCodeplug : public AnytoneCodeplug
 public:
   /** Represents the general config of the radio within the D868UV binary codeplug.
    *
-   * This class only implemements the differences to the generic
+   * This class only implements the differences to the generic
    * @c AnytoneCodeplug::GeneralSettingsElement.
    *
-   * Memmory layout of encoded general settings (size 0x00d0 bytes):
+   * Memory layout of encoded general settings (size 0x00d0 bytes):
    * @verbinclude d868uv_generalsettings.txt
    */
   class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
@@ -216,7 +216,7 @@ public:
     virtual Color callDisplayColor() const;
     /** Sets the display color for callsigns. */
     virtual void setCallDisplayColor(Color color);
-    /** Returns the GPS update preriod in seconds. */
+    /** Returns the GPS update period in seconds. */
     virtual unsigned gpsUpdatePeriod() const;
     /** Sets the GPS update period in seconds. */
     virtual void setGPSUpdatePeriod(unsigned sec);
@@ -277,7 +277,7 @@ public:
     virtual AutoRepDir autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
     virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
-    /** Retuns @c true if the default boot channel is enabled. */
+    /** Returns @c true if the default boot channel is enabled. */
     virtual bool defaultChannel() const;
     /** Enables/disables default boot channel. */
     virtual void enableDefaultChannel(bool enable);
@@ -307,9 +307,9 @@ public:
     virtual void setDefaultChannelBIndex(unsigned idx);
     /** Sets the default channel for VFO B to be VFO. */
     virtual void setDefaultChannelBToVFO();
-    /** Returns @c true if the last caller is kept when changeing channel. */
+    /** Returns @c true if the last caller is kept when changing channel. */
     virtual bool keepLastCaller() const;
-    /** Enables/disables keeping the last caller when changeing the channel. */
+    /** Enables/disables keeping the last caller when changing the channel. */
     virtual void enableKeepLastCaller(bool enable);
 
     virtual bool fromConfig(const Flags &flags, Context &ctx);
@@ -336,25 +336,25 @@ public:
   virtual void allocateForEncoding();
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-	bool decode(Config *config);
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
 
   /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags = Flags());
+  bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack());
 
 protected:
   /** Encodes the given config (via context) to the binary codeplug. */
-  virtual bool encodeElements(const Flags &flags, Context &ctx);
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the downloaded codeplug. */
-  virtual bool decodeElements(Context &ctx);
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();
   /** Encode channels into codeplug. */
-  virtual bool encodeChannels(const Flags &flags, Context &ctx);
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create channels from codeplug. */
-  virtual bool createChannels(Context &ctx);
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link channels. */
-  virtual bool linkChannels(Context &ctx);
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate VFO settings. */
   virtual void allocateVFOSettings();
@@ -362,57 +362,63 @@ protected:
   /** Allocate contacts from bitmaps. */
   virtual void allocateContacts();
   /** Encode contacts into codeplug. */
-  virtual bool encodeContacts(const Flags &flags, Context &ctx);
+  virtual bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create contacts from codeplug. */
-  virtual bool createContacts(Context &ctx);
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate analog contacts from bitmaps. */
   virtual void allocateAnalogContacts();
   /** Encode analog contacts into codeplug. */
-  virtual bool encodeAnalogContacts(const Flags &flags, Context &ctx);
+  virtual bool encodeAnalogContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create analog contacts from codeplug. */
-  virtual bool createAnalogContacts(Context &ctx);
+  virtual bool createAnalogContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate radio IDs from bitmaps. */
   virtual void allocateRadioIDs();
   /** Encode radio ID into codeplug. */
-  virtual bool encodeRadioID(const Flags &flags, Context &ctx);
+  virtual bool encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Set radio ID from codeplug. */
-  virtual bool setRadioID(Context &ctx);
+  virtual bool setRadioID(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates RX group lists from bitmaps. */
   virtual void allocateRXGroupLists();
   /** Encode RX group lists into codeplug. */
-  virtual bool encodeRXGroupLists(const Flags &flags, Context &ctx);
+  virtual bool encodeRXGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create RX group lists from codeplug. */
-  virtual bool createRXGroupLists(Context &ctx);
+  virtual bool createRXGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link RX group lists. */
-  virtual bool linkRXGroupLists(Context &ctx);
+  virtual bool linkRXGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate zones from bitmaps. */
   virtual void allocateZones();
   /** Encode zones into codeplug. */
-  virtual bool encodeZones(const Flags &flags, Context &ctx);
+  virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to encode a single zone. */
+  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create zones from codeplug. */
-  virtual bool createZones(Context &ctx);
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to decode a single zone. */
+  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
-  virtual bool linkZones(Context &ctx);
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Function to link a single zone. */
+  virtual bool linkZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate scanlists from bitmaps. */
   virtual void allocateScanLists();
   /** Encode scan lists into codeplug. */
-  virtual bool encodeScanLists(const Flags &flags, Context &ctx);
+  virtual bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create scan lists from codeplug. */
-  virtual bool createScanLists(Context &ctx);
+  virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link scan lists. */
-  virtual bool linkScanLists(Context &ctx);
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates general settings memory section. */
   virtual void allocateGeneralSettings();
   /** Encodes the general settings section. */
-  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx);
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the general settings section. */
-  virtual bool decodeGeneralSettings(Context &ctx);
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates zone channel list memory section. */
   virtual void allocateZoneChannelList();
@@ -423,18 +429,18 @@ protected:
   /** Allocates boot settings memory section. */
   virtual void allocateBootSettings();
   /** Encodes the boot settings section. */
-  virtual bool encodeBootSettings(const Flags &flags, Context &ctx);
+  virtual bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the boot settings section. */
-  virtual bool decodeBootSettings(Context &ctx);
+  virtual bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates GPS settings memory section. */
   virtual void allocateGPSSystems();
   /** Encodes the GPS settings section. */
-  virtual bool encodeGPSSystems(const Flags &flags, Context &ctx);
+  virtual bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create GPS systems from codeplug. */
-  virtual bool createGPSSystems(Context &ctx);
+  virtual bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link GPS systems. */
-  virtual bool linkGPSSystems(Context &ctx);
+  virtual bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate refab SMS messages. */
   virtual void allocateSMSMessages();

@@ -16,8 +16,16 @@
 /* ********************************************************************************************* *
  * Implementation of RXGroupList
  * ********************************************************************************************* */
+RXGroupList::RXGroupList(QObject *parent)
+  : ConfigObject("grp", parent), _contacts()
+{
+  connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
+  connect(&_contacts, SIGNAL(elementAdded(int)), this, SLOT(onModified()));
+}
+
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
-  : ConfigObject("grp", parent), _name(name), _contacts()
+  : ConfigObject(name, "grp", parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -26,11 +34,18 @@ RXGroupList::RXGroupList(const QString &name, QObject *parent)
 
 RXGroupList &
 RXGroupList::operator =(const RXGroupList &other) {
-  clear();
-  _name = other.name();
-  for (int i=0; i<other.count(); i++)
-    _contacts.add(other._contacts.get(i));
+  copy(other);
   return *this;
+}
+
+ConfigItem *
+RXGroupList::clone() const {
+  RXGroupList *lst = new RXGroupList();
+  if (! lst->copy(*this)) {
+    lst->deleteLater();
+    return nullptr;
+  }
+  return lst;
 }
 
 int
@@ -42,19 +57,6 @@ void
 RXGroupList::clear() {
   _contacts.clear();
   emit modified(this);
-}
-
-const QString &
-RXGroupList::name() const {
-  return _name;
-}
-
-bool
-RXGroupList::setName(const QString &name) {
-  if (name.simplified().isEmpty())
-    return false;
-  _name = name.simplified();
-  return true;
 }
 
 DigitalContact *
@@ -85,8 +87,8 @@ RXGroupList::contacts() {
 }
 
 YAML::Node
-RXGroupList::serialize(const Context &context) {
-  YAML::Node node = ConfigObject::serialize(context);
+RXGroupList::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = ConfigObject::serialize(context, err);
   node.SetStyle(YAML::EmitterStyle::Flow);
   return node;
 }
@@ -109,7 +111,7 @@ RXGroupLists::RXGroupLists(QObject *parent)
 
 RXGroupList *
 RXGroupLists::list(int idx) const {
-  if (ConfigObject *obj = get(idx))
+  if (ConfigItem *obj = get(idx))
     return obj->as<RXGroupList>();
   return nullptr;
 }
@@ -121,4 +123,19 @@ RXGroupLists::add(ConfigObject *obj, int row) {
   return -1;
 }
 
+ConfigItem *
+RXGroupLists::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create group list: Expected object.";
+    return nullptr;
+  }
+
+  return new RXGroupList();
+}
 

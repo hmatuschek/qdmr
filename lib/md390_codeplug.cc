@@ -26,6 +26,7 @@
 #define ADDR_SETTINGS           0x002040
 #define ADDR_BOOTSETTINGS       0x02f000
 #define ADDR_MENUSETTINGS       0x0020f0
+#define MENUSETTINGS_SIZE       0x000010
 #define ADDR_BUTTONSETTINGS     0x002100
 #define ADDR_PRIVACY_KEYS       0x0059c0
 
@@ -47,36 +48,22 @@
  * Implementation of MD390Codeplug::ChannelElement
  * ********************************************************************************************* */
 MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
-  : TyTCodeplug::ChannelElement::ChannelElement(ptr, size)
+  : DM1701Codeplug::ChannelElement::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 MD390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
+  : DM1701Codeplug::ChannelElement(ptr, CHANNEL_SIZE)
 {
   // pass...
 }
 
 void
 MD390Codeplug::ChannelElement::clear() {
-  TyTCodeplug::ChannelElement::clear();
+  DM1701Codeplug::ChannelElement::clear();
 
-  enableTightSquelch(false);
   enableCompressedUDPHeader(false);
-  enableReverseBurst(true);
-  setPower(Channel::Power::High);
-  setUInt8(0x0005, 0xc3);
-  setUInt8(0x000f, 0xff);
-}
-
-bool
-MD390Codeplug::ChannelElement::tightSquelchEnabled() const {
-  return !getBit(0x0000, 5);
-}
-void
-MD390Codeplug::ChannelElement::enableTightSquelch(bool enable) {
-  setBit(0x0000, 5, !enable);
 }
 
 bool
@@ -88,50 +75,83 @@ MD390Codeplug::ChannelElement::enableCompressedUDPHeader(bool enable) {
   setBit(0x0003, 6, !enable);
 }
 
-bool
-MD390Codeplug::ChannelElement::reverseBurst() const {
-  return getBit(0x0004, 2);
-}
-void
-MD390Codeplug::ChannelElement::enableReverseBurst(bool enable) {
-  setBit(0x0004, 2, enable);
-}
-
-Channel::Power
-MD390Codeplug::ChannelElement::power() const {
-  if (getBit(0x0004, 5))
-    return Channel::Power::High;
-  return Channel::Power::Low;
-}
-void
-MD390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
-  switch (pwr) {
-  case Channel::Power::Min:
-  case Channel::Power::Low:
-  case Channel::Power::Mid:
-    setBit(0x0004, 5, false);
-    break;
-  case Channel::Power::High:
-  case Channel::Power::Max:
-    setBit(0x0004, 5, true);
-  }
-}
-
 Channel *
 MD390Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+  Channel *ch = DM1701Codeplug::ChannelElement::toChannelObj();
   if (nullptr == ch)
     return ch;
 
-  ch->setPower(power());
+  // Apply extension
+  if (ch->tytChannelExtension()) {
+    ch->tytChannelExtension()->enableCompressedUDPHeader(compressedUDPHeader());
+  }
   return ch;
 }
 
 void
 MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
+  DM1701Codeplug::ChannelElement::fromChannelObj(c, ctx);
 
-  setPower(c->power());
+  // apply extensions (extension will be created in TyTCodeplug::ChannelElement::fromChannelObj)
+  if (TyTChannelExtension *ex = c->tytChannelExtension()) {
+    enableCompressedUDPHeader(ex->compressedUDPHeader());
+  }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of MD390Codeplug::MenuSettingsElement
+ * ******************************************************************************************** */
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr, size_t size)
+  : TyTCodeplug::MenuSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+MD390Codeplug::MenuSettingsElement::MenuSettingsElement(uint8_t *ptr)
+  : TyTCodeplug::MenuSettingsElement(ptr, MENUSETTINGS_SIZE)
+{
+  // pass...
+}
+
+void
+MD390Codeplug::MenuSettingsElement::clear() {
+  TyTCodeplug::MenuSettingsElement::clear();
+
+  enableGPSInformation(true);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::gpsInformation() const {
+  return !getBit(0x04, 4);
+}
+void
+MD390Codeplug::MenuSettingsElement::enableGPSInformation(bool enable) {
+  setBit(0x04, 4, !enable);
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::fromConfig(const Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::fromConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+     enableGPSInformation(ex->menuSettings()->gpsInformation());
+  }
+
+  return true;
+}
+
+bool
+MD390Codeplug::MenuSettingsElement::updateConfig(Config *config) {
+  if (! TyTCodeplug::MenuSettingsElement::updateConfig(config))
+    return false;
+
+  if (TyTConfigExtension *ex = config->tytExtension()) {
+    ex->menuSettings()->enableGPSInformation(gpsInformation());
+  }
+
+  return true;
 }
 
 
@@ -139,6 +159,7 @@ MD390Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
  * Implementation of MD390Codeplug
  * ********************************************************************************************* */
 MD390Codeplug::MD390Codeplug(QObject *parent)
+  : TyTCodeplug(parent)
 {
   addImage("TYT MD-390 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
@@ -147,10 +168,10 @@ MD390Codeplug::MD390Codeplug(QObject *parent)
 }
 
 bool
-MD390Codeplug::decodeElements(Context &ctx) {
+MD390Codeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   logDebug() << "Decode MD390 codeplug, programmed with CPS version "
              << TimestampElement(data(ADDR_TIMESTAMP)).cpsVersion() << ".";
-  return TyTCodeplug::decodeElements(ctx);
+  return TyTCodeplug::decodeElements(ctx, err);
 }
 
 void
@@ -171,12 +192,14 @@ MD390Codeplug::clearGeneralSettings() {
 }
 
 bool
-MD390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeGeneralSettings(Config *config) {
+MD390Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
 }
 
@@ -188,7 +211,8 @@ MD390Codeplug::clearChannels() {
 }
 
 bool
-MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
@@ -202,7 +226,7 @@ MD390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-MD390Codeplug::createChannels(Config *config, Context &ctx) {
+MD390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
@@ -210,8 +234,7 @@ MD390Codeplug::createChannels(Config *config, Context &ctx) {
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid channel at index " << i << ".";
       return false;
     }
   }
@@ -219,14 +242,13 @@ MD390Codeplug::createChannels(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkChannels(Context &ctx) {
+MD390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       break;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode TyT codeplug: Cannot link channel at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }
   }
@@ -241,7 +263,8 @@ MD390Codeplug::clearContacts() {
 }
 
 bool
-MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -254,7 +277,7 @@ MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx) 
 }
 
 bool
-MD390Codeplug::createContacts(Config *config, Context &ctx) {
+MD390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
@@ -262,8 +285,7 @@ MD390Codeplug::createContacts(Config *config, Context &ctx) {
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid contact at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
     }
   }
@@ -279,7 +301,8 @@ MD390Codeplug::clearZones() {
 }
 
 bool
-MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0,z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     zone.clear();
@@ -316,7 +339,8 @@ MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx) {
 }
 
 bool
-MD390Codeplug::createZones(Config *config, Context &ctx) {
+MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   Zone *last_zone = nullptr;
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
@@ -337,7 +361,8 @@ MD390Codeplug::createZones(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkZones(Context &ctx) {
+MD390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   Zone *last_zone = nullptr;
   for (int i=0, z=0; i<NUM_ZONES; i++, z++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
@@ -377,7 +402,8 @@ MD390Codeplug::clearGroupLists() {
 }
 
 bool
-MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (i < config->rxGroupLists()->count())
@@ -389,7 +415,7 @@ MD390Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
+MD390Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
@@ -397,8 +423,7 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid RX group list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid group list at index " << i << ".";
       return false;
     }
   }
@@ -406,14 +431,13 @@ MD390Codeplug::createGroupLists(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkGroupLists(Context &ctx) {
+MD390Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       break;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link group-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link group list at index " << i << ".";
       return false;
     }
   }
@@ -428,7 +452,8 @@ MD390Codeplug::clearScanLists() {
 }
 
 bool
-MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
@@ -441,7 +466,7 @@ MD390Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx)
 }
 
 bool
-MD390Codeplug::createScanLists(Config *config, Context &ctx) {
+MD390Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
@@ -449,8 +474,7 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx) {
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode TyT codeplug: Invlaid scanlist at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid scanlist at index " << i << ".";
       return false;
     }
   }
@@ -458,15 +482,14 @@ MD390Codeplug::createScanLists(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkScanLists(Context &ctx) {
+MD390Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       break;
 
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link scan-list at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link scan list at index " << i << ".";
       return false;
     }
   }
@@ -482,7 +505,8 @@ MD390Codeplug::clearPositioningSystems() {
 }
 
 bool
-MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (i < config->posSystems()->gpsCount()) {
@@ -497,7 +521,7 @@ MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Cont
 }
 
 bool
-MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
+MD390Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
@@ -505,8 +529,7 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
-      _errorMessage = QString("Cannot decode codeplug: Invlaid GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Invalid GPS system at index " << i << ".";
       return false;
     }
   }
@@ -515,14 +538,13 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx) {
 }
 
 bool
-MD390Codeplug::linkPositioningSystems(Context &ctx) {
+MD390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       break;
     if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
-      _errorMessage = QString("Cannot decode codeplug: Cannot link GPS system at index %1.").arg(i);
-      logError() << _errorMessage;
+      errMsg(err) << "Cannot link GPS system at index " << i << ".";
       return false;
     }
   }
@@ -536,15 +558,48 @@ MD390Codeplug::clearButtonSettings() {
 }
 
 bool
-MD390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx) {
+MD390Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(flags); Q_UNUSED(err)
   // Encode settings
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
 }
 
 bool
-MD390Codeplug::decodeButtonSetttings(Config *config) {
+MD390Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err)
   return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
 }
+
+
+void
+MD390Codeplug::clearPrivacyKeys() {
+  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
+}
+
+bool
+MD390Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+  // First, reset keys
+  clearPrivacyKeys();
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  // Encode keys
+  return keys.fromCommercialExt(config->commercialExtension(), ctx);
+}
+
+bool
+MD390Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
+  // Get keys
+  EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
+  // Decode element
+  if (! keys.updateCommercialExt(ctx)) {
+    errMsg(err) << "Cannot create encryption extension.";
+    return false;
+  }
+  return true;
+}
+
 
 void
 MD390Codeplug::clearMenuSettings() {
@@ -554,12 +609,6 @@ MD390Codeplug::clearMenuSettings() {
 void
 MD390Codeplug::clearTextMessages() {
   memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
-}
-
-void
-MD390Codeplug::clearPrivacyKeys() {
-  EncryptionElement(data(ADDR_PRIVACY_KEYS)).clear();
-
 }
 
 void

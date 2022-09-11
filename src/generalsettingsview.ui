@@ -6,237 +6,265 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>494</height>
+    <width>644</width>
+    <height>496</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
-    <widget class="QGroupBox" name="dmrIDBox">
-     <property name="title">
-      <string>DMR Radio ID</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="dMRIDLabel">
-        <property name="text">
-         <string>DMR ID</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="nameLabel">
-        <property name="text">
-         <string>Radio Name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="radioName">
-        <property name="toolTip">
-         <string>Enter your name or callsign.</string>
-        </property>
-        <property name="accessibleName">
-         <string>Name/Callsign</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="dmrID"/>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QGroupBox" name="dmrIDBox">
+       <property name="title">
+        <string>DMR Radio ID</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="dMRIDLabel">
+          <property name="text">
+           <string>DMR ID</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="nameLabel">
+          <property name="text">
+           <string>Radio Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="radioName">
+          <property name="toolTip">
+           <string>Enter your name or callsign.</string>
+          </property>
+          <property name="accessibleName">
+           <string>Name/Callsign</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="dmrID"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="bootSettingsBox">
+       <property name="title">
+        <string>Boot Settings</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="introLine1Label">
+          <property name="text">
+           <string>Intro Line 1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="introLine1">
+          <property name="toolTip">
+           <string>First greeting line (if supported by the radio).</string>
+          </property>
+          <property name="accessibleName">
+           <string>Intro line 1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="introLine2Label">
+          <property name="text">
+           <string>Intro Line 2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="introLine2">
+          <property name="toolTip">
+           <string>Second greeting line (if supported by the radio).</string>
+          </property>
+          <property name="statusTip">
+           <string/>
+          </property>
+          <property name="accessibleName">
+           <string>Intro line 2</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="audioSettingsBox">
+       <property name="title">
+        <string>Audio Settings</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_5">
+        <item row="0" column="0">
+         <widget class="QLabel" name="micLabel">
+          <property name="text">
+           <string>MIC Amp.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="mic">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="speechLabel">
+          <property name="text">
+           <string>Speech Synthesis</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCheckBox" name="speech">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Channel Default Values</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="powerLabel">
+          <property name="text">
+           <string>Power</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="powerValue">
+          <item>
+           <property name="text">
+            <string>Max</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>High</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mid</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Low</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Min</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="squelchLabel">
+          <property name="text">
+           <string>Squelch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="squelchValue">
+          <property name="specialValueText">
+           <string>Open</string>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="transmitTimeoutLabel">
+          <property name="text">
+           <string>Transmit Timeout</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="totValue">
+          <property name="specialValueText">
+           <string>Off</string>
+          </property>
+          <property name="suffix">
+           <string> s</string>
+          </property>
+          <property name="maximum">
+           <number>9999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="voxLevelLabel">
+          <property name="text">
+           <string>VOX Level</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="voxValue">
+          <property name="specialValueText">
+           <string>Off</string>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="bootSettingsBox">
-     <property name="title">
-      <string>Boot Settings</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_4">
-      <item row="0" column="0">
-       <widget class="QLabel" name="introLine1Label">
-        <property name="text">
-         <string>Intro Line 1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="introLine1">
-        <property name="toolTip">
-         <string>First greeting line (if supported by the radio).</string>
-        </property>
-        <property name="accessibleName">
-         <string>Intro line 1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="introLine2Label">
-        <property name="text">
-         <string>Intro Line 2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="introLine2">
-        <property name="toolTip">
-         <string>Second greeting line (if supported by the radio).</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="accessibleName">
-         <string>Intro line 2</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="audioSettingsBox">
-     <property name="title">
-      <string>Audio Settings</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="micLabel">
-        <property name="text">
-         <string>MIC Amp.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="mic">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="speechLabel">
-        <property name="text">
-         <string>Speech Synthesis</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="speech">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Channel Default Values</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_3">
-      <item row="0" column="0">
-       <widget class="QLabel" name="powerLabel">
-        <property name="text">
-         <string>Power</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="powerValue">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QGroupBox" name="extensionBox">
+       <property name="title">
+        <string>Extensions</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <property name="text">
-          <string>Max</string>
-         </property>
+         <widget class="ExtensionView" name="extensionView" native="true"/>
         </item>
-        <item>
-         <property name="text">
-          <string>High</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Mid</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Low</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Min</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="squelchLabel">
-        <property name="text">
-         <string>Squelch</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="squelchValue">
-        <property name="specialValueText">
-         <string>Open</string>
-        </property>
-        <property name="maximum">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="transmitTimeoutLabel">
-        <property name="text">
-         <string>Transmit Timeout</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="totValue">
-        <property name="specialValueText">
-         <string>Off</string>
-        </property>
-        <property name="suffix">
-         <string> s</string>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="voxLevelLabel">
-        <property name="text">
-         <string>VOX Level</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QSpinBox" name="voxValue">
-        <property name="specialValueText">
-         <string>Off</string>
-        </property>
-        <property name="maximum">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExtensionView</class>
+   <extends>QWidget</extends>
+   <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

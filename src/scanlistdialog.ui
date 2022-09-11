@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>354</width>
-    <height>441</height>
+    <width>437</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,82 +15,101 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="nameLabel">
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="scanListName"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="priorityChannel50Label">
-       <property name="text">
-        <string>Primary Channel (50%)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="priorityChannel1"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="priorityChannel25Label">
-       <property name="text">
-        <string>Secondary Channel (25%)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="priorityChannel2"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="transmitChannelLabel">
-       <property name="text">
-        <string>Transmit Channel</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="transmitChannel"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="ConfigObjectListView" name="channelListView" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Basic</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="nameLabel">
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="scanListName"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="priorityChannel50Label">
+           <property name="text">
+            <string>Primary Channel (50%)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="priorityChannel1"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="priorityChannel25Label">
+           <property name="text">
+            <string>Secondary Channel (25%)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="priorityChannel2"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="transmitChannelLabel">
+           <property name="text">
+            <string>Transmit Channel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="transmitChannel"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="ConfigObjectListView" name="channelListView" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="addChannel">
+           <property name="text">
+            <string>Add Channel</string>
+           </property>
+           <property name="shortcut">
+            <string>Alt++</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remChannel">
+           <property name="text">
+            <string>Remove Channel</string>
+           </property>
+           <property name="shortcut">
+            <string>Alt+-</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="ExtensionView" name="extensionView">
+      <attribute name="title">
+       <string>Extensions</string>
+      </attribute>
+     </widget>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="addChannel">
-       <property name="text">
-        <string>Add Channel</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt++</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="remChannel">
-       <property name="text">
-        <string>Remove Channel</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt+-</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -105,6 +124,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ExtensionView</class>
+   <extends>QWidget</extends>
+   <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>ConfigObjectListView</class>
    <extends>QWidget</extends>

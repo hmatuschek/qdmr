@@ -7,6 +7,9 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+#include "tyt_extensions.hh"
+#include "opengd77_extension.hh"
+#include "commercial_extension.hh"
 
 class Config;
 class RXGroupList;
@@ -15,7 +18,7 @@ class ScanList;
 class APRSSystem;
 class PositioningSystem;
 class RoamingZone;
-class RadioID;
+class DMRRadioID;
 
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
@@ -28,29 +31,33 @@ class Channel: public ConfigObject
 {
 	Q_OBJECT
 
-  /** The name of the channel. */
-  Q_PROPERTY(QString name READ name WRITE setName)
   /** The receive frequency of the channel. */
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel. */
   Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
-  // /** The transmit power. */
-  //Q_PROPERTY(Power power READ power WRITE setPower)
-  // /** The transmit timeout in seconds. */
-  //Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout)
+  /** The transmit power. */
+  Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
+  /** The transmit timeout in seconds. */
+  Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout SCRIPTABLE false)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
-  Q_PROPERTY(ScanListReference* scanList READ scanList)
-  // /** The VOX setting. */
-  //Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
+  Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
+  /** The VOX setting. */
+  Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  /** The OpenGD77 channel extension. */
+  Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
+  /** The TyT channel extension. */
+  Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
 
 public:
   /** Possible power settings. */
   enum class Power {
     Max,  ///< Highest power setting (e.g. > 5W, if available).
     High, ///< High power setting (e.g, 5W).
-    Mid,  ///< Medium power setting (e.g., 2W, if avaliable)
+    Mid,  ///< Medium power setting (e.g., 2W, if available)
     Low,  ///< Low power setting (e.g., 1W).
     Min   ///< Lowest power setting (e.g., <1W, if available).
   };
@@ -64,29 +71,8 @@ protected:
   Channel(const Channel &other, QObject *parent=nullptr);
 
 public:
-  /** Returns @c true if the channel is of type @c T. This can be used to text wheter this channel
-   * is actuially an analog or digital channel: @c channel->is<AnalogChannel>(). */
-  template<class T>
-  bool is() const {
-	  return 0 != dynamic_cast<const T *>(this);
-  }
-
-  /** Dynamic cast of channels. For example @c channel->as<AnalogChannel>(). */
-  template<class T>
-  T *as() {
-	  return dynamic_cast<T *>(this);
-  }
-
-  /** Dynamic cast of channels. For example @c channel->as<AnalogChannel>(). */
-  template<class T>
-  const T *as() const{
-	  return dynamic_cast<const T *>(this);
-  }
-
-  /** Returns the name of the channel. */
-  const QString &name() const;
-  /** (Re-)Sets the name of the channel. */
-  bool setName(const QString &name);
+  bool copy(const ConfigItem &other);
+  void clear();
 
   /** Returns the RX frequency of the channel in MHz. */
   double rxFrequency() const;
@@ -97,7 +83,7 @@ public:
   /** (Re-)Sets the TX frequency of the channel in MHz. */
   bool setTXFrequency(double freq);
 
-  /** Retunrs @c true if the channel uses the global default power setting. */
+  /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
   /** Returns the power setting of the channel if the channel does not use the default power. */
   Power power() const;
@@ -126,7 +112,7 @@ public:
 
   /** Returns @c true if the VOX is disabled. */
   bool voxDisabled() const;
-  /** Retunrs @c true if the VOX is specified by the global default value. */
+  /** Returns @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
   unsigned vox() const;
@@ -138,25 +124,43 @@ public:
   void disableVOX();
 
   /** Returns the reference to the scan list. */
-  const ScanListReference *scanList() const;
+  const ScanListReference *scanListRef() const;
   /** Returns the reference to the scan list. */
-  ScanListReference *scanList();
-
+  ScanListReference *scanListRef();
   /** Returns the default scan list for the channel. */
-  ScanList *scanListObj() const;
+  ScanList *scanList() const;
   /** (Re-) Sets the default scan list for the channel. */
-  bool setScanListObj(ScanList *list);
+  bool setScanList(ScanList *list);
+
+  /** Returns the channel extension for the OpenGD77 firmware.
+   * If this extension is not set, returns @c nullptr. */
+  OpenGD77ChannelExtension *openGD77ChannelExtension() const;
+  /** Sets the OpenGD77 channel extension. */
+  void setOpenGD77ChannelExtension(OpenGD77ChannelExtension *ext);
+
+  /** Returns the channel extension for TyT devices.
+   * If this extension is not set, returns @c nullptr. */
+  TyTChannelExtension *tytChannelExtension() const;
+  /** Sets the TyT channel extension. */
+  void setTyTChannelExtension(TyTChannelExtension *ext);
+
+  /** Returns the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
+public:
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected slots:
   /** Gets called whenever a referenced object is changed or deleted. */
   void onReferenceModified();
 
 protected:
-  /** The channel name. */
-  QString _name;
   /** The RX frequency in MHz. */
   double _rxFreq;
   /** The TX frequency in MHz. */
@@ -173,6 +177,12 @@ protected:
   unsigned _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
+  /** Owns the OpenGD77 channel extension object. */
+  OpenGD77ChannelExtension *_openGD77ChannelExtension;
+  /** Owns the TyT channel extension object. */
+  TyTChannelExtension *_tytChannelExtension;
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
 };
 
 
@@ -188,12 +198,12 @@ class AnalogChannel: public Channel
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
-  // /** The squelch level of the channel [1-10]. */
-  // Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
+  /** The squelch level of the channel [1-10]. */
+  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
-  Q_PROPERTY(APRSSystemReference* aprs READ aprs)
+  Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
 
 public:
   /** Admit criteria of analog channel. */
@@ -217,7 +227,9 @@ public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+  void clear();
 
   /** Returns the admit criterion for the analog channel. */
 	Admit admit() const;
@@ -255,13 +267,19 @@ public:
   const APRSSystemReference *aprs() const;
   /** Returns the reference to the APRS system. */
   APRSSystemReference *aprs();
+  /** Sets the APRS system reference. */
+  void setAPRS(APRSSystemReference *ref);
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   APRSSystem *aprsSystem() const;
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+
 protected:
-  bool populate(YAML::Node &node, const Context &context);
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the admit criterion. */
@@ -296,20 +314,20 @@ class DigitalChannel: public Channel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(RadioIDReference* radioID READ radioID)
+  Q_PROPERTY(RadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupList)
+  Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
   /** The tx contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact)
+  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
-  Q_PROPERTY(PositioningSystemReference* aprs READ aprs)
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* roaming READ roaming)
+  Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
 
 public:
   /** Possible admit criteria of digital channels. */
   enum class Admit {
-    Always,      ///< No admit criteria, allows to transmit any time.
+    Always,      ///< No admit criteria, allows one to transmit any time.
     Free,        ///< Transmit only if channel is free.
     ColorCode    ///< Transmit only if channel is free and matches given color code.
   };
@@ -328,7 +346,8 @@ public:
   /** Copy constructor. */
   DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 
-  YAML::Node serialize(const Context &context);
+  ConfigItem *clone() const;
+  void clear();
 
   /** Returns the admit criterion for the channel. */
 	Admit admit() const;
@@ -349,7 +368,9 @@ public:
   const GroupListReference *groupList() const;
   /** Returns a reference to the group list. */
   GroupListReference *groupList();
-  /** Retruns the RX group list for the channel. */
+  /** Sets the reference to the group list. */
+  void setGroupList(GroupListReference *ref);
+  /** Returns the RX group list for the channel. */
   RXGroupList *groupListObj() const;
   /** (Re-)Sets the RX group list for the channel. */
   bool setGroupListObj(RXGroupList *rxg);
@@ -358,6 +379,8 @@ public:
   const DigitalContactReference *contact() const;
   /** Returns a reference to the transmit contact. */
   DigitalContactReference *contact();
+  /** Sets the reference to the transmit contact. */
+  void setContact(DigitalContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
   DigitalContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
@@ -367,6 +390,8 @@ public:
   const PositioningSystemReference *aprs() const;
   /** Returns a reference to the positioning system. */
   PositioningSystemReference *aprs();
+  /** Sets the reference to the positioning system. */
+  void setAPRS(PositioningSystemReference *ref);
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
   PositioningSystem *aprsObj() const;
   /** Associates the GPS System with this channel. */
@@ -376,19 +401,26 @@ public:
   const RoamingZoneReference *roaming() const;
   /** Returns a reference to the roaming zone. */
   RoamingZoneReference *roaming();
+  /** Sets the reference to the roaming zone. */
+  void setRoaming(RoamingZoneReference *ref);
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
   RoamingZone *roamingZone() const;
   /** Associates the given roaming zone with this channel. */
   bool setRoamingZone(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const RadioIDReference *radioID() const;
+  const RadioIDReference *radioId() const;
   /** Returns the reference to the radio ID. */
-  RadioIDReference *radioID();
-  /** Returns the radio ID associated with this channel or @c nullptr if the default ID is used. */
-  RadioID *radioIdObj() const;
-  /** Associates the given radio ID with this channel. Pass nullptr to set to default ID. */
-  bool setRadioIdObj(RadioID *id);
+  RadioIDReference *radioId();
+  /** Sets the reference to the radio ID. */
+  void setRadioId(RadioIDReference *ref);
+  /** Returns the radio ID associated with this channel. */
+  DMRRadioID *radioIdObj() const;
+  /** Associates the given radio ID with this channel. */
+  bool setRadioIdObj(DMRRadioID *id);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The admit criterion. */
@@ -405,7 +437,7 @@ protected:
   PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
   RoamingZoneReference _roaming;
-  /** Radio ID to use on this channel. @c nullptr if default ID is used. */
+  /** Radio ID to use on this channel. */
   RadioIDReference _radioId;
 };
 
@@ -424,6 +456,9 @@ protected:
 public:
   /** Destructor. */
   virtual ~SelectedChannel();
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
 
   /** Constructs/gets the singleton instance. */
   static SelectedChannel *get();
@@ -453,10 +488,13 @@ public:
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
-  /** Finds a digial channel with the given frequencies, time slot and color code. */
+  /** Finds a digital channel with the given frequencies, time slot and color code. */
   DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
-  /** Finds an analog channel with the given frequeny. */
+  /** Finds an analog channel with the given frequency. */
   AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 
