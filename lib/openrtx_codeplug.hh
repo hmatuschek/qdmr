@@ -13,16 +13,62 @@ class ScanList;
 
 /** Implements the binary encoding and decoding of the OpenRTX codeplug.
  *
+ * @section ortxcpl Codeplug structure within radio
+ * The binary codeplug does not use fixed offsets. It is just a concatenation arrays of codeplug
+ * elements. This codeplug implements the revision 0.1.
+ * <table>
+ *  <tr><th>Content</th></tr>
+ *  <tr><td>Header see @c HeaderElement.</td></tr>
+ *  <tr><td>Max. 65536 contacts as specified in the header. See @c ContactElement.</td></tr>
+ *  <tr><td>Max. 65536 channels as specified in the header. See @c ChannelElement.</td></tr>
+ *  <tr><td>Max. 65536 bank (zone) offsets as specified in the header. Each offset is stored as a
+ *      ??? and specifies the offset to the bank w.r.t. ??? in ???.</td></tr>
+ *  <tr><td>Max. 65536 banks (zones). See @c ZoneElement.</td></tr>
+ * </table>
+ *
  * @ingroup ortx */
 class OpenRTXCodeplug : public Codeplug
 {
   Q_OBJECT
 
 public:
-  /** Implements the channel encoding.*/
+  /** Implements the binary rerpesentation of a channel.
+   *
+   * Binary representation (size 0058h bytes):
+   * @verbinclude openrtx_channel.txt */
   class ChannelElement: public Codeplug::Element
   {
   public:
+    /** Possible modes for a channel. */
+    enum Mode {
+      Mode_None = 0, ///< Disabled?
+      Mode_FM   = 1, ///< FM Channel.
+      Mode_DMR  = 2, ///< DMR Channel.
+      Mode_M17  = 3  ///< M17 Channel.
+    };
+
+    enum Bandwidth {
+      BW_12_5kHz = 0,
+      BW_20kHz   = 1,
+      BW_25kHz   = 2
+    };
+
+    enum Timeslot {
+      Timeslot1 = 1,
+      Timeslot2 = 2
+    };
+
+    enum ChannelMode {
+      M17Voice = 1,
+      M17Data = 2,
+      M17VoiceData = 3
+    };
+
+    enum EncryptionMode {
+      EncrNone      = 0,
+      EncrAES256    = 1,
+      EncrScrambler = 2
+    };
 
   protected:
     /** Constructs a channel from the given memory. */
@@ -34,16 +80,167 @@ public:
     /** Destructor. */
     virtual ~ChannelElement();
 
+    bool isValid() const;
+
     /** Resets the channel. */
     virtual void clear();
 
+    /** Returns the channel mode. */
+    virtual Mode mode() const;
+    /** Sets the channel mode. */
+    virtual void setMode(Mode mode);
+
+    /** Returns @c true, if the channel is RX only. */
+    virtual bool rxOnly() const;
+    /** Enables/disables RX only for the channel. */
+    virtual void setRXOnly(bool enable);
+
+    /** Retunrs the bandwidth of the channel. */
+    virtual Bandwidth bandwidth() const;
+    /** Sets the bandwidth of the channel. */
+    virtual void setBandwidth(Bandwidth bw);
+
+    /** Power in dBm. */
+    virtual float power() const;
+    /** Set power in dBm. */
+    virtual void setPower(float dBm);
+
+    /** Returns the RX frequency in MHz. */
+    virtual double rxFrequency() const;
+    /** Sets the RX frequency in MHz. */
+    virtual void setRXFrequency(double MHz);
+    /** Returns the TX frequency in MHz. */
+    virtual double txFrequency() const;
+    /** Sets the TX frequency in MHz. */
+    virtual void setTXFrequency(double MHz);
+
+    /** Retrusn @c true if the scan list is set. */
+    virtual bool hasScanListIndex() const;
+    /** Retunrs the scan list index. */
+    virtual unsigned int scanListIndex() const;
+    /** Sets the scan list index. */
+    virtual void setScanListIndex(unsigned int index);
+    /** Clears the scan list index. */
+    virtual void clearScanListIndex();
+
+    /** Retrusn @c true if the group list is set. */
+    virtual bool hasGroupListIndex() const;
+    /** Retunrs the group list index. */
+    virtual unsigned int groupListIndex() const;
+    /** Sets the group list index. */
+    virtual void setGroupListIndex(unsigned int index);
+    /** Clears the group list index. */
+    virtual void clearGroupListIndex();
+
+    /** Returns the channel name. */
+    virtual QString name() const;
+    /** Sets the channel name. */
+    virtual void setName(const QString &name);
+    /** Returns the channel description. */
+    virtual QString description() const;
+    /** Sets the channel description. */
+    virtual void setDescription(const QString &description);
+
+    /** Returns the channel latitude. */
+    virtual float latitude() const;
+    /** Sets the latitude. */
+    virtual void setLatitude(float lat);
+    /** Returns the channel longitude. */
+    virtual float longitude() const;
+    /** Sets the longitude. */
+    virtual void setLongitude(float lat);
+    /** Returns the height in meters. */
+    virtual unsigned int altitude() const;
+    /** Sets the height in meters. */
+    virtual void setAltitude(unsigned int alt);
+
+    /** Returns the CTCSS RX sub-tone. Only valid for FM channels. */
+    virtual Signaling::Code rxTone() const;
+    /** Sets the CTCSS RX sub-tone. Only valid for FM channels. */
+    virtual void setRXTone(Signaling::Code code, const ErrorStack &err=ErrorStack());
+    /** Returns the CTCSS TX sub-tone. Only valid for FM channels. */
+    virtual Signaling::Code txTone() const;
+    /** Sets the CTCSS TX sub-tone. Only valid for FM channels. */
+    virtual void setTXTone(Signaling::Code code, const ErrorStack &err=ErrorStack());
+
+    /** Returns the RX color code. Only valid for DMR channels. */
+    virtual unsigned int rxColorCode() const;
+    /** Sets the RX color code. Only valid for DMR channels. */
+    virtual void setRXColorCode(unsigned int cc);
+    /** Returns the TX color code. Only valid for DMR channels. */
+    virtual unsigned int txColorCode() const;
+    /** Sets the TX color code. Only valid for DMR channels. */
+    virtual void setTXColorCode(unsigned int cc);
+
+    /** Returns the times slot for the channel. Only valid for DMR channels. */
+    virtual DigitalChannel::TimeSlot timeslot() const;
+    /** Sets the timeslot for the channel. Only valid for DMR channels. */
+    virtual void setTimeslot(DigitalChannel::TimeSlot ts);
+
+    /** Returns @c true if the DMR contact index is set. */
+    virtual bool hasDMRContactIndex() const;
+    /** Returns the contact index for the DMR contact. Only valid for DMR channels. */
+    virtual unsigned int dmrContactIndex() const;
+    /** Sets the DMR contact index. Only valid for DMR channels. */
+    virtual void setDMRContactIndex(unsigned int idx);
+    /** Clears the DMR contact index. */
+    virtual void clearDMRContactIndex();
+
+    /** Returns the RX channel access number. Only valid for M17 channels. */
+    virtual unsigned int rxChannelAccessNumber() const;
+    /** Sets the RX channel access number. Only valid for M17 channels. */
+    virtual void setRXChannelAccessNumber(unsigned int cc);
+    /** Returns the TX color code. Only valid for M17 channels. */
+    virtual unsigned int txChannelAccessNumber() const;
+    /** Sets the TX color code. Only valid for M17 channels. */
+    virtual void setTXChannelAccessNumber(unsigned int cc);
+
+    /** Returns the encryption mode of the channel. Only valid for M17 channels. */
+    virtual EncryptionMode encryptionMode() const;
+    /** Sets the encryption mode for the channel. Only valid for M17 channels. */
+    virtual void setEncryptionMode(EncryptionMode mode);
+
+    /** Returns the channe mode. Only valid for M17 channels. */
+    virtual ChannelMode channelMode() const;
+    /** Sets the channel mode. Only valid for M17 channels. */
+    virtual void setChannelMode(ChannelMode mode);
+
+    /** Returns @c true if GPS position is send as meta-data. Only valid for M17 channels. */
+    virtual bool gpsDataEnabled() const;
+    /** Enables/disables sending of GPS position as meta-data. Only valid for M17 channels. */
+    virtual void enableGPSData(bool enable);
+
+    /** Returns @c true if the M17 contact index is set. */
+    virtual bool hasM17ContactIndex() const;
+    /** Returns the M17 contact index. Only valid for M17 channels. */
+    virtual unsigned int m17ContactIndex() const;
+    /** Sets the M17 contact index. Only valid for M17 channels. */
+    virtual void setM17ContactIndex(unsigned int idx);
+    /** Clears the M17 contact index. */
+    virtual void clearM17ContactIndex();
+
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx) const;
+    virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+    virtual bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Just contains the offsets within the channel element. */
+    enum Offsets {
+      OffsetMode = 0x00, OffsetBandwidth = 0x01, BitBandwidth = 0x00, OffsetRXOnly = 0x01,
+      BitRXOnly = 0x02, OffsetPower = 0x02, OffsetRXFrequency = 0x03, OffsetTXFrequency = 0x07,
+      OffsetScanList = 0x0b, OffsetGroupList = 0x0c, OffsetName = 0x0d, OffsetDescription = 0x2d,
+      OffsetChLatInt = 0x4d, OffsetChLatDec = 0x4e, OffsetChLonInt = 0x50, OffsetChLonDec = 0x51,
+      OffsetChAltitude = 0x53, OffsetRXTone = 0x55, OffsetTXTone = 0x56, OffsetRXColorCode = 0x55,
+      BitRXColorCode = 0x00, OffsetTXColorCode = 0x55, BitTXColorCode = 0x04, OffsetTimeSlot = 0x56,
+      OffsetDMRContact = 0x57, OffsetRXCAN = 0x55, BitRXCAN = 0x00, OffsetTXCAN = 0x55,
+      BitTXCAN = 0x04, OffsetEncrMode = 0x56, BitEncrMode = 0x04, OffsetM17ChMode = 0x56,
+      BitM17ChMode = 0x00, OffsetM17GPSMode = 0x57, OffsetM17Contact = 0x58, StringLength = 0x20
+    };
   };
+
 
   /** Implements the digital contact encoding. */
   class ContactElement: public Element
