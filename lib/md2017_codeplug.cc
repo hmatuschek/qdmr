@@ -139,7 +139,7 @@ MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
-      break;
+      continue;
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -155,7 +155,7 @@ MD2017Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
-      break;
+      continue;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
@@ -190,7 +190,7 @@ MD2017Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &e
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
-      break;
+      continue;
     if (DigitalContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -232,7 +232,7 @@ MD2017Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
-      break;
+      continue;
     if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -249,7 +249,7 @@ MD2017Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
-      break;
+      continue;
     if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
@@ -288,7 +288,7 @@ MD2017Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack 
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
-      break;
+      continue;
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -304,7 +304,7 @@ MD2017Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
-      break;
+      continue;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
       errMsg(err) << "Cannot link group list at index " << i << ".";
       return false;
@@ -340,7 +340,7 @@ MD2017Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
-      break;
+      continue;
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -356,8 +356,7 @@ MD2017Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
-      break;
-
+      continue;
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
       errMsg(err) << "Cannot link scan list at index" << i << ".";
       return false;
@@ -392,7 +391,7 @@ MD2017Codeplug::createPositioningSystems(Config *config, Context &ctx, const Err
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
-      break;
+      continue;
     if (GPSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -409,7 +408,7 @@ MD2017Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
-      break;
+      continue;
     if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
       errMsg(err) << "Cannot link GPS system at index " << i << ".";
       return false;
