@@ -1117,6 +1117,8 @@ OpenRTXCodeplug::offsetChannel(unsigned int n) {
 
 bool
 OpenRTXCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags)
+
   /// @todo Limit number of channels.
   unsigned int numChannels = config->channelList()->count();
   HeaderElement(data(0x0000)).setChannelCount(numChannels);
@@ -1262,7 +1264,7 @@ OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err
 
 bool
 OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config)
+  Q_UNUSED(config); Q_UNUSED(err)
 
   unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());

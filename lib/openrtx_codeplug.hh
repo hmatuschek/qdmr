@@ -91,6 +91,7 @@ public:
     virtual void setZoneCount(unsigned int n);
 
   protected:
+    /** Just holds the offsets within the header and other constants. */
     enum Offsets {
       OffsetMagic = 0x00, MagicNumber = 0x43585452, OffsetVersion = 0x08, OffsetAuthor = 0x0a,
       OffsetDescription = 0x2a, OffsetTimestamp = 0x4a, OffsetContactCount = 0x52,

@@ -149,6 +149,7 @@ public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
 
+    /** Clears the zone. */
     void clear();
     bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
     void fromZoneObjA(const Zone *zone, Context &ctx);

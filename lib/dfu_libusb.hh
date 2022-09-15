@@ -91,6 +91,7 @@ public:
    * specifies the blocksize for every read and write operation. */
   DFUSEDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), uint16_t blocksize=32, QObject *parent=nullptr);
 
+  /** Closes the connection. */
   void close();
 
   /** Returns the blocksize in bytes. */
