@@ -7,6 +7,8 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "config.hh"
+#include "config.h"
+#include <QtEndian>
 
 QVector<unsigned int> _openrtx_ctcss_tone_table{
     670, 693, 719, 744, 770, 797, 825, 854, 885, 915, 948, 974, 1000, 1034,
@@ -14,6 +16,108 @@ QVector<unsigned int> _openrtx_ctcss_tone_table{
     1598, 1622, 1655, 1679, 1713, 1738, 1773, 1799, 1835, 1862, 1899, 1928,
     1966, 1995, 2035, 2065, 2107, 2181, 2257, 2291, 2336, 2418, 2503, 2541
 };
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenRTXCodeplug::HeaderElement
+ * ********************************************************************************************* */
+OpenRTXCodeplug::HeaderElement::HeaderElement(uint8_t *ptr, size_t size)
+  : Codeplug::Element(ptr, size)
+{
+  // pass...
+}
+
+OpenRTXCodeplug::HeaderElement::HeaderElement(uint8_t *ptr)
+  : Codeplug::Element(ptr, 0x0058)
+{
+  // pass...
+}
+
+void
+OpenRTXCodeplug::HeaderElement::clear() {
+  memset(_data, 0, _size);
+  setUInt64_le(OffsetMagic, MagicNumber);
+  setVersion();
+  setTimestamp();
+}
+
+bool
+OpenRTXCodeplug::HeaderElement::isValid() const {
+  return Codeplug::Element::isValid() && (MagicNumber == getUInt64_le(OffsetMagic));
+}
+
+uint16_t
+OpenRTXCodeplug::HeaderElement::version() const {
+  return getUInt16_le(OffsetVersion);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setVersion() {
+  setUInt16_le(OffsetVersion, SupportedVersion);
+}
+
+
+QString
+OpenRTXCodeplug::HeaderElement::author() const {
+  return readASCII(OffsetAuthor, StringLength, 0);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setAuthor(const QString &name) {
+  writeASCII(OffsetAuthor, name, StringLength, 0);
+}
+
+QString
+OpenRTXCodeplug::HeaderElement::description() const {
+  return readASCII(OffsetDescription, StringLength, 0);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setDescription(const QString description) {
+  writeASCII(OffsetDescription, description, StringLength, 0);
+}
+
+
+QDateTime
+OpenRTXCodeplug::HeaderElement::timestamp() const {
+  return QDateTime::fromSecsSinceEpoch(getUInt64_le(OffsetTimestamp), Qt::UTC);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setTimestamp(const QDateTime timestamp) {
+  setUInt64_le(OffsetTimestamp, timestamp.toUTC().toSecsSinceEpoch());
+}
+
+
+unsigned int
+OpenRTXCodeplug::HeaderElement::contactCount() const {
+  return getUInt16_le(OffsetContactCount);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setContactCount(unsigned int n) {
+  setUInt16_le(OffsetContactCount, n);
+}
+
+unsigned int
+OpenRTXCodeplug::HeaderElement::channelCount() const {
+  return getUInt16_le(OffsetChannelCount);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setChannelCount(unsigned int n) {
+  setUInt16_le(OffsetChannelCount, n);
+}
+
+unsigned int
+OpenRTXCodeplug::HeaderElement::zoneCount() const {
+  return getUInt16_le(OffsetZoneCount);
+}
+
+void
+OpenRTXCodeplug::HeaderElement::setZoneCount(unsigned int n) {
+  return setUInt16_le(OffsetZoneCount, n);
+}
 
 
 /* ********************************************************************************************* *
@@ -46,9 +150,9 @@ OpenRTXCodeplug::ChannelElement::clear() {
 }
 
 
-OpenRTXCodeplug::ChannelElement::Mode
+OpenRTXCodeplug::Mode
 OpenRTXCodeplug::ChannelElement::mode() const {
-  return (OpenRTXCodeplug::ChannelElement::Mode)getUInt8(OffsetMode);
+  return (OpenRTXCodeplug::Mode)getUInt8(OffsetMode);
 }
 
 void
@@ -412,6 +516,8 @@ OpenRTXCodeplug::ChannelElement::clearM17ContactIndex() {
 
 Channel *
 OpenRTXCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx)
+
   if (! isValid()) {
     errMsg(err) << "Cannot decode invalid channel.";
     return nullptr;
@@ -456,7 +562,7 @@ OpenRTXCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const Erro
   ch->setRXFrequency(rxFrequency());
   ch->setTXFrequency(txFrequency());
 
-  return nullptr;
+  return ch;
 }
 
 bool
@@ -473,14 +579,14 @@ OpenRTXCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const 
     DigitalChannel *dmr = c->as<DigitalChannel>();
 
     // Link group list, if set
-    if (hasGroupListIndex()) {
+    /*if (hasGroupListIndex()) {
       if (! ctx.has<RXGroupList>(groupListIndex())) {
         errMsg(err) << "Cannot link group list index " << groupListIndex()
                     << " for channel '" << c->name() << "': Index not found.";
         return false;
       }
       dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-    }
+    }*/
 
     // Link contact, if set
     if (hasDMRContactIndex()) {
@@ -494,14 +600,14 @@ OpenRTXCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const 
   }
 
   // Link scan list, if set
-  if (hasScanListIndex()) {
+  /*if (hasScanListIndex()) {
     if (! ctx.has<ScanList>(scanListIndex())) {
       errMsg(err) << "Cannot link scan list index " << scanListIndex()
                   << " for channel '" << c->name() << "': Index not found.";
       return false;
     }
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
-  }
+  }*/
 
   return true;
 }
@@ -558,7 +664,7 @@ OpenRTXCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
 }
 
 OpenRTXCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, 0x0018)
+  : Element(ptr, 0x0027)
 {
   // pass...
 }
@@ -569,20 +675,143 @@ OpenRTXCodeplug::ContactElement::~ContactElement() {
 
 void
 OpenRTXCodeplug::ContactElement::clear() {
+  memset(_data, 0, _size);
 }
 
 bool
 OpenRTXCodeplug::ContactElement::isValid() const {
-  return false;
+  return Codeplug::Element::isValid() && ( (Mode_M17 == mode()) || (Mode_DMR == mode()) );
 }
 
-DigitalContact *
-OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx) const {
-  return nullptr;
+
+QString
+OpenRTXCodeplug::ContactElement::name() const {
+  return readASCII(OffsetName, StringLength, 0);
 }
 
 void
-OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx) {
+OpenRTXCodeplug::ContactElement::setName(const QString &name) {
+  writeASCII(OffsetName, name, StringLength, 0);
+}
+
+
+OpenRTXCodeplug::Mode
+OpenRTXCodeplug::ContactElement::mode() const {
+  return (Mode) getUInt8(OffsetMode);
+}
+
+void
+OpenRTXCodeplug::ContactElement::setMode(Mode mode) {
+  setUInt8(OffsetMode, mode);
+}
+
+
+unsigned int
+OpenRTXCodeplug::ContactElement::dmrId() const {
+  return getUInt32_le(OffsetDMRId);
+}
+
+void
+OpenRTXCodeplug::ContactElement::setDMRId(unsigned int id) {
+  setUInt32_le(OffsetDMRId, id);
+}
+
+
+bool
+OpenRTXCodeplug::ContactElement::dmrRing() const {
+  return getBit(OffsetDMRRing, BitDMRRing);
+}
+
+void
+OpenRTXCodeplug::ContactElement::enableDMRRing(bool enable) {
+  return setBit(OffsetDMRRing, BitDMRRing, enable);
+}
+
+
+DigitalContact::Type
+OpenRTXCodeplug::ContactElement::dmrContactType() const {
+  // This is not specified yet?!?
+  return (DigitalContact::Type)getUInt2(OffsetDMRCallType, BitDMRCallType);
+}
+void
+OpenRTXCodeplug::ContactElement::setDMRContactType(DigitalContact::Type type) {
+  setUInt2(OffsetDMRCallType, BitDMRCallType, type);
+}
+
+
+QString
+OpenRTXCodeplug::ContactElement::m17Call() const {
+  static const char charMap[] = "xABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/.";
+  uint64_t encoded; memcpy(((uint8_t *)&encoded)+2, _data+OffsetM17Address, 6);
+  QString result;
+  while (encoded) {
+    result.append(charMap[encoded%40]);
+    encoded /= 40;
+  }
+  return result;
+}
+
+bool
+OpenRTXCodeplug::ContactElement::setM17Call(const QString &call, const ErrorStack &err) {
+  if (call.size() > 9) {
+    errMsg(err) << "Cannot encode calls longer than 9 chars.";
+    return false;
+  }
+  QString C = call.toUpper();
+
+  uint64_t encoded = 0;
+  for (QString::const_reverse_iterator it=C.rbegin(); it!=C.rend(); it++) {
+    encoded *= 40;
+    char c = QChar(*it).toLatin1();
+    if (('A' <= c) && ('Z' >= c))
+      encoded += (c-'A')+1;
+    else if (('0' <= c) && ('9' >= c))
+      encoded += (c-'0')+27;
+    else if ('-' == c)
+      encoded += 37;
+    else if ('/' == c)
+      encoded += 38;
+    else if ('.' == c)
+      encoded += 39;
+    else {
+      errMsg(err) << "Invalid char '" << *it << "' for an M17 call [A-Z,0-9,-,/,.].";
+      return false;
+    }
+  }
+  memcpy(_data+OffsetM17Address, ((uint8_t*)&encoded)+2, 6);
+  return true;
+}
+
+DigitalContact *
+OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx)
+
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid contacts.";
+    return nullptr;
+  }
+
+  if (Mode_DMR != mode()) {
+    errMsg(err) << "Only DMR contacts are implemented.";
+    return nullptr;
+  }
+
+  DigitalContact *contact = new DigitalContact();
+  contact->setName(name());
+  contact->setNumber(dmrId());
+  contact->setType(dmrContactType());
+  contact->setRing(dmrRing());
+
+  return contact;
+}
+
+void
+OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+  setMode(Mode_DMR);
+  setName(cont->name());
+  setDMRId(cont->number());
+  enableDMRRing(cont->ring());
 }
 
 
@@ -596,9 +825,9 @@ OpenRTXCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, unsigned size)
 }
 
 OpenRTXCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, 0x0022)
 {
-  // pass...
+  _size = 0x22 + channelCount()*4;
 }
 
 OpenRTXCodeplug::ZoneElement::~ZoneElement() {
@@ -607,139 +836,93 @@ OpenRTXCodeplug::ZoneElement::~ZoneElement() {
 
 void
 OpenRTXCodeplug::ZoneElement::clear() {
+  memset(_data, 0, 0x22);
+  setChannelCount(0);
 }
+
 bool
 OpenRTXCodeplug::ZoneElement::isValid() const {
-  return false;
+  return Codeplug::Element::isValid();
 }
+
+
+QString
+OpenRTXCodeplug::ZoneElement::name() const {
+  return readASCII(OffsetName, StringLength, 0);
+}
+
+void
+OpenRTXCodeplug::ZoneElement::setName(const QString &name) {
+  writeASCII(OffsetName, name, StringLength, 0);
+}
+
+
+unsigned int
+OpenRTXCodeplug::ZoneElement::channelCount() const {
+  return getUInt16_le(OffsetCount);
+}
+
+void
+OpenRTXCodeplug::ZoneElement::setChannelCount(unsigned int n) {
+  setUInt16_le(OffsetCount, n);
+  _size = 0x22 + 4*n;
+}
+
+
+unsigned int
+OpenRTXCodeplug::ZoneElement::channelIndex(unsigned int n) const {
+  return getUInt32_le(OffsetChannel + 4*n);
+}
+
+void
+OpenRTXCodeplug::ZoneElement::setChannelIndex(unsigned int n, unsigned int idx) {
+  setUInt32_le(OffsetChannel + 4*n, idx);
+}
+
 
 Zone *
 OpenRTXCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
-  return nullptr;
+  Q_UNUSED(ctx)
+  Zone *zone = new Zone();
+  zone->setName(name());
+  return zone;
 }
 
 bool
-OpenRTXCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
-  return false;
+OpenRTXCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB, const ErrorStack &err) const {
+  for (unsigned int i=0; i<channelCount(); i++) {
+    if (! ctx.has<Channel>(channelIndex(i))) {
+      errMsg(err) << "Cannot link zone '" << zone->name() << "': Channel index " << channelIndex(i)
+                  << " not known.";
+      return false;
+    }
+    if (putInB)
+      zone->B()->add(ctx.get<Channel>(channelIndex(i)));
+    else
+      zone->A()->add(ctx.get<Channel>(channelIndex(i)));
+  }
+  return true;
 }
 
 void
 OpenRTXCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
+  if (zone->B()->count())
+    setName(zone->name()+" A");
+  else
+    setName(zone->name());
+  setChannelCount(zone->A()->count());
+  for (int i=0; i<zone->A()->count(); i++) {
+    setChannelIndex(i, ctx.index(zone->A()->get(i)));
+  }
 }
 
 void
 OpenRTXCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of OpenRTXCodeplug::GroupListElement
- * ********************************************************************************************* */
-OpenRTXCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-OpenRTXCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
-{
-  // pass...
-}
-
-OpenRTXCodeplug::GroupListElement::~GroupListElement() {
-  // pass...
-}
-
-void
-OpenRTXCodeplug::GroupListElement::clear() {
-}
-
-RXGroupList *
-OpenRTXCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
-  return nullptr;
-}
-
-bool
-OpenRTXCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
-  return false;
-}
-
-void
-OpenRTXCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of OpenRTXCodeplug::ScanListElement
- * ********************************************************************************************* */
-OpenRTXCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-OpenRTXCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
-  : Element(ptr, 0x0058)
-{
-  // pass...
-}
-
-OpenRTXCodeplug::ScanListElement::~ScanListElement() {
-  // pass...
-}
-
-void
-OpenRTXCodeplug::ScanListElement::clear() {
-  // pass...
-}
-
-ScanList *
-OpenRTXCodeplug::ScanListElement::toScanListObj(Context &ctx) const {
-  return nullptr;
-}
-
-bool
-OpenRTXCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) const {
-  return false;
-}
-
-void
-OpenRTXCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx) {
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of OpenRTXCodeplug::GeneralSettingsElement
- * ********************************************************************************************* */
-OpenRTXCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pas...
-}
-
-OpenRTXCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0028)
-{
-  // pass...
-}
-
-OpenRTXCodeplug::GeneralSettingsElement::~GeneralSettingsElement() {
-  // pass...
-}
-
-void
-OpenRTXCodeplug::GeneralSettingsElement::clear() {
-}
-
-bool
-OpenRTXCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
-  return false;
+  setName(zone->name() + " B");
+  setChannelCount(zone->B()->count());
+  for (int i=0; i<zone->B()->count(); i++) {
+    setChannelIndex(i, ctx.index(zone->B()->get(i)));
+  }
 }
 
 
@@ -749,7 +932,8 @@ OpenRTXCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx
 OpenRTXCodeplug::OpenRTXCodeplug(QObject *parent)
   : Codeplug(parent)
 {
-  // pass...
+  addImage("OpenRTX codeplug v0.1");
+  image(0).addElement(0x0000, HeaderSize);
 }
 
 OpenRTXCodeplug::~OpenRTXCodeplug() {
@@ -758,38 +942,23 @@ OpenRTXCodeplug::~OpenRTXCodeplug() {
 
 void
 OpenRTXCodeplug::clear() {
-  // Clear general config
-  clearGeneralSettings();
-  // Clear contacts
-  clearContacts();
-  // clear zones
-  clearZones();
-  // clear scan lists
-  clearScanLists();
-  // clear group lists
-  clearGroupLists();
+  remImage(0);
+  addImage("OpenRTX codeplug v0.1");
+  image(0).addElement(0x0000, HeaderSize);
 }
 
 bool
 OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
-  // All indices as 1-based. That is, the first channel gets index 1.
+  Q_UNUSED(err)
 
-  // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i+1);
+  // All indices as 1-based. That is, the first channel gets index 1 etc.
 
-  // Map digital and DTMF contacts
-  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+  // Map DMR contacts
+  for (int i=0, d=0; i<config->contacts()->count(); i++) {
     if (config->contacts()->contact(i)->is<DigitalContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
-    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
     }
   }
-
-  // Map rx group lists
-  for (int i=0; i<config->rxGroupLists()->count(); i++)
-    ctx.add(config->rxGroupLists()->list(i), i+1);
 
   // Map channels
   for (int i=0; i<config->channelList()->count(); i++)
@@ -798,23 +967,6 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
     ctx.add(config->zones()->zone(i), i+1);
-
-  // Map scan lists
-  for (int i=0; i<config->scanlists()->count(); i++)
-    ctx.add(config->scanlists()->scanlist(i), i+1);
-
-  // Map DMR APRS systems
-  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<GPSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d+1); d++;
-    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a+1); a++;
-    }
-  }
-
-  // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i+1);
 
   return true;
 }
@@ -837,11 +989,10 @@ OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
 
 bool
 OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  // General config
-  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx, err)) {
-    errMsg(err) << "Cannot encode general settings.";
-    return false;
-  }
+  HeaderElement header(data(0));
+  header.clear();
+  header.setAuthor(ctx.config()->radioIDs()->defaultId()->name());
+  header.setDescription("Encoded by qdmr v" VERSION_STRING);
 
   // Define Contacts
   if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
@@ -856,16 +1007,6 @@ OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorSta
 
   if (! this->encodeZones(ctx.config(), flags, ctx, err)) {
     errMsg(err) << "Cannot encode zones.";
-    return false;
-  }
-
-  if (! this->encodeScanLists(ctx.config(), flags, ctx, err)) {
-    errMsg(err) << "Cannot encode scan lists.";
-    return false;
-  }
-
-  if (! this->encodeGroupLists(ctx.config(), flags, ctx, err)) {
-    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
@@ -885,11 +1026,6 @@ OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
 
 bool
 OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
-  if (! this->decodeGeneralSettings(ctx.config(), ctx, err)) {
-    errMsg(err) << "Cannot decode general settings.";
-    return false;
-  }
-
   if (! this->createContacts(ctx.config(), ctx, err)) {
     errMsg(err) << "Cannot create contacts.";
     return false;
@@ -905,16 +1041,6 @@ OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  if (! this->createScanLists(ctx.config(), ctx, err)) {
-    errMsg(err) << "Cannot create scan lists.";
-    return false;
-  }
-
-  if (! this->createGroupLists(ctx.config(), ctx, err)) {
-    errMsg(err) << "Cannot create group lists.";
-    return false;
-  }
-
   if (! this->linkChannels(ctx.config(), ctx, err)) {
     errMsg(err) << "Cannot link channels.";
     return false;
@@ -925,125 +1051,245 @@ OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  if (! this->linkScanLists(ctx.config(), ctx, err)) {
-    errMsg(err) << "Cannot link scan lists.";
-    return false;
+  return true;
+}
+
+unsigned int
+OpenRTXCodeplug::numContacts() {
+  return HeaderElement(data(0x0000)).contactCount();
+}
+
+unsigned int
+OpenRTXCodeplug::offsetContact(unsigned int n) {
+  return HeaderSize + n*ContactSize;
+}
+
+bool
+OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags)
+
+  /// @todo Limit number of contacts.
+  unsigned int numContacts = ctx.count<DigitalContact>();
+  HeaderElement(data(0x0000)).setContactCount(numContacts);
+  image(0).addElement(offsetContact(0), numContacts*ContactSize);
+
+  for (int i=0,c=0; i<config->contacts()->count(); i++) {
+    if (! config->contacts()->contact(i)->is<DigitalContact>())
+      continue;
+    ContactElement contact(data(offsetContact(c)));
+    contact.fromContactObj(
+          config->contacts()->contact(i)->as<DigitalContact>(), ctx, err);
+    c++;
   }
 
-  if (! this->linkGroupLists(ctx.config(), ctx, err)) {
-    errMsg(err) << "Cannot link group lists.";
-    return false;
+  return true;
+}
+
+bool
+OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+  unsigned int numContacts = HeaderElement(data(0x0000)).contactCount();
+
+  for (unsigned int i=0; i<numContacts; i++) {
+    DigitalContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
+    if (nullptr == contact) {
+      errMsg(err) << "Cannot create " << (i+1) << "-th contact.";
+      return false;
+    }
+    config->contacts()->add(contact);
+    ctx.add(contact, i+1);
   }
 
   return true;
 }
 
 
-void
-OpenRTXCodeplug::clearGeneralSettings(const ErrorStack &err) {
+unsigned int
+OpenRTXCodeplug::numChannels() {
+  return HeaderElement(data(0x0000)).channelCount();
 }
 
-bool
-OpenRTXCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-
-void
-OpenRTXCodeplug::clearContacts(const ErrorStack &err) {
-}
-
-bool
-OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-
-void
-OpenRTXCodeplug::clearChannels(const ErrorStack &err) {
+unsigned int
+OpenRTXCodeplug::offsetChannel(unsigned int n) {
+  unsigned int numContacts = HeaderElement(data(0x0000)).contactCount();
+  return HeaderSize + numContacts*ContactSize + n*ChannelSize;
 }
 
 bool
 OpenRTXCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
+  /// @todo Limit number of channels.
+  unsigned int numChannels = config->channelList()->count();
+  HeaderElement(data(0x0000)).setChannelCount(numChannels);
+  image(0).addElement(offsetChannel(0), numChannels*ChannelSize);
+
+  for (int i=0; i<config->channelList()->count(); i++) {
+    ChannelElement ch(data(offsetChannel(i)));
+    if (! ch.fromChannelObj(config->channelList()->channel(i), ctx, err)) {
+      errMsg(err) << "Cannot encode " << (i+1) << "-th channel '"
+                  << config->channelList()->channel(i)->name() << "'.";
+      return false;
+    }
+    ctx.add(config->channelList()->channel(i), i+1);
+  }
+
+  return true;
 }
 
 bool
 OpenRTXCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
+  unsigned int numChannels = HeaderElement(data(0x0000)).channelCount();
+  unsigned int offsetChannels = offsetChannel(0);
+  for (unsigned int i=0; i<numChannels; i++) {
+    ChannelElement ch(data(offsetChannels + i*ChannelSize));
+    Channel *chObj = ch.toChannelObj(ctx, err);
+    if (nullptr == chObj) {
+      errMsg(err) << "Cannot decode " << (i+1) << "-th channel.";
+      return false;
+    }
+    config->channelList()->add(chObj);
+    ctx.add(chObj, i+1);
+  }
+
+  return true;
 }
 
 bool
 OpenRTXCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
+  unsigned int numChannels = HeaderElement(data(0x0000)).channelCount();
+  unsigned int offsetChannels = offsetChannel(0);
+  for (unsigned int i=0; i<numChannels; i++) {
+    ChannelElement ch(data(offsetChannels + i*ChannelSize));
+    Channel *chObj = config->channelList()->channel(i);
+    if (! ch.linkChannelObj(chObj, ctx, err)) {
+      errMsg(err) << "Cannot link " << (i+1) << "-th channel "
+                  << chObj->name() << ".";
+      return false;
+    }
+  }
+
+  return true;
 }
 
 
-void
-OpenRTXCodeplug::clearZones(const ErrorStack &err) {
+unsigned int
+OpenRTXCodeplug::numZones() {
+  return HeaderElement(data(0x0000)).zoneCount();
+}
+
+unsigned int
+OpenRTXCodeplug::offsetZoneOffsets() {
+  HeaderElement header(data(0x0000));
+  unsigned int numContacts = header.contactCount();
+  unsigned int numChannels = header.channelCount();
+  return  HeaderSize + numContacts*ContactSize + numChannels*ChannelSize;
+}
+
+unsigned int
+OpenRTXCodeplug::offsetZone(unsigned int n) {
+  HeaderElement header(data(0x0000));
+  unsigned int numContacts = header.contactCount();
+  unsigned int numChannels = header.channelCount();
+  uint32_t *ptr = (uint32_t *)data(HeaderSize + numContacts*ContactSize + numChannels*ChannelSize
+                                   + n*sizeof(uint32_t));
+  return qFromLittleEndian(*ptr);
 }
 
 bool
 OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
+  Q_UNUSED(flags); Q_UNUSED(err)
+
+  // Count zones (A + B)
+  unsigned int zoneCount=0;
+  for (int i=0; i<config->zones()->count(); i++) {
+    zoneCount++;
+    // Check if B contains channels
+    if (config->zones()->zone(i)->B()->count())
+      zoneCount++;
+  }
+
+  // Allocate zone offsets
+  HeaderElement(data(0x0000)).setZoneCount(zoneCount);
+  image(0).addElement(offsetZoneOffsets(), zoneCount*sizeof(uint32_t));
+  uint32_t *offsets = (uint32_t *)data(offsetZoneOffsets());
+
+  // Allocate and encode zones
+  unsigned int currentOffset = offsetZoneOffsets() + zoneCount*sizeof(uint32_t);
+  for (unsigned int z=0, i=0; i<zoneCount; i++,z++) {
+    // Allocate & encode zone A
+    unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->A()->count()*sizeof(uint32_t);
+    image(0).addElement(currentOffset, zoneSize);
+    offsets[i] = qToLittleEndian(currentOffset);
+    ZoneElement(data(currentOffset)).fromZoneObjA(config->zones()->zone(z), ctx);
+    currentOffset += zoneSize;
+    // Allocate & encode zone B, if not empty
+    if (ZoneHeaderSize+config->zones()->zone(z)->B()->count()) {
+      i++;
+      unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->B()->count()*sizeof(uint32_t);
+      image(0).addElement(currentOffset, zoneSize);
+      offsets[i] = qToLittleEndian(currentOffset);
+      ZoneElement(data(currentOffset)).fromZoneObjB(config->zones()->zone(z), ctx);
+      currentOffset += zoneSize;
+    }
+  }
+
+  return true;
 }
 
 bool
 OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
+  unsigned int zoneCount = numZones();
+  uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
+
+  Zone *last_zone = nullptr;
+  for (unsigned int i=0; i<zoneCount; i++) {
+    ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
+    if (! zone.isValid())
+      continue;
+    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
+        (zone.name().startsWith(last_zone->name()));
+    Zone *obj = last_zone;
+    if (! is_ext) {
+      last_zone = obj = new Zone(zone.name());
+      if (zone.name().endsWith(" A"))
+        obj->setName(zone.name().chopped(2));
+      config->zones()->add(obj); ctx.add(obj, i+1);
+    }
+  }
+
+  return true;
 }
 
 bool
 OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
+  unsigned int zoneCount = numZones();
+  uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
+  Zone *last_zone = nullptr;
+  for (int i=0, z=0; i<zoneCount; i++, z++) {
+    ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
+    if (! zone.isValid())
+      continue;
+    if (ctx.has<Zone>(i+1)) {
+      Zone *obj = last_zone = ctx.get<Zone>(i+1);
+      for (int i=0; zone.channelCount(); i++) {
+        if (! ctx.has<Channel>(zone.channelIndex(i))) {
+          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
+                    << " channel not defined.";
+          continue;
+        }
+        obj->A()->add(ctx.get<Channel>(zone.channelIndex(i)));
+      }
+    } else {
+      Zone *obj = last_zone; last_zone = nullptr;
+      for (int i=0; zone.channelCount(); i++) {
+        if (! ctx.has<Channel>(zone.channelIndex(i))) {
+          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
+                    << " channel not defined.";
+          continue;
+        }
+        obj->B()->add(ctx.get<Channel>(zone.channelIndex(i)));
+      }
+    }
+  }
 
-void
-OpenRTXCodeplug::clearGroupLists(const ErrorStack &err) {
-}
-
-bool
-OpenRTXCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-
-void
-OpenRTXCodeplug::clearScanLists(const ErrorStack &err) {
-}
-
-bool
-OpenRTXCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
-}
-
-bool
-OpenRTXCodeplug::linkScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  return false;
+  return true;
 }

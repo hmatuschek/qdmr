@@ -21,6 +21,7 @@
 #include "gd77_codeplug.hh"
 #include "gd77_filereader.hh"
 #include "opengd77_codeplug.hh"
+#include "openrtx_codeplug.hh"
 #include "anytone_filereader.hh"
 #include "d868uv_codeplug.hh"
 #include "d878uv_codeplug.hh"
@@ -168,6 +169,23 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     OpenGD77Codeplug codeplug;
+    if (! codeplug.read(filename, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "':\n" << err.format();
+      return -1;
+    }
+    if (! codeplug.decode(&config, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "':\n" << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::OpenRTX == radio) {
+    if (parser.isSet("manufacturer")) {
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
+      return -1;
+    }
+    OpenRTXCodeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "':\n" << err.format();

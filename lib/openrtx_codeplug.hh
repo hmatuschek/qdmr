@@ -32,38 +32,101 @@ class OpenRTXCodeplug : public Codeplug
   Q_OBJECT
 
 public:
+  /** Possible modes for a channel or contact. */
+  enum Mode {
+    Mode_None = 0, ///< Disabled?
+    Mode_FM   = 1, ///< FM Channel.
+    Mode_DMR  = 2, ///< DMR Channel.
+    Mode_M17  = 3  ///< M17 Channel.
+  };
+
+public:
+  /** Implements the codeplug header element.
+   *
+   * Binary representation of the header (size 0058h bytes):
+   * @verbinclude openrtx_header.txt */
+  class HeaderElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    HeaderElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HeaderElement(uint8_t *ptr);
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the version number (MAJOR<<8)|MINOR. */
+    virtual uint16_t version() const;
+    /** Sets the version number. This number is fixed to 0.1, the supported version. */
+    virtual void setVersion();
+
+    /** Returns the author name. */
+    virtual QString author() const;
+    /** Sets the author name. */
+    virtual void setAuthor(const QString &name);
+    /** Returns the description. */
+    virtual QString description() const;
+    /** Sets the description. */
+    virtual void setDescription(const QString description);
+
+    /** Returns the timestamp. */
+    virtual QDateTime timestamp() const;
+    /** Sets the timestamp. */
+    virtual void setTimestamp(const QDateTime timestamp=QDateTime::currentDateTime());
+
+    /** Returns the contact count. */
+    virtual unsigned int contactCount() const;
+    /** Sets the contact count. */
+    virtual void setContactCount(unsigned int n);
+    /** Returns the channel count. */
+    virtual unsigned int channelCount() const;
+    /** Sets the channel count. */
+    virtual void setChannelCount(unsigned int n);
+    /** Returns the zone count. */
+    virtual unsigned int zoneCount() const;
+    /** Sets the zone count. */
+    virtual void setZoneCount(unsigned int n);
+
+  protected:
+    enum Offsets {
+      OffsetMagic = 0x00, MagicNumber = 0x43585452, OffsetVersion = 0x08, OffsetAuthor = 0x0a,
+      OffsetDescription = 0x2a, OffsetTimestamp = 0x4a, OffsetContactCount = 0x52,
+      OffsetChannelCount = 0x54, OffsetZoneCount = 0x56, StringLength = 0x20,
+      SupportedVersion = ((0<<8)|1)
+    };
+  };
+
   /** Implements the binary rerpesentation of a channel.
    *
-   * Binary representation (size 0058h bytes):
+   * Binary representation (size 005ah bytes):
    * @verbinclude openrtx_channel.txt */
   class ChannelElement: public Codeplug::Element
   {
   public:
-    /** Possible modes for a channel. */
-    enum Mode {
-      Mode_None = 0, ///< Disabled?
-      Mode_FM   = 1, ///< FM Channel.
-      Mode_DMR  = 2, ///< DMR Channel.
-      Mode_M17  = 3  ///< M17 Channel.
-    };
-
+    /** Specifies the possible bandwidth settings. */
     enum Bandwidth {
       BW_12_5kHz = 0,
       BW_20kHz   = 1,
       BW_25kHz   = 2
     };
 
+    /** Specifies the DMR time slot settings. */
     enum Timeslot {
       Timeslot1 = 1,
       Timeslot2 = 2
     };
 
+    /** Specifies the M17 channel mode. */
     enum ChannelMode {
       M17Voice = 1,
       M17Data = 2,
       M17VoiceData = 3
     };
 
+    /** Specifies the M17 encryption modes. */
     enum EncryptionMode {
       EncrNone      = 0,
       EncrAES256    = 1,
@@ -241,8 +304,10 @@ public:
     };
   };
 
-
-  /** Implements the digital contact encoding. */
+  /** Implements the digital contact for the OpenRTX firmware.
+   *
+   * Binary representation (size 0027h bytes):
+   * @verbinclude openrtx_contact.txt */
   class ContactElement: public Element
   {
   protected:
@@ -260,13 +325,56 @@ public:
     /** Returns @c true if the contact is valid. */
     bool isValid() const;
 
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the contact. */
+    virtual void setName(const QString &name);
+
+    /** Returns the mode of the contact (either DMR or M17). */
+    virtual Mode mode() const;
+    /** Sets the mode of the contact. */
+    virtual void setMode(Mode mode);
+
+    /** Returns the DMR ID. Only valid for DMR contacts. */
+    virtual unsigned int dmrId() const;
+    /** Sets the DMR ID. Only valid for DMR contacts. */
+    virtual void setDMRId(unsigned int id);
+
+    /** Retruns @c true if the RX tone is enabled (ring). Only valid for DMR contacts. */
+    virtual bool dmrRing() const;
+    /** Enables/disables RX tone (ring). Only valid for DMR contacts. */
+    virtual void enableDMRRing(bool enable);
+
+    /** Returns the contact type. Only valid for DMR contacts. */
+    virtual DigitalContact::Type dmrContactType() const;
+    /** Sets the contact type. */
+    virtual void setDMRContactType(DigitalContact::Type type);
+
+    /** Returns the contact call. */
+    virtual QString m17Call() const;
+    /** Sets the M17 call. */
+    virtual bool setM17Call(const QString &call, const ErrorStack &err=ErrorStack());
+
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DigitalContact *toContactObj(Context &ctx) const;
+    virtual DigitalContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DigitalContact *obj, Context &ctx);
+    virtual void fromContactObj(const DigitalContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Just holds the offsets within the codeplug. */
+    enum Offsets {
+      OffsetName = 0x00, OffsetMode = 0x20, OffsetDMRId = 0x21, OffsetDMRCallType = 0x25,
+      BitDMRCallType = 0, OffsetDMRRing = 0x25, BitDMRRing = 0x02, OffsetM17Address = 0x21,
+      StringLength = 0x20
+    };
+
   };
 
-  /** Represents the zone encoding. */
+
+  /** The binary encoding of a zone.
+   *
+   * Binary representation (variable size):
+   * @verbinclude openrtx_zone.txt */
   class ZoneElement: Element
   {
   protected:
@@ -283,90 +391,36 @@ public:
     /** Returns @c true if the zone is valid. */
     bool isValid() const;
 
+    /** Returns the zone name. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void setName(const QString &name);
+
+    /** Returns the number of channels in zone. */
+    virtual unsigned int channelCount() const;
+    /** Sets the number of channels in zone. */
+    virtual void setChannelCount(unsigned int n);
+
+    /** Returns the n-th channel index. */
+    virtual unsigned int channelIndex(unsigned int n) const;
+    /** Sets the n-th channel index. */
+    virtual void setChannelIndex(unsigned int n, unsigned int idx);
+
     /** Constructs a generic @c Zone object from this codeplug zone. */
     virtual Zone *toZoneObj(Context &ctx) const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjB(const Zone *zone, Context &ctx);
-  };
-
-  /** Implements the group list encoding. */
-  class GroupListElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    GroupListElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    explicit GroupListElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~GroupListElement();
-
-    /** Resets the group list. */
-    void clear();
-
-    /** Constructs a @c RXGroupList object from the codeplug representation. */
-    virtual RXGroupList *toRXGroupListObj(Context &ctx);
-    /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const;
-    /** Reset this codeplug representation from a @c RXGroupList object. */
-    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
-  };
-
-  /** Implements the scan list encoding. */
-  class ScanListElement: public Element
-  {
-  public:
 
   protected:
-    /** Hidden constructor. */
-    ScanListElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    explicit ScanListElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~ScanListElement();
-
-    /** Resets the scan list. */
-    void clear();
-
-    /** Constrcuts a @c ScanList object from this codeplug representation. */
-    virtual ScanList *toScanListObj(Context &ctx) const;
-    /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
-    virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
-    /** Initializes this codeplug representation from the given @c ScanList object. */
-    virtual void fromScanListObj(const ScanList *lst, Context &ctx);
-  };
-
-  /** Implements the general settings encoding. */
-  class GeneralSettingsElement: public Element
-  {
-  public:
-
-  protected:
-    /** Hidden constructor. */
-    GeneralSettingsElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    explicit GeneralSettingsElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~GeneralSettingsElement();
-
-    /** Resets the general settings. */
-    void clear();
-
-
-    /** Encodes the general setting from the given config. */
-    virtual bool fromConfig(const Config *conf, Context &ctx);
-    /** Updates the given config from this settings. */
-    virtual bool updateConfig(Config *conf, Context &ctx);
+    /** Just defines the offsets with the element. */
+    enum Offsets {
+      OffsetName = 0x00, OffsetCount = 0x20, OffsetChannel = 0x22, StringLength = 0x20
+    };
   };
 
 public:
@@ -393,22 +447,19 @@ public:
   /** Encodes the given generic configuration as a binary codeplug using the given context. */
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Clears the general settings in the codeplug. */
-  virtual void clearGeneralSettings(const ErrorStack &err=ErrorStack());
-  /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Clears all contacts in the codeplug. */
-  virtual void clearContacts(const ErrorStack &err=ErrorStack());
+  /** Returns the number of stored contacts. */
+  virtual unsigned int numContacts();
+  /** Returns the offset to the n-th contact element. */
+  virtual unsigned int offsetContact(unsigned int n);
   /** Encodes all digital contacts in the configuration into the codeplug. */
   virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds a digital contact to the configuration for each one in the codeplug. */
   virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Clear all channels. */
-  virtual void clearChannels(const ErrorStack &err=ErrorStack());
+  /** Returns the number of stored channes. */
+  virtual unsigned int numChannels();
+  /** Returns the offset to the n-th channel element. */
+  virtual unsigned int offsetChannel(unsigned int n);
   /** Encode all channels. */
   virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds all defined channels to the configuration. */
@@ -416,8 +467,12 @@ public:
   /** Links all channels. */
   virtual bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Clears all zones. */
-  virtual void clearZones(const ErrorStack &err=ErrorStack());
+  /** Returns the number of stored zones. */
+  virtual unsigned int numZones();
+  /** Returns the offset to the zone offset array. */
+  virtual unsigned int offsetZoneOffsets();
+  /** Returns the offset to the n-th zone element. */
+  virtual unsigned int offsetZone(unsigned int n);
   /** Encodes zones. */
   virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Adds zones to the configuration. */
@@ -425,23 +480,11 @@ public:
   /** Links all zones within the configuration. */
   virtual bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Clears all scan lists. */
-  virtual void clearScanLists(const ErrorStack &err=ErrorStack());
-  /** Encodes all scan lists. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Creates all scan lists. */
-  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Links all scan lists. */
-  virtual bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Clears all group lists. */
-  virtual void clearGroupLists(const ErrorStack &err=ErrorStack());
-  /** Encodes all group lists. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Creates all group lists. */
-  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Links all group lists. */
-  virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+protected:
+  /** Just stores some sizes. */
+  enum Offsets {
+    HeaderSize = 0x58, ChannelSize = 0x5a, ContactSize = 0x27, ZoneHeaderSize=0x22
+  };
 };
 
 #endif // OPENRTX_CODEPLUG_HH

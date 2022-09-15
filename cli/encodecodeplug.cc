@@ -11,6 +11,7 @@
 #include "rd5r_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
+#include "openrtx_codeplug.hh"
 #include "md390_codeplug.hh"
 #include "uv390_codeplug.hh"
 #include "md2017_codeplug.hh"
@@ -121,6 +122,14 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::OpenGD77 == radio) {
     OpenGD77Codeplug codeplug;
+    codeplug.encode(&config, flags, err);
+    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::OpenRTX == radio) {
+    OpenRTXCodeplug codeplug;
     codeplug.encode(&config, flags, err);
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)

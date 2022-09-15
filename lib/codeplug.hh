@@ -134,6 +134,15 @@ public:
     /** Stores a 32bit little-endian unsigned integer at the given byte-offset. */
     void setUInt32_le(unsigned offset, uint32_t value);
 
+    /** Reads a 64bit big-endian unsigned integer at the given byte-offset. */
+    uint64_t getUInt64_be(unsigned offset) const;
+    /** Reads a 64bit little-endian unsigned integer at the given byte-offset. */
+    uint64_t getUInt64_le(unsigned offset) const;
+    /** Stores a 64bit big-endian unsigned integer at the given byte-offset. */
+    void setUInt64_be(unsigned offset, uint64_t value);
+    /** Stores a 64bit little-endian unsigned integer at the given byte-offset. */
+    void setUInt64_le(unsigned offset, uint64_t value);
+
     /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
     uint8_t getBCD2(unsigned offset) const;
     /** Stores a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
@@ -213,6 +222,12 @@ public:
     template <class T>
     bool has(unsigned idx) {
       return nullptr != this->obj(&(T::staticMetaObject), idx)->template as<T>();
+    }
+
+    /** Returns the number of elements for the specified type. */
+    template <class T>
+    unsigned int count() {
+      return getTable(&T::staticMetaObject).indices.size();
     }
 
   protected:

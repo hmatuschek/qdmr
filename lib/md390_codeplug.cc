@@ -345,7 +345,7 @@ MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) 
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
-      break;
+      continue;
     bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
         (zone.name().startsWith(last_zone->name()));
     Zone *obj = last_zone;
