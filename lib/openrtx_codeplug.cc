@@ -811,6 +811,7 @@ OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Cont
   setMode(Mode_DMR);
   setName(cont->name());
   setDMRId(cont->number());
+  setDMRContactType(cont->type());
   enableDMRRing(cont->ring());
 }
 
@@ -865,18 +866,18 @@ OpenRTXCodeplug::ZoneElement::channelCount() const {
 void
 OpenRTXCodeplug::ZoneElement::setChannelCount(unsigned int n) {
   setUInt16_le(OffsetCount, n);
-  _size = 0x22 + 4*n;
+  _size = 0x22 + sizeof(uint32_t)*n;
 }
 
 
 unsigned int
 OpenRTXCodeplug::ZoneElement::channelIndex(unsigned int n) const {
-  return getUInt32_le(OffsetChannel + 4*n);
+  return getUInt32_le(OffsetChannel + sizeof(uint32_t)*n);
 }
 
 void
 OpenRTXCodeplug::ZoneElement::setChannelIndex(unsigned int n, unsigned int idx) {
-  setUInt32_le(OffsetChannel + 4*n, idx);
+  setUInt32_le(OffsetChannel + sizeof(uint32_t)*n, idx);
 }
 
 
@@ -1212,7 +1213,7 @@ OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, c
   uint32_t *offsets = (uint32_t *)data(offsetZoneOffsets());
 
   // Allocate and encode zones
-  unsigned int currentOffset = offsetZoneOffsets() + zoneCount*sizeof(uint32_t);
+  uint32_t currentOffset = offsetZoneOffsets() + zoneCount*sizeof(uint32_t);
   for (unsigned int z=0, i=0; i<zoneCount; i++,z++) {
     // Allocate & encode zone A
     unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->A()->count()*sizeof(uint32_t);
@@ -1236,6 +1237,7 @@ OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, c
 
 bool
 OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
@@ -1260,17 +1262,19 @@ OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err
 
 bool
 OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(config)
+
   unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
   Zone *last_zone = nullptr;
-  for (int i=0, z=0; i<zoneCount; i++, z++) {
+  for (unsigned int i=0, z=0; i<zoneCount; i++, z++) {
     ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
     if (! zone.isValid())
       continue;
     if (ctx.has<Zone>(i+1)) {
       Zone *obj = last_zone = ctx.get<Zone>(i+1);
-      for (int i=0; zone.channelCount(); i++) {
+      for (unsigned int i=0; i<zone.channelCount(); i++) {
         if (! ctx.has<Channel>(zone.channelIndex(i))) {
           logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
                     << " channel not defined.";
@@ -1280,7 +1284,7 @@ OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) 
       }
     } else {
       Zone *obj = last_zone; last_zone = nullptr;
-      for (int i=0; zone.channelCount(); i++) {
+      for (unsigned int i=0; i<zone.channelCount(); i++) {
         if (! ctx.has<Channel>(zone.channelIndex(i))) {
           logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
                     << " channel not defined.";
