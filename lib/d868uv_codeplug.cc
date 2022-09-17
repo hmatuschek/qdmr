@@ -585,23 +585,32 @@ D868UVCodeplug::setBitmaps(Config *config)
   // Mark valid channels (set bit)
   uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
   memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
-    channel_bitmap[i/8] |= (1 << (i%8));
+  for (int i=0,c=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if ((! channel->is<DMRChannel>()) && (! channel->is<FMChannel>()))
+      continue;
+    channel_bitmap[c/8] |= (1 << (c%8)); c++;
   }
 
   // Mark valid contacts (clear bit)
   uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
   memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
   memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
-  for (int i=0; i<std::min(NUM_CONTACTS, config->contacts()->digitalCount()); i++) {
-    contact_bitmap[i/8] &= ~(1 << (i%8));
+  for (int i=0, c=0; i<std::min(NUM_CONTACTS, config->contacts()->count()); i++) {
+    Contact *contact = config->contacts()->contact(i);
+    if (! contact->is<DMRContact>())
+      continue;
+    contact_bitmap[c/8] &= ~(1 << (c%8)); c++;
   }
 
   // Mark valid analog contacts (clear bytes)
   uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
   memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
-  for (int i=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->dtmfCount()); i++) {
-    analog_contact_bitmap[i] = 0x00;
+  for (int i=0, c=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->count()); i++) {
+    Contact *contact = config->contacts()->contact(i);
+    if (! contact->is<DTMFContact>())
+      continue;
+    analog_contact_bitmap[i] = 0x00; c++;
   }
 
   // Mark valid zones (set bits)
@@ -756,11 +765,11 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/128, idx = i%128;
     ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
-    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
   }
   return true;
@@ -843,11 +852,11 @@ D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
     uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
     uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
     ContactElement con(data(addr));
-    DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
+    DMRContact *contact = ctx.get<DMRContact>(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
@@ -910,11 +919,11 @@ D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx, const Err
 
   uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
   memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
-  for (int i=0; i<ctx.config()->contacts()->dtmfCount(); i++) {
+  for (unsigned int i=0; i<ctx.count<DTMFContact>(); i++) {
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
         + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
     DTMFContactElement cont(data(addr));
-    cont.fromContact(ctx.config()->contacts()->dtmfContact(i));
+    cont.fromContact(ctx.get<DTMFContact>(i));
     idxlst[i] = i;
   }
   return true;

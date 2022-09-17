@@ -227,7 +227,7 @@ public:
     /** Returns the number of elements for the specified type. */
     template <class T>
     unsigned int count() {
-      return getTable(&T::staticMetaObject).indices.size();
+      return this->getTable(&T::staticMetaObject).indices.size();
     }
 
   protected:

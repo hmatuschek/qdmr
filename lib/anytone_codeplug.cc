@@ -3951,6 +3951,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << config->contacts()->contact(i)->name()
+                << "'. Contact type '" << config->contacts()->contact(i)->metaObject()->className()
+                << "' not supported by or implemented for AnyTone devices.";
     }
   }
 
@@ -3959,8 +3963,16 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     ctx.add(config->rxGroupLists()->list(i), i);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i);
+  for (int i=0,c=0; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if ((channel->is<DMRChannel>()) || (channel->is<FMChannel>()) ) {
+      ctx.add(channel, c); c++;
+    } else {
+      logInfo() << "Cannot index channel '" << channel->name()
+                << "'. Channel type '" << channel->metaObject()->className()
+                << "' not supported by or implemented for AnyTone devices.";
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)

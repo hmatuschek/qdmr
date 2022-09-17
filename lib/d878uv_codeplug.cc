@@ -2255,11 +2255,11 @@ bool
 D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/128, idx = i%128;
     ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
-    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
   }
   return true;
 }

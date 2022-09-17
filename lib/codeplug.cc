@@ -646,7 +646,7 @@ Codeplug::Context::index(ConfigItem *obj) {
 
 bool
 Codeplug::Context::add(ConfigItem *obj, unsigned idx) {
-  if (!hasTable(obj->metaObject()))
+  if (! hasTable(obj->metaObject()))
     return false;
   if (getTable(obj->metaObject()).indices.contains(obj))
     return false;
