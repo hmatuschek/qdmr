@@ -805,14 +805,28 @@ OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &er
   return contact;
 }
 
-void
-OpenRTXCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err)
-  setMode(Mode_DMR);
+bool
+OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
   setName(cont->name());
-  setDMRId(cont->number());
-  setDMRContactType(cont->type());
   enableDMRRing(cont->ring());
+
+  if (cont->is<DMRContact>()) {
+    const DMRContact *dmr = cont->as<DMRContact>();
+    setMode(Mode_DMR);
+    setDMRId(dmr->number());
+    setDMRContactType(dmr->type());
+  } else if (cont->is<M17Contact>()) {
+    const M17Contact *m17 = cont->as<M17Contact>();
+    setM17Call(m17->call());
+  } else {
+    errMsg(err) << "Cannot encode contact '" << cont->name() << "': Contact type '"
+                << cont->metaObject()->className() << "' not supported by OpenRTX firmware.";
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -955,15 +969,22 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // All indices as 1-based. That is, the first channel gets index 1 etc.
 
   // Map DMR contacts
-  for (int i=0, d=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DMRContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
+  for (int i=0, c=0; i<config->contacts()->count(); i++) {
+    Contact *contact = config->contacts()->contact(i);
+    if (contact->is<DMRContact>() || contact->is<M17Contact>()) {
+      ctx.add(contact, c+1); c++;
+    } else {
+      logInfo() << "Cannot index contact '" << contact->name()
+                << "'. Contact type '" << contact->metaObject()->className()
+                << "' not supported by or implemented for OpenRTX devices.";
     }
   }
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i+1);
+  for (int i=0; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    ctx.add(channel, i+1);
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
@@ -976,7 +997,7 @@ bool
 OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
   if (nullptr == config->radioIDs()->defaultId()) {
-    errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
+    errMsg(err) << "Cannot encode OpenRTX codeplug: No default radio ID specified.";
     return false;
   }
 
@@ -1067,20 +1088,19 @@ OpenRTXCodeplug::offsetContact(unsigned int n) {
 
 bool
 OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags)
+  Q_UNUSED(config); Q_UNUSED(flags)
 
   /// @todo Limit number of contacts.
-  unsigned int numContacts = ctx.count<DMRContact>();
+  unsigned int numContacts = ctx.count<DigitalContact>();
   HeaderElement(data(0x0000)).setContactCount(numContacts);
   image(0).addElement(offsetContact(0), numContacts*ContactSize);
 
-  for (int i=0,c=0; i<config->contacts()->count(); i++) {
-    if (! config->contacts()->contact(i)->is<DMRContact>())
-      continue;
-    ContactElement contact(data(offsetContact(c)));
-    contact.fromContactObj(
-          config->contacts()->contact(i)->as<DMRContact>(), ctx, err);
-    c++;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    ContactElement contact(data(offsetContact(i)));
+    if (! contact.fromContactObj(ctx.get<DigitalContact>(i+1), ctx, err)) {
+      errMsg(err) << "Cannot encode contact '" << ctx.get<DigitalContact>(i+1)->name() <<"'.";
+      return false;
+    }
   }
 
   return true;

@@ -359,7 +359,7 @@ public:
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
     virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool fromContactObj(const DigitalContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Just holds the offsets within the codeplug. */
