@@ -575,14 +575,14 @@ OpenGD77Codeplug::clearContacts() {
 
 bool
 OpenGD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(config); Q_UNUSED(err)
 
-  for (int i=0; i<NUM_CONTACTS; i++) {
+  for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE, IMAGE_CONTACTS));
     el.clear();
-    if (i >= config->contacts()->digitalCount())
+    if (i >= ctx.count<DMRContact>())
       continue;
-    el.fromContactObj(config->contacts()->digitalContact(i), ctx);
+    el.fromContactObj(ctx.get<DMRContact>(i+1), ctx);
   }
   return true;
 }
@@ -651,18 +651,18 @@ OpenGD77Codeplug::clearChannels() {
 
 bool
 OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(config); Q_UNUSED(flags)
 
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
     else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
     ChannelBankElement bank(ptr); bank.clear();
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       ChannelElement el(bank.get(i));
-      if (c < config->channelList()->count()) {
-        if (! el.fromChannelObj(config->channelList()->channel(c), ctx)) {
-          logError() << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+      if (c < ctx.count<Channel>()) {
+        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
