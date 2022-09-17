@@ -513,7 +513,7 @@ FMChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["analog"] = node;
+  type["fm"] = node;
   return type;
 }
 
@@ -880,7 +880,7 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["digital"] = node;
+  type["dmr"] = node;
   return type;
 }
 
@@ -975,6 +975,7 @@ ChannelList::findFMChannelByTxFreq(double freq) const {
 
 ConfigItem *
 ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  static bool digitalDepricated = true, analogDeprecated = true;
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
@@ -987,8 +988,18 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if (("digital" == type) || ("dmr" == type)) {
+    if (("digital" == type) && digitalDepricated) {
+      logWarn() << node.Mark().line << ":" << node.Mark().column
+                << ": Using 'digital' for DMR channels is deprecated. Please use 'dmr' instead.";
+      digitalDepricated = false;
+    }
     return new DMRChannel();
   } else if (("analog" == type) || ("fm"==type)) {
+    if (("analog" == type) && analogDeprecated) {
+      logWarn() << node.Mark().line << ":" << node.Mark().column
+                << ": Using 'analog' for FM channels is deprecated. Please use 'fm' instead.";
+      analogDeprecated = false;
+    }
     return new FMChannel();
   }
 

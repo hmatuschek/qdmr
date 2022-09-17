@@ -3,6 +3,7 @@
 #include "utils.hh"
 #include "logger.hh"
 #include "opengd77_extension.hh"
+#include <QRegularExpression>
 
 
 /* ********************************************************************************************* *
@@ -250,6 +251,77 @@ DMRContact::setAnytoneExtension(AnytoneContactExtension *ext) {
     connect(_anytone, &OpenGD77ContactExtension::modified,
             [this](ConfigItem*){ emit modified(this); });
   }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of M17Contact
+ * ********************************************************************************************* */
+M17Contact::M17Contact(QObject *parent)
+  : DigitalContact(parent), _isBroadcast(false), _call()
+{
+  // pass...
+}
+
+M17Contact::M17Contact(const QString &name, bool ring, const QString &call, QObject *parent)
+  : DigitalContact(name, ring, parent), _isBroadcast(false), _call()
+{
+  _call = normalizeCall(call);
+}
+
+ConfigItem *
+M17Contact::clone() const {
+  M17Contact *c = new M17Contact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+M17Contact::clear() {
+  DigitalContact::clear();
+  _isBroadcast = false;
+  _call.clear();
+}
+
+const QString &
+M17Contact::call() const {
+  return _call;
+}
+
+void
+M17Contact::setCall(const QString &call) {
+  _call = normalizeCall(call);
+}
+
+bool
+M17Contact::isBroadcast() const {
+  return _isBroadcast;
+}
+
+void
+M17Contact::setBroadcast(bool enable) {
+  _isBroadcast = enable;
+}
+
+YAML::Node
+M17Contact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalContact::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  YAML::Node type; type["m17"] = node;
+  return type;
+}
+
+QString
+M17Contact::normalizeCall(const QString call) {
+  QString tmp = call.toUpper();
+  tmp.remove(QRegularExpression("[^A-Z0-9/\\.\\-]"));
+  return tmp.mid(0, 9);
 }
 
 

@@ -207,6 +207,53 @@ protected:
 };
 
 
+/** Represents an M17 contact.
+ * @ingroup conf */
+class M17Contact: public DigitalContact
+{
+  Q_OBJECT
+
+  /** The call of the contact. */
+  Q_PROPERTY(QString call READ call WRITE setCall)
+  /** If @c true, the contact is the M17 broadcast destination. */
+  Q_PROPERTY(bool isBroadcast READ isBroadcast WRITE setBroadcast)
+
+public:
+  /** Empty constructor. */
+  explicit M17Contact(QObject *parent=nullptr);
+  /** Constructor.
+   * @param name Specifies the name of the contact. Can be descriptive.
+   * @param ring Specifies if a call from this contact rings a bell.
+   * @param call Specifies the call/ID of the contact.
+   * @param parent QObject parent, takes the ownership of this object. */
+  M17Contact(const QString &name, bool ring, const QString &call, QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+  void clear();
+
+  /** Returns the call/ID of the contact. */
+  const QString &call() const;
+  /** Sets the call/ID of the contact. */
+  void setCall(const QString &call);
+  /** Retunrs @c true, if the contact is the M17 broadcast contact. If set, the call has no effect. */
+  bool isBroadcast() const;
+  /** Sets/Resets the broadcast flag. */
+  void setBroadcast(bool enable);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+
+  /** Helper function to normalize a call. */
+  static QString normalizeCall(const QString call);
+
+protected:
+  /** If true, the contact is the M17 broadcast contact. The call is ignored then. */
+  bool _isBroadcast;
+  /** Holds the normalized call/ID of the contact. */
+  QString _call;
+};
+
+
 /** Represents the list of contacts within the abstract radio configuration.
  *
  * A special feature of this list, is that DTMF and digital contacts can be accessed by their own

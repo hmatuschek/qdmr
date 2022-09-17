@@ -3,7 +3,6 @@
 
 #include <QFile>
 #include "config.hh"
-#include "codeplugcontext.hh"
 
 
 /** This class implements a reader of AnyTone codeplug files.
@@ -72,8 +71,6 @@ public:
   static bool read(const QString &filename, Config *config, QString &message);
 
 protected:
-  /** Offset-element map. */
-  CodeplugContext _context;
   /** Pointer to the start. */
   const uint8_t * const _start;
   /** Pointer to the entire data. */
