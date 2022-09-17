@@ -123,6 +123,16 @@ DMRContactReference::DMRContactReference(QObject *parent)
 
 
 /* ********************************************************************************************* *
+ * Implementation of DMRContactReference
+ * ********************************************************************************************* */
+M17ContactReference::M17ContactReference(QObject *parent)
+  : ContactReference(M17Contact::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DMRContactRefList
  * ********************************************************************************************* */
 DMRContactRefList::DMRContactRefList(QObject *parent)

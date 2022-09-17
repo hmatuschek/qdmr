@@ -27,11 +27,14 @@ GPSSystemDialog::construct() {
   name->setText(_myGPSSystem->name());
 
   // setup contact entry
-  for (int i=0; i<_config->contacts()->digitalCount(); i++) {
-    destination->addItem(_config->contacts()->digitalContact(i)->name(),
-                         QVariant::fromValue(_config->contacts()->digitalContact(i)));
-    if (_myGPSSystem->contactObj() == _config->contacts()->digitalContact(i))
-      destination->setCurrentIndex(i);
+  for (int i=0,r=0; i<_config->contacts()->count(); i++) {
+    if (! _config->contacts()->contact(i)->is<DMRContact>())
+      continue;
+    destination->addItem(_config->contacts()->contact(i)->name(),
+                         QVariant::fromValue(_config->contacts()->contact(i)->as<DMRContact>()));
+    if (_myGPSSystem->contactObj() == _config->contacts()->contact(i)->as<DMRContact>())
+      destination->setCurrentIndex(r);
+    r++;
   }
 
   // setup period

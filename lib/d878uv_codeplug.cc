@@ -1932,7 +1932,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
     sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(destination(idx));
+  DMRContact *cont = ctx.config()->contacts()->findDMRContact(destination(idx));
   // If no matching contact is found, create one
   if (nullptr == cont) {
     cont = new DMRContact(callType(idx), tr("GPS #%1 Contact").arg(idx+1),

@@ -216,11 +216,11 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
     uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
     uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
     ContactElement con(data(addr));
-    DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
+    DMRContact *contact = ctx.get<DMRContact>(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);

@@ -614,14 +614,14 @@ GD77Codeplug::clearDTMFContacts() {
 
 bool
 GD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
 
-  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
+  for (unsigned int i=0; i<NUM_DTMF_CONTACTS; i++) {
     DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
     el.clear();
-    if (i >= config->contacts()->dtmfCount())
+    if (i >= ctx.count<DTMFContact>())
       continue;
-    el.fromContactObj(config->contacts()->dtmfContact(i), ctx);
+    el.fromContactObj(ctx.get<DTMFContact>(i+1), ctx);
   }
   return true;
 }

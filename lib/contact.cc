@@ -341,25 +341,6 @@ ContactList::add(ConfigObject *obj, int row) {
   return ConfigObjectList::add(obj, row);
 }
 
-int
-ContactList::digitalCount() const {
-  int c=0;
-  for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<DMRContact>())
-      c++;
-  return c;
-}
-
-int
-ContactList::dtmfCount() const {
-  int c=0;
-  for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<DTMFContact>())
-      c++;
-  return c;
-}
-
-
 Contact *
 ContactList::contact(int idx) const {
   if ((0>idx) || (idx >= count()))
@@ -368,38 +349,12 @@ ContactList::contact(int idx) const {
 }
 
 DMRContact *
-ContactList::digitalContact(int idx) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<DMRContact>()) {
-      if (0 == idx)
-        return _items.at(i)->as<DMRContact>();
-      else
-        idx--;
-    }
-  }
-  return nullptr;
-}
-
-DMRContact *
-ContactList::findDigitalContact(unsigned number) const {
+ContactList::findDMRContact(unsigned number) const {
   for (int i=0; i<_items.size(); i++) {
     if (! _items.at(i)->is<DMRContact>())
       continue;
     if (_items.at(i)->as<DMRContact>()->number() == number)
       return _items.at(i)->as<DMRContact>();
-  }
-  return nullptr;
-}
-
-DTMFContact *
-ContactList::dtmfContact(int idx) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<DTMFContact>()) {
-      if (0 == idx)
-        return _items.at(i)->as<DTMFContact>();
-      else
-        idx--;
-    }
   }
   return nullptr;
 }
@@ -420,6 +375,8 @@ ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if ("dmr" == type) {
     return new DMRContact();
+  } else if ("m17" == type) {
+    return new M17Contact();
   } else if ("dtmf" == type) {
     return new DTMFContact();
   }

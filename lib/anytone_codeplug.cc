@@ -2501,7 +2501,7 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
   DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
-  if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
+  if (nullptr == (cont = ctx.config()->contacts()->findDMRContact(destination()))) {
     cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }

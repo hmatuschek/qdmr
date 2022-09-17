@@ -102,6 +102,18 @@ public:
 };
 
 
+/** Represents a reference to a M17 contact.
+ * @ingroup conf*/
+class M17ContactReference: public ContactReference
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit M17ContactReference(QObject *parent=nullptr);
+};
+
+
 /** List of references to DMR contacts. */
 class DMRContactRefList: public ConfigObjectRefList
 {

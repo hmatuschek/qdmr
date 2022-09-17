@@ -886,6 +886,178 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of M17Channel
+ * ********************************************************************************************* */
+M17Channel::M17Channel(QObject *parent)
+  : DigitalChannel(parent), _mode(Mode::Voice), _accessNumber(0), _txContact(),
+    _rxGroup(), _gpsEnabled(false), _encryptionMode(EncryptionMode::None)
+{
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+M17Channel::M17Channel(const M17Channel &other, QObject *parent)
+  : DigitalChannel(other, parent), _mode(Mode::Voice), _accessNumber(0),
+    _txContact(), _rxGroup(), _gpsEnabled(false),
+    _encryptionMode(EncryptionMode::None)
+{
+  copy(other);
+
+  // Connect signals of references
+  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+void
+M17Channel::clear() {
+  DigitalChannel::clear();
+  setMode(Mode::Voice);
+  setAccessNumber(0);
+  setContact(nullptr);
+  setGroupList(nullptr);
+  enableGPS(false);
+  setEncryptionMode(EncryptionMode::None);
+}
+
+ConfigItem *
+M17Channel::clone() const {
+  M17Channel *c = new M17Channel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+M17Channel::Mode
+M17Channel::mode() const {
+  return _mode;
+}
+
+void
+M17Channel::setMode(Mode mode) {
+  if (_mode == mode)
+    return;
+  _mode = mode;
+  emit modified(this);
+}
+
+unsigned int
+M17Channel::accessNumber() const {
+  return _accessNumber;
+}
+
+void
+M17Channel::setAccessNumber(unsigned int can) {
+  can = std::min(15u, can);
+  if (_accessNumber == can)
+    return;
+  _accessNumber = can;
+  emit modified(this);
+}
+
+const GroupListReference *
+M17Channel::groupListRef() const {
+  return &_rxGroup;
+}
+
+GroupListReference *
+M17Channel::groupListRef() {
+  return &_rxGroup;
+}
+
+void
+M17Channel::setGroupListRef(GroupListReference *ref) {
+  if (nullptr == ref)
+    _rxGroup.clear();
+  else
+    _rxGroup.copy(ref);
+}
+
+RXGroupList *
+M17Channel::groupList() const {
+  return _rxGroup.as<RXGroupList>();
+}
+
+bool
+M17Channel::setGroupList(RXGroupList *g) {
+  if(! _rxGroup.set(g))
+    return false;
+  emit modified(this);
+  return true;
+}
+
+const M17ContactReference *
+M17Channel::contactRef() const {
+  return &_txContact;
+}
+
+M17ContactReference *
+M17Channel::contactRef() {
+  return &_txContact;
+}
+
+void
+M17Channel::setContactRef(M17ContactReference *ref) {
+  if (nullptr == ref)
+    _txContact.clear();
+  else
+    _txContact.copy(ref);
+}
+
+M17Contact *
+M17Channel::contact() const {
+  return _txContact.as<M17Contact>();
+}
+
+bool
+M17Channel::setContact(M17Contact *c) {
+  if(! _txContact.set(c))
+    return false;
+  emit modified(this);
+  return true;
+}
+
+bool
+M17Channel::gpsEnabled() const {
+  return _gpsEnabled;
+}
+
+void
+M17Channel::enableGPS(bool enabled) {
+  if (_gpsEnabled == enabled)
+    return;
+  _gpsEnabled = enabled;
+  emit modified(this);
+}
+
+M17Channel::EncryptionMode
+M17Channel::encryptionMode() const {
+  return _encryptionMode;
+}
+
+void
+M17Channel::setEncryptionMode(EncryptionMode mode) {
+  if (_encryptionMode == mode)
+    return;
+  _encryptionMode = mode;
+  emit modified(this);
+}
+
+YAML::Node
+M17Channel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalChannel::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["m17"] = node;
+  return type;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of SelectedChannel
  * ********************************************************************************************* */
 SelectedChannel *SelectedChannel::_instance = nullptr;
@@ -1001,6 +1173,8 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
       analogDeprecated = false;
     }
     return new FMChannel();
+  } else if ("m17" == type) {
+    return new M17Channel();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

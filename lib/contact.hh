@@ -275,19 +275,10 @@ public:
 
   int add(ConfigObject *obj, int row=-1);
 
-  /** Returns the number of digital contacts. */
-	int digitalCount() const;
-  /** Returns the number of DTMF contacts. */
-	int dtmfCount() const;
-
   /** Returns the contact at index @c idx. */
   Contact *contact(int idx) const;
-  /** Returns the digital contact at index @c idx among digital contacts. */
-  DMRContact *digitalContact(int idx) const;
   /** Searches for a digital contact with the given number. */
-  DMRContact *findDigitalContact(unsigned number) const;
-  /** Returns the DTMF contact at index @c idx among DTMF contacts. */
-  DTMFContact *dtmfContact(int idx) const;
+  DMRContact *findDMRContact(unsigned number) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
