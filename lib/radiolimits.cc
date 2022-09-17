@@ -873,13 +873,13 @@ RadioLimitGroupCallRefList::verify(const ConfigItem *item, const QMetaProperty &
   }
 
   for (int i=0; i<plist->count(); i++) {
-    if (! plist->get(i)->is<DigitalContact>()) {
+    if (! plist->get(i)->is<DMRContact>()) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
           << "Must be DigtialContact.";
       return false;
     }
-    if (DigitalContact::GroupCall != plist->get(i)->as<DigitalContact>()->type()) {
+    if (DMRContact::GroupCall != plist->get(i)->as<DMRContact>()->type()) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Expected reference to a group call digital contact.";
       return false;

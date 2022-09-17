@@ -4,6 +4,7 @@
 #include "logger.hh"
 #include "opengd77_extension.hh"
 
+
 /* ********************************************************************************************* *
  * Implementation of Contact
  * ********************************************************************************************* */
@@ -57,16 +58,32 @@ Contact::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err)
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnalogContact
+ * ********************************************************************************************* */
+AnalogContact::AnalogContact(QObject *parent)
+  : Contact(parent)
+{
+  // pass...
+}
+
+AnalogContact::AnalogContact(const QString &name, bool ring, QObject *parent)
+  : Contact(name, ring, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DTMFContact
  * ********************************************************************************************* */
 DTMFContact::DTMFContact(QObject *parent)
-  : Contact(parent), _number()
+  : AnalogContact(parent), _number()
 {
   // pass...
 }
 
 DTMFContact::DTMFContact(const QString &name, const QString &number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _number(number.simplified())
+  : AnalogContact(name, rxTone, parent), _number(number.simplified())
 {
   // pass...
 }
@@ -103,7 +120,7 @@ DTMFContact::setNumber(const QString &number) {
 
 YAML::Node
 DTMFContact::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = Contact::serialize(context, err);
+  YAML::Node node = AnalogContact::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -117,20 +134,36 @@ DTMFContact::serialize(const Context &context, const ErrorStack &err) {
  * Implementation of DigitalContact
  * ********************************************************************************************* */
 DigitalContact::DigitalContact(QObject *parent)
-  : Contact(parent), _type(PrivateCall), _number(0), _anytone(nullptr), _openGD77(nullptr)
+  : Contact(parent)
 {
   // pass...
 }
 
-DigitalContact::DigitalContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
-  : Contact(name, rxTone, parent), _type(type), _number(number), _anytone(nullptr), _openGD77(nullptr)
+DigitalContact::DigitalContact(const QString &name, bool ring, QObject *parent)
+  : Contact(name, ring, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DMRContact
+ * ********************************************************************************************* */
+DMRContact::DMRContact(QObject *parent)
+  : DigitalContact(parent), _type(PrivateCall), _number(0), _anytone(nullptr), _openGD77(nullptr)
+{
+  // pass...
+}
+
+DMRContact::DMRContact(Type type, const QString &name, unsigned number, bool rxTone, QObject *parent)
+  : DigitalContact(name, rxTone, parent), _type(type), _number(number), _anytone(nullptr), _openGD77(nullptr)
 {
   // pass...
 }
 
 ConfigItem *
-DigitalContact::clone() const {
-  DigitalContact *c = new DigitalContact();
+DMRContact::clone() const {
+  DMRContact *c = new DMRContact();
   if (! c->copy(*this)) {
     c->deleteLater();
     return nullptr;
@@ -139,8 +172,8 @@ DigitalContact::clone() const {
 }
 
 void
-DigitalContact::clear() {
-  Contact::clear();
+DMRContact::clear() {
+  DigitalContact::clear();
   _type = PrivateCall;
   _number = 0;
   if (_openGD77)
@@ -151,31 +184,31 @@ DigitalContact::clear() {
   _anytone = nullptr;
 }
 
-DigitalContact::Type
-DigitalContact::type() const {
+DMRContact::Type
+DMRContact::type() const {
   return _type;
 }
 
 void
-DigitalContact::setType(DigitalContact::Type type) {
+DMRContact::setType(DMRContact::Type type) {
   _type = type;
 }
 
 unsigned
-DigitalContact::number() const {
+DMRContact::number() const {
   return _number;
 }
 
 bool
-DigitalContact::setNumber(unsigned number) {
+DMRContact::setNumber(unsigned number) {
   _number = number;
   emit modified(this);
   return true;
 }
 
 YAML::Node
-DigitalContact::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = Contact::serialize(context, err);
+DMRContact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalContact::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -186,12 +219,12 @@ DigitalContact::serialize(const Context &context, const ErrorStack &err) {
 
 
 OpenGD77ContactExtension *
-DigitalContact::openGD77ContactExtension() const {
+DMRContact::openGD77ContactExtension() const {
   return _openGD77;
 }
 
 void
-DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
+DMRContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
   if (_openGD77)
     _openGD77->deleteLater();
   _openGD77 = ext;
@@ -203,12 +236,12 @@ DigitalContact::setOpenGD77ContactExtension(OpenGD77ContactExtension *ext) {
 }
 
 AnytoneContactExtension *
-DigitalContact::anytoneExtension() const {
+DMRContact::anytoneExtension() const {
   return _anytone;
 }
 
 void
-DigitalContact::setAnytoneExtension(AnytoneContactExtension *ext) {
+DMRContact::setAnytoneExtension(AnytoneContactExtension *ext) {
   if (_anytone)
     _anytone->deleteLater();
   _anytone = ext;
@@ -240,7 +273,7 @@ int
 ContactList::digitalCount() const {
   int c=0;
   for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<DigitalContact>())
+    if (_items.at(i)->is<DMRContact>())
       c++;
   return c;
 }
@@ -255,30 +288,6 @@ ContactList::dtmfCount() const {
 }
 
 
-int
-ContactList::indexOfDigital(DigitalContact *contact) const {
-  int idx = 0;
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i) == contact)
-      return idx;
-    else if (_items.at(i)->is<DigitalContact>())
-      idx++;
-  }
-  return -1;
-}
-
-int
-ContactList::indexOfDTMF(DTMFContact *contact) const {
-  int idx = 0;
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i) == contact)
-      return idx;
-    else if (_items.at(i)->is<DTMFContact>())
-      idx++;
-  }
-  return -1;
-}
-
 Contact *
 ContactList::contact(int idx) const {
   if ((0>idx) || (idx >= count()))
@@ -286,12 +295,12 @@ ContactList::contact(int idx) const {
   return _items[idx]->as<Contact>();
 }
 
-DigitalContact *
+DMRContact *
 ContactList::digitalContact(int idx) const {
   for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<DigitalContact>()) {
+    if (_items.at(i)->is<DMRContact>()) {
       if (0 == idx)
-        return _items.at(i)->as<DigitalContact>();
+        return _items.at(i)->as<DMRContact>();
       else
         idx--;
     }
@@ -299,13 +308,13 @@ ContactList::digitalContact(int idx) const {
   return nullptr;
 }
 
-DigitalContact *
+DMRContact *
 ContactList::findDigitalContact(unsigned number) const {
   for (int i=0; i<_items.size(); i++) {
-    if (! _items.at(i)->is<DigitalContact>())
+    if (! _items.at(i)->is<DMRContact>())
       continue;
-    if (_items.at(i)->as<DigitalContact>()->number() == number)
-      return _items.at(i)->as<DigitalContact>();
+    if (_items.at(i)->as<DMRContact>()->number() == number)
+      return _items.at(i)->as<DMRContact>();
   }
   return nullptr;
 }
@@ -338,7 +347,7 @@ ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if ("dmr" == type) {
-    return new DigitalContact();
+    return new DMRContact();
   } else if ("dtmf" == type) {
     return new DTMFContact();
   }

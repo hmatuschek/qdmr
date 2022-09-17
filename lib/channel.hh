@@ -13,7 +13,7 @@
 
 class Config;
 class RXGroupList;
-class DigitalContact;
+class DMRContact;
 class ScanList;
 class APRSSystem;
 class PositioningSystem;
@@ -186,13 +186,30 @@ protected:
 };
 
 
-/** Extension to the @c Channel class to implement an analog channel.
- *
- * This class implements all the properties specific to an analog channel. That is, the admit
- * criterion, squelch, RX and TX tones and bandwidth settings.
+/** Base class for all analog channels.
  *
  * @ingroup conf */
 class AnalogChannel: public Channel
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit AnalogChannel(QObject *parent=nullptr);
+
+public:
+  /** Copy constructor. */
+  AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
+};
+
+
+/** Extension to the @c AnalogChannel class to implement an analog FM channel.
+ *
+ * This class implements all the properties specific to an FM channel. That is, the admit
+ * criterion, squelch, RX and TX tones and bandwidth settings.
+ *
+ * @ingroup conf */
+class FMChannel: public AnalogChannel
 {
   Q_OBJECT
 
@@ -223,9 +240,9 @@ public:
 
 public:
   /** Constructs a new empty analog channel. */
-  explicit AnalogChannel(QObject *parent=nullptr);
+  explicit FMChannel(QObject *parent=nullptr);
   /** Copy constructor. */
-  AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
+  FMChannel(const FMChannel &other, QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
@@ -297,13 +314,29 @@ protected:
 };
 
 
+/** Base class of all digital channels.
+ *
+ * @ingroup conf */
+class DigitalChannel: public Channel
+{
+  Q_OBJECT
 
-/** Extension to the @c Channel class to implement an digital (DMR) channel.
+protected:
+  /** Hidden constructor. */
+  explicit DigitalChannel(QObject *parent=nullptr);
+
+public:
+  /** Copy constructor. */
+  DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
+};
+
+
+/** Extension to the @c DigitalChannel class to implement an DMR channel.
  *
  * That is, the admit criterion, color code, time slot, RX group list and TX contact.
  *
  * @ingroup conf */
-class DigitalChannel: public Channel
+class DMRChannel: public DigitalChannel
 {
 	Q_OBJECT
 
@@ -314,11 +347,11 @@ class DigitalChannel: public Channel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(RadioIDReference* radioId READ radioId WRITE setRadioId)
+  Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
   Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
   /** The tx contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
+  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
   Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
@@ -342,9 +375,9 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  DigitalChannel(QObject *parent=nullptr);
+  DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
-  DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
+  DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   void clear();
@@ -376,15 +409,15 @@ public:
   bool setGroupListObj(RXGroupList *rxg);
 
   /** Returns a reference to the transmit contact. */
-  const DigitalContactReference *contact() const;
+  const DMRContactReference *contact() const;
   /** Returns a reference to the transmit contact. */
-  DigitalContactReference *contact();
+  DMRContactReference *contact();
   /** Sets the reference to the transmit contact. */
-  void setContact(DigitalContactReference *ref);
+  void setContact(DMRContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
-  DigitalContact *txContactObj() const;
+  DMRContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
-  bool setTXContactObj(DigitalContact *c);
+  bool setTXContactObj(DMRContact *c);
 
   /** Returns a reference to the positioning system. */
   const PositioningSystemReference *aprs() const;
@@ -409,11 +442,11 @@ public:
   bool setRoamingZone(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const RadioIDReference *radioId() const;
+  const DMRRadioIDReference *radioId() const;
   /** Returns the reference to the radio ID. */
-  RadioIDReference *radioId();
+  DMRRadioIDReference *radioId();
   /** Sets the reference to the radio ID. */
-  void setRadioId(RadioIDReference *ref);
+  void setRadioId(DMRRadioIDReference *ref);
   /** Returns the radio ID associated with this channel. */
   DMRRadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. */
@@ -432,13 +465,13 @@ protected:
   /** The RX group list for this channel. */
   GroupListReference _rxGroup;
   /** The default TX contact. */
-  DigitalContactReference _txContact;
+  DMRContactReference _txContact;
   /** The GPS system. */
   PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
   RoamingZoneReference _roaming;
   /** Radio ID to use on this channel. */
-  RadioIDReference _radioId;
+  DMRRadioIDReference _radioId;
 };
 
 
@@ -489,9 +522,9 @@ public:
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
   /** Finds a digital channel with the given frequencies, time slot and color code. */
-  DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
+  DMRChannel *findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequency. */
-  AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
+  FMChannel *findFMChannelByTxFreq(double freq) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

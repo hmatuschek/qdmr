@@ -79,7 +79,7 @@ CodeplugContext::hasDigitalContact(int index) const {
 }
 
 bool
-CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
+CodeplugContext::addDigitalContact(DMRContact *con, int index) {
   if (_digitalContactTable.contains(index))
     return false;
   //logDebug() << "Register contact '" << con->name() << "' under idx=" << index << ".";
@@ -90,7 +90,7 @@ CodeplugContext::addDigitalContact(DigitalContact *con, int index) {
   return true;
 }
 
-DigitalContact *
+DMRContact *
 CodeplugContext::getDigitalContact(int index) const {
   if (! _digitalContactTable.contains(index))
     return nullptr;
@@ -247,15 +247,15 @@ CodeplugContext::hasRoamingChannel(int index) const {
   return _roamingChannelTable.contains(index);
 }
 
-DigitalChannel *
+DMRChannel *
 CodeplugContext::getRoamingChannel(int index) const {
   if (! _roamingChannelTable.contains(index))
     return nullptr;
-  return _config->channelList()->channel(_roamingChannelTable[index])->as<DigitalChannel>();
+  return _config->channelList()->channel(_roamingChannelTable[index])->as<DMRChannel>();
 }
 
 bool
-CodeplugContext::addRoamingChannel(DigitalChannel *ch, int index) {
+CodeplugContext::addRoamingChannel(DMRChannel *ch, int index) {
   if (_roamingChannelTable.contains(index))
     return false;
   int sidx = _config->channelList()->indexOf(ch);

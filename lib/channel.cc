@@ -344,7 +344,23 @@ Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const Erro
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(QObject *parent)
-  : Channel(parent),
+  : Channel(parent)
+{
+  // pass...
+}
+
+AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
+  : Channel(other, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of FMChannel
+ * ********************************************************************************************* */
+FMChannel::FMChannel(QObject *parent)
+  : AnalogChannel(parent),
     _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
     _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
     _aprsSystem()
@@ -353,8 +369,8 @@ AnalogChannel::AnalogChannel(QObject *parent)
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(parent), _aprsSystem()
+FMChannel::FMChannel(const FMChannel &other, QObject *parent)
+  : AnalogChannel(parent), _aprsSystem()
 {
   copy(other);
   // Link APRS system reference
@@ -362,9 +378,9 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 }
 
 bool
-AnalogChannel::copy(const ConfigItem &other) {
-  const AnalogChannel *c = other.as<AnalogChannel>();
-  if ((nullptr==c) || (! Channel::copy(other)))
+FMChannel::copy(const ConfigItem &other) {
+  const FMChannel *c = other.as<FMChannel>();
+  if ((nullptr==c) || (! AnalogChannel::copy(other)))
     return false;
 
   setRXTone(c->rxTone());
@@ -374,8 +390,8 @@ AnalogChannel::copy(const ConfigItem &other) {
 }
 
 ConfigItem *
-AnalogChannel::clone() const {
-  AnalogChannel *c = new AnalogChannel();
+FMChannel::clone() const {
+  FMChannel *c = new FMChannel();
   if (! c->copy(*this)) {
     c->deleteLater();
     return nullptr;
@@ -384,8 +400,8 @@ AnalogChannel::clone() const {
 }
 
 void
-AnalogChannel::clear() {
-  Channel::clear();
+FMChannel::clear() {
+  AnalogChannel::clear();
   setAdmit(Admit::Always);
   setSquelchDefault();
   setRXTone(Signaling::SIGNALING_NONE);
@@ -394,105 +410,105 @@ AnalogChannel::clear() {
   setAPRSSystem(nullptr);
 }
 
-AnalogChannel::Admit
-AnalogChannel::admit() const {
+FMChannel::Admit
+FMChannel::admit() const {
   return _admit;
 }
 void
-AnalogChannel::setAdmit(Admit admit) {
+FMChannel::setAdmit(Admit admit) {
   _admit = admit;
   emit modified(this);
 }
 
 bool
-AnalogChannel::defaultSquelch() const {
+FMChannel::defaultSquelch() const {
   return std::numeric_limits<unsigned>::max()==squelch();
 }
 bool
-AnalogChannel::squelchDisabled() const {
+FMChannel::squelchDisabled() const {
   return 0==squelch();
 }
 unsigned
-AnalogChannel::squelch() const {
+FMChannel::squelch() const {
   return _squelch;
 }
 bool
-AnalogChannel::setSquelch(unsigned val) {
+FMChannel::setSquelch(unsigned val) {
   _squelch = val;
   emit modified(this);
   return true;
 }
 void
-AnalogChannel::disableSquelch() {
+FMChannel::disableSquelch() {
   setSquelch(0);
 }
 void
-AnalogChannel::setSquelchDefault() {
+FMChannel::setSquelchDefault() {
   setSquelch(std::numeric_limits<unsigned>::max());
 }
 
 Signaling::Code
-AnalogChannel::rxTone() const {
+FMChannel::rxTone() const {
   return _rxTone;
 }
 bool
-AnalogChannel::setRXTone(Signaling::Code code) {
+FMChannel::setRXTone(Signaling::Code code) {
   _rxTone = code;
   emit modified(this);
   return true;
 }
 
 Signaling::Code
-AnalogChannel::txTone() const {
+FMChannel::txTone() const {
   return _txTone;
 }
 bool
-AnalogChannel::setTXTone(Signaling::Code code) {
+FMChannel::setTXTone(Signaling::Code code) {
   _txTone = code;
   emit modified(this);
   return true;
 }
 
-AnalogChannel::Bandwidth
-AnalogChannel::bandwidth() const {
+FMChannel::Bandwidth
+FMChannel::bandwidth() const {
   return _bw;
 }
 bool
-AnalogChannel::setBandwidth(Bandwidth bw) {
+FMChannel::setBandwidth(Bandwidth bw) {
   _bw = bw;
   emit modified(this);
   return true;
 }
 
 const APRSSystemReference *
-AnalogChannel::aprs() const {
+FMChannel::aprs() const {
   return &_aprsSystem;
 }
 
 APRSSystemReference *
-AnalogChannel::aprs() {
+FMChannel::aprs() {
   return &_aprsSystem;
 }
 
 void
-AnalogChannel::setAPRS(APRSSystemReference *ref) {
+FMChannel::setAPRS(APRSSystemReference *ref) {
   if (nullptr == ref)
     return _aprsSystem.clear();
   _aprsSystem.copy(ref);
 }
 
 APRSSystem *
-AnalogChannel::aprsSystem() const {
+FMChannel::aprsSystem() const {
   return _aprsSystem.as<APRSSystem>();
 }
 void
-AnalogChannel::setAPRSSystem(APRSSystem *sys) {
+FMChannel::setAPRSSystem(APRSSystem *sys) {
   _aprsSystem.set(sys);
 }
 
 YAML::Node
-AnalogChannel::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = Channel::serialize(context, err);
+FMChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = AnalogChannel::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -502,8 +518,8 @@ AnalogChannel::serialize(const Context &context, const ErrorStack &err) {
 }
 
 bool
-AnalogChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! Channel::populate(node, context, err))
+FMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! AnalogChannel::populate(node, context, err))
     return false;
 
   if (Signaling::SIGNALING_NONE != _rxTone) {
@@ -541,7 +557,7 @@ AnalogChannel::populate(YAML::Node &node, const Context &context, const ErrorSta
 }
 
 bool
-AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
@@ -581,7 +597,7 @@ AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err
     setSquelch(ch["squelch"].as<unsigned>());
   }
 
-  return Channel::parse(node, ctx, err);
+  return AnalogChannel::parse(node, ctx, err);
 }
 
 
@@ -589,7 +605,23 @@ AnalogChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err
  * Implementation of DigitalChannel
  * ********************************************************************************************* */
 DigitalChannel::DigitalChannel(QObject *parent)
-  : Channel(parent), _admit(Admit::Always),
+  : Channel(parent)
+{
+  // pass...
+}
+
+DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
+  : Channel(other, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DMRChannel
+ * ********************************************************************************************* */
+DMRChannel::DMRChannel(QObject *parent)
+  : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
@@ -610,8 +642,8 @@ DigitalChannel::DigitalChannel(QObject *parent)
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
-  : Channel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+DMRChannel::DMRChannel(const DMRChannel &other, QObject *parent)
+  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
 {
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
@@ -630,8 +662,8 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
 }
 
 void
-DigitalChannel::clear() {
-  Channel::clear();
+DMRChannel::clear() {
+  DigitalChannel::clear();
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupListObj(nullptr);
@@ -642,8 +674,8 @@ DigitalChannel::clear() {
 }
 
 ConfigItem *
-DigitalChannel::clone() const {
-  DigitalChannel *c = new DigitalChannel();
+DMRChannel::clone() const {
+  DMRChannel *c = new DMRChannel();
   if (! c->copy(*this)) {
     c->deleteLater();
     return nullptr;
@@ -651,22 +683,22 @@ DigitalChannel::clone() const {
   return c;
 }
 
-DigitalChannel::Admit
-DigitalChannel::admit() const {
+DMRChannel::Admit
+DMRChannel::admit() const {
   return _admit;
 }
 void
-DigitalChannel::setAdmit(Admit admit) {
+DMRChannel::setAdmit(Admit admit) {
   _admit = admit;
   emit modified(this);
 }
 
 unsigned
-DigitalChannel::colorCode() const {
+DMRChannel::colorCode() const {
   return _colorCode;
 }
 bool
-DigitalChannel::setColorCode(unsigned cc) {
+DMRChannel::setColorCode(unsigned cc) {
   if (15 < cc) {
     logWarn() << "Color-code " << cc << " is not in range [0,15], set to 15.";
     cc = 15;
@@ -676,29 +708,29 @@ DigitalChannel::setColorCode(unsigned cc) {
   return true;
 }
 
-DigitalChannel::TimeSlot
-DigitalChannel::timeSlot() const {
+DMRChannel::TimeSlot
+DMRChannel::timeSlot() const {
   return _timeSlot;
 }
 bool
-DigitalChannel::setTimeSlot(TimeSlot slot) {
+DMRChannel::setTimeSlot(TimeSlot slot) {
   _timeSlot = slot;
   emit modified(this);
   return true;
 }
 
 const GroupListReference *
-DigitalChannel::groupList() const {
+DMRChannel::groupList() const {
   return &_rxGroup;
 }
 
 GroupListReference *
-DigitalChannel::groupList() {
+DMRChannel::groupList() {
   return &_rxGroup;
 }
 
 void
-DigitalChannel::setGroupList(GroupListReference *ref) {
+DMRChannel::setGroupList(GroupListReference *ref) {
   if (nullptr == ref)
     _rxGroup.clear();
   else
@@ -706,43 +738,43 @@ DigitalChannel::setGroupList(GroupListReference *ref) {
 }
 
 RXGroupList *
-DigitalChannel::groupListObj() const {
+DMRChannel::groupListObj() const {
   return _rxGroup.as<RXGroupList>();
 }
 
 bool
-DigitalChannel::setGroupListObj(RXGroupList *g) {
+DMRChannel::setGroupListObj(RXGroupList *g) {
   if(! _rxGroup.set(g))
     return false;
   emit modified(this);
   return true;
 }
 
-const DigitalContactReference *
-DigitalChannel::contact() const {
+const DMRContactReference *
+DMRChannel::contact() const {
   return &_txContact;
 }
 
-DigitalContactReference *
-DigitalChannel::contact() {
+DMRContactReference *
+DMRChannel::contact() {
   return &_txContact;
 }
 
 void
-DigitalChannel::setContact(DigitalContactReference *ref) {
+DMRChannel::setContact(DMRContactReference *ref) {
   if (nullptr == ref)
     _txContact.clear();
   else
     _txContact.copy(ref);
 }
 
-DigitalContact *
-DigitalChannel::txContactObj() const {
-  return _txContact.as<DigitalContact>();
+DMRContact *
+DMRChannel::txContactObj() const {
+  return _txContact.as<DMRContact>();
 }
 
 bool
-DigitalChannel::setTXContactObj(DigitalContact *c) {
+DMRChannel::setTXContactObj(DMRContact *c) {
   if(! _txContact.set(c))
     return false;
   emit modified(this);
@@ -750,17 +782,17 @@ DigitalChannel::setTXContactObj(DigitalContact *c) {
 }
 
 const PositioningSystemReference *
-DigitalChannel::aprs() const {
+DMRChannel::aprs() const {
   return &_posSystem;
 }
 
 PositioningSystemReference *
-DigitalChannel::aprs() {
+DMRChannel::aprs() {
   return &_posSystem;
 }
 
 void
-DigitalChannel::setAPRS(PositioningSystemReference *ref) {
+DMRChannel::setAPRS(PositioningSystemReference *ref) {
   if (nullptr == ref)
     _posSystem.clear();
   else
@@ -768,12 +800,12 @@ DigitalChannel::setAPRS(PositioningSystemReference *ref) {
 }
 
 PositioningSystem *
-DigitalChannel::aprsObj() const {
+DMRChannel::aprsObj() const {
   return _posSystem.as<PositioningSystem>();
 }
 
 bool
-DigitalChannel::setAPRSObj(PositioningSystem *sys) {
+DMRChannel::setAPRSObj(PositioningSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);
@@ -781,17 +813,17 @@ DigitalChannel::setAPRSObj(PositioningSystem *sys) {
 }
 
 const RoamingZoneReference *
-DigitalChannel::roaming() const {
+DMRChannel::roaming() const {
   return &_roaming;
 }
 
 RoamingZoneReference *
-DigitalChannel::roaming() {
+DMRChannel::roaming() {
   return &_roaming;
 }
 
 void
-DigitalChannel::setRoaming(RoamingZoneReference *ref) {
+DMRChannel::setRoaming(RoamingZoneReference *ref) {
   if (nullptr == ref)
     _roaming.clear();
   else
@@ -799,29 +831,29 @@ DigitalChannel::setRoaming(RoamingZoneReference *ref) {
 }
 
 RoamingZone *
-DigitalChannel::roamingZone() const {
+DMRChannel::roamingZone() const {
   return _roaming.as<RoamingZone>();
 }
 
 bool
-DigitalChannel::setRoamingZone(RoamingZone *zone) {
+DMRChannel::setRoamingZone(RoamingZone *zone) {
   _roaming.set(zone);
   emit modified(this);
   return true;
 }
 
-const RadioIDReference *
-DigitalChannel::radioId() const {
+const DMRRadioIDReference *
+DMRChannel::radioId() const {
   return &_radioId;
 }
 
-RadioIDReference *
-DigitalChannel::radioId() {
+DMRRadioIDReference *
+DMRChannel::radioId() {
   return &_radioId;
 }
 
 void
-DigitalChannel::setRadioId(RadioIDReference *ref) {
+DMRChannel::setRadioId(DMRRadioIDReference *ref) {
   if (nullptr == ref)
     _radioId.clear();
   else
@@ -829,12 +861,12 @@ DigitalChannel::setRadioId(RadioIDReference *ref) {
 }
 
 DMRRadioID *
-DigitalChannel::radioIdObj() const {
+DMRChannel::radioIdObj() const {
   return _radioId.as<DMRRadioID>();
 }
 
 bool
-DigitalChannel::setRadioIdObj(DMRRadioID *id) {
+DMRChannel::setRadioIdObj(DMRRadioID *id) {
   if (! _radioId.set(id))
     return false;
   emit modified(this);
@@ -842,8 +874,8 @@ DigitalChannel::setRadioIdObj(DMRRadioID *id) {
 }
 
 YAML::Node
-DigitalChannel::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = Channel::serialize(context, err);
+DMRChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalChannel::serialize(context, err);
   if (node.IsNull())
     return node;
 
@@ -911,16 +943,16 @@ ChannelList::channel(int idx) const {
   return nullptr;
 }
 
-DigitalChannel *
-ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const {
+DMRChannel *
+ChannelList::findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsigned cc) const {
   for (int i=0; i<count(); i++) {
-    if (! _items[i]->is<DigitalChannel>())
+    if (! _items[i]->is<DMRChannel>())
       continue;
     /// @bug I should certainly change the frequency handling to integer values!
     if ( (1e-6<std::abs(channel(i)->txFrequency()-tx)) ||
          (1e-6<std::abs(channel(i)->rxFrequency()-rx)) )
       continue;
-    DigitalChannel *digi = channel(i)->as<DigitalChannel>();
+    DMRChannel *digi = channel(i)->as<DMRChannel>();
     if (digi->timeSlot() != ts)
       continue;
     if (digi->colorCode() != cc)
@@ -930,13 +962,13 @@ ChannelList::findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot t
   return nullptr;
 }
 
-AnalogChannel *
-ChannelList::findAnalogChannelByTxFreq(double freq) const {
+FMChannel *
+ChannelList::findFMChannelByTxFreq(double freq) const {
   for (int i=0; i<count(); i++) {
-    if (! channel(i)->is<AnalogChannel>())
+    if (! channel(i)->is<FMChannel>())
       continue;
     if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
-      return channel(i)->as<AnalogChannel>();
+      return channel(i)->as<FMChannel>();
   }
   return nullptr;
 }
@@ -955,9 +987,9 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if (("digital" == type) || ("dmr" == type)) {
-    return new DigitalChannel();
+    return new DMRChannel();
   } else if (("analog" == type) || ("fm"==type)) {
-    return new AnalogChannel();
+    return new FMChannel();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

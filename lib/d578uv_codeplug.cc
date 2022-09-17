@@ -214,13 +214,13 @@ bool
 D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  QVector<DigitalContact*> contacts;
+  QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
   for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
     uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
     uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
     ContactElement con(data(addr));
-    DigitalContact *contact = ctx.config()->contacts()->digitalContact(i);
+    DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
     ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
@@ -228,12 +228,12 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   }
   // encode index map for contacts
   std::sort(contacts.begin(), contacts.end(),
-            [](DigitalContact *a, DigitalContact *b) {
+            [](DMRContact *a, DMRContact *b) {
     return a->number() < b->number();
   });
   for (int i=0; i<contacts.size(); i++) {
     ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
-    el.setID(contacts[i]->number(), (DigitalContact::GroupCall==contacts[i]->type()));
+    el.setID(contacts[i]->number(), (DMRContact::GroupCall==contacts[i]->type()));
     el.setIndex(ctx.index(contacts[i]));
   }
   return true;

@@ -44,15 +44,15 @@ RoamingZone::clear() {
   _channel.clear();
 }
 
-DigitalChannel *
+DMRChannel *
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
     return nullptr;
-  return _channel.get(idx)->as<DigitalChannel>();
+  return _channel.get(idx)->as<DMRChannel>();
 }
 
 int
-RoamingZone::addChannel(DigitalChannel *ch, int row) {
+RoamingZone::addChannel(DMRChannel *ch, int row) {
   row = _channel.add(ch, row);
   if (0 > row)
     return row;
@@ -66,16 +66,16 @@ RoamingZone::remChannel(int row) {
 }
 
 bool
-RoamingZone::remChannel(DigitalChannel *ch) {
+RoamingZone::remChannel(DMRChannel *ch) {
   return _channel.del(ch);
 }
 
-const DigitalChannelRefList *
+const DMRChannelRefList *
 RoamingZone::channels() const {
   return &_channel;
 }
 
-DigitalChannelRefList *
+DMRChannelRefList *
 RoamingZone::channels() {
   return &_channel;
 }
@@ -109,15 +109,15 @@ RoamingZoneList::RoamingZoneList(QObject *parent)
   // pass...
 }
 
-QSet<DigitalChannel *>
+QSet<DMRChannel *>
 RoamingZoneList::uniqueChannels() const {
-  QSet<DigitalChannel *> channels;
+  QSet<DMRChannel *> channels;
   uniqueChannels(channels);
   return channels;
 }
 
 void
-RoamingZoneList::uniqueChannels(QSet<DigitalChannel *> &channels) const {
+RoamingZoneList::uniqueChannels(QSet<DMRChannel *> &channels) const {
   for (int i=0; i<count(); i++) {
     RoamingZone *zone = this->zone(i);
     for (int j=0; j<zone->count(); j++) {

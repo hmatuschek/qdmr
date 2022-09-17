@@ -42,13 +42,13 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   /* Define limits for contacts. */
   add("contacts",
       new RadioLimitList{
-        { DigitalContact::staticMetaObject, 1, 1024, new RadioLimitObject {
+        { DMRContact::staticMetaObject, 1, 1024, new RadioLimitObject {
             { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
             { "ring", new RadioLimitBool() },
             { "type", new RadioLimitEnum{
-                (unsigned)DigitalContact::PrivateCall,
-                (unsigned)DigitalContact::GroupCall,
-                (unsigned)DigitalContact::AllCall
+                (unsigned)DMRContact::PrivateCall,
+                (unsigned)DMRContact::GroupCall,
+                (unsigned)DMRContact::AllCall
               }},
             { "number", new RadioLimitUInt(0, 16777215) }
           } },
@@ -65,7 +65,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
             RXGroupList::staticMetaObject, 1, 76, new RadioLimitObject {
               { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
               // allow for any digital contact reference
-              { "contacts", new RadioLimitRefList(1, 32, DigitalContact::staticMetaObject) }
+              { "contacts", new RadioLimitRefList(1, 32, DMRContact::staticMetaObject) }
         }));
 
   /* Define limits for channel list. */
@@ -73,7 +73,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
       new RadioLimitList(
         Channel::staticMetaObject, 1, 1024, // < up to 1024 channels
         new RadioLimitObjects {
-          { AnalogChannel::staticMetaObject,
+          { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
               {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
@@ -84,21 +84,21 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
-                 (unsigned)AnalogChannel::Admit::Always,
-                 (unsigned)AnalogChannel::Admit::Free,
-                 (unsigned)AnalogChannel::Admit::Tone
+                 (unsigned)FMChannel::Admit::Always,
+                 (unsigned)FMChannel::Admit::Free,
+                 (unsigned)FMChannel::Admit::Tone
                } },
               {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"bandwidth", new RadioLimitEnum{
-                 (unsigned)AnalogChannel::Bandwidth::Narrow,
-                 (unsigned)AnalogChannel::Bandwidth::Wide
+                 (unsigned)FMChannel::Bandwidth::Narrow,
+                 (unsigned)FMChannel::Bandwidth::Wide
                }},
               {"aprs", new RadioLimitObjRefIgnored()},
               /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored()},
               {"tyt", new RadioLimitIgnored()}
             } },
-          { DigitalChannel::staticMetaObject,
+          { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
               {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
@@ -109,16 +109,16 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
-                 unsigned(DigitalChannel::Admit::Always),
-                 unsigned(DigitalChannel::Admit::Free),
-                 unsigned(DigitalChannel::Admit::ColorCode) } },
+                 unsigned(DMRChannel::Admit::Always),
+                 unsigned(DMRChannel::Admit::Free),
+                 unsigned(DMRChannel::Admit::ColorCode) } },
               {"colorCode", new RadioLimitUInt(0,16)},
               {"timeSlot", new RadioLimitEnum {
-                 unsigned(DigitalChannel::TimeSlot::TS1),
-                 unsigned(DigitalChannel::TimeSlot::TS2) } },
+                 unsigned(DMRChannel::TimeSlot::TS1),
+                 unsigned(DMRChannel::TimeSlot::TS2) } },
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
-              {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
+              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
               {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               /// @todo handle OpenGD77 extension

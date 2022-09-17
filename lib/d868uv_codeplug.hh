@@ -8,7 +8,7 @@
 #include "codeplugcontext.hh"
 
 class Channel;
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;

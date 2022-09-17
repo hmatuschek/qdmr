@@ -191,8 +191,8 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
-  if (c->is<DigitalChannel>()) {
-    DigitalChannel *dc = c->as<DigitalChannel>();
+  if (c->is<DMRChannel>()) {
+    DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
     if (txDigitalAPRS() && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
@@ -203,8 +203,8 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
       dc->setRoamingZone(DefaultRoamingZone::get());
-  } else if (c->is<AnalogChannel>()) {
-    AnalogChannel *ac = c->as<AnalogChannel>();
+  } else if (c->is<FMChannel>()) {
+    FMChannel *ac = c->as<FMChannel>();
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
@@ -219,7 +219,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
-  if (const DigitalChannel *dc = c->as<DigitalChannel>()) {
+  if (const DMRChannel *dc = c->as<DMRChannel>()) {
     // Set GPS system index
     enableRXAPRS(false);
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
@@ -233,7 +233,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Enable roaming
     if (dc->roaming())
       enableRoaming(true);
-  } else if (const AnalogChannel *ac = c->as<AnalogChannel>()) {
+  } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
     enableRXAPRS(false);
     if (nullptr != ac->aprsSystem()) {
@@ -300,19 +300,19 @@ D878UVCodeplug::RoamingChannelElement::disableColorCode() {
   setUInt8(Offsets::ColorCode, ColorCodeValue::Disabled);
 }
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 D878UVCodeplug::RoamingChannelElement::timeSlot() const {
   switch (getUInt8(Offsets::TimeSlot)) {
-  case TimeSlotValue::TS1: return DigitalChannel::TimeSlot::TS1;
-  case TimeSlotValue::TS2: return DigitalChannel::TimeSlot::TS2;
+  case TimeSlotValue::TS1: return DMRChannel::TimeSlot::TS1;
+  case TimeSlotValue::TS2: return DMRChannel::TimeSlot::TS2;
   }
-  return DigitalChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-D878UVCodeplug::RoamingChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
+D878UVCodeplug::RoamingChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   switch (ts) {
-  case DigitalChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
-  case DigitalChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
   }
 }
 
@@ -326,7 +326,7 @@ D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
 }
 
 bool
-D878UVCodeplug::RoamingChannelElement::fromChannel(const DigitalChannel *ch) {
+D878UVCodeplug::RoamingChannelElement::fromChannel(const DMRChannel *ch) {
   setName(ch->name());
   setRXFrequency(ch->rxFrequency()*1e6);
   setTXFrequency(ch->txFrequency()*1e6);
@@ -335,14 +335,14 @@ D878UVCodeplug::RoamingChannelElement::fromChannel(const DigitalChannel *ch) {
   return true;
 }
 
-DigitalChannel *
+DMRChannel *
 D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   // Find matching channel for RX, TX frequency, TS and CC
-  DigitalChannel *digi = ctx.config()->channelList()->findDigitalChannel(
+  DMRChannel *digi = ctx.config()->channelList()->findDMRChannel(
         rxFrequency()/1e6, txFrequency()/1e6, timeSlot(), colorCode());
   if (nullptr == digi) {
     // If no matching channel can be found -> create one
-    digi = new DigitalChannel();
+    digi = new DMRChannel();
     digi->setName(name());
     digi->setRXFrequency(rxFrequency()/1e6);
     digi->setTXFrequency(txFrequency()/1e6);
@@ -405,7 +405,7 @@ D878UVCodeplug::RoamingZoneElement::setName(const QString &name) {
 
 bool
 D878UVCodeplug::RoamingZoneElement::fromRoamingZone(
-    RoamingZone *zone, const QHash<DigitalChannel *, unsigned> &map)
+    RoamingZone *zone, const QHash<DMRChannel *, unsigned> &map)
 {
   clear();
   setName(zone->name());
@@ -422,10 +422,10 @@ D878UVCodeplug::RoamingZoneElement::toRoamingZone() const {
 
 bool
 D878UVCodeplug::RoamingZoneElement::linkRoamingZone(
-    RoamingZone *zone, const QHash<unsigned, DigitalChannel*> &map)
+    RoamingZone *zone, const QHash<unsigned, DMRChannel*> &map)
 {
   for (uint8_t i=0; (i<NUM_CH_PER_ROAMINGZONE)&&hasMember(i); i++) {
-    DigitalChannel *digi = nullptr;
+    DMRChannel *digi = nullptr;
     if (map.contains(member(i))) {
       // If matching index is known -> resolve directly
       digi = map.value(member(i));
@@ -1609,16 +1609,16 @@ D878UVCodeplug::AnalogAPRSSettingsElement::toAPRSSystem() {
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  AnalogChannel *ch = ctx.config()->channelList()->findAnalogChannelByTxFreq(frequency()/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(frequency()/1e6);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
-    ch = new AnalogChannel();
+    ch = new FMChannel();
     ch->setName("APRS Channel");
     ch->setRXFrequency(frequency()/1e6);
     ch->setTXFrequency(frequency()/1e6);
     ch->setPower(power());
     ch->setTXTone(txTone());
-    ch->setBandwidth(AnalogChannel::Bandwidth::Wide);
+    ch->setBandwidth(FMChannel::Bandwidth::Wide);
     logInfo() << "No matching APRS channel found for TX frequency " << frequency()/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
@@ -1826,21 +1826,21 @@ D878UVCodeplug::DMRAPRSSystemsElement::setDestination(unsigned n, unsigned idx) 
   setBCD8_be(0x0010 + 4*n, idx);
 }
 
-DigitalContact::Type
+DMRContact::Type
 D878UVCodeplug::DMRAPRSSystemsElement::callType(unsigned n) const {
   switch(getUInt8(0x0030 + n)) {
-  case 0: return DigitalContact::PrivateCall;
-  case 1: return DigitalContact::GroupCall;
-  case 2: return DigitalContact::AllCall;
+  case 0: return DMRContact::PrivateCall;
+  case 1: return DMRContact::GroupCall;
+  case 2: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setCallType(unsigned n, DigitalContact::Type type) {
+D878UVCodeplug::DMRAPRSSystemsElement::setCallType(unsigned n, DMRContact::Type type) {
   switch(type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
-  case DigitalContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
-  case DigitalContact::AllCall: setUInt8(0x0030+n, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
+  case DMRContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
+  case DMRContact::AllCall: setUInt8(0x0030+n, 0x02); break;
   }
 }
 
@@ -1848,19 +1848,19 @@ bool
 D878UVCodeplug::DMRAPRSSystemsElement::timeSlotOverride(unsigned n) {
   return 0x00 != getUInt8(0x0039 + n);
 }
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(unsigned n) const {
   switch (getUInt8(0x0039 + n)) {
-  case 1: return DigitalChannel::TimeSlot::TS1;
-  case 2: return DigitalChannel::TimeSlot::TS2;
+  case 1: return DMRChannel::TimeSlot::TS1;
+  case 2: return DMRChannel::TimeSlot::TS2;
   }
-  return DigitalChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(unsigned n, DigitalChannel::TimeSlot ts) {
+D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
   switch (ts) {
-  case DigitalChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
-  case DigitalChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
+  case DMRChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
   }
 }
 void
@@ -1928,14 +1928,14 @@ D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Co
   // if a revert channel is defined -> link to it
   if (channelIsSelected(idx))
     sys->setRevertChannel(nullptr);
-  else if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DigitalChannel>())
-    sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DigitalChannel>());
+  else if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DMRChannel>())
+    sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DigitalContact *cont = ctx.config()->contacts()->findDigitalContact(destination(idx));
+  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(destination(idx));
   // If no matching contact is found, create one
   if (nullptr == cont) {
-    cont = new DigitalContact(callType(idx), tr("GPS #%1 Contact").arg(idx+1),
+    cont = new DMRContact(callType(idx), tr("GPS #%1 Contact").arg(idx+1),
                               destination(idx), false);
     ctx.config()->contacts()->add(cont);
   }
@@ -2190,7 +2190,7 @@ D878UVCodeplug::setBitmaps(Config *config)
   uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
   // Get all (unique) channels used in roaming
-  QSet<DigitalChannel*> roaming_channels;
+  QSet<DMRChannel*> roaming_channels;
   config->roaming()->uniqueChannels(roaming_channels);
   for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,roaming_channels.count()); i++)
     roaming_ch_bitmap[i/8] |= (1<<(i%8));
@@ -2507,13 +2507,13 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode roaming channels
-  QHash<DigitalChannel *, unsigned> roaming_ch_map;
+  QHash<DMRChannel *, unsigned> roaming_ch_map;
   {
     // Get set of unique roaming channels
-    QSet<DigitalChannel*> roaming_channels;
+    QSet<DMRChannel*> roaming_channels;
     ctx.config()->roaming()->uniqueChannels(roaming_channels);
     // Encode channels and store in index<->channel map
-    int i=0; QSet<DigitalChannel*>::iterator ch=roaming_channels.begin();
+    int i=0; QSet<DMRChannel*>::iterator ch=roaming_channels.begin();
     for(; ch != roaming_channels.end(); ch++, i++) {
       roaming_ch_map[*ch] = i;
       uint32_t addr = ADDR_ROAMING_CHANNEL_0+i*ROAMING_CHANNEL_OFFSET;
@@ -2539,7 +2539,7 @@ bool
 D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  QHash<unsigned, DigitalChannel*> map;
+  QHash<unsigned, DMRChannel*> map;
   // Create or find roaming channels
   uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
@@ -2548,7 +2548,7 @@ D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
       continue;
     uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
     RoamingChannelElement ch(data(addr));
-    if (DigitalChannel *digi = ch.toChannel(ctx))
+    if (DMRChannel *digi = ch.toChannel(ctx))
       map.insert(i, digi);
   }
 

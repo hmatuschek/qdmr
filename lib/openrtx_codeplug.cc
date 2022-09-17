@@ -400,16 +400,16 @@ OpenRTXCodeplug::ChannelElement::setTXColorCode(unsigned int cc) {
 }
 
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 OpenRTXCodeplug::ChannelElement::timeslot() const {
   if (1 == getUInt8(OffsetTimeSlot))
-    return DigitalChannel::TimeSlot::TS1;
-  return DigitalChannel::TimeSlot::TS2;
+    return DMRChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS2;
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setTimeslot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+OpenRTXCodeplug::ChannelElement::setTimeslot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setUInt8(OffsetTimeSlot, 1);
   else
     setUInt8(OffsetTimeSlot, 2);
@@ -530,17 +530,17 @@ OpenRTXCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const Erro
 
   Channel *ch = nullptr;
   if (Mode_FM == mode()) {
-    AnalogChannel *an = new AnalogChannel(); ch = an;
+    FMChannel *an = new FMChannel(); ch = an;
     switch(bandwidth()) {
-    case BW_12_5kHz: an->setBandwidth(AnalogChannel::Bandwidth::Narrow); break;
+    case BW_12_5kHz: an->setBandwidth(FMChannel::Bandwidth::Narrow); break;
     case BW_20kHz:
-    case BW_25kHz: an->setBandwidth(AnalogChannel::Bandwidth::Wide); break;
+    case BW_25kHz: an->setBandwidth(FMChannel::Bandwidth::Wide); break;
     }
     an->setRXTone(rxTone());
     an->setTXTone(txTone());
   } else if (Mode_DMR == mode()) {
-    DigitalChannel *dmr = new DigitalChannel(); ch = dmr;
-    dmr->setAdmit(DigitalChannel::Admit::ColorCode);
+    DMRChannel *dmr = new DMRChannel(); ch = dmr;
+    dmr->setAdmit(DMRChannel::Admit::ColorCode);
     dmr->setColorCode(rxColorCode());
     dmr->setTimeSlot(timeslot());
   }
@@ -576,7 +576,7 @@ OpenRTXCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const 
     errMsg(err) << "Cannot link M17 channel '" << c->name() << "', not implemented yet.";
     return false;
   } else if (Mode_DMR == mode()) {
-    DigitalChannel *dmr = c->as<DigitalChannel>();
+    DMRChannel *dmr = c->as<DMRChannel>();
 
     // Link group list, if set
     /*if (hasGroupListIndex()) {
@@ -590,12 +590,12 @@ OpenRTXCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const 
 
     // Link contact, if set
     if (hasDMRContactIndex()) {
-      if (! ctx.has<DigitalContact>(dmrContactIndex())) {
+      if (! ctx.has<DMRContact>(dmrContactIndex())) {
         errMsg(err) << "Cannot link DMR contact index " << dmrContactIndex()
                     << " for channel '" << c->name() << "': Index not found.";
         return false;
       }
-      dmr->setTXContactObj(ctx.get<DigitalContact>(dmrContactIndex()));
+      dmr->setTXContactObj(ctx.get<DMRContact>(dmrContactIndex()));
     }
   }
 
@@ -633,13 +633,13 @@ OpenRTXCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, 
     setScanListIndex(ctx.index(c->scanList()));
   clearGroupListIndex();
 
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *fm = c->as<AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *fm = c->as<FMChannel>();
     setMode(Mode_FM);
     setRXTone(fm->rxTone(), err);
     setTXTone(fm->txTone(), err);
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dmr = c->as<DigitalChannel>();
+  } else if (c->is<DMRChannel>()) {
+    const DMRChannel *dmr = c->as<DMRChannel>();
     setMode(Mode_DMR);
     if (! dmr->groupList()->isNull())
       setGroupListIndex(ctx.index(dmr->groupListObj()));
@@ -728,13 +728,13 @@ OpenRTXCodeplug::ContactElement::enableDMRRing(bool enable) {
 }
 
 
-DigitalContact::Type
+DMRContact::Type
 OpenRTXCodeplug::ContactElement::dmrContactType() const {
   // This is not specified yet?!?
-  return (DigitalContact::Type)getUInt2(OffsetDMRCallType, BitDMRCallType);
+  return (DMRContact::Type)getUInt2(OffsetDMRCallType, BitDMRCallType);
 }
 void
-OpenRTXCodeplug::ContactElement::setDMRContactType(DigitalContact::Type type) {
+OpenRTXCodeplug::ContactElement::setDMRContactType(DMRContact::Type type) {
   setUInt2(OffsetDMRCallType, BitDMRCallType, type);
 }
 
@@ -782,7 +782,7 @@ OpenRTXCodeplug::ContactElement::setM17Call(const QString &call, const ErrorStac
   return true;
 }
 
-DigitalContact *
+DMRContact *
 OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
 
@@ -796,7 +796,7 @@ OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &er
     return nullptr;
   }
 
-  DigitalContact *contact = new DigitalContact();
+  DMRContact *contact = new DMRContact();
   contact->setName(name());
   contact->setNumber(dmrId());
   contact->setType(dmrContactType());
@@ -806,7 +806,7 @@ OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &er
 }
 
 void
-OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx, const ErrorStack &err) {
+OpenRTXCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err)
   setMode(Mode_DMR);
   setName(cont->name());
@@ -956,8 +956,8 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map DMR contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DigitalContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
     }
   }
 
@@ -1070,16 +1070,16 @@ OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx
   Q_UNUSED(flags)
 
   /// @todo Limit number of contacts.
-  unsigned int numContacts = ctx.count<DigitalContact>();
+  unsigned int numContacts = ctx.count<DMRContact>();
   HeaderElement(data(0x0000)).setContactCount(numContacts);
   image(0).addElement(offsetContact(0), numContacts*ContactSize);
 
   for (int i=0,c=0; i<config->contacts()->count(); i++) {
-    if (! config->contacts()->contact(i)->is<DigitalContact>())
+    if (! config->contacts()->contact(i)->is<DMRContact>())
       continue;
     ContactElement contact(data(offsetContact(c)));
     contact.fromContactObj(
-          config->contacts()->contact(i)->as<DigitalContact>(), ctx, err);
+          config->contacts()->contact(i)->as<DMRContact>(), ctx, err);
     c++;
   }
 
@@ -1091,7 +1091,7 @@ OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &
   unsigned int numContacts = HeaderElement(data(0x0000)).contactCount();
 
   for (unsigned int i=0; i<numContacts; i++) {
-    DigitalContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
+    DMRContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
     if (nullptr == contact) {
       errMsg(err) << "Cannot create " << (i+1) << "-th contact.";
       return false;

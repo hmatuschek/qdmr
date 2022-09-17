@@ -10,7 +10,7 @@ namespace Ui {
 class QCompleter;
 class UserDatabase;
 class TalkGroupDatabase;
-class DigitalContact;
+class DMRContact;
 class Config;
 
 class DMRContactDialog : public QDialog
@@ -19,11 +19,11 @@ class DMRContactDialog : public QDialog
 
 public:
   explicit DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent=nullptr);
-  explicit DMRContactDialog(DigitalContact *contact, UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent=nullptr);
+  explicit DMRContactDialog(DMRContact *contact, UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent=nullptr);
   ~DMRContactDialog();
 
 public:
-  DigitalContact *contact();
+  DMRContact *contact();
 
 protected slots:
   void onTypeChanged(int idx);
@@ -33,8 +33,8 @@ protected:
   void construct();
 
 private:
-  DigitalContact *_myContact;
-  DigitalContact *_contact;
+  DMRContact *_myContact;
+  DMRContact *_contact;
   QCompleter *_user_completer;
   QCompleter *_tg_completer;
   Config *_config;

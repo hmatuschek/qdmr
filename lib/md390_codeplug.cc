@@ -282,7 +282,7 @@ MD390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &er
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
       continue;
-    if (DigitalContact *obj = cont.toContactObj()) {
+    if (DMRContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid contact at index " << i << ".";

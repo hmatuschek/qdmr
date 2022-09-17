@@ -207,7 +207,7 @@ Config::requiresRoaming() const {
   // Check is roaming should be enabled
   bool chHasRoaming = false;
   for (int i=0; i<channelList()->count(); i++) {
-    const DigitalChannel *digi = channelList()->channel(i)->as<const DigitalChannel>();
+    const DMRChannel *digi = channelList()->channel(i)->as<const DMRChannel>();
     if (nullptr == digi)
       continue;
     if (nullptr != digi->roamingZone()) {
@@ -226,8 +226,8 @@ Config::requiresGPS() const {
     Channel *ch = channelList()->channel(i);
     // For analog channels if APRS system is set or
     // for digital channels if any positioning system is set
-    if ( (ch->is<AnalogChannel>() && ch->as<AnalogChannel>()->aprsSystem()) ||
-         (ch->is<DigitalChannel>() && ch->as<DigitalChannel>()->aprsObj()) ) {
+    if ( (ch->is<FMChannel>() && ch->as<FMChannel>()->aprsSystem()) ||
+         (ch->is<DMRChannel>() && ch->as<DMRChannel>()->aprsObj()) ) {
       chHasGPS = true;
       break;
     }

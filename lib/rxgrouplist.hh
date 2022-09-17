@@ -6,7 +6,7 @@
 #include "configreference.hh"
 
 class Config;
-class DigitalContact;
+class DMRContact;
 
 
 /** Generic representation of a RX group list.
@@ -16,7 +16,7 @@ class RXGroupList: public ConfigObject
 	Q_OBJECT
 
   /** The list of contacts. */
-  Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
+  Q_PROPERTY(DMRContactRefList* contacts READ contacts)
 
 public:
   /** Default constructor. */
@@ -36,18 +36,18 @@ public:
   void clear();
 
   /** Returns the contact at the given list index. */
-	DigitalContact *contact(int idx) const;
+	DMRContact *contact(int idx) const;
   /** Adds a contact to the list. */
-  int addContact(DigitalContact *contact, int idx=-1);
+  int addContact(DMRContact *contact, int idx=-1);
   /** Removes the given contact from the list. */
-	bool remContact(DigitalContact *contact);
+	bool remContact(DMRContact *contact);
   /** Removes the contact from the list at the given position. */
 	bool remContact(int idx);
 
   /** Returns the contact list. */
-  const DigitalContactRefList *contacts() const;
+  const DMRContactRefList *contacts() const;
   /** Returns the contact list. */
-  DigitalContactRefList *contacts();
+  DMRContactRefList *contacts();
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -58,7 +58,7 @@ protected slots:
 
 protected:
   /** The list of contacts. */
-  DigitalContactRefList _contacts;
+  DMRContactRefList _contacts;
 };
 
 

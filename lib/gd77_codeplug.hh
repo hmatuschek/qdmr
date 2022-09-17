@@ -159,7 +159,7 @@ public:
 
     /** Marks the entry as valid/invalid. */
     virtual void markValid(bool valid=true);
-    void fromContactObj(const DigitalContact *obj, Context &ctx);
+    void fromContactObj(const DMRContact *obj, Context &ctx);
   };
 
   /** Represents an RX group list within the codeplug.

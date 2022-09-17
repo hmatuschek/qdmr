@@ -131,9 +131,9 @@ APRSSystemDialog::construct() {
 
   // Setup analog channels
   for (int i=0, j=0; i<_config->channelList()->count(); i++) {
-    if (! _config->channelList()->channel(i)->is<AnalogChannel>())
+    if (! _config->channelList()->channel(i)->is<FMChannel>())
       continue;
-    AnalogChannel *ch = _config->channelList()->channel(i)->as<AnalogChannel>();
+    FMChannel *ch = _config->channelList()->channel(i)->as<FMChannel>();
     ui->channel->addItem(ch->name(), QVariant::fromValue(ch));
     if (_myAPRS->revertChannel() == ch)
       ui->channel->setCurrentIndex(j);
@@ -166,7 +166,7 @@ APRSSystemDialog::construct() {
 APRSSystem *
 APRSSystemDialog::aprsSystem() {
   _myAPRS->setName(ui->name->text().simplified());
-  _myAPRS->setRevertChannel(ui->channel->currentData().value<AnalogChannel*>());
+  _myAPRS->setRevertChannel(ui->channel->currentData().value<FMChannel*>());
   _myAPRS->setSource(ui->source->text().simplified(), ui->srcSSID->value());
   _myAPRS->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
   _myAPRS->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));

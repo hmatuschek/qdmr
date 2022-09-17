@@ -31,11 +31,11 @@ D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr)
 }
 
 void
-D868UVCallsignDB::EntryElement::setCallType(DigitalContact::Type type) {
+D868UVCallsignDB::EntryElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0000, 0); break;
-  case DigitalContact::GroupCall: setUInt8(0x0000, 1); break;
-  case DigitalContact::AllCall: setUInt8(0x0000, 2); break;
+  case DMRContact::PrivateCall: setUInt8(0x0000, 0); break;
+  case DMRContact::GroupCall: setUInt8(0x0000, 1); break;
+  case DMRContact::AllCall: setUInt8(0x0000, 2); break;
   }
 }
 
@@ -65,7 +65,7 @@ D868UVCallsignDB::EntryElement::setContent(
 
 unsigned
 D868UVCallsignDB::EntryElement::fromUser(const UserDatabase::User &user) {
-  setCallType(DigitalContact::PrivateCall);
+  setCallType(DMRContact::PrivateCall);
   setNumber(user.id);
   setRingTone(RingTone::Off);
   setContent(user.name, user.city, user.call, user.state, user.country, "");

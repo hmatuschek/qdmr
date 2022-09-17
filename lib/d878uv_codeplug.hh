@@ -8,7 +8,7 @@
 #include "codeplugcontext.hh"
 
 class Channel;
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
@@ -1082,16 +1082,16 @@ public:
     virtual void setDestination(unsigned n, unsigned idx);
 
     /** Returns the call type for the n-th system. */
-    virtual DigitalContact::Type callType(unsigned n) const;
+    virtual DMRContact::Type callType(unsigned n) const;
     /** Sets the call type for the n-th system. */
-    virtual void setCallType(unsigned n, DigitalContact::Type type);
+    virtual void setCallType(unsigned n, DMRContact::Type type);
 
     /** Returns @c true if the n-th system overrides the channel time-slot. */
     virtual bool timeSlotOverride(unsigned n);
     /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
-    virtual DigitalChannel::TimeSlot timeSlot(unsigned n) const;
+    virtual DMRChannel::TimeSlot timeSlot(unsigned n) const;
     /** Overrides the time slot of the n-th selected channel. */
-    virtual void setTimeSlot(unsigned n, DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(unsigned n, DMRChannel::TimeSlot ts);
     /** Clears the time-slot override. */
     virtual void clearTimeSlotOverride(unsigned n);
 
@@ -1173,9 +1173,9 @@ public:
     virtual void disableColorCode();
 
     /** Returns the time slot. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Sets the time slot. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
 
     /** Returns the name of the channel. */
     virtual QString name() const;
@@ -1183,9 +1183,9 @@ public:
     virtual void setName(const QString &name);
 
     /** Constructs a roaming channel from the given digital channel. */
-    virtual bool fromChannel(const DigitalChannel *ch);
+    virtual bool fromChannel(const DMRChannel *ch);
     /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
-    virtual DigitalChannel *toChannel(Context &ctx);
+    virtual DMRChannel *toChannel(Context &ctx);
   };
 
   /** Represents a roaming zone within the binary codeplug.
@@ -1220,11 +1220,11 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, unsigned> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DMRChannel *, unsigned> &map);
     /** Constructs a @c RoamingZone instance from this configuration. */
     virtual RoamingZone *toRoamingZone() const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DigitalChannel *> &map);
+    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DMRChannel *> &map);
   };
 
   /** Represents an AES encryption key.

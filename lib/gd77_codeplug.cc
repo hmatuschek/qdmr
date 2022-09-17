@@ -159,7 +159,7 @@ GD77Codeplug::ContactElement::markValid(bool valid) {
     setUInt8(0x0017, 0x00);
 }
 void
-GD77Codeplug::ContactElement::fromContactObj(const DigitalContact *obj, Context &ctx) {
+GD77Codeplug::ContactElement::fromContactObj(const DMRContact *obj, Context &ctx) {
   RadioddityCodeplug::ContactElement::fromContactObj(obj, ctx);
   markValid();
 }
@@ -600,7 +600,7 @@ GD77Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err
     if (!el.isValid())
       continue;
 
-    DigitalContact *cont = el.toContactObj(ctx);
+    DMRContact *cont = el.toContactObj(ctx);
     ctx.add(cont, i+1); config->contacts()->add(cont);
   }
   return true;

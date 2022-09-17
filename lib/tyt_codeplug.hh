@@ -9,7 +9,7 @@
 #include "contact.hh"
 #include "tyt_extensions.hh"
 
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
@@ -82,9 +82,9 @@ public:
     virtual void setMode(Mode setMode);
 
     /** Returns the bandwidth of the (analog) channel. */
-    virtual AnalogChannel::Bandwidth bandwidth() const;
+    virtual FMChannel::Bandwidth bandwidth() const;
     /** Sets the bandwidth of the (analog) channel. */
-    virtual void setBandwidth(AnalogChannel::Bandwidth bw);
+    virtual void setBandwidth(FMChannel::Bandwidth bw);
 
     /** Returns @c true if the channel has auto scan enabled. */
     virtual bool autoScan() const;
@@ -107,9 +107,9 @@ public:
     virtual void enableRXOnly(bool enable);
 
     /** Returns the time slot of this channel. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Sets the time slot of this channel. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
 
     /** Returns the color code of this channel. */
     virtual uint8_t colorCode() const;
@@ -276,9 +276,9 @@ public:
     virtual void setDMRId(uint32_t id);
 
     /** Returns the call-type of the contact. */
-    virtual DigitalContact::Type callType() const;
+    virtual DMRContact::Type callType() const;
     /** Sets the call-type of the contact. */
-    virtual void setCallType(DigitalContact::Type type);
+    virtual void setCallType(DMRContact::Type type);
 
     /** Returns @c true if the ring-tone is enabled for this contact. */
     virtual bool ringTone() const;
@@ -291,9 +291,9 @@ public:
     virtual void setName(const QString &nm);
 
     /** Encodes the give contact. */
-    virtual bool fromContactObj(const DigitalContact *contact);
+    virtual bool fromContactObj(const DMRContact *contact);
     /** Creates a contact. */
-    virtual DigitalContact *toContactObj() const;
+    virtual DMRContact *toContactObj() const;
   };
 
   /** Represents a zone within the codeplug.

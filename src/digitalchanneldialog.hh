@@ -12,9 +12,9 @@ class DigitalChannelDialog: public QDialog, private Ui::DigitalChannelDialog
 
 public:
   DigitalChannelDialog(Config *config, QWidget *parent=nullptr);
-  DigitalChannelDialog(Config *config, DigitalChannel *channel, QWidget *parent=nullptr);
+  DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
 
-  DigitalChannel *channel();
+  DMRChannel *channel();
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
@@ -27,8 +27,8 @@ protected:
 
 protected:
   Config *_config;
-  DigitalChannel *_myChannel;
-  DigitalChannel *_channel;
+  DMRChannel *_myChannel;
+  DMRChannel *_channel;
 };
 
 

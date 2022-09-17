@@ -40,9 +40,9 @@ public:
   /** Returns @c true, if the given digital contact index has been defined before. */
   bool hasDigitalContact(int index) const;
   /** Adds a digital contact to the config and maps the given index to that contact. */
-  bool addDigitalContact(DigitalContact *con, int index);
+  bool addDigitalContact(DMRContact *con, int index);
   /** Gets a digital contact for the specified index or @c nullptr if not defined. */
-  DigitalContact *getDigitalContact(int index) const;
+  DMRContact *getDigitalContact(int index) const;
 
   /** Returns @c true, if the given analog contact index has been defined before. */
   bool hasAnalogContact(int index) const;
@@ -88,9 +88,9 @@ public:
   /** Returns @c true if a roaming channel is defined for the given index. */
   bool hasRoamingChannel(int index) const;
   /** Associates the given digital channel as the roaming channel with the given index. */
-  bool addRoamingChannel(DigitalChannel *ch, int index);
+  bool addRoamingChannel(DMRChannel *ch, int index);
   /** Returns the roaming channel associated with the given index. */
-  DigitalChannel *getRoamingChannel(int index) const;
+  DMRChannel *getRoamingChannel(int index) const;
 
 protected:
   /** The wrapped radio config (aka abstract code-plug). */

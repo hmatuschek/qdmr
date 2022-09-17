@@ -7,7 +7,7 @@
 
 /** Abstract base class for all radio IDs.
  *
- * That is, DMR radio IDs as well as DTMF, ZVEI, 5-tone etc PTT-IDs.
+ * That is, DMR radio IDs as well as M17, DTMF, ZVEI, 5-tone etc PTT-IDs.
  *
  * @ingroup conf */
 class RadioID: public ConfigObject

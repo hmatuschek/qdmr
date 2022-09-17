@@ -5,9 +5,9 @@
 #include <QAbstractTableModel>
 
 class Config;
-class DigitalContact;
-class DigitalChannel;
-class AnalogChannel;
+class DMRContact;
+class DMRChannel;
+class FMChannel;
 
 
 /** Base class of the positioning systems, that is APRS and DMR position reporting system.
@@ -63,9 +63,9 @@ class GPSSystem : public PositioningSystem
   Q_OBJECT
 
   /** References the destination contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
+  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** References the revert channel. */
-  Q_PROPERTY(DigitalChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(DMRChannelReference* revert READ revert WRITE setRevert)
 
 public:
   /** Default constructor. */
@@ -80,8 +80,8 @@ public:
    * data is send on the current channel.
    * @param period Specifies the update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  GPSSystem(const QString &name, DigitalContact *contact=nullptr,
-            DigitalChannel *revertChannel = nullptr, unsigned period=300,
+  GPSSystem(const QString &name, DMRContact *contact=nullptr,
+            DMRChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
   ConfigItem *clone() const;
@@ -89,38 +89,38 @@ public:
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
-  DigitalContact *contactObj() const;
+  DMRContact *contactObj() const;
   /** Sets the destination contact for the GPS information. */
-  void setContactObj(DigitalContact *contactObj);
+  void setContactObj(DMRContact *contactObj);
   /** Returns the reference to the destination contact. */
-  const DigitalContactReference *contact() const;
+  const DMRContactReference *contact() const;
   /** Returns the reference to the destination contact. */
-  DigitalContactReference *contact();
+  DMRContactReference *contact();
   /** Sets the reference to the destination contact for the GPS information. */
-  void setContact(DigitalContactReference *contactObj);
+  void setContact(DMRContactReference *contactObj);
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
    * be send on the current channel. */
   bool hasRevertChannel() const;
   /** Returns the revert channel for the GPS information or @c nullptr if not set. */
-  DigitalChannel *revertChannel() const;
+  DMRChannel *revertChannel() const;
   /** Sets the revert channel for the GPS information to be send on. */
-  void setRevertChannel(DigitalChannel *channel);
+  void setRevertChannel(DMRChannel *channel);
   /** Returns a reference to the revert channel. */
-  const DigitalChannelReference *revert() const;
+  const DMRChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  DigitalChannelReference *revert();
+  DMRChannelReference *revert();
   /** Sets the revert channel for the GPS information to be send on. */
-  void setRevert(DigitalChannelReference *channel);
+  void setRevert(DMRChannelReference *channel);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the destination contact for the GPS information. */
-  DigitalContactReference _contact;
+  DMRContactReference _contact;
   /** Holds the revert channel on which the GPS information is send on. */
-  DigitalChannelReference _revertChannel;
+  DMRChannelReference _revertChannel;
 };
 
 
@@ -131,7 +131,7 @@ class APRSSystem: public PositioningSystem
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(AnalogChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(FMChannelReference* revert READ revert WRITE setRevert)
   /** The APRS icon. */
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
@@ -176,7 +176,7 @@ public:
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+  APRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
              const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
              const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
@@ -184,15 +184,15 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the transmit channel of the APRS system. */
-  AnalogChannel *revertChannel() const;
+  FMChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
-  void setRevertChannel(AnalogChannel *revertChannel);
+  void setRevertChannel(FMChannel *revertChannel);
   /** Returns a reference to the revert channel. */
-  const AnalogChannelReference *revert() const;
+  const FMChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  AnalogChannelReference *revert();
+  FMChannelReference *revert();
   /** Sets the revert channel reference. */
-  void setRevert(AnalogChannelReference *ref);
+  void setRevert(FMChannelReference *ref);
 
   /** Returns the destination call. */
   const QString &destination() const;
@@ -232,7 +232,7 @@ protected:
 
 protected:
   /** A weak reference to the transmit channel. */
-  AnalogChannelReference _channel;
+  FMChannelReference _channel;
   /** Holds the destination call. */
   QString _destination;
   /** Holds the destination SSID. */

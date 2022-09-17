@@ -55,7 +55,7 @@ public:
     explicit EntryElement(uint8_t *ptr);
 
     /** Sets the call type. */
-    virtual void setCallType(DigitalContact::Type type);
+    virtual void setCallType(DMRContact::Type type);
     /** Sets the DMR ID number. */
     virtual void setNumber(unsigned num);
     /** Sets the ring tone. */

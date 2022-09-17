@@ -80,7 +80,7 @@ AnytoneCodeplug::ChannelElement::clear() {
   setTXOffset(0);
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
-  setBandwidth(AnalogChannel::Bandwidth::Narrow);
+  setBandwidth(FMChannel::Bandwidth::Narrow);
   setRXTone(Signaling::SIGNALING_NONE);
   setTXTone(Signaling::SIGNALING_NONE);
   setBit(0x0008, 5, false); // Unused set to 0
@@ -163,17 +163,17 @@ AnytoneCodeplug::ChannelElement::setPower(Channel::Power power) {
   }
 }
 
-AnalogChannel::Bandwidth
+FMChannel::Bandwidth
 AnytoneCodeplug::ChannelElement::bandwidth() const {
   if (getBit(0x0008, 4))
-    return AnalogChannel::Bandwidth::Wide;
-  return AnalogChannel::Bandwidth::Narrow;
+    return FMChannel::Bandwidth::Wide;
+  return FMChannel::Bandwidth::Narrow;
 }
 void
-AnytoneCodeplug::ChannelElement::setBandwidth(AnalogChannel::Bandwidth bw) {
+AnytoneCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
   switch (bw) {
-  case AnalogChannel::Bandwidth::Narrow: setBit(0x0008, 4, false); break;
-  case AnalogChannel::Bandwidth::Wide: setBit(0x0008, 4, true); break;
+  case FMChannel::Bandwidth::Narrow: setBit(0x0008, 4, false); break;
+  case FMChannel::Bandwidth::Wide: setBit(0x0008, 4, true); break;
   }
 }
 
@@ -464,15 +464,15 @@ AnytoneCodeplug::ChannelElement::setColorCode(unsigned code) {
   setUInt8(0x0020, code);
 }
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 AnytoneCodeplug::ChannelElement::timeSlot() const {
   if (false == getBit(0x0021, 0))
-    return DigitalChannel::TimeSlot::TS1;
-  return DigitalChannel::TimeSlot::TS2;
+    return DMRChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS2;
 }
 void
-AnytoneCodeplug::ChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+AnytoneCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setBit(0x0021, 0, false);
   else
     setBit(0x0021, 0, true);
@@ -641,12 +641,12 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     if (Mode::MixedAnalog == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as analog channel.";
-    AnalogChannel *ach = new AnalogChannel();
+    FMChannel *ach = new FMChannel();
     switch(this->admit()) {
-    case Admit::Always: ach->setAdmit(AnalogChannel::Admit::Always); break;
-    case Admit::Busy: ach->setAdmit(AnalogChannel::Admit::Free); break;
-    case Admit::Tone: ach->setAdmit(AnalogChannel::Admit::Tone); break;
-    default: ach->setAdmit(AnalogChannel::Admit::Always); break;
+    case Admit::Always: ach->setAdmit(FMChannel::Admit::Always); break;
+    case Admit::Busy: ach->setAdmit(FMChannel::Admit::Free); break;
+    case Admit::Tone: ach->setAdmit(FMChannel::Admit::Tone); break;
+    default: ach->setAdmit(FMChannel::Admit::Always); break;
     }
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
@@ -658,14 +658,14 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as digital channel.";
-    DigitalChannel *dch = new DigitalChannel();
+    DMRChannel *dch = new DMRChannel();
     switch (this->admit()) {
-    case Admit::Always: dch->setAdmit(DigitalChannel::Admit::Always); break;
-    case Admit::Free: dch->setAdmit(DigitalChannel::Admit::Free); break;
-    case Admit::ColorCode: dch->setAdmit(DigitalChannel::Admit::ColorCode); break;
+    case Admit::Always: dch->setAdmit(DMRChannel::Admit::Always); break;
+    case Admit::Free: dch->setAdmit(DMRChannel::Admit::Free); break;
+    case Admit::ColorCode: dch->setAdmit(DMRChannel::Admit::ColorCode); break;
     case Admit::DifferentColorCode:
       logWarn() << "Cannot decode admit cirit. 'different CC', use 'same CC' instead.";
-      dch->setAdmit(DigitalChannel::Admit::ColorCode);
+      dch->setAdmit(DMRChannel::Admit::ColorCode);
       break;
     }
     dch->setColorCode(colorCode());
@@ -694,17 +694,17 @@ bool
 AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (Mode::Digital == mode()) {
     // If channel is digital
-    DigitalChannel *dc = c->as<DigitalChannel>();
+    DMRChannel *dc = c->as<DMRChannel>();
     if (nullptr == dc)
       return false;
 
     // Check if default contact is set, in fact a valid contact index is mandatory.
-    if (! ctx.has<DigitalContact>(contactIndex())) {
+    if (! ctx.has<DMRContact>(contactIndex())) {
       logError() << "Cannot resolve contact index " << contactIndex() << " for channel '"
                  << c->name() << "'.";
       return false;
     }
-    dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
+    dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
@@ -724,7 +724,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setRadioIdObj(rid);
   } else if (Mode::Analog == mode()) {
     // If channel is analog
-    AnalogChannel *ac = c->as<AnalogChannel>();
+    FMChannel *ac = c->as<FMChannel>();
     if (nullptr == ac)
       return false;
   }
@@ -761,14 +761,14 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setScanListIndex(ctx.index(c->scanList()));
 
   // Dispatch by channel type
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<const AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *ac = c->as<const FMChannel>();
     setMode(Mode::Analog);
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::Admit::Always: setAdmit(Admit::Always); break;
-    case AnalogChannel::Admit::Free: setAdmit(Admit::Busy); break;
-    case AnalogChannel::Admit::Tone: setAdmit(Admit::Tone); break;
+    case FMChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case FMChannel::Admit::Free: setAdmit(Admit::Busy); break;
+    case FMChannel::Admit::Tone: setAdmit(Admit::Tone); break;
     }
     // squelch mode
     setRXTone(ac->rxTone());
@@ -779,15 +779,15 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<const DigitalChannel>();
+  } else if (c->is<DMRChannel>()) {
+    const DMRChannel *dc = c->as<const DMRChannel>();
     // pack digital channel config.
     setMode(Mode::Digital);
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::Admit::Always: setAdmit(Admit::Always); break;
-    case DigitalChannel::Admit::Free: setAdmit(Admit::Free); break;
-    case DigitalChannel::Admit::ColorCode: setAdmit(Admit::ColorCode); break;
+    case DMRChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case DMRChannel::Admit::Free: setAdmit(Admit::Free); break;
+    case DMRChannel::Admit::ColorCode: setAdmit(Admit::ColorCode); break;
     }
     // set color code
     setColorCode(dc->colorCode());
@@ -858,21 +858,21 @@ AnytoneCodeplug::ContactElement::isValid() const {
   return !name().isEmpty();
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::ContactElement::type() const {
   switch (getUInt8(0x0000)) {
-  case 0: return DigitalContact::PrivateCall;
-  case 1: return DigitalContact::GroupCall;
-  case 2: return DigitalContact::AllCall;
+  case 0: return DMRContact::PrivateCall;
+  case 1: return DMRContact::GroupCall;
+  case 2: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::ContactElement::setType(DigitalContact::Type type) {
+AnytoneCodeplug::ContactElement::setType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0000, 0); break;
-  case DigitalContact::GroupCall: setUInt8(0x0000, 1); break;
-  case DigitalContact::AllCall: setUInt8(0x0000, 2); break;
+  case DMRContact::PrivateCall: setUInt8(0x0000, 0); break;
+  case DMRContact::GroupCall: setUInt8(0x0000, 1); break;
+  case DMRContact::AllCall: setUInt8(0x0000, 2); break;
   }
 }
 
@@ -916,12 +916,12 @@ AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType
   setUInt8(0x0027, (unsigned)type);
 }
 
-DigitalContact *
+DMRContact *
 AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx);
 
   // Common settings
-  DigitalContact *cont = new DigitalContact();
+  DMRContact *cont = new DMRContact();
   cont->setType(type());
   cont->setName(name());
   cont->setNumber(number());
@@ -936,7 +936,7 @@ AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
 }
 
 bool
-AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+AnytoneCodeplug::ContactElement::fromContactObj(const DMRContact *contact, Context &ctx) {
   Q_UNUSED(ctx)
 
   clear();
@@ -1093,12 +1093,12 @@ AnytoneCodeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx)
     if (! hasMemberIndex(i))
       continue;
     // Missing contact ignore.
-    if (! ctx.has<DigitalContact>(memberIndex(i))) {
+    if (! ctx.has<DMRContact>(memberIndex(i))) {
       logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
                 << this->name() << "': Invalid contact index. Ignored.";
       continue;
     }
-    lst->addContact(ctx.get<DigitalContact>(memberIndex(i)));
+    lst->addContact(ctx.get<DMRContact>(memberIndex(i)));
   }
   return true;
 }
@@ -1114,7 +1114,7 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   // set members
   for (uint8_t i=0; i<64; i++) {
     // Skip non-private-call entries
-    while((lst->count() > j) && (DigitalContact::GroupCall != lst->contact(j)->type())) {
+    while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                 << "' is not a private call. Skip entry.";
       j++;
@@ -2422,21 +2422,21 @@ AnytoneCodeplug::DMRAPRSSettingsElement::setDestination(unsigned id) {
   setBCD8_be(0x001c, id);
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::DMRAPRSSettingsElement::callType() const {
   switch (getUInt8(0x0020)) {
-  case 0x00: return DigitalContact::PrivateCall;
-  case 0x01: return DigitalContact::GroupCall;
-  case 0x02: return DigitalContact::AllCall;
+  case 0x00: return DMRContact::PrivateCall;
+  case 0x01: return DMRContact::GroupCall;
+  case 0x02: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::DMRAPRSSettingsElement::setCallType(DigitalContact::Type type) {
+AnytoneCodeplug::DMRAPRSSettingsElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0020, 0x00); break;
-  case DigitalContact::GroupCall: setUInt8(0x0020, 0x01); break;
-  case DigitalContact::AllCall: setUInt8(0x0020, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(0x0020, 0x00); break;
+  case DMRContact::GroupCall: setUInt8(0x0020, 0x01); break;
+  case DMRContact::AllCall: setUInt8(0x0020, 0x02); break;
   }
 }
 
@@ -2444,17 +2444,17 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::timeSlotOverride() const {
   return 0 != getUInt8(0x0021);
 }
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 AnytoneCodeplug::DMRAPRSSettingsElement::timeslot() const {
   if (1 == getUInt8(0x0021))
-    return DigitalChannel::TimeSlot::TS1;
+    return DMRChannel::TimeSlot::TS1;
   else if (2 == getUInt8(0x0021))
-    return DigitalChannel::TimeSlot::TS2;
-  return DigitalChannel::TimeSlot::TS1;
+    return DMRChannel::TimeSlot::TS2;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setUInt8(0x0021, 0x01);
   else
     setUInt8(0x0021, 0x02);
@@ -2482,7 +2482,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   disableTimeSlotOverride();
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
     setChannelSelected(0);
-  } else if (sys->revert()->is<DigitalChannel>()) {
+  } else if (sys->revert()->is<DMRChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
   } else {
     clearChannel(0);
@@ -2499,17 +2499,17 @@ AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
-  DigitalContact *cont = nullptr;
+  DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
   if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
-    cont = new DigitalContact(callType(), QString("GPS target"), destination());
+    cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
   ctx.get<GPSSystem>(i)->setContactObj(cont);
 
   // Check if there is a revert channel set
-  if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
-    DigitalChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DigitalChannel>();
+  if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DMRChannel>()) {
+    DMRChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DMRChannel>();
     ctx.get<GPSSystem>(i)->setRevertChannel(ch);
   }
   return true;
@@ -3036,21 +3036,21 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::clear() {
   memset(_data, 0x00, _size);
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::DigitalAlarmExtensionElement::callType() const {
   switch (getUInt8(0x0000)) {
-  case 0x00: return DigitalContact::PrivateCall;
-  case 0x01: return DigitalContact::GroupCall;
-  case 0x02: return DigitalContact::AllCall;
+  case 0x00: return DMRContact::PrivateCall;
+  case 0x01: return DMRContact::GroupCall;
+  case 0x02: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DigitalContact::Type type) {
+AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0000, 0x00); break;
-  case DigitalContact::GroupCall: setUInt8(0x0000, 0x01); break;
-  case DigitalContact::AllCall: setUInt8(0x0000, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(0x0000, 0x00); break;
+  case DMRContact::GroupCall: setUInt8(0x0000, 0x01); break;
+  case DMRContact::AllCall: setUInt8(0x0000, 0x02); break;
   }
 }
 
@@ -3947,8 +3947,8 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DigitalContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d); d++;
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
     }

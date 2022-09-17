@@ -16,7 +16,7 @@ class RoamingZone : public ConfigObject
   Q_OBJECT
 
   /** The channels in the roaming zone. */
-  Q_PROPERTY(DigitalChannelRefList * channels READ channels)
+  Q_PROPERTY(DMRChannelRefList * channels READ channels)
 
 public:
   /** Default constructor. */
@@ -39,25 +39,25 @@ public:
 
   /** Returns the digital channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
-  DigitalChannel *channel(int idx) const;
+  DMRChannel *channel(int idx) const;
   /** Adds a channel to the roaming zone.
    * @param ch Specifies the channel to add.
    * @param row Speicifies the index where to insert the channel
    *        (optional, default insert at end). */
-  int addChannel(DigitalChannel *ch, int row=-1);
+  int addChannel(DMRChannel *ch, int row=-1);
   /** Removes the channel from the roaming zone at index @c row. */
   bool remChannel(int row);
   /** Removes the given channel from the roaming zone. */
-  bool remChannel(DigitalChannel *ch);
+  bool remChannel(DMRChannel *ch);
 
   /** Returns the list of digital channels in this roaming zone. */
-  const DigitalChannelRefList *channels() const;
+  const DMRChannelRefList *channels() const;
   /** Returns the list of digital channels in this roaming zone. */
-  DigitalChannelRefList *channels();
+  DMRChannelRefList *channels();
 
 protected:
   /** Holds the actual channels of the roaming zone. */
-  DigitalChannelRefList _channel;
+  DMRChannelRefList _channel;
 };
 
 
@@ -96,9 +96,9 @@ public:
   explicit RoamingZoneList(QObject *parent=nullptr);
 
   /** Returns a set of unique channels used in all roaming zones. */
-  QSet<DigitalChannel *> uniqueChannels() const;
+  QSet<DMRChannel *> uniqueChannels() const;
   /** Adds all channels of all roaming zones to the given set. */
-  void uniqueChannels(QSet<DigitalChannel *> &channels) const;
+  void uniqueChannels(QSet<DMRChannel *> &channels) const;
 
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;

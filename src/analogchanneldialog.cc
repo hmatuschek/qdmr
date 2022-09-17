@@ -10,18 +10,18 @@
  * Implementation of AnalogChannelDialog
  * ********************************************************************************************* */
 AnalogChannelDialog::AnalogChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _myChannel(new AnalogChannel(this)), _channel(nullptr)
+  : QDialog(parent), _config(config), _myChannel(new FMChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-AnalogChannelDialog::AnalogChannelDialog(Config *config, AnalogChannel *channel, QWidget *parent)
+AnalogChannelDialog::AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (nullptr == _channel)
-    _myChannel = new AnalogChannel();
+    _myChannel = new FMChannel();
   else
-    _myChannel = _channel->clone()->as<AnalogChannel>();
+    _myChannel = _channel->clone()->as<FMChannel>();
   _myChannel->setParent(this);
 
   construct();
@@ -58,14 +58,14 @@ AnalogChannelDialog::construct() {
     if (_myChannel && (_myChannel->scanList() == lst) )
       scanList->setCurrentIndex(i+1);
   }
-  txAdmit->setItemData(0, unsigned(AnalogChannel::Admit::Always));
-  txAdmit->setItemData(1, unsigned(AnalogChannel::Admit::Free));
-  txAdmit->setItemData(2, unsigned(AnalogChannel::Admit::Tone));
+  txAdmit->setItemData(0, unsigned(FMChannel::Admit::Always));
+  txAdmit->setItemData(1, unsigned(FMChannel::Admit::Free));
+  txAdmit->setItemData(2, unsigned(FMChannel::Admit::Tone));
   squelchDefault->setChecked(true); squelchValue->setValue(1); squelchValue->setEnabled(false);
   populateCTCSSBox(rxTone, (nullptr != _myChannel ? _myChannel->rxTone() : Signaling::SIGNALING_NONE));
   populateCTCSSBox(txTone, (nullptr != _myChannel ? _myChannel->txTone() : Signaling::SIGNALING_NONE));
-  bandwidth->setItemData(0, unsigned(AnalogChannel::Bandwidth::Narrow));
-  bandwidth->setItemData(1, unsigned(AnalogChannel::Bandwidth::Wide));
+  bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
+  bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
   for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
@@ -95,17 +95,17 @@ AnalogChannelDialog::construct() {
   }
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
-  case AnalogChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
-  case AnalogChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
-  case AnalogChannel::Admit::Tone: txAdmit->setCurrentIndex(2); break;
+  case FMChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
+  case FMChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
+  case FMChannel::Admit::Tone: txAdmit->setCurrentIndex(2); break;
   }
   if (! _myChannel->defaultSquelch()) {
     squelchDefault->setChecked(false); squelchValue->setEnabled(true);
     squelchValue->setValue(_myChannel->squelch());
   }
-  if (AnalogChannel::Bandwidth::Narrow == _myChannel->bandwidth())
+  if (FMChannel::Bandwidth::Narrow == _myChannel->bandwidth())
     bandwidth->setCurrentIndex(0);
-  else if (AnalogChannel::Bandwidth::Wide == _myChannel->bandwidth())
+  else if (FMChannel::Bandwidth::Wide == _myChannel->bandwidth())
     bandwidth->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
@@ -126,7 +126,7 @@ AnalogChannelDialog::construct() {
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
-AnalogChannel *
+FMChannel *
 AnalogChannelDialog::channel()
 {
   _myChannel->setName(channelName->text());
@@ -142,14 +142,14 @@ AnalogChannelDialog::channel()
   else
     _myChannel->setTimeout(totValue->value());
   _myChannel->setRXOnly(rxOnly->isChecked());
-  _myChannel->setAdmit(AnalogChannel::Admit(txAdmit->currentData().toUInt()));
+  _myChannel->setAdmit(FMChannel::Admit(txAdmit->currentData().toUInt()));
   if (squelchDefault->isChecked())
     _myChannel->setSquelchDefault();
   else
     _myChannel->setSquelch(squelchValue->value());
   _myChannel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
   _myChannel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
-  _myChannel->setBandwidth(AnalogChannel::Bandwidth(bandwidth->currentData().toUInt()));
+  _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
   if (voxDefault->isChecked())
@@ -157,7 +157,7 @@ AnalogChannelDialog::channel()
   else
     _myChannel->setVOX(voxValue->value());
 
-  AnalogChannel *channel = _myChannel;
+  FMChannel *channel = _myChannel;
   if (nullptr == _channel) {
     _myChannel->setParent(nullptr);
     _myChannel = nullptr;

@@ -587,7 +587,7 @@ Codeplug::Context::Context(Config *config)
 {
   // Add tables for common elements
   addTable(&DMRRadioID::staticMetaObject);
-  addTable(&DigitalContact::staticMetaObject);
+  addTable(&DMRContact::staticMetaObject);
   addTable(&DTMFContact::staticMetaObject);
   addTable(&RXGroupList::staticMetaObject);
   addTable(&Channel::staticMetaObject);

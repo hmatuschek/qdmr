@@ -47,13 +47,13 @@ TyTCodeplug::ChannelElement::clear() {
   Element::clear();
 
   setMode(MODE_ANALOG);
-  setBandwidth(AnalogChannel::Bandwidth::Narrow);
+  setBandwidth(FMChannel::Bandwidth::Narrow);
   enableAutoScan(0);
   setBit(0, 1); setBit(0,2);
   enableLoneWorker(false);
   enableTalkaround(false);
   enableRXOnly(false);
-  setTimeSlot(DigitalChannel::TimeSlot::TS1);
+  setTimeSlot(DMRChannel::TimeSlot::TS1);
   setColorCode(1);
   setPrivacyIndex(0);
   setPrivacyType(PRIV_NONE);
@@ -103,15 +103,15 @@ TyTCodeplug::ChannelElement::setMode(Mode mode) {
   setUInt2(0,0, uint8_t(mode));
 }
 
-AnalogChannel::Bandwidth
+FMChannel::Bandwidth
 TyTCodeplug::ChannelElement::bandwidth() const {
   if (0 == getUInt2(0, 2))
-    return AnalogChannel::Bandwidth::Narrow;
-  return AnalogChannel::Bandwidth::Wide;
+    return FMChannel::Bandwidth::Narrow;
+  return FMChannel::Bandwidth::Wide;
 }
 void
-TyTCodeplug::ChannelElement::setBandwidth(AnalogChannel::Bandwidth bw) {
-  if (AnalogChannel::Bandwidth::Narrow == bw)
+TyTCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
+  if (FMChannel::Bandwidth::Narrow == bw)
     setUInt2(0, 2, BW_12_5_KHZ);
   else
     setUInt2(0, 2, BW_25_KHZ);
@@ -153,15 +153,15 @@ TyTCodeplug::ChannelElement::enableRXOnly(bool enable) {
   setBit(1, 1, enable);
 }
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 TyTCodeplug::ChannelElement::timeSlot() const {
   if (2 == getUInt2(1,2))
-    return DigitalChannel::TimeSlot::TS2;
-  return DigitalChannel::TimeSlot::TS1;
+    return DMRChannel::TimeSlot::TS2;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-TyTCodeplug::ChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+TyTCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setUInt2(1,2,1);
   else
     setUInt2(1,2,2);
@@ -430,14 +430,14 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
 
   // decode power setting
   if (MODE_ANALOG == mode()) {
-    AnalogChannel::Admit admit_crit;
+    FMChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = AnalogChannel::Admit::Always; break;
-      case ADMIT_TONE: admit_crit = AnalogChannel::Admit::Tone; break;
-      case ADMIT_CH_FREE: admit_crit = AnalogChannel::Admit::Free; break;
-      default: admit_crit = AnalogChannel::Admit::Free; break;
+      case ADMIT_ALWAYS: admit_crit = FMChannel::Admit::Always; break;
+      case ADMIT_TONE: admit_crit = FMChannel::Admit::Tone; break;
+      case ADMIT_CH_FREE: admit_crit = FMChannel::Admit::Free; break;
+      default: admit_crit = FMChannel::Admit::Free; break;
     }
-    AnalogChannel *ach = new AnalogChannel();
+    FMChannel *ach = new FMChannel();
     ach->setAdmit(admit_crit);
     ach->setSquelchDefault();
     ach->setRXTone(rxSignaling());
@@ -447,14 +447,14 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ex->enableDisplayPTTId(displayPTTId());
     ch = ach;
   } else if (MODE_DIGITAL == mode()) {
-    DigitalChannel::Admit admit_crit;
+    DMRChannel::Admit admit_crit;
     switch(admitCriterion()) {
-      case ADMIT_ALWAYS: admit_crit = DigitalChannel::Admit::Always; break;
-      case ADMIT_CH_FREE: admit_crit = DigitalChannel::Admit::Free; break;
-      case ADMIT_COLOR: admit_crit = DigitalChannel::Admit::ColorCode; break;
-      default: admit_crit = DigitalChannel::Admit::Free; break;
+      case ADMIT_ALWAYS: admit_crit = DMRChannel::Admit::Always; break;
+      case ADMIT_CH_FREE: admit_crit = DMRChannel::Admit::Free; break;
+      case ADMIT_COLOR: admit_crit = DMRChannel::Admit::ColorCode; break;
+      default: admit_crit = DMRChannel::Admit::Free; break;
     }
-    DigitalChannel *dch = new DigitalChannel();
+    DMRChannel *dch = new DMRChannel();
     dch->setAdmit(admit_crit);
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
@@ -507,10 +507,10 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
 
   if (MODE_ANALOG == mode()) {
     return true;
-  } else if ((MODE_DIGITAL == mode()) && (c->is<DigitalChannel>())){
-    DigitalChannel *dc = c->as<DigitalChannel>();
-    if (contactIndex() && ctx.has<DigitalContact>(contactIndex())) {
-      dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
+  } else if ((MODE_DIGITAL == mode()) && (c->is<DMRChannel>())){
+    DMRChannel *dc = c->as<DMRChannel>();
+    if (contactIndex() && ctx.has<DMRContact>(contactIndex())) {
+      dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
     }
     if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
@@ -571,13 +571,13 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
   // power setting must be set by specialized element
 
-  if (chan->is<const DigitalChannel>()) {
-    const DigitalChannel *dchan = chan->as<const DigitalChannel>();
+  if (chan->is<const DMRChannel>()) {
+    const DMRChannel *dchan = chan->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
     switch (dchan->admit()) {
-    case DigitalChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
-    case DigitalChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
-    case DigitalChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR); break;
+    case DMRChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
+    case DMRChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
+    case DMRChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR); break;
     }
     setColorCode(dchan->colorCode());
     setTimeSlot(dchan->timeSlot());
@@ -587,7 +587,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setGroupListIndex(0);
     if (dchan->txContactObj())
       setContactIndex(ctx.index(dchan->txContactObj()));
-    setBandwidth(AnalogChannel::Bandwidth::Narrow);
+    setBandwidth(FMChannel::Bandwidth::Narrow);
     setRXSignaling(Signaling::SIGNALING_NONE);
     setTXSignaling(Signaling::SIGNALING_NONE);
     if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
@@ -618,15 +618,15 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
                   << " for DMR channel.";
       }
     }
-  } else if (chan->is<AnalogChannel>()) {
-    const AnalogChannel *achan = chan->as<const AnalogChannel>();
+  } else if (chan->is<FMChannel>()) {
+    const FMChannel *achan = chan->as<const FMChannel>();
     setMode(MODE_ANALOG);
     setBandwidth(achan->bandwidth());
     // Squelch must be set by specialized element
     switch (achan->admit()) {
-    case AnalogChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
-    case AnalogChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
-    case AnalogChannel::Admit::Tone: setAdmitCriterion(ADMIT_TONE); break;
+    case FMChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
+    case FMChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
+    case FMChannel::Admit::Tone: setAdmitCriterion(ADMIT_TONE); break;
     }
     setRXSignaling(achan->rxTone());
     setTXSignaling(achan->txTone());
@@ -702,22 +702,22 @@ TyTCodeplug::ContactElement::enableRingTone(bool enable) {
   setBit(3, 5, enable);
 }
 
-DigitalContact::Type TyTCodeplug::ContactElement::callType() const {
+DMRContact::Type TyTCodeplug::ContactElement::callType() const {
   switch(getUInt2(3,0)) {
-  case 1: return DigitalContact::GroupCall;
-  case 2: return DigitalContact::PrivateCall;
-  case 3: return DigitalContact::AllCall;
+  case 1: return DMRContact::GroupCall;
+  case 2: return DMRContact::PrivateCall;
+  case 3: return DMRContact::AllCall;
   default:
     break;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-TyTCodeplug::ContactElement::setCallType(DigitalContact::Type type) {
+TyTCodeplug::ContactElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::GroupCall:   setUInt2(3,0, 1); break;
-  case DigitalContact::PrivateCall: setUInt2(3,0, 2); break;
-  case DigitalContact::AllCall:     setUInt2(3,0, 3); break;
+  case DMRContact::GroupCall:   setUInt2(3,0, 1); break;
+  case DMRContact::PrivateCall: setUInt2(3,0, 2); break;
+  case DMRContact::AllCall:     setUInt2(3,0, 3); break;
   }
 }
 
@@ -730,13 +730,13 @@ TyTCodeplug::ContactElement::setName(const QString &nm) {
   writeUnicode(4, nm, 16, 0x0000);
 }
 
-DigitalContact *
+DMRContact *
 TyTCodeplug::ContactElement::toContactObj() const {
-  return new DigitalContact(callType(), name(), dmrId(), ringTone());
+  return new DMRContact(callType(), name(), dmrId(), ringTone());
 }
 
 bool
-TyTCodeplug::ContactElement::fromContactObj(const DigitalContact *cont) {
+TyTCodeplug::ContactElement::fromContactObj(const DMRContact *cont) {
   if (nullptr == cont)
     return false;
 
@@ -889,7 +889,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
   // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
     // Skip non-private-call entries
-    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+    while((lst->count() > j) && (DMRContact::PrivateCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                 << "' is not a private call. Skip entry.";
       j++;
@@ -919,14 +919,14 @@ TyTCodeplug::GroupListElement::linkGroupListObj(RXGroupList *lst, Context &ctx) 
     return false;
 
   for (int i=0; (i<32) && memberIndex(i); i++) {
-    if (! ctx.has<DigitalContact>(memberIndex(i))) {
+    if (! ctx.has<DMRContact>(memberIndex(i))) {
       logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
                 << name() << "': Invalid contact index. Ignored.";
       continue;
     }
     //logDebug() << "Add contact idx=" << memberIndex(i) << " to group list " << lst->name() << ".";
-    if (0 > lst->addContact(ctx.get<DigitalContact>(memberIndex(i)))) {
-      logWarn() << "Cannot add contact '" << ctx.get<DigitalContact>(memberIndex(i))->name()
+    if (0 > lst->addContact(ctx.get<DMRContact>(memberIndex(i)))) {
+      logWarn() << "Cannot add contact '" << ctx.get<DMRContact>(memberIndex(i))->name()
                 << "' at idx=" << memberIndex(i) << ".";
       continue;
     }
@@ -1818,13 +1818,13 @@ TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
   if (! isValid())
     return false;
 
-  if ((! destinationContactDisabled()) && (ctx.has<DigitalContact>(destinationContactIndex())))
-    sys->setContactObj(ctx.get<DigitalContact>(destinationContactIndex()));
+  if ((! destinationContactDisabled()) && (ctx.has<DMRContact>(destinationContactIndex())))
+    sys->setContactObj(ctx.get<DMRContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
     sys->setRevertChannel(nullptr);
-  else if (ctx.has<Channel>(revertChannelIndex()) && ctx.get<Channel>(revertChannelIndex())->is<DigitalChannel>())
-    sys->setRevertChannel(ctx.get<Channel>(revertChannelIndex())->as<DigitalChannel>());
+  else if (ctx.has<Channel>(revertChannelIndex()) && ctx.get<Channel>(revertChannelIndex())->is<DMRChannel>())
+    sys->setRevertChannel(ctx.get<Channel>(revertChannelIndex())->as<DMRChannel>());
 
   return true;
 }
@@ -2746,8 +2746,8 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DigitalContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
     }

@@ -170,7 +170,7 @@ CSVHandler::handleDTMFContact(qint64 idx, const QString &name, const QString &nu
 }
 
 bool
-CSVHandler::handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type, qint64 id,
+CSVHandler::handleDigitalContact(qint64 idx, const QString &name, DMRContact::Type type, qint64 id,
                                  bool rxTone, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -199,7 +199,7 @@ CSVHandler::handleGroupList(qint64 idx, const QString &name, const QList<qint64>
 
 bool
 CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
+    qint64 tot, bool ro, DMRChannel::Admit admit, qint64 color, DMRChannel::TimeSlot slot,
     qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -226,8 +226,8 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
-    AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
   Q_UNUSED(name);
@@ -671,13 +671,13 @@ CSVParser::_parse_contact(qint64 idx, CSVLexer &lexer) {
     return false;
   }
   bool dtmf = false;
-  DigitalContact::Type type = DigitalContact::PrivateCall;
+  DMRContact::Type type = DMRContact::PrivateCall;
   if ("group" == token.value.toLower()) {
-    type = DigitalContact::GroupCall;
+    type = DMRContact::GroupCall;
   } else if ("private" == token.value.toLower()) {
-    type = DigitalContact::PrivateCall;
+    type = DMRContact::PrivateCall;
   } else if ("all" == token.value.toLower()) {
-    type = DigitalContact::AllCall;
+    type = DMRContact::AllCall;
   } else if ("dtmf" == token.value.toLower()) {
     dtmf = true;
   } else {
@@ -909,14 +909,14 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  DigitalChannel::Admit admit;
+  DMRChannel::Admit admit;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    admit = DigitalChannel::Admit::Always;
+    admit = DMRChannel::Admit::Always;
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("free" == token.value.toLower())
-      admit = DigitalChannel::Admit::Free;
+      admit = DMRChannel::Admit::Free;
     else if ("color" == token.value.toLower())
-      admit = DigitalChannel::Admit::ColorCode;
+      admit = DMRChannel::Admit::ColorCode;
     else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free' or 'Color'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -937,12 +937,12 @@ CSVParser::_parse_digital_channel(qint64 idx, CSVLexer &lexer) {
   qint64 color = token.value.toInt();
 
   token = lexer.next();
-  DigitalChannel::TimeSlot slot;
+  DMRChannel::TimeSlot slot;
   if (CSVLexer::Token::T_NUMBER == token.type) {
     if (1 == token.value.toInt()) {
-      slot = DigitalChannel::TimeSlot::TS1;
+      slot = DMRChannel::TimeSlot::TS1;
     } else if (2 == token.value.toInt()) {
-      slot = DigitalChannel::TimeSlot::TS2;
+      slot = DMRChannel::TimeSlot::TS2;
     } else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '1' or '2'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1146,14 +1146,14 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  AnalogChannel::Admit admit;
+  FMChannel::Admit admit;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    admit = AnalogChannel::Admit::Always;
+    admit = FMChannel::Admit::Always;
   } else if (CSVLexer::Token::T_KEYWORD == token.type) {
     if ("free" == token.value.toLower())
-      admit = AnalogChannel::Admit::Free;
+      admit = FMChannel::Admit::Free;
     else if ("tone" == token.value.toLower())
-      admit = AnalogChannel::Admit::Tone;
+      admit = FMChannel::Admit::Tone;
     else {
       _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected 'Free', 'Tone'.")
           .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1211,11 +1211,11 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
     return false;
   }
-  AnalogChannel::Bandwidth bw;
+  FMChannel::Bandwidth bw;
   if (25 == token.value.toFloat()) {
-    bw = AnalogChannel::Bandwidth::Wide;
+    bw = FMChannel::Bandwidth::Wide;
   } else if (12.5 == token.value.toFloat()) {
-    bw = AnalogChannel::Bandwidth::Narrow;
+    bw = FMChannel::Bandwidth::Narrow;
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected '12.5' or '25'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1845,7 +1845,7 @@ CSVReader::handleDTMFContact(qint64 idx, const QString &name, const QString &num
 
 
 bool
-CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type,
+CSVReader::handleDigitalContact(qint64 idx, const QString &name, DMRContact::Type type,
                                 qint64 id, bool rxTone, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
@@ -1858,7 +1858,7 @@ CSVReader::handleDigitalContact(qint64 idx, const QString &name, DigitalContact:
         .arg(line).arg(column).arg(name).arg(idx);
     return false;
   }
-  DigitalContact *contact = new DigitalContact(type, name, id, rxTone);
+  DMRContact *contact = new DMRContact(type, name, id, rxTone);
   _digital_contacts[idx] = contact;
   _config->contacts()->add(contact);
 
@@ -1900,7 +1900,7 @@ CSVReader::handleGroupList(qint64 idx, const QString &name, const QList<qint64> 
 
 bool
 CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
+    qint64 tot, bool ro, DMRChannel::Admit admit, qint64 color, DMRChannel::TimeSlot slot,
     qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
@@ -1911,7 +1911,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gl);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setGroupListObj(_rxgroups[gl]);
+      _channels[idx]->as<DMRChannel>()->setGroupListObj(_rxgroups[gl]);
     }
 
     // Check TX Contact
@@ -1921,7 +1921,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(contact);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setTXContactObj(_digital_contacts[contact]);
+      _channels[idx]->as<DMRChannel>()->setTXContactObj(_digital_contacts[contact]);
     }
 
     // Check scanlist
@@ -1931,7 +1931,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setScanList(_scanlists[scan]);
+      _channels[idx]->as<DMRChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check GPS System
@@ -1941,13 +1941,13 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gps);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setAPRSObj(_posSystems[gps]);
+      _channels[idx]->as<DMRChannel>()->setAPRSObj(_posSystems[gps]);
     }
 
     // Check roaming zone
     if (0 == roam) {
       // index 0 mean default zone -> just set it
-      _channels[idx]->as<DigitalChannel>()->setRoamingZone(DefaultRoamingZone::get());
+      _channels[idx]->as<DMRChannel>()->setRoamingZone(DefaultRoamingZone::get());
     } else if (0 < roam) {
       // positive index means reference to roaming specific roaming zone
       if (! _roamingZones.contains(roam)) {
@@ -1955,14 +1955,14 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(roam);
         return false;
       }
-      _channels[idx]->as<DigitalChannel>()->setRoamingZone(_roamingZones[roam]);
+      _channels[idx]->as<DMRChannel>()->setRoamingZone(_roamingZones[roam]);
     }
 
     // check radio ID
     if (-1 == radioID) {
-      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(DefaultRadioID::get());
+      _channels[idx]->as<DMRChannel>()->setRadioIdObj(DefaultRadioID::get());
     } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
-      _channels[idx]->as<DigitalChannel>()->setRadioIdObj(_radioIDs[radioID]);
+      _channels[idx]->as<DMRChannel>()->setRadioIdObj(_radioIDs[radioID]);
     } else {
       errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
           .arg(line).arg(column).arg(name).arg(radioID);
@@ -1979,7 +1979,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
     return false;
   }
 
-  DigitalChannel *chan = new DigitalChannel();
+  DMRChannel *chan = new DMRChannel();
   chan->setName(name);
   chan->setRXFrequency(rx);
   chan->setTXFrequency(tx);
@@ -1999,8 +1999,8 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
 bool
 CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
-    AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
     // Check scanlist
@@ -2010,7 +2010,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(scan);
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setScanList(_scanlists[scan]);
+      _channels[idx]->as<FMChannel>()->setScanList(_scanlists[scan]);
     }
 
     // Check APRS system
@@ -2025,7 +2025,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
         return false;
       }
-      _channels[idx]->as<AnalogChannel>()->setAPRSSystem(_posSystems[aprs]->as<APRSSystem>());
+      _channels[idx]->as<FMChannel>()->setAPRSSystem(_posSystems[aprs]->as<APRSSystem>());
     }
     return true;
   }
@@ -2037,7 +2037,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
     return false;
   }
 
-  AnalogChannel *chan = new AnalogChannel();
+  FMChannel *chan = new FMChannel();
   chan->setName(name);
   chan->setRXFrequency(rx);
   chan->setTXFrequency(tx);
@@ -2109,12 +2109,12 @@ CSVReader::handleGPSSystem(
             .arg(line).arg(column).arg(name).arg(revertChannelIdx);
         return false;
       }
-      if (! _channels[revertChannelIdx]->is<DigitalChannel>()) {
+      if (! _channels[revertChannelIdx]->is<DMRChannel>()) {
         errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', revert channel %4 is not a digital channel.")
             .arg(line).arg(column).arg(name).arg(revertChannelIdx);
         return false;
       }
-      gps->setRevertChannel(_channels[revertChannelIdx]->as<DigitalChannel>());
+      gps->setRevertChannel(_channels[revertChannelIdx]->as<DMRChannel>());
     }
 
     return true;
@@ -2148,12 +2148,12 @@ CSVReader::handleAPRSSystem(
           .arg(line).arg(column).arg(name).arg(channelIdx);
       return false;
     }
-    if (! _channels[channelIdx]->is<AnalogChannel>()) {
+    if (! _channels[channelIdx]->is<FMChannel>()) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create APRS system '%3', transmit channel %4 is not an analog channel.")
           .arg(line).arg(column).arg(name).arg(channelIdx);
       return false;
     }
-    aprs->setRevertChannel(_channels[channelIdx]->as<AnalogChannel>());
+    aprs->setRevertChannel(_channels[channelIdx]->as<FMChannel>());
 
     return true;
   }
@@ -2256,13 +2256,13 @@ CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64
         errorMessage = QString("Parse error @ %1,%2: Cannot create zone '%3', unknown channel index %4.")
             .arg(line).arg(column).arg(name).arg(i);
         return false;
-      } else if (_channels[i]->is<AnalogChannel>()) {
+      } else if (_channels[i]->is<FMChannel>()) {
         errorMessage = QString("Parse error @ %1,%2: Cannot add channel '%3' (idx %4) "
                                "to roaming zone, only digital channels can be used.")
             .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
-      _roamingZones[idx]->addChannel(_channels[i]->as<DigitalChannel>());
+      _roamingZones[idx]->addChannel(_channels[i]->as<DMRChannel>());
     }
     // done
     return true;

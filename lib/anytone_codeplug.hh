@@ -115,9 +115,9 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Returns the band width of the channel. */
-    virtual AnalogChannel::Bandwidth bandwidth() const;
+    virtual FMChannel::Bandwidth bandwidth() const;
     /** Sets the band width of the channel. */
-    virtual void setBandwidth(AnalogChannel::Bandwidth bw);
+    virtual void setBandwidth(FMChannel::Bandwidth bw);
 
     /** Returns the transmit offset direction. */
     virtual RepeaterMode repeaterMode() const;
@@ -249,9 +249,9 @@ public:
     virtual void setColorCode(unsigned code);
 
     /** Returns the time slot. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Sets the time slot. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
 
     /** Returns @c true if SMS confirmation is enabled. */
     virtual bool smsConfirm() const;
@@ -362,9 +362,9 @@ public:
     bool isValid() const;
 
     /** Returns the contact type. */
-    virtual DigitalContact::Type type() const;
+    virtual DMRContact::Type type() const;
     /** Sets the contact type. */
-    virtual void setType(DigitalContact::Type type);
+    virtual void setType(DMRContact::Type type);
 
     /** Returns the name of the contact. */
     virtual QString name() const;
@@ -382,9 +382,9 @@ public:
     virtual void setAlertType(AnytoneContactExtension::AlertType type);
 
     /** Assembles a @c DigitalContact from this contact. */
-    virtual DigitalContact *toContactObj(Context &ctx) const;
+    virtual DMRContact *toContactObj(Context &ctx) const;
     /** Constructs this contact from the give @c DigitalContact. */
-    virtual bool fromContactObj(const DigitalContact *contact, Context &ctx);
+    virtual bool fromContactObj(const DMRContact *contact, Context &ctx);
   };
 
   /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
@@ -1143,16 +1143,16 @@ public:
     virtual void setDestination(unsigned id);
 
     /** Returns the call type. */
-    virtual DigitalContact::Type callType() const;
+    virtual DMRContact::Type callType() const;
     /** Sets the call type. */
-    virtual void setCallType(DigitalContact::Type type);
+    virtual void setCallType(DMRContact::Type type);
 
     /** Returns @c true if the timeslot of the channel is overridden. */
     virtual bool timeSlotOverride() const;
     /** Returns the timeslot (only valid if @c timeSlotOverride returns @c true). */
-    virtual DigitalChannel::TimeSlot timeslot() const;
+    virtual DMRChannel::TimeSlot timeslot() const;
     /** Sets the timeslot. */
-    virtual void overrideTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void overrideTimeSlot(DMRChannel::TimeSlot ts);
     /** Disables TS override. */
     virtual void disableTimeSlotOverride();
 
@@ -1569,9 +1569,9 @@ public:
     void clear();
 
     /** Returns the call type. */
-    virtual DigitalContact::Type callType() const;
+    virtual DMRContact::Type callType() const;
     /** Sets the call type. */
-    virtual void setCallType(DigitalContact::Type type);
+    virtual void setCallType(DMRContact::Type type);
 
     /** Returns the destination DMR number. */
     virtual unsigned destination() const;

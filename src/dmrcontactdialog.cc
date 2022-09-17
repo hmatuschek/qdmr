@@ -16,7 +16,7 @@
 
 
 DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent)
-  : QDialog(parent), _myContact(new DigitalContact(this)), _contact(nullptr),
+  : QDialog(parent), _myContact(new DMRContact(this)), _contact(nullptr),
     _user_completer(nullptr), _tg_completer(nullptr), _config(context),
     ui(new Ui::DMRContactDialog)
 {
@@ -39,9 +39,9 @@ DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, 
   construct();
 }
 
-DMRContactDialog::DMRContactDialog(DigitalContact *contact, UserDatabase *users,
+DMRContactDialog::DMRContactDialog(DMRContact *contact, UserDatabase *users,
                                    TalkGroupDatabase *tgs, Config *context, QWidget *parent)
-  : QDialog(parent), _myContact(new DigitalContact(this)), _contact(contact),
+  : QDialog(parent), _myContact(new DMRContact(this)), _contact(contact),
     _user_completer(nullptr), _tg_completer(nullptr), _config(context),
     ui(new Ui::DMRContactDialog)
 {
@@ -76,13 +76,13 @@ DMRContactDialog::construct() {
   ui->setupUi(this);
   Settings settings;
 
-  ui->typeComboBox->addItem(tr("Private Call"), unsigned(DigitalContact::PrivateCall));
-  ui->typeComboBox->addItem(tr("Group Call"), unsigned(DigitalContact::GroupCall));
-  ui->typeComboBox->addItem(tr("All Call"), unsigned(DigitalContact::AllCall));
-  if (DigitalContact::PrivateCall == _myContact->type()) {
+  ui->typeComboBox->addItem(tr("Private Call"), unsigned(DMRContact::PrivateCall));
+  ui->typeComboBox->addItem(tr("Group Call"), unsigned(DMRContact::GroupCall));
+  ui->typeComboBox->addItem(tr("All Call"), unsigned(DMRContact::AllCall));
+  if (DMRContact::PrivateCall == _myContact->type()) {
     ui->typeComboBox->setCurrentIndex(0);
     ui->nameLineEdit->setCompleter(_user_completer);
-  } else if (DigitalContact::GroupCall == _myContact->type()) {
+  } else if (DMRContact::GroupCall == _myContact->type()) {
     ui->typeComboBox->setCurrentIndex(1);
     ui->nameLineEdit->setCompleter(_tg_completer);
   } else {
@@ -149,15 +149,15 @@ DMRContactDialog::onCompleterActivated(const QModelIndex &idx) {
   }
 }
 
-DigitalContact *
+DMRContact *
 DMRContactDialog::contact()
 {
-  _myContact->setType(DigitalContact::Type(ui->typeComboBox->currentData().toUInt()));
+  _myContact->setType(DMRContact::Type(ui->typeComboBox->currentData().toUInt()));
   _myContact->setName(ui->nameLineEdit->text().simplified());
   _myContact->setNumber(ui->numberLineEdit->text().toUInt());
   _myContact->setRing(ui->ringCheckBox->isChecked());
 
-  DigitalContact *contact = _myContact;
+  DMRContact *contact = _myContact;
   if (_contact) {
     _contact->copy(*_myContact);
     contact = _contact;

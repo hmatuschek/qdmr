@@ -55,10 +55,10 @@ RoamingZoneListView::onGenRoamingZone() {
   if (QDialog::Accepted != contSel.exec())
     return;
 
-  QList<DigitalContact *> contacts = contSel.contacts();
+  QList<DMRContact *> contacts = contSel.contacts();
   RoamingZone *zone = new RoamingZone("Name");
   for (int i=0; i<_config->channelList()->count(); i++) {
-    DigitalChannel *dch = _config->channelList()->channel(i)->as<DigitalChannel>();
+    DMRChannel *dch = _config->channelList()->channel(i)->as<DMRChannel>();
     if (nullptr == dch)
       continue;
     if (contacts.contains(dch->txContactObj()))

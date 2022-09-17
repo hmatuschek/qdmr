@@ -6,7 +6,7 @@
 #include "channel.hh"
 #include "contact.hh"
 
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
@@ -237,9 +237,9 @@ public:
     virtual void setTXColorCode(unsigned int cc);
 
     /** Returns the times slot for the channel. Only valid for DMR channels. */
-    virtual DigitalChannel::TimeSlot timeslot() const;
+    virtual DMRChannel::TimeSlot timeslot() const;
     /** Sets the timeslot for the channel. Only valid for DMR channels. */
-    virtual void setTimeslot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeslot(DMRChannel::TimeSlot ts);
 
     /** Returns @c true if the DMR contact index is set. */
     virtual bool hasDMRContactIndex() const;
@@ -347,9 +347,9 @@ public:
     virtual void enableDMRRing(bool enable);
 
     /** Returns the contact type. Only valid for DMR contacts. */
-    virtual DigitalContact::Type dmrContactType() const;
+    virtual DMRContact::Type dmrContactType() const;
     /** Sets the contact type. */
-    virtual void setDMRContactType(DigitalContact::Type type);
+    virtual void setDMRContactType(DMRContact::Type type);
 
     /** Returns the contact call. */
     virtual QString m17Call() const;
@@ -357,9 +357,9 @@ public:
     virtual bool setM17Call(const QString &call, const ErrorStack &err=ErrorStack());
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DigitalContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DigitalContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual void fromContactObj(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Just holds the offsets within the codeplug. */

@@ -201,16 +201,16 @@ public:
     virtual bool overridesTimeSlot() const;
     /** Returns the time slot associated with the contact.
      * Only valid if @c overridesTimeSlot returns @c true. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Associates the given time slot with this contact.
      * This will cause the use this time slot whenever this contact is chosen as the TX contact.
      * Irrespective of the selected time slot of the channel. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
     /** Disables time slot override feature. */
     virtual void disableTimeSlotOverride();
 
-    DigitalContact *toContactObj(Context &ctx) const;
-    void fromContactObj(const DigitalContact *c, Context &ctx);
+    DMRContact *toContactObj(Context &ctx) const;
+    void fromContactObj(const DMRContact *c, Context &ctx);
   };
 
   /** Implements the OpenGD77 specific group list.

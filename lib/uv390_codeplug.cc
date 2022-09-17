@@ -172,8 +172,8 @@ UV390Codeplug::ChannelElement::toChannelObj() const {
     return nullptr;
 
   // decode squelch setting
-  if (ch->is<AnalogChannel>()) {
-    AnalogChannel *ach = ch->as<AnalogChannel>();
+  if (ch->is<FMChannel>()) {
+    FMChannel *ach = ch->as<FMChannel>();
     ach->setSquelch(squelch());
   }
   // Common settings
@@ -201,8 +201,8 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
     setPower(chan->power());
   setSquelch(0);
 
-  if (chan->is<AnalogChannel>()) {
-    const AnalogChannel *achan = chan->as<const AnalogChannel>();
+  if (chan->is<FMChannel>()) {
+    const FMChannel *achan = chan->as<const FMChannel>();
     if (achan->defaultSquelch())
       setSquelch(ctx.config()->settings()->squelch());
     else
@@ -714,7 +714,7 @@ UV390Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &er
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
       continue;
-    if (DigitalContact *obj = cont.toContactObj()) {
+    if (DMRContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid contact at index " << i << ".";

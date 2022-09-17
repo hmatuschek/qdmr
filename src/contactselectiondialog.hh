@@ -4,7 +4,7 @@
 #include <QList>
 #include <QDialog>
 
-class DigitalContact;
+class DMRContact;
 class ContactList;
 class QListWidget;
 class QLabel;
@@ -17,7 +17,7 @@ class MultiGroupCallSelectionDialog: public QDialog
 public:
   explicit MultiGroupCallSelectionDialog(ContactList *contacts, bool showPrivateCalls=false, QWidget *parent=nullptr);
 
-  QList<DigitalContact *> contacts();
+  QList<DMRContact *> contacts();
 
   void setLabel(const QString &text);
 

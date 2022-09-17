@@ -51,9 +51,9 @@ RoamingZoneDialog::onAddChannel() {
   foreach (Channel *channel, lst) {
     if (0 <= _myZone->channels()->indexOf(channel))
       continue;
-    if (channel->is<AnalogChannel>())
+    if (channel->is<FMChannel>())
       continue;
-    _myZone->addChannel(channel->as<DigitalChannel>());
+    _myZone->addChannel(channel->as<DMRChannel>());
   }
 }
 
@@ -62,10 +62,10 @@ RoamingZoneDialog::onRemChannel() {
   if (! channelListView->hasSelection())
     return;
   QPair<int, int> selection = channelListView->selection();
-  QList<DigitalChannel *> channels;
+  QList<DMRChannel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
-    channels.push_back(_myZone->channels()->get(i)->as<DigitalChannel>());
-  foreach (DigitalChannel *channel, channels) {
+    channels.push_back(_myZone->channels()->get(i)->as<DMRChannel>());
+  foreach (DMRChannel *channel, channels) {
     _myZone->channels()->del(channel);
   }
 }

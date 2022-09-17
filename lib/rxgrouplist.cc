@@ -59,15 +59,15 @@ RXGroupList::clear() {
   emit modified(this);
 }
 
-DigitalContact *
+DMRContact *
 RXGroupList::contact(int idx) const {
   if (idx >= _contacts.count())
     return nullptr;
-  return _contacts.get(idx)->as<DigitalContact>();
+  return _contacts.get(idx)->as<DMRContact>();
 }
 
 int
-RXGroupList::addContact(DigitalContact *contact, int idx) {
+RXGroupList::addContact(DMRContact *contact, int idx) {
   return _contacts.add(contact, idx);
 }
 
@@ -76,12 +76,12 @@ RXGroupList::remContact(int idx) {
   return _contacts.del(_contacts.get(idx));
 }
 
-const DigitalContactRefList *
+const DMRContactRefList *
 RXGroupList::contacts() const {
   return &_contacts;
 }
 
-DigitalContactRefList *
+DMRContactRefList *
 RXGroupList::contacts() {
   return &_contacts;
 }

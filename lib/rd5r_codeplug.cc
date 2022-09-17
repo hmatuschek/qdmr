@@ -82,8 +82,8 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! RadioddityCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *ac = c->as<FMChannel>();
     if (ac->defaultSquelch())
       setSquelch(ctx.config()->settings()->squelch());
     else if (ac->squelchDisabled())
@@ -104,8 +104,8 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (nullptr == ch)
     return nullptr;
 
-  if (ch->is<AnalogChannel>()) {
-    AnalogChannel *ac = ch->as<AnalogChannel>();
+  if (ch->is<FMChannel>()) {
+    FMChannel *ac = ch->as<FMChannel>();
     ac->setSquelch(squelch());
   }
 
@@ -307,7 +307,7 @@ RD5RCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err
     if (!el.isValid())
       continue;
 
-    DigitalContact *cont = el.toContactObj(ctx);
+    DMRContact *cont = el.toContactObj(ctx);
     ctx.add(cont, i+1); config->contacts()->add(cont);
   }
   return true;
@@ -640,7 +640,7 @@ RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
     // Only group calls are encoded
     int count = 0;
     for (int j=0; j<config->rxGroupLists()->list(i)->count(); j++)
-      if (DigitalContact::GroupCall == config->rxGroupLists()->list(i)->contact(j)->type())
+      if (DMRContact::GroupCall == config->rxGroupLists()->list(i)->contact(j)->type())
         count++;
     bank.setContactCount(i, count);
   }

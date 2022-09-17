@@ -43,13 +43,13 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
 
   /* Define limits for contacts. */
   add("contacts", new RadioLimitList{
-        { DigitalContact::staticMetaObject, 1, 10000, new RadioLimitObject {
+        { DMRContact::staticMetaObject, 1, 10000, new RadioLimitObject {
             { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
             { "ring", new RadioLimitBool() },
             { "type", new RadioLimitEnum {
-                (unsigned) DigitalContact::PrivateCall,
-                (unsigned) DigitalContact::GroupCall,
-                (unsigned) DigitalContact::AllCall
+                (unsigned) DMRContact::PrivateCall,
+                (unsigned) DMRContact::GroupCall,
+                (unsigned) DMRContact::AllCall
               }},
             { "number", new RadioLimitUInt(0, 16777215) }
           } },
@@ -67,7 +67,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
   add("channels", new RadioLimitList(
         Channel::staticMetaObject, 1, 1000,
         new RadioLimitObjects {
-          { AnalogChannel::staticMetaObject,
+          { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
@@ -80,18 +80,18 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"admit", new RadioLimitEnum{
-                 (unsigned)AnalogChannel::Admit::Always,
-                 (unsigned)AnalogChannel::Admit::Free,
-                 (unsigned)AnalogChannel::Admit::Tone
+                 (unsigned)FMChannel::Admit::Always,
+                 (unsigned)FMChannel::Admit::Free,
+                 (unsigned)FMChannel::Admit::Tone
                } },
               {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"bandwidth", new RadioLimitEnum{
-                 (unsigned)AnalogChannel::Bandwidth::Narrow,
-                 (unsigned)AnalogChannel::Bandwidth::Wide
+                 (unsigned)FMChannel::Bandwidth::Narrow,
+                 (unsigned)FMChannel::Bandwidth::Wide
                }},
               {"aprs", new RadioLimitObjRefIgnored(nullptr, RadioLimitIssue::Hint)}
             } },
-          { DigitalChannel::staticMetaObject,
+          { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies(freqRanges, true)},
@@ -106,16 +106,16 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
-                 unsigned(DigitalChannel::Admit::Always),
-                 unsigned(DigitalChannel::Admit::Free),
-                 unsigned(DigitalChannel::Admit::ColorCode) } },
+                 unsigned(DMRChannel::Admit::Always),
+                 unsigned(DMRChannel::Admit::Free),
+                 unsigned(DMRChannel::Admit::ColorCode) } },
               {"colorCode", new RadioLimitUInt(0,16)},
               {"timeSlot", new RadioLimitEnum {
-                 unsigned(DigitalChannel::TimeSlot::TS1),
-                 unsigned(DigitalChannel::TimeSlot::TS2) } },
+                 unsigned(DMRChannel::TimeSlot::TS1),
+                 unsigned(DMRChannel::TimeSlot::TS2) } },
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
-              {"contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, true)},
+              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, true)},
               {"aprs", new RadioLimitObjRefIgnored()},
               {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -147,8 +147,8 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &
         GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
-          { "contact", new RadioLimitObjRef(DigitalContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DigitalChannel::staticMetaObject, true) }
+          { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
+          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
         } ) );
 
   /* Ignore roaming zones. */
