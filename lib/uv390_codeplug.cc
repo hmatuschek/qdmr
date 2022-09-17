@@ -643,12 +643,12 @@ UV390Codeplug::clearChannels() {
 
 bool
 UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
-  for (int i=0; i<NUM_CHANNELS; i++) {
+  for (unsigned int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < config->channelList()->count()) {
-      chan.fromChannelObj(config->channelList()->channel(i), ctx);
+    if (i < ctx.count<Channel>()) {
+      chan.fromChannelObj(ctx.get<Channel>(i+1), ctx);
     } else {
       chan.clear();
     }
@@ -695,12 +695,12 @@ UV390Codeplug::clearContacts() {
 
 bool
 UV390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(config); Q_UNUSED(err)
   // Encode contacts
-  for (int i=0; i<NUM_CONTACTS; i++) {
+  for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < config->contacts()->digitalCount())
-      cont.fromContactObj(config->contacts()->digitalContact(i));
+    if (i < ctx.count<DMRContact>())
+      cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();
   }
