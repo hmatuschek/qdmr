@@ -11,7 +11,7 @@
 <para>
   The <token>contacts</token> element specifies a list of all contacts. Each contact is a map 
   that contains a single entry to specify the contact type. The key specifies the type name and 
-  the value specifies the actual contact definition. Currently there are two possible contact 
+  the value specifies the actual contact definition. Currently there are three possible contact 
   types.
 </para>
 
@@ -82,6 +82,48 @@
     </listitem>
   </varlistentry>
 </variablelist>
+</section>
+
+
+<section>
+  <info>
+    <title>M17 Contacts (<token>m17</token>)</title>
+  </info>
+  
+  <para>
+    An M17 contact is a simple object and is usually defined in one line. Each contact contains
+    an optional <token>id</token> that will be used to reference this contact throughout the
+    codeplug (e.g., in M17 channels). For now, M17 is only supported by radios running the 
+    <ulink url="https://openrtx.org"><citetitle>OpenRTX firmware</citetitle></ulink>.
+  </para>
+
+  <variablelist>
+    <title>M17 Contact Fields</title>
+    <varlistentry>
+      <term><token>id</token></term>
+      <listitem>
+        <para>Specifies the identifier of the contact. This identifier can later be used to 
+          reference the contact. Any unique string is valid.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>call</token></term>
+      <listitem>
+        <para>Specifies the call (M17 ID) of the contact. This must be a string of not more than 9
+          chars, containing only <token>A-Z</token>, <token>0-9</token>, <token>.</token>, 
+          <token>/</token> &amp; <token>-</token>. See <ulink 
+          url="https://m17-protocol-specification.readthedocs.io/en/latest/address_encoding.html">
+          <citetitle>M17 specification</citetitle></ulink></para> for details.
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>broadcast</token></term>
+      <listitem>
+        <para>Specifies whether the contact is the M17 broadcast destination. Default is 
+          <token>false</token>. If <token>true</token>, the <token>call</token> is ignored.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
 </section>
 
 
