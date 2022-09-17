@@ -782,8 +782,7 @@ OpenRTXCodeplug::ContactElement::setM17Call(const QString &call, const ErrorStac
   return true;
 }
 
-DMRContact *
-OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
+DigitalContact *OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
 
   if (! isValid()) {
@@ -791,18 +790,26 @@ OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &er
     return nullptr;
   }
 
-  if (Mode_DMR != mode()) {
-    errMsg(err) << "Only DMR contacts are implemented.";
-    return nullptr;
+  if (Mode_DMR == mode()) {
+    DMRContact *contact = new DMRContact();
+
+    contact->setName(name());
+    contact->setRing(dmrRing());
+    contact->setNumber(dmrId());
+    contact->setType(dmrContactType());
+
+    return contact;
+  } else if (Mode_M17 == mode()) {
+    M17Contact *contact = new M17Contact();
+
+    contact->setName(name());
+    contact->setRing(dmrRing());
+    contact->setCall(m17Call());
+
+    return contact;
   }
 
-  DMRContact *contact = new DMRContact();
-  contact->setName(name());
-  contact->setNumber(dmrId());
-  contact->setType(dmrContactType());
-  contact->setRing(dmrRing());
-
-  return contact;
+  return nullptr;
 }
 
 bool
@@ -1111,7 +1118,7 @@ OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &
   unsigned int numContacts = HeaderElement(data(0x0000)).contactCount();
 
   for (unsigned int i=0; i<numContacts; i++) {
-    DMRContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
+    DigitalContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
     if (nullptr == contact) {
       errMsg(err) << "Cannot create " << (i+1) << "-th contact.";
       return false;

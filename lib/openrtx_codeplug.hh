@@ -357,7 +357,7 @@ public:
     virtual bool setM17Call(const QString &call, const ErrorStack &err=ErrorStack());
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual DigitalContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
     virtual bool fromContactObj(const DigitalContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
