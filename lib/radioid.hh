@@ -82,6 +82,42 @@ private:
 };
 
 
+/** Implements the M17 radio ID.
+ * @ingroup conf */
+class M17RadioID: public RadioID
+{
+  Q_OBJECT
+
+  /** The callsign of the radio ID. */
+  Q_PROPERTY(QString call READ call WRITE setCall)
+
+public:
+  /** Default constructor. */
+  explicit M17RadioID(QObject *parent=nullptr);
+
+  /** Constructor.
+   * @param name Specifies the name of the ID.
+   * @param call Specifies the M17 callsign/ID.
+   * @param parent Specifies the parent QObject owning this object. */
+  M17RadioID(const QString &name, const QString &call, QObject *parent = nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the M17 call/ID. */
+  const QString &call() const;
+  /** Sets the M17 call/ID. */
+  void setCall(const QString &call);
+
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
+  bool link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Holds the M17 call/ID. */
+  QString _call;
+};
+
+
 /** Represents a DTMF radio ID as used for PTT-ID on analog channels.
  *
  * This class just holds the name and DTMF number of the ID.

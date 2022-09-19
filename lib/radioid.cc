@@ -1,6 +1,7 @@
 #include "radioid.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include "contact.hh"
 
 
 /* ********************************************************************************************* *
@@ -115,6 +116,86 @@ DefaultRadioID::get() {
   if (nullptr == _instance)
     _instance = new DefaultRadioID();
   return _instance;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of M17RadioID
+ * ********************************************************************************************* */
+M17RadioID::M17RadioID(QObject *parent)
+  : RadioID("id", parent), _call()
+{
+  // pass...
+}
+
+M17RadioID::M17RadioID(const QString &name, const QString &call, QObject *parent)
+  : RadioID(name, "id", parent), _call()
+{
+  setCall(call);
+}
+
+ConfigItem *
+M17RadioID::clone() const {
+  M17RadioID *id = new M17RadioID();
+  if (! id->copy(*this)) {
+    id->deleteLater();
+    return nullptr;
+  }
+  return id;
+}
+
+const QString &
+M17RadioID::call() const {
+  return _call;
+}
+
+void
+M17RadioID::setCall(const QString &call) {
+  if (call == _call)
+    return;
+  _call = M17Contact::normalizeCall(call);
+  emit modified(this);
+}
+
+YAML::Node
+M17RadioID::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = RadioID::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  type["m17"] = node;
+
+  return type;
+}
+
+bool
+M17RadioID::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse M17 radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::parse(node.begin()->second, ctx, err);
+}
+
+bool
+M17RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot link M17 radio id: Expected object with one child.";
+    return false;
+  }
+
+  return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 
@@ -258,6 +339,10 @@ RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if ("dmr" == type) {
     return new DMRRadioID();
+  } else if ("m17" == type) {
+    return new M17RadioID();
+  } else if ("dtmf" == type) {
+    return new DTMFRadioID();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column
