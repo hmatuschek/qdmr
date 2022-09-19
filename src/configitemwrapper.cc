@@ -256,9 +256,13 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   switch (index.column()) {
   case 0:
     if (channel->is<FMChannel>())
-      return tr("Analog");
+      return tr("FM");
+    else if (channel->is<DMRChannel>())
+      return tr("DMR");
+    else if (channel->is<M17Channel>())
+      return tr("M17");
     else
-      return tr("Digital");
+      return QVariant();
   case 1:
     return channel->name();
   case 2:
@@ -287,44 +291,54 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      switch (digi->admit()) {
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      switch (dmr->admit()) {
       case DMRChannel::Admit::Always: return tr("Always"); break;
       case DMRChannel::Admit::Free: return tr("Free"); break;
       case DMRChannel::Admit::ColorCode: return tr("Color"); break;
       }
-    } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      switch (analog->admit()) {
+    } else if (FMChannel *fm = channel->as<FMChannel>()) {
+      switch (fm->admit()) {
       case FMChannel::Admit::Always: return tr("Always"); break;
       case FMChannel::Admit::Free: return tr("Free"); break;
       case FMChannel::Admit::Tone: return tr("Tone"); break;
       }
+    } else if (channel->is<M17Channel>()) {
+      return tr("[None]");
     }
     break;
   case 8:
     if (channel->scanList()) {
       return channel->scanList()->name();
     } else {
-      return tr("-");
+      return tr("[None]");
     }
   case 9:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      return digi->colorCode();
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      return dmr->colorCode();
+    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
+      return m17->accessNumber();
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
   case 10:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      return (DMRChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
-    } else if (channel->is<FMChannel>()) {
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      return (DMRChannel::TimeSlot::TS1 == dmr->timeSlot()) ? 1 : 2;
+    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     }
     break;
   case 11:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->groupListObj()) {
-        return digi->groupListObj()->name();
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      if (dmr->groupListObj()) {
+        return dmr->groupListObj()->name();
+      } else {
+        return tr("-");
+      }
+    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
+      if (m17->groupList()) {
+        return m17->groupList()->name();
       } else {
         return tr("-");
       }
@@ -338,6 +352,11 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return digi->txContactObj()->name();
       else
         return tr("-");
+    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
+      if (m17->contact())
+        return m17->contact()->name();
+      else
+        return tr("-");
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
@@ -347,19 +366,23 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
         return tr("[Default]");
       return digi->radioIdObj()->name();
-    } else if (channel->is<FMChannel>()) {
+    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     }
     break;
   case 14:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->aprsObj())
-        return digi->aprsObj()->name();
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      if (dmr->aprsObj())
+        return dmr->aprsObj()->name();
       else
         return tr("-");
-    } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (analog->aprsSystem())
-        return analog->aprsSystem()->name();
+    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
+      if (m17->gpsEnabled())
+        return tr("Enabled");
+      return tr("Disabled");
+    } else if (FMChannel *fm = channel->as<FMChannel>()) {
+      if (fm->aprsSystem())
+        return fm->aprsSystem()->name();
       else
         return tr("-");
     }
@@ -371,12 +394,12 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       else if (DefaultRoamingZone::get() == digi->roamingZone())
         return tr("[Default]");
       return digi->roamingZone()->name();
-    } else if (channel->is<FMChannel>()) {
+    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     }
     break;
   case 16:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (analog->defaultSquelch())
@@ -388,7 +411,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 17:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (Signaling::SIGNALING_NONE == analog->rxTone()) {
@@ -398,7 +421,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 18:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (Signaling::SIGNALING_NONE == analog->txTone()) {
@@ -408,7 +431,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 19:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (FMChannel::Bandwidth::Wide == analog->bandwidth()) {

@@ -9,13 +9,13 @@
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
  * ********************************************************************************************* */
-AnalogChannelDialog::AnalogChannelDialog(Config *config, QWidget *parent)
+FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new FMChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-AnalogChannelDialog::AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent)
+FMChannelDialog::FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (nullptr == _channel)
@@ -28,7 +28,7 @@ AnalogChannelDialog::AnalogChannelDialog(Config *config, FMChannel *channel, QWi
 }
 
 void
-AnalogChannelDialog::construct() {
+FMChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
@@ -127,7 +127,7 @@ AnalogChannelDialog::construct() {
 }
 
 FMChannel *
-AnalogChannelDialog::channel()
+FMChannelDialog::channel()
 {
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(rxFrequency->text().toDouble());
@@ -169,7 +169,7 @@ AnalogChannelDialog::channel()
 }
 
 void
-AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
+FMChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
@@ -189,22 +189,22 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 void
-AnalogChannelDialog::onPowerDefaultToggled(bool checked) {
+FMChannelDialog::onPowerDefaultToggled(bool checked) {
   powerValue->setEnabled(!checked);
 }
 
 void
-AnalogChannelDialog::onTimeoutDefaultToggled(bool checked) {
+FMChannelDialog::onTimeoutDefaultToggled(bool checked) {
   totValue->setEnabled(!checked);
 }
 
 void
-AnalogChannelDialog::onSquelchDefaultToggled(bool checked) {
+FMChannelDialog::onSquelchDefaultToggled(bool checked) {
   squelchValue->setEnabled(! checked);
 }
 
 void
-AnalogChannelDialog::onVOXDefaultToggled(bool checked) {
+FMChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 

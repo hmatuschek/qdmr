@@ -3,6 +3,7 @@
 
 #include "analogchanneldialog.hh"
 #include "digitalchanneldialog.hh"
+#include "m17channeldialog.hh"
 #include "config.hh"
 #include "settings.hh"
 
@@ -42,7 +43,7 @@ ChannelListView::~ChannelListView() {
 
 void
 ChannelListView::onAddFMChannel() {
-  AnalogChannelDialog dialog(_config);
+  FMChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -54,7 +55,7 @@ ChannelListView::onAddFMChannel() {
 
 void
 ChannelListView::onAddDMRChannel() {
-  DigitalChannelDialog dialog(_config);
+  DMRChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -66,7 +67,7 @@ ChannelListView::onAddDMRChannel() {
 
 void
 ChannelListView::onAddM17Channel() {
-  DigitalChannelDialog dialog(_config);
+  M17ChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -97,7 +98,7 @@ ChannelListView::onCloneChannel() {
     // clone channel
     FMChannel *clone = new FMChannel(*(channel->as<FMChannel>()));
     // open editor
-    AnalogChannelDialog dialog(_config, clone);
+    FMChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
       // if rejected -> destroy clone
       clone->deleteLater();
@@ -107,11 +108,24 @@ ChannelListView::onCloneChannel() {
     dialog.channel();
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
-  } else {
+  } else if (channel->is<DMRChannel>()) {
     // clone channel
     DMRChannel *clone = new DMRChannel(*(channel->as<DMRChannel>()));
     // open editor
-    DigitalChannelDialog dialog(_config, clone);
+    DMRChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->add(clone, row+1);
+  } else if (channel->is<M17Channel>()) {
+    // clone channel
+    M17Channel *clone = new M17Channel(*(channel->as<M17Channel>()));
+    // open editor
+    M17ChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
       clone->deleteLater();
       return;
@@ -162,12 +176,17 @@ ChannelListView::onEditChannel(unsigned row) {
   if (! channel)
     return;
   if (channel->is<FMChannel>()) {
-    AnalogChannelDialog dialog(_config, channel->as<FMChannel>());
+    FMChannelDialog dialog(_config, channel->as<FMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();
-  } else {
-    DigitalChannelDialog dialog(_config, channel->as<DMRChannel>());
+  } else if (channel->is<DMRChannel>()) {
+    DMRChannelDialog dialog(_config, channel->as<DMRChannel>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.channel();
+  } else if (channel->is<M17Channel>()) {
+    M17ChannelDialog dialog(_config, channel->as<M17Channel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();

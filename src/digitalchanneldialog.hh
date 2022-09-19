@@ -6,13 +6,13 @@
 
 #include "ui_digitalchanneldialog.h"
 
-class DigitalChannelDialog: public QDialog, private Ui::DigitalChannelDialog
+class DMRChannelDialog: public QDialog, private Ui::DigitalChannelDialog
 {
   Q_OBJECT
 
 public:
-  DigitalChannelDialog(Config *config, QWidget *parent=nullptr);
-  DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
+  DMRChannelDialog(Config *config, QWidget *parent=nullptr);
+  DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
 
   DMRChannel *channel();
 

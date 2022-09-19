@@ -13,13 +13,13 @@
 /* ********************************************************************************************* *
  * Implementation of DigitalChannelDialog
  * ********************************************************************************************* */
-DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new DMRChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (_channel) {
@@ -30,7 +30,7 @@ DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, 
 }
 
 void
-DigitalChannelDialog::construct() {
+DMRChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
@@ -71,6 +71,8 @@ DigitalChannelDialog::construct() {
   if (_myChannel && (nullptr == _myChannel->txContactObj()))
     txContact->setCurrentIndex(0);
   for (int i=0; i<_config->contacts()->count(); i++) {
+    if (! _config->contacts()->contact(i)->is<DMRContact>())
+      continue;
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
     if (_myChannel && (_myChannel->txContactObj() == _config->contacts()->contact(i)) )
@@ -149,7 +151,7 @@ DigitalChannelDialog::construct() {
 }
 
 DMRChannel *
-DigitalChannelDialog::channel()
+DMRChannelDialog::channel()
 {
   _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
@@ -190,7 +192,7 @@ DigitalChannelDialog::channel()
 }
 
 void
-DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
+DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
@@ -205,17 +207,17 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 void
-DigitalChannelDialog::onPowerDefaultToggled(bool checked) {
+DMRChannelDialog::onPowerDefaultToggled(bool checked) {
   powerValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onTimeoutDefaultToggled(bool checked) {
+DMRChannelDialog::onTimeoutDefaultToggled(bool checked) {
   totValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onVOXDefaultToggled(bool checked) {
+DMRChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 

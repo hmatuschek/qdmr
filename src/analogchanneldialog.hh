@@ -6,13 +6,13 @@
 
 #include "ui_analogchanneldialog.h"
 
-class AnalogChannelDialog: public QDialog, private Ui::AnalogChannelDialog
+class FMChannelDialog: public QDialog, private Ui::AnalogChannelDialog
 {
   Q_OBJECT
 
 public:
-  AnalogChannelDialog(Config *config, QWidget *parent=nullptr);
-  AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
+  FMChannelDialog(Config *config, QWidget *parent=nullptr);
+  FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
 
   FMChannel *channel();
 
