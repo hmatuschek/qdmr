@@ -1,12 +1,13 @@
 #include "contactlistview.hh"
 #include "ui_contactlistview.h"
 #include "dmrcontactdialog.hh"
+#include "m17contactdialog.hh"
 #include "dtmfcontactdialog.hh"
 #include "application.hh"
 #include "settings.hh"
 #include <QMessageBox>
 #include <QHeaderView>
-
+#include <QMenu>
 
 ContactListView::ContactListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::ContactListView), _config(config)
@@ -20,8 +21,15 @@ ContactListView::ContactListView(Config *config, QWidget *parent)
 
   ui->listView->setModel(new ContactListWrapper(_config->contacts(), ui->listView));
 
-  connect(ui->addDMRContact, SIGNAL(clicked()), this, SLOT(onAddDMRContact()));
-  connect(ui->addDTMFContact, SIGNAL(clicked()), this, SLOT(onAddDTMFContact()));
+  QMenu *menu = new QMenu();
+  menu->addAction(ui->actionAdd_DMR_Contact);
+  menu->addAction(ui->actionAdd_M17_Contact);
+  menu->addAction(ui->actionAdd_DTMF_Contact);
+  ui->addContact->setMenu(menu);
+
+  connect(ui->actionAdd_DMR_Contact, SIGNAL(triggered(bool)), this, SLOT(onAddDMRContact()));
+  connect(ui->actionAdd_M17_Contact, SIGNAL(triggered(bool)), this, SLOT(onAddM17Contact()));
+  connect(ui->actionAdd_DTMF_Contact, SIGNAL(triggered(bool)), this, SLOT(onAddDTMFContact()));
   connect(ui->remContact, SIGNAL(clicked()), this, SLOT(onRemContact()));
   connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditContact(unsigned)));
 }
@@ -34,6 +42,18 @@ void
 ContactListView::onAddDMRContact() {
   Application *app = qobject_cast<Application *>(QApplication::instance());
   DMRContactDialog dialog(app->user(), app->talkgroup(), _config);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  int row=-1;
+  if (ui->listView->hasSelection())
+    row = ui->listView->selection().second+1;
+  _config->contacts()->add(dialog.contact(), row);
+}
+
+void
+ContactListView::onAddM17Contact() {
+  M17ContactDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -94,8 +114,13 @@ ContactListView::onEditContact(unsigned row) {
   Application *app = qobject_cast<Application *>(QApplication::instance());
   Contact *contact = _config->contacts()->contact(row);
 
-  if (DMRContact *digi = contact->as<DMRContact>()) {
-    DMRContactDialog dialog(digi, app->user(), app->talkgroup(), _config);
+  if (DMRContact *dmr = contact->as<DMRContact>()) {
+    DMRContactDialog dialog(dmr, app->user(), app->talkgroup(), _config);
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.contact();
+  } else if (M17Contact *m17 = contact->as<M17Contact>()) {
+    M17ContactDialog dialog(_config, m17);
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.contact();

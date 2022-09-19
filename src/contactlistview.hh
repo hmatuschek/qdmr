@@ -18,6 +18,7 @@ public:
 
 protected slots:
   void onAddDMRContact();
+  void onAddM17Contact();
   void onAddDTMFContact();
   void onRemContact();
   void onEditContact(unsigned row);

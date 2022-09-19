@@ -17,8 +17,9 @@ public:
   ~ChannelListView();
 
 protected slots:
-  void onAddAnalogChannel();
-  void onAddDigitalChannel();
+  void onAddFMChannel();
+  void onAddDMRChannel();
+  void onAddM17Channel();
   void onCloneChannel();
   void onRemChannel();
   void onEditChannel(unsigned row);

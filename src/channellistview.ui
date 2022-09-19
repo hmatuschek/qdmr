@@ -27,22 +27,12 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <widget class="QPushButton" name="addAnalogChannel">
+      <widget class="QPushButton" name="addChannel">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
+       </property>
        <property name="text">
-        <string>Add Analog Channel</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt+A</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="addDigitalChannel">
-       <property name="text">
-        <string>Add Digital Channel</string>
-       </property>
-       <property name="shortcut">
-        <string>Alt+D</string>
+        <string>Add Channel</string>
        </property>
       </widget>
      </item>
@@ -69,6 +59,30 @@
     </layout>
    </item>
   </layout>
+  <action name="actionAdd_FM_Channel">
+   <property name="text">
+    <string>Add FM Channel</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an FM channel to the list.</string>
+   </property>
+  </action>
+  <action name="actionAdd_DMR_Channel">
+   <property name="text">
+    <string>Add DMR Channel</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds a new DMR channel to the list.</string>
+   </property>
+  </action>
+  <action name="actionAdd_M17_Channel">
+   <property name="text">
+    <string>Add M17 Channel</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an M17 channel to the list.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

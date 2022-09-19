@@ -8,7 +8,7 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
-
+#include <QMenu>
 
 ChannelListView::ChannelListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::ChannelListView), _config(config)
@@ -21,9 +21,15 @@ ChannelListView::ChannelListView(Config *config, QWidget *parent)
           this, SLOT(storeChannelListSectionState()));
 
   ui->listView->setModel(new ChannelListWrapper(_config->channelList(), ui->listView));
+  QMenu *menu = new QMenu();
+  menu->addAction(ui->actionAdd_FM_Channel);
+  menu->addAction(ui->actionAdd_DMR_Channel);
+  menu->addAction(ui->actionAdd_M17_Channel);
+  ui->addChannel->setMenu(menu);
 
-  connect(ui->addAnalogChannel, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
-  connect(ui->addDigitalChannel, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
+  connect(ui->actionAdd_FM_Channel, SIGNAL(triggered(bool)), this, SLOT(onAddFMChannel()));
+  connect(ui->actionAdd_DMR_Channel, SIGNAL(triggered(bool)), this, SLOT(onAddDMRChannel()));
+  connect(ui->actionAdd_M17_Channel, SIGNAL(triggered(bool)), this, SLOT(onAddM17Channel()));
   connect(ui->cloneChannel, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
   connect(ui->remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
   connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditChannel(unsigned)));
@@ -35,7 +41,7 @@ ChannelListView::~ChannelListView() {
 
 
 void
-ChannelListView::onAddAnalogChannel() {
+ChannelListView::onAddFMChannel() {
   AnalogChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;
@@ -47,7 +53,19 @@ ChannelListView::onAddAnalogChannel() {
 }
 
 void
-ChannelListView::onAddDigitalChannel() {
+ChannelListView::onAddDMRChannel() {
+  DigitalChannelDialog dialog(_config);
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  int row=-1;
+  if (ui->listView->hasSelection())
+    row = ui->listView->selection().second+1;
+  _config->channelList()->add(dialog.channel(), row);
+}
+
+void
+ChannelListView::onAddM17Channel() {
   DigitalChannelDialog dialog(_config);
   if (QDialog::Accepted != dialog.exec())
     return;

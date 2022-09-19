@@ -520,25 +520,42 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
           return QVariant();
       }
     } else if (contact->is<DMRContact>()) {
-      DMRContact *digi = contact->as<DMRContact>();
+      DMRContact *dmr = contact->as<DMRContact>();
       switch (index.column()) {
         case 0:
-          switch (digi->type()) {
+          switch (dmr->type()) {
             case DMRContact::PrivateCall: return tr("Private Call");
             case DMRContact::GroupCall: return tr("Group Call");
             case DMRContact::AllCall: return tr("All Call");
           }
         case 1:
-          return digi->name();
+          return dmr->name();
         case 2:
-          return digi->number();
+          return dmr->number();
         case 3:
-          return (digi->ring() ? tr("On") : tr("Off"));
+          return (dmr->ring() ? tr("On") : tr("Off"));
         default:
           return QVariant();
       }
+    } else if (contact->is<M17Contact>()) {
+      M17Contact *m17 = contact->as<M17Contact>();
+      switch (index.column()) {
+      case 0:
+        return tr("M17");
+      case 1:
+        return m17->name();
+      case 2:
+        if (m17->isBroadcast())
+          return tr("[Broadcast]");
+        return m17->call();
+      case 3:
+        return (m17->ring() ? tr("On") : tr("Off"));
+      default:
+        return QVariant();
+      }
     }
   }
+
   return QVariant();
 }
 

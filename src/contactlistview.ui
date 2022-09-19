@@ -27,7 +27,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="addDMRContact">
+      <widget class="QPushButton" name="addContact">
        <property name="toolTip">
         <string>Adds a contact to the list.</string>
        </property>
@@ -35,17 +35,10 @@
         <string>Add contact button</string>
        </property>
        <property name="text">
-        <string>Add Digital Contact</string>
+        <string>Add Contact</string>
        </property>
        <property name="shortcut">
         <string>Alt++</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="addDTMFContact">
-       <property name="text">
-        <string>Add DTMF Contact</string>
        </property>
       </widget>
      </item>
@@ -65,6 +58,30 @@
     </layout>
    </item>
   </layout>
+  <action name="actionAdd_M17_Contact">
+   <property name="text">
+    <string>Add M17 Contact</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an M17 contact to the list.</string>
+   </property>
+  </action>
+  <action name="actionAdd_DTMF_Contact">
+   <property name="text">
+    <string>Add DTMF Contact</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an DTMF (analog) contact to the list.</string>
+   </property>
+  </action>
+  <action name="actionAdd_DMR_Contact">
+   <property name="text">
+    <string>Add DMR Contact</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds an DMR contact to the list.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
