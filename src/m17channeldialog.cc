@@ -60,13 +60,15 @@ M17ChannelDialog::construct() {
   ui->txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
   if (_channel && (nullptr == _myChannel->contact()))
     ui->txContact->setCurrentIndex(0);
-  for (int i=0; i<_config->contacts()->count(); i++) {
+  // Populate contacts
+  for (int i=0,c=1; i<_config->contacts()->count(); i++) {
     if (! _config->contacts()->contact(i)->is<M17Contact>())
       continue;
     ui->txContact->addItem(_config->contacts()->contact(i)->name(),
                            QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_channel && (_myChannel->contact() == _config->contacts()->contact(i)) )
-      ui->txContact->setCurrentIndex(i+1);
+    if (_channel && (_myChannel->contact() == _config->contacts()->contact(i)->as<M17Contact>()) )
+      ui->txContact->setCurrentIndex(c);
+    c++;
   }
   ui->channelMode->setItemData(0, QVariant::fromValue(M17Channel::Mode::Voice));
   ui->channelMode->setItemData(1, QVariant::fromValue(M17Channel::Mode::Data));

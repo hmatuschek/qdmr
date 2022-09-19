@@ -70,13 +70,14 @@ DMRChannelDialog::construct() {
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
   if (_myChannel && (nullptr == _myChannel->txContactObj()))
     txContact->setCurrentIndex(0);
-  for (int i=0; i<_config->contacts()->count(); i++) {
+  for (int i=0,c=1; i<_config->contacts()->count(); i++) {
     if (! _config->contacts()->contact(i)->is<DMRContact>())
       continue;
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
     if (_myChannel && (_myChannel->txContactObj() == _config->contacts()->contact(i)) )
-      txContact->setCurrentIndex(i+1);
+      txContact->setCurrentIndex(c);
+    c++;
   }
   gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
   for (int i=0; i<_config->posSystems()->count(); i++) {
