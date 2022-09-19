@@ -486,8 +486,6 @@ class M17Channel: public DigitalChannel
   Q_PROPERTY(unsigned accessNumber READ accessNumber WRITE setAccessNumber)
   /** The transmit contact. */
   Q_PROPERTY(M17ContactReference* contact READ contactRef WRITE setContactRef)
-  /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupListRef WRITE setGroupListRef)
   /** The channel mode. */
   Q_PROPERTY(Mode mode READ mode WRITE setMode)
   /** The encryption mode. */
@@ -527,17 +525,6 @@ public:
   /** Sets the channel access number (0-15). */
   void setAccessNumber(unsigned int can);
 
-  /** Returns a reference to the group list. */
-  const GroupListReference *groupListRef() const;
-  /** Returns a reference to the group list. */
-  GroupListReference *groupListRef();
-  /** Sets the reference to the group list. */
-  void setGroupListRef(GroupListReference *ref);
-  /** Returns the RX group list for the channel. */
-  RXGroupList *groupList() const;
-  /** (Re-)Sets the RX group list for the channel. */
-  bool setGroupList(RXGroupList *rxg);
-
   /** Returns a reference to the transmit contact. */
   const M17ContactReference *contactRef() const;
   /** Returns a reference to the transmit contact. */
@@ -569,8 +556,6 @@ protected:
   unsigned int _accessNumber;
   /** The default TX contact. */
   M17ContactReference _txContact;
-  /** The RX group list for this channel. */
-  GroupListReference _rxGroup;
   /** If @c true, positioning information is send alonside voice and data. */
   bool _gpsEnabled;
   /** Holds the encryption mode for the channel. */

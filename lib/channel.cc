@@ -890,22 +890,20 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
  * ********************************************************************************************* */
 M17Channel::M17Channel(QObject *parent)
   : DigitalChannel(parent), _mode(Mode::Voice), _accessNumber(0), _txContact(),
-    _rxGroup(), _gpsEnabled(false), _encryptionMode(EncryptionMode::None)
+    _gpsEnabled(false), _encryptionMode(EncryptionMode::None)
 {
   // Connect signals of references
-  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 M17Channel::M17Channel(const M17Channel &other, QObject *parent)
   : DigitalChannel(other, parent), _mode(Mode::Voice), _accessNumber(0),
-    _txContact(), _rxGroup(), _gpsEnabled(false),
+    _txContact(), _gpsEnabled(false),
     _encryptionMode(EncryptionMode::None)
 {
   copy(other);
 
   // Connect signals of references
-  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
@@ -915,7 +913,6 @@ M17Channel::clear() {
   setMode(Mode::Voice);
   setAccessNumber(0);
   setContact(nullptr);
-  setGroupList(nullptr);
   enableGPS(false);
   setEncryptionMode(EncryptionMode::None);
 }
@@ -955,37 +952,6 @@ M17Channel::setAccessNumber(unsigned int can) {
     return;
   _accessNumber = can;
   emit modified(this);
-}
-
-const GroupListReference *
-M17Channel::groupListRef() const {
-  return &_rxGroup;
-}
-
-GroupListReference *
-M17Channel::groupListRef() {
-  return &_rxGroup;
-}
-
-void
-M17Channel::setGroupListRef(GroupListReference *ref) {
-  if (nullptr == ref)
-    _rxGroup.clear();
-  else
-    _rxGroup.copy(ref);
-}
-
-RXGroupList *
-M17Channel::groupList() const {
-  return _rxGroup.as<RXGroupList>();
-}
-
-bool
-M17Channel::setGroupList(RXGroupList *g) {
-  if(! _rxGroup.set(g))
-    return false;
-  emit modified(this);
-  return true;
 }
 
 const M17ContactReference *

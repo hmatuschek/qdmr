@@ -336,13 +336,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       } else {
         return tr("-");
       }
-    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
-      if (m17->groupList()) {
-        return m17->groupList()->name();
-      } else {
-        return tr("-");
-      }
-    } else if (channel->is<FMChannel>()) {
+    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     }
     break;

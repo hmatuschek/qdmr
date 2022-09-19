@@ -57,8 +57,6 @@ M17ChannelDialog::construct() {
     if (_channel && (_myChannel->scanList() == _config->scanlists()->scanlist(i)) )
       ui->scanList->setCurrentIndex(i+1);
   }
-  populateRXGroupListBox(ui->rxGroupList, _config->rxGroupLists(),
-                         (_channel ? _myChannel->groupList() : nullptr));
   ui->txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
   if (_channel && (nullptr == _myChannel->contact()))
     ui->txContact->setCurrentIndex(0);
@@ -128,7 +126,6 @@ M17ChannelDialog::channel() {
   _myChannel->setScanList(ui->scanList->currentData().value<ScanList *>());
   _myChannel->setMode(ui->channelMode->currentData().value<M17Channel::Mode>());
   _myChannel->setAccessNumber(ui->accessNumber->value());
-  _myChannel->setGroupList(ui->rxGroupList->currentData().value<RXGroupList *>());
   _myChannel->setContact(ui->txContact->currentData().value<M17Contact *>());
   _myChannel->enableGPS(ui->sendGPS->isChecked());
 
