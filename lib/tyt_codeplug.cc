@@ -889,7 +889,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
   // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
     // Skip non-private-call entries
-    while((lst->count() > j) && (DMRContact::PrivateCall != lst->contact(j)->type())) {
+    while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                 << "' is not a private call. Skip entry.";
       j++;
