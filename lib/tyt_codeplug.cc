@@ -891,7 +891,7 @@ TyTCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Context 
     // Skip non-private-call entries
     while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                << "' is not a private call. Skip entry.";
+                << "' is not a group call. Skip entry.";
       j++;
     }
     if (lst->count() > j) {
