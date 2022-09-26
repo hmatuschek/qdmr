@@ -238,7 +238,7 @@ public:
    * Memory layout of encoded channel (size 0x40 bytes):
    * @verbinclude d878uv_channel.txt
    */
-  class ChannelElement: public D868UVCodeplug::ChannelElement
+  class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
   public:
     /** Possible PTT ID settings. */

@@ -75,13 +75,13 @@
  * Implementation of D878UVCodeplug::ChannelElement
  * ******************************************************************************************** */
 D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : D868UVCodeplug::ChannelElement(ptr, size)
+  : AnytoneCodeplug::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : D868UVCodeplug::ChannelElement(ptr, 0x0040)
+  : AnytoneCodeplug::ChannelElement(ptr, 0x0040)
 {
   // pass...
 }
