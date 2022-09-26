@@ -736,14 +736,15 @@ bool
 UV390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_ZONES; i++) {
-    ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
+    ZoneElement elm(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
-    zone.clear();
+    elm.clear();
     ext.clear();
     if (i < config->zones()->count()) {
-      zone.fromZoneObj(config->zones()->zone(i), ctx);
-      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
-        ext.fromZoneObj(config->zones()->zone(i), ctx);
+      Zone *zone = config->zones()->zone(i);
+      elm.fromZoneObj(zone, ctx);
+      if (zone->B()->count() || (16 < zone->A()->count()))
+        ext.fromZoneObj(zone, ctx);
     }
   }
   return true;

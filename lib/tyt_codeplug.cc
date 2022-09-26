@@ -786,22 +786,28 @@ TyTCodeplug::ZoneElement::setName(const QString &name) {
   writeUnicode(0, name, 16);
 }
 
+bool
+TyTCodeplug::ZoneElement::hasMemberIndex(unsigned n) const {
+  return 0 != memberIndex(n);
+}
 uint16_t
 TyTCodeplug::ZoneElement::memberIndex(unsigned n) const {
-  return getUInt16_le(0x20 + n*2);
+  return getUInt16_le(0x20 + n*sizeof(uint16_t));
 }
 void
 TyTCodeplug::ZoneElement::setMemberIndex(unsigned n, uint16_t idx) {
-  setUInt16_le(0x20 + n*2, idx);
+  setUInt16_le(0x20 + n*sizeof(uint16_t), idx);
 }
 
 bool
 TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, Context &ctx) {
   setName(zone->name());
   for (int i=0; i<16; i++) {
-    if (i < zone->A()->count())
-      setMemberIndex(i, ctx.index(zone->A()->get(i)));
-    else
+    if (i < zone->A()->count()) {
+      Channel *ch = zone->A()->get(i)->as<Channel>();
+      int idx = ctx.index(ch);
+      setMemberIndex(i, idx);
+    } else
       setMemberIndex(i, 0);
   }
   return true;
@@ -819,7 +825,7 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
   if (! isValid())
     return false;
 
-  for (int i=0; ((i<16) && memberIndex(i)); i++) {
+  for (int i=0; ((i<16) && hasMemberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
       logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
       continue;
@@ -2765,7 +2771,7 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0, c=0; i<config->channelList()->count(); i++) {
     Channel *channel = config->channelList()->channel(i);
     if (channel->is<FMChannel>() || channel->is<DMRChannel>()) {
-      ctx.add(channel, c+1);
+      ctx.add(channel, c+1); c++;
     } else {
       logInfo() << "Cannot index channel '" << channel->name()
                 << "'. Channel type '" << channel->metaObject()->className()

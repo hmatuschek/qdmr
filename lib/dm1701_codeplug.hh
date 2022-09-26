@@ -238,10 +238,14 @@ public:
 
     void clear();
 
+    /** Returns @c true if the n-th member index for list A is set. */
+    virtual bool hasMemberIndexA(unsigned n) const;
     /** Returns the n-th member index of the channel list for A. */
     virtual uint16_t memberIndexA(unsigned n) const;
     /** Sets the n-th member index of the channel list for A. */
     virtual void setMemberIndexA(unsigned n, uint16_t idx);
+    /** Returns @c true if the n-th member index for list B is set. */
+    virtual bool hasMemberIndexB(unsigned n) const;
     /** Returns the n-th member index of the channel list for B. */
     virtual uint16_t memberIndexB(unsigned n) const;
     /** Returns the n-th member index of the channel list for B. */

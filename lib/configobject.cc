@@ -1006,7 +1006,8 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
   }
 }
 
-ConfigObject *AbstractConfigObjectList::get(int idx) const {
+ConfigObject *
+AbstractConfigObjectList::get(int idx) const {
   return _items.value(idx, nullptr);
 }
 

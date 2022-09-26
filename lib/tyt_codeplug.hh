@@ -322,6 +322,8 @@ public:
     /** Sets the name of the zone. */
     virtual void setName(const QString &setName);
 
+    /** Returns @c true if the n-th member index is set. */
+    virtual bool hasMemberIndex(unsigned n) const;
     /** Returns the index (+1) of the @c n-th member. */
     virtual uint16_t memberIndex(unsigned n) const;
     /** Sets the index (+1) of the @c n-th member. */
