@@ -50,8 +50,6 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
-  /** The commercial channel extension. */
-  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
 
 public:
   /** Possible power settings. */
@@ -145,11 +143,6 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
-  /** Returns the extension for commercial features. */
-  CommercialChannelExtension *commercialExtension() const;
-  /** Sets the commercial channel extension. */
-  void setCommercialExtension(CommercialChannelExtension *ext);
-
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -182,8 +175,6 @@ protected:
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
-  /** Owns the commercial channel extension. */
-  CommercialChannelExtension *_commercialExtension;
 };
 
 
@@ -371,6 +362,8 @@ class DMRChannel: public DigitalChannel
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
 
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
   /** The AnyTone DMR channel extension. */
   Q_PROPERTY(AnytoneDMRChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
@@ -469,6 +462,11 @@ public:
   /** Associates the given radio ID with this channel. */
   bool setRadioIdObj(DMRRadioID *id);
 
+  /** Returns the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
   /** Returns the DMR channel extension for AnyTone devices.
    * If this extension is not set, returns @c nullptr. */
   AnytoneDMRChannelExtension *anytoneChannelExtension() const;
@@ -496,6 +494,8 @@ protected:
   /** Radio ID to use on this channel. */
   DMRRadioIDReference _radioId;
 
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
   /** Owns the AnyTone DMR channel extension. */
   AnytoneDMRChannelExtension *_anytoneExtension;
 };

@@ -29,7 +29,7 @@ Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
     _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
-    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
+    _tytChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -37,7 +37,7 @@ Channel::Channel(QObject *parent)
 
 Channel::Channel(const Channel &other, QObject *parent)
   : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
-    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
+    _tytChannelExtension(nullptr)
 {
   copy(other);
 
@@ -76,9 +76,6 @@ Channel::clear() {
   if (_tytChannelExtension)
     _tytChannelExtension->deleteLater();
   _tytChannelExtension = nullptr;
-  if (_commercialExtension)
-    _commercialExtension->deleteLater();
-  _commercialExtension = nullptr;
 }
 
 double
@@ -241,23 +238,6 @@ Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
   if (_tytChannelExtension) {
     _tytChannelExtension->setParent(this);
     connect(_tytChannelExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
-  }
-}
-
-CommercialChannelExtension *
-Channel::commercialExtension() const {
-  return _commercialExtension;
-}
-void
-Channel::setCommercialExtension(CommercialChannelExtension *ext) {
-  if (_commercialExtension == ext)
-    return;
-  if (_commercialExtension)
-    _commercialExtension->deleteLater();
-  _commercialExtension = ext;
-  if (_commercialExtension) {
-    _commercialExtension->setParent(this);
-    connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
   }
 }
 
@@ -643,7 +623,7 @@ DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
-    _anytoneExtension(nullptr)
+    _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
@@ -691,6 +671,7 @@ DMRChannel::clear() {
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
   setRadioIdObj(DefaultRadioID::get());
+  setCommercialExtension(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
 
@@ -892,6 +873,23 @@ DMRChannel::setRadioIdObj(DMRRadioID *id) {
     return false;
   emit modified(this);
   return true;
+}
+
+CommercialChannelExtension *
+DMRChannel::commercialExtension() const {
+  return _commercialExtension;
+}
+void
+DMRChannel::setCommercialExtension(CommercialChannelExtension *ext) {
+  if (_commercialExtension == ext)
+    return;
+  if (_commercialExtension)
+    _commercialExtension->deleteLater();
+  _commercialExtension = ext;
+  if (_commercialExtension) {
+    _commercialExtension->setParent(this);
+    connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
 }
 
 AnytoneDMRChannelExtension *
