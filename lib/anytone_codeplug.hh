@@ -160,14 +160,23 @@ public:
     /** Enables/disables talkaround. */
     virtual void enableTalkaround(bool enable);
 
+    /** Retunrs @c true if the TX CTCSS tone frequency is custom (non standard). */
+    virtual bool txCTCSSIsCustom() const;
     /** Returns the TX CTCSS tone. */
     virtual Signaling::Code txCTCSS() const;
     /** Sets the TX CTCSS tone. */
     virtual void setTXCTCSS(Signaling::Code tone);
+    /** Enables TX custom CTCSS frequency. */
+    virtual void enableTXCustomCTCSS();
+    /** Retunrs @c true if the RX CTCSS tone frequency is custom (non standard). */
+    virtual bool rxCTCSSIsCustom() const;
     /** Returns the RX CTCSS tone. */
     virtual Signaling::Code rxCTCSS() const;
     /** Sets the RX CTCSS tone. */
     virtual void setRXCTCSS(Signaling::Code tone);
+    /** Enables RX custom CTCSS frequency. */
+    virtual void enableRXCustomCTCSS();
+
     /** Returns the TX DCS code. */
     virtual Signaling::Code txDCS() const;
     /** Sets the TX DCS code. */
@@ -198,9 +207,9 @@ public:
     virtual void setRadioIDIndex(unsigned idx);
 
     /** Returns @c true if the sequelch is silent and @c false if open. */
-    virtual AnytoneAnalogChannelExtension::SquelchMode squelchMode() const;
+    virtual AnytoneFMChannelExtension::SquelchMode squelchMode() const;
     /** Enables/disables silent squelch. */
-    virtual void setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode);
+    virtual void setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode);
 
     /** Returns the admit criterion. */
     virtual Admit admit() const;

@@ -10,10 +10,12 @@
 </info>
 
 <para>
-  This chapter documents the extensions and settings specific to AnyTone radios.
+  This chapter documents the extensions and settings specific to AnyTone radios. Please note, that
+  not all attributes are applicable to all AnyTone devices.
 </para>
 
 <xi:include href="contact.xml"/>
+<xi:include href="channel.xml"/>
 <xi:include href="zone.xml"/>
 
 </section>

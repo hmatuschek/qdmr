@@ -356,6 +356,7 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of FMChannel
  * ********************************************************************************************* */
@@ -363,7 +364,7 @@ FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
     _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
     _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
-    _aprsSystem()
+    _aprsSystem(), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -408,6 +409,7 @@ FMChannel::clear() {
   setTXTone(Signaling::SIGNALING_NONE);
   setBandwidth(Bandwidth::Narrow);
   setAPRSSystem(nullptr);
+  setAnytoneChannelExtension(nullptr);
 }
 
 FMChannel::Admit
@@ -504,6 +506,23 @@ FMChannel::aprsSystem() const {
 void
 FMChannel::setAPRSSystem(APRSSystem *sys) {
   _aprsSystem.set(sys);
+}
+
+AnytoneFMChannelExtension *
+FMChannel::anytoneChannelExtension() const {
+  return _anytoneExtension;
+}
+void
+FMChannel::setAnytoneChannelExtension(AnytoneFMChannelExtension *ext) {
+  if (_anytoneExtension == ext)
+    return;
+  if (_anytoneExtension)
+    _anytoneExtension->deleteLater();
+  _anytoneExtension = ext;
+  if (_anytoneExtension) {
+    _anytoneExtension->setParent(this);
+    connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
 }
 
 YAML::Node
@@ -623,7 +642,8 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
 DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
-    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+    _anytoneExtension(nullptr)
 {
   // Register default tags
   if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
@@ -671,6 +691,7 @@ DMRChannel::clear() {
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
   setRadioIdObj(DefaultRadioID::get());
+  setAnytoneChannelExtension(nullptr);
 }
 
 ConfigItem *
@@ -871,6 +892,23 @@ DMRChannel::setRadioIdObj(DMRRadioID *id) {
     return false;
   emit modified(this);
   return true;
+}
+
+AnytoneDMRChannelExtension *
+DMRChannel::anytoneChannelExtension() const {
+  return _anytoneExtension;
+}
+void
+DMRChannel::setAnytoneChannelExtension(AnytoneDMRChannelExtension *ext) {
+  if (_anytoneExtension == ext)
+    return;
+  if (_anytoneExtension)
+    _anytoneExtension->deleteLater();
+  _anytoneExtension = ext;
+  if (_anytoneExtension) {
+    _anytoneExtension->setParent(this);
+    connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
 }
 
 YAML::Node

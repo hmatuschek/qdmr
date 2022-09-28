@@ -5,6 +5,8 @@
 
 using namespace Signaling;
 
+#define CUSTOM_CTCSS_TONE 0x33
+
 Code _anytone_ctcss_num2code[52] = {
   SIGNALING_NONE, // 62.5 not supported
   CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
@@ -283,6 +285,10 @@ AnytoneCodeplug::ChannelElement::enableTalkaround(bool enable) {
   setBit(0x0009, 7, enable);
 }
 
+bool
+AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000a);
+}
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txCTCSS() const {
   return ctcss_num2code(getUInt8(0x000a));
@@ -290,6 +296,14 @@ AnytoneCodeplug::ChannelElement::txCTCSS() const {
 void
 AnytoneCodeplug::ChannelElement::setTXCTCSS(Code tone) {
   setUInt8(0x000a, ctcss_code2num(tone));
+}
+void
+AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
+  setUInt8(0x000a, CUSTOM_CTCSS_TONE);
+}
+bool
+AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000b);
 }
 Signaling::Code
 AnytoneCodeplug::ChannelElement::rxCTCSS() const {
@@ -299,6 +313,11 @@ void
 AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
   setUInt8(0x000b, ctcss_code2num(tone));
 }
+void
+AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
+  setUInt8(0x000b, CUSTOM_CTCSS_TONE);
+}
+
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
@@ -369,12 +388,12 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-AnytoneAnalogChannelExtension::SquelchMode
+AnytoneFMChannelExtension::SquelchMode
 AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (AnytoneAnalogChannelExtension::SquelchMode)getUInt3(0x0019, 4);
+  return (AnytoneFMChannelExtension::SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode) {
+AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) {
   setUInt3(0x0019, 4, (unsigned)mode);
 }
 
@@ -636,6 +655,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
+  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
@@ -653,6 +673,17 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+
+    // Create extension
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    ach->setAnytoneChannelExtension(ext);
+    ext->enableReverseBurst(ctcssPhaseReversal());
+    ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
+    ext->enableTXCustomCTCSS(txCTCSSIsCustom());
+    ext->setCustomCTCSS(customCTCSSFrequency());
+    ext->setSquelchMode(squelchMode());
+
+    // done
     ch = ach;
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
@@ -670,6 +701,19 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+
+    // Create extension
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    dch->setAnytoneChannelExtension(ext);
+    ext->enableCallConfirm(callConfirm());
+    ext->enableSMS(sms());
+    ext->enableSMSConfirm(smsConfirm());
+    ext->enableDataACK(dataACK());
+    ext->enableSimplexTDMA(simplexTDMA());
+    ext->enableAdaptiveTDMA(adaptiveTDMA());
+    ext->enableLoneWorker(loneWorker());
+    ext->enableThroughMode(throughMode());
+    // Done
     ch = dch;
   } else {
     logError() << "Cannot create channel '" << name()
@@ -686,6 +730,11 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
+
+  // Apply common channel extension settings
+  if (nullptr != ch_ext) {
+    ch_ext->enableTalkaround(talkaround());
+  }
 
   return ch;
 }
@@ -774,11 +823,24 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     if (Signaling::SIGNALING_NONE != ac->rxTone())
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::SubTone);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::SubTone);
     else
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
+    // Handle extension
+    if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply FM settings
+      enableCTCSSPhaseReversal(ext->reverseBurst());
+      setCustomCTCSSFrequency(ext->customCTCSS());
+      if (ext->rxCustomCTCSS())
+        enableRXCustomCTCSS();
+      if (ext->txCustomCTCSS())
+        enableTXCustomCTCSS();
+      setSquelchMode(ext->squelchMode());
+    }
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     // pack digital channel config.
@@ -822,6 +884,20 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       }
     } else {
       setRadioIDIndex(ctx.index(dc->radioIdObj()));
+    }
+    // Handle extension
+    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply DMR settings
+      enableCallConfirm(ext->callConfirm());
+      enableSMS(ext->sms());
+      enableSMSConfirm(ext->smsConfirm());
+      enableDataACK(ext->dataACK());
+      enableSimplexTDMA(ext->simplexTDMA());
+      enableAdaptiveTDMA(ext->adaptiveTDMA());
+      enableLoneWorker(ext->loneWorker());
+      enableThroughMode(ext->throughMode());
     }
   }
 

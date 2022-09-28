@@ -9,6 +9,7 @@
 #include "signaling.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
+#include "anytone_extension.hh"
 #include "commercial_extension.hh"
 
 class Config;
@@ -222,6 +223,10 @@ class FMChannel: public AnalogChannel
   /** The APRS system. */
   Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
 
+  /** The AnyTone FM channel extension. */
+  Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
+
+
 public:
   /** Admit criteria of analog channel. */
   enum class Admit {
@@ -291,6 +296,12 @@ public:
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
+  /** Returns the FM channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneFMChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone FM channel extension. */
+  void setAnytoneChannelExtension(AnytoneFMChannelExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -311,6 +322,9 @@ protected:
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
   APRSSystemReference _aprsSystem;
+
+  /** Owns the AnyTone FM channel extension. */
+  AnytoneFMChannelExtension *_anytoneExtension;
 };
 
 
@@ -356,6 +370,9 @@ class DMRChannel: public DigitalChannel
   Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
+
+  /** The AnyTone DMR channel extension. */
+  Q_PROPERTY(AnytoneDMRChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
 public:
   /** Possible admit criteria of digital channels. */
@@ -452,6 +469,12 @@ public:
   /** Associates the given radio ID with this channel. */
   bool setRadioIdObj(DMRRadioID *id);
 
+  /** Returns the DMR channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneDMRChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone DMR channel extension. */
+  void setAnytoneChannelExtension(AnytoneDMRChannelExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
@@ -472,6 +495,9 @@ protected:
   RoamingZoneReference _roaming;
   /** Radio ID to use on this channel. */
   DMRRadioIDReference _radioId;
+
+  /** Owns the AnyTone DMR channel extension. */
+  AnytoneDMRChannelExtension *_anytoneExtension;
 };
 
 
