@@ -269,7 +269,7 @@ public:
     /** Sets the channel mode. Only valid for M17 channels. */
     virtual void setChannelMode(ChannelMode mode);
 
-    /** Returns @c true if GPS position is send as meta-data. Only valid for M17 channels. */
+    /** Returns @c true if GPS position is sent as meta-data. Only valid for M17 channels. */
     virtual bool gpsDataEnabled() const;
     /** Enables/disables sending of GPS position as meta-data. Only valid for M17 channels. */
     virtual void enableGPSData(bool enable);

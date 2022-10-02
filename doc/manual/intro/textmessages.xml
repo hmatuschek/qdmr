@@ -28,7 +28,7 @@
 </para>
 
 <para> 
-  There are also service numbers (free of charge). If messages are send to them, certain 
+  There are also service numbers (free of charge). If messages are sent to them, certain 
   information can be retrieved to forwarded to other networks (e.g. to the 
   <glossterm>DAPNET</glossterm>). In Germany (and other countries) there are:
 </para>
@@ -43,8 +43,8 @@
       <listitem><para>Send <token>wx CITY</token> and you will receive the weather at the specified
         city.</para></listitem>
       <listitem><para>Send <token>gps</token> and the last GPS position is returned that you have 
-        send to the DMR network.</para></listitem>
-      <listitem><para>With <token>gps CALL</token> you can retrieve the last position send by the 
+        sent to the DMR network.</para></listitem>
+      <listitem><para>With <token>gps CALL</token> you can retrieve the last position sent by the 
         specified call.</para></listitem>
       <listitem><para>Send <token>rssi</token> and you will receive a signal report from the 
         repeater.</para></listitem>

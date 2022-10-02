@@ -43,7 +43,7 @@
   using a group call. They are subscribed to a local repeater by a private call to the 
   reflector. Then all repeaters subscribed to that reflector behave like a single repeater. You will
   then participate on that reflector by performing a group call to TG9, the local talk group. Your
-  call will then be send to the reflector as well as to all other reflectors currently subscribed 
+  call will then be sent to the reflector as well as to all other reflectors currently subscribed 
   on the repeater and consequently to all repeater also subscribed to that reflector.
 </para>
 

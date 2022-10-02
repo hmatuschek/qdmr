@@ -99,7 +99,7 @@
     <term><token>contact</token></term>
     <listitem>
       <para>
-        Specifies the digital contact, the GPS information is send to. This must be a 
+        Specifies the digital contact, the GPS information is sent to. This must be a 
         reference to a digital contact.
       </para>
     </listitem>
@@ -108,7 +108,7 @@
     <term><token>revert</token></term>
     <listitem>
       <para>
-        Specifies the revert channel. That is, the channel the data is send on. If set, 
+        Specifies the revert channel. That is, the channel the data is sent on. If set, 
         it must be a reference to a digital channel. If omitted or set to <token>!selected</token>,
         the currently active channel will be used to send the GPS information.
       </para>
@@ -133,7 +133,7 @@
     <term><token>revert</token></term>
     <listitem>
       <para>
-        Specifies the revert channel. That is, the channel the APRS information is send on.
+        Specifies the revert channel. That is, the channel the APRS information is sent on.
         This must be a reference to an analog channel. Usually a dedicated analog APRS channel is 
         defined and referenced here.
       </para>
@@ -143,7 +143,7 @@
     <term><token>destination</token></term>
     <listitem>
       <para>
-        Specifies the destination call and SSID, the information is send to. This must be a
+        Specifies the destination call and SSID, the information is sent to. This must be a
         string in the form <token>CALL-SSID</token>. Please note that the call must match the 
         format defined by the AX.25 protocol. That is, it may only contain letters and numbers and
         cannot exceed the length of 6.
@@ -181,7 +181,7 @@
     <term><token>message</token></term>
     <listitem>
       <para>
-        Specifies an optional message send along with the position information.
+        Specifies an optional message sent along with the position information.
       </para>
     </listitem>
   </varlistentry>

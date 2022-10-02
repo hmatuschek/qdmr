@@ -16,7 +16,7 @@
 </warning>
 
 <para>
-  Some radios are actually identical to others. They also identify them self as a different radio.
+  Some radios are actually identical to others. They also identify themselves as a different radio.
   An example for such a radio is the Retevis RT3S, this radio is simply a relabeled TyT MD-UV390. 
   The RT3S actually identifies itself as a MD-UV390. From the perspective of the CPS, these two 
   radios are indistinguishable. Consequently, <application>qdmr</application> and 
@@ -24,7 +24,7 @@
 </para>
 
 <para>
-  There are, however, virtually identical radios. These are radios that actually identify them self
+  There are, however, virtually identical radios. These are radios that actually identify themselves
   as different models but the firmware, communication protocol and codeplug is basically identical 
   to another model. An example for such virtually identical models are the AnyTone AT-D868UV and 
   the BTech DMR-6X2. Each model identifies itself correspondingly and thus is distinguished by the
