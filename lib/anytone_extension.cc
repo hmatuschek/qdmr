@@ -167,7 +167,7 @@ void
 AnytoneDMRChannelExtension::enableDataACK(bool enable) {
   if (enable==_dataACK)
     return;
-  _dataACK == enable;
+  _dataACK = enable;
   emit modified(this);
 }
 
@@ -215,7 +215,7 @@ void
 AnytoneDMRChannelExtension::enableThroughMode(bool enable) {
   if (enable == _throughMode)
     return;
-  _throughMode == enable;
+  _throughMode = enable;
   emit modified(this);
 }
 
