@@ -265,7 +265,7 @@ void
 ConfigItem::clear() {
   emit beginClear();
 
-  // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
+  // Delete or clear all object owned by properties, that is ConfigObjectList and ConfigObject
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);

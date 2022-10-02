@@ -41,7 +41,7 @@ protected:
     uint32_t length;    ///< The size/length of the memory item.
     uint32_t index;     ///< The associated (element) index.
 
-    /** Contstructor. */
+    /** Constructor. */
     inline AddrMapItem(uint32_t addr, uint32_t len, uint32_t idx)
       : address(addr), length(len), index(idx) {
       // pass...

@@ -89,7 +89,7 @@ public:
     uint8_t numChannels() const;
     /** Returns the channel index for the i-th entry. */
     uint16_t channel(uint8_t index) const;
-    /** Retunrs the name of the zone. */
+    /** Returns the name of the zone. */
     QString name() const;
 
     size_t size() const;
@@ -108,9 +108,9 @@ public:
     /** Constructor. */
     ScanListElement(const uint8_t *ptr);
 
-    /** Retunrs the index of the scan list. */
+    /** Returns the index of the scan list. */
     uint8_t index() const;
-    /** Retunrs the number of channels in the scan list. */
+    /** Returns the number of channels in the scan list. */
     uint8_t numChannels() const;
     /** Returns the priority channel selection. */
     AnytoneCodeplug::ScanListElement::PriChannel prioChannelSelect() const;
@@ -141,7 +141,7 @@ public:
 
     /** Returns the index of the analog contact. */
     uint8_t index() const;
-    /** Retunrs the number. */
+    /** Returns the number. */
     QString number() const;
     /** Returns the name. */
     QString name() const;

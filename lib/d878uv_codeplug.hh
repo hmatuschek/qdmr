@@ -559,9 +559,9 @@ public:
     /** Sets the display color for callsigns. */
     virtual void setCallDisplayColor(Color color);
 
-    /** Returns @c true if the GPS units are imperical. */
+    /** Returns @c true if the GPS units are imperial. */
     virtual bool gpsUnitsImperial() const;
-    /** Enables/disables imperical GPS units. */
+    /** Enables/disables imperial GPS units. */
     virtual void enableGPSUnitsImperial(bool enable);
 
     /** Returns @c true if the knob is locked. */

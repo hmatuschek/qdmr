@@ -76,7 +76,7 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
 
   default:
     logInfo() << "Unknown band-code" << QString::number(int(info.bands), 16)
-              << ": Ingore frequency limits.";
+              << ": Ignore frequency limits.";
     _limits = new D868UVLimits({}, {}, info.version, this);
     break;
   }

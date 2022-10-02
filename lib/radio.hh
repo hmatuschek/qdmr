@@ -23,7 +23,7 @@ class RadioLimits;
 /** Base class for all Radio objects.
  *
  * The radio objects represents a connected radio. This class controlles the communication
- * with the device as well as the conversion betwenn device specific code-plugs and generic
+ * with the device as well as the conversion between device specific code-plugs and generic
  * configurations.
  *
  * @ingroup rif
