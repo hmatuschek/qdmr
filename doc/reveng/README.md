@@ -17,7 +17,7 @@ Radioddity GD-77 code-plugs and to some lesser extend for the RD-5R, TyT MD-UV39
 
 Sometimes, however, the manufacturer CPS saves something that has basically nothing to do with 
 what is written to the device. For example the AnyTone D-878UV. In these cases, the content 
-being written to the device must be captured. This can be done unsing wireshark on a linux 
+being written to the device must be captured. This can be done using wireshark on a linux 
 host. That is, fire up a virtual machine running the original CPS. Start wireshark on the host 
 system and monitor the USB interface using *usbmon*. Then, write a small script that extracts 
 the actual data written to the device from the capture files. These can then be compared to 

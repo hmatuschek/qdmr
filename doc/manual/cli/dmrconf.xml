@@ -274,7 +274,7 @@
         <term><option>--ignore-limits</option></term>
         <listitem>
           <para>
-            Disables the enforcement of limits. Warnings are still show.
+            Disables the enforcement of limits. Warnings are still shown.
           </para>
         </listitem>
       </varlistentry>
@@ -306,7 +306,7 @@
         <term><option>-V</option> or <option>--verbose</option></term>
         <listitem>
           <para>
-            Enable debug messages.
+            Enables debug messages.
           </para>
         </listitem>
       </varlistentry>
@@ -419,7 +419,7 @@
     <para>
       This program is still under development and may contain bugs that
       may cause harm to the radios and may even destroy them. Hence you may
-      use this software on your own risk. I you want to have guaranties,
+      use this software on your own risk. If you want to have guaranties,
       consider using the CPS (code-plug programming software) supplied with
       your radio.
     </para>

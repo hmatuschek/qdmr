@@ -254,7 +254,7 @@
 
 <para>
   <guilabel>APRS</guilabel> allows to specify an APRS system to be used on this channel. If the 
-  radio supports analog APRS, your position will be send using the frequency, destination and path
+  radio supports analog APRS, your position will be sent using the frequency, destination and path
   specified in this APRS system. If <guilabel>None</guilabel> is selected, APRS is disabled for
   this channel. If your radio does not support APRS, this setting is ignored.
 </para>

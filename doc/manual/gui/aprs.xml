@@ -10,7 +10,7 @@
 
 <para>
   The <guilabel>GPS/APRS</guilabel> tab allows to specify several so-called positioning systems. A 
-  positioning system is a collection of settings on how GPS information is send to 
+  positioning system is a collection of settings on how GPS information is sent to 
   <glossterm>APRS</glossterm> network. 
 </para>
 
@@ -40,11 +40,11 @@
 </screenshot>
 
 <para>
-  This dialog allows to specify how the GPS information is send through the DMR network. That is
+  This dialog allows to specify how the GPS information is sent through the DMR network. That is
   the <guilabel>Name</guilabel> field specifies the name of the GPS system. The 
   <guilabel>Destination</guilabel> field specifies the private-call contact, the information is 
-  send to. For example 262999 in the Brandmeister network. The <guilabel>Update Period</guilabel>
-  specifies the period in which the current GPS information is send to the contact. The 
+  sent to. For example 262999 in the Brandmeister network. The <guilabel>Update Period</guilabel>
+  specifies the period in which the current GPS information is sent to the contact. The 
   <glossterm>Revert Channel</glossterm> specifies to which channel the radio should switch to, 
   to send the position information. This should always be <guilabel>Selected</guilabel>. That is,
   the radio will always send the information on the currently selected channel. 
@@ -77,7 +77,7 @@
 </screenshot>
 
 <para>
-  This dialog allows to specify how the GPS information is send through the APRS network. That is
+  This dialog allows to specify how the GPS information is sent through the APRS network. That is
   the <guilabel>Name</guilabel> field specifies the name of the APRS system. The 
   <guilabel>Channel</guilabel> field specifies on which channel the APRS information should be 
   send. This must be an analog channel with one of the typical 

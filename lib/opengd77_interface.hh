@@ -216,7 +216,7 @@ protected:
   /** Read some data from Flash at the given address. */
   bool readFlash(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Select the correct Flash sector for the given address.
-   * This command must be send before writing to the flash memory. */
+   * This command must be sent before writing to the flash memory. */
   bool setFlashSector(uint32_t addr, const ErrorStack &err=ErrorStack());
   /** Write some data to the given Flash memory. */
   bool writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
