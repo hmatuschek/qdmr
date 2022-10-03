@@ -67,7 +67,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
       } else {
-        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       }
       anytone->close();
@@ -83,7 +83,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
       } else {
-        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       }
       ogd77->close();
@@ -106,7 +106,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         logDebug() << "Create DM-1701 radio object.";
         return new DM1701(dfu);
       } else {
-        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       }
       dfu->close();
@@ -124,7 +124,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
       } else {
-        errMsg(err) << "Unhandled device " << id.manufactuer() << " " << id.name()
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       }
       hid->close();

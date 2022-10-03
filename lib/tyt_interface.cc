@@ -53,7 +53,7 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     close(); return;
   }
 
-  logDebug() << "Found device " << _ident.manufactuer() << " "<< _ident.name()
+  logDebug() << "Found device " << _ident.manufacturer() << " "<< _ident.name()
              << " at " << descr.description() << ".";
 }
 

@@ -748,18 +748,18 @@ Application::showAbout() {
   radioTab->setColumnCount(1);
   QHash<QString, QTreeWidgetItem*> items;
   foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
-    if (! items.contains(radio.manufactuer()))
-      items.insert(radio.manufactuer(),
-                   new QTreeWidgetItem(QStringList(radio.manufactuer())));
-    items[radio.manufactuer()]->addChild(
+    if (! items.contains(radio.manufacturer()))
+      items.insert(radio.manufacturer(),
+                   new QTreeWidgetItem(QStringList(radio.manufacturer())));
+    items[radio.manufacturer()]->addChild(
           new QTreeWidgetItem(QStringList(radio.name())));
     foreach (RadioInfo alias, radio.alias()) {
-      if (! items.contains(alias.manufactuer()))
-        items.insert(alias.manufactuer(),
-                     new QTreeWidgetItem(QStringList(alias.manufactuer())));
-      items[alias.manufactuer()]->addChild(
+      if (! items.contains(alias.manufacturer()))
+        items.insert(alias.manufacturer(),
+                     new QTreeWidgetItem(QStringList(alias.manufacturer())));
+      items[alias.manufacturer()]->addChild(
             new QTreeWidgetItem(QStringList(tr("%1 (alias for %2 %3)").arg(alias.name())
-                                            .arg(radio.manufactuer()).arg(radio.name()))));
+                                            .arg(radio.manufacturer()).arg(radio.name()))));
     }
   }
   radioTab->insertTopLevelItems(0, items.values());

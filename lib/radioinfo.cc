@@ -98,7 +98,7 @@ RadioInfo::name() const {
 }
 
 const QString &
-RadioInfo::manufactuer() const {
+RadioInfo::manufacturer() const {
   return _manufacturer;
 }
 

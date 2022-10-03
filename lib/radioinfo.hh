@@ -59,7 +59,7 @@ public:
   /** Returns the radio name. */
   const QString &name() const;
   /** Returns the manufacturer name. */
-  const QString &manufactuer() const;
+  const QString &manufacturer() const;
   /** Returns some information about the interface to the radio. */
   const USBDeviceInfo &interface() const;
 
