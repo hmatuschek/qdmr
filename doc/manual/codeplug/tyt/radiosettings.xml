@@ -11,12 +11,13 @@
 </info>
 
 <para>
-  This extension allows to set the device-specific general settings for TyT/Retevis radios. It 
-  extends the <token>settings</token> section of the codeplug. 
+  This extension allows to set the device-specific general settings for <trademark>TyT</trademark>
+  and <trademark>Retevis</trademark> radios. It extends the <token>settings</token> section of 
+  the codeplug. 
 </para>
 
 <example>
-  <title>TyT radio settings extension showing default values.</title>
+  <title>Radio settings extension example showing default values.</title>
   <programlisting><![CDATA[settings:
   [...]
   tyt:
@@ -161,20 +162,12 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>groupCallHangTime</token></term>
+    <term><token>groupCallHangTime</token>, <token>privateCallHangTime</token></term>
     <listitem>
       <para>
-        Specifies the group-call hang time in milliseconds. This is the time a group call can be 
-        answered directly even if that group call is not the default contact of the channel.
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>privateCallHangTime</token></term>
-    <listitem>
-      <para>
-        Specifies the private-call hang time in milliseconds. This is the time a private call can 
-        be answered directly even if that private call is not the default contact of the channel.
+        Specifies the group-call hang time in milliseconds. This is the time a group or private 
+        call can be answered directly even if that group call is not the default contact of the 
+        channel. See also <xref linkend="glHangTime">hang time</xref>.
       </para>
     </listitem>
   </varlistentry>
@@ -194,34 +187,35 @@
   <varlistentry>
     <term><token>callAlertToneDuration</token></term>
     <listitem>
-      <para>Specifies the call alert-tone duration in seconds. If 
+      <para>
+        Specifies the call alert-tone duration in seconds. If 
         <token>callAlertToneContinuous</token> is enabled, the alert tone will be continuous 
-        irrespective of this setting. </para>
+        irrespective of this setting. 
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>loneWorkerResponseTime</token></term>
     <listitem>
-      <para>Sets the lone-worker response time in minutes.</para>
+      <para>
+        Sets the lone-worker response time in minutes. See also 
+        <xref linkend="glLoneWorker">lone worker</xref>.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>loneWorkerReminderTime</token></term>
     <listitem>
-      <para>Sets the lone-worker reminder time in minutes.</para>
+      <para>
+        Sets the lone-worker reminder time in minutes. See also 
+        <xref linkend="glLoneWorker">lone worker</xref>.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>digitalScanHangTime</token></term>
+    <term><token>digitalScanHangTime</token>, <token>analogScanHangTime</token></term>
     <listitem>
-      <para>Specifies the time in milliseconds, the radio will continue monitoring a digital 
-        channel after the transmission on that channel ended. </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>analogScanHangTime</token></term>
-    <listitem>
-      <para>Specifies the time in milliseconds, the radio will continue monitoring an analog
+      <para>Specifies the time in milliseconds, the radio will continue monitoring a DMR or FM 
         channel after the transmission on that channel ended. </para>
     </listitem>
   </varlistentry>

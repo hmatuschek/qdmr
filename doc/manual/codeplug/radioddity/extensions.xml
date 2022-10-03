@@ -6,15 +6,17 @@
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
 <info>
-  <title>Radioddity Codeplug Extensions</title>
+  <title><trademark>Radioddity</trademark> Codeplug Extensions</title>
 </info>
 
 <para>
-  This section collects all device specific extensions to the codeplug for Radioddity and some Baofeng devices.
+  This section collects all device specific extensions to the codeplug for 
+  <trademark>Radioddity</trademark> and some <trademark>Baofeng</trademark> devices.
 </para>
 
 <para>
-  These extensions are applicable to Radioddity GD77 and Baofeng/Radioddity RD-5R radios.
+  These extensions are applicable to <trademark>Radioddity</trademark> 
+  <productname>GD77</productname> and Baofeng/Radioddity <productname>RD-5R</productname> radios.
 </para>
 
 <xi:include href="radiosettings.xml"/>

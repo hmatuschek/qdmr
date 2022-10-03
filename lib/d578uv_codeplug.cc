@@ -109,6 +109,32 @@ D578UVCodeplug::ChannelElement::enableAnalogScamber(bool enable) {
   setUInt8(0x003a, (enable ? 0x01 : 0x00));
 }
 
+Channel *
+D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch = D878UVCodeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return nullptr;
+
+  // Apply extensions
+  if (FMChannel *fch = ch->as<FMChannel>()) {
+    if (AnytoneFMChannelExtension *ext = fch->anytoneChannelExtension()) {
+      // Common settings
+      ext->enableHandsFree(handsFree());
+      // FM specific settings
+      ext->enableScrambler(analogScambler());
+    }
+  } else if (DMRChannel *dch = ch->as<DMRChannel>()) {
+    if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
+      // Common settings
+      ext->enableHandsFree(handsFree());
+      // DMR specific extensions
+    }
+  }
+
+  // Done.
+  return ch;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of D578UVCodeplug

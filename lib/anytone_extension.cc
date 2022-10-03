@@ -5,7 +5,7 @@
  * Implementation of AnytoneChannelExtension
  * ********************************************************************************************* */
 AnytoneChannelExtension::AnytoneChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _talkaround(false)
+  : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false)
 {
   // pass...
 }
@@ -22,13 +22,37 @@ AnytoneChannelExtension::enableTalkaround(bool enable) {
   emit modified(this);
 }
 
+int
+AnytoneChannelExtension::frequencyCorrection() const {
+  return _frequencyCorrection;
+}
+void
+AnytoneChannelExtension::setFrequencyCorrection(int corr) {
+  if (corr == _frequencyCorrection)
+    return;
+  _frequencyCorrection = corr;
+  emit modified(this);
+}
+
+bool
+AnytoneChannelExtension::handsFree() const {
+  return _handsFree;
+}
+void
+AnytoneChannelExtension::enableHandsFree(bool enable) {
+  if (enable == _handsFree)
+    return;
+  _handsFree = enable;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAnalogChannelExtension
  * ********************************************************************************************* */
 AnytoneFMChannelExtension::AnytoneFMChannelExtension(QObject *parent)
   : AnytoneChannelExtension(parent), _reverseBurst(false), _rxCustomCTCSS(false),
-    _txCustomCTCSS(false), _customCTCSS(0)
+    _txCustomCTCSS(false), _customCTCSS(0), _scrambler(false)
 {
   // pass...
 }
@@ -101,6 +125,18 @@ AnytoneFMChannelExtension::setSquelchMode(SquelchMode mode) {
   emit modified(this);
 }
 
+bool
+AnytoneFMChannelExtension::scrambler() const {
+  return _scrambler;
+}
+void
+AnytoneFMChannelExtension::enableScrambler(bool enable) {
+  if (enable == _scrambler)
+    return;
+  _scrambler = enable;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneDigitalChannelExtension
@@ -167,7 +203,7 @@ void
 AnytoneDMRChannelExtension::enableDataACK(bool enable) {
   if (enable==_dataACK)
     return;
-  _dataACK == enable;
+  _dataACK = enable;
   emit modified(this);
 }
 
@@ -215,7 +251,7 @@ void
 AnytoneDMRChannelExtension::enableThroughMode(bool enable) {
   if (enable == _throughMode)
     return;
-  _throughMode == enable;
+  _throughMode = enable;
   emit modified(this);
 }
 

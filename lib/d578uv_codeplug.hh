@@ -233,6 +233,8 @@ public:
     virtual bool analogScambler() const;
     /** Enables/disables the analog scambler. */
     virtual void enableAnalogScamber(bool enable);
+
+    Channel *toChannelObj(Context &ctx) const;
   };
 
 public:

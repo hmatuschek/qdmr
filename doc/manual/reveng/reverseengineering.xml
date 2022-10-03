@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xml:id="reverseEngineering"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" 
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>Reverse engineering</title>
+</info>
+
+<para>
+  The majority of the development time needed for <application>qdmr</application> consists of 
+  reverse engineering the codeplug and communication protocols of the radios. Fortunately, many 
+  radios share the same communication protocol, in particular those from the same manufacturer.
+</para>
+<para>
+  
+</para>
+</chapter>

@@ -11,12 +11,13 @@
 </info>
 
 <para>
-  This extension allows to set the device-specific general settings for Radioddity radios. It 
-  extends the <token>settings</token> section of the codeplug. 
+  This extension allows to set the device-specific general settings for 
+  <trademark>Radioddity</trademark> radios. It extends the 
+  <token>settings</token> section of the codeplug. 
 </para>
 
 <example>
-  <title>Radioddity radio settings extension showing default values.</title>
+  <title>Radio settings extension example showing default values.</title>
   <programlisting><![CDATA[settings:
   [...]
   radioddity:
@@ -91,7 +92,7 @@
     <listitem>
       <para>
         When lone worker is enabled, specifies the time in minutes before the radio will start to 
-        remind the user. Default 1min.
+        remind the user. Default 1min. See also <xref linkend="glLoneWorker">lone worker</xref>.
       </para>
     </listitem>
   </varlistentry>
@@ -99,7 +100,8 @@
     <term><token>loneWorkerReminderPeriod</token></term>
     <listitem>
       <para>
-        Specifies the period in seconds for the lone worker reminder. Default 10s. 
+        Specifies the period in seconds for the lone worker reminder. Default 10s. See also 
+        <xref linkend="glLoneWorker">lone worker</xref>.
       </para>
     </listitem>
   </varlistentry>
@@ -109,7 +111,8 @@
       <para>        
         Specifies the group-call hang time in milliseconds. This is the time-period the user can 
         answer a received group call by pressing PTT. After this time has passed, a press on the
-        PTT button will call the default contact on the selected channel. Default 3000ms.
+        PTT button will call the default contact on the selected channel. Default 3000ms. See also
+        <xref linkend="glHangTime">hang time</xref>.
       </para>
     </listitem>
   </varlistentry>
@@ -119,7 +122,8 @@
       <para>        
         Specifies the private-call hang time in milliseconds. This is the time-period the user can 
         answer a received private call by pressing PTT. After this time has passed, a press on the
-        PTT button will call the default contact on the selected channel. Default 3000ms.
+        PTT button will call the default contact on the selected channel. Default 3000ms. See also
+        <xref linkend="glHangTime">hang time</xref>.
       </para>
     </listitem>
   </varlistentry>

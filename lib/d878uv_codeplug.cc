@@ -182,7 +182,19 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (nullptr == ch)
     return nullptr;
 
-  // Nothing else to do
+  // Get extensions
+  AnytoneChannelExtension *ext = nullptr;
+  if (DMRChannel *dch = ch->as<DMRChannel>()) {
+    ext = dch->anytoneChannelExtension();
+  } else if (FMChannel *fch = ch->as<FMChannel>()){
+    ext = fch->anytoneChannelExtension();
+  }
+
+  // If extension is present, update
+  if (nullptr != ext) {
+    ext->setFrequencyCorrection(frequenyCorrection());
+  }
+
   return ch;
 }
 
@@ -233,12 +245,20 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Enable roaming
     if (dc->roaming())
       enableRoaming(true);
+    // Apply extension settings, if present
+    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
+      setFrequencyCorrection(ext->frequencyCorrection());
+    }
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
     enableRXAPRS(false);
     if (nullptr != ac->aprsSystem()) {
       enableTXAnalogAPRS(true);
       enableRXAPRS(true);
+    }
+    // Apply extension settings
+    if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
+      setFrequencyCorrection(ext->frequencyCorrection());
     }
   }
 

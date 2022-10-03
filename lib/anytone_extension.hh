@@ -13,6 +13,10 @@ class AnytoneChannelExtension: public ConfigExtension
 
   /** If @c true, talkaround is enabled. */
   Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
+  /** Holds the frequency correction in some unknown units. */
+  Q_PROPERTY(int frequencyCorrection READ frequencyCorrection WRITE setFrequencyCorrection)
+  /** If @c true, the hands-free featrue is enabled for this channel. */
+  Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
 
 protected:
   /** Hidden constructor. */
@@ -24,9 +28,24 @@ public:
   /** Enables/disables talkaround. */
   void enableTalkaround(bool enable);
 
+  /** Returns the frequency correction in some unknown units. */
+  int frequencyCorrection() const;
+  /** Sets the frequency correction. */
+  void setFrequencyCorrection(int corr);
+
+  /** Returns @c true if the hands-free feature is enabled. */
+  bool handsFree() const;
+  /** Enables/disables the hands-free feature for this channel. */
+  void enableHandsFree(bool enable);
+
+
 protected:
   /** If @c true, talkaround is enabled. */
   bool _talkaround;
+  /** The frequency correction. */
+  int _frequencyCorrection;
+  /** If @c true, the hands-free featrue is enabled for this channel. */
+  bool _handsFree;
 };
 
 
@@ -46,6 +65,8 @@ class AnytoneFMChannelExtension: public AnytoneChannelExtension
   Q_PROPERTY(double customCTCSS READ customCTCSS WRITE setCustomCTCSS)
   /** Holds the squelch mode. */
   Q_PROPERTY(SquelchMode squelchMode READ squelchMode WRITE setSquelchMode)
+  /** If @c true, the analog scrabler is enabled. */
+  Q_PROPERTY(bool scrambler READ scrambler WRITE enableScrambler)
 
 public:
   /** Possible squelch mode settings. */
@@ -87,6 +108,11 @@ public:
   /** Sets the squelch mode. */
   void setSquelchMode(SquelchMode mode);
 
+  /** Reuturns @c true, if the analog scrambler is enabled. */
+  bool scrambler() const;
+  /** Enables/disables the analog scrambler. */
+  void enableScrambler(bool enable);
+
 protected:
   /** If @c true, the CTCSS phase-reverse burst at the end of transmission is enabled. */
   bool _reverseBurst;
@@ -98,6 +124,8 @@ protected:
   double _customCTCSS;
   /** Holds the squelch mode. */
   SquelchMode _squelchMode;
+  /** If @c true, the analog scrambler is enabled for this channel. */
+  bool _scrambler;
 };
 
 

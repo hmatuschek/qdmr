@@ -11,13 +11,15 @@
 </info>
 
 <para>
-  This extension to the codeplug allows to set device specific channel settings for many TyT radios
-  (and therefore also many Retevis radios). Not all settings are present in all radios. Unsupported
-  settings are ignored during encoding or set to the default value during decoding.
+  This extension to the codeplug allows to set device specific channel settings for many 
+  <trademark>TyT</trademark> radios (and therefore also many <trademark>Retevis</trademark> 
+  radios). Not all settings are present in all radios. Unsupported settings are ignored 
+  during encoding or set to the default value during decoding.
 </para>
 
 <example>
-  <title>Example channel settings specifying the default values for TyT/Retevis devices.</title>
+  <title>Example channel settings specifying the default values for <trademark>TyT</trademark> 
+    <trademark>Retevis</trademark> devices.</title>
   <programlisting><![CDATA[tyt:
   loneWorker: false
   autoScan: false
@@ -44,7 +46,8 @@
   <varlistentry>
     <term><token>loneWorker</token></term>
     <listitem>
-      <para>If <token>true</token>, the lone worker feature is enabled.</para>
+      <para>If <token>true</token>, the lone worker feature is enabled. See also 
+        <xref linkend="glLoneWorker">Lone Worker</xref></para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -59,7 +62,7 @@
       <para>
         If <token>true</token>, talk around is enabled. That is, the radio will receive on the 
         input and transmit on the output frequency of the repeater effectively bypassing the 
-        repeater.
+        repeater. See also <xref linkend="glTalkaround">Talkaround</xref>.
       </para>
     </listitem>
   </varlistentry>
@@ -94,7 +97,8 @@
 </variablelist>
 
 <variablelist>
-  <title>Channel settings for TyT MD-390 and Retevis RT8</title>
+  <title>Channel settings for <trademark>TyT</trademark> <productname>MD-390</productname> and 
+    <trademark>Retevis</trademark> <productname>RT8</productname></title>
   <varlistentry>
     <term><token>tightSquelch</token></term>
     <listitem>
@@ -110,13 +114,15 @@
   <varlistentry>
     <term><token>reverseBurst</token></term>
     <listitem>
-      <para>If enabled (default), avoids a noise burst at the end of a transmission, when the squelch is controlled by a sub tone.</para>
+      <para>If enabled (default), avoids a noise burst at the end of a transmission, when the 
+        squelch is controlled by a sub tone.</para>
     </listitem>
   </varlistentry>
 </variablelist>
 
 <variablelist>
-  <title>Channel settings for TyT MD-390 and Retevis RT8</title>
+  <title>Channel settings for <trademark>TyT</trademark> <productname>MD-390</productname> and 
+    <trademark>Retevis</trademark> <productname>RT8</productname></title>
   <varlistentry>
     <term><token>killTone</token></term>
     <listitem>
@@ -146,7 +152,8 @@
   <varlistentry>
     <term><token>dcdm</token></term>
     <listitem>
-      <para>If enabled, the dual-capacity direct mode is used for simplex operation.</para>
+      <para>If enabled, the dual-capacity direct mode is used for simplex operation. 
+        See also <xref linkend="glDCDM">DCDM</xref>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>

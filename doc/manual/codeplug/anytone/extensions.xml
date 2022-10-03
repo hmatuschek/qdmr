@@ -6,12 +6,12 @@
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
 <info>
-  <title>AnyTone Codeplug Extensions</title>
+  <title><trademark>AnyTone</trademark> Codeplug Extensions</title>
 </info>
 
 <para>
-  This chapter documents the extensions and settings specific to AnyTone radios. Please note, that
-  not all attributes are applicable to all AnyTone devices.
+  This chapter documents the extensions and settings specific to <trademark>AnyTone</trademark> radios. Please note, that
+  not all attributes are applicable to all devices.
 </para>
 
 <xi:include href="contact.xml"/>

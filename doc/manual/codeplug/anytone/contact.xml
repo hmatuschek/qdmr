@@ -11,7 +11,7 @@
 </info>
 
 <para>
-  This extensions allows to specify some DMR contact attributes for AnyTone devices. This extension
+  This extensions allows to specify some DMR contact attributes for <trademark>AnyTone</trademark> devices. This extension
   is only applicable to DMR (digital) contacts. 
 </para>
 
@@ -27,7 +27,7 @@
 </example>
 
 <para>
-  The AnyTone contact extension is a mapping named <token>anytone</token>. It contains the 
+  The <trademark>AnyTone</trademark> contact extension is a mapping named <token>anytone</token>. It contains the 
   device specific settings for that DMR contact.
 </para>
 
