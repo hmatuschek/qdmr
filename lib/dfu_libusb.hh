@@ -79,7 +79,7 @@ protected:
 };
 
 
-/** Implements the ST MCU extesions for the DFU protocol, aka DfuSe.
+/** Implements the ST MCU extensions for the DFU protocol, aka DfuSe.
  * This class implements the extensions to the DFU protocaol used by ST for their MCUs. This is
  * also known as DfuSe.
  *
@@ -87,7 +87,7 @@ protected:
 class DFUSEDevice: public DFUDevice
 {
 public:
-  /** Constructor, also connects to the specifed VID/PID device found first. The @c blocksize
+  /** Constructor, also connects to the specified VID/PID device found first. The @c blocksize
    * specifies the blocksize for every read and write operation. */
   DFUSEDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), uint16_t blocksize=32, QObject *parent=nullptr);
 

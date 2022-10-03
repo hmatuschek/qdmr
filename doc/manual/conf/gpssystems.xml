@@ -9,8 +9,8 @@
 </info>
 
 <para>
-  The GPS system list just specifies the contact to which some positional information is send to
-  (which usually gets forwarded to the APRS system) and at which period this information is send.
+  The GPS system list just specifies the contact to which some positional information is sent to
+  (which usually gets forwarded to the APRS system) and at which period this information is sent.
 </para>
 
 <informalexample>
@@ -22,7 +22,7 @@
 <para>
   The first column specifies the ID of the GPS system. This can be any number >0. The second column
   (Name) specifies the name of the GPS system. The third column specifies the destination contact
-  ID (see Contacts above), the position information is send to. The fourth column (Period) specifies
+  ID (see Contacts above), the position information is sent to. The fourth column (Period) specifies
   the update period in seconds. The fifth column (Revert) specifies the revert channel. In amateur
   radio, this can be left blank ("-").
 </para> 

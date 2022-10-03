@@ -232,9 +232,9 @@ public:
     virtual void setKeyToneLevel(unsigned level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
-    /** Returns @c true if the GPS units are imperical. */
+    /** Returns @c true if the GPS units are imperial. */
     virtual bool gpsUnitsImperial() const;
-    /** Enables/disables imperical GPS units. */
+    /** Enables/disables imperial GPS units. */
     virtual void enableGPSUnitsImperial(bool enable);
     /** Returns @c true if the knob is locked. */
     virtual bool knobLock() const;

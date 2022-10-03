@@ -41,7 +41,7 @@
       <para>
         Unfortunately, the local talk group (number 9) is frequently used on simplex channel although only 
         those radios will receive calls to this talk group if it is in the group list assigned to the 
-        simplex channel. To be on the save side, use the all-call for simplex calls.
+        simplex channel. To be on the safe side, use the all-call for simplex calls.
       </para>
     </glossdef>
   </glossentry>
@@ -231,11 +231,11 @@
     <glossdef>
       <para>
         Due to the lossy compression of audio data, it is possible to send more than twice the 
-        amount of audio data through a single 12.5kHz wide channel that needed. This allows to 
+        amount of audio data through a single 12.5kHz wide channel than needed. This allows to 
         provide two independent audio streams within a single physical channel. 
       </para>
       <para>
-        There are basically two ways to separate these two audio stream. Either by frequency, 
+        There are basically two ways to separate these two audio streams. Either by frequency, 
         effectively splitting the single 12.5kHz channel into two 6.25kHz wide ones. Alternatively,
         one can split the channel in <quote>time</quote>. That is, the band width remains 12.5kHz
         but each of the two simultaneous participants sends one after the other. One in time slot 1
@@ -261,7 +261,7 @@
         to call whenever the PTT is pressed on that channel. 
       </para>
       <para>
-        It, however, possible to answer any received call directly by pressing the PTT button 
+        It is, however, possible to answer any received call directly by pressing the PTT button 
         within the so-called hang time, although the call may not match the transmit contact. 
         These hang times can be set within the radio settings, usually for private and group calls
         separately.

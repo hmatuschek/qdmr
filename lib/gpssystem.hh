@@ -75,9 +75,9 @@ public:
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
    *
    * @param name Specifies the name of the GPS system.
-   * @param contact Specifies the contact, the GPS position is send to.
-   * @param revertChannel Specifies the channel on which the GPS is send on. If @c nullptr, the GPS
-   * data is send on the current channel.
+   * @param contact Specifies the contact, the GPS position is sent to.
+   * @param revertChannel Specifies the channel on which the GPS is sent on. If @c nullptr, the GPS
+   * data is sent on the current channel.
    * @param period Specifies the update period in seconds.
    * @param parent Specifies the QObject parent object. */
   GPSSystem(const QString &name, DMRContact *contact=nullptr,
@@ -100,17 +100,17 @@ public:
   void setContact(DMRContactReference *contactObj);
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
-   * be send on the current channel. */
+   * be sent on the current channel. */
   bool hasRevertChannel() const;
   /** Returns the revert channel for the GPS information or @c nullptr if not set. */
   DMRChannel *revertChannel() const;
-  /** Sets the revert channel for the GPS information to be send on. */
+  /** Sets the revert channel for the GPS information to be sent on. */
   void setRevertChannel(DMRChannel *channel);
   /** Returns a reference to the revert channel. */
   const DMRChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DMRChannelReference *revert();
-  /** Sets the revert channel for the GPS information to be send on. */
+  /** Sets the revert channel for the GPS information to be sent on. */
   void setRevert(DMRChannelReference *channel);
 
 public:
@@ -119,7 +119,7 @@ public:
 protected:
   /** Holds the destination contact for the GPS information. */
   DMRContactReference _contact;
-  /** Holds the revert channel on which the GPS information is send on. */
+  /** Holds the revert channel on which the GPS information is sent on. */
   DMRChannelReference _revertChannel;
 };
 
@@ -166,7 +166,7 @@ public:
    *        affect the radio configuration.
    * @param channel Specifies the transmit channel. This property is not optional. A transmit
    *        channel must be specified to obtain a working APRS system.
-   * @param dest Specifies the destination call, APRS messages are send to. Usually 'WIDE3' is a
+   * @param dest Specifies the destination call, APRS messages are sent to. Usually 'WIDE3' is a
    *        reasonable setting.
    * @param destSSID Specifies the destination SSID. Usually 3 is a reasonable choice.
    * @param src Specifies the source call, usually you call has to be entered here.

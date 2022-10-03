@@ -17,7 +17,7 @@
  *
  * The funny thing is, however, that there is a command that sets the memory read and write address,
  * although the DFU interface actually provides means to specify that address. Moreover, commands
- * and data are send and written to the same DFU interface number. Someone did not understood the
+ * and data are sent and written to the same DFU interface number. Someone did not understand the
  * DFU interface.
  *
  * @subsection Commands

@@ -160,7 +160,7 @@ public:
     /** Enables/disables talkaround. */
     virtual void enableTalkaround(bool enable);
 
-    /** Retunrs @c true if the TX CTCSS tone frequency is custom (non standard). */
+    /** Returns @c true if the TX CTCSS tone frequency is custom (non standard). */
     virtual bool txCTCSSIsCustom() const;
     /** Returns the TX CTCSS tone. */
     virtual Signaling::Code txCTCSS() const;
@@ -168,7 +168,7 @@ public:
     virtual void setTXCTCSS(Signaling::Code tone);
     /** Enables TX custom CTCSS frequency. */
     virtual void enableTXCustomCTCSS();
-    /** Retunrs @c true if the RX CTCSS tone frequency is custom (non standard). */
+    /** Returns @c true if the RX CTCSS tone frequency is custom (non standard). */
     virtual bool rxCTCSSIsCustom() const;
     /** Returns the RX CTCSS tone. */
     virtual Signaling::Code rxCTCSS() const;
@@ -1006,7 +1006,7 @@ public:
     virtual bool updateConfig(Context &ctx);
   };
 
-  /** Represets the base class for zone channel list for all AnyTone codeplugs.
+  /** Represents the base class for zone channel list for all AnyTone codeplugs.
    * Zone channel lists assign a default channel to each zone for VFO A and B.
    *
    * Memory layout of ecoded zone channel lists (size 0x400 bytes):

@@ -632,7 +632,7 @@ class RadioLimitGroupCallRefList: public RadioLimitElement
   Q_OBJECT
 
 public:
-  /** Costructor
+  /** Constructor
    * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
    * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
    * @param parent  Specifies the QObject parent. */
