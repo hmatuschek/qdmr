@@ -1,5 +1,5 @@
 ---
-version: 0.10.3
+version: 0.10.2
 settings:
   introLine1: qDMR
   introLine2: DM3MAT
@@ -24,31 +24,32 @@ contacts:
   - dmr: {id: cont9, name: SA/MV, ring: false, type: GroupCall, number: 2620}
   - dmr: {id: cont10, name: Hessen, ring: false, type: GroupCall, number: 2626}
   - dmr: {id: cont11, name: HamRadio Village, ring: false, type: GroupCall, number: 98638}
-  - dmr: {id: cont12, name: All Call, ring: false, type: AllCall, number: 16777215}
-  - dmr: {id: cont13, name: Simplex TG99, ring: false, type: GroupCall, number: 99}
-  - dmr: {id: cont14, name: Cl Brandenburg, ring: false, type: GroupCall, number: 26209}
-  - dmr: {id: cont15, name: Cl Berlin, ring: false, type: GroupCall, number: 26212}
-  - dmr: {id: cont16, name: Refl Brandenburg, ring: false, type: PrivateCall, number: 4044}
-  - dmr: {id: cont17, name: Refl Berlin, ring: false, type: PrivateCall, number: 4016}
-  - dmr: {id: cont18, name: BM SMS, ring: false, type: PrivateCall, number: 262993}
-  - dmr: {id: cont19, name: BM DAPNET, ring: false, type: PrivateCall, number: 262994}
-  - dmr: {id: cont20, name: BM Parrot, ring: false, type: PrivateCall, number: 262997}
-  - dmr: {id: cont21, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
-  - dmr: {id: cont22, name: DG2RON Ronny, ring: true, type: PrivateCall, number: 2621246}
-  - dmr: {id: cont23, name: DM9KS Silvio, ring: true, type: PrivateCall, number: 2621045}
-  - dmr: {id: cont24, name: DM3MAT Hannes, ring: true, type: PrivateCall, number: 2621370}
-  - dmr: {id: cont25, name: DL2BQF Thomas, ring: true, type: PrivateCall, number: 2621437}
-  - dmr: {id: cont26, name: DL7JOM Olaf, ring: true, type: PrivateCall, number: 2621004}
-  - dmr: {id: cont27, name: DG1RPH Peter, ring: true, type: PrivateCall, number: 2621528}
-  - dmr: {id: cont28, name: DO1RPH Richard, ring: false, type: PrivateCall, number: 2634160}
+  - dmr: {id: cont12, name: Chaoswelle, ring: false, type: GroupCall, number: 26223}
+  - dmr: {id: cont13, name: All Call, ring: false, type: AllCall, number: 16777215}
+  - dmr: {id: cont14, name: Simplex TG99, ring: false, type: GroupCall, number: 99}
+  - dmr: {id: cont15, name: Cl Brandenburg, ring: false, type: GroupCall, number: 26209}
+  - dmr: {id: cont16, name: Cl Berlin, ring: false, type: GroupCall, number: 26212}
+  - dmr: {id: cont17, name: Refl Brandenburg, ring: false, type: PrivateCall, number: 4044}
+  - dmr: {id: cont18, name: Refl Berlin, ring: false, type: PrivateCall, number: 4016}
+  - dmr: {id: cont19, name: BM SMS, ring: false, type: PrivateCall, number: 262993}
+  - dmr: {id: cont20, name: BM DAPNET, ring: false, type: PrivateCall, number: 262994}
+  - dmr: {id: cont21, name: BM Parrot, ring: false, type: PrivateCall, number: 262997}
+  - dmr: {id: cont22, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
+  - dmr: {id: cont23, name: DG2RON Ronny, ring: true, type: PrivateCall, number: 2621246}
+  - dmr: {id: cont24, name: DM9KS Silvio, ring: true, type: PrivateCall, number: 2621045}
+  - dmr: {id: cont25, name: DM3MAT Hannes, ring: true, type: PrivateCall, number: 2621370}
+  - dmr: {id: cont26, name: DL2BQF Thomas, ring: true, type: PrivateCall, number: 2621437}
+  - dmr: {id: cont27, name: DL7JOM Olaf, ring: true, type: PrivateCall, number: 2621004}
+  - dmr: {id: cont28, name: DG1RPH Peter, ring: true, type: PrivateCall, number: 2621528}
+  - dmr: {id: cont29, name: DO1RPH Richard, ring: false, type: PrivateCall, number: 2634160}
 groupLists:
   - {id: grp1, name: DL, contacts: [cont1, cont2, cont3]}
-  - {id: grp2, name: Berlin/Brand, contacts: [cont6, cont5, cont7]}
+  - {id: grp2, name: Berlin/Brand, contacts: [cont6, cont5, cont7, cont11]}
   - {id: grp3, name: Sa/Th, contacts: [cont5, cont6, cont8]}
   - {id: grp4, name: SA/MV, contacts: [cont5, cont6, cont9]}
   - {id: grp5, name: Hessen, contacts: [cont5, cont6, cont10]}
-  - {id: grp6, name: Simplex, contacts: [cont6, cont13]}
-  - {id: grp7, name: Ham Radio Village, contacts: [cont11]}
+  - {id: grp6, name: Simplex, contacts: [cont6, cont14]}
+  - {id: grp7, name: Ham Radio Village, contacts: [cont11, cont12]}
 channels:
   - digital:
       id: ch1
@@ -149,6 +150,22 @@ channels:
       vox: !<!default> ""
   - digital:
       id: ch7
+      name: ChW DB0LDS TS1
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS1
+      radioId: !<!default> ""
+      groupList: grp7
+      contact: cont12
+      roaming: !<!default> ""
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch8
       name: DM0TZN TS1
       rxFrequency: 438.825
       txFrequency: 431.225
@@ -164,7 +181,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch8
+      id: ch9
       name: TG8 DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
@@ -180,7 +197,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch9
+      id: ch10
       name: TG9 DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
@@ -196,7 +213,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch10
+      id: ch11
       name: BB DM0TZN TS2
       rxFrequency: 438.825
       txFrequency: 431.225
@@ -212,7 +229,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch11
+      id: ch12
       name: DB0LOS TS1
       rxFrequency: 438.475
       txFrequency: 430.875
@@ -228,7 +245,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch12
+      id: ch13
       name: R/TG9 DB0LOS TS2
       rxFrequency: 438.475
       txFrequency: 430.875
@@ -244,7 +261,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch13
+      id: ch14
       name: R/TG9 DM0TT TS1
       rxFrequency: 439.0875
       txFrequency: 431.4875
@@ -260,7 +277,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch14
+      id: ch15
       name: TG8 DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
@@ -276,7 +293,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch15
+      id: ch16
       name: TG9 DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
@@ -292,7 +309,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch16
+      id: ch17
       name: BB DM0TT TS2
       rxFrequency: 439.0875
       txFrequency: 431.4875
@@ -308,7 +325,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch17
+      id: ch18
       name: TG9 DB0KK TS1
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -324,7 +341,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch18
+      id: ch19
       name: BB DB0KK TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -340,7 +357,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch19
+      id: ch20
       name: DB0OUD TS1
       rxFrequency: 438.625
       txFrequency: 431.025
@@ -356,7 +373,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch20
+      id: ch21
       name: TG8 DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
@@ -372,7 +389,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch21
+      id: ch22
       name: TG9 DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
@@ -388,7 +405,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch22
+      id: ch23
       name: BB DB0OUD TS2
       rxFrequency: 438.625
       txFrequency: 431.025
@@ -404,7 +421,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch23
+      id: ch24
       name: TG9 DB0TU TS1
       rxFrequency: 439.575
       txFrequency: 431.975
@@ -420,7 +437,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch24
+      id: ch25
       name: BB DB0TU TS2
       rxFrequency: 439.575
       txFrequency: 431.975
@@ -436,7 +453,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch25
+      id: ch26
       name: DM0MOT TS1
       rxFrequency: 439.525
       txFrequency: 431.925
@@ -452,7 +469,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch26
+      id: ch27
       name: TG8 DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
@@ -468,7 +485,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch27
+      id: ch28
       name: TG9 DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
@@ -484,7 +501,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch28
+      id: ch29
       name: BB DM0MOT TS2
       rxFrequency: 439.525
       txFrequency: 431.925
@@ -500,7 +517,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch29
+      id: ch30
       name: DB0TA TS1
       rxFrequency: 439.475
       txFrequency: 431.875
@@ -516,7 +533,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch30
+      id: ch31
       name: TG8 DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
@@ -532,7 +549,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch31
+      id: ch32
       name: TG9 DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
@@ -548,7 +565,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch32
+      id: ch33
       name: BB DB0TA TS2
       rxFrequency: 439.475
       txFrequency: 431.875
@@ -564,7 +581,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch33
+      id: ch34
       name: DB0FX TS1
       rxFrequency: 439.45
       txFrequency: 431.85
@@ -580,7 +597,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch34
+      id: ch35
       name: TG8 DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
@@ -596,7 +613,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch35
+      id: ch36
       name: TG9 DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
@@ -612,7 +629,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch36
+      id: ch37
       name: BB DB0FX TS2
       rxFrequency: 439.45
       txFrequency: 431.85
@@ -628,7 +645,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch37
+      id: ch38
       name: DB0PDM TS1
       rxFrequency: 438.4
       txFrequency: 430.8
@@ -644,7 +661,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch38
+      id: ch39
       name: TG8 DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
@@ -660,7 +677,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch39
+      id: ch40
       name: TG9 DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
@@ -676,7 +693,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch40
+      id: ch41
       name: BB DB0PDM TS2
       rxFrequency: 438.4
       txFrequency: 430.8
@@ -692,7 +709,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch41
+      id: ch42
       name: DB0BRB TS1
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -708,7 +725,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch42
+      id: ch43
       name: TG8 DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -724,7 +741,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch43
+      id: ch44
       name: TG9 DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -740,7 +757,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch44
+      id: ch45
       name: BB DB0BRB TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -756,7 +773,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch45
+      id: ch46
       name: DB0SPN TS1
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -772,7 +789,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch46
+      id: ch47
       name: R/TG9 DB0SPN TS2
       rxFrequency: 439.4875
       txFrequency: 431.8875
@@ -788,7 +805,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch47
+      id: ch48
       name: DB0NLS TS1
       rxFrequency: 439.5125
       txFrequency: 431.9125
@@ -804,7 +821,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch48
+      id: ch49
       name: R/TG9 DB0NLS TS2
       rxFrequency: 439.5125
       txFrequency: 431.9125
@@ -820,7 +837,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch49
+      id: ch50
       name: DB0LS TS1
       rxFrequency: 438.225
       txFrequency: 430.625
@@ -836,7 +853,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch50
+      id: ch51
       name: TG8 DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
@@ -852,7 +869,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch51
+      id: ch52
       name: TG9 DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
@@ -868,7 +885,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch52
+      id: ch53
       name: BB DB0LS TS2
       rxFrequency: 438.225
       txFrequency: 430.625
@@ -884,7 +901,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch53
+      id: ch54
       name: DM0LC TS1
       rxFrequency: 439.3875
       txFrequency: 431.7875
@@ -900,7 +917,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch54
+      id: ch55
       name: TG8 DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
@@ -916,7 +933,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch55
+      id: ch56
       name: TG9 DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
@@ -932,7 +949,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch56
+      id: ch57
       name: Sa/Th DM0LC TS2
       rxFrequency: 439.3875
       txFrequency: 431.7875
@@ -948,7 +965,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch57
+      id: ch58
       name: BB DM0LC TS1
       rxFrequency: 439.3875
       txFrequency: 431.7875
@@ -964,7 +981,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch58
+      id: ch59
       name: DB0FLW TS1
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -980,7 +997,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch59
+      id: ch60
       name: TG8 DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -996,7 +1013,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch60
+      id: ch61
       name: TG9 DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -1012,7 +1029,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch61
+      id: ch62
       name: Sa/Th DB0FLW TS2
       rxFrequency: 439.5375
       txFrequency: 431.9375
@@ -1028,7 +1045,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch62
+      id: ch63
       name: DB0LE TS1
       rxFrequency: 439.575
       txFrequency: 431.975
@@ -1044,7 +1061,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch63
+      id: ch64
       name: R/TG9 DB0LE TS2
       rxFrequency: 439.575
       txFrequency: 431.975
@@ -1060,7 +1077,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch64
+      id: ch65
       name: DL DB0AFZ TS1
       rxFrequency: 439.975
       txFrequency: 430.575
@@ -1076,7 +1093,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch65
+      id: ch66
       name: BB DB0AFZ TS1
       rxFrequency: 439.975
       txFrequency: 430.575
@@ -1092,7 +1109,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch66
+      id: ch67
       name: TG9 DB0AFZ TS2
       rxFrequency: 439.975
       txFrequency: 430.575
@@ -1108,7 +1125,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch67
+      id: ch68
       name: Hes DB0AFZ TS2
       rxFrequency: 439.975
       txFrequency: 430.575
@@ -1124,7 +1141,7 @@ channels:
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch68
+      id: ch69
       name: DMR S0
       rxFrequency: 433.45
       txFrequency: 433.45
@@ -1134,13 +1151,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch69
+      id: ch70
       name: DMR S1
       rxFrequency: 433.612
       txFrequency: 433.612
@@ -1150,13 +1167,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch70
+      id: ch71
       name: DMR S2
       rxFrequency: 433.625
       txFrequency: 433.625
@@ -1166,13 +1183,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch71
+      id: ch72
       name: DMR S3
       rxFrequency: 433.638
       txFrequency: 433.638
@@ -1182,13 +1199,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch72
+      id: ch73
       name: DMR S4
       rxFrequency: 433.65
       txFrequency: 433.65
@@ -1198,13 +1215,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch73
+      id: ch74
       name: DMR S5
       rxFrequency: 433.663
       txFrequency: 433.663
@@ -1214,13 +1231,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch74
+      id: ch75
       name: DMR S6
       rxFrequency: 433.675
       txFrequency: 433.675
@@ -1230,13 +1247,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch75
+      id: ch76
       name: DMR S7
       rxFrequency: 433.688
       txFrequency: 433.688
@@ -1246,13 +1263,13 @@ channels:
       timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp6
-      contact: cont12
+      contact: cont13
       roaming: !<!default> ""
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - analog:
-      id: ch76
+      id: ch77
       name: DB0LDS
       rxFrequency: 439.5625
       txFrequency: 431.9625
@@ -1266,7 +1283,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: !<!default> ""
   - analog:
-      id: ch77
+      id: ch78
       name: DB0RAG
       rxFrequency: 439.3
       txFrequency: 431.7
@@ -1278,7 +1295,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch78
+      id: ch79
       name: DB0LUD
       rxFrequency: 438.575
       txFrequency: 430.975
@@ -1292,7 +1309,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: !<!default> ""
   - analog:
-      id: ch79
+      id: ch80
       name: DB0SP-2
       rxFrequency: 145.6
       txFrequency: 145
@@ -1304,7 +1321,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch80
+      id: ch81
       name: DB0SP-70
       rxFrequency: 439.425
       txFrequency: 431.825
@@ -1316,7 +1333,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch81
+      id: ch82
       name: DB0ZOD-2
       rxFrequency: 145.6625
       txFrequency: 145.0625
@@ -1328,7 +1345,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch82
+      id: ch83
       name: DB0ZOD-70
       rxFrequency: 438.725
       txFrequency: 431.125
@@ -1340,7 +1357,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch83
+      id: ch84
       name: DB0BRL
       rxFrequency: 145.725
       txFrequency: 145.125
@@ -1352,7 +1369,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch84
+      id: ch85
       name: DB0BLO
       rxFrequency: 439.275
       txFrequency: 431.675
@@ -1364,7 +1381,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch85
+      id: ch86
       name: DB0SX
       rxFrequency: 439.05
       txFrequency: 431.45
@@ -1376,7 +1393,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch86
+      id: ch87
       name: DB0TA
       rxFrequency: 439.125
       txFrequency: 431.525
@@ -1388,7 +1405,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch87
+      id: ch88
       name: DB0PDM
       rxFrequency: 145.675
       txFrequency: 145.075
@@ -1400,7 +1417,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch88
+      id: ch89
       name: DB0CBS
       rxFrequency: 438.85
       txFrequency: 431.25
@@ -1412,7 +1429,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch89
+      id: ch90
       name: DB0AF
       rxFrequency: 438.6375
       txFrequency: 431.0375
@@ -1424,7 +1441,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch90
+      id: ch91
       name: DB0NFL
       rxFrequency: 438.95
       txFrequency: 431.35
@@ -1436,7 +1453,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch91
+      id: ch92
       name: DB0LMM
       rxFrequency: 439.3
       txFrequency: 431.7
@@ -1448,7 +1465,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch92
+      id: ch93
       name: DM0LEI
       rxFrequency: 439.15
       txFrequency: 431.55
@@ -1460,7 +1477,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch93
+      id: ch94
       name: DB0LEI
       rxFrequency: 145.775
       txFrequency: 145.175
@@ -1472,7 +1489,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch94
+      id: ch95
       name: DB0SML
       rxFrequency: 439.275
       txFrequency: 431.675
@@ -1484,7 +1501,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch95
+      id: ch96
       name: DB0LSA
       rxFrequency: 145.6625
       txFrequency: 145.0625
@@ -1496,7 +1513,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch96
+      id: ch97
       name: DB0LE
       rxFrequency: 438.7875
       txFrequency: 431.1875
@@ -1508,7 +1525,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch97
+      id: ch98
       name: DOK Y07
       rxFrequency: 144.675
       txFrequency: 144.675
@@ -1520,7 +1537,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch98
+      id: ch99
       name: DOK D20
       rxFrequency: 144.65
       txFrequency: 144.65
@@ -1532,7 +1549,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch99
+      id: ch100
       name: DOK D23
       rxFrequency: 145.375
       txFrequency: 145.375
@@ -1544,7 +1561,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch100
+      id: ch101
       name: DOK S31
       rxFrequency: 144.725
       txFrequency: 144.725
@@ -1556,7 +1573,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch101
+      id: ch102
       name: S20
       rxFrequency: 145.3
       txFrequency: 145.3
@@ -1568,7 +1585,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch102
+      id: ch103
       name: 2m Mobil
       rxFrequency: 145.5
       txFrequency: 145.5
@@ -1580,7 +1597,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch103
+      id: ch104
       name: 70cm Mobil
       rxFrequency: 433.5
       txFrequency: 433.5
@@ -1592,7 +1609,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch104
+      id: ch105
       name: APRS
       rxFrequency: 144.8
       txFrequency: 144.8
@@ -1605,7 +1622,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch105
+      id: ch106
       name: ISS APRS
       rxFrequency: 145.825
       txFrequency: 145.825
@@ -1617,7 +1634,7 @@ channels:
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch106
+      id: ch107
       name: ISS FM Rep
       rxFrequency: 437.8
       txFrequency: 145.99
@@ -1630,7 +1647,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
-      id: ch107
+      id: ch108
       name: CAS-3H FM
       rxFrequency: 437.2
       txFrequency: 144.35
@@ -1642,7 +1659,7 @@ channels:
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch108
+      id: ch109
       name: PO-101 FM
       rxFrequency: 145.9
       txFrequency: 437.5
@@ -1654,7 +1671,7 @@ channels:
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch109
+      id: ch110
       name: SO-50 FM
       rxFrequency: 436.79
       txFrequency: 145.85
@@ -1667,7 +1684,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
-      id: ch110
+      id: ch111
       name: AO-92 FM
       rxFrequency: 145.88
       txFrequency: 435.35
@@ -1680,7 +1697,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
-      id: ch111
+      id: ch112
       name: AO-91 FM
       rxFrequency: 145.96
       txFrequency: 435.25
@@ -1693,7 +1710,7 @@ channels:
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
-      id: ch112
+      id: ch113
       name: U0
       rxFrequency: 430.2
       txFrequency: 430.2
@@ -1705,7 +1722,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch113
+      id: ch114
       name: U1
       rxFrequency: 430.225
       txFrequency: 430.225
@@ -1717,7 +1734,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch114
+      id: ch115
       name: U2
       rxFrequency: 430.25
       txFrequency: 430.25
@@ -1729,7 +1746,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch115
+      id: ch116
       name: U3
       rxFrequency: 430.275
       txFrequency: 430.275
@@ -1741,7 +1758,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch116
+      id: ch117
       name: PMR 1
       rxFrequency: 446.00625
       txFrequency: 446.00625
@@ -1754,7 +1771,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch117
+      id: ch118
       name: PMR 2
       rxFrequency: 446.01875
       txFrequency: 446.01875
@@ -1767,7 +1784,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch118
+      id: ch119
       name: PMR 3
       rxFrequency: 446.03125
       txFrequency: 446.03125
@@ -1780,7 +1797,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch119
+      id: ch120
       name: PMR 4
       rxFrequency: 446.04375
       txFrequency: 446.04375
@@ -1793,7 +1810,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch120
+      id: ch121
       name: PMR 5
       rxFrequency: 446.05625
       txFrequency: 446.05625
@@ -1806,7 +1823,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch121
+      id: ch122
       name: PMR 6
       rxFrequency: 446.06875
       txFrequency: 446.06875
@@ -1819,7 +1836,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch122
+      id: ch123
       name: PMR 7
       rxFrequency: 446.08125
       txFrequency: 446.08125
@@ -1832,7 +1849,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch123
+      id: ch124
       name: PMR 8
       rxFrequency: 446.09375
       txFrequency: 446.09375
@@ -1845,7 +1862,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch124
+      id: ch125
       name: PMR 9
       rxFrequency: 446.10625
       txFrequency: 446.10625
@@ -1858,7 +1875,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch125
+      id: ch126
       name: PMR 10
       rxFrequency: 446.11875
       txFrequency: 446.11875
@@ -1871,7 +1888,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch126
+      id: ch127
       name: PMR 11
       rxFrequency: 446.13125
       txFrequency: 446.13125
@@ -1884,7 +1901,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch127
+      id: ch128
       name: PMR 12
       rxFrequency: 446.14375
       txFrequency: 446.14375
@@ -1897,7 +1914,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch128
+      id: ch129
       name: PMR 13
       rxFrequency: 446.15625
       txFrequency: 446.15625
@@ -1910,7 +1927,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch129
+      id: ch130
       name: PMR 14
       rxFrequency: 446.16875
       txFrequency: 446.16875
@@ -1923,7 +1940,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch130
+      id: ch131
       name: PMR 15
       rxFrequency: 446.18125
       txFrequency: 446.18125
@@ -1936,7 +1953,7 @@ channels:
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
-      id: ch131
+      id: ch132
       name: PMR 16
       rxFrequency: 446.19375
       txFrequency: 446.19375
@@ -1951,61 +1968,61 @@ channels:
 zones:
   - id: zone1
     name: KW
-    A: [ch1, ch4, ch5, ch2, ch6, ch11, ch12, ch13, ch15, ch16, ch76, ch77, ch78, ch79]
-    B: [ch97, ch101, ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch1, ch4, ch5, ch2, ch6, ch7, ch12, ch13, ch14, ch16, ch17, ch77, ch78, ch79, ch80]
+    B: [ch98, ch102, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone2
     name: TH Wildau
-    A: [ch112, ch113, ch114, ch115]
+    A: [ch113, ch114, ch115, ch116]
     B: []
   - id: zone3
     name: Hessen
-    A: [ch64, ch66, ch67]
-    B: [ch102, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch65, ch67, ch68]
+    B: [ch103, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone4
     name: Berlin
-    A: [ch16, ch18, ch22, ch24, ch28, ch32, ch36, ch79, ch80, ch81, ch82, ch83, ch84, ch85, ch86]
-    B: [ch98, ch99, ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch17, ch19, ch23, ch25, ch29, ch33, ch37, ch80, ch81, ch82, ch83, ch84, ch85, ch86, ch87]
+    B: [ch99, ch100, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone5
     name: Potsdam
-    A: [ch37, ch38, ch39, ch40, ch41, ch42, ch43, ch44, ch79, ch80, ch87]
-    B: [ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch38, ch39, ch40, ch41, ch42, ch43, ch44, ch45, ch80, ch81, ch88]
+    B: [ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone6
     name: Cottbus
-    A: [ch45, ch46, ch47, ch48, ch49, ch50, ch51, ch52, ch88, ch89, ch90]
-    B: [ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch46, ch47, ch48, ch49, ch50, ch51, ch52, ch53, ch89, ch90, ch91]
+    B: [ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone7
     name: Leipzig
-    A: [ch53, ch55, ch56, ch57, ch58, ch60, ch61, ch62, ch63, ch91, ch92, ch93, ch94, ch95, ch96]
-    B: [ch100, ch102, ch103, ch68, ch69, ch70, ch71, ch72, ch73, ch74, ch75]
+    A: [ch54, ch56, ch57, ch58, ch59, ch61, ch62, ch63, ch64, ch92, ch93, ch94, ch95, ch96, ch97]
+    B: [ch101, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
   - id: zone8
     name: Sat
-    A: [ch106, ch111, ch110, ch109, ch108, ch107]
-    B: [ch105, ch106, ch111, ch110, ch109, ch108, ch107]
+    A: [ch107, ch112, ch111, ch110, ch109, ch108]
+    B: [ch106, ch107, ch112, ch111, ch110, ch109, ch108]
   - id: zone9
     name: PMR
-    A: [ch116, ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131]
-    B: [ch116, ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131]
+    A: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
+    B: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
 scanLists:
   - id: scan1
     name: KW
-    channels: [ch4, ch5, ch76, ch77, ch97, ch102, ch68, ch112]
+    channels: [ch4, ch5, ch77, ch78, ch98, ch103, ch69, ch113]
   - id: scan2
     name: BerBra
-    channels: [ch5, ch10, ch16, ch18, ch22, ch24, ch32, ch36, ch28, ch40, ch44, ch52]
+    channels: [ch5, ch11, ch17, ch19, ch23, ch25, ch33, ch37, ch29, ch41, ch45, ch53]
   - id: scan3
     name: PMR
-    channels: [ch116, ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131]
+    channels: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
 positioning:
   - dmr:
       id: aprs1
       name: BM ARPS
       period: 300
-      contact: cont21
+      contact: cont22
   - aprs:
       id: aprs2
       name: APRS APAT81
       period: 300
-      revert: ch104
+      revert: ch105
       icon: Jogger
       message: Y07, QRG 144.675
       destination: APAT81-0
@@ -2014,7 +2031,7 @@ positioning:
 roaming:
   - id: roam1
     name: Berlin/Brand
-    channels: [ch3, ch8, ch14, ch18, ch20, ch24, ch26, ch30, ch34, ch38, ch42, ch50]
+    channels: [ch3, ch9, ch15, ch19, ch21, ch25, ch27, ch31, ch35, ch39, ch43, ch51]
 commercial:
   encryptionKeys:
     []
