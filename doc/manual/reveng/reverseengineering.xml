@@ -10,11 +10,294 @@
 </info>
 
 <para>
-  The majority of the development time needed for <application>qdmr</application> consists of 
+  The majority of the development time needed for <application>qdmr</application>, consists of 
   reverse engineering the codeplug and communication protocols of the radios. Fortunately, many 
   radios share the same communication protocol, in particular those from the same manufacturer.
+  But sometimes these protocols are also used by other manufacturers. Even if the protocol is 
+  already implemented in <application>qdmr</application>, you may need to reverse engineer the 
+  codeplug format. This step has to be performed always, even if a already implemented codeplug
+  is reused, you will need to verify that format. Any mistake here, may brick your device.
+</para>
+<note>
+  <para>
+    Before you attempt to reverse engineer anything, consider to invest some significant time in 
+    research. Reverse engineering is an cumbersome and frequently frustrating task, there is no
+    need to waste your valuable time on something, that someone else has already done. Also, 
+    consider documenting and publishing your results, so others can find it, even if it is 
+    incomplete.
+  </para>
+</note>
+<para>
+  In the following sections, I attempt to describe, how I approach reverse engineering the 
+  communication protocols and codeplugs. To this end, I hope it might help you in your reverse 
+  engineering work. And if you like, you may contribute your work to qdmr.
+</para>
+
+<section>
+<info><title>Reverse engineering communication protocols</title></info>
+<para>
+  There is no one ultimate way to successfully reverse engineer a communication protocol. But some
+  methods are very common. First, one needs to get some captures of the communication between the 
+  manufacturer codeplug programming software (<acronym>CPS</acronym>) and the radio of interest. 
+  The majority of theses radios will communicate via USB. Hence, some means are needed to capture
+  USB traffic.
 </para>
 <para>
-  
+  There is an application, called <application>Wireshark</application> 
+  (<ulink url="https://www.wireshark.org/"/>). This application is usually used to capture and 
+  analyze network traffic. It can, however, also capture traffic from USB. How this is done, 
+  depends a bit on the operating system you are using. If you want to capture and analyze the 
+  communication under <trademark>Windows</trademark>, read the instructions at 
+  <ulink url="https://wiki.wireshark.org/CaptureSetup/USB"/>. This makes sense, as you need a 
+  windows installation, to run the manufacturer CPS. 
 </para>
+<para>
+  I personally prefer to work under Linux, to this end, I've installed Windows in a virtual 
+  machine, but capture the USB traffic under the host Linux system. To do that, the 
+  <command>usbmon</command> kernel module must be loaded. If loaded, Wireshark will show USB
+  as a capture source.
+</para>
+<para>
+  Once, capturing USB traffic works, connect the radio to the host. You may need to allow the 
+  guest system to have access to the USB device. Then fire up the manufacturer CPS, start 
+  capturing in Wireshark and start a codeplug read. Stop capturing once the read is complete.
+  Save the captured data and restart the capturing. Then write the codeplug back to the device,
+  stop the capture and save it in another file.
+</para>
+<para>
+  These files now contain all packets send and received by the PC over USB. In a next step, 
+  the packets must be filtered and inspected. To do that, I personally prefer to write short
+  Python scripts. The <productname>pyshark</productname> package provides means to read 
+  packages from the capture file and access their content. This allows to filter those
+  packages to and from the device, that contain the actual payload to and from the device.
+</para>
+<para>
+  Please note, that may radios may misuse some already existing protocols over USB. Some 
+  Radioddity and Baofeng devices use the HID specification to transfer data to and from 
+  the device. Others may use the DFU specification (TyT, Retevis), mass storage (CSi) or 
+  simply serial-over-USB (AnyTone). Irrespective of the underlying specification used to
+  send data to the device, the payload of these packages must be extracted.
+</para>
+<para>
+  To do that, use Wireshark to inspect these packages by hand. Search for a packet, that 
+  was definitely send to or by the device and note the USB (URB) device address. This is 
+  the best way to filter all packets to and from the device.
+</para>
+<example>
+  <title>Some simple example to filter packages by device address and destination/source.</title>
+  <programlisting language="python"><![CDATA[
+import pyshark
+
+packages = pyshark.FileCapture(FILENAME, include_raw=True, use_json=True)
+device_address = '9' # just an example
+
+for package in packages:
+  if device_address != package.usb.device_address:
+    continue
+  if "host" == package.usb.src:
+    # From host to device.
+  else if "host" == package.usb.dst:
+    # From device to host.]]>
+  </programlisting>
+</example>
+<para>
+  This example shows how to filter only those packets to and from a specific device and also 
+  dispatch depending on the destination and source of the packet. That is, if the packet was 
+  send by the host or the device. 
+</para>
+<para>
+  In a next step, the captured payload must be inspected. If the packet contains any additional
+  payload data, the <varname>usb.data_length</varname> field will be set. Then, there is a field
+  called <varname>usb.capdata_raw</varname>. Unfortunately, that field name contains a dot, so you
+  need to access it differently. That is
+</para>
+<programlisting language="python"><![CDATA[
+  # [...] 
+  if int(package.usb.data_length):
+    data = package["usb.capdata_raw"].value
+  # [...]]]>
+</programlisting>
+<para>
+  The extracted data is hex string. Now comes the difficult part. Staring at these packets and 
+  making sense of them. Usually, the communication is performed in a strict command-response 
+  structure. That is, the host sends a request packet and the device responses with a single 
+  packet. This eases the analysis a lot, as the communication is always initiated by the host and
+  the association between the request and the response packets are trivial.
+</para>
+
+<section>
+<title>Identifying the communication structure</title>
+<para>
+  A typical communication with the device is performed in three steps: First, the 
+  radio is identified and brought into a programming mode. Several packets might be needed to 
+  perform this task. In that state, the radio usually displays some message on the screen or
+  blinks an LED.
+</para>
+<para>
+  The second step consists of the actual codeplug transfer. There, a large 
+  amount of packets are send. This step is usually easy to find within the captured packets, as a
+  large number of equally sized packets are exchanged. Sometimes, a relatively large amount of 
+  data is read or written at once. This can be spotted easily, as basic control commands of 
+  the first step are usually pretty short.
+</para>
+<para>
+  Frequently, these packets contain an address field or sequence number used to specify where the 
+  codeplug data chunk is written to or read from. These fields are of upmost importance and need to
+  be identified. They are, however, easy to spot, as this field is likely constantly increasing, 
+  with a fixed increment from packet to packet. 
+</para>
+<para>
+  The final step usually is to reboot the radio or leaving the programming mode. This is commonly 
+  performed by a single packet. Sometimes, the device reboots immediately and no response to the 
+  command is received by the host. 
+</para>
+<para>
+  Once the protocol structure is identified, that is, the purpose of the single packets is known, 
+  the actual work of identifying the packet structure can start. 
+</para>
+</section>
+
+<section>
+<title>Identifying the packet format</title>
+<para>
+  The actual packet format will be much harder to reverse engineer. I cannot give any general 
+  suggestions on how to figure out the meaning of each byte in a packet. However, I can give you 
+  some examples. This might help in reverse engineering new protocols as the structure of the 
+  packets will be different, but the concepts remain the same. For example, read and write commands
+  must somehow specify an address to read from and write to as well as the amount of data to read 
+  or write. This might be helpful
+</para>
+<para>
+  Let us inspect some packets send and received from an AnyTone device.
+</para>
+<example xml:id="revEngD578">
+  <title>Capture of a codeplug read from an AnyTone AT-D578UV</title>
+  <programlisting><![CDATA[> 50 52 4f 47 52 41 4d                            | PROGRAM
+< 51 58 06                                        | QX.
+
+> 02                                              | .
+< 49 44 35 37 38 55 56 00 12 56 31 31 30 00 00 06 | ID578UV..V110...
+
+> 52 02 64 00 00 10                               | R.d...
+< 57 02 64 00 00 10 fe ff ff ff ff ff ff ff ff ff | W.d.............
+| ff ff ff ff ff ff 65 06                         | ......e.
+
+> 52 02 64 00 10 10                               | R.d...
+< 57 02 64 00 10 10 ff ff ff ff ff ff ff ff ff ff | W.d.............
+| ff ff ff ff ff ff 76 06                         | ......v.
+
+> 52 02 64 00 20 10                               | R.d. .
+< 57 02 64 00 20 10 ff ff ff ff ff ff ff ff ff ff | W.d. ...........
+| ff ff ff ff ff ff 86 06                         | ........
+
+...
+
+> 52 01 64 08 80 10                               | R.d...
+< 57 01 64 08 80 10 00 ff ff ff ff ff ff ff ff ff | W.d.............
+| ff ff ff ff ff ff ee 06                         | ........
+
+> 52 02 48 02 00 10                               | R.H...
+< 57 02 48 02 00 10 01 08 00 00 ff ff ff ff ff ff | W.H.............
+| ff ff ff ff ff ff 59 06                         | ......Y.
+
+... ]]></programlisting>
+</example>
+<para>
+  The <xref linkend="revEngD578"/> shows a capture of the data exchanged between the host 
+  and an AnyTone AT-D578UV during a codeplug read. Everything starting with <token>&gt;</token> is
+  send from the host to the device, while everything starting with <token>&lt;</token> is send by 
+  the device to the host.
+</para>
+<para>
+  The first packet send, is the ASCII string <token>PROGRAM</token>. This causes the device to enter
+  the programming mode. A message will be shown on the screen of the device. This is then 
+  acknowledged by the device with a short message <token>QX</token> followed by a single 
+  <token>06h</token> byte. The last byte appears to be weird, but it will always be present on any 
+  response from the device. This might be seen as an end-of-packet byte.
+</para>
+<para>
+  The next command send by the host is pretty simple. It consists of a single <token>02h</token> 
+  byte. The device responds with a 15 bytes long ID string, identifying the device name and hardware
+  version followed by the 06h end-of-packet byte. 
+</para>
+<para>
+  After this, the actual codeplug read appears to start. The host sends a series of equally size 
+  commands, each starting with an <token>R</token> followed by 5 bytes of payload. As mentioned 
+  above, this payload must contain some sort of memory address and length field, to specify how 
+  much to read and from where. To figure that out, one may study subsequent read requests. 
+</para>
+<para>
+  The payloads of the first tree read read requests are 
+  <programlisting><![CDATA[02 64 00 00 10
+02 64 00 10 10
+02 64 00 20 10
+]]></programlisting>
+  The only difference of these requests is the fourth byte. Hence, one may assume, that this byte is 
+  part of the address field. However, we do not know wich bytes are part of the address as well. 
+</para>
+<para>
+  The responses to these requests also contain these bytes as well as 18 more bytes of payload. It is 
+  reasonable that the transfer size is a power of two. So the request likely reads 16 bytes from the 
+  device. 16 in hex is <token>10h</token>, hence one may assume that the last byte specifies the 
+  amount of data to read. Hence we identified the size field as the fifth byte of the read request 
+  payload data.
+</para>
+<para>
+  As the address increases by 10h from request to request, one may infer, that the read request
+  specifies the address to read from, not the sequence or block number of a read from. As the 
+  entire Codeplug will not fit into 256 bytes, the address field must be larger. Even 64kb will 
+  be too small, to hold the entire codeplug, the address is likely a 32bit integer. 
+</para>
+<para>
+  This does not need to be true. Some radios will implement special commands to select the memory 
+  bank beforehand. Then each 64kB bank can be accessed with a 16bit address. 
+</para>
+<para>
+  To verify our assumption, we will study some read requests, that appear much later and check if 
+  the first bytes change as well. And indeed, much later, we observe read request payloads like
+  <programlisting><![CDATA[01 64 08 80 10
+02 48 02 00 10
+]]></programlisting>  
+  Obviously, these bytes change too. Consequently, we may assume that the address is stored as a 
+  32bit unsigned integer in big-endian byte-order. Finally, we may summarize the read request 
+  format as
+  <programlisting><![CDATA[+---+---+---+---+---+---+
+|'R'| Address       | N |
++---+---+---+---+---+---+]]></programlisting>
+Where <token>N</token> is the number of bytes to read.
+</para>
+<para>
+  Now, it is time to study the structure of the read response. As we already reverse engineered the
+  read request, the read response is then easy to understand. Each of these responses start with a 
+  <token>W</token> char, followed by the same address and length as send by the request. That is
+  <programlisting><![CDATA[> 52 02 64 00 00 10
+< 57 02 64 00 00 10 fe ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 65 06]]></programlisting>
+  Obviously the 16 byte data read, follows the length byte. The last byte is the common 06h 
+  end-of-packet byte, we have already seen. So a single unknown 65h byte is still unknown.
+</para>
+<para>
+  This byte might be some sort of checksum over the payload. Checksums are notoriously difficult to
+  figure out. Frequently, common techniques like CRC16 are used. Here, a single checksum byte is 
+  used, hence one of the common checksums is unlikely. Now starts some guesswork. We may compare 
+  some very similar read responses to get an idea, how this checksum may work. For example
+  <programlisting><![CDATA[57 02 64 00 10 10 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 76 06
+57 02 64 00 20 10 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 86 06]]></programlisting>
+  The only difference between these two responses is one byte in the address, the remaining payload
+  is identical. The address also only differs by 10h like the checksum. So one may assume, that the 
+  checksum is simply the sum over the payload bytes. Summing all bytes of the latter up to the 
+  checksum gets 10ddh. Of cause, this is not the checksum directly. The checksum is a single byte. 
+  But the least significant byte of the sum (ddh), however, does not match.
+</para>
+<para>
+  Maybe, the sum is not taken over the entire payload, but over the part that actually matters. That 
+  is, the address, length and data fields. This time, the sum is 1086h and this time, the least 
+  significant byte (86h) matches the checksum. Now, we can summarize the read response format as
+  <programlisting><![CDATA[+---+---+---+---+---+---+---+...+---+---+---+
+|'W'| Address       | N | Data (N)  |CRC|06h|
++---+---+---+---+---+---+---+...+---+---+---+]]></programlisting>
+  where the CRC is the least significant byte of the sum over the address, length and data payload.
+</para>
+</section>
+
+</section>
 </chapter>
