@@ -1,5 +1,8 @@
 # QDMR, a GUI application and command line tool to program DMR radios
-
+<a href="https://translate.codeberg.org/projects/qdmr/">
+ <img src="https://translate.codeberg.org/widgets/qdmr/-/graphical-user-interface/svg-badge.svg"
+      alt="Translation status">
+</a>
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
 *qdmr* is a graphical user interface (GUI) application that allows to program several types of DMR radios.
