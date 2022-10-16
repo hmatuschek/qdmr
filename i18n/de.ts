@@ -6,12 +6,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
         <source>Create APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS System erzeugen</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="110"/>
         <source>Edit APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS System bearbeiten</translation>
     </message>
 </context>
 <context>
@@ -20,13 +20,13 @@
         <location filename="../src/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
-        <translation type="unfinished"></translation>
+        <translation>Über qdrm</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
-        <translation type="unfinished"></translation>
+        <translation>Über qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="52"/>
@@ -46,7 +46,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="73"/>
         <source>Supported Radios</source>
-        <translation type="unfinished"></translation>
+        <translation>Unterstützte Geräte</translation>
     </message>
 </context>
 <context>
@@ -55,7 +55,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.cc" line="53"/>
         <location filename="../src/analogchanneldialog.cc" line="69"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
@@ -223,12 +223,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../lib/anytone_limits.cc" line="18"/>
         <source>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wahrscheinlich verwenden Sie eine neuere Revision (%1) des Gerätes als jene, die von qdmr unterstützt wird (%2). Der erzeugte Codeplug könnte inkompatibel sein. Bitte informieren Sie die Entwickler über diese neue Revision.</translation>
     </message>
     <message>
         <location filename="../lib/anytone_limits.cc" line="23"/>
         <source>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wahrscheinlich verwenden Sie eine ältere Revision (%1) des Gerätes als jene, die von qdmr unterstützt wird (%2). Der Codeplug könnte inkompatibel sein.</translation>
     </message>
 </context>
 <context>
@@ -236,38 +236,38 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="208"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="222"/>
         <location filename="../src/application.cc" line="710"/>
         <source>Radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio IDs</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="226"/>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontakte</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="230"/>
         <source>Group Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Empfangsgruppen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="234"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanäle</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="238"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Zonen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="242"/>
         <source>Scan Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanlisten</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="246"/>
