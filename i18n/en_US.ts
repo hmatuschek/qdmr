@@ -17,6 +17,7 @@
 <context>
     <name>AboutDialog</name>
     <message>
+        <location filename="../src/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
         <translation>About qdrm</translation>
@@ -65,6 +66,166 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.cc" line="69"/>
         <source>[None]</source>
         <translation>[None]</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="14"/>
+        <source>Edit Analog Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="32"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="49"/>
+        <source>Rx Frequency</source>
+        <translation type="unfinished">RX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="59"/>
+        <source>Tx Frequency</source>
+        <translation type="unfinished">TX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="69"/>
+        <source>Power</source>
+        <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="79"/>
+        <source>Max</source>
+        <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="84"/>
+        <source>High</source>
+        <translation type="unfinished">High</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="89"/>
+        <source>Mid</source>
+        <translation type="unfinished">Mid</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="94"/>
+        <source>Low</source>
+        <translation type="unfinished">Low</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="99"/>
+        <source>Min</source>
+        <translation type="unfinished">Min</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="107"/>
+        <location filename="../src/analogchanneldialog.ui" line="138"/>
+        <location filename="../src/analogchanneldialog.ui" line="166"/>
+        <location filename="../src/analogchanneldialog.ui" line="295"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="116"/>
+        <source>Tx Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="125"/>
+        <location filename="../src/analogchanneldialog.ui" line="156"/>
+        <source>Off</source>
+        <translation type="unfinished">Off</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="128"/>
+        <source> s</source>
+        <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="147"/>
+        <source>VOX Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="175"/>
+        <source>Rx Only</source>
+        <translation type="unfinished">RX Only</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="185"/>
+        <source>Scan List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="199"/>
+        <source>Tx Admit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="207"/>
+        <source>Always</source>
+        <translation type="unfinished">Always</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="212"/>
+        <source>Channel Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="217"/>
+        <source>Tone</source>
+        <translation type="unfinished">Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="225"/>
+        <source>Squelch</source>
+        <translation type="unfinished">Squelch</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="232"/>
+        <source>Rx Tone</source>
+        <translation type="unfinished">RX Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="242"/>
+        <source>Tx Tone</source>
+        <translation type="unfinished">TX Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="252"/>
+        <source>Bandwidth</source>
+        <translation type="unfinished">Bandwidth</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="260"/>
+        <source>Narrow (12.5 kHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="265"/>
+        <source>Wide (25 kHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="273"/>
+        <source>APRS</source>
+        <translation type="unfinished">APRS</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="285"/>
+        <source>Open</source>
+        <translation type="unfinished">Open</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="307"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -370,6 +531,51 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Delete %1 channels?</source>
         <translation>Delete %1 channels?</translation>
     </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="32"/>
+        <source>Add Analog Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="35"/>
+        <source>Alt+A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="42"/>
+        <source>Add Digital Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="45"/>
+        <source>Alt+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="52"/>
+        <source>Clone Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="55"/>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="62"/>
+        <source>Delete Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channellistview.ui" line="65"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelListWrapper</name>
@@ -622,6 +828,11 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
     </message>
+    <message>
+        <location filename="../src/configobjectlistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfigObjectTableView</name>
@@ -637,6 +848,11 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
     </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfigObjectTypeSelectionDialog</name>
@@ -649,6 +865,16 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configobjecttypeselectiondialog.cc" line="55"/>
         <source>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</source>
         <translation>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
+        <source>Select the class of object to create</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -682,6 +908,51 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
         <translation>Delete %1 contacts?</translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="32"/>
+        <source>Adds a contact to the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="35"/>
+        <source>Add contact button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="38"/>
+        <source>Add Digital Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="41"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="48"/>
+        <source>Add DTMF Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="55"/>
+        <source>Delete contact button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="58"/>
+        <source>Delete Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="61"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -827,6 +1098,69 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>All Call</source>
         <translation>All Call</translation>
     </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="30"/>
+        <source>Type</source>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="40"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="50"/>
+        <source>Number</source>
+        <translation type="unfinished">Number</translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="60"/>
+        <source>Ring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmrcontactdialog.ui" line="71"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
+    </message>
+</context>
+<context>
+    <name>DMRIDDialog</name>
+    <message>
+        <location filename="../src/dmriddialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmriddialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmriddialog.ui" line="30"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/dmriddialog.ui" line="40"/>
+        <source>DMR ID</source>
+        <translation type="unfinished">DMR ID</translation>
+    </message>
+    <message>
+        <location filename="../src/dmriddialog.ui" line="51"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
+    </message>
 </context>
 <context>
     <name>DTMFContactDialog</name>
@@ -839,6 +1173,36 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
         <translation>Edit DMR Contact</translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="30"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="40"/>
+        <source>Number</source>
+        <translation type="unfinished">Number</translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="50"/>
+        <source>Ring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dtmfcontactdialog.ui" line="61"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -858,6 +1222,19 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
+    <name>DeviceSelectionDialog</name>
+    <message>
+        <location filename="../src/deviceselectiondialog.ui" line="14"/>
+        <source>Select a device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/deviceselectiondialog.ui" line="20"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There is either more than one device detected or the one found is not considered save to access. Either way, select the device to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DigitalChannelDialog</name>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="55"/>
@@ -873,6 +1250,175 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>[Default]</source>
         <translation type="unfinished">[Default]</translation>
     </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="14"/>
+        <source>Edit Digital Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="32"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="49"/>
+        <source>Rx Frequency</source>
+        <translation type="unfinished">RX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="59"/>
+        <source>Tx Frequency</source>
+        <translation type="unfinished">TX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="69"/>
+        <source>Power</source>
+        <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="76"/>
+        <source>Tx Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="83"/>
+        <source>Rx Only</source>
+        <translation type="unfinished">RX Only</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="93"/>
+        <source>Scan List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="106"/>
+        <source>Max</source>
+        <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="111"/>
+        <source>High</source>
+        <translation type="unfinished">High</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="116"/>
+        <source>Mid</source>
+        <translation type="unfinished">Mid</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="121"/>
+        <source>Low</source>
+        <translation type="unfinished">Low</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="126"/>
+        <source>Min</source>
+        <translation type="unfinished">Min</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="134"/>
+        <location filename="../src/digitalchanneldialog.ui" line="161"/>
+        <location filename="../src/digitalchanneldialog.ui" line="186"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="145"/>
+        <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="148"/>
+        <location filename="../src/digitalchanneldialog.ui" line="179"/>
+        <source>Off</source>
+        <translation type="unfinished">Off</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="151"/>
+        <source> s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="170"/>
+        <source>VOX Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="199"/>
+        <source>Tx Admit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="207"/>
+        <source>Always</source>
+        <translation type="unfinished">Always</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="212"/>
+        <source>Channel Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="217"/>
+        <location filename="../src/digitalchanneldialog.ui" line="225"/>
+        <source>Color Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="242"/>
+        <source>Time Slot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="250"/>
+        <source>TS 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="255"/>
+        <source>TS 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="263"/>
+        <source>Rx Group List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="273"/>
+        <source>Tx Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="283"/>
+        <source>Positioning System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="293"/>
+        <source>Roaming Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="303"/>
+        <source>DMR ID</source>
+        <translation type="unfinished">DMR ID</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="316"/>
+        <source>Extended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="319"/>
+        <source>Device specific settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ErrorMessageView</name>
@@ -885,6 +1431,22 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/errormessageview.cc" line="18"/>
         <source>Error: %1</source>
         <translation>Error: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/errormessageview.ui" line="17"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/errormessageview.ui" line="23"/>
+        <location filename="../src/errormessageview.ui" line="48"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/errormessageview.ui" line="30"/>
+        <source>Traceback:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -909,6 +1471,21 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Cannot create list element, consider reporting a bug.</source>
         <translation>Cannot create list element, consider reporting a bug.</translation>
     </message>
+    <message>
+        <location filename="../src/extensionview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/extensionview.ui" line="25"/>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/extensionview.ui" line="32"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GPSSystemDialog</name>
@@ -926,6 +1503,195 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/gpssystemdialog.cc" line="41"/>
         <source>[Selected]</source>
         <translation type="unfinished">[Selected]</translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="14"/>
+        <source>Edit GPS System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="30"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="43"/>
+        <source>Destination</source>
+        <translation type="unfinished">Destination</translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="50"/>
+        <source>Update period [s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="67"/>
+        <source>Revert Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gpssystemdialog.ui" line="78"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
+    </message>
+</context>
+<context>
+    <name>GeneralSettingsView</name>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="22"/>
+        <source>DMR Radio ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="28"/>
+        <source>DMR ID</source>
+        <translation type="unfinished">DMR ID</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="35"/>
+        <source>Radio Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="42"/>
+        <source>Enter your name or callsign.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="45"/>
+        <source>Name/Callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="58"/>
+        <source>Boot Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="64"/>
+        <source>Intro Line 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="71"/>
+        <source>First greeting line (if supported by the radio).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="74"/>
+        <source>Intro line 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="81"/>
+        <source>Intro Line 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="88"/>
+        <source>Second greeting line (if supported by the radio).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="94"/>
+        <source>Intro line 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="104"/>
+        <source>Audio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="110"/>
+        <source>MIC Amp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="127"/>
+        <source>Speech Synthesis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="144"/>
+        <source>Channel Default Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="150"/>
+        <source>Power</source>
+        <translation type="unfinished">Power</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="158"/>
+        <source>Max</source>
+        <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="163"/>
+        <source>High</source>
+        <translation type="unfinished">High</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="168"/>
+        <source>Mid</source>
+        <translation type="unfinished">Mid</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="173"/>
+        <source>Low</source>
+        <translation type="unfinished">Low</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="178"/>
+        <source>Min</source>
+        <translation type="unfinished">Min</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="186"/>
+        <source>Squelch</source>
+        <translation type="unfinished">Squelch</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="193"/>
+        <source>Open</source>
+        <translation type="unfinished">Open</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="203"/>
+        <source>Transmit Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="210"/>
+        <location filename="../src/generalsettingsview.ui" line="230"/>
+        <source>Off</source>
+        <translation type="unfinished">Off</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="213"/>
+        <source> s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="223"/>
+        <source>VOX Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="247"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -963,6 +1729,31 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete %1 RX group lists?</source>
         <translation>Delete %1 group lists?</translation>
+    </message>
+    <message>
+        <location filename="../src/grouplistsview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/grouplistsview.ui" line="32"/>
+        <source>Add RX Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/grouplistsview.ui" line="35"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/grouplistsview.ui" line="42"/>
+        <source>Delete RX Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/grouplistsview.ui" line="45"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1240,6 +2031,46 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
         <translation>Delete %1 positioning systems?</translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="35"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS or APRS. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="72"/>
+        <source>Add GPS System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="75"/>
+        <source>Alt+G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="85"/>
+        <source>Add APRS System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="88"/>
+        <source>Alt+A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="95"/>
+        <source>Delete Position System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/positioningsystemlistview.ui" line="98"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2004,6 +2835,41 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Cannot remove group call: You have to select at least one group call first.</source>
         <translation>Cannot remove group call: You have to select at least one group call first.</translation>
     </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="32"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="59"/>
+        <source>Add Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="62"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="69"/>
+        <source>Remove Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="72"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="82"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
+    </message>
 </context>
 <context>
     <name>RadioIDListView</name>
@@ -2036,6 +2902,26 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete %1 scan lists?</source>
         <translation>Delete %1 scan lists?</translation>
+    </message>
+    <message>
+        <location filename="../src/radioidlistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/radioidlistview.ui" line="22"/>
+        <source>Default Radio ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/radioidlistview.ui" line="46"/>
+        <source>Add Radio ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/radioidlistview.ui" line="53"/>
+        <source>Delete Radio ID</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2083,6 +2969,19 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../lib/radiolimits.cc" line="954"/>
         <source>The support for this radio is still under development. Some features may sill be missing or are not well tested.</source>
         <translation>The support for this radio is still under development. Some features may sill be missing or are not well tested.</translation>
+    </message>
+</context>
+<context>
+    <name>RadioSelectionDialog</name>
+    <message>
+        <location filename="../src/radioselectiondialog.ui" line="14"/>
+        <source>Cannot auto-detect radio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/radioselectiondialog.ui" line="20"/>
+        <source>Select a specific radio</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2147,6 +3046,46 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Set Roaming Zone</source>
         <translation>Edit roaming zone</translation>
     </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="32"/>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="56"/>
+        <source>Add Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="59"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="66"/>
+        <source>Remove Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="69"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="79"/>
+        <source>Extension</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RoamingZoneListView</name>
@@ -2190,13 +3129,99 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Delete %1 roaming zones?</source>
         <translation>Delete %1 roaming zones?</translation>
     </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="23"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="48"/>
+        <source>Add Roaming Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="51"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="58"/>
+        <source>Generate Roaming Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="65"/>
+        <source>Delete Roaming Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonelistview.ui" line="68"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanListDialog</name>
     <message>
+        <location filename="../src/scanlistdialog.ui" line="14"/>
         <location filename="../src/scanlistdialog.cc" line="13"/>
         <source>Edit Scan List</source>
         <translation>Edit scan list</translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="32"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="42"/>
+        <source>Primary Channel (50%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="52"/>
+        <source>Secondary Channel (25%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="62"/>
+        <source>Transmit Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="86"/>
+        <source>Add Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="89"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="96"/>
+        <source>Remove Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="99"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistdialog.ui" line="109"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
@@ -2254,6 +3279,31 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Delete %1 scan lists?</source>
         <translation>Delete %1 scan lists?</translation>
     </message>
+    <message>
+        <location filename="../src/scanlistsview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistsview.ui" line="35"/>
+        <source>Add Scan List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistsview.ui" line="38"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistsview.ui" line="45"/>
+        <source>Delete Scan List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/scanlistsview.ui" line="48"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanListsWrapper</name>
@@ -2285,6 +3335,141 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Warning!</source>
         <translation>Warning!</translation>
     </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="14"/>
+        <source>Settings</source>
+        <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="20"/>
+        <source>Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="26"/>
+        <source>System location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="40"/>
+        <source>Locator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="53"/>
+        <source>Radio Programming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="62"/>
+        <source>Update codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="69"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="79"/>
+        <source>Auto-enable GPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="86"/>
+        <source>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="96"/>
+        <source>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="106"/>
+        <source>Auto-enable roaming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="113"/>
+        <source>Ignore verification warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="120"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="130"/>
+        <source>Ignore frequency limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="137"/>
+        <source>Do not set this option unless you know what you are doing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="150"/>
+        <source>Call-Sign DB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="156"/>
+        <source>Limit number of DB entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="163"/>
+        <source>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="173"/>
+        <source>Number of DB entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="180"/>
+        <source>Specifies the number of DB entries (if enabled above).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="193"/>
+        <source>Select using my DMR ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="200"/>
+        <source>If enabled, the entries are selected using the users DMR ID.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="210"/>
+        <source>Select using prefixes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="217"/>
+        <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="227"/>
+        <source>Extended Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="233"/>
+        <source>Show commercial features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="247"/>
+        <source>Show device extensions</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TalkGroupDatabase</name>
@@ -2308,11 +3493,62 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
+    <name>VerifyDialog</name>
+    <message>
+        <location filename="../src/verifydialog.ui" line="14"/>
+        <source>Verify Codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ZoneDialog</name>
     <message>
+        <location filename="../src/zonedialog.ui" line="14"/>
         <location filename="../src/zonedialog.cc" line="17"/>
         <source>Edit Zone</source>
         <translation>Edit zone</translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="33"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="48"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="65"/>
+        <source>Channels A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="83"/>
+        <location filename="../src/zonedialog.ui" line="120"/>
+        <source>add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="90"/>
+        <location filename="../src/zonedialog.ui" line="127"/>
+        <source>remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="102"/>
+        <source>Channels B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.ui" line="142"/>
+        <source>Extension</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="27"/>
@@ -2352,6 +3588,31 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Delete %1 zones?</source>
         <translation>Delete %1 zones?</translation>
     </message>
+    <message>
+        <location filename="../src/zonelistview.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonelistview.ui" line="32"/>
+        <source>Add Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonelistview.ui" line="35"/>
+        <source>Alt++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonelistview.ui" line="42"/>
+        <source>Delete Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/zonelistview.ui" line="45"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ZoneListWrapper</name>
@@ -2359,6 +3620,98 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configitemwrapper.cc" line="585"/>
         <source>Zone</source>
         <translation>Zone</translation>
+    </message>
+</context>
+<context>
+    <name>aprssystemdialog</name>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="14"/>
+        <source>Edit APRS System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="36"/>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="46"/>
+        <source>Channel</source>
+        <translation type="unfinished">Channel</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="56"/>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="75"/>
+        <location filename="../src/aprssystemdialog.ui" line="113"/>
+        <source>-</source>
+        <translation type="unfinished">-</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="94"/>
+        <source>Destination</source>
+        <translation type="unfinished">Destination</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="103"/>
+        <source>WIDE3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="132"/>
+        <source>Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="139"/>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="146"/>
+        <source>Update period [s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="153"/>
+        <source>Message</source>
+        <translation type="unfinished">Message</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="169"/>
+        <source>s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="186"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensions</translation>
+    </message>
+</context>
+<context>
+    <name>pageStart</name>
+    <message>
+        <location filename="../src/configwizardstart.ui" line="14"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configwizardstart.ui" line="17"/>
+        <source>Welcome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configwizardstart.ui" line="20"/>
+        <source>Guided codeplug setup</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

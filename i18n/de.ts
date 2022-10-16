@@ -215,7 +215,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="307"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -668,7 +668,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="402"/>
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="385"/>
@@ -758,12 +758,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>Roaming</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Roaming</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="449"/>
@@ -1119,7 +1119,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="71"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1147,7 +1147,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmriddialog.ui" line="51"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1190,7 +1190,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="61"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1230,7 +1230,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/digitalchanneldialog.cc" line="79"/>
         <location filename="../src/digitalchanneldialog.cc" line="86"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="87"/>
@@ -1525,7 +1525,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/gpssystemdialog.ui" line="78"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1679,7 +1679,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/generalsettingsview.ui" line="247"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1913,7 +1913,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="265"/>
         <source>About qdmr</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Über qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="277"/>
@@ -1928,7 +1928,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="289"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Einstellungen</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="292"/>
@@ -2082,7 +2082,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="626"/>
         <location filename="../src/configitemwrapper.cc" line="643"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="629"/>
@@ -2145,7 +2145,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/propertydelegate.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
 </context>
 <context>
@@ -2184,7 +2184,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/extensionwrapper.cc" line="586"/>
         <location filename="../src/extensionwrapper.cc" line="594"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="596"/>
@@ -2204,7 +2204,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <location filename="../lib/signaling.cc" line="212"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -2856,7 +2856,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -3206,7 +3206,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/scanlistdialog.ui" line="109"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
@@ -3217,7 +3217,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/scanlistdialog.cc" line="34"/>
         <location filename="../src/scanlistdialog.cc" line="36"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Kein]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="35"/>
@@ -3323,7 +3323,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="20"/>
@@ -3678,7 +3678,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/aprssystemdialog.ui" line="186"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erweiterungen</translation>
     </message>
 </context>
 <context>
