@@ -272,18 +272,18 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="246"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="250"/>
         <source>Roaming</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="255"/>
         <location filename="../src/application.cc" line="724"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="274"/>
@@ -315,7 +315,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="308"/>
         <location filename="../src/application.cc" line="368"/>
         <source>Cannot open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Datei nicht öffnen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="309"/>
@@ -343,12 +343,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="356"/>
         <source>Please use new YAML format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze bitte das neue YAML-Format.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="357"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Speichern der Config im alten tabellenbasierten Format wurde mit Version 0.9.0 deaktiviert. Das Einlesen dieser Dateien funktioniert nach wie vor.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="369"/>
@@ -368,7 +368,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="416"/>
         <source>No matching devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein passendes Gerät gefunden.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="442"/>
@@ -393,7 +393,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="480"/>
         <source>Verification success</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifizierung erfolgreich</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="481"/>
@@ -418,7 +418,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="582"/>
         <source>Upload ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Schreibe …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="599"/>
