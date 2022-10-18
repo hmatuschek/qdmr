@@ -373,7 +373,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="442"/>
         <source>Cannot connect to radio</source>
-        <translation>Kann keine Verbindung zum Gerät herstellen</translation>
+        <translation>Verbindung zum Radio nicht möglich</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="443"/>
