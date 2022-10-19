@@ -1810,12 +1810,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="123"/>
         <source>toolBar</source>
-        <translation>toolBar</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="126"/>
         <source>Toolbar</source>
-        <translation>Toolbar</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="154"/>
