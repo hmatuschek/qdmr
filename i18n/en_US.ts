@@ -75,7 +75,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
@@ -238,7 +238,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../lib/anytone_interface.cc" line="156"/>
         <source>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</translation>
     </message>
 </context>
 <context>
@@ -1271,7 +1271,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
@@ -2894,12 +2894,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../lib/radio.cc" line="70"/>
         <source>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</translation>
     </message>
     <message>
         <location filename="../lib/radio.cc" line="74"/>
         <source>Unknown AnyTone (or similar) device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unknown AnyTone (or similar) device.</translation>
     </message>
 </context>
 <context>
