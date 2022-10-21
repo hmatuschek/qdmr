@@ -62,8 +62,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>AnalogChannelDialog</name>
     <message>
-        <location filename="../src/analogchanneldialog.cc" line="53"/>
-        <location filename="../src/analogchanneldialog.cc" line="69"/>
+        <location filename="../src/analogchanneldialog.cc" line="56"/>
+        <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
@@ -73,159 +73,172 @@ p, li { white-space: pre-wrap; }
         <translation>Edit analog channel</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="24"/>
+        <location filename="../src/analogchanneldialog.ui" line="23"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="32"/>
+        <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="49"/>
+        <location filename="../src/analogchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="59"/>
+        <location filename="../src/analogchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="69"/>
+        <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="79"/>
+        <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="84"/>
+        <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="89"/>
+        <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="94"/>
+        <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="99"/>
+        <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="107"/>
-        <location filename="../src/analogchanneldialog.ui" line="138"/>
-        <location filename="../src/analogchanneldialog.ui" line="166"/>
-        <location filename="../src/analogchanneldialog.ui" line="295"/>
+        <location filename="../src/analogchanneldialog.ui" line="123"/>
+        <location filename="../src/analogchanneldialog.ui" line="154"/>
+        <location filename="../src/analogchanneldialog.ui" line="182"/>
+        <location filename="../src/analogchanneldialog.ui" line="311"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="116"/>
+        <location filename="../src/analogchanneldialog.ui" line="132"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="125"/>
-        <location filename="../src/analogchanneldialog.ui" line="156"/>
+        <location filename="../src/analogchanneldialog.ui" line="141"/>
+        <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="128"/>
+        <location filename="../src/analogchanneldialog.ui" line="144"/>
         <source> s</source>
         <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
         <translation> s</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="147"/>
+        <location filename="../src/analogchanneldialog.ui" line="163"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="175"/>
+        <location filename="../src/analogchanneldialog.ui" line="191"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="185"/>
+        <location filename="../src/analogchanneldialog.ui" line="201"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="199"/>
+        <location filename="../src/analogchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="207"/>
+        <location filename="../src/analogchanneldialog.ui" line="223"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="212"/>
+        <location filename="../src/analogchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="217"/>
+        <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="225"/>
+        <location filename="../src/analogchanneldialog.ui" line="241"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="232"/>
+        <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="242"/>
+        <location filename="../src/analogchanneldialog.ui" line="258"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="252"/>
+        <location filename="../src/analogchanneldialog.ui" line="268"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="260"/>
+        <location filename="../src/analogchanneldialog.ui" line="276"/>
         <source>Narrow (12.5 kHz)</source>
         <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="265"/>
+        <location filename="../src/analogchanneldialog.ui" line="281"/>
         <source>Wide (25 kHz)</source>
         <translation>Wide (25 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="273"/>
+        <location filename="../src/analogchanneldialog.ui" line="289"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="285"/>
+        <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="307"/>
+        <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
+    </message>
+</context>
+<context>
+    <name>AnytoneInterface</name>
+    <message>
+        <location filename="../lib/anytone_interface.cc" line="156"/>
+        <source>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -244,231 +257,231 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="208"/>
+        <location filename="../src/application.cc" line="237"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="222"/>
-        <location filename="../src/application.cc" line="710"/>
+        <location filename="../src/application.cc" line="251"/>
+        <location filename="../src/application.cc" line="739"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="226"/>
+        <location filename="../src/application.cc" line="255"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="230"/>
+        <location filename="../src/application.cc" line="259"/>
         <source>Group Lists</source>
         <translation>Group Lists</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="234"/>
+        <location filename="../src/application.cc" line="263"/>
         <source>Channels</source>
         <translation>Channels</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="238"/>
+        <location filename="../src/application.cc" line="267"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="242"/>
+        <location filename="../src/application.cc" line="271"/>
         <source>Scan Lists</source>
         <translation>Scan Lists</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="246"/>
+        <location filename="../src/application.cc" line="275"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="250"/>
+        <location filename="../src/application.cc" line="279"/>
         <source>Roaming</source>
         <translation>Roaming</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="255"/>
-        <location filename="../src/application.cc" line="724"/>
+        <location filename="../src/application.cc" line="284"/>
+        <location filename="../src/application.cc" line="753"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="274"/>
-        <location filename="../src/application.cc" line="291"/>
-        <location filename="../src/application.cc" line="392"/>
-        <location filename="../src/application.cc" line="498"/>
+        <location filename="../src/application.cc" line="303"/>
+        <location filename="../src/application.cc" line="320"/>
+        <location filename="../src/application.cc" line="421"/>
+        <location filename="../src/application.cc" line="527"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="275"/>
-        <location filename="../src/application.cc" line="292"/>
-        <location filename="../src/application.cc" line="393"/>
-        <location filename="../src/application.cc" line="499"/>
+        <location filename="../src/application.cc" line="304"/>
+        <location filename="../src/application.cc" line="321"/>
+        <location filename="../src/application.cc" line="422"/>
+        <location filename="../src/application.cc" line="528"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="300"/>
+        <location filename="../src/application.cc" line="329"/>
         <source>Open codeplug</source>
         <translation>Open codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="302"/>
+        <location filename="../src/application.cc" line="331"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="308"/>
-        <location filename="../src/application.cc" line="368"/>
+        <location filename="../src/application.cc" line="337"/>
+        <location filename="../src/application.cc" line="397"/>
         <source>Cannot open file</source>
         <translation>Cannot open file</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="309"/>
-        <location filename="../src/application.cc" line="323"/>
-        <location filename="../src/application.cc" line="334"/>
+        <location filename="../src/application.cc" line="338"/>
+        <location filename="../src/application.cc" line="352"/>
+        <location filename="../src/application.cc" line="363"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Cannot read codeplug from file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="322"/>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="351"/>
+        <location filename="../src/application.cc" line="362"/>
         <source>Cannot read codeplug.</source>
         <translation>Cannot read codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="349"/>
+        <location filename="../src/application.cc" line="378"/>
         <source>Save codeplug</source>
         <translation>Save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="350"/>
+        <location filename="../src/application.cc" line="379"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Codeplug Files (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="356"/>
+        <location filename="../src/application.cc" line="385"/>
         <source>Please use new YAML format.</source>
         <translation>Please use new YAML format.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="357"/>
+        <location filename="../src/application.cc" line="386"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="369"/>
+        <location filename="../src/application.cc" line="398"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="378"/>
+        <location filename="../src/application.cc" line="407"/>
         <source>Cannot save codeplug</source>
         <translation>Cannot save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="379"/>
+        <location filename="../src/application.cc" line="408"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="416"/>
+        <location filename="../src/application.cc" line="445"/>
         <source>No matching devices found.</source>
         <translation>No matching devices found.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="442"/>
+        <location filename="../src/application.cc" line="471"/>
         <source>Cannot connect to radio</source>
         <translation>Cannot connect to radio</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="443"/>
+        <location filename="../src/application.cc" line="472"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Cannot connect to radio: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="453"/>
+        <location filename="../src/application.cc" line="482"/>
         <source>Radio found</source>
         <translation>Radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="453"/>
+        <location filename="../src/application.cc" line="482"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Found device &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="480"/>
+        <location filename="../src/application.cc" line="509"/>
         <source>Verification success</source>
         <translation>Verification success</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="481"/>
+        <location filename="../src/application.cc" line="510"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="517"/>
+        <location filename="../src/application.cc" line="546"/>
         <source>Read ...</source>
         <translation>Read …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="527"/>
+        <location filename="../src/application.cc" line="556"/>
         <source>Read error</source>
         <translation>Read error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="545"/>
+        <location filename="../src/application.cc" line="574"/>
         <source>Read complete</source>
         <translation>Read complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="582"/>
+        <location filename="../src/application.cc" line="611"/>
         <source>Upload ...</source>
         <translation>Write …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="599"/>
-        <location filename="../src/application.cc" line="609"/>
-        <location filename="../src/application.cc" line="621"/>
+        <location filename="../src/application.cc" line="628"/>
+        <location filename="../src/application.cc" line="638"/>
+        <location filename="../src/application.cc" line="650"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Cannot write call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="600"/>
+        <location filename="../src/application.cc" line="629"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="639"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="622"/>
+        <location filename="../src/application.cc" line="651"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="658"/>
+        <location filename="../src/application.cc" line="687"/>
         <source>Write call-sign DB ...</source>
         <translation>Write call-sign DB …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="669"/>
+        <location filename="../src/application.cc" line="698"/>
         <source>Write error</source>
         <translation>Write error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="681"/>
+        <location filename="../src/application.cc" line="710"/>
         <source>Write complete</source>
         <translation>Write complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="761"/>
+        <location filename="../src/application.cc" line="790"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias for %2 %3)</translation>
     </message>
@@ -1237,16 +1250,16 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>DigitalChannelDialog</name>
     <message>
-        <location filename="../src/digitalchanneldialog.cc" line="55"/>
-        <location filename="../src/digitalchanneldialog.cc" line="70"/>
-        <location filename="../src/digitalchanneldialog.cc" line="79"/>
-        <location filename="../src/digitalchanneldialog.cc" line="86"/>
+        <location filename="../src/digitalchanneldialog.cc" line="58"/>
+        <location filename="../src/digitalchanneldialog.cc" line="73"/>
+        <location filename="../src/digitalchanneldialog.cc" line="82"/>
+        <location filename="../src/digitalchanneldialog.cc" line="89"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.cc" line="87"/>
-        <location filename="../src/digitalchanneldialog.cc" line="96"/>
+        <location filename="../src/digitalchanneldialog.cc" line="90"/>
+        <location filename="../src/digitalchanneldialog.cc" line="99"/>
         <source>[Default]</source>
         <translation>[Default]</translation>
     </message>
@@ -1256,166 +1269,171 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Edit digital channel</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="24"/>
+        <location filename="../src/digitalchanneldialog.ui" line="23"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="32"/>
+        <location filename="../src/digitalchanneldialog.ui" line="48"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="49"/>
+        <location filename="../src/digitalchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="59"/>
+        <location filename="../src/digitalchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="69"/>
+        <location filename="../src/digitalchanneldialog.ui" line="85"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="76"/>
+        <location filename="../src/digitalchanneldialog.ui" line="92"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="83"/>
+        <location filename="../src/digitalchanneldialog.ui" line="99"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="93"/>
+        <location filename="../src/digitalchanneldialog.ui" line="109"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="106"/>
+        <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="111"/>
+        <location filename="../src/digitalchanneldialog.ui" line="127"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="116"/>
+        <location filename="../src/digitalchanneldialog.ui" line="132"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="121"/>
+        <location filename="../src/digitalchanneldialog.ui" line="137"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="126"/>
+        <location filename="../src/digitalchanneldialog.ui" line="142"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="134"/>
-        <location filename="../src/digitalchanneldialog.ui" line="161"/>
-        <location filename="../src/digitalchanneldialog.ui" line="186"/>
+        <location filename="../src/digitalchanneldialog.ui" line="150"/>
+        <location filename="../src/digitalchanneldialog.ui" line="177"/>
+        <location filename="../src/digitalchanneldialog.ui" line="202"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="145"/>
+        <location filename="../src/digitalchanneldialog.ui" line="161"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
         <translation>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="148"/>
-        <location filename="../src/digitalchanneldialog.ui" line="179"/>
+        <location filename="../src/digitalchanneldialog.ui" line="164"/>
+        <location filename="../src/digitalchanneldialog.ui" line="195"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="151"/>
+        <location filename="../src/digitalchanneldialog.ui" line="167"/>
         <source> s</source>
         <translation> s</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="170"/>
+        <location filename="../src/digitalchanneldialog.ui" line="186"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="199"/>
+        <location filename="../src/digitalchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="207"/>
+        <location filename="../src/digitalchanneldialog.ui" line="223"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="212"/>
+        <location filename="../src/digitalchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="217"/>
-        <location filename="../src/digitalchanneldialog.ui" line="225"/>
+        <location filename="../src/digitalchanneldialog.ui" line="233"/>
+        <location filename="../src/digitalchanneldialog.ui" line="241"/>
         <source>Color Code</source>
         <translation>Color Code</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="242"/>
+        <location filename="../src/digitalchanneldialog.ui" line="258"/>
         <source>Time Slot</source>
         <translation>Time Slot</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="250"/>
+        <location filename="../src/digitalchanneldialog.ui" line="266"/>
         <source>TS 1</source>
         <translation>TS 1</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="255"/>
+        <location filename="../src/digitalchanneldialog.ui" line="271"/>
         <source>TS 2</source>
         <translation>TS 2</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="263"/>
+        <location filename="../src/digitalchanneldialog.ui" line="279"/>
         <source>Rx Group List</source>
         <translation>Group List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="273"/>
+        <location filename="../src/digitalchanneldialog.ui" line="289"/>
         <source>Tx Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="283"/>
+        <location filename="../src/digitalchanneldialog.ui" line="299"/>
         <source>Positioning System</source>
         <translation>Positioning System</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="293"/>
+        <location filename="../src/digitalchanneldialog.ui" line="309"/>
         <source>Roaming Zone</source>
         <translation>Roaming Zone</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="303"/>
+        <location filename="../src/digitalchanneldialog.ui" line="319"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="316"/>
+        <location filename="../src/digitalchanneldialog.ui" line="332"/>
         <source>Extended</source>
         <translation>Extended</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="319"/>
+        <location filename="../src/digitalchanneldialog.ui" line="335"/>
         <source>Device specific settings</source>
         <translation>Device specific settings</translation>
     </message>
@@ -2872,6 +2890,19 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
+    <name>Radio</name>
+    <message>
+        <location filename="../lib/radio.cc" line="70"/>
+        <source>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../lib/radio.cc" line="74"/>
+        <source>Unknown AnyTone (or similar) device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RadioIDListView</name>
     <message>
         <location filename="../src/radioidlistview.cc" line="61"/>
@@ -3331,7 +3362,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="351"/>
+        <location filename="../src/settings.cc" line="360"/>
         <source>Warning!</source>
         <translation>Warning!</translation>
     </message>
