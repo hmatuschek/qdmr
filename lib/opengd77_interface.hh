@@ -53,9 +53,9 @@ public:
 
 protected:
   /** Represents a read message. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) ReadRequest {
     /** Possible read sources. */
-    typedef enum {
+    enum Command {
       READ_FLASH = 1,
       READ_EEPROM = 2,
       READ_MCU_ROM = 5,
@@ -63,7 +63,7 @@ protected:
       READ_WAV_BUFFER = 7,
       READ_AMBE_BUFFER = 8,
       READ_FIRMWARE_INFO = 9
-    } Command;
+    };
 
     /// 'R' read block, 'W' write block, 'C' command.
     char type;
@@ -80,10 +80,10 @@ protected:
     bool initReadEEPROM(uint32_t address, uint16_t length);
     /** Constructs a firmware-info read message. */
     bool initReadFirmwareInfo();
-  } ReadRequest;
+  };
 
   /** Represents a read response message. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) ReadResponse {
     /// Same code as request. That is 'R' read block, 'W' write block, 'C' command.
     char type;
     /// Length of paylod.
@@ -101,18 +101,18 @@ protected:
         uint32_t _unknown24;  ///< Some unknown number in little endian, seen 0x4014
       } radio_info;
     };
-  } ReadResponse;
+  };
 
   /** Represents a write message. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) WriteRequest {
     /** Possible write destinations. */
-    typedef enum {
+    enum Command {
       SET_FLASH_SECTOR = 1,
       WRITE_SECTOR_BUFFER = 2,
       WRITE_FLASH_SECTOR = 3,
       WRITE_EEPROM = 4,
       WRITE_WAV_BUFFER = 7
-    } Command;
+    };
 
     /// 'R' read block, 'W' write block or 'C' command.
     char type;
@@ -141,36 +141,36 @@ protected:
     bool initWriteFlash(uint32_t addr, const uint8_t *data, uint16_t size);
     /** Constructs a finish-write-to-flash message. */
     bool initFinishWriteFlash();
-  } WriteRequest;
+  };
 
   /** Represents a write-response message. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) WriteResponse {
     /// Same code as request. That is 'R' read block, 'W' write block, 'C' command or '-' on Error.
     char type;
     /// Same code as request if OK.
     uint8_t command;
-  } WriteResponse;
+  };
 
   /** Represents a command message. */
-  typedef struct __attribute__((packed)) {
+  struct __attribute__((packed)) CommandRequest {
     /** Possible commands. */
-    typedef enum {
+    enum Command {
       SHOW_CPS_SCREEN  = 0,
       CLEAR_SCREEN     = 1,
       DISPLAY          = 2,
       RENDER_CPS       = 3,
       CLOSE_CPS_SCREEN = 5,
       COMMAND          = 6
-    } Command;
+    };
 
     /** Possible options. */
-    typedef enum {
+    enum Option {
       SAVE_SETTINGS_NOT_VFOS = 0,
       REBOOT = 1,
       SAVE_SETTINGS_AND_VFOS = 2,
       FLASH_GREEN_LED = 3,
       FLASH_RED_LED = 4
-    } Option;
+    };
 
     /** Message type, here 'C' for command. */
     char type;
@@ -206,7 +206,7 @@ protected:
     void initCloseScreen();
     /** Construct a command message with the given option. */
     void initCommand(Option option);
-  } CommandRequest;
+  };
 
 protected:
   /** Write some data to EEPROM at the given address. */

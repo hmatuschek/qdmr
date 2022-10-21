@@ -153,7 +153,8 @@ AnytoneInterface::identifier(const ErrorStack &err) {
     return RadioInfo::byID(RadioInfo::D578UV);
   }
 
-  errMsg(err) << "Unsupported AnyTone radio '" << _info.name << "'.";
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
   return RadioInfo();
 }
 

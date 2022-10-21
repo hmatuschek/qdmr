@@ -34,6 +34,9 @@ DigitalChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
+  if (settings.hideChannelNote())
+    hintLabel->setVisible(false);
+
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
@@ -146,6 +149,7 @@ DigitalChannelDialog::construct() {
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
+  connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 }
 
 DMRChannel *
@@ -217,5 +221,12 @@ DigitalChannelDialog::onTimeoutDefaultToggled(bool checked) {
 void
 DigitalChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
+}
+
+void
+DigitalChannelDialog::onHideChannelHint() {
+  Settings settings;
+  settings.setHideChannelNote(true);
+  hintLabel->setVisible(false);
 }
 
