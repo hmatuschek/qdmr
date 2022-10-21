@@ -11,7 +11,7 @@
     
     <xi:include href="meta/authors.xml"/>    
 
-    <date>September 30th, 2022</date>
+    <date>October 21th, 2022</date>
     
     <copyright>
       <year>2022</year>
@@ -20,7 +20,7 @@
     
     <releaseinfo>
       <para>
-        This document covers <application>qdmr</application> version 0.10.3.
+        This document covers <application>qdmr</application> version 0.10.4.
       </para>
     </releaseinfo>
     
