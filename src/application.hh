@@ -10,6 +10,7 @@
 #include "radio.hh"
 
 class QMainWindow;
+class QTranslator;
 class RepeaterBookList;
 class UserDatabase;
 class TalkGroupDatabase;
@@ -81,6 +82,7 @@ private slots:
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
+  QTranslator *_translator;
 
   GeneralSettingsView *_generalSettings;
   RadioIDListView *_radioIdTab;

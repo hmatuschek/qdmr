@@ -92,6 +92,9 @@ IF(UNIX AND APPLE)
  message(STATUS "RPATH: ${CMAKE_INSTALL_RPATH}")
 ENDIF(UNIX AND APPLE)
 
+# Directory to install translations to
+SET(LOCALE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/locale/")
+
 # Sources...
 add_subdirectory(lib)
 add_subdirectory(cli)

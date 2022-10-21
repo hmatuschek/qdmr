@@ -2,6 +2,8 @@
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QDesktopServices>
+#include <QTranslator>
+#include <QStandardPaths>
 
 #include "logger.hh"
 #include "radio.hh"
@@ -38,10 +40,21 @@
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
 
+inline QStringList getLanguages() {
+  QStringList languages = {QLocale::system().name()};
+  if (languages.last().contains("_")) {
+    languages.append(languages.last().split("_").first());
+  }
+  return languages;
+}
+
+inline QString getLocalePath(const QString &language) {
+  return QDir(LOCALE_DIRECTORY "/" + language + "/LC_MESSAGES/").absolutePath();
+}
 
 Application::Application(int &argc, char *argv[])
-  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr),
-    _lastDevice()
+  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _translator(nullptr),
+    _repeater(nullptr), _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -51,18 +64,33 @@ Application::Application(int &argc, char *argv[])
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
-  // Register icon themes
+  // register icon themes
   QStringList iconPaths = QIcon::themeSearchPaths();
   iconPaths.prepend(":/icons");
   QIcon::setThemeSearchPaths(iconPaths);
   onPaletteChanged(palette());
 
+  // handle translations
+  _translator = new QTranslator(this);
+  foreach (QString language, getLanguages()) {
+    logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
+    if (_translator->load("qdmr", getLocalePath(language), "", "_qt.qm")) {
+      this->installTranslator(_translator);
+      logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
+      break;
+    }
+  }
+
+  // load settings
   Settings settings;
+  // load databases
   _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
-  _config = new Config(this);
+  // create empty codeplug
+  _config     = new Config(this);
 
+  // Handle args (if there are some)
   if (argc>1) {
     QFileInfo info(argv[1]);
     QFile file(argv[1]);
@@ -86,6 +114,7 @@ Application::Application(int &argc, char *argv[])
     }
   }
 
+  // load position
   _currentPosition = settings.position();
   _source = QGeoPositionInfoSource::createDefaultSource(this);
   if (_source) {    
