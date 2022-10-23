@@ -51,7 +51,7 @@
 
   <xi:include href="reveng/reverseengineering.xml"/>
   
-  <xi:include  href="meta/glossary.xml"/>
+  <xi:include href="meta/glossary.xml"/>
 
   <index/>
 </book>

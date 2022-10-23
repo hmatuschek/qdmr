@@ -269,13 +269,6 @@ Where <token>N</token> is the number of bytes to read.
 +---+---+---+---+---+---+---+...+---+---+---+]]></programlisting>
   where the CRC is the least significant byte of the sum over the address, length and data payload.
 </para>
-<para>
-  qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. 
-  After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. 
-  These requests may take some time. The results are stored locally in a cache. A drop-down list will
-  appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and 
-  CTCSS tones are filled in (if applicable).
-</para>
 
 </section>
 
