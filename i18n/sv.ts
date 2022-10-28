@@ -6,12 +6,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
         <source>Create APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa APRS-system</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="110"/>
         <source>Edit APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera APRS-system</translation>
     </message>
 </context>
 <context>
@@ -20,13 +20,13 @@
         <location filename="../src/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
-        <translation type="unfinished"></translation>
+        <translation>Om qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
-        <translation type="unfinished"></translation>
+        <translation>Om qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="52"/>
@@ -46,7 +46,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="73"/>
         <source>Supported Radios</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio som stöds</translation>
     </message>
 </context>
 <context>
@@ -60,12 +60,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
         <source>Edit Analog Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera analog kanal</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Obs!&lt;/span&gt; qdmr tillhandahåller viss autokomplettering för kanaler. Det vill säga, börja skriva anropssignalen för en repeater. Efter att tre tecken har angetts skickas en begäran till repeaterbook.com för att hämta matchande repeatrar. Dessa förfrågningar kan ta lite tid. Resultaten lagras lokalt i en cache.&lt;/p&gt;&lt;p&gt;En rullgardinslista visas där du kan välja en repeater. När en repeater har valts fylls RX/TX-frekvenserna och CTCSS-tonerna i (om tillämpligt).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
