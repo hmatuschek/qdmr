@@ -75,47 +75,47 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>RX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>TX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Effekt</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>max.</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Hög</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>Mitten</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Lågt</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimalt</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
@@ -123,7 +123,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.ui" line="182"/>
         <location filename="../src/analogchanneldialog.ui" line="311"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
