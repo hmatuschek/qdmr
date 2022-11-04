@@ -150,77 +150,77 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="191"/>
         <source>Rx Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Bara RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="201"/>
         <source>Scan List</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan List</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Admit</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="223"/>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Alltid</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal Tillgänglig</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ton</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="241"/>
         <source>Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Rx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>RX Ton</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="258"/>
         <source>Tx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Ton</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="268"/>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbredd</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="276"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Smal (12,5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="281"/>
         <source>Wide (25 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bred (25 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="289"/>
         <source>APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppet</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillägg</translation>
     </message>
 </context>
 <context>
@@ -228,7 +228,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../lib/anytone_interface.cc" line="156"/>
         <source>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>AnyTone-radio &apos;%1&apos; som inte stöds, HW rev. &apos;%2&apos;.</translation>
     </message>
 </context>
 <context>
@@ -236,12 +236,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../lib/anytone_limits.cc" line="18"/>
         <source>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du använder sannolikt en nyare radioreversion (%1) än vad som stöds (%2) av qdmr. Kodpluggen kan vara inkompatibel. Meddela utvecklarna av qdmr om den nya återgången.</translation>
     </message>
     <message>
         <location filename="../lib/anytone_limits.cc" line="23"/>
         <source>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du använder troligen en äldre maskinvaruversion (%1) än vad som stöds (%2) av qdmr. Kodpluggen kan vara inkompatibel.</translation>
     </message>
 </context>
 <context>
@@ -249,54 +249,54 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="237"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="251"/>
         <location filename="../src/application.cc" line="739"/>
         <source>Radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio ID-nummrar</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="255"/>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontakter</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="259"/>
         <source>Group Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupplistor</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="263"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaler</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="267"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoner</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="271"/>
         <source>Scan Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Lists</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="275"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="279"/>
         <source>Roaming</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
         <location filename="../src/application.cc" line="753"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="303"/>
@@ -304,7 +304,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="421"/>
         <location filename="../src/application.cc" line="527"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ej sparade ändringar i codeplug.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="304"/>
@@ -312,163 +312,163 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="422"/>
         <location filename="../src/application.cc" line="528"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det finns osparade ändringar av den aktuella kodpluggen. Dessa ändringar går förlorade om du fortsätter.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="329"/>
         <source>Open codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppna kodpluggen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="331"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Codeplug-filer (*.yaml);;Codeplug-filer, gammalt format (*.conf *.csv *.txt);;Alla filer (*)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="337"/>
         <location filename="../src/application.cc" line="397"/>
         <source>Cannot open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte öppna filen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="338"/>
         <location filename="../src/application.cc" line="352"/>
         <location filename="../src/application.cc" line="363"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte läsa codeplug från filen &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="351"/>
         <location filename="../src/application.cc" line="362"/>
         <source>Cannot read codeplug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte läsa kodpluggen.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="378"/>
         <source>Save codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara kodpluggen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="379"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
-        <translation type="unfinished"></translation>
+        <translation>Codeplug-filer (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="385"/>
         <source>Please use new YAML format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd det nya YAML-formatet.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="386"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara i det gamla tabellbaserade conf-formatet inaktiverades med 0.9.0. Att läsa dessa filer fungerar fortfarande.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="398"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Det går inte att spara codeplug till filen &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="407"/>
         <source>Cannot save codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Det går inte att spara codepluggen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="408"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det går inte att spara codeplug till filen &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="445"/>
         <source>No matching devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga matchande enheter hittades.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="471"/>
         <source>Cannot connect to radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ansluta till radio</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="472"/>
         <source>Cannot connect to radio: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ansluta till radio: %1</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="482"/>
         <source>Radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio hittad</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="482"/>
         <source>Found device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hittade enheten &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="509"/>
         <source>Verification success</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifieringen lyckades</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="510"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodpluggen har verifierats med radion &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="546"/>
         <source>Read ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Läs…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="556"/>
         <source>Read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Läsfel</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="574"/>
         <source>Read complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Läs komplett</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="611"/>
         <source>Upload ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="628"/>
         <location filename="../src/application.cc" line="638"/>
         <location filename="../src/application.cc" line="650"/>
         <source>Cannot write call-sign DB.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte skriva anropssignal DB.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="629"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den upptäckta radion &apos;%1&apos; stöder inte en anropssignal-DB.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="639"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den upptäckta radion &apos;%1&apos; stöder en anropssignal-DB. Denna funktion är dock inte implementerad ännu.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="651"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
-        <translation type="unfinished"></translation>
+        <translation>QDMR väljer de anropssignaler som ska skrivas baserat på radions standard DMR-ID. Inget standard-ID inställt.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="687"/>
         <source>Write call-sign DB ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv anropssignal DB …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="698"/>
         <source>Write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrivfel</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="710"/>
         <source>Write complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv komplett</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="790"/>
