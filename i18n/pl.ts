@@ -6,12 +6,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
         <source>Create APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz system APRS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="110"/>
         <source>Edit APRS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj system APRS</translation>
     </message>
 </context>
 <context>
@@ -20,13 +20,13 @@
         <location filename="../src/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
-        <translation type="unfinished"></translation>
+        <translation>O qdrm</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
-        <translation type="unfinished"></translation>
+        <translation>O qdrm</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="52"/>
@@ -55,12 +55,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>Zależy ściśle od kontekstu.</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
         <source>Edit Analog Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj kanał analogowy</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="23"/>
@@ -75,22 +75,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Częstotliwość RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Częstotliwość TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Moc</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
@@ -100,17 +100,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoki</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>Średni</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Niski</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
@@ -123,7 +123,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.ui" line="182"/>
         <location filename="../src/analogchanneldialog.ui" line="311"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
@@ -570,7 +570,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/channellistview.ui" line="62"/>
         <source>Delete Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń kanał</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="65"/>
@@ -588,7 +588,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>Digital</source>
-        <translation type="unfinished"></translation>
+        <translation>Cyfrowy</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
@@ -597,7 +597,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="372"/>
         <location filename="../src/configitemwrapper.cc" line="383"/>
         <source>[Default]</source>
-        <translation type="unfinished"></translation>
+        <translation>Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
@@ -607,22 +607,22 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Wysoki</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="277"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>Średni</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="278"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Niski</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimum</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="285"/>
@@ -630,34 +630,34 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="395"/>
         <location filename="../src/configitemwrapper.cc" line="405"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="288"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="292"/>
         <location filename="../src/configitemwrapper.cc" line="298"/>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Zawsze</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
         <location filename="../src/configitemwrapper.cc" line="299"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Wolny</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="294"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Kolor</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="300"/>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ton</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="308"/>
@@ -667,7 +667,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="364"/>
         <location filename="../src/configitemwrapper.cc" line="370"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="314"/>
@@ -681,67 +681,67 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configitemwrapper.cc" line="402"/>
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="385"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="415"/>
         <source>Wide</source>
-        <translation type="unfinished"></translation>
+        <translation>Szeroki</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="417"/>
         <source>Narrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Wąski</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="433"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="434"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="435"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Częstotliwość RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="436"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Częstotliwość TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="437"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Moc</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="438"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Koniec czasu połączenia</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="439"/>
         <source>Rx Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Tylko RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="440"/>
         <source>Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>Zezwól</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="441"/>
         <source>Scanlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista skanowania</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="442"/>
@@ -756,17 +756,17 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>RX Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista grupy</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>TX Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontakt TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikator DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
@@ -786,17 +786,17 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Rx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ton RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Tx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Ton TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerokość pasma</translation>
     </message>
 </context>
 <context>
@@ -804,7 +804,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="480"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanał</translation>
     </message>
 </context>
 <context>
@@ -812,7 +812,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/channelselectiondialog.cc" line="23"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz kanał:</translation>
     </message>
 </context>
 <context>
@@ -821,13 +821,13 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configobjectlistview.cc" line="63"/>
         <location filename="../src/configobjectlistview.cc" line="84"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przenieść elementów.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.cc" line="64"/>
         <location filename="../src/configobjectlistview.cc" line="85"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przenieść elementów: Musisz wybrać conajmniej jeden z nich.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="14"/>
@@ -841,13 +841,13 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
         <location filename="../src/configobjecttableview.cc" line="70"/>
         <location filename="../src/configobjecttableview.cc" line="94"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przenieść elementów</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="71"/>
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można przenieść elementów: Musisz wybrać conajmniej jeden z nich.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="14"/>
@@ -883,7 +883,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/contactlistview.cc" line="63"/>
         <source>Cannot delete contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można usunąć kontaktu</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="64"/>
@@ -928,7 +928,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
         <source>Add Digital Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj cyfrowy kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="41"/>
@@ -1003,7 +1003,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/configitemwrapper.cc" line="556"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numer</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="558"/>
@@ -1082,7 +1082,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="48"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj kontakt DMR</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="79"/>
@@ -1112,17 +1112,17 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="40"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="50"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numer</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="60"/>
@@ -1132,7 +1132,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="71"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozszerzenia</translation>
     </message>
 </context>
 <context>
@@ -1150,17 +1150,17 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nazwa</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="40"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikator DMR</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="51"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozszerzenia</translation>
     </message>
 </context>
 <context>
@@ -1168,12 +1168,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="12"/>
         <source>Create DTMF Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz kontakt DTMF</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj kontakt DMR</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="14"/>
