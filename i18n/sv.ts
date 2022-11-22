@@ -499,38 +499,38 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</sour
     <message>
         <location filename="../src/channellistview.cc" line="66"/>
         <source>Select a single channel first</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en enskild kanal först</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="67"/>
         <source>To clone a channel, please select a single channel to clone.</source>
-        <translation type="unfinished"></translation>
+        <translation>För att klona en kanal, välj en enskild kanal att klona.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="112"/>
         <source>Cannot delete channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="113"/>
         <source>Cannot delete channel: You have to select a channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kanal: Du måste först välja en kanal.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="123"/>
         <location filename="../src/channellistview.cc" line="127"/>
         <source>Delete channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kanal?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="123"/>
         <source>Delete channel %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kanalen &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="127"/>
         <source>Delete %1 channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort %1 kanaler?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="14"/>
