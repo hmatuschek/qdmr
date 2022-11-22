@@ -1244,7 +1244,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="20"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There is either more than one device detected or the one found is not considered save to access. Either way, select the device to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Es entweder es wurden mehrere Gräte gefunden oder eines dieser Geräte wird als unsicher betrachtet. Wie dem auch sei, wählen Sie ein Gerät aus.</translation>
+        <translation>Entweder wurde mehr als ein Gerät gefunden oder das gefundene Gerät wird als unsicher betrachtet. Wählen Sie dennoch ein Gerät aus.</translation>
     </message>
 </context>
 <context>
