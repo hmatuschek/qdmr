@@ -107,7 +107,7 @@ AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const 
 
 AnytoneInterface::~AnytoneInterface() {
   if (isOpen())
-    this->close();
+    AnytoneInterface::close();
 }
 
 USBDeviceInfo

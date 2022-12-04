@@ -30,7 +30,9 @@ SET(libdmrconf_SOURCES
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_limits.cc
     d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
     d578uv.cc d578uv_codeplug.cc d578uv_limits.cc
-    d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc)
+    d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
+    auctus_a6_interface.cc
+    dr1801uv.cc dr1801uv_interface.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh
@@ -52,7 +54,9 @@ SET(libdmrconf_MOC_HEADERS
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d868uv_limits.hh
     d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
     d578uv.hh d578uv_codeplug.hh d578uv_limits.hh
-    d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh)
+    d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh
+    auctus_a6_interface.hh
+    dr1801uv.hh dr1801uv_interface.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh
     md390_filereader.hh

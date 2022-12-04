@@ -9,7 +9,7 @@
 #include "radioddity_interface.hh"
 #include "opengd77_interface.hh"
 #include "tyt_interface.hh"
-
+#include "dr1801uv_interface.hh"
 
 /* ********************************************************************************************* *
  * Implementation of USBDeviceHandle
@@ -300,6 +300,7 @@ USBDeviceDescriptor::detect() {
   res.append(OpenGD77Interface::detect());
   res.append(RadioddityInterface::detect());
   res.append(TyTInterface::detect());
+  res.append(DR1801UVInterface::detect());
   return res;
 }
 

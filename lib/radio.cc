@@ -3,6 +3,7 @@
 #include "anytone_interface.hh"
 #include "radioddity_interface.hh"
 #include "tyt_interface.hh"
+#include "dr1801uv_interface.hh"
 
 #include "rd5r.hh"
 #include "gd77.hh"
@@ -15,6 +16,7 @@
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+#include "dr1801uv.hh"
 
 #include "config.hh"
 #include "logger.hh"
@@ -126,15 +128,37 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new RD5R(hid);
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
-      } else {
+      } else if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device not known.";
       }
       hid->close();
       hid->deleteLater();
       return nullptr;
     }
     hid->deleteLater();
+    return nullptr;
+  } else if (DR1801UVInterface::interfaceInfo() == descr) {
+    DR1801UVInterface *dif = new DR1801UVInterface(descr, err);
+    if (dif->isOpen()) {
+      RadioInfo id = dif->identifier(err);
+      if (((id.isValid()) && (RadioInfo::DR1801UV == id.id())) ||
+          (force.isValid() && (RadioInfo::DR1801UV==force.id()))) {
+        return new DR1801UV(dif);
+      } else if (id.isValid()) {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Unknown device or failed connection to the device.";
+      }
+      dif->close();
+      dif->deleteLater();
+      return nullptr;
+    }
+    dif->deleteLater();
     return nullptr;
   }
   return nullptr;
