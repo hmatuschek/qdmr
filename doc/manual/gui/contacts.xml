@@ -32,19 +32,23 @@
   down the list, respectively.
 </para>
 
+
+<section>
+<info><title>Editing DMR contacts</title></info>
+
 <para>
   When you create a code-plug, the contact list should contain all talk groups and reflectors you
   are interested in, as well as a so-called <glossterm>All Call</glossterm> contact to the number
   <emphasis>16777215</emphasis>. Additionally you may add private calls to several operators you 
-  know as well as some <emphasis>service numbers</emphasis>.
+  know, as well as some <emphasis>service numbers</emphasis>.
 </para>
 
 <screenshot>
   <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-edit-contact.png" width="3cm" align="center"/></imageobject>
-    <textobject>Screen-shot new/edit contact dialog.</textobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-dmr-contact.png" width="3cm" align="center"/></imageobject>
+    <textobject>Screen-shot new/edit DMR contact dialog.</textobject>
   </mediaobject>
-  <title>The new/edit contact dialog.</title>
+  <title>The new/edit DMR contact dialog.</title>
 </screenshot>
 
 <para>
@@ -62,15 +66,45 @@
   <para>
     <application>qdmr</application> tries to download the current list of all registered user DMR IDs.
     The contact dialog will use this information (once downloaded) to resolve call-signs to DMR IDs.
-    Just start entering the call-sign into the name field and matching call-signs are shown. The same
-    holds true for Brandmeister <glossterm>Talkgroup</glossterm> names.
+    Just start entering the call-sign into the name field and matching call-signs are shown. 
+  </para>
+  <para>
+    The same holds true for Brandmeister <glossterm>Talkgroup</glossterm> names. That is, start 
+    typing the name of a talk group and a drop-down list of talk group names will appear for 
+    auto-completion. Select the talk group and its DMR ID gets set.
   </para>
 </tip>
 
 <para>
-  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+  If <guilabel>Show device extensions</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for contacts. 
 </para>
+</section>
+
+
+<section>
+<info><title>Editing DTMF contacts</title></info>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-edit-dtmf-contact.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen-shot new/edit DTMF contact dialog.</textobject>
+  </mediaobject>
+  <title>The new/edit DTMF contact dialog.</title>
+</screenshot>
+
+<para>
+  Beside DMR contacts, the contact list may also contain analog DTMF contacts. You can add a new DTMF 
+  contact by clicking on the <guibutton>Add DTMF contact</guibutton> button. This will open the 
+  <guilabel>Edit DTMF contact</guilabel> dialog (see above). This is a rather simple dialog. 
+</para>
+<para>
+  <guilabel>Name</guilabel> specifies the name of the DTMF contact, while <guilabel>Number</guilabel>
+  specifies the DTMF number. There, any DTMF number can be entered, this includes symbols like *, #, 
+  A-D. The <guilabel>Ring</guilabel> option specifies whether the radio should ring if a call by this
+  contact is received.
+</para>
+</section>
 
 </section>

@@ -39,7 +39,7 @@ Channel::Channel(const Channel &other, QObject *parent)
   : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
-  copy(other);
+  Channel::copy(other);
 
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -351,7 +351,7 @@ FMChannel::FMChannel(QObject *parent)
 }
 
 FMChannel::FMChannel(const FMChannel &other, QObject *parent)
-  : AnalogChannel(parent), _aprsSystem()
+  : AnalogChannel(parent), _aprsSystem(), _anytoneExtension(nullptr)
 {
   copy(other);
   // Link APRS system reference
@@ -626,10 +626,10 @@ DMRChannel::DMRChannel(QObject *parent)
     _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
@@ -643,13 +643,14 @@ DMRChannel::DMRChannel(QObject *parent)
 }
 
 DMRChannel::DMRChannel(const DMRChannel &other, QObject *parent)
-  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+  _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
 
   copy(other);
 
