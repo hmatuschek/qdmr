@@ -5,7 +5,6 @@
 
 #include "anytone_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 class Channel;
 class DMRContact;
