@@ -1,6 +1,7 @@
 #ifndef DMR6X2UVCODEPLUG_HH
 #define DMR6X2UVCODEPLUG_HH
 
+#include "d868uv_codeplug.hh"
 #include "d878uv_codeplug.hh"
 
 /** Represents the device specific binary codeplug for BTECH DMR-6X2UV radios.
@@ -36,21 +37,12 @@
  *    0x00 padded.</td></tr>
  *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of up to 128 channels,
  *    see @c D878UVCodeplug::ChannelElement 64 b each. </td></tr>
- *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information
- *    for channel bank 0? It is of exactly the same size as the channel bank 0. Mostly 0x00, a
- *    few 0xff.</td></tr>
  *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of up to 128 channels.</td></tr>
- *  <tr><td>00842000</td> <td>max. 002000</td> <td>Unknown data, related to CH bank 1?</td></tr>
- *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
  *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, up to 32 channels.</td></tr>
- *  <tr><td>00FC2000</td> <td>max. 000800</td> <td>Unknown data, related to CH bank 32.</td></tr>
  *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings,
  *    see @c D878UVCodeplug::ChannelElement.</td></tr>
  *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings,
  *    see @c D878UVCodeplug::ChannelElement.</td></tr>
- *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknown data, related to VFO A+B?
- *    It is of exactly the same size as the two VFO channels. Mostly 0x00, a few 0xff. Same pattern
- *    as the unknown data associated with channel banks.</td></tr>
  *
  *  <tr><th colspan="3">Zones</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -131,24 +123,16 @@
  *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
  *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
- *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000100</td> <td>General settings,
+ *  <tr><td>02500000</td> <td>0000e0</td> <td>General settings,
  *    see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
  *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1,
- *    see @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
  *    Default 0x00000000, 0x00 padded.</td></tr>
@@ -212,17 +196,26 @@
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
+ *  <tr><th colspan="3">Unknown settings.</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C2610</td> <td>000020</td> <td>Unknown bitmap.</td> </tr>
+ *  <tr><td>024C2630</td> <td>000020</td> <td>Unknown bitmap.</td> </tr>
+ *  <tr><td>024C3000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
+ *  <tr><td>024C5000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settings.</td> </tr>
+ *  <tr><td>02501400</td> <td>000030</td> <td>Uknonwn settings.</td> </tr>
+ *  <tr><td>025C1000</td> <td>005000</td> <td>Unknown settings.</td> </tr>
  * </table>
  *
  * @ingroup dmr6x2uv */
-class DMR6X2UVCodeplug : public D878UVCodeplug
+class DMR6X2UVCodeplug : public D868UVCodeplug
 {
   Q_OBJECT
 
 public:
   /** General settings element for the DMR-6X2UV.
    *
-   * Memory representation of the encoded settings element (size 0x100 bytes):
+   * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_generalsettings.txt */
   class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
   {
@@ -263,6 +256,7 @@ public:
 public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
+
 };
 
 #endif // DMR6X2UVCODEPLUG_HH

@@ -1,5 +1,24 @@
 #include "dmr6x2uv_codeplug.hh"
 
+#define NUM_CHANNELS              4000
+#define NUM_CHANNEL_BANKS         32
+#define CHANNEL_BANK_0            0x00800000
+#define CHANNEL_BANK_SIZE         0x00002000
+#define CHANNEL_BANK_31           0x00fc0000
+#define CHANNEL_BANK_31_SIZE      0x00000800
+#define CHANNEL_BANK_OFFSET       0x00040000
+#define CHANNEL_SIZE              0x00000040
+#define CHANNEL_BITMAP            0x024c1500
+#define CHANNEL_BITMAP_SIZE       0x00000200
+
+#define ADDR_GENERAL_CONFIG       0x02500000
+#define GENERAL_CONFIG_SIZE       0x00000100
+#define ADDR_GENERAL_CONFIG_EXT1  0x02501280
+#define GENERAL_CONFIG_EXT1_SIZE  0x00000030
+#define ADDR_GENERAL_CONFIG_EXT2  0x02501400
+#define GENERAL_CONFIG_EXT2_SIZE  0x00000100
+
+
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
@@ -10,7 +29,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, u
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : D878UVCodeplug::GeneralSettingsElement(ptr, 0x0100)
+  : D878UVCodeplug::GeneralSettingsElement(ptr, 0x00e0)
 {
   // pass...
 }
@@ -77,9 +96,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
  * Implementation of DMR6X2UVCodeplug
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
-  : D878UVCodeplug(parent)
+  : D868UVCodeplug(parent)
 {
   // pass...
 }
-
-
