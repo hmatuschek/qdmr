@@ -5,7 +5,9 @@
 
 /** Represents the device specific binary codeplug for BTECH DMR-6X2UV radios.
  *
- * In contrast to many other code-plugs, the code-plug for Anytone radios are spread over a large
+ * This codeplug implementation is compatible with firmware revision 2.04.
+ *
+ * In contrast to many other codeplugs, the codeplug for Anytone radios are spread over a large
  * memory area. In principle, this is a good idea, as it allows one to upload only the portion of the
  * codeplug that is actually configured. For example, if only a small portion of the available
  * contacts and channels are used, the amount of data that is written to the device can be
@@ -13,18 +15,18 @@
  *
  * However, the implementation of this idea in this device is utter shit. The amount of
  * fragmentation of the codeplug is overwhelming. For example, while channels are organized more or
- * less nicely in continuous banks, zones are distributed throughout the entire code-plug. That is,
+ * less nicely in continuous banks, zones are distributed throughout the entire codeplug. That is,
  * the names of zones are located in a different memory section that the channel lists. Some lists
  * are defined though bit-masks others by byte-masks. All bit-masks are positive, that is 1
  * indicates an enabled item while the bit-mask for contacts is inverted.
  *
- * In general the code-plug is huge and complex. Moreover, the radio provides a huge amount of
- * options and features. To this end, reverse-engineering this code-plug was a nightmare.
+ * In general the codeplug is huge and complex. Moreover, the radio provides a huge amount of
+ * options and features. To this end, reverse engineering this codeplug was a nightmare.
  *
- * More over, the binary code-plug file generate by the windows CPS does not directly relate to
- * the data being written to the radio. To this end the code-plug has been reverse-engineered
+ * More over, the binary codeplug file generate by the windows CPS does not directly relate to
+ * the data being written to the radio. To this end the codeplug has been reverse-engineered
  * using wireshark to monitor the USB communication between the windows CPS (running in a virtual
- * box) and the device. The latter makes the reverse-engineering particularly cumbersome.
+ * box) and the device. The latter makes the reverse engineering particularly cumbersome.
  *
  * @section dmr6x2uvcpl Codeplug structure within radio
  * <table>
@@ -216,6 +218,47 @@
 class DMR6X2UVCodeplug : public D878UVCodeplug
 {
   Q_OBJECT
+
+public:
+  /** General settings element for the DMR-6X2UV.
+   *
+   * Memory representation of the encoded settings element (size 0x100 bytes):
+   * @verbinclude dmr6x2uv_generalsettings.txt */
+  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  {
+  public:
+    /** Possible GPS modes. */
+    enum class SimplexRepeaterSlot {
+      TS1 = 0, TS2 = 1, Channel = 2
+    };
+
+  protected:
+    /** Hidden Constructor. */
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit GeneralSettingsElement(uint8_t *ptr);
+
+    /** Returns @c true if the simplex repeater feature is enabled. */
+    virtual bool simplexRepeaterEnabled() const;
+    /** Enables disables the simplex repeater feature. */
+    virtual void enableSimplexRepeater(bool enable);
+    /** Returns @c true if the speaker is switched on during RX in simplex repeater mode,
+     * see @c simplexRepeaterEnabled. */
+    virtual bool monitorSimplexRepeaterEnabled() const;
+    /** Enables/disables the speaker during RX in simplex repeater mode. */
+    virtual void enableMonitorSimplexRepeater(bool enable);
+    /** Returns the time-slot in simplex repeater mode. */
+    virtual SimplexRepeaterSlot simplexRepeaterTimeslot() const;
+    /** Sets the time-slot in simplex repeater mode. */
+    virtual void setSimplexRepeaterTimeslot(SimplexRepeaterSlot slot);
+
+    /** Encodes the settings from the config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Update config from settings. */
+    virtual bool updateConfig(Context &ctx);
+  };
 
 public:
   /** Empty constructor. */

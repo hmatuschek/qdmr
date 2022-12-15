@@ -1,4 +1,4 @@
-/** @defgroup d6x2uv BTECH DMR-6X2UV
+/** @defgroup dmr6x2uv BTECH DMR-6X2UV
  * Device specific classes for BTECH DMR-6X2UV.
  *
  * Athough labeled BTECH (Baofeng USA), this device is basically a relabled AnyTone AT-D878UV.
@@ -16,6 +16,8 @@
 #include "anytone_radio.hh"
 #include "anytone_interface.hh"
 
+/** Represents a BTECH DMR-6X2UV.
+ * @ingroup dmr6x2uv */
 class DMR6X2UV: public AnytoneRadio
 {
   Q_OBJECT
