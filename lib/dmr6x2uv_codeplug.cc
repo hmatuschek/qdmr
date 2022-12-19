@@ -23,15 +23,20 @@
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : D878UVCodeplug::GeneralSettingsElement(ptr, size)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : D878UVCodeplug::GeneralSettingsElement(ptr, 0x00e0)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, 0x00e0)
 {
   // pass...
+}
+
+DMR6X2UVCodeplug::GeneralSettingsElement::DisplayColor
+DMR6X2UVCodeplug::GeneralSettingsElement::callsignDisplayColor() const {
+  return (DisplayColor)getUInt8(0x00b0);
 }
 
 bool

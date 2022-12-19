@@ -195,9 +195,14 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_generalsettings.txt */
-  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
   {
   public:
+    /** Possible colors for the callsign etc. */
+    enum class DisplayColor {
+      Orange=0x00, Red=0x01, Yellow=0x02, Green=0x03, Turquoise=0x04, Blue=0x05, White=0x06, Black=0x07
+    };
+
     /** Possible GPS modes. */
     enum class SimplexRepeaterSlot {
       TS1 = 0, TS2 = 1, Channel = 2
@@ -210,6 +215,11 @@ public:
   public:
     /** Constructor. */
     explicit GeneralSettingsElement(uint8_t *ptr);
+
+    /** Retunrs the color for call-signs. */
+    virtual DisplayColor callsignDisplayColor() const;
+    /** Sets the color for call-signs. */
+    void setCallsignDisplayColor(DisplayColor color);
 
     /** Returns @c true if the simplex repeater feature is enabled. */
     virtual bool simplexRepeaterEnabled() const;
