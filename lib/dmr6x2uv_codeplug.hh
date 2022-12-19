@@ -1,33 +1,11 @@
 #ifndef DMR6X2UVCODEPLUG_HH
 #define DMR6X2UVCODEPLUG_HH
 
-#include "d868uv_codeplug.hh"
 #include "d878uv_codeplug.hh"
 
 /** Represents the device specific binary codeplug for BTECH DMR-6X2UV radios.
  *
  * This codeplug implementation is compatible with firmware revision 2.04.
- *
- * In contrast to many other codeplugs, the codeplug for Anytone radios are spread over a large
- * memory area. In principle, this is a good idea, as it allows one to upload only the portion of the
- * codeplug that is actually configured. For example, if only a small portion of the available
- * contacts and channels are used, the amount of data that is written to the device can be
- * reduced.
- *
- * However, the implementation of this idea in this device is utter shit. The amount of
- * fragmentation of the codeplug is overwhelming. For example, while channels are organized more or
- * less nicely in continuous banks, zones are distributed throughout the entire codeplug. That is,
- * the names of zones are located in a different memory section that the channel lists. Some lists
- * are defined though bit-masks others by byte-masks. All bit-masks are positive, that is 1
- * indicates an enabled item while the bit-mask for contacts is inverted.
- *
- * In general the codeplug is huge and complex. Moreover, the radio provides a huge amount of
- * options and features. To this end, reverse engineering this codeplug was a nightmare.
- *
- * More over, the binary codeplug file generate by the windows CPS does not directly relate to
- * the data being written to the radio. To this end the codeplug has been reverse-engineered
- * using wireshark to monitor the USB communication between the windows CPS (running in a virtual
- * box) and the device. The latter makes the reverse engineering particularly cumbersome.
  *
  * @section dmr6x2uvcpl Codeplug structure within radio
  * <table>
@@ -36,13 +14,13 @@
  *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00,
  *    0x00 padded.</td></tr>
  *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of up to 128 channels,
- *    see @c D878UVCodeplug::ChannelElement 64 b each. </td></tr>
+ *    see @c AnytoneCodeplug::ChannelElement 64 b each. </td></tr>
  *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of up to 128 channels.</td></tr>
  *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, up to 32 channels.</td></tr>
  *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings,
- *    see @c D878UVCodeplug::ChannelElement.</td></tr>
+ *    see @c AnytoneCodeplug::ChannelElement.</td></tr>
  *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings,
- *    see @c D878UVCodeplug::ChannelElement.</td></tr>
+ *    see @c AnytoneCodeplug::ChannelElement.</td></tr>
  *
  *  <tr><th colspan="3">Zones</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -59,11 +37,11 @@
  *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits,
  *    0-padded, default 0.</td></tr>
  *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
- *    See @c D878UVCodeplug::RoamingChannelElement for details.</td></tr>
+ *    See @c D868UVCodeplug::RoamingChannelElement for details.</td></tr>
  *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded,
  *    default 0.</td></tr>
  *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
- *    See @c D878UVCodeplug::RoamingZoneElement for details.</td></tr>
+ *    See @c D868UVCodeplug::RoamingZoneElement for details.</td></tr>
  *
  *  <tr><th colspan="3">Contacts</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -120,19 +98,21 @@
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
+ *    see @c D868UVCodeplug::AnalogAPRSSettingsElement.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
- *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
+ *    see @c D868UVCodeplug::DMRAPRSSystemsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501280</td> <td>000030</td> <td>GPS template message, ASCII, 0-padded.</td> </tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>0000e0</td> <td>General settings,
- *    see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
+ *    see @c DMR6X2UVCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
  *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
+ *  <tr><td>02501400</td> <td>000030</td> <td>Settings extension, see @c DMR6X2UVCodeplug::ExtendedSettingsElement.</td> </tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
  *    Default 0x00000000, 0x00 padded.</td></tr>
@@ -166,7 +146,7 @@
  *    see @c D868UVCodeplug::dmr_encryption_key_t,
  *    40b each.</td></tr>
  *  <tr><td>024C4000</td> <td>004000</td> <td>Up to 256 AES encryption keys.
- *    See @c D878UVCodeplug::AESEncryptionKeyElement.</td></tr>
+ *    See @c D868UVCodeplug::AESEncryptionKeyElement.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -202,8 +182,6 @@
  *  <tr><td>024C2630</td> <td>000020</td> <td>Unknown bitmap.</td> </tr>
  *  <tr><td>024C3000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
  *  <tr><td>024C5000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settings.</td> </tr>
- *  <tr><td>02501400</td> <td>000030</td> <td>Uknonwn settings.</td> </tr>
  *  <tr><td>025C1000</td> <td>005000</td> <td>Unknown settings.</td> </tr>
  * </table>
  *
@@ -252,6 +230,25 @@ public:
     /** Update config from settings. */
     virtual bool updateConfig(Context &ctx);
   };
+
+  /** Implements some settings extension for the BTECH DMR-6X2UV.
+   *
+   * Memory representation of the encoded settings element (size 0x0e0 bytes):
+   * @verbinclude dmr6x2uv_settingsextension.txt */
+  class ExtendedSettingsElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden Constructor. */
+    ExtendedSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit ExtendedSettingsElement(uint8_t *ptr);
+
+    /** Resets the general settings. */
+    void clear();
+  };
+
 
 public:
   /** Empty constructor. */
