@@ -37,7 +37,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<double, dou
       new RadioLimitList {
         { DMRRadioID::staticMetaObject, 1, 250, new RadioLimitObject {
             {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"id", new RadioLimitDMRId()}
           } }
       });
 
@@ -52,7 +52,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<double, dou
                     (unsigned)DMRContact::GroupCall,
                     (unsigned)DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId() }
           } },
         { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
       });

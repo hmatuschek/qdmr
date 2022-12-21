@@ -354,7 +354,17 @@ RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitUInt
+ * Implementation of RadioLimitDMRId
+ * ********************************************************************************************* */
+RadioLimitDMRId::RadioLimitDMRId(QObject *parent)
+  : RadioLimitUInt(1, 16777215, -1, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitEnum
  * ********************************************************************************************* */
 RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent)
   : RadioLimitValue(parent), _values(values)

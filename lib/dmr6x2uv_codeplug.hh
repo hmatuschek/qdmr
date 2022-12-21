@@ -25,7 +25,6 @@
  *  <tr><th colspan="3">Zones</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
  *  <tr><td>024C1300</td> <td>000020</td>      <td>Bitmap of 250 zones.</td></tr>
- *  <tr><td>024C1360</td> <td>000020</td>      <td>Hidden zone bitmap of 250 zones.</td></tr>
  *  <tr><td>01000000</td> <td>max. 01f400</td> <td>250 zones channel lists of 250 16bit indices each.
  *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200,
  *    size of each list 0x1f4.</td></tr>
@@ -98,9 +97,9 @@
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings,
- *    see @c D868UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
- *    see @c D868UVCodeplug::DMRAPRSSystemsElement.</td>
+ *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
+ *  <tr><td>02501040</td> <td>000060</td> <td>DMR-APRS systems,
+ *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501280</td> <td>000030</td> <td>GPS template message, ASCII, 0-padded.</td> </tr>
  *
@@ -145,8 +144,8 @@
  *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys,
  *    see @c D868UVCodeplug::dmr_encryption_key_t,
  *    40b each.</td></tr>
- *  <tr><td>024C4000</td> <td>004000</td> <td>Up to 256 AES encryption keys.
- *    See @c D868UVCodeplug::AESEncryptionKeyElement.</td></tr>
+ *  <tr><td>025C1000</td> <td>004000</td> <td>Up to 256 AES encryption keys.
+ *    See @c D878UVCodeplug::AESEncryptionKeyElement.</td></tr>
  *
  *  <tr><th colspan="3">Misc</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -182,7 +181,6 @@
  *  <tr><td>024C2630</td> <td>000020</td> <td>Unknown bitmap.</td> </tr>
  *  <tr><td>024C3000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
  *  <tr><td>024C5000</td> <td>000020</td> <td>Unknown settings.</td> </tr>
- *  <tr><td>025C1000</td> <td>005000</td> <td>Unknown settings.</td> </tr>
  * </table>
  *
  * @ingroup dmr6x2uv */
@@ -394,6 +392,16 @@ public:
   class ExtendedSettingsElement: public Codeplug::Element
   {
   public:
+    /** Possible talker alias encodings. */
+    enum class TalkerAliasEncoding {
+      ISO8=0x00, ISO7=0x01, Unicode=0x02
+    };
+
+    /** Possible display priorities for the talker alias. */
+    enum class TalkerAliasSource {
+      None=0x00, Database=0x01, OverTheAir=0x02
+    };
+
     /** Possible font colors. */
     enum class FontColor {
       White=0x00, Black=0x01, Orange=0x02, Red=0x03, Yellow=0x04, Green=0x05, Turquoise=0x06, Blue=0x07
@@ -429,6 +437,19 @@ public:
 
     /** Resets the general settings. */
     void clear();
+
+    /** Returns @c true, if a talker alias is send. */
+    virtual bool talkerAliasIsSend() const;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
+    /** Retunrs the talker alias source. */
+    virtual TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(TalkerAliasSource source);
+    /** Retunrs the talker alias encoding. */
+    virtual TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
 
     /** Returns the font color. */
     virtual FontColor fontColor() const;
@@ -520,11 +541,21 @@ public:
     virtual bool updateConfig(Context &ctx);
   };
 
-
 public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
 
+  /** Allocates general settings memory section. */
+  virtual void allocateGeneralSettings();
+  /** Encodes the general settings section. */
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decodes the general settings section. */
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void allocateGPSSystems();
+  bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // DMR6X2UVCODEPLUG_HH

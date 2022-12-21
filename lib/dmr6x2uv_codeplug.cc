@@ -1,4 +1,6 @@
 #include "dmr6x2uv_codeplug.hh"
+#include "utils.hh"
+
 
 #define NUM_CHANNELS              4000
 #define NUM_CHANNEL_BANKS         32
@@ -12,11 +14,18 @@
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
 #define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x00000100
-#define ADDR_GENERAL_CONFIG_EXT1  0x02501280
-#define GENERAL_CONFIG_EXT1_SIZE  0x00000030
-#define ADDR_GENERAL_CONFIG_EXT2  0x02501400
-#define GENERAL_CONFIG_EXT2_SIZE  0x00000100
+#define GENERAL_CONFIG_SIZE       0x000000e0
+#define ADDR_EXTENDED_SETTINGS    0x02501400
+#define EXTENDED_SETTINGS_SIZE    0x00000030
+
+#define ADDR_APRS_SETTINGS        0x02501000
+#define APRS_SETTINGS_SIZE        0x00000040
+#define NUM_DMRAPRS_SYSTEMS                8
+#define ADDR_DMRAPRS_SETTINGS     0x02501040
+#define DMRAPRS_SETTINGS_SIZE     0x00000060
+
+#define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
+#define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
 
 
 /* ********************************************************************************************* *
@@ -29,7 +38,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, u
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, 0x00e0)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, GENERAL_CONFIG_SIZE)
 {
   // pass...
 }
@@ -350,7 +359,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr,
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, 0x0030)
+  : Codeplug::Element(ptr, EXTENDED_SETTINGS_SIZE)
 {
   // pass...
 }
@@ -358,6 +367,33 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::clear() {
   Codeplug::Element::clear();
+}
+
+bool
+DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasIsSend() const {
+  return 0x01 == getUInt8(0x0000);
+}
+void
+DMR6X2UVCodeplug::ExtendedSettingsElement::enableSendTalkerAlias(bool enable) {
+  setUInt8(0x0000, enable ? 0x01 : 0x00);
+}
+
+DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasSource
+DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasSource() const {
+  return (TalkerAliasSource) getUInt8(0x0001);
+}
+void
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(TalkerAliasSource source) {
+  setUInt8(0x0001, (uint8_t)source);
+}
+
+DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasEncoding
+DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
+  return (TalkerAliasEncoding) getUInt8(0x0002);
+}
+void
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
+  setUInt8(0x0002, (uint8_t)encoding);
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::FontColor
@@ -551,4 +587,133 @@ DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
   : D868UVCodeplug(parent)
 {
   // pass...
+}
+
+void
+DMR6X2UVCodeplug::allocateGeneralSettings() {
+  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(ADDR_EXTENDED_SETTINGS, EXTENDED_SETTINGS_SIZE);
+}
+
+bool
+DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx)) {
+    errMsg(err) << "Cannot encode general settings element.";
+    return false;
+  }
+
+  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).fromConfig(flags, ctx)) {
+    errMsg(err) << "Cannot encode extended settings element.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
+  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx)) {
+    errMsg(err) << "Cannot decode general settings element.";
+    return false;
+  }
+
+  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).updateConfig(ctx)) {
+    errMsg(err) << "Cannot decode extended settings element.";
+    return false;
+  }
+
+  return true;
+}
+
+void
+DMR6X2UVCodeplug::allocateGPSSystems() {
+  // replaces D868UVCodeplug::allocateGPSSystems
+
+  // APRS settings
+  image(0).addElement(ADDR_APRS_SETTINGS, APRS_SETTINGS_SIZE);
+  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
+  image(0).addElement(ADDR_DMRAPRS_SETTINGS, DMRAPRS_SETTINGS_SIZE);
+}
+
+bool
+DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+  // replaces D868UVCodeplug::encodeGPSSystems
+
+  // Encode APRS system (there can only be one)
+  if (0 < ctx.config()->posSystems()->aprsCount()) {
+    D878UVCodeplug::AnalogAPRSSettingsElement(data(ADDR_APRS_SETTINGS))
+        .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
+    encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+  }
+
+  // Encode GPS systems
+  D878UVCodeplug::DMRAPRSSystemsElement gps(data(ADDR_DMRAPRS_SETTINGS));
+  if (! gps.fromGPSSystems(ctx))
+    return false;
+  if (0 < ctx.config()->posSystems()->gpsCount()) {
+    // If there is at least one GPS system defined -> set auto TX interval.
+    //  This setting might be overridden by any analog APRS system below
+    D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+    aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+    aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+  }
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // replaces D868UVCodeplug::createGPSSystems
+
+  // Before creating any GPS/APRS systems, get global auto TX interval
+  D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  unsigned pos_intervall = aprs.autoTXInterval();
+
+  // Create APRS system (if enabled)
+  uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
+  if (aprs.isValid()) {
+    APRSSystem *sys = aprs.toAPRSSystem();
+    sys->setPeriod(pos_intervall);
+    sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
+    ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
+  }
+
+  // Create GPS systems
+  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
+    if (0 == gps_systems.destination(i))
+      continue;
+    if (GPSSystem *sys = gps_systems.toGPSSystemObj(i)) {
+      sys->setPeriod(pos_intervall);
+      ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  // replaces D868UVCodeplug::linkGPSSystems
+
+  // Link APRS system
+  D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  if (aprs.isValid()) {
+    aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+  }
+
+  // Link GPS systems
+  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
+    if (0 == gps_systems.destination(i))
+      continue;
+    gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
+  }
+
+  return true;
 }

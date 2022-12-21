@@ -441,7 +441,7 @@ protected:
   /** Link GPS systems. */
   virtual bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Allocate refab SMS messages. */
+  /** Allocate prefab SMS messages. */
   virtual void allocateSMSMessages();
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();
