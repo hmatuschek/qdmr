@@ -104,6 +104,8 @@ public:
   virtual bool copy(const ConfigItem &other);
   /** Clones this item. */
   virtual ConfigItem *clone() const = 0;
+  /** Compares two items. */
+  virtual int compare(const ConfigItem &other) const;
 
 public:
   /** Recursively labels the config object.
@@ -337,6 +339,9 @@ public:
   bool del(ConfigObject *obj);
   void clear();
   bool copy(const AbstractConfigObjectList &other);
+
+  /** Compares the elements within the list. */
+  virtual int compare(const ConfigObjectList &other) const;
 
   /** Allocates a member objects for the given YAML node. */
   virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack()) = 0;

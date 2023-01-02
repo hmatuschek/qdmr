@@ -16,18 +16,7 @@ private slots:
   void initTestCase();
   void cleanupTestCase();
 
-  void testDMRID();
-  void testRadioName();
-  void testIntroLines();
-  void testMicLevel();
-  void testSpeechSynthesis();
-  void testDigitalContacts();
-  void testRXGroups();
-  void testDigitalChannels();
-  void testAnalogChannels();
-  void testZones();
-  void testScanLists();
-  void testGPSSystems();
+  void testCloneChannelBasic();
 
 protected:
   Config _config;

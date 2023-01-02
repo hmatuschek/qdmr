@@ -56,6 +56,9 @@ public:
     return _object->is<Type>();
   }
 
+  /** Compares the references. */
+  int compare(const ConfigObjectReference &other) const;
+
 signals:
   /** Gets emitted if the reference is changed.
    * This signal is not emitted if the referenced object is modified. */

@@ -73,6 +73,17 @@ ConfigObjectReference::copy(const ConfigObjectReference *ref) {
   return set(ref->_object);
 }
 
+int
+ConfigObjectReference::compare(const ConfigObjectReference &other) const {
+  if (isNull() && other.isNull())
+    return 0;
+  if (!isNull() && other.isNull())
+    return 1;
+  if (isNull() && !other.isNull())
+    return -1;
+  return this->_object->compare(*other._object);
+}
+
 bool
 ConfigObjectReference::allow(const QMetaObject *elementType) {
   if (! _elementTypes.contains(elementType->className()))
