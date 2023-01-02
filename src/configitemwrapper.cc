@@ -528,6 +528,7 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
             case DMRContact::GroupCall: return tr("Group Call");
             case DMRContact::AllCall: return tr("All Call");
           }
+        break;
         case 1:
           return digi->name();
         case 2:
@@ -628,6 +629,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
+    break;
   case 3:
     return sys->period();
   case 4:
@@ -638,6 +640,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
                 sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
+    break;
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");
