@@ -581,6 +581,78 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DMR6X2UVCodeplug::ChannelElement
+ * ********************************************************************************************* */
+DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
+  : AnytoneCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : AnytoneCodeplug::ChannelElement(ptr)
+{
+  // pass...
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::hasScanListIndex() const {
+  return hasScanListIndex(0);
+}
+unsigned
+DMR6X2UVCodeplug::ChannelElement::scanListIndex() const {
+  return scanListIndex(0);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setScanListIndex(unsigned idx) {
+  setScanListIndex(0, idx);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::clearScanListIndex() {
+  clearScanListIndex(0);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::hasScanListIndex(unsigned int n) const {
+  return 0xff != scanListIndex(n);
+}
+unsigned int
+DMR6X2UVCodeplug::ChannelElement::scanListIndex(unsigned int n) const {
+  if (n > 7)
+    return 0xff;
+  return getUInt8(0x0036+n);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setScanListIndex(unsigned int n, unsigned idx) {
+  if (n > 7)
+    return;
+  setUInt8(0x0036+n, idx);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::clearScanListIndex(unsigned int n) {
+  setScanListIndex(n, 0xff);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::roamingEnabled() const {
+  return ! getBit(0x001b, 2);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableRoaming(bool enable) {
+  setBit(0x001b, 2, !enable);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::ranging() const {
+  return getBit(0x001b, 0);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableRanging(bool enable) {
+  return setBit(0x001b, 0, enable);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)

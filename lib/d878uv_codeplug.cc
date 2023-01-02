@@ -75,13 +75,13 @@
  * Implementation of D878UVCodeplug::ChannelElement
  * ******************************************************************************************** */
 D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ChannelElement(ptr, size)
+  : D868UVCodeplug::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : AnytoneCodeplug::ChannelElement(ptr, 0x0040)
+  : D868UVCodeplug::ChannelElement(ptr, 0x0040)
 {
   // pass...
 }
@@ -177,7 +177,7 @@ D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
 
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+  Channel *ch = D868UVCodeplug::ChannelElement::toChannelObj(ctx);
 
   if (nullptr == ch)
     return nullptr;
@@ -200,7 +200,7 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+  if (! D868UVCodeplug::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -228,7 +228,7 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+  if (! D868UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
   if (const DMRChannel *dc = c->as<DMRChannel>()) {

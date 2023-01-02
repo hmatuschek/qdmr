@@ -541,6 +541,52 @@ public:
     virtual bool updateConfig(Context &ctx);
   };
 
+  /** Implements the channel element for the BTECH DMR-6X2UV.
+   *  Extends the AnytoneCodeplug::ChannelElement by the device specific features, like multiple
+   *  scan lists associated with the channel.
+   *
+   *  Memory representation of the encoded channel element (size 0x040 bytes):
+   *  @verbinclude dmr6x2uv_channel.txt */
+  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    ChannelElement(uint8_t *ptr);
+
+    /** Returns @c true, if the first scan list index is set. */
+    bool hasScanListIndex() const;
+    /** Returns the first scan list index (0-based). */
+    unsigned scanListIndex() const;
+    /** Sets the first scan list index (0-based). */
+    void setScanListIndex(unsigned idx);
+    /** Clears the first scan list index. */
+    void clearScanListIndex();
+
+    /** Returns @c true, if the n-th scan list index is set (n=0,...,7). */
+    virtual bool hasScanListIndex(unsigned int n) const;
+    /** Returns the n-th scan list index (0-based, n=0,...,7). */
+    virtual unsigned scanListIndex(unsigned int n) const;
+    /** Sets the n-th scan list index (0-based, n=0,...,7). */
+    virtual void setScanListIndex(unsigned int n, unsigned idx);
+    /** Clears the n-th scan list index (n=0,...,7). */
+    virtual void clearScanListIndex(unsigned int n);
+
+    /** Returns @c true if roaming is enabled for this channel. */
+    virtual bool roamingEnabled() const;
+    /** Enables/disables roaming. */
+    virtual void enableRoaming(bool enable);
+
+    /** Returns @c true, if ranging is enabled. */
+    bool ranging() const;
+    /** Enables/disables ranging. */
+    void enableRanging(bool enable);
+
+  };
+
 public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);

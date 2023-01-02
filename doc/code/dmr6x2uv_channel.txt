@@ -12,17 +12,19 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 14 | Contact index 0-based, little endian                                                                                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-18 | Radio ID table index.         | 0 |SquelchMode| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | Scan list index               |
+18 | Radio ID table index.         | 0 |SquelchMode| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | 0   0   0   0   0 |XFR| 0 |RNG|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 1c | RX Group list index           | 2-tone ID                     | 5-tone ID                     | DTMF ID                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 20 | Color code                    |LWK|EEE|RGP|EAT| 0 |EST|SMC|TSL| AES Encryption key            | Name 16 x ASCII 0-padded   ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30  ...                                                                                            | Pad byte set to 0x00          |
+30  ...                                                                                            | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | Device specific settings                                                                                                   ...
+34 | 0   0   0   0   0 |DAD|ETM| 0 | Unused, set to 0x00           | Scanlist idx 0, 0xff=unset    | Scanlist idx 1, 0xff=unset    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c  ...                                                                                                                            |
+38 | Scanlist idx 2, 0xff=unset    | Scanlist idx 3, 0xff=unset    | Scanlist idx 4, 0xff=unset    | Scanlist idx 5, 0xff=unset    |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0   0   0   0   0 |RGP|ATy|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
@@ -42,10 +44,15 @@ Field description:
    4 = CTCSS/DCS or Optional Signaling
  - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
  - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
+ - XFR: Exlcude channel from roaming
  - LWK: Enable lone worker.
  - EEE: Enable enhanced encryption
- - RGP: Enable RX GPS:
- - EAT: Enable adative TDMA
- - EST: Enable simplex TDMA,
+ - RGP: Enable DMR-APRS RX
+ - EAT: Enable adaptive TDMA
+ - EST: Enable simplex TDMA
  - SMC: SMS confirmation,
  - TSL: Time slot where 0=TS1, 1=TS2
+ - DAD: Data ACK disable (inverted!)
+ - ETM: Enable through mode
+ - RNG: Ranging
+ - ATy: APRS Type: 0=DMR-APRS, 1=Analog APRS
