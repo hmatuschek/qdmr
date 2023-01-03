@@ -591,12 +591,13 @@ public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
 
-  /** Allocates general settings memory section. */
   virtual void allocateGeneralSettings();
-  /** Encodes the general settings section. */
   virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Decodes the general settings section. */
   virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGPSSystems();
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
