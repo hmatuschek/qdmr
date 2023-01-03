@@ -30,6 +30,7 @@
  *    size of each list 0x1f4.</td></tr>
  *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
  *    Each zone name is up to 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
+ *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *
  *  <tr><th colspan="3">Roaming</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
@@ -107,7 +108,6 @@
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02500000</td> <td>0000e0</td> <td>General settings,
  *    see @c DMR6X2UVCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
  *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
