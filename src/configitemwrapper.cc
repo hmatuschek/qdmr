@@ -278,6 +278,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     case Channel::Power::Low: return tr("Low"); break;
     case Channel::Power::Min: return tr("Min"); break;
     }
+    break;
   case 5:
     if (channel->defaultTimeout())
       return tr("[Default]");

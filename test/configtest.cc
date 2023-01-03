@@ -1,5 +1,7 @@
 #include "configtest.hh"
 #include "config.hh"
+#include "errorstack.hh"
+#include <iostream>
 #include <QTest>
 
 
@@ -11,7 +13,10 @@ ConfigTest::ConfigTest(QObject *parent) : QObject(parent)
 
 void
 ConfigTest::initTestCase() {
-  _config.readYAML(":/config_test.yaml");
+  ErrorStack err;
+  if (! _config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1").arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
@@ -24,7 +29,8 @@ void
 ConfigTest::testCloneChannelBasic() {
   // Check if a channel can be cloned
   Channel *clone = _config.channelList()->channel(0)->clone()->as<Channel>();
-  QTEST_ASSERT(0 == clone->compare(*_config.channelList()->channel(0)));
+  // Check if channels are the same
+  QCOMPARE(clone->compare(*_config.channelList()->channel(0)), 0);
 }
 
 

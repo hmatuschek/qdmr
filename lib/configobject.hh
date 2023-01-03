@@ -372,6 +372,8 @@ protected:
 public:
   bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
   YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+
+  virtual int compare(const ConfigObjectRefList &other) const;
 };
 
 

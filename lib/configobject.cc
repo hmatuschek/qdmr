@@ -265,21 +265,25 @@ ConfigItem::compare(const ConfigItem &other) const {
     if (QVariant::String == prop.type()) {
       int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
       if (cmp) return cmp;
+      continue;
     }
 
     if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       int cmp = ref->compare(*oprop.read(&other).value<ConfigObjectReference*>());
       if (cmp) return cmp;
+      continue;
     }
 
     if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectList*>());
       if (cmp) return cmp;
+      continue;
     }
 
     if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
-      int cmp = lst->copy(*oprop.read(&other).value<ConfigObjectRefList*>());
+      int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectRefList*>());
       if (cmp) return cmp;
+      continue;
     }
 
     if (propIsInstance<ConfigItem>(prop)) {
@@ -292,6 +296,7 @@ ConfigItem::compare(const ConfigItem &other) const {
         continue;
       int cmp = prop.read(&other).value<ConfigItem*>()->compare(*oprop.read(&other).value<ConfigItem*>());
       if (cmp) return cmp;
+      continue;
     }
   }
 
@@ -1381,5 +1386,16 @@ ConfigObjectRefList::serialize(const ConfigItem::Context &context, const ErrorSt
     list.push_back(context.getId(obj).toStdString());
   }
   return list;
+}
+
+int
+ConfigObjectRefList::compare(const ConfigObjectRefList &other) const {
+  if (count() < other.count()) return -1;
+  if (count() > other.count()) return 1;
+  for (int i=0; i<count(); i++) {
+    int cmp = get(i)->compare(*other.get(i));
+    if (cmp) return cmp;
+  }
+  return 0;
 }
 

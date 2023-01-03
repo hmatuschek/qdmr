@@ -310,7 +310,14 @@ bool
 Config::readYAML(const QString &filename, const ErrorStack &err) {
   YAML::Node node;
   try {
-     node = YAML::LoadFile(filename.toStdString());
+    QFile file(filename);
+    if (! file.open(QIODevice::ReadOnly)) {
+      errMsg(err) << "Cannot open file '" << filename << "': " << file.errorString() << ".";
+      errMsg(err) << "Cannot read YAML codeplug from file '" << filename << "'.";
+      return false;
+    }
+    QByteArray content = file.readAll();
+    node = YAML::Load(content.constData());
   } catch (const YAML::Exception &exc) {
     errMsg(err) << "Cannot read YAML codeplug from file '"<< filename
                 << "': " << QString::fromStdString(exc.msg) << ".";
