@@ -45,8 +45,13 @@ D868UVCallsignDB::EntryElement::setNumber(unsigned num) {
 }
 
 void
+D868UVCallsignDB::EntryElement::setFriendFlag(bool set) {
+  setBit(0x0005, 3, set);
+}
+
+void
 D868UVCallsignDB::EntryElement::setRingTone(RingTone tone) {
-  setUInt8(0x0005, (unsigned)tone);
+  setUInt2(0x0005, 0, (unsigned)tone);
 }
 
 void
