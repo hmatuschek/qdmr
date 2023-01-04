@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include "configreference.hh"
-
+#include "roamingchannel.hh"
 
 /** Represents a RoamingZone within the abstract device configuration.
  *

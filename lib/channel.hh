@@ -343,7 +343,7 @@ public:
  * @ingroup conf */
 class DMRChannel: public DigitalChannel
 {
-	Q_OBJECT
+  Q_OBJECT
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
@@ -385,7 +385,7 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  DMRChannel(QObject *parent=nullptr);
+  explicit DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
@@ -537,7 +537,7 @@ protected:
  * @ingroup conf */
 class ChannelList: public ConfigObjectList
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Constructs an empty channel list. */
