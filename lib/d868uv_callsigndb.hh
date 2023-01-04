@@ -58,6 +58,8 @@ public:
     virtual void setCallType(DMRContact::Type type);
     /** Sets the DMR ID number. */
     virtual void setNumber(unsigned num);
+    /** Set/clear friend flag. */
+    virtual void setFriendFlag(bool set);
     /** Sets the ring tone. */
     virtual void setRingTone(RingTone tone);
     /** Sets the entry content. */

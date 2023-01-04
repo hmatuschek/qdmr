@@ -9,7 +9,7 @@ ELSE (APPLE)
 ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
-    utils.cc crc32.cc signaling.cc codeplugcontext.cc addressmap.cc radiointerface.cc errorstack.cc
+    utils.cc crc32.cc signaling.cc addressmap.cc radiointerface.cc errorstack.cc
     radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc usbdevice.cc radiolimits.cc
     csvreader.cc dfufile.cc userdatabase.cc logger.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
@@ -30,7 +30,8 @@ SET(libdmrconf_SOURCES
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_limits.cc
     d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
     d578uv.cc d578uv_codeplug.cc d578uv_limits.cc
-    d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc)
+    d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
+    dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc)
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh
@@ -52,11 +53,12 @@ SET(libdmrconf_MOC_HEADERS
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d868uv_limits.hh
     d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
     d578uv.hh d578uv_codeplug.hh d578uv_limits.hh
-    d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh)
+    d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh
+    dmr6x2uv.hh dmr6x2uv_codeplug.hh dmr6x2uv_limits.hh)
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh
     md390_filereader.hh
-    utils.hh crc32.hh signaling.hh codeplugcontext.hh addressmap.hh errorstack.hh)
+    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh)
 
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)

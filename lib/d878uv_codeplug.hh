@@ -5,7 +5,6 @@
 
 #include "d868uv_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 class Channel;
 class DMRContact;
@@ -238,7 +237,7 @@ public:
    * Memory layout of encoded channel (size 0x40 bytes):
    * @verbinclude d878uv_channel.txt
    */
-  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  class ChannelElement: public D868UVCodeplug::ChannelElement
   {
   public:
     /** Possible PTT ID settings. */

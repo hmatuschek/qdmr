@@ -25,6 +25,7 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   case 0x01:
     _limits = new D578UVLimits({ {136., 174.}, {400., 480.} },
                                { {136., 174.}, {400., 480.} }, info.version, this);
+    break;
   case 0x02:
     _limits = new D578UVLimits({ {136., 174.}, {430., 440.} },
                                { {136., 174.}, {430., 440.} }, info.version, this);
@@ -32,6 +33,7 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   case 0x03:
     _limits = new D578UVLimits({ {136., 174.}, {400., 480.} },
                                { {144., 146.}, {430., 440.} }, info.version, this);
+    break;
   case 0x04:
     _limits = new D578UVLimits({ {144., 146.}, {434., 438.} },
                                { {144., 146.}, {434., 438.} }, info.version, this);

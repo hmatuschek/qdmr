@@ -1,0 +1,42 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Enable send talker alias      | Talker alias display priority | Talker alias encoding         | Font Color                    |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | Enable custom ch. background  | Roaming zone index 0-based    | Enable auto roaming           | Enable repeater check         |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08 | Out of repeater range alert   | Rep. out of range reminder    | Repeater check intervall      | Repeater reconnections        |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c | Start roaming condition       | Auto roaming intervall        | Roaming eff. waiting time     | Roaming return condition      |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+10 | Mute timer (n+1) min          | Encryption type               | Zone A name color             | Zone B name color             |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14 | Channel A name color          | Channel B name color          |                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+18 |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+1c |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+20 |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+24 |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+28 |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+2c |                                                                                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Field description:
+ - Talker alias display priority: 0x00=None, 0x01=Contact alias, 0x02=Over-the-air alias
+ - Talker alias encoding: 0x00=ISO-8, 0x01=ISO-7, 0x02=Unicode
+ - Font Color: 0x00=White, 0x01=Black, 0x02=Orange, 0x03=Red, 0x04=Yellow, 0x05=Green, 0x06=Turquoise, 0x07=Blue
+ - Encryption type: 0x00=Common(Basic), 0x01=AES
+ - Zone/Channel A/B name color: 0x00=Orange, 0x01=Red, 0x02=Yellow, 0x03=Green, 0x04=Turquoise, 0x05=Blue, 0x06=White, 0x07=Black
+ - Out of repeater range alert: 0x00=Off, 0x01=Bell, 0x02=Voice
+ - Rep. out of range reminder: Number of times, the reminder is shown (n-1), 0x00=1, 0x01=2, ..., 0x09=10
+ - Repeater check intervall (n+1)*5 seconds: 0x00=5s, ..., 0x09=50s
+ - Repeater reconnections: 0x00=3, 0x01=4, 0x03=5
+ - Start roaming condition: 0x00=fixed time, 0x01=out of range
+ - Auto roaming intervall: 0x00=1min, ..., 0xff=256min
+ - Roaming eff. waiting time: 0x00=off, 0x01=1s, ..., 0x1e=30s
+ - Roaming return condition: 0x00=fixed time, 0x01=out of range
+

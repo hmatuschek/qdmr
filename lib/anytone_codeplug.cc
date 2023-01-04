@@ -572,83 +572,6 @@ AnytoneCodeplug::ChannelElement::setName(const QString &name) {
   writeASCII(0x0023, name, 16, 0x00);
 }
 
-bool
-AnytoneCodeplug::ChannelElement::ranging() const {
-  return getBit(0x0034, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRanging(bool enable) {
-  setBit(0x0034, 0, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::throughMode() const {
-  return getBit(0x0034, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableThroughMode(bool enable) {
-  setBit(0x0034, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::dataACK() const {
-  return !getBit(0x0034, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableDataACK(bool enable) {
-  setBit(0x0034, 2, !enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(0x0035, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(0x0035, 0, enable);
-}
-unsigned
-AnytoneCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0036);
-}
-void
-AnytoneCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0036, idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(0x003a);
-}
-void
-AnytoneCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x003a, idx);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::multipleKeyEncryption() const {
-  return getBit(0x003b, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
-  setBit(0x003b, 0, enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::randomKey() const {
-  return getBit(0x003b, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRandomKey(bool enable) {
-  setBit(0x003b, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::sms() const {
-  return !getBit(0x003b, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
-  setBit(0x003b, 0, !enable);
-}
-
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
@@ -706,13 +629,10 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
     dch->setAnytoneChannelExtension(ext);
     ext->enableCallConfirm(callConfirm());
-    ext->enableSMS(sms());
     ext->enableSMSConfirm(smsConfirm());
-    ext->enableDataACK(dataACK());
     ext->enableSimplexTDMA(simplexTDMA());
     ext->enableAdaptiveTDMA(adaptiveTDMA());
     ext->enableLoneWorker(loneWorker());
-    ext->enableThroughMode(throughMode());
     // Done
     ch = dch;
   } else {
@@ -758,12 +678,6 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-
-    // Link to GPS system
-    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
-      logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
@@ -865,15 +779,6 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       clearGroupListIndex();
     else
       setGroupListIndex(ctx.index(dc->groupListObj()));
-    // Set GPS system index
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXDigitalAPRS(true);
-      enableRXAPRS(false);
-    } else {
-      enableTXDigitalAPRS(false);
-      enableRXAPRS(false);
-    }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
       if (nullptr == ctx.config()->radioIDs()->defaultId()) {
@@ -891,13 +796,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       enableTalkaround(ext->talkaround());
       // Apply DMR settings
       enableCallConfirm(ext->callConfirm());
-      enableSMS(ext->sms());
       enableSMSConfirm(ext->smsConfirm());
-      enableDataACK(ext->dataACK());
       enableSimplexTDMA(ext->simplexTDMA());
       enableAdaptiveTDMA(ext->adaptiveTDMA());
       enableLoneWorker(ext->loneWorker());
-      enableThroughMode(ext->throughMode());
     }
   }
 

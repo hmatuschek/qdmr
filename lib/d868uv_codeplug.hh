@@ -5,7 +5,6 @@
 
 #include "anytone_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 class Channel;
 class DMRContact;
@@ -191,6 +190,69 @@ class D868UVCodeplug : public AnytoneCodeplug
   Q_OBJECT
 
 public:
+  /** Represents the channel element for AnyTone D868UV devices.
+   *  This class derives from @c AnytoneCodeplug::ChannelElement and implements the device-specific
+   *  encoding of channels for the AnyTone D868UV.
+   *
+   *  Memory layout of the encoded channel element (size 0x0040 bytes):
+   *  @verbinclude d868uv_channel.txt */
+  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    ChannelElement(uint8_t *ptr);
+
+    /** Returns @c true if ranging is enabled. */
+    virtual bool ranging() const;
+    /** Enables/disables ranging. */
+    virtual void enableRanging(bool enable);
+    /** Returns @c true if through mode is enabled. */
+    virtual bool throughMode() const;
+    /** Enables/disables though mode. */
+    virtual void enableThroughMode(bool enable);
+    /** Returns @c true if data ACK is enabled. */
+    virtual bool dataACK() const;
+    /** Enables/disables data ACK. */
+    virtual void enableDataACK(bool enable);
+
+    /** Returns @c true if TX APRS is enabled. */
+    virtual bool txDigitalAPRS() const;
+    /** Enables/disables TX APRS. */
+    virtual void enableTXDigitalAPRS(bool enable);
+    /** Returns the DMR APRS system index. */
+    virtual unsigned digitalAPRSSystemIndex() const;
+    /** Sets the DMR APRS system index. */
+    virtual void setDigitalAPRSSystemIndex(unsigned idx);
+
+    /** Returns the DMR encryption key index (+1), 0=Off. */
+    virtual unsigned dmrEncryptionKeyIndex() const;
+    /** Sets the DMR encryption key index (+1), 0=Off. */
+    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    /** Returns @c true if multiple key encryption is enabled. */
+    virtual bool multipleKeyEncryption() const;
+    /** Enables/disables multiple key encryption. */
+    virtual void enableMultipleKeyEncryption(bool enable);
+    /** Returns @c true if random key is enabled. */
+    virtual bool randomKey() const;
+    /** Enables/disables random key. */
+    virtual void enableRandomKey(bool enable);
+    /** Returns @c true if SMS is enabled. */
+    virtual bool sms() const;
+    /** Enables/disables SMS. */
+    virtual void enableSMS(bool enable);
+
+    /** Constructs a generic @c Channel object from the codeplug channel. */
+    virtual Channel *toChannelObj(Context &ctx) const;
+    /** Links a previously constructed channel to the rest of the configuration. */
+    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    /** Initializes this codeplug channel from the given generic configuration. */
+    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+  };
+
   /** Represents the general config of the radio within the D868UV binary codeplug.
    *
    * This class only implements the differences to the generic
@@ -442,7 +504,7 @@ protected:
   /** Link GPS systems. */
   virtual bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Allocate refab SMS messages. */
+  /** Allocate prefab SMS messages. */
   virtual void allocateSMSMessages();
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();

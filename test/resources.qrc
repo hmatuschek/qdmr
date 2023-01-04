@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>testconfig.conf</file>
+        <file>data/config_test.yaml</file>
     </qresource>
 </RCC>
