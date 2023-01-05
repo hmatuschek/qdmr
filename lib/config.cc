@@ -23,7 +23,8 @@ Config::Config(QObject *parent)
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
+    _gpsSystems(new PositioningSystems(this)),
+    _roamingChannels(new RoamingChannelList(this)), _roaming(new RoamingZoneList(this)),
     _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
@@ -48,6 +49,9 @@ Config::Config(QObject *parent)
   connect(_gpsSystems, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_gpsSystems, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_gpsSystems, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_roaming, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
@@ -69,6 +73,7 @@ Config::copy(const ConfigItem &other) {
   _zones->copy(*conf->zones());
   _scanlists->copy(*conf->scanlists());
   _gpsSystems->copy(*conf->posSystems());
+  _roamingChannels->copy(*conf->roamingChannels());
   _roaming->copy(*conf->roaming());
 
   return true;
@@ -146,6 +151,11 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
       return false;
   }
 
+  if (_roamingChannels->count()) {
+    if ((node["roaming"] = _roamingChannels->serialize(context, err)).IsNull())
+      return false;
+  }
+
   if (_roaming->count()) {
     if ((node["roaming"] = _roaming->serialize(context, err)).IsNull())
       return false;
@@ -195,6 +205,11 @@ Config::scanlists() const {
 PositioningSystems *
 Config::posSystems() const {
   return _gpsSystems;
+}
+
+RoamingChannelList *
+Config::roamingChannels() const {
+  return _roamingChannels;
 }
 
 RoamingZoneList *
@@ -248,6 +263,7 @@ Config::clear() {
   _zones->clear();
   _scanlists->clear();
   _gpsSystems->clear();
+  _roamingChannels->clear();
   _roaming->clear();
 
   emit modified(this);
@@ -374,6 +390,8 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
   if (node["scanLists"] && (! _scanlists->parse(node["scanLists"], ctx, err)))
     return false;
   if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx, err)))
+    return false;
+  if (node["roamingChannels"] && (! _roamingChannels->parse(node["roamingChannels"], ctx, err)))
     return false;
   if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
     return false;

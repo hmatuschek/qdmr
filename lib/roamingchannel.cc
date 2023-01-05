@@ -1,5 +1,8 @@
 #include "roamingchannel.hh"
 
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannel
+ * ********************************************************************************************* */
 RoamingChannel::RoamingChannel(QObject *parent)
   : ConfigObject("rc", parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
     _colorCode(0), _overrideTimeSlot(false), _timeSlot(DMRChannel::TimeSlot::TS1)
@@ -19,6 +22,16 @@ RoamingChannel::clear() {
   _rxFrequency = _txFrequency = 0;
   _overrideColorCode = false; _colorCode = 0;
   _overrideTimeSlot = false; _timeSlot = DMRChannel::TimeSlot::TS1;
+}
+
+ConfigItem *
+RoamingChannel::clone() const {
+  RoamingChannel *c = new RoamingChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
 }
 
 double
@@ -90,4 +103,45 @@ RoamingChannel::setTimeSlot(DMRChannel::TimeSlot ts) {
     return;
   _timeSlot = ts;
   emit modified(this);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelList
+ * ********************************************************************************************* */
+RoamingChannelList::RoamingChannelList(QObject *parent)
+  : ConfigObjectList(RoamingChannel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+RoamingChannel *
+RoamingChannelList::channel(int idx) const {
+  if (ConfigItem *obj = get(idx))
+    return obj->as<RoamingChannel>();
+  return nullptr;
+}
+
+int
+RoamingChannelList::add(ConfigObject *obj, int row) {
+  if (obj && obj->is<RoamingChannel>())
+    return ConfigObjectList::add(obj, row);
+  return -1;
+}
+
+ConfigItem *
+RoamingChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
+  if (! node)
+    return nullptr;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot create roaming zone: Expected object.";
+    return nullptr;
+  }
+
+  return new RoamingChannel();
 }

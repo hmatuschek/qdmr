@@ -35,6 +35,7 @@ public:
   /** Copy constructor. */
   RoamingChannel(const RoamingChannel &other, QObject *parent=nullptr);
 
+  ConfigItem *clone() const;
   void clear();
 
   /** Returns the RX frequency in MHz. */
@@ -77,6 +78,27 @@ protected:
   bool _overrideTimeSlot;
   /** If @c _overrideTimeSlot is @c true, specifies the time slot. */
   DMRChannel::TimeSlot _timeSlot;
+};
+
+
+/** Represents the list of roaming channels within the abstract device configuration.
+ *
+ * @ingroup config */
+class RoamingChannelList: public ConfigObjectList
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RoamingChannelList(QObject *parent=nullptr);
+
+  /** Returns the roaming channel at the given index. */
+  RoamingChannel *channel(int idx) const;
+
+  int add(ConfigObject *obj, int row=-1);
+
+public:
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // ROAMINGCHANNEL_HH

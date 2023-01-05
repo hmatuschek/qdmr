@@ -47,6 +47,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
+#include "roamingchannel.hh"
 #include "roaming.hh"
 #include "radioid.hh"
 #include "radiosettings.hh"
@@ -83,6 +84,8 @@ class Config : public ConfigItem
   Q_PROPERTY(ScanLists* scanLists READ scanlists SCRIPTABLE false)
   /** The list of positioning systems. */
   Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
+  /** The list of roaming channels. */
+  Q_PROPERTY(RoamingChannelList* roamingChannels READ roamingChannels SCRIPTABLE false)
   /** The list of roaming zones. */
   Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
 
@@ -119,6 +122,8 @@ public:
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
   PositioningSystems *posSystems() const;
+  /** Returns the list of roaming channels. */
+  RoamingChannelList *roamingChannels() const;
   /** Returns the list of roaming zones. */
   RoamingZoneList *roaming() const;
 
@@ -184,6 +189,8 @@ protected:
   ScanLists *_scanlists;
   /** The list of GPS Systems. */
   PositioningSystems *_gpsSystems;
+  /** The list of roaming channels. */
+  RoamingChannelList *_roamingChannels;
   /** The list of roaming zones. */
   RoamingZoneList *_roaming;
   /** Owns the TyT settings extension. */
