@@ -44,15 +44,15 @@ RoamingZone::clear() {
   _channel.clear();
 }
 
-DMRChannel *
+RoamingChannel*
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
     return nullptr;
-  return _channel.get(idx)->as<DMRChannel>();
+  return _channel.get(idx)->as<RoamingChannel>();
 }
 
 int
-RoamingZone::addChannel(DMRChannel *ch, int row) {
+RoamingZone::addChannel(RoamingChannel* ch, int row) {
   row = _channel.add(ch, row);
   if (0 > row)
     return row;
@@ -66,16 +66,16 @@ RoamingZone::remChannel(int row) {
 }
 
 bool
-RoamingZone::remChannel(DMRChannel *ch) {
+RoamingZone::remChannel(RoamingChannel* ch) {
   return _channel.del(ch);
 }
 
-const DMRChannelRefList *
+const RoamingChannelRefList *
 RoamingZone::channels() const {
   return &_channel;
 }
 
-DMRChannelRefList *
+RoamingChannelRefList*
 RoamingZone::channels() {
   return &_channel;
 }
@@ -107,23 +107,6 @@ RoamingZoneList::RoamingZoneList(QObject *parent)
   : ConfigObjectList(RoamingZone::staticMetaObject, parent)
 {
   // pass...
-}
-
-QSet<DMRChannel *>
-RoamingZoneList::uniqueChannels() const {
-  QSet<DMRChannel *> channels;
-  uniqueChannels(channels);
-  return channels;
-}
-
-void
-RoamingZoneList::uniqueChannels(QSet<DMRChannel *> &channels) const {
-  for (int i=0; i<count(); i++) {
-    RoamingZone *zone = this->zone(i);
-    for (int j=0; j<zone->count(); j++) {
-      channels.insert(zone->channel(j));
-    }
-  }
 }
 
 RoamingZone *

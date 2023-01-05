@@ -206,6 +206,16 @@ DMRChannelRefList::DMRChannelRefList(QObject *parent)
 
 
 /* ********************************************************************************************* *
+ * Implementation of RoamingChannelRefList
+ * ********************************************************************************************* */
+RoamingChannelRefList::RoamingChannelRefList(QObject *parent)
+  : ChannelRefList(RoamingChannel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ScanListReference
  * ********************************************************************************************* */
 ScanListReference::ScanListReference(QObject *parent)

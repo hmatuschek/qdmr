@@ -173,7 +173,7 @@ public:
 };
 
 
-/** Represents a list of references to some digital channels.
+/** Represents a list of references to some DMR channels.
  * @ingroup config */
 class DMRChannelRefList: public ChannelRefList
 {
@@ -182,6 +182,18 @@ class DMRChannelRefList: public ChannelRefList
 public:
   /** Empty constructor. */
   explicit DMRChannelRefList(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of references to some roaming channels.
+ * @ingroup config */
+class RoamingChannelRefList: public ChannelRefList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RoamingChannelRefList(QObject *parent=nullptr);
 };
 
 

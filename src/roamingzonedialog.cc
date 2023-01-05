@@ -53,7 +53,7 @@ RoamingZoneDialog::onAddChannel() {
       continue;
     if (channel->is<FMChannel>())
       continue;
-    _myZone->addChannel(channel->as<DMRChannel>());
+    _myZone->addChannel(RoamingChannel::fromDMRChannel(channel->as<DMRChannel>()));
   }
 }
 

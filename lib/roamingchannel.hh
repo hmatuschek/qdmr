@@ -65,6 +65,11 @@ public:
   /** Sets the time slot. */
   void setTimeSlot(DMRChannel::TimeSlot ts);
 
+public:
+  /** Helper method to construct a Roaming channel from a given DMR channel. Optionally with
+   * reference to a thid one. */
+  static RoamingChannel *fromDMRChannel(DMRChannel *ch, DMRChannel *ref=nullptr);
+
 protected:
   /** Holds the RX frequency in MHz. */
   double _rxFrequency;

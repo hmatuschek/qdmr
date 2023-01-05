@@ -62,7 +62,7 @@ RoamingZoneListView::onGenRoamingZone() {
     if (nullptr == dch)
       continue;
     if (contacts.contains(dch->txContactObj()))
-      zone->addChannel(dch);
+      zone->addChannel(RoamingChannel::fromDMRChannel(dch));
   }
 
   RoamingZoneDialog dialog(_config, zone);

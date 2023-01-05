@@ -1182,9 +1182,9 @@ public:
     virtual void setName(const QString &name);
 
     /** Constructs a roaming channel from the given digital channel. */
-    virtual bool fromChannel(const DMRChannel *ch);
-    /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
-    virtual DMRChannel *toChannel(Context &ctx);
+    virtual bool fromChannel(const RoamingChannel *ch);
+    /** Constructs a @c RoamingChannel instance for this roaming channel. */
+    virtual RoamingChannel *toChannel(Context &ctx);
   };
 
   /** Represents a roaming zone within the binary codeplug.
@@ -1219,11 +1219,11 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DMRChannel *, unsigned> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, Context& ctx);
     /** Constructs a @c RoamingZone instance from this configuration. */
     virtual RoamingZone *toRoamingZone() const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DMRChannel *> &map);
+    virtual bool linkRoamingZone(RoamingZone *zone, Context& ctx);
   };
 
   /** Represents an AES encryption key.

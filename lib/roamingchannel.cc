@@ -105,6 +105,23 @@ RoamingChannel::setTimeSlot(DMRChannel::TimeSlot ts) {
   emit modified(this);
 }
 
+RoamingChannel *
+RoamingChannel::fromDMRChannel(DMRChannel *ch, DMRChannel* ref) {
+  RoamingChannel *rch = new RoamingChannel();
+  rch->setRXFrequency(ch->rxFrequency());
+  rch->setTXFrequency(ch->txFrequency());
+  rch->overrideColorCode(true);
+  rch->setColorCode(ch->colorCode());
+  rch->overrideTimeSlot(true);
+  rch->setTimeSlot(ch->timeSlot());
+  if (nullptr != ref) {
+    if (ch->colorCode() == ref->colorCode())
+      rch->overrideColorCode(false);
+    if (ch->timeSlot() == ref->timeSlot())
+      rch->overrideTimeSlot(false);
+  }
+  return rch;
+}
 
 
 /* ********************************************************************************************* *

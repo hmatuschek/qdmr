@@ -16,7 +16,7 @@ class RoamingZone : public ConfigObject
   Q_OBJECT
 
   /** The channels in the roaming zone. */
-  Q_PROPERTY(DMRChannelRefList * channels READ channels)
+  Q_PROPERTY(RoamingChannelRefList * channels READ channels)
 
 public:
   /** Default constructor. */
@@ -37,27 +37,27 @@ public:
   /** Clears the zone list. */
   void clear();
 
-  /** Returns the digital channel, which is the member at index @c idx (0-based).
+  /** Returns the roaming channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
-  DMRChannel *channel(int idx) const;
+  RoamingChannel *channel(int idx) const;
   /** Adds a channel to the roaming zone.
    * @param ch Specifies the channel to add.
    * @param row Speicifies the index where to insert the channel
    *        (optional, default insert at end). */
-  int addChannel(DMRChannel *ch, int row=-1);
+  int addChannel(RoamingChannel *ch, int row=-1);
   /** Removes the channel from the roaming zone at index @c row. */
   bool remChannel(int row);
   /** Removes the given channel from the roaming zone. */
-  bool remChannel(DMRChannel *ch);
+  bool remChannel(RoamingChannel *ch);
 
   /** Returns the list of digital channels in this roaming zone. */
-  const DMRChannelRefList *channels() const;
+  const RoamingChannelRefList *channels() const;
   /** Returns the list of digital channels in this roaming zone. */
-  DMRChannelRefList *channels();
+  RoamingChannelRefList *channels();
 
 protected:
   /** Holds the actual channels of the roaming zone. */
-  DMRChannelRefList _channel;
+  RoamingChannelRefList _channel;
 };
 
 
@@ -94,11 +94,6 @@ class RoamingZoneList: public ConfigObjectList
 public:
   /** Constructor. */
   explicit RoamingZoneList(QObject *parent=nullptr);
-
-  /** Returns a set of unique channels used in all roaming zones. */
-  QSet<DMRChannel *> uniqueChannels() const;
-  /** Adds all channels of all roaming zones to the given set. */
-  void uniqueChannels(QSet<DMRChannel *> &channels) const;
 
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;
