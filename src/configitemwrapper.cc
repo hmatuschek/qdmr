@@ -482,6 +482,28 @@ ChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int 
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelRefListWrapper
+ * ********************************************************************************************* */
+RoamingChannelRefListWrapper::RoamingChannelRefListWrapper(RoamingChannelRefList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+RoamingChannelRefListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<RoamingChannel>()->name();
+}
+
+QVariant
+RoamingChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("Roaming Channel");
+}
 
 
 /* ********************************************************************************************* *

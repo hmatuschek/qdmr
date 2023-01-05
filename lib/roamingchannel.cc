@@ -108,6 +108,7 @@ RoamingChannel::setTimeSlot(DMRChannel::TimeSlot ts) {
 RoamingChannel *
 RoamingChannel::fromDMRChannel(DMRChannel *ch, DMRChannel* ref) {
   RoamingChannel *rch = new RoamingChannel();
+  rch->setName(QString("R %1").arg(ch->name()));
   rch->setRXFrequency(ch->rxFrequency());
   rch->setTXFrequency(ch->txFrequency());
   rch->overrideColorCode(true);

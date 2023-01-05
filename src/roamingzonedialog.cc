@@ -2,6 +2,7 @@
 #include "settings.hh"
 #include "config.hh"
 #include "channelselectiondialog.hh"
+#include <QMessageBox>
 
 
 RoamingZoneDialog::RoamingZoneDialog(Config *config, QWidget *parent)
@@ -29,7 +30,7 @@ RoamingZoneDialog::construct() {
   Settings settings;
 
   zoneName->setText(_myZone->name());
-  channelListView->setModel(new ChannelRefListWrapper(_myZone->channels(), channelListView));
+  channelListView->setModel(new RoamingChannelRefListWrapper(_myZone->channels(), channelListView));
 
   extensionView->setObjectName("roamingZoneExtension");
   extensionView->setObject(_myZone, _config);
@@ -51,7 +52,7 @@ RoamingZoneDialog::onAddChannel() {
   foreach (Channel *channel, lst) {
     if (0 <= _myZone->channels()->indexOf(channel))
       continue;
-    if (channel->is<FMChannel>())
+    if (! channel->is<DMRChannel>())
       continue;
     _myZone->addChannel(RoamingChannel::fromDMRChannel(channel->as<DMRChannel>()));
   }
@@ -59,13 +60,18 @@ RoamingZoneDialog::onAddChannel() {
 
 void
 RoamingZoneDialog::onRemChannel() {
-  if (! channelListView->hasSelection())
+  if (! channelListView->hasSelection()) {
+    QMessageBox::information(nullptr, tr("Cannot remove channels."),
+                             tr("Cannot remove channels. Select at least one channel first."),
+                             QMessageBox::Close, QMessageBox::Close);
     return;
+  }
+
   QPair<int, int> selection = channelListView->selection();
-  QList<DMRChannel *> channels;
+  QList<RoamingChannel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
-    channels.push_back(_myZone->channels()->get(i)->as<DMRChannel>());
-  foreach (DMRChannel *channel, channels) {
+    channels.push_back(_myZone->channels()->get(i)->as<RoamingChannel>());
+  foreach (RoamingChannel *channel, channels) {
     _myZone->channels()->del(channel);
   }
 }

@@ -152,7 +152,7 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
   }
 
   if (_roamingChannels->count()) {
-    if ((node["roaming"] = _roamingChannels->serialize(context, err)).IsNull())
+    if ((node["roamingChannels"] = _roamingChannels->serialize(context, err)).IsNull())
       return false;
   }
 
