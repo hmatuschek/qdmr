@@ -162,11 +162,11 @@ UV390Codeplug::ChannelElement::enableDCDMLeader(bool enable) {
 
 
 Channel *
-UV390Codeplug::ChannelElement::toChannelObj() const {
+UV390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
   if (! isValid())
     return nullptr;
 
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj(err);
   if (nullptr == ch)
     return nullptr;
 

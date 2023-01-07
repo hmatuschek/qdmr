@@ -139,10 +139,10 @@ MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       continue;
-    if (Channel *obj = chan.toChannelObj()) {
+    if (Channel *obj = chan.toChannelObj(err)) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invalid channel at index %" << i << ".";
+      errMsg(err) << "Invalid channel at index " << i << ".";
       return false;
     }
   }

@@ -420,9 +420,11 @@ TyTCodeplug::ChannelElement::setName(const QString &name) {
 }
 
 Channel *
-TyTCodeplug::ChannelElement::toChannelObj() const {
-  if (! isValid())
+TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid channel.";
     return nullptr;
+  }
 
   Channel *ch = nullptr;
   TyTChannelExtension *ex = new TyTChannelExtension();
@@ -469,6 +471,9 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
 
     // done
     ch = dch;
+  } else {
+    errMsg(err) << "Cannot decode channel. Channel type " << mode() << " unknown!";
+    return nullptr;
   }
 
   // Common settings
