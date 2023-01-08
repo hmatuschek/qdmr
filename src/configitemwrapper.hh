@@ -122,6 +122,24 @@ public:
 };
 
 
+class RoamingChannelListWrapper: public GenericTableWrapper
+{
+  Q_OBJECT
+
+public:
+  RoamingChannelListWrapper(RoamingChannelList *list, QObject *parent=nullptr);
+
+public:
+  // Implementation of QAbstractTableModel
+  /** Returns the number of columns, implements the QAbstractTableModel. */
+  int columnCount(const QModelIndex &index) const;
+  /** Returns the cell data at given index, implements the QAbstractTableModel. */
+  QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
+  /** Implementation of QAbstractListModel, returns the header data at the given section. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+};
+
+
 class RoamingChannelRefListWrapper: public GenericListWrapper
 {
   Q_OBJECT

@@ -4,7 +4,7 @@ SET(qdmr_SOURCES main.cc
 	analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
   ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc
-  aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc searchpopup.cc
+  aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc searchpopup.cc
   configobjectlistview.cc configobjecttableview.cc
   generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
@@ -17,7 +17,7 @@ SET(qdmr_MOC_HEADERS
 	analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
   ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
-  aprssystemdialog.hh releasenotes.hh roamingzonedialog.hh searchpopup.hh
+  aprssystemdialog.hh releasenotes.hh roamingzonedialog.hh roamingchannellistview.hh searchpopup.hh
   configobjectlistview.hh configobjecttableview.hh
   generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
@@ -27,7 +27,7 @@ SET(qdmr_MOC_HEADERS
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
-  gpssystemdialog.ui aprssystemdialog.ui roamingzonedialog.ui
+  gpssystemdialog.ui aprssystemdialog.ui roamingzonedialog.ui roamingchannellistview.ui
   configobjectlistview.ui configobjecttableview.ui
   generalsettingsview.ui radioidlistview.ui contactlistview.ui grouplistsview.ui channellistview.ui
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui

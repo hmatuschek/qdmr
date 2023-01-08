@@ -54,7 +54,9 @@ RoamingZoneDialog::onAddChannel() {
       continue;
     if (! channel->is<DMRChannel>())
       continue;
-    _myZone->addChannel(RoamingChannel::fromDMRChannel(channel->as<DMRChannel>()));
+    RoamingChannel *rch = RoamingChannel::fromDMRChannel(channel->as<DMRChannel>());
+    _config->roamingChannels()->add(rch);
+    _myZone->addChannel(rch);
   }
 }
 

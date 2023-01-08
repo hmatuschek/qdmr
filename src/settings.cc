@@ -216,6 +216,16 @@ Settings::setHideGPSNote(bool hide) {
 }
 
 bool
+Settings::hideRoamingChannelNote() const {
+  return value("hideRoamingChannelNote", false).toBool();
+}
+
+void
+Settings::setHideRoamingChannelNote(bool hide) {
+  setValue("hideRoamingChannelNote", hide);
+}
+
+bool
 Settings::hideRoamingNote() const {
   return value("hideRoamingNote", false).toBool();
 }

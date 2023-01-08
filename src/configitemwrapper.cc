@@ -483,6 +483,67 @@ ChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int 
 
 
 /* ********************************************************************************************* *
+ * Implementation of RoamingChannelListWrapper
+ * ********************************************************************************************* */
+RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index);
+  return 5;
+}
+
+QVariant
+RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+
+  RoamingChannel *ch = _list->get(index.row())->as<RoamingChannel>();
+
+  // Dispatch by column
+  switch (index.column()) {
+  case 0: return ch->name();
+  case 1: return ch->rxFrequency();
+  case 2: return ch->txFrequency();
+  case 3:
+    if (ch->colorCodeOverridden())
+      return ch->colorCode();
+    return tr("[Selected]");
+  case 4:
+    if (ch->timeSlotOverridden()) {
+      switch(ch->timeSlot()) {
+      case DMRChannel::TimeSlot::TS1: return 1;
+      case DMRChannel::TimeSlot::TS2: return 2;
+      }
+    }
+    return tr("[Selected]");
+  default: break;
+  }
+
+  return QVariant();
+}
+
+QVariant
+RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  switch (section) {
+  case 0: return tr("Name");
+  case 1: return tr("RX Frequency");
+  case 2: return tr("TX Frequency");
+  case 3: return tr("TS");
+  case 4: return tr("CC");
+  default: break;
+  }
+  return QVariant();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RoamingChannelRefListWrapper
  * ********************************************************************************************* */
 RoamingChannelRefListWrapper::RoamingChannelRefListWrapper(RoamingChannelRefList *list, QObject *parent)

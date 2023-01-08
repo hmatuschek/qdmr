@@ -34,6 +34,7 @@
 #include "zonelistview.hh"
 #include "scanlistsview.hh"
 #include "positioningsystemlistview.hh"
+#include "roamingchannellistview.hh"
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
 #include "extensionview.hh"
@@ -275,8 +276,12 @@ Application::createMainWindow() {
   tabs->addTab(_posSysList, tr("GPS/APRS"));
 
   // Wire-up "Roaming Zone List" view
+  _roamingChannelList = new RoamingChannelListView(_config);
+  tabs->addTab(_roamingChannelList, tr("Roaming Channels"));
+
+  // Wire-up "Roaming Zone List" view
   _roamingZoneList = new RoamingZoneListView(_config);
-  tabs->addTab(_roamingZoneList, tr("Roaming"));
+  tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
 
   // Wire-up "extension view"
   _extensionView = new ExtensionView();

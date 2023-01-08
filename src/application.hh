@@ -22,6 +22,7 @@ class ChannelListView;
 class ZoneListView;
 class ScanListsView;
 class PositioningSystemListView;
+class RoamingChannelListView;
 class RoamingZoneListView;
 class ExtensionView;
 
@@ -92,6 +93,7 @@ protected:
   ZoneListView *_zoneList;
   ScanListsView *_scanLists;
   PositioningSystemListView *_posSysList;
+  RoamingChannelListView *_roamingChannelList;
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 
