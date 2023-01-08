@@ -90,8 +90,8 @@ DigitalChannelDialog::construct() {
   roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
   if (_myChannel && (_myChannel->roamingZone() == DefaultRoamingZone::get()))
     roaming->setCurrentIndex(1);
-  for (int i=0; i<_config->roaming()->count(); i++) {
-    RoamingZone *zone = _config->roaming()->zone(i);
+  for (int i=0; i<_config->roamingZones()->count(); i++) {
+    RoamingZone *zone = _config->roamingZones()->zone(i);
     roaming->addItem(zone->name(), QVariant::fromValue(zone));
     if (_myChannel && (_myChannel->roamingZone() == zone))
       roaming->setCurrentIndex(i+2);

@@ -2660,8 +2660,8 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i+1);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i+1);
 
   return true;
 }

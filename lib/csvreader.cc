@@ -2274,7 +2274,7 @@ CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64
   if (! _roamingZones.contains(idx)) {
     RoamingZone *zone = new RoamingZone(name);
     _roamingZones[idx] = zone;
-    _config->roaming()->add(zone);
+    _config->roamingZones()->add(zone);
   }
 
   return true;

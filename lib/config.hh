@@ -87,7 +87,7 @@ class Config : public ConfigItem
   /** The list of roaming channels. */
   Q_PROPERTY(RoamingChannelList* roamingChannels READ roamingChannels SCRIPTABLE false)
   /** The list of roaming zones. */
-  Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
+  Q_PROPERTY(RoamingZoneList* roamingZones READ roamingZones SCRIPTABLE false)
 
   /** Represents the config extension for encryption keys. */
   Q_PROPERTY(CommercialExtension* commercial READ commercialExtension)
@@ -125,7 +125,7 @@ public:
   /** Returns the list of roaming channels. */
   RoamingChannelList *roamingChannels() const;
   /** Returns the list of roaming zones. */
-  RoamingZoneList *roaming() const;
+  RoamingZoneList *roamingZones() const;
 
   /** Returns @c true if one of the digital channels has a roaming zone assigned. */
   bool requiresRoaming() const;

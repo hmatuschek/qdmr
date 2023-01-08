@@ -3958,8 +3958,8 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i);
 
   return true;
 }

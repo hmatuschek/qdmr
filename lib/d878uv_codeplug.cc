@@ -2195,7 +2195,7 @@ D878UVCodeplug::setBitmaps(Config *config)
   // Mark roaming zones
   uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
   memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  for (int i=0; i<config->roaming()->count(); i++)
+  for (int i=0; i<config->roamingZones()->count(); i++)
     roaming_zone_bitmap[i/8] |= (1<<(i%8));
 
   // Mark roaming channels
@@ -2530,13 +2530,13 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack
   }
 
   // Encode roaming zones
-  for (int i=0; i<ctx.config()->roaming()->count(); i++){
+  for (int i=0; i<ctx.config()->roamingZones()->count(); i++){
     uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
     RoamingZoneElement zone(data(addr));
-    logDebug() << "Encode roaming zone " << ctx.config()->roaming()->zone(i)->name()
+    logDebug() << "Encode roaming zone " << ctx.config()->roamingZones()->zone(i)->name()
                << " (" << (i+1) << ") at " << QString::number(addr, 16)
-               << " with " << ctx.config()->roaming()->zone(i)->count() << " elements.";
-    zone.fromRoamingZone(ctx.config()->roaming()->zone(i), ctx);
+               << " with " << ctx.config()->roamingZones()->zone(i)->count() << " elements.";
+    zone.fromRoamingZone(ctx.config()->roamingZones()->zone(i), ctx);
   }
 
   return true;
@@ -2567,7 +2567,7 @@ D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
     RoamingZoneElement z(data(addr));
     RoamingZone *zone = z.toRoamingZone();
-    ctx.config()->roaming()->add(zone); ctx.add(zone, i);
+    ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);
     z.linkRoamingZone(zone, ctx);
   }
 

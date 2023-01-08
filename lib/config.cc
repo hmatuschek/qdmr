@@ -74,7 +74,7 @@ Config::copy(const ConfigItem &other) {
   _scanlists->copy(*conf->scanlists());
   _gpsSystems->copy(*conf->posSystems());
   _roamingChannels->copy(*conf->roamingChannels());
-  _roamingZones->copy(*conf->roaming());
+  _roamingZones->copy(*conf->roamingZones());
 
   return true;
 }
@@ -213,7 +213,7 @@ Config::roamingChannels() const {
 }
 
 RoamingZoneList *
-Config::roaming() const {
+Config::roamingZones() const {
   return _roamingZones;
 }
 
