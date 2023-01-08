@@ -187,7 +187,7 @@ public:
 
 /** Represents a list of references to some roaming channels.
  * @ingroup config */
-class RoamingChannelRefList: public ChannelRefList
+class RoamingChannelRefList: public ConfigObjectRefList
 {
   Q_OBJECT
 

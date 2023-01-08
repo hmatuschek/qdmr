@@ -15,8 +15,10 @@ class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
-  /** The channels in the roaming zone. */
-  Q_PROPERTY(RoamingChannelRefList * channels READ channels)
+  /** The channels in the roaming zone.
+   * @todo This property is marked non-scriptable to handle references to DMR channels before
+   *       version 0.11.0. Remove in future. */
+  Q_PROPERTY(RoamingChannelRefList * channels READ channels SCRIPTABLE false)
 
 public:
   /** Default constructor. */
@@ -54,6 +56,13 @@ public:
   const RoamingChannelRefList *channels() const;
   /** Returns the list of digital channels in this roaming zone. */
   RoamingChannelRefList *channels();
+
+  /** Links the channel reference list.
+   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err);
+  /** Serializes the channel reference list.
+   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
   /** Holds the actual channels of the roaming zone. */

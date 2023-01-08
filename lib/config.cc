@@ -157,7 +157,7 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
   }
 
   if (_roaming->count()) {
-    if ((node["roaming"] = _roaming->serialize(context, err)).IsNull())
+    if ((node["roamingZones"] = _roaming->serialize(context, err)).IsNull())
       return false;
   }
 
@@ -393,7 +393,10 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     return false;
   if (node["roamingChannels"] && (! _roamingChannels->parse(node["roamingChannels"], ctx, err)))
     return false;
-  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
+  if (node["roamingZones"] && (! _roaming->parse(node["roamingZones"], ctx, err)))
+    return false;
+  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  else if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
     return false;
 
   // also parses extensions
