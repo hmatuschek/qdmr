@@ -19,7 +19,8 @@ public:
 protected slots:
   void construct();
 
-  void onAddChannel();
+  void onAddRoamingChannel();
+  void onAddDMRChannel();
   void onRemChannel();
 
 protected:

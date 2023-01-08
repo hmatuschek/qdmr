@@ -1,5 +1,5 @@
 ---
-version: 0.10.2
+version: 0.11.0
 settings:
   introLine1: qDMR
   introLine2: DM3MAT
@@ -55,7 +55,7 @@ channels:
       id: ch1
       name: DB0LDS TS1
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -71,7 +71,7 @@ channels:
       id: ch2
       name: Sa/Th DB0LDS TS1
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -87,7 +87,7 @@ channels:
       id: ch3
       name: TG8 DB0LDS TS2
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -103,7 +103,7 @@ channels:
       id: ch4
       name: TG9 DB0LDS TS2
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -119,7 +119,7 @@ channels:
       id: ch5
       name: BB DB0LDS TS2
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -136,7 +136,7 @@ channels:
       id: ch6
       name: HRV DB0LDS TS1
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -152,7 +152,7 @@ channels:
       id: ch7
       name: ChW DB0LDS TS1
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -167,8 +167,8 @@ channels:
   - digital:
       id: ch8
       name: DM0TZN TS1
-      rxFrequency: 438.825
-      txFrequency: 431.225
+      rxFrequency: 438.82499999999999
+      txFrequency: 431.22500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -183,8 +183,8 @@ channels:
   - digital:
       id: ch9
       name: TG8 DM0TZN TS2
-      rxFrequency: 438.825
-      txFrequency: 431.225
+      rxFrequency: 438.82499999999999
+      txFrequency: 431.22500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -199,8 +199,8 @@ channels:
   - digital:
       id: ch10
       name: TG9 DM0TZN TS2
-      rxFrequency: 438.825
-      txFrequency: 431.225
+      rxFrequency: 438.82499999999999
+      txFrequency: 431.22500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -215,8 +215,8 @@ channels:
   - digital:
       id: ch11
       name: BB DM0TZN TS2
-      rxFrequency: 438.825
-      txFrequency: 431.225
+      rxFrequency: 438.82499999999999
+      txFrequency: 431.22500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -231,7 +231,7 @@ channels:
   - digital:
       id: ch12
       name: DB0LOS TS1
-      rxFrequency: 438.475
+      rxFrequency: 438.47500000000002
       txFrequency: 430.875
       rxOnly: false
       admit: ColorCode
@@ -247,7 +247,7 @@ channels:
   - digital:
       id: ch13
       name: R/TG9 DB0LOS TS2
-      rxFrequency: 438.475
+      rxFrequency: 438.47500000000002
       txFrequency: 430.875
       rxOnly: false
       admit: ColorCode
@@ -263,8 +263,8 @@ channels:
   - digital:
       id: ch14
       name: R/TG9 DM0TT TS1
-      rxFrequency: 439.0875
-      txFrequency: 431.4875
+      rxFrequency: 439.08749999999998
+      txFrequency: 431.48750000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -279,8 +279,8 @@ channels:
   - digital:
       id: ch15
       name: TG8 DM0TT TS2
-      rxFrequency: 439.0875
-      txFrequency: 431.4875
+      rxFrequency: 439.08749999999998
+      txFrequency: 431.48750000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -295,8 +295,8 @@ channels:
   - digital:
       id: ch16
       name: TG9 DM0TT TS2
-      rxFrequency: 439.0875
-      txFrequency: 431.4875
+      rxFrequency: 439.08749999999998
+      txFrequency: 431.48750000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -311,8 +311,8 @@ channels:
   - digital:
       id: ch17
       name: BB DM0TT TS2
-      rxFrequency: 439.0875
-      txFrequency: 431.4875
+      rxFrequency: 439.08749999999998
+      txFrequency: 431.48750000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -327,7 +327,7 @@ channels:
   - digital:
       id: ch18
       name: TG9 DB0KK TS1
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -343,7 +343,7 @@ channels:
   - digital:
       id: ch19
       name: BB DB0KK TS2
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -360,7 +360,7 @@ channels:
       id: ch20
       name: DB0OUD TS1
       rxFrequency: 438.625
-      txFrequency: 431.025
+      txFrequency: 431.02499999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -376,7 +376,7 @@ channels:
       id: ch21
       name: TG8 DB0OUD TS2
       rxFrequency: 438.625
-      txFrequency: 431.025
+      txFrequency: 431.02499999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -392,7 +392,7 @@ channels:
       id: ch22
       name: TG9 DB0OUD TS2
       rxFrequency: 438.625
-      txFrequency: 431.025
+      txFrequency: 431.02499999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -408,7 +408,7 @@ channels:
       id: ch23
       name: BB DB0OUD TS2
       rxFrequency: 438.625
-      txFrequency: 431.025
+      txFrequency: 431.02499999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -423,8 +423,8 @@ channels:
   - digital:
       id: ch24
       name: TG9 DB0TU TS1
-      rxFrequency: 439.575
-      txFrequency: 431.975
+      rxFrequency: 439.57499999999999
+      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -439,8 +439,8 @@ channels:
   - digital:
       id: ch25
       name: BB DB0TU TS2
-      rxFrequency: 439.575
-      txFrequency: 431.975
+      rxFrequency: 439.57499999999999
+      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -455,8 +455,8 @@ channels:
   - digital:
       id: ch26
       name: DM0MOT TS1
-      rxFrequency: 439.525
-      txFrequency: 431.925
+      rxFrequency: 439.52499999999998
+      txFrequency: 431.92500000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -471,8 +471,8 @@ channels:
   - digital:
       id: ch27
       name: TG8 DM0MOT TS2
-      rxFrequency: 439.525
-      txFrequency: 431.925
+      rxFrequency: 439.52499999999998
+      txFrequency: 431.92500000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -487,8 +487,8 @@ channels:
   - digital:
       id: ch28
       name: TG9 DM0MOT TS2
-      rxFrequency: 439.525
-      txFrequency: 431.925
+      rxFrequency: 439.52499999999998
+      txFrequency: 431.92500000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -503,8 +503,8 @@ channels:
   - digital:
       id: ch29
       name: BB DM0MOT TS2
-      rxFrequency: 439.525
-      txFrequency: 431.925
+      rxFrequency: 439.52499999999998
+      txFrequency: 431.92500000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -519,7 +519,7 @@ channels:
   - digital:
       id: ch30
       name: DB0TA TS1
-      rxFrequency: 439.475
+      rxFrequency: 439.47500000000002
       txFrequency: 431.875
       rxOnly: false
       admit: ColorCode
@@ -535,7 +535,7 @@ channels:
   - digital:
       id: ch31
       name: TG8 DB0TA TS2
-      rxFrequency: 439.475
+      rxFrequency: 439.47500000000002
       txFrequency: 431.875
       rxOnly: false
       admit: ColorCode
@@ -551,7 +551,7 @@ channels:
   - digital:
       id: ch32
       name: TG9 DB0TA TS2
-      rxFrequency: 439.475
+      rxFrequency: 439.47500000000002
       txFrequency: 431.875
       rxOnly: false
       admit: ColorCode
@@ -567,7 +567,7 @@ channels:
   - digital:
       id: ch33
       name: BB DB0TA TS2
-      rxFrequency: 439.475
+      rxFrequency: 439.47500000000002
       txFrequency: 431.875
       rxOnly: false
       admit: ColorCode
@@ -583,8 +583,8 @@ channels:
   - digital:
       id: ch34
       name: DB0FX TS1
-      rxFrequency: 439.45
-      txFrequency: 431.85
+      rxFrequency: 439.44999999999999
+      txFrequency: 431.85000000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -599,8 +599,8 @@ channels:
   - digital:
       id: ch35
       name: TG8 DB0FX TS2
-      rxFrequency: 439.45
-      txFrequency: 431.85
+      rxFrequency: 439.44999999999999
+      txFrequency: 431.85000000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -615,8 +615,8 @@ channels:
   - digital:
       id: ch36
       name: TG9 DB0FX TS2
-      rxFrequency: 439.45
-      txFrequency: 431.85
+      rxFrequency: 439.44999999999999
+      txFrequency: 431.85000000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -631,8 +631,8 @@ channels:
   - digital:
       id: ch37
       name: BB DB0FX TS2
-      rxFrequency: 439.45
-      txFrequency: 431.85
+      rxFrequency: 439.44999999999999
+      txFrequency: 431.85000000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -647,8 +647,8 @@ channels:
   - digital:
       id: ch38
       name: DB0PDM TS1
-      rxFrequency: 438.4
-      txFrequency: 430.8
+      rxFrequency: 438.39999999999998
+      txFrequency: 430.80000000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -663,8 +663,8 @@ channels:
   - digital:
       id: ch39
       name: TG8 DB0PDM TS2
-      rxFrequency: 438.4
-      txFrequency: 430.8
+      rxFrequency: 438.39999999999998
+      txFrequency: 430.80000000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -679,8 +679,8 @@ channels:
   - digital:
       id: ch40
       name: TG9 DB0PDM TS2
-      rxFrequency: 438.4
-      txFrequency: 430.8
+      rxFrequency: 438.39999999999998
+      txFrequency: 430.80000000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -695,8 +695,8 @@ channels:
   - digital:
       id: ch41
       name: BB DB0PDM TS2
-      rxFrequency: 438.4
-      txFrequency: 430.8
+      rxFrequency: 438.39999999999998
+      txFrequency: 430.80000000000001
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -711,8 +711,8 @@ channels:
   - digital:
       id: ch42
       name: DB0BRB TS1
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -727,8 +727,8 @@ channels:
   - digital:
       id: ch43
       name: TG8 DB0BRB TS2
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -743,8 +743,8 @@ channels:
   - digital:
       id: ch44
       name: TG9 DB0BRB TS2
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -759,8 +759,8 @@ channels:
   - digital:
       id: ch45
       name: BB DB0BRB TS2
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -775,8 +775,8 @@ channels:
   - digital:
       id: ch46
       name: DB0SPN TS1
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -791,8 +791,8 @@ channels:
   - digital:
       id: ch47
       name: R/TG9 DB0SPN TS2
-      rxFrequency: 439.4875
-      txFrequency: 431.8875
+      rxFrequency: 439.48750000000001
+      txFrequency: 431.88749999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -807,8 +807,8 @@ channels:
   - digital:
       id: ch48
       name: DB0NLS TS1
-      rxFrequency: 439.5125
-      txFrequency: 431.9125
+      rxFrequency: 439.51249999999999
+      txFrequency: 431.91250000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -823,8 +823,8 @@ channels:
   - digital:
       id: ch49
       name: R/TG9 DB0NLS TS2
-      rxFrequency: 439.5125
-      txFrequency: 431.9125
+      rxFrequency: 439.51249999999999
+      txFrequency: 431.91250000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -839,7 +839,7 @@ channels:
   - digital:
       id: ch50
       name: DB0LS TS1
-      rxFrequency: 438.225
+      rxFrequency: 438.22500000000002
       txFrequency: 430.625
       rxOnly: false
       admit: ColorCode
@@ -855,7 +855,7 @@ channels:
   - digital:
       id: ch51
       name: TG8 DB0LS TS2
-      rxFrequency: 438.225
+      rxFrequency: 438.22500000000002
       txFrequency: 430.625
       rxOnly: false
       admit: ColorCode
@@ -871,7 +871,7 @@ channels:
   - digital:
       id: ch52
       name: TG9 DB0LS TS2
-      rxFrequency: 438.225
+      rxFrequency: 438.22500000000002
       txFrequency: 430.625
       rxOnly: false
       admit: ColorCode
@@ -887,7 +887,7 @@ channels:
   - digital:
       id: ch53
       name: BB DB0LS TS2
-      rxFrequency: 438.225
+      rxFrequency: 438.22500000000002
       txFrequency: 430.625
       rxOnly: false
       admit: ColorCode
@@ -903,8 +903,8 @@ channels:
   - digital:
       id: ch54
       name: DM0LC TS1
-      rxFrequency: 439.3875
-      txFrequency: 431.7875
+      rxFrequency: 439.38749999999999
+      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -919,8 +919,8 @@ channels:
   - digital:
       id: ch55
       name: TG8 DM0LC TS2
-      rxFrequency: 439.3875
-      txFrequency: 431.7875
+      rxFrequency: 439.38749999999999
+      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -935,8 +935,8 @@ channels:
   - digital:
       id: ch56
       name: TG9 DM0LC TS2
-      rxFrequency: 439.3875
-      txFrequency: 431.7875
+      rxFrequency: 439.38749999999999
+      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -951,8 +951,8 @@ channels:
   - digital:
       id: ch57
       name: Sa/Th DM0LC TS2
-      rxFrequency: 439.3875
-      txFrequency: 431.7875
+      rxFrequency: 439.38749999999999
+      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -967,8 +967,8 @@ channels:
   - digital:
       id: ch58
       name: BB DM0LC TS1
-      rxFrequency: 439.3875
-      txFrequency: 431.7875
+      rxFrequency: 439.38749999999999
+      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -983,7 +983,7 @@ channels:
   - digital:
       id: ch59
       name: DB0FLW TS1
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -999,7 +999,7 @@ channels:
   - digital:
       id: ch60
       name: TG8 DB0FLW TS2
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -1015,7 +1015,7 @@ channels:
   - digital:
       id: ch61
       name: TG9 DB0FLW TS2
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -1031,7 +1031,7 @@ channels:
   - digital:
       id: ch62
       name: Sa/Th DB0FLW TS2
-      rxFrequency: 439.5375
+      rxFrequency: 439.53750000000002
       txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
@@ -1047,8 +1047,8 @@ channels:
   - digital:
       id: ch63
       name: DB0LE TS1
-      rxFrequency: 439.575
-      txFrequency: 431.975
+      rxFrequency: 439.57499999999999
+      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1063,8 +1063,8 @@ channels:
   - digital:
       id: ch64
       name: R/TG9 DB0LE TS2
-      rxFrequency: 439.575
-      txFrequency: 431.975
+      rxFrequency: 439.57499999999999
+      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1079,8 +1079,8 @@ channels:
   - digital:
       id: ch65
       name: DL DB0AFZ TS1
-      rxFrequency: 439.975
-      txFrequency: 430.575
+      rxFrequency: 439.97500000000002
+      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1095,8 +1095,8 @@ channels:
   - digital:
       id: ch66
       name: BB DB0AFZ TS1
-      rxFrequency: 439.975
-      txFrequency: 430.575
+      rxFrequency: 439.97500000000002
+      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1111,8 +1111,8 @@ channels:
   - digital:
       id: ch67
       name: TG9 DB0AFZ TS2
-      rxFrequency: 439.975
-      txFrequency: 430.575
+      rxFrequency: 439.97500000000002
+      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1127,8 +1127,8 @@ channels:
   - digital:
       id: ch68
       name: Hes DB0AFZ TS2
-      rxFrequency: 439.975
-      txFrequency: 430.575
+      rxFrequency: 439.97500000000002
+      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1143,8 +1143,8 @@ channels:
   - digital:
       id: ch69
       name: DMR S0
-      rxFrequency: 433.45
-      txFrequency: 433.45
+      rxFrequency: 433.44999999999999
+      txFrequency: 433.44999999999999
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1159,8 +1159,8 @@ channels:
   - digital:
       id: ch70
       name: DMR S1
-      rxFrequency: 433.612
-      txFrequency: 433.612
+      rxFrequency: 433.61200000000002
+      txFrequency: 433.61200000000002
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1191,8 +1191,8 @@ channels:
   - digital:
       id: ch72
       name: DMR S3
-      rxFrequency: 433.638
-      txFrequency: 433.638
+      rxFrequency: 433.63799999999998
+      txFrequency: 433.63799999999998
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1207,8 +1207,8 @@ channels:
   - digital:
       id: ch73
       name: DMR S4
-      rxFrequency: 433.65
-      txFrequency: 433.65
+      rxFrequency: 433.64999999999998
+      txFrequency: 433.64999999999998
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1223,8 +1223,8 @@ channels:
   - digital:
       id: ch74
       name: DMR S5
-      rxFrequency: 433.663
-      txFrequency: 433.663
+      rxFrequency: 433.66300000000001
+      txFrequency: 433.66300000000001
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1239,8 +1239,8 @@ channels:
   - digital:
       id: ch75
       name: DMR S6
-      rxFrequency: 433.675
-      txFrequency: 433.675
+      rxFrequency: 433.67500000000001
+      txFrequency: 433.67500000000001
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1255,8 +1255,8 @@ channels:
   - digital:
       id: ch76
       name: DMR S7
-      rxFrequency: 433.688
-      txFrequency: 433.688
+      rxFrequency: 433.68799999999999
+      txFrequency: 433.68799999999999
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1272,7 +1272,7 @@ channels:
       id: ch77
       name: DB0LDS
       rxFrequency: 439.5625
-      txFrequency: 431.9625
+      txFrequency: 431.96249999999998
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1285,8 +1285,8 @@ channels:
   - analog:
       id: ch78
       name: DB0RAG
-      rxFrequency: 439.3
-      txFrequency: 431.7
+      rxFrequency: 439.30000000000001
+      txFrequency: 431.69999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1297,8 +1297,8 @@ channels:
   - analog:
       id: ch79
       name: DB0LUD
-      rxFrequency: 438.575
-      txFrequency: 430.975
+      rxFrequency: 438.57499999999999
+      txFrequency: 430.97500000000002
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1311,7 +1311,7 @@ channels:
   - analog:
       id: ch80
       name: DB0SP-2
-      rxFrequency: 145.6
+      rxFrequency: 145.59999999999999
       txFrequency: 145
       rxOnly: false
       admit: Always
@@ -1323,8 +1323,8 @@ channels:
   - analog:
       id: ch81
       name: DB0SP-70
-      rxFrequency: 439.425
-      txFrequency: 431.825
+      rxFrequency: 439.42500000000001
+      txFrequency: 431.82499999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1335,7 +1335,7 @@ channels:
   - analog:
       id: ch82
       name: DB0ZOD-2
-      rxFrequency: 145.6625
+      rxFrequency: 145.66249999999999
       txFrequency: 145.0625
       rxOnly: false
       admit: Always
@@ -1347,7 +1347,7 @@ channels:
   - analog:
       id: ch83
       name: DB0ZOD-70
-      rxFrequency: 438.725
+      rxFrequency: 438.72500000000002
       txFrequency: 431.125
       rxOnly: false
       admit: Always
@@ -1359,7 +1359,7 @@ channels:
   - analog:
       id: ch84
       name: DB0BRL
-      rxFrequency: 145.725
+      rxFrequency: 145.72499999999999
       txFrequency: 145.125
       rxOnly: false
       admit: Always
@@ -1371,8 +1371,8 @@ channels:
   - analog:
       id: ch85
       name: DB0BLO
-      rxFrequency: 439.275
-      txFrequency: 431.675
+      rxFrequency: 439.27499999999998
+      txFrequency: 431.67500000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1383,8 +1383,8 @@ channels:
   - analog:
       id: ch86
       name: DB0SX
-      rxFrequency: 439.05
-      txFrequency: 431.45
+      rxFrequency: 439.05000000000001
+      txFrequency: 431.44999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1396,7 +1396,7 @@ channels:
       id: ch87
       name: DB0TA
       rxFrequency: 439.125
-      txFrequency: 431.525
+      txFrequency: 431.52499999999998
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1407,8 +1407,8 @@ channels:
   - analog:
       id: ch88
       name: DB0PDM
-      rxFrequency: 145.675
-      txFrequency: 145.075
+      rxFrequency: 145.67500000000001
+      txFrequency: 145.07499999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1419,7 +1419,7 @@ channels:
   - analog:
       id: ch89
       name: DB0CBS
-      rxFrequency: 438.85
+      rxFrequency: 438.85000000000002
       txFrequency: 431.25
       rxOnly: false
       admit: Always
@@ -1431,8 +1431,8 @@ channels:
   - analog:
       id: ch90
       name: DB0AF
-      rxFrequency: 438.6375
-      txFrequency: 431.0375
+      rxFrequency: 438.63749999999999
+      txFrequency: 431.03750000000002
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1443,8 +1443,8 @@ channels:
   - analog:
       id: ch91
       name: DB0NFL
-      rxFrequency: 438.95
-      txFrequency: 431.35
+      rxFrequency: 438.94999999999999
+      txFrequency: 431.35000000000002
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1455,8 +1455,8 @@ channels:
   - analog:
       id: ch92
       name: DB0LMM
-      rxFrequency: 439.3
-      txFrequency: 431.7
+      rxFrequency: 439.30000000000001
+      txFrequency: 431.69999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1467,8 +1467,8 @@ channels:
   - analog:
       id: ch93
       name: DM0LEI
-      rxFrequency: 439.15
-      txFrequency: 431.55
+      rxFrequency: 439.14999999999998
+      txFrequency: 431.55000000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1479,8 +1479,8 @@ channels:
   - analog:
       id: ch94
       name: DB0LEI
-      rxFrequency: 145.775
-      txFrequency: 145.175
+      rxFrequency: 145.77500000000001
+      txFrequency: 145.17500000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1491,8 +1491,8 @@ channels:
   - analog:
       id: ch95
       name: DB0SML
-      rxFrequency: 439.275
-      txFrequency: 431.675
+      rxFrequency: 439.27499999999998
+      txFrequency: 431.67500000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1503,7 +1503,7 @@ channels:
   - analog:
       id: ch96
       name: DB0LSA
-      rxFrequency: 145.6625
+      rxFrequency: 145.66249999999999
       txFrequency: 145.0625
       rxOnly: false
       admit: Always
@@ -1515,7 +1515,7 @@ channels:
   - analog:
       id: ch97
       name: DB0LE
-      rxFrequency: 438.7875
+      rxFrequency: 438.78750000000002
       txFrequency: 431.1875
       rxOnly: false
       admit: Always
@@ -1527,8 +1527,8 @@ channels:
   - analog:
       id: ch98
       name: DOK Y07
-      rxFrequency: 144.675
-      txFrequency: 144.675
+      rxFrequency: 144.67500000000001
+      txFrequency: 144.67500000000001
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1539,8 +1539,8 @@ channels:
   - analog:
       id: ch99
       name: DOK D20
-      rxFrequency: 144.65
-      txFrequency: 144.65
+      rxFrequency: 144.65000000000001
+      txFrequency: 144.65000000000001
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1563,8 +1563,8 @@ channels:
   - analog:
       id: ch101
       name: DOK S31
-      rxFrequency: 144.725
-      txFrequency: 144.725
+      rxFrequency: 144.72499999999999
+      txFrequency: 144.72499999999999
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1575,8 +1575,8 @@ channels:
   - analog:
       id: ch102
       name: S20
-      rxFrequency: 145.3
-      txFrequency: 145.3
+      rxFrequency: 145.30000000000001
+      txFrequency: 145.30000000000001
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1611,8 +1611,8 @@ channels:
   - analog:
       id: ch105
       name: APRS
-      rxFrequency: 144.8
-      txFrequency: 144.8
+      rxFrequency: 144.80000000000001
+      txFrequency: 144.80000000000001
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1624,8 +1624,8 @@ channels:
   - analog:
       id: ch106
       name: ISS APRS
-      rxFrequency: 145.825
-      txFrequency: 145.825
+      rxFrequency: 145.82499999999999
+      txFrequency: 145.82499999999999
       rxOnly: false
       admit: Free
       bandwidth: Narrow
@@ -1636,8 +1636,8 @@ channels:
   - analog:
       id: ch107
       name: ISS FM Rep
-      rxFrequency: 437.8
-      txFrequency: 145.99
+      rxFrequency: 437.80000000000001
+      txFrequency: 145.99000000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1649,8 +1649,8 @@ channels:
   - analog:
       id: ch108
       name: CAS-3H FM
-      rxFrequency: 437.2
-      txFrequency: 144.35
+      rxFrequency: 437.19999999999999
+      txFrequency: 144.34999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1661,7 +1661,7 @@ channels:
   - analog:
       id: ch109
       name: PO-101 FM
-      rxFrequency: 145.9
+      rxFrequency: 145.90000000000001
       txFrequency: 437.5
       rxOnly: false
       admit: Always
@@ -1673,8 +1673,8 @@ channels:
   - analog:
       id: ch110
       name: SO-50 FM
-      rxFrequency: 436.79
-      txFrequency: 145.85
+      rxFrequency: 436.79000000000002
+      txFrequency: 145.84999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1687,7 +1687,7 @@ channels:
       id: ch111
       name: AO-92 FM
       rxFrequency: 145.88
-      txFrequency: 435.35
+      txFrequency: 435.35000000000002
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1699,7 +1699,7 @@ channels:
   - analog:
       id: ch112
       name: AO-91 FM
-      rxFrequency: 145.96
+      rxFrequency: 145.96000000000001
       txFrequency: 435.25
       rxOnly: false
       admit: Always
@@ -1712,8 +1712,8 @@ channels:
   - analog:
       id: ch113
       name: U0
-      rxFrequency: 430.2
-      txFrequency: 430.2
+      rxFrequency: 430.19999999999999
+      txFrequency: 430.19999999999999
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1724,8 +1724,8 @@ channels:
   - analog:
       id: ch114
       name: U1
-      rxFrequency: 430.225
-      txFrequency: 430.225
+      rxFrequency: 430.22500000000002
+      txFrequency: 430.22500000000002
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1748,8 +1748,8 @@ channels:
   - analog:
       id: ch116
       name: U3
-      rxFrequency: 430.275
-      txFrequency: 430.275
+      rxFrequency: 430.27499999999998
+      txFrequency: 430.27499999999998
       rxOnly: false
       admit: Always
       bandwidth: Narrow
@@ -1760,8 +1760,8 @@ channels:
   - analog:
       id: ch117
       name: PMR 1
-      rxFrequency: 446.00625
-      txFrequency: 446.00625
+      rxFrequency: 446.00625000000002
+      txFrequency: 446.00625000000002
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1773,8 +1773,8 @@ channels:
   - analog:
       id: ch118
       name: PMR 2
-      rxFrequency: 446.01875
-      txFrequency: 446.01875
+      rxFrequency: 446.01875000000001
+      txFrequency: 446.01875000000001
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1799,8 +1799,8 @@ channels:
   - analog:
       id: ch120
       name: PMR 4
-      rxFrequency: 446.04375
-      txFrequency: 446.04375
+      rxFrequency: 446.04374999999999
+      txFrequency: 446.04374999999999
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1812,8 +1812,8 @@ channels:
   - analog:
       id: ch121
       name: PMR 5
-      rxFrequency: 446.05625
-      txFrequency: 446.05625
+      rxFrequency: 446.05624999999998
+      txFrequency: 446.05624999999998
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1825,8 +1825,8 @@ channels:
   - analog:
       id: ch122
       name: PMR 6
-      rxFrequency: 446.06875
-      txFrequency: 446.06875
+      rxFrequency: 446.06875000000002
+      txFrequency: 446.06875000000002
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1838,8 +1838,8 @@ channels:
   - analog:
       id: ch123
       name: PMR 7
-      rxFrequency: 446.08125
-      txFrequency: 446.08125
+      rxFrequency: 446.08125000000001
+      txFrequency: 446.08125000000001
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1864,8 +1864,8 @@ channels:
   - analog:
       id: ch125
       name: PMR 9
-      rxFrequency: 446.10625
-      txFrequency: 446.10625
+      rxFrequency: 446.10624999999999
+      txFrequency: 446.10624999999999
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1877,8 +1877,8 @@ channels:
   - analog:
       id: ch126
       name: PMR 10
-      rxFrequency: 446.11875
-      txFrequency: 446.11875
+      rxFrequency: 446.11874999999998
+      txFrequency: 446.11874999999998
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1890,8 +1890,8 @@ channels:
   - analog:
       id: ch127
       name: PMR 11
-      rxFrequency: 446.13125
-      txFrequency: 446.13125
+      rxFrequency: 446.13125000000002
+      txFrequency: 446.13125000000002
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1903,8 +1903,8 @@ channels:
   - analog:
       id: ch128
       name: PMR 12
-      rxFrequency: 446.14375
-      txFrequency: 446.14375
+      rxFrequency: 446.14375000000001
+      txFrequency: 446.14375000000001
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1929,8 +1929,8 @@ channels:
   - analog:
       id: ch130
       name: PMR 14
-      rxFrequency: 446.16875
-      txFrequency: 446.16875
+      rxFrequency: 446.16874999999999
+      txFrequency: 446.16874999999999
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1942,8 +1942,8 @@ channels:
   - analog:
       id: ch131
       name: PMR 15
-      rxFrequency: 446.18125
-      txFrequency: 446.18125
+      rxFrequency: 446.18124999999998
+      txFrequency: 446.18124999999998
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -1955,8 +1955,8 @@ channels:
   - analog:
       id: ch132
       name: PMR 16
-      rxFrequency: 446.19375
-      txFrequency: 446.19375
+      rxFrequency: 446.19375000000002
+      txFrequency: 446.19375000000002
       rxOnly: false
       scanListRef: scan3
       admit: Free
@@ -2028,10 +2028,83 @@ positioning:
       destination: APAT81-0
       source: DM3MAT-7
       path: [WIDE1-1, WIDE2-1]
-roaming:
+roamingChannels:
+  - id: rc1
+    name: R DB0LDS
+    rxFrequency: 439.5625
+    txFrequency: 431.96249999999998
+    colorCode: 1
+  - id: rc2
+    name: R DM0TZN
+    rxFrequency: 438.82499999999999
+    txFrequency: 431.22500000000002
+    colorCode: 1
+  - id: rc3
+    name: R DM0TT
+    rxFrequency: 439.08749999999998
+    txFrequency: 431.48750000000001
+    colorCode: 1
+  - id: rc4
+    name: R DB0KK
+    rxFrequency: 439.53750000000002
+    txFrequency: 431.9375
+    colorCode: 1
+  - id: rc5
+    name: R DB0OUD
+    rxFrequency: 438.625
+    txFrequency: 431.02499999999998
+    colorCode: 1
+  - id: rc6
+    name: R DB0TU
+    rxFrequency: 439.57499999999999
+    txFrequency: 431.97500000000002
+    colorCode: 1
+  - id: rc7
+    name: R DM0MOT
+    rxFrequency: 439.52499999999998
+    txFrequency: 431.92500000000001
+    colorCode: 1
+  - id: rc8
+    name: R DB0TA
+    rxFrequency: 439.47500000000002
+    txFrequency: 431.875
+    colorCode: 1
+  - id: rc9
+    name: R DB0FX
+    rxFrequency: 439.44999999999999
+    txFrequency: 431.85000000000002
+    colorCode: 1
+  - id: rc10
+    name: R DB0PDM
+    rxFrequency: 438.39999999999998
+    txFrequency: 430.80000000000001
+    colorCode: 1
+  - id: rc11
+    name: R DB0BRB
+    rxFrequency: 439.48750000000001
+    txFrequency: 431.88749999999999
+    colorCode: 1
+  - id: rc12
+    name: R DB0LS
+    rxFrequency: 438.22500000000002
+    txFrequency: 430.625
+    colorCode: 1
+roamingZones:
   - id: roam1
     name: Berlin/Brand
-    channels: [ch3, ch9, ch15, ch19, ch21, ch25, ch27, ch31, ch35, ch39, ch43, ch51]
+    channels:
+      - rc1
+      - rc2
+      - rc3
+      - rc4
+      - rc5
+      - rc6
+      - rc7
+      - rc8
+      - rc9
+      - rc10
+      - rc11
+      - rc12
 commercial:
   encryptionKeys:
     []

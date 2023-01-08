@@ -2,6 +2,7 @@
 #include "settings.hh"
 #include "config.hh"
 #include "channelselectiondialog.hh"
+#include "roamingchannelselectiondialog.hh"
 #include <QMessageBox>
 
 
@@ -37,13 +38,14 @@ RoamingZoneDialog::construct() {
   if (! settings.showExtensions())
     tabWidget->tabBar()->hide();
 
-  connect(add, SIGNAL(clicked(bool)), this, SLOT(onAddChannel()));
+  connect(addRoam, SIGNAL(clicked(bool)), this, SLOT(onAddRoamingChannel()));
+  connect(addDMR, SIGNAL(clicked(bool)), this, SLOT(onAddDMRChannel()));
   connect(rem, SIGNAL(clicked(bool)), this, SLOT(onRemChannel()));
 }
 
 
 void
-RoamingZoneDialog::onAddChannel() {
+RoamingZoneDialog::onAddDMRChannel() {
   MultiChannelSelectionDialog dia(_config->channelList(), false, true);
   if (QDialog::Accepted != dia.exec())
     return;
@@ -57,6 +59,20 @@ RoamingZoneDialog::onAddChannel() {
     RoamingChannel *rch = RoamingChannel::fromDMRChannel(channel->as<DMRChannel>());
     _config->roamingChannels()->add(rch);
     _myZone->addChannel(rch);
+  }
+}
+
+void
+RoamingZoneDialog::onAddRoamingChannel() {
+  MultiRoamingChannelSelectionDialog dia(_config);
+  if (QDialog::Accepted != dia.exec())
+    return;
+
+  QList<RoamingChannel *> lst = dia.channels();
+  foreach (RoamingChannel *channel, lst) {
+    if (0 <= _myZone->channels()->indexOf(channel))
+      continue;
+    _myZone->addChannel(channel);
   }
 }
 

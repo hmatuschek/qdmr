@@ -41,12 +41,12 @@ RoamingChannelDialog::construct() {
   ui->timeSlot->setCurrentIndex(
         (DMRChannel::TimeSlot::TS1 == _myChannel->timeSlot()) ? 0 : 1);
   if (! _myChannel->timeSlotOverridden()) {
-    ui->overrideTimeSlot->setChecked(false);
+    ui->overrideTimeSlot->setChecked(true);
     ui->timeSlot->setEnabled(false);
   }
   ui->colorCode->setValue(_myChannel->colorCode());
   if (! _myChannel->colorCodeOverridden()) {
-    ui->overrideColorCode->setChecked(false);
+    ui->overrideColorCode->setChecked(true);
     ui->colorCode->setEnabled(false);
   }
 
@@ -59,12 +59,12 @@ RoamingChannelDialog::construct() {
 
 void
 RoamingChannelDialog::onOverrideTimeSlotToggled(bool override) {
-  ui->timeSlot->setEnabled(override);
+  ui->timeSlot->setEnabled(! override);
 }
 
 void
 RoamingChannelDialog::onOverrideColorCodeToggled(bool override) {
-  ui->colorCode->setEnabled(override);
+  ui->colorCode->setEnabled(! override);
 }
 
 RoamingChannel *
@@ -73,9 +73,9 @@ RoamingChannelDialog::channel() {
   _myChannel->setRXFrequency(ui->rxFrequency->text().toDouble());
   _myChannel->setTXFrequency(ui->txFrequency->text().toDouble());
   _myChannel->setTimeSlot(ui->timeSlot->currentData().value<DMRChannel::TimeSlot>());
-  _myChannel->overrideTimeSlot(ui->overrideTimeSlot->isChecked());
+  _myChannel->overrideTimeSlot(! ui->overrideTimeSlot->isChecked());
   _myChannel->setColorCode(ui->colorCode->value());
-  _myChannel->overrideColorCode(ui->overrideColorCode->isChecked());
+  _myChannel->overrideColorCode(! ui->overrideColorCode->isChecked());
 
   if (_channel) {
     _channel->copy(*_myChannel);
