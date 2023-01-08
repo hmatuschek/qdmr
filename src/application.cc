@@ -486,6 +486,9 @@ Application::detectRadio() {
   if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
+  } else {
+    QMessageBox::information(nullptr, tr("No radio found"),
+                             tr("No matching device was found."));
   }
 }
 
@@ -497,9 +500,14 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
     myRadio = autoDetect();
-  if (nullptr == myRadio)
-    return false;
 
+  if (nullptr == myRadio) {
+    if (showSuccess) {
+      QMessageBox::warning(nullptr, tr("No radio found"),
+                           tr("No matching device was found."));
+    }
+    return false;
+  }
   Settings settings;
   RadioLimitContext ctx(settings.ignoreFrequencyLimits());
   myRadio->limits().verifyConfig(_config, ctx);
@@ -537,8 +545,11 @@ Application::downloadCodeplug() {
   }
 
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
@@ -594,8 +605,11 @@ Application::uploadCodeplug() {
   Settings settings;
 
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
@@ -625,8 +639,11 @@ void
 Application::uploadCallsignDB() {
   // Start upload
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
