@@ -124,6 +124,72 @@ RoamingChannel::fromDMRChannel(DMRChannel *ch, DMRChannel* ref) {
   return rch;
 }
 
+bool
+RoamingChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! ConfigObject::parse(node, ctx, err))
+    return false;
+
+  if (! node["timeSlot"]) {
+    this->overrideTimeSlot(false);
+  } else {
+    if (! node["timeSlot"].IsScalar()) {
+      errMsg(err) << node["timeSlot"].Mark().line << ":" << node["timeSlot"].Mark().column
+                  << "Cannot parse 'timeSlot' of RoamingChannel: time slot is not scalar.";
+      return false;
+    }
+    QMetaEnum e = QMetaEnum::fromType<DMRChannel::TimeSlot>();
+    std::string key = node["timeSlot"].as<std::string>();
+    bool ok=true; int value = e.keyToValue(key.c_str(), &ok);
+    if (! ok) {
+      QStringList lst;
+      for (int i=0; i<e.keyCount(); i++)
+        lst.push_back(e.key(i));
+      errMsg(err) << node["timeSlot"].Mark().line << ":" << node["timeSlot"].Mark().column
+                  << ": Unknown key '" << key.c_str() << "' for enum 'DMRChannel::TimeSlot'."
+                  << " Expected one of " << lst.join(", ") << ".";
+      return false;
+    }
+
+    // finally set property
+    this->overrideTimeSlot(true);
+    this->setTimeSlot((DMRChannel::TimeSlot)value);
+  }
+
+  if (! node["colorCode"]) {
+    this->overrideTimeSlot(false);
+  } else {
+    if (! node["colorCode"].IsScalar()) {
+      errMsg(err) << node["colorCode"].Mark().line << ":" << node["colorCode"].Mark().column
+                  << "Cannot parse 'colorCode' of RoamingChannel: color code is not scalar.";
+      return false;
+    }
+    // finally set property
+    this->overrideColorCode(true);
+    this->setColorCode(node["colorCode"].as<unsigned>());
+  }
+
+  return true;
+}
+
+
+bool
+RoamingChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  // First, populate scriptable properties
+  if (! ConfigObject::populate(node, context, err))
+    return false;
+
+  if (timeSlotOverridden()) {
+    QMetaEnum e = QMetaEnum::fromType<DMRChannel::TimeSlot>();
+    node["timeSlot"] = e.valueToKey((int)timeSlot());
+  }
+
+  if (colorCodeOverridden()) {
+    node["colorCode"] = colorCode();
+  }
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of RoamingChannelList

@@ -6,7 +6,7 @@
 #include "gpssystem.hh"
 #include "radioid.hh"
 #include "rxgrouplist.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "encryptionextension.hh"
 
 

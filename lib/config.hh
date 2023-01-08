@@ -48,7 +48,7 @@
 #include "scanlist.hh"
 #include "gpssystem.hh"
 #include "roamingchannel.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "radioid.hh"
 #include "radiosettings.hh"
 #include "tyt_extensions.hh"
@@ -192,7 +192,7 @@ protected:
   /** The list of roaming channels. */
   RoamingChannelList *_roamingChannels;
   /** The list of roaming zones. */
-  RoamingZoneList *_roaming;
+  RoamingZoneList *_roamingZones;
   /** Owns the TyT settings extension. */
   TyTConfigExtension *_tytExtension;
   /** Owns the commercial extension. */

@@ -2,7 +2,7 @@
 #define ROAMINGZONEDIALOG_HH
 
 #include <QDialog>
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "ui_roamingzonedialog.h"
 
 class Config;

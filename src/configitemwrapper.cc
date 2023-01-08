@@ -508,7 +508,10 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
   switch (index.column()) {
   case 0: return ch->name();
   case 1: return ch->rxFrequency();
-  case 2: return ch->txFrequency();
+  case 2:
+    if (ch->rxFrequency() == ch->txFrequency())
+      return ch->txFrequency();
+    return ch->txFrequency()-ch->rxFrequency();
   case 3:
     if (ch->colorCodeOverridden())
       return ch->colorCode();

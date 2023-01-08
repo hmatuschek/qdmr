@@ -1,4 +1,4 @@
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "channel.hh"
 #include <QSet>
 #include "config.hh"
@@ -111,6 +111,7 @@ RoamingZone::link(const YAML::Node &node, const Context &ctx, const ErrorStack &
                   << id << "' not defined.";
       return false;
     }
+    // Handle referenced object (either DMR channel or roaming channel)
     ConfigObject *obj = ctx.getObj(id);
     if (obj->is<DMRChannel>()) {
       RoamingChannel *rch = RoamingChannel::fromDMRChannel(obj->as<DMRChannel>());

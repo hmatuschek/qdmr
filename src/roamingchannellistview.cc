@@ -1,5 +1,6 @@
 #include "roamingchannellistview.hh"
 #include "ui_roamingchannellistview.h"
+#include "roamingchanneldialog.hh"
 #include "configitemwrapper.hh"
 #include "config.hh"
 #include "settings.hh"
@@ -34,12 +35,25 @@ RoamingChannelListView::~RoamingChannelListView() {
 
 void
 RoamingChannelListView::onAddChannel() {
+  RoamingChannelDialog dialog(_config);
+
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  int row=-1;
+  if (ui->roamingChannelTableView->hasSelection())
+    row = ui->roamingChannelTableView->selection().second+1;
+  _config->roamingChannels()->add(dialog.channel(), row);
 
 }
 
 void
 RoamingChannelListView::onEditChannel(unsigned int idx) {
+  RoamingChannelDialog dialog(_config, _config->roamingChannels()->channel(idx));
+  if (QDialog::Accepted != dialog.exec())
+    return;
 
+  dialog.channel();
 }
 
 void

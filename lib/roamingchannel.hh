@@ -21,13 +21,13 @@ class RoamingChannel : public ConfigObject
   /** Holds the TX frequency in MHz. */
   Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
   /** If @c true, the color code of the channel gets overridden by the one specified in @c colorCode. */
-  Q_PROPERTY(bool overrideColorCode READ colorCodeOverridden WRITE overrideColorCode)
+  Q_PROPERTY(bool overrideColorCode READ colorCodeOverridden WRITE overrideColorCode SCRIPTABLE false)
   /** If @c overrideColorCode is @c true, specifies the color code. */
-  Q_PROPERTY(unsigned int colorCode READ colorCode WRITE setColorCode)
+  Q_PROPERTY(unsigned int colorCode READ colorCode WRITE setColorCode SCRIPTABLE false)
   /** If @c true, the time slot of the channel gets overridden by the one specified in @c timeSlot. */
-  Q_PROPERTY(bool overrideTimeSlot READ timeSlotOverridden WRITE overrideTimeSlot)
+  Q_PROPERTY(bool overrideTimeSlot READ timeSlotOverridden WRITE overrideTimeSlot SCRIPTABLE false)
   /** If @c overrideTimeSlot is @c true, specifies the time slot. */
-  Q_PROPERTY(DMRChannel::TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
+  Q_PROPERTY(DMRChannel::TimeSlot timeSlot READ timeSlot WRITE setTimeSlot SCRIPTABLE false)
 
 public:
   /** Default constuctor for a roaming channel. */
@@ -65,10 +65,15 @@ public:
   /** Sets the time slot. */
   void setTimeSlot(DMRChannel::TimeSlot ts);
 
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err);
+
 public:
   /** Helper method to construct a Roaming channel from a given DMR channel. Optionally with
    * reference to a thid one. */
   static RoamingChannel *fromDMRChannel(DMRChannel *ch, DMRChannel *ref=nullptr);
+
+protected:
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
   /** Holds the RX frequency in MHz. */
