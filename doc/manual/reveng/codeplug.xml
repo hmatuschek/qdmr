@@ -186,6 +186,6 @@
 <para>
   There are some additional Pad bytes (00h) that terminate ASCII strings. This is nothing, we found
   by the differential analysis, but it is some common scheme, found in many codeplugs. Obviously, 
-  firmware developer do not know the strnlen C function.
+  firmware developer do not know the <function>strnlen</function> C function.
 </para>
 </section>

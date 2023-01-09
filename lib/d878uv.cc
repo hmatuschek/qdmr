@@ -19,7 +19,10 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
   _callsigns = new D868UVCallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info;
+  if (_dev)
+    _dev->getInfo(info);
+
   switch (info.bands) {
   case 0x00:
   case 0x01:
