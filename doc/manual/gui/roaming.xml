@@ -12,10 +12,41 @@
   Roaming is a feature that allows DMR radios to select an alternative repeater once you leave 
   the range of the currently selected one. To do that, you have to specify so-called 
   <glossterm>Roaming zone</glossterm>s. Within these zones, you collect all repeaters that provide 
-  access to a particular talk group. When roaming is enabled, the radio will check periodically 
+  access to a particular talk group. When roaming is enabled, the radio will check periodically,
   whether the current repeater is still reachable. If not, the strongest repeater from the 
   selected roaming zone will then be selected instead. 
 </para>
+
+<para>
+  In order to stay connected to a particular talk group, not the entire channel settings must be 
+  changed. But only those properties, that are specific to the repeater we change to. These are 
+  the RX and TX frequencies, color codes and sometimes the time-slot. The latter is necessary, as 
+  those repeaters may be located in other regions. Usually &mdash; at least for Brandmeister 
+  repeaters &mdash; the time slot 2 is reserved for regional communication while time slot 1 is 
+  intended for inter-regional communication. So you may need to override the time-slot of the active
+  channel, whenever you roam outside of the region associated with the talk group. Some talk groups,
+  however, are over-regional anyway. For example, the world-wide talk group 91. Here, the time slot 
+  will always be TS 1 and thus does not need to be overridden. 
+</para>
+
+<para>
+  As only some properties of the current DMR channel needs to be overridden, there are special 
+  channels called <glossterm>roaming channels</glossterm> that contain only those settings, that
+  are changed during roaming. 
+</para>
+
+
+<section>
+<info>
+  <title>Roaming Channels</title>
+</info>
+
+</section>
+
+<section>
+<info>
+  <title>Roaming Zones</title>
+</info>
 
 <para>
   The <guilabel>Roaming</guilabel> tab collects all defined roaming zones. 
@@ -51,4 +82,6 @@
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
   the device specific settings for the roaming zone. 
 </para>
+</section>
+
 </section>
