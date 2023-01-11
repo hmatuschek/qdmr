@@ -527,11 +527,6 @@ p, li { white-space: pre-wrap; }
         <translation>Delete %1 channels?</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Analog Channel</source>
         <translation>Add Analog Channel</translation>
@@ -823,11 +818,6 @@ p, li { white-space: pre-wrap; }
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
     </message>
-    <message>
-        <location filename="../src/configobjectlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>ConfigObjectTableView</name>
@@ -842,11 +832,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -863,8 +848,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
-        <source>Dialog</source>
-        <translation></translation>
+        <source>Create extension object</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
@@ -903,11 +888,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
         <translation>Delete %1 contacts?</translation>
-    </message>
-    <message>
-        <location filename="../src/contactlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>

@@ -517,11 +517,6 @@ p, li { white-space: pre-wrap; }
         <translation>Ta bort %1 kanaler?</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Analog Channel</source>
         <translation type="unfinished"></translation>
@@ -813,11 +808,6 @@ p, li { white-space: pre-wrap; }
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../src/configobjectlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ConfigObjectTableView</name>
@@ -831,11 +821,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/configobjecttableview.cc" line="71"/>
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -853,7 +838,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
-        <source>Dialog</source>
+        <source>Create extension object</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -892,11 +877,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/contactlistview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
