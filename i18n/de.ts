@@ -80,7 +80,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
@@ -1147,7 +1147,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
@@ -1185,7 +1185,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
@@ -1223,7 +1223,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
@@ -1304,7 +1304,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
@@ -1558,7 +1558,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
@@ -2884,7 +2884,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
@@ -3113,7 +3113,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="32"/>
@@ -3255,7 +3255,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/scanlistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
@@ -3590,7 +3590,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/zonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="33"/>
@@ -3723,7 +3723,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
     <message>
         <location filename="../src/aprssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
@@ -3837,6 +3837,26 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <location filename="../src/roamingchanneldialog.ui" line="36"/>
         <source>TX Frequency [MHz]</source>
         <translation>TX Frequenz [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="44"/>
+        <source>TS 1</source>
+        <translation>TS 1</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="45"/>
+        <source>TS 2</source>
+        <translation>TS 2</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="37"/>
+        <source>Edit roaming channel</source>
+        <translation>Roamingkanal bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="39"/>
+        <source>Create roaming channel</source>
+        <translation>Roamingkanal anlegen</translation>
     </message>
 </context>
 <context>
