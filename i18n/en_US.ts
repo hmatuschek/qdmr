@@ -1659,16 +1659,6 @@ p, li { white-space: pre-wrap; }
         <translation>Main window</translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="55"/>
-        <source>Tablist</source>
-        <translation>Tablist</translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="58"/>
-        <source>There are 6 tabs providing general settings, contact, Rx group, channel zone and scan lists.</source>
-        <translation>There are several tabs providing general settings, contact, Rx group, channel, zone and scan lists etc.</translation>
-    </message>
-    <message>
         <location filename="../shared/ui/mainwindow.ui" line="78"/>
         <source>File</source>
         <translation>File</translation>
@@ -1688,11 +1678,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../shared/ui/mainwindow.ui" line="106"/>
         <source>Databases</source>
         <translation>Databases</translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="123"/>
-        <source>toolBar</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="126"/>
