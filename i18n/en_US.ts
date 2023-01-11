@@ -234,24 +234,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>AnytoneInterface</name>
-    <message>
-        <source>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</source>
-        <translation type="vanished">Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>AnytoneLimits</name>
-    <message>
-        <source>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</source>
-        <translation type="vanished">You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</translation>
-    </message>
-    <message>
-        <source>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</source>
-        <translation type="vanished">You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</translation>
-    </message>
-</context>
-<context>
     <name>Application</name>
     <message>
         <location filename="../src/application.cc" line="238"/>
@@ -293,10 +275,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="276"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
-    </message>
-    <message>
-        <source>Roaming</source>
-        <translation type="vanished">Roaming</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="280"/>
@@ -508,24 +486,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias for %2 %3)</translation>
-    </message>
-</context>
-<context>
-    <name>CSVLexer</name>
-    <message>
-        <source>Lexer error %1,%2: Unexpected char &apos;%3&apos;.</source>
-        <translation type="vanished">Lexer error %1,%2: Unexpected char &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>CSVReader</name>
-    <message>
-        <source>
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</source>
-        <translation type="vanished">
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</translation>
     </message>
 </context>
 <context>
@@ -1046,56 +1006,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
-    <name>D878UVCodeplug</name>
-    <message>
-        <source>APRS %1</source>
-        <translation type="vanished">APRS %1</translation>
-    </message>
-    <message>
-        <source>GPS Sys #%1</source>
-        <translation type="vanished">GPS Sys #%1</translation>
-    </message>
-    <message>
-        <source>GPS #%1 Contact</source>
-        <translation type="vanished">GPS #%1 Contact</translation>
-    </message>
-</context>
-<context>
-    <name>DFUFile</name>
-    <message>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read element prefix: %2</source>
-        <translation type="vanished">Cannot read DFU file &apos;%1&apos;: Cannot read element prefix: %2</translation>
-    </message>
-    <message>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read element data: %2</source>
-        <translation type="vanished">Cannot read DFU file &apos;%1&apos;: Cannot read element data: %2</translation>
-    </message>
-    <message>
-        <source>Cannot write element prefix to file &apos;%1&apos;: %2</source>
-        <translation type="vanished">Cannot write element prefix to file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <source>Cannot write element data to file &apos;%1&apos;: %2</source>
-        <translation type="vanished">Cannot write element data to file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read image: %2</source>
-        <translation type="vanished">Cannot read DFU file &apos;%1&apos;: Cannot read image: %2</translation>
-    </message>
-    <message>
-        <source>Cannot read DFU file &apos;%1&apos;: Invalid image signature value.</source>
-        <translation type="vanished">Cannot read DFU file &apos;%1&apos;: Invalid image signature value.</translation>
-    </message>
-    <message>
-        <source>Cannot read DFU file &apos;%1&apos;: Invalid image size %2b specified, expected %3b.</source>
-        <translation type="vanished">Cannot read DFU file &apos;%1&apos;: Invalid image size %2b specified, expected %3b.</translation>
-    </message>
-    <message>
-        <source>Cannot write image prefix to &apos;%1&apos;: %2.</source>
-        <translation type="vanished">Cannot write image prefix to &apos;%1&apos;: %2.</translation>
-    </message>
-</context>
-<context>
     <name>DMRContactDialog</name>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="23"/>
@@ -1227,20 +1137,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/dtmfcontactdialog.ui" line="61"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
-    </message>
-</context>
-<context>
-    <name>DefaultRadioID</name>
-    <message>
-        <source>[Default]</source>
-        <translation type="vanished">[Default]</translation>
-    </message>
-</context>
-<context>
-    <name>DefaultRoamingZone</name>
-    <message>
-        <source>[Default]</source>
-        <translation type="vanished">[Default]</translation>
     </message>
 </context>
 <context>
@@ -2687,106 +2583,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Shelter</source>
         <translation>Shelter</translation>
     </message>
-    <message>
-        <source>Cannot open file &apos;%1&apos;: File does not exist.</source>
-        <translation type="vanished">Cannot open file &apos;%1&apos;: File does not exist.</translation>
-    </message>
-    <message>
-        <source>Cannot open file &apos;%1&apos;: %2.</source>
-        <translation type="vanished">Cannot open file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <source>Cannot read header from file &apos;%1&apos;: %2.</source>
-        <translation type="vanished">Cannot read header from file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <source>Malformed header in file &apos;%1&apos;: Mismatching content size. Expected %2, got %3.</source>
-        <translation type="vanished">Malformed header in file &apos;%1&apos;: Mismatching content size. Expected %2, got %3.</translation>
-    </message>
-    <message>
-        <source>Cannot mmap file &apos;%1&apos;: %2.</source>
-        <translation type="vanished">Cannot mmap file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: Unknown model &apos;%2&apos;.</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: Unknown model &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: Model &apos;%2&apos; not implemented yet.</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: Model &apos;%2&apos; not implemented yet.</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: %2</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <source>Invalid read response: Expected command &apos;W&apos; got &apos;%1&apos;</source>
-        <translation type="vanished">Invalid read response: Expected command &apos;W&apos; got &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Invalid read response: Expected address &apos;%1&apos; got &apos;%2&apos;</source>
-        <translation type="vanished">Invalid read response: Expected address &apos;%1&apos; got &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <source>Invalid read response: Expected size 64 got %1</source>
-        <translation type="vanished">Invalid read response: Expected size 64 got %1.</translation>
-    </message>
-    <message>
-        <source>Invalid read response: Expected check-sum %1 got %2</source>
-        <translation type="vanished">Invalid read response: Expected check-sum %1 got %2.</translation>
-    </message>
-    <message>
-        <source>Invalid read response: Expected ACK 6 got %1</source>
-        <translation type="vanished">Invalid read response: Expected ACK 6 got %1.</translation>
-    </message>
-    <message>
-        <source>0x%1: Cannot add zone to config.</source>
-        <translation type="vanished">0x%1: Cannot add zone to config.</translation>
-    </message>
-    <message>
-        <source>0x%1: Cannot add channel %2 to zone &apos;%3&apos;.</source>
-        <translation type="vanished">0x%1: Cannot add channel &apos;%2&apos; to zone &apos;%3&apos;.</translation>
-    </message>
-    <message>
-        <source>0x%1: Cannot add channel %2 to scan list &apos;%3&apos;.</source>
-        <translation type="vanished">0x%1: Cannot add channel &apos;%2&apos; to scan list &apos;%3&apos;.</translation>
-    </message>
-    <message>
-        <source>Cannot open file &apos;%1&apos;: File does not exisist.</source>
-        <translation type="vanished">Cannot open file &apos;%1&apos;: File does not exist.</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 852533 bytes.</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: File size is not 852533 bytes.</translation>
-    </message>
-    <message>
-        <source>Cannot open file &apos;%1&apos;: %2</source>
-        <translation type="vanished">Cannot open file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: Cannot seek within file: %2</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: Cannot seek within file: %2</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 131072 bytes.</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: File size is not 131072 bytes.</translation>
-    </message>
-    <message>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 262709 bytes.</source>
-        <translation type="vanished">Cannot read codeplug file &apos;%1&apos;: File size is not 262709 bytes.</translation>
-    </message>
-    <message>
-        <source>CTCSS %1Hz</source>
-        <translation type="vanished">CTCSS %1Hz</translation>
-    </message>
-    <message>
-        <source>DCS %1 N</source>
-        <translation type="vanished">DCS %1 N</translation>
-    </message>
-    <message>
-        <source>DCS %1 I</source>
-        <translation type="vanished">DCS %1 I</translation>
-    </message>
 </context>
 <context>
     <name>RXGroupListDialog</name>
@@ -2844,17 +2640,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
-    </message>
-</context>
-<context>
-    <name>Radio</name>
-    <message>
-        <source>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</source>
-        <translation type="vanished">Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</translation>
-    </message>
-    <message>
-        <source>Unknown AnyTone (or similar) device.</source>
-        <translation type="vanished">Unknown AnyTone (or similar) device.</translation>
     </message>
 </context>
 <context>
@@ -2926,31 +2711,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configitemwrapper.cc" line="904"/>
         <source>Number</source>
         <translation>Number</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimitIgnored</name>
-    <message>
-        <source>Ignore %1 &apos;%2&apos;. Not applicable/supported by this radio.</source>
-        <translation type="vanished">Ignore %1 &apos;%2&apos;. Not applicable/supported by this radio.</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimitStringIgnored</name>
-    <message>
-        <source>Expected value of &apos;%1&apos; to be string.</source>
-        <translation type="vanished">Expected value of &apos;%1&apos; to be string.</translation>
-    </message>
-    <message>
-        <source>Value of &apos;%1&apos; is ignored. Not applicable/supported by the radio.</source>
-        <translation type="vanished">Value of &apos;%1&apos; is ignored. Not applicable/supported by the radio.</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimits</name>
-    <message>
-        <source>The support for this radio is still under development. Some features may sill be missing or are not well tested.</source>
-        <translation type="vanished">The support for this radio is still under development. Some features may sill be missing or are not well tested.</translation>
     </message>
 </context>
 <context>
@@ -3196,10 +2956,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/roamingzonedialog.ui" line="32"/>
         <source>Name:</source>
         <translation>Name:</translation>
-    </message>
-    <message>
-        <source>Add Channel</source>
-        <translation type="vanished">Add Channel</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="56"/>
@@ -3614,24 +3370,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/settingsdialog.ui" line="247"/>
         <source>Show device extensions</source>
         <translation>Show device extensions</translation>
-    </message>
-</context>
-<context>
-    <name>TalkGroupDatabase</name>
-    <message>
-        <source>%1 (%2)</source>
-        <translation type="vanished">%1 (%2)</translation>
-    </message>
-</context>
-<context>
-    <name>UserDatabase</name>
-    <message>
-        <source>%1 (%2)</source>
-        <translation type="vanished">%1 (%2)</translation>
-    </message>
-    <message>
-        <source>%1 (%2, %3)</source>
-        <translation type="vanished">%1 (%2, %3)</translation>
     </message>
 </context>
 <context>
