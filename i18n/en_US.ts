@@ -301,12 +301,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="280"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming Channels</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming Zones</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="289"/>
@@ -426,7 +426,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="609"/>
         <location filename="../src/application.cc" line="643"/>
         <source>No radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>No radio found</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="491"/>
@@ -435,7 +435,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="610"/>
         <location filename="../src/application.cc" line="644"/>
         <source>No matching device was found.</source>
-        <translation type="unfinished"></translation>
+        <translation>No matching device was found.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="522"/>
@@ -2036,7 +2036,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
         <source>Select roaming channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Select roaming channels</translation>
     </message>
 </context>
 <context>
@@ -3013,43 +3013,43 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="22"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="29"/>
         <source>RX Frequency [MHz]</source>
-        <translation type="unfinished"></translation>
+        <translation>RX Frequency [MHz]</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="36"/>
         <source>TX Frequency [MHz]</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Frequency [MHz]</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="43"/>
         <source>Time Slot</source>
-        <translation type="unfinished">Time Slot</translation>
+        <translation>Time Slot</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="50"/>
         <source>Color Code</source>
-        <translation type="unfinished">Color Code</translation>
+        <translation>Color Code</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="68"/>
         <location filename="../src/roamingchanneldialog.ui" line="89"/>
         <source>Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Selected</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="39"/>
         <source>TS 1</source>
-        <translation type="unfinished">TS 1</translation>
+        <translation>TS 1</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="40"/>
         <source>TS 2</source>
-        <translation type="unfinished">TS 2</translation>
+        <translation>TS 2</translation>
     </message>
 </context>
 <context>
@@ -3062,47 +3062,47 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="51"/>
         <source>Add Roaming Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Add Roaming Channel</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="58"/>
         <source>Delete Roaming Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete Roaming Channel</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="63"/>
         <source>Cannot delete roaming channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot delete roaming channel</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="64"/>
         <source>Cannot delete roaming channel: You have to select a channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot delete roaming channel: You have to select a channel first.</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <source>Delete roaming zone?</source>
-        <translation type="unfinished">Delete roaming zone?</translation>
+        <translation>Delete roaming zone?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <source>Delete roaming zone %1?</source>
-        <translation type="unfinished">Delete roaming zone &apos;%1&apos;?</translation>
+        <translation>Delete roaming zone &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete roaming zones?</source>
-        <translation type="unfinished">Delete roaming zones?</translation>
+        <translation>Delete roaming zones?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete %1 roaming zones?</source>
-        <translation type="unfinished">Delete %1 roaming zones?</translation>
+        <translation>Delete %1 roaming zones?</translation>
     </message>
 </context>
 <context>
@@ -3111,32 +3111,32 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configitemwrapper.cc" line="518"/>
         <location filename="../src/configitemwrapper.cc" line="526"/>
         <source>[Selected]</source>
-        <translation type="unfinished">[Selected]</translation>
+        <translation>[Selected]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="538"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="539"/>
         <source>RX Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>RX Frequency</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="540"/>
         <source>TX Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Frequency</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="541"/>
         <source>TS</source>
-        <translation type="unfinished">TS</translation>
+        <translation>TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="542"/>
         <source>CC</source>
-        <translation type="unfinished">CC</translation>
+        <translation>CC</translation>
     </message>
 </context>
 <context>
@@ -3144,7 +3144,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/configitemwrapper.cc" line="569"/>
         <source>Roaming Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming Channel</translation>
     </message>
 </context>
 <context>
@@ -3175,12 +3175,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/roamingzonedialog.cc" line="82"/>
         <source>Cannot remove channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot remove channels.</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="83"/>
         <source>Cannot remove channels. Select at least one channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot remove channels. Select at least one channel first.</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="14"/>
@@ -3204,12 +3204,12 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/roamingzonedialog.ui" line="56"/>
         <source>Add Roaming Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Add Roaming Channel</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="63"/>
         <source>Add DMR Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Add DMR Channel</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="66"/>
@@ -3701,13 +3701,13 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/zonedialog.cc" line="76"/>
         <location filename="../src/zonedialog.cc" line="107"/>
         <source>Cannot remove channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot remove channel</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="77"/>
         <location filename="../src/zonedialog.cc" line="108"/>
         <source>Select at least one channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Select at least one channel first.</translation>
     </message>
 </context>
 <context>
