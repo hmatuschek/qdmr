@@ -485,6 +485,34 @@ p, li { white-space: pre-wrap; }
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (Alias für %2 %3)</translation>
     </message>
+    <message>
+        <location filename="../src/application.cc" line="280"/>
+        <source>Roaming Channels</source>
+        <translation>Roamingkanäle</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="284"/>
+        <source>Roaming Zones</source>
+        <translation>Roamingzonen</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="490"/>
+        <location filename="../src/application.cc" line="506"/>
+        <location filename="../src/application.cc" line="549"/>
+        <location filename="../src/application.cc" line="609"/>
+        <location filename="../src/application.cc" line="643"/>
+        <source>No radio found</source>
+        <translation>Kein Gerät erkannt</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="491"/>
+        <location filename="../src/application.cc" line="507"/>
+        <location filename="../src/application.cc" line="550"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="644"/>
+        <source>No matching device was found.</source>
+        <translation>Kein bekanntes Gerät erkannt.</translation>
+    </message>
 </context>
 <context>
     <name>CSVLexer</name>
@@ -609,7 +637,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <location filename="../src/configitemwrapper.cc" line="372"/>
         <location filename="../src/configitemwrapper.cc" line="383"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Standard]</translation>
+        <translation>[Standard]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
@@ -693,7 +721,7 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <location filename="../src/configitemwrapper.cc" line="402"/>
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="385"/>
@@ -1255,13 +1283,13 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <location filename="../src/digitalchanneldialog.cc" line="82"/>
         <location filename="../src/digitalchanneldialog.cc" line="89"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="90"/>
         <location filename="../src/digitalchanneldialog.cc" line="99"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Standard]</translation>
+        <translation>[Standard]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="14"/>
@@ -3117,6 +3145,26 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <source>Extension</source>
         <translation>Erweiterung</translation>
     </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="56"/>
+        <source>Add Roaming Channel</source>
+        <translation>Roamingkanal hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="63"/>
+        <source>Add DMR Channel</source>
+        <translation>DMR Kanal hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.cc" line="82"/>
+        <source>Cannot remove channels.</source>
+        <translation>Kann Kanäle nicht entfernen.</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.cc" line="83"/>
+        <source>Cannot remove channels. Select at least one channel first.</source>
+        <translation>Kann Kanäle nicht entfernen. Wählen sie zunächst mindestens einen Kanal aus.</translation>
+    </message>
 </context>
 <context>
     <name>RoamingZoneListView</name>
@@ -3586,6 +3634,18 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <source>Create Zone</source>
         <translation>Zone anlegen</translation>
     </message>
+    <message>
+        <location filename="../src/zonedialog.cc" line="77"/>
+        <location filename="../src/zonedialog.cc" line="108"/>
+        <source>Select at least one channel first.</source>
+        <translation>Wählen sie zunächst mindestens einen Kanal aus.</translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.cc" line="76"/>
+        <location filename="../src/zonedialog.cc" line="107"/>
+        <source>Cannot remove channel</source>
+        <translation>Kann Kanal nicht entfernen</translation>
+    </message>
 </context>
 <context>
     <name>ZoneListView</name>
@@ -3743,6 +3803,138 @@ Mehr Informationen finden Sie unter https://github.com/hmatuschek/qdmr/releases.
         <location filename="../src/configwizardstart.ui" line="20"/>
         <source>Guided codeplug setup</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelDialog</name>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="43"/>
+        <source>Time Slot</source>
+        <translation>Zeitschlitz</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="50"/>
+        <source>Color Code</source>
+        <translation>Farbcode</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="68"/>
+        <location filename="../src/roamingchanneldialog.ui" line="89"/>
+        <source>Selected</source>
+        <translation>Auswahl</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="22"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="29"/>
+        <source>RX Frequency [MHz]</source>
+        <translation>RX Frequenz [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="36"/>
+        <source>TX Frequency [MHz]</source>
+        <translation>TX Frequenz [MHz]</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelListView</name>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="74"/>
+        <source>Delete roaming zone %1?</source>
+        <translation>Roamingzone &apos;%1&apos; löschen?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming zones?</source>
+        <translation>Roamingzonen löschen?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete %1 roaming zones?</source>
+        <translation>%1 Roamingzonen löschen?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="51"/>
+        <source>Add Roaming Channel</source>
+        <translation>Roamingkanal hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="58"/>
+        <source>Delete Roaming Channel</source>
+        <translation>Roamingkanal löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="63"/>
+        <source>Cannot delete roaming channel</source>
+        <translation>Kann Roamingkanal nicht löschen</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="64"/>
+        <source>Cannot delete roaming channel: You have to select a channel first.</source>
+        <translation>Kann Roamingkanal nicht löschen: Sie müssen zunächst mindestens einen Kanal auswählen.</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="74"/>
+        <source>Delete roaming zone?</source>
+        <translation>Roamingzone löschen?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="26"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hinweis:&lt;/span&gt; QDMR ist eine Geräte unabhängige CPS. Wie dem auch sei, nicht alle Geräte unterstützen das Roaming. Diese Einstellungen werden für jene Geräte ignoriert. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tip:&lt;/span&gt; Sie müssen die Roamingkanäle nicht explizit anlegen. Sie können diese zusammen mit der Roamingzone automatisch erzeugen lassen. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelListWrapper</name>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="518"/>
+        <location filename="../src/configitemwrapper.cc" line="526"/>
+        <source>[Selected]</source>
+        <translation>[Auswahl]</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="538"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="539"/>
+        <source>RX Frequency</source>
+        <translation>RX Frequenz</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="542"/>
+        <source>CC</source>
+        <translation>CC</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="540"/>
+        <source>TX Frequency</source>
+        <translation>TX Frequenz</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="541"/>
+        <source>TS</source>
+        <translation>TS</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelRefListWrapper</name>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="569"/>
+        <source>Roaming Channel</source>
+        <translation>Roaming Kanal</translation>
+    </message>
+</context>
+<context>
+    <name>MultiRoamingChannelSelectionDialog</name>
+    <message>
+        <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
+        <source>Select roaming channels</source>
+        <translation>Roamingkanäle auswählen</translation>
     </message>
 </context>
 </TS>
