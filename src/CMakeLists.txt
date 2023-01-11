@@ -29,7 +29,7 @@ SET(qdmr_MOC_HEADERS
   repeaterbookcompleter.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
-  digitalchanneldialog.ui scanlistdialog.ui configwizardstart.ui verifydialog.ui settingsdialog.ui
+  digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui
   gpssystemdialog.ui aprssystemdialog.ui
   roamingzonedialog.ui roamingchannellistview.ui roamingchanneldialog.ui
   configobjectlistview.ui configobjecttableview.ui
