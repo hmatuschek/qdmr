@@ -2748,12 +2748,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="37"/>
         <source>Edit roaming channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit roaming channel</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="39"/>
         <source>Create roaming channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Create roaming channel</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="44"/>
