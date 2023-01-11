@@ -6,13 +6,93 @@
 
 
 <info>
-  <title>Roaming Zones</title>
+  <title>Roaming</title>
 </info>
 
 <para>
-  Roaming zones are collections of channels, that are scanned for the strongest signal to 
-  maintain connection to a particular network or talk group. Consequently, they usually group
-  channels with the same talk group.
+  The roaming configuration consists of a list of roaming channels and roaming zones. While 
+  roaming channels specify those channel settings, that might be overridden during roaming, 
+  the roaming zone specifies a collection of roaming channels, that can be used to maintain a
+  connection to a particular talk group.
+</para>
+
+<section>
+<info><title>Roaming Channels</title></info>
+<para>
+  Roaming channels contain those settings of a DMR channel, that are specific for a particular 
+  repeater. This allows to override these settings in a channel, when the repeater of that channel 
+  gets out of range. Then, the radio may switch to a different repeater to maintain the connection 
+  to the current talk group. 
+</para>
+
+<example pgwide="1">
+  <title></title>
+  <programlisting><![CDATA[roamingChannels:
+  - id: rch1
+    name: R DB0LDS
+    rxFrequency: 439.5625
+    txFrequency: 431.9625
+  - id: rch2
+    name: R DB0AFZ
+    rxFrequency: 439.97500
+    txFrequency: 430.57500
+    colorCode: 1
+    timeSlot: 1
+]]></programlisting>
+</example>
+
+<para>
+  The example above shows the definition of two roaming channels. Both are used to stay in contact 
+  with a regional talk group within the Brandmeister network. While the repeater DB0LDS is located
+  within this region, DB0AFZ is not. Consequently, the time-slot of the channel needs to be 
+  overridden. 
+</para>
+
+<variablelist>
+  <title>Roaming channel fields</title>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>Specifies the ID of the roaming channel. This ID can then be used to refer to this 
+        channel within a roaming zone. Any unique string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>Specifies the name of the roaming channel. Any string is valid here.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>rxFrequency</token>, <token>txFrequency</token></term>
+    <listitem>
+      <para>Specifies the receive and transmit frequencies of the channel.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>colorCode</token></term>
+    <listitem>
+      <para>Specifies the color code of the channel. If set, overrides the color code of the 
+        current channel. If omitted, the color code of the selected channel is used during 
+        roaming. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>timeSlot</token></term>
+    <listitem>
+      <para>Specifies the time slot of the channel. If set, overrides the time slot of the current
+        DMR channel. If omitted, the time slot of the selected channel is used during 
+        roaming. </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section> 
+
+<section>
+<info><title>Roaming Zones</title></info>
+<para>
+  Roaming zones are collections of roaming channels, that are scanned for the strongest signal to 
+  maintain connection to a particular network or talk group.
 </para>
 
 <para>
@@ -21,16 +101,17 @@
 
 <example pgwide="1">
   <title></title>
-  <programlisting><![CDATA[roaming:
+  <programlisting><![CDATA[roamingZones:
   - id: roam1
     name: Berlin/Brand
-    channels: [ch3, ch8, ch14, ch18, ch20, ch24, ch26, ch30, ch34, ch38, ch42, ch50] 
+    channels: [rch1, rch2, rch3] 
 ]]></programlisting>
 </example>
 
 <para>
-  This zone has the ID <emphasis>roam1</emphasis> and the name <emphasis>Berlin/Brand</emphasis>. This group collects 
-all channels that provide access to the <emphasis>Berlin/Brandenburg</emphasis> talk group.
+  This zone has the ID <emphasis>roam1</emphasis> and the name <emphasis>Berlin/Brand</emphasis>. 
+  This group collects all roaming channels that provide access to the 
+  <emphasis>Berlin/Brandenburg</emphasis> talk group.
 </para>
 <variablelist>
   <title>Roaming zone fields</title>
@@ -51,9 +132,10 @@ all channels that provide access to the <emphasis>Berlin/Brandenburg</emphasis> 
     <term><token>channels</token></term>
     <listitem>
       <para>Specifies the member channels for this roaming zone. This must be a list of 
-        references to digital channels.</para>
+        references to roaming channels.</para>
     </listitem>
   </varlistentry>
 </variablelist>
+</section> 
 
 </section>

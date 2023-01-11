@@ -5,95 +5,95 @@
          xmlns:xlink="http://www.w3.org/1999/xlink" 
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<info><title>Reverse engineering of the codeplug format</title></info>
+<info><title>Reverse engineering of the code plug format</title></info>
 
 <para>
-  Once the communication protocol is known, it is time to focus on the codeplug format. Depending 
-  on the codeplug complexity, this can be a very cumbersome task. Moreover, depending on the 
-  device, it can be pretty hard to access the binary representation of the configuration (codeplug)
+  Once the communication protocol is known, it is time to focus on the code plug format. Depending 
+  on the code plug complexity, this can be a very cumbersome task. Moreover, depending on the 
+  device, it can be pretty hard to access the binary representation of the configuration (code plug)
   that is actually written onto the device. In general, one cannot expect, that the binary file, 
-  created by the manufacturer, does relate to the binary codeplug written onto the device at all. 
+  created by the manufacturer, does relate to the binary code plug written onto the device at all. 
 </para>
 <para>
-  To figure the relationship out, between the codeplug file and the actual codeplug written onto 
-  the device, the codeplug must first be extracted from the Wireshark capture. As we already know 
+  To figure the relationship out, between the code plug file and the actual code plug written onto 
+  the device, the code plug must first be extracted from the Wireshark capture. As we already know 
   the protocol, this can be done easily using Python and pyshark. When doing so, be careful 
-  with the addresses, data is written to or read from. The binary codeplug might not be written 
+  with the addresses, data is written to or read from. The binary code plug might not be written 
   sequentially and with gaps. A best practice is to extract the data read or written along with 
   its addresses and sort it with respect to the address. Then dump everything as a hex-dump. 
 </para>
 <para>
-  Once the codeplug is extracted from the Wireshark capture, compare it to the corresponding 
-  codeplug file, created by the CPS. If you are lucky (usually for very cheap DMR radios), the CPS
-  codeplug file is simply the binary codeplug written to the device (e.g., GD77, RD5R). Then it is
-  very easy to reverse engineer the codeplug format, as you can study changes to the CPS codeplug 
-  file. 
+  Once the code plug is extracted from the Wireshark capture, compare it to the corresponding 
+  code plug file created by the CPS. If you are lucky (usually for very cheap DMR radios), the CPS
+  code plug file is simply the binary code plug written to the device (e.g., for GD77, RD5R). Then 
+  it is very easy to reverse engineer the code plug format, as you can study changes to the CPS code
+  plug file. 
 </para>
 <para>
-  If they are not identical, you will need to somehow extract the binary codeplug written to the 
+  If they are not identical, you will need to somehow extract the binary code plug written to the 
   device from the manufacturer CPS. If the protocol is based on Serial-over-USB, you may be able
   to write an emulator for the device, knowing the communication protocol. This then allows to 
-  trick the CPS to talk to the emulator instead of the device and dump the codeplug. If not, you
-  are likely stuck with writing a lot of codeplugs to the real device and extracting the codeplug
+  trick the CPS to talk to the emulator instead of the device and dump the code plug. If not, you
+  are likely stuck with writing a lot of code plugs to the real device and extracting the code plug
   from the Wireshark captures. This can be considered the worst-case scenario.
 </para>
 
 <section>
 <info><title>Differential analysis</title></info>
 <para>
-  Irrespective on how you gain access to the binary codeplug written onto the device, the analysis
-  of this codeplug is always the same. This is called differential analysis. The idea is to change
-  a single option in the codeplug and compare the resulting binary codeplugs bit by bit. Ideally, 
-  only a single place in the binary codeplug will change too and this change then reflects the 
+  Irrespective on how you gain access to the binary code plug written onto the device, the analysis
+  of this code plug is always the same. This is called differential analysis. The idea is, to change
+  a single option in the CPS and compare the resulting binary code plugs bit by bit. Ideally, 
+  only a single place in the binary code plug will change too and this change then reflects the 
   encoding of the particular setting touched. This is then repeated for all possible settings in
-  the CPS until the entire codeplug structure is known. 
+  the CPS until the entire code plug structure is known. 
 </para>
 <note>
   <para>
-    There will be some bits and bytes in the codeplug that will never changed. These are usually
-    reserved bits/bytes. There may also be some undocumented and hidden options in the codeplug,
+    There will be some bits and bytes in the code plug that will never changed. These are usually
+    reserved bits/bytes. There may also be some undocumented and hidden options in the code plug,
     that cannot be set via the (normal) CPS. 
   </para>
 </note>
 <para>
-  Before you can start reverse engineering the codeplug, you need to create a <quote>base</quote>
-  codeplug. That is, one small simple codeplug that touches very feature of the radio. It should 
-  not be overly complex with hundreds of channels but should contain everything the radio provides.
-  For example, it should contain a APRS system, if the radio has GPS or a roaming zone if the radio
-  supports roaming. You should also create two of every kind. That is, at least two channels, 
+  Before you can start reverse engineering the code plug, you need to create a <quote>base</quote>
+  code plug. That is, one small simple code plug, that touches every feature of the radio. It should 
+  not be overly complex with hundreds of channels, but should contain everything the radio provides.
+  For example, it should contain the APRS settings, if the radio has GPS or a roaming zone if the 
+  radio supports roaming. You should also create two of every kind. That is, at least two channels, 
   contacts, group lists, zones and scan lists. Otherwise, it will be hard to figure the index 
   scheme out.
 </para>
 <para>
-  Once you created the base-codeplug, get its binary representation (e.g., from file, emulation or 
+  Once you created the base-code plug, get its binary representation (e.g., from file, emulation or 
   Wireshark capture). Change something simple. For example the name of the first contact. Then get 
-  the binary representation of this modified codeplug. Then compare the two binary codeplugs.  
+  the binary representation of this modified code plug and compare the two binary code plugs.  
 </para>
 <para>
-  As an example, consider the following difference between two hex-dumps of codeplugs for a BTech
-  DMR-6X2UV Pro. Here, the name of the first contact was changed. 
+  As an example, consider the following difference between two hex-dumps of the binary code plugs 
+  for a BTech DMR-6X2UV Pro. Here, the name of the first contact was changed. 
 </para>
 <example>
-  <title>Difference between two codeplugs for a DMR-6X2UV Pro. Only the name of the first contact 
-    was changed.</title>
+  <title>Difference between two binary code plugs for a DMR-6X2UV Pro. Only the name of the first 
+    contact was changed.</title>
   <programlisting><![CDATA[< 02680000 : 01 43 6f 6e 74 61 63 74 20 31 00 00 00 00 00 00 | .Contact 1......
 < 02680010 : 00 00 00 55 6e 6b 6e 6f 77 6e 00 00 00 00 00 00 | ...Unknown......
 > 02680000 : 01 56 65 72 79 20 6c 6f 6e 67 20 6e 61 6d 65 2e | .Very long name.
 > 02680010 : 2e 00 00 55 6e 6b 6e 6f 77 6e 00 00 00 00 00 00 | ...Unknown......]]></programlisting>
 </example>
 <para>
-  This difference already shows some very important information about the codeplug encoding. First,
+  This difference already shows some very important information about the code plug encoding. First,
   the list of contacts appears to start at address 2680000h. This is very important for the coarse 
-  structure of the binary codeplug. We learn about the structure of the encoded contacts, that the 
-  name starts at offset 01h. So, the first byte is still unknown. The length of the name is 
-  limited to 16bytes and is terminated/padded with 0-bytes. However, we still don't know how large
-  the encoded contact element in the codeplug actually is. 
+  structure of the binary code plug. We also learn about the structure of the encoded contacts, that
+  the name starts at offset 01h. So, the first byte is still unknown. The length of the name is 
+  limited to 16 bytes and is terminated/padded with 0-bytes. However, we still don't know how large
+  the encoded contact element in the code plug actually is. 
 </para>
 <para>
   To figure out the size of the contact element, one can use the fact, that all elements very 
   likely have identical sizes. Hence the offset from one name to the name of the next contact will
   be the size of the contact element. We already know, that the contact list starts at the address 
-  2680000h. Hence, we can look in the codeplug directly at that address.
+  2680000h. Hence, we can look in the code plug directly at that address.
 </para>
 <example>
   <title>Codeplug hex-dump at the contact-list address.</title>
@@ -116,9 +116,9 @@
   The offset between the two names <quote>Contact 1</quote> and <quote>Contact 2</quote> is exactly 
   100 bytes (64h). With this, we know the exact size of the contact element. However, wo only know
   what 16 of these 100 bytes mean. So there is a lot to figure out. The differential analysis, 
-  however, makes it quiet easy. First we may change the call-type of the first contact. From 
+  however, makes it quiet easy. First we may change the call type of the first contact. From 
   <quote>group call</quote> to <quote>private call</quote> and study the differences in the 
-  codeplug. 
+  code plug. 
 </para>
 <example>
   <title></title>
@@ -128,12 +128,12 @@
 <para>
   We see, that only one byte has changed. The one at offset 0. It changed from 01h to 00h. We may 
   conclude that this byte encodes the contact type, where 00h means private call and 01h means 
-  group call. Analogously, we find out, that 03h means all-call. 
+  group call. Analogously, we find out that 03h means all-call. 
 </para>
 <para>
   The next step is to find the encoding and offset of the contact DMR ID. To find it, we reload the
-  base codeplug and change the DMR ID of the first contact from <quote>1</quote> to something more 
-  complex. E.g., to <quote>1234567</quote> and compare the binary codeplugs.
+  base code plug and change the DMR ID of the first contact from <quote>1</quote> to something more 
+  complex. E.g., to <quote>1234567</quote> and compare the binary  .
 </para>
 <example>
   <title></title>
@@ -143,15 +143,16 @@
 <para>
   Here we find some changes at the offset 23h. The content changed from 00000001h to 01234567h. 
   This is somewhat weird, as the binary representation of 1234567 in hex is actually 12d687h. 
-  However, for DMR codeplugs, it is quiet common to store integers in so-called BCD. Here each 
-  digit is stored in 4bit each. This has the consequence, that the decimal digits are readable in 
+  However, for DMR code plugs, it is quiet common to store integers in so-called BCD. Here each 
+  digit is stored in 4bits. This has the consequence, that the decimal digits are readable in 
   hex. But this storage is inefficient, as the DMR ID is actually a 24bit number, that can be 
   stored in 3 bytes. Its BCD encoding requires 4 bytes. 
 </para>
 <para>
   The last setting for contacts remaining in the CPS is the <quote>call-alert</quote>. This setting 
   is only valid for private calls. Changing the contact 1 from group to private call, changing 
-  the call alert from <quote>None</quote> to <quote>Ring</quote> and comparing the codeplugs, one gets.
+  the call alert from <quote>None</quote> to <quote>Ring</quote> and comparing the code plugs, one 
+  gets:
 </para>
 <example>
   <title></title>
@@ -162,7 +163,7 @@
 </example>
 <para>
   Of cause, we find two changes. The change of the first byte, indicating the change from group to 
-  private call as well as one byte changing at offset 27h from 00h to 01h. This is the only 
+  private call, as well as one byte changing at offset 27h from 00h to 01h. This is the only 
   unexplained change and thus must reflect the alert-type setting. Consequently, the alert type 
   <quote>None</quote> is represented by 00h and <quote>Ring</quote> by 01h. Analogously, we find 
   that alert-type <quote>Online</quote> is encoded as 02h. 
@@ -185,7 +186,21 @@
 </programlisting>
 <para>
   There are some additional Pad bytes (00h) that terminate ASCII strings. This is nothing, we found
-  by the differential analysis, but it is some common scheme, found in many codeplugs. Obviously, 
-  firmware developer do not know the <function>strnlen</function> C function.
+  by the differential analysis, but it is some common scheme, found in many binary code plugs. 
+  Obviously, the firmware developer did not knew the <function>strnlen</function> C function.
+</para>
+
+<para>
+  The remaining bytes of the contact element appears to be empty, unused space. This is also quiet
+  frequent in code plugs. They contain a lot of unused bytes that might be reserved for future uses.
+  This allows the firmware developer to extend the code plug, while maintaining backward 
+  compatibility with older versions of the CPS. 
+</para>
+
+<para>
+  Having reverse engineered the contacts, does not mean that you are done. There are a lot more 
+  elements to decipher. Did I mentioned that it is a lot of work? But the general scheme of things 
+  remain the same. Change a single setting in the CPS and compare the resulting binary code plugs. 
+  Document your findings. Step by step, you will figure out the entire code-plug structure. 
 </para>
 </section>

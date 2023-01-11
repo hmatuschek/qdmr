@@ -249,13 +249,25 @@
   </glossentry>
 
   <glossentry>
+    <glossterm>Roaming Channel</glossterm>
+    <glossdef>
+      <para>
+        Specifies which settings of the current channel needs to be overridden to stay in contact 
+        with a particular talk group. These settings are usually those, specific for a repeater. 
+        That is, receive and transmit frequency and color code. The time-slot might also be 
+        overridden.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
     <glossterm>Roaming Zone</glossterm>
     <glossdef>
       <para>
-        A collection of channels usually sharing the same transmit contact. When roaming is enabled
-        (and supported by the radio) this list of channels is scanned for a reachable channel once 
-        the current repeater gets out-of-range. This way, one can stay in contact with a particular 
-        talk group when being mobile.
+        A collection of <glossterm>roaming channels</glossterm> usually sharing the same transmit 
+        contact. When roaming is enabled (and supported by the radio) this list of channels is 
+        scanned for a reachable channel once the current repeater gets out-of-range. This way, one 
+        can stay in contact with a particular talk group when being mobile.
       </para>
     </glossdef>
   </glossentry>
