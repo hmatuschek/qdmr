@@ -33,6 +33,11 @@ RoamingChannelDialog::~RoamingChannelDialog() {
 
 void
 RoamingChannelDialog::construct() {
+  if (_channel)
+    setWindowTitle(tr("Edit roaming channel"));
+  else
+    setWindowTitle(tr("Create roaming channel"));
+
   ui->name->setText(_myChannel->name());
   ui->rxFrequency->setText(QString::number(_myChannel->rxFrequency(), 'f'));
   ui->txFrequency->setText(QString::number(_myChannel->txFrequency(), 'f'));

@@ -1023,11 +1023,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
@@ -1061,11 +1056,6 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>DMRIDDialog</name>
     <message>
-        <location filename="../src/dmriddialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
@@ -1096,11 +1086,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="14"/>
-        <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1346,17 +1331,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/errormessageview.ui" line="17"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/errormessageview.ui" line="23"/>
-        <location filename="../src/errormessageview.ui" line="48"/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/errormessageview.ui" line="30"/>
         <source>Traceback:</source>
         <translation type="unfinished"></translation>
@@ -1382,11 +1356,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/extensionview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1455,11 +1424,6 @@ p, li { white-space: pre-wrap; }
 </context>
 <context>
     <name>GeneralSettingsView</name>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
         <source>DMR Radio ID</source>
@@ -1641,11 +1605,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete %1 RX group lists?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/grouplistsview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1951,11 +1910,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/positioningsystemlistview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2665,11 +2619,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/radioidlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
         <source>Default Radio ID</source>
         <translation type="unfinished"></translation>
@@ -2753,11 +2702,6 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RoamingChannelDialog</name>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/roamingchanneldialog.ui" line="22"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
@@ -2789,23 +2733,28 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/roamingchanneldialog.cc" line="37"/>
+        <source>Edit roaming channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/roamingchanneldialog.cc" line="39"/>
+        <source>Create roaming channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="44"/>
         <source>TS 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.cc" line="40"/>
+        <location filename="../src/roamingchanneldialog.cc" line="45"/>
         <source>TS 2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RoamingChannelListView</name>
-    <message>
-        <location filename="../src/roamingchannellistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -2930,11 +2879,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
@@ -3015,11 +2959,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/roamingzonelistview.cc" line="102"/>
         <source>Delete %1 roaming zones?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/roamingzonelistview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3165,11 +3104,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete %1 scan lists?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/scanlistsview.ui" line="14"/>
-        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3468,11 +3402,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/zonelistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/zonelistview.ui" line="32"/>
         <source>Add Zone</source>
         <translation type="unfinished"></translation>
@@ -3572,24 +3501,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/aprssystemdialog.ui" line="186"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>pageStart</name>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="14"/>
-        <source>WizardPage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="17"/>
-        <source>Welcome</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="20"/>
-        <source>Guided codeplug setup</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
