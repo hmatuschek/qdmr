@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -25,7 +25,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset theme="edit-move-up"/>
+        <iconset theme="edit-move-up">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
@@ -35,7 +36,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset theme="edit-move-down"/>
+        <iconset theme="edit-move-down">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
