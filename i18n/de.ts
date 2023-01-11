@@ -65,7 +65,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
@@ -849,7 +849,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
         <source>Create extension object</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweiterungsobjekt erzeugen</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
@@ -1944,7 +1944,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/configitemwrapper.cc" line="714"/>
         <location filename="../src/configitemwrapper.cc" line="733"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Keine]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="717"/>
@@ -1954,7 +1954,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/configitemwrapper.cc" line="725"/>
         <source>[Selected]</source>
-        <translation type="unfinished">[Auswahl]</translation>
+        <translation>[Auswahl]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="729"/>
@@ -2007,7 +2007,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/propertydelegate.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Leer]</translation>
     </message>
 </context>
 <context>
@@ -2046,7 +2046,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/extensionwrapper.cc" line="586"/>
         <location filename="../src/extensionwrapper.cc" line="594"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Leer]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="596"/>
@@ -2065,7 +2065,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -3037,14 +3037,14 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/scanlistdialog.cc" line="34"/>
         <location filename="../src/scanlistdialog.cc" line="36"/>
         <source>[None]</source>
-        <translation type="unfinished">[Kein]</translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="35"/>
         <location filename="../src/scanlistdialog.cc" line="37"/>
         <location filename="../src/scanlistdialog.cc" line="39"/>
         <source>[Selected]</source>
-        <translation type="unfinished">[Auswahl]</translation>
+        <translation>[Auswahl]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="38"/>
