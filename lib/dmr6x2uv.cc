@@ -12,7 +12,10 @@ DMR6X2UV::DMR6X2UV(AnytoneInterface *device, QObject *parent)
   _callsigns = new D868UVCallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info;
+  if (_dev)
+    _dev->getInfo(info);
+
   switch (info.bands) {
   case 0x00:
     _limits = new DMR6X2UVLimits({ {136., 174.}, {400., 480.} },

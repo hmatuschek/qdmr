@@ -53,7 +53,7 @@ public:
 
 protected:
   /** The device identifier. */
-	QString _name;
+  QString _name;
   /** The actual binary codeplug representation. */
   DM1701Codeplug _codeplug;
 

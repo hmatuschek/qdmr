@@ -24,7 +24,7 @@ groupLists:
   - {id: grp2, name: DL, contacts: [cont4]}
   - {id: grp3, name: HamRadioVillage, contacts: [cont6]}
 channels:
-  - digital:
+  - dmr:
       id: ch1
       name: L9 DB0LDS
       rxFrequency: 439.5625
@@ -38,7 +38,7 @@ channels:
       power: High
       timeout: 0
       vox: 0
-  - digital:
+  - dmr:
       id: ch2
       name: BB DB0LDS
       rxFrequency: 439.5625
@@ -53,7 +53,7 @@ channels:
       power: High
       timeout: 0
       vox: 0
-  - digital:
+  - dmr:
       id: ch3
       name: DL DB0LDS
       rxFrequency: 439.5625
@@ -67,7 +67,7 @@ channels:
       power: High
       timeout: 0
       vox: 0
-  - digital:
+  - dmr:
       id: ch4
       name: HRV DB0LDS
       rxFrequency: 439.5625

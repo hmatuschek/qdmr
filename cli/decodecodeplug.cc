@@ -27,6 +27,7 @@
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
+#include "dmr6x2uv_codeplug.hh"
 
 
 int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -254,6 +255,23 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     D578UVCodeplug codeplug;
+    if (! codeplug.read(filename, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "':\n" << err.format();
+      return -1;
+    }
+    if (! codeplug.decode(&config, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "':\n" << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DMR6X2UV == radio) {
+    if (parser.isSet("manufacturer")) {
+      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
+                    RadioInfo::byID(radio).name() << "'.";
+      return -1;
+    }
+    DMR6X2UVCodeplug codeplug;
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "':\n" << err.format();

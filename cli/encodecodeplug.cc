@@ -19,6 +19,7 @@
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
+#include "dmr6x2uv_codeplug.hh"
 #include "crc32.hh"
 
 
@@ -181,6 +182,19 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D578UV == radio) {
     D578UVCodeplug codeplug;
+    codeplug.clear();
+    codeplug.setBitmaps(&config);
+    codeplug.allocateUpdated();
+    codeplug.allocateForEncoding();
+    codeplug.encode(&config, flags, err);
+    codeplug.image(0).sort();
+    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DMR6X2UV == radio) {
+    DMR6X2UVCodeplug codeplug;
     codeplug.clear();
     codeplug.setBitmaps(&config);
     codeplug.allocateUpdated();

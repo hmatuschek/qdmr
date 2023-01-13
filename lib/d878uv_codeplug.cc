@@ -2517,15 +2517,17 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode roaming channels
-  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    // Allocate roaming channel
+  for (uint8_t i=0; i<std::min(NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count()); i++) {
+    // Encode roaming channel
     uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
     RoamingChannelElement rch_elm(data(addr));
+    RoamingChannel *rch = ctx.config()->roamingChannels()->get(i)->as<RoamingChannel>();
     rch_elm.clear();
-    if (i<ctx.config()->roamingChannels()->count()) {
-      RoamingChannel *rch = ctx.config()->roamingChannels()->get(i)->as<RoamingChannel>();
-      rch_elm.fromChannel(rch);
-      ctx.add(rch, i);
+    rch_elm.fromChannel(rch);
+    if (! ctx.add(rch, i)) {
+      errMsg(err) << "Cannot add index " << i << " for roaming channel '"
+                  << rch->name() << "' to codeplug context.";
+      return false;
     }
   }
 
