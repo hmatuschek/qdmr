@@ -591,6 +591,16 @@ public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
 
+  void clear();
+  void setBitmaps(Config *config);
+  void allocateForDecoding();
+  void allocateUpdated();
+  void allocateForEncoding();
+
+protected:
+  bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+
   virtual void allocateGeneralSettings();
   virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -603,6 +613,15 @@ public:
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates memory to store all roaming channels and zones. */
+  virtual void allocateRoaming();
+  /** Encodes the roaming channels and zones. */
+  virtual bool encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Creates roaming channels and zones from codeplug. */
+  virtual bool createRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Links roaming channels and zones. */
+  virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // DMR6X2UVCODEPLUG_HH

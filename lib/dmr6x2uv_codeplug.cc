@@ -27,6 +27,21 @@
 #define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
 #define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
 
+#define NUM_ROAMING_CHANNEL         250
+#define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
+#define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
+#define ADDR_ROAMING_CHANNEL_0      0x01040000
+#define ROAMING_CHANNEL_SIZE        0x00000020
+#define ROAMING_CHANNEL_OFFSET      0x00000020
+
+#define NUM_ROAMING_ZONES           64
+#define NUM_CH_PER_ROAMINGZONE      64
+#define ADDR_ROAMING_ZONE_BITMAP    0x01042080
+#define ROAMING_ZONE_BITMAP_SIZE    0x00000010
+#define ADDR_ROAMING_ZONE_0         0x01043000
+#define ROAMING_ZONE_SIZE           0x00000080
+#define ROAMING_ZONE_OFFSET         0x00000080
+
 
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
@@ -662,6 +677,91 @@ DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
 }
 
 void
+DMR6X2UVCodeplug::clear() {
+  D868UVCodeplug::clear();
+
+  // Rename image
+  image(0).setName("BTECH DMR-6X2UV Codeplug");
+
+  // Roaming channel bitmaps
+  image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
+  // Roaming zone bitmaps
+  image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
+}
+
+void
+DMR6X2UVCodeplug::allocateUpdated() {
+  // First allocate everything common between D868UV and DMR-6X2UV codeplugs.
+  D868UVCodeplug::allocateUpdated();
+}
+
+void
+DMR6X2UVCodeplug::allocateForEncoding() {
+  // First allocate everything common between D868UV and D878UV codeplugs.
+  D868UVCodeplug::allocateForEncoding();
+  this->allocateRoaming();
+}
+
+void
+DMR6X2UVCodeplug::allocateForDecoding() {
+  // First allocate everything common between D868UV and D878UV codeplugs.
+  D868UVCodeplug::allocateForDecoding();
+  this->allocateRoaming();
+}
+
+void
+DMR6X2UVCodeplug::setBitmaps(Config *config)
+{
+  // First set everything common between D868UV and D878UV codeplugs.
+  D868UVCodeplug::setBitmaps(config);
+
+  // Mark roaming zones
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    roaming_zone_bitmap[i/8] |= (1<<(i%8));
+
+  // Mark roaming channels
+  uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
+  // Get all (unique) channels used in roaming
+  for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,config->roamingChannels()->count()); i++)
+    roaming_ch_bitmap[i/8] |= (1<<(i%8));
+}
+
+
+bool
+DMR6X2UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
+{
+  // Encode everything common between d868uv and d878uv radios.
+  if (! D868UVCodeplug::encodeElements(flags, ctx, err))
+    return false;
+
+  if (! this->encodeRoaming(flags, ctx, err))
+    return false;
+
+  return true;
+}
+
+
+bool
+DMR6X2UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
+{
+  // Decode everything commong between d868uv and d878uv codeplugs.
+  if (! D868UVCodeplug::decodeElements(ctx, err))
+    return false;
+
+  if (! this->createRoaming(ctx, err))
+    return false;
+
+  if (! this->linkRoaming(ctx, err))
+    return false;
+
+  return true;
+}
+
+
+void
 DMR6X2UVCodeplug::allocateGeneralSettings() {
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
   image(0).addElement(ADDR_EXTENDED_SETTINGS, EXTENDED_SETTINGS_SIZE);
@@ -838,5 +938,106 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
     gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
   }
 
+  return true;
+}
+
+
+void
+DMR6X2UVCodeplug::allocateRoaming() {
+  /* Allocate roaming channels */
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    // Get byte and bit for roaming channel
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming channel
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    if (nullptr == data(addr, 0))
+      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+  }
+
+  /* Allocate roaming zones. */
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+    // Get byte and bit for radio ID
+    uint16_t bit = i%8, byte = i/8;
+    // if disabled -> skip
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    // Allocate roaming zone
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    if (nullptr == data(addr, 0)) {
+      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+    }
+  }
+}
+
+bool
+DMR6X2UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+
+  // Encode roaming channels
+  for (uint8_t i=0; i<std::min(NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count()); i++) {
+    // Encode roaming channel
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    D878UVCodeplug::RoamingChannelElement rch_elm(data(addr));
+    RoamingChannel *rch = ctx.config()->roamingChannels()->get(i)->as<RoamingChannel>();
+    rch_elm.clear();
+    rch_elm.fromChannel(rch);
+    if (! ctx.add(rch, i)) {
+      errMsg(err) << "Cannot add index " << i << " for roaming channel '"
+                  << rch->name() << "' to codeplug context.";
+      return false;
+    }
+  }
+
+  // Encode roaming zones
+  for (int i=0; i<ctx.config()->roamingZones()->count(); i++){
+    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
+    D878UVCodeplug::RoamingZoneElement zone(data(addr));
+    zone.fromRoamingZone(ctx.config()->roamingZones()->zone(i), ctx);
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Create or find roaming channels
+  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
+  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    D878UVCodeplug::RoamingChannelElement ch(data(addr));
+    RoamingChannel *digi = ch.toChannel(ctx);
+    ctx.add(digi, i);
+  }
+
+  // Create and link roaming zones
+  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
+  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
+    uint8_t byte=i/8, bit=i%8;
+    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+      continue;
+    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    D878UVCodeplug::RoamingZoneElement z(data(addr));
+    RoamingZone *zone = z.toRoamingZone();
+    ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);
+    z.linkRoamingZone(zone, ctx);
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::linkRoaming(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+  // Pass, no need to link roaming channels.
   return true;
 }
