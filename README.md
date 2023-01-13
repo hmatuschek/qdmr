@@ -42,7 +42,7 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.11.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.0)** -- Added proper support for BTech DMR-6X2UV, some bugfixes.
+ * **[Version 0.11.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.1)** -- Added proper support for BTech DMR-6X2UV, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
  * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
  * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
