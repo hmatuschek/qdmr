@@ -20,6 +20,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Update APT
+      run: sudo apt-get update
+      
     - name: Install Dependencies
       run: sudo apt-get install qttools5-dev qtbase5-dev qtbase5-dev-tools libqt5serialport5-dev qtpositioning5-dev libusb-1.0-0-dev libyaml-cpp-dev
       
