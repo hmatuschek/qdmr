@@ -30,13 +30,9 @@ D878UV2Test::cleanupTestCase() {
 void
 D878UV2Test::testBasicConfigEncoding() {
   ErrorStack err;
-  D878UV2 radio;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   D878UV2Codeplug codeplug;
-  codeplug.clear();
-  codeplug.setBitmaps(&_basicConfig);
-  codeplug.allocateUpdated();
-  codeplug.allocateForEncoding();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UVII: {}")
           .arg(err.format()).toStdString().c_str());
   }
@@ -45,13 +41,9 @@ D878UV2Test::testBasicConfigEncoding() {
 void
 D878UV2Test::testBasicConfigDecoding() {
   ErrorStack err;
-  D878UV2 radio;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   D878UV2Codeplug codeplug;
-  codeplug.clear();
-  codeplug.setBitmaps(&_basicConfig);
-  codeplug.allocateUpdated();
-  codeplug.allocateForEncoding();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UVII: {}")
           .arg(err.format()).toStdString().c_str());
   }

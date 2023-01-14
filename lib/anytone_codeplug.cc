@@ -3903,14 +3903,25 @@ AnytoneCodeplug::ContactMapElement::size() {
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
-AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
-  : Codeplug(parent)
+AnytoneCodeplug::AnytoneCodeplug(const QString &label, QObject *parent)
+  : Codeplug(parent), _label(label)
 {
   // pass...
 }
 
 AnytoneCodeplug::~AnytoneCodeplug() {
   // pass...
+}
+
+void
+AnytoneCodeplug::clear() {
+  while (this->numImages())
+    remImage(0);
+
+  addImage(_label);
+
+  // Allocate bitmaps
+  this->allocateBitmaps();
 }
 
 bool
@@ -3963,5 +3974,38 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   return true;
 }
+
+bool
+AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
+  Context ctx(config);
+
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode anytone codeplug.";
+    return false;
+  }
+
+  // If codeplug is generated from scratch -> clear and reallocate
+  if (! flags.updateCodePlug) {
+    // Clear codeplug
+    this->clear();
+    // First set bitmaps
+    this->setBitmaps(config);
+    // Then allocate elements
+    this->allocateUpdated();
+    this->allocateForEncoding();
+  }
+
+  // Then encode everything.
+  return this->encodeElements(flags, ctx, err);
+}
+
+bool
+AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
+  // Maps code-plug indices to objects
+  Context ctx(config);
+  return this->decodeElements(ctx, err);
+}
+
+
 
 
