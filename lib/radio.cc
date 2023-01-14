@@ -15,6 +15,7 @@
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+#include "dmr6x2uv.hh"
 
 #include "config.hh"
 #include "logger.hh"
@@ -66,6 +67,8 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new D878UV2(anytone);
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
+      } else if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
+        return new DMR6X2UV(anytone);
       } else if (id.isValid()) {
         errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
                        .arg(id.manufacturer())
