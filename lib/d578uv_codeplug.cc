@@ -139,8 +139,14 @@ D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 /* ******************************************************************************************** *
  * Implementation of D578UVCodeplug
  * ******************************************************************************************** */
+D578UVCodeplug::D578UVCodeplug(const QString &label, QObject *parent)
+  : D878UVCodeplug(label, parent)
+{
+  // pass...
+}
+
 D578UVCodeplug::D578UVCodeplug(QObject *parent)
-  : D878UVCodeplug(parent)
+  : D878UVCodeplug("AnyTone AT-D578UV Codeplug", parent)
 {
   // pass...
 }

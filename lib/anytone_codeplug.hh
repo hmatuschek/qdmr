@@ -2030,27 +2030,46 @@ public:
 
 protected:
   /** Hidden constructor. */
-  explicit AnytoneCodeplug(QObject *parent=nullptr);
+  AnytoneCodeplug(const QString &label, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
   virtual ~AnytoneCodeplug();
 
   /** Clears and resets the complete codeplug to some default values. */
-  virtual void clear() = 0;
+  virtual void clear();
 
+  bool encode(Config *config, const Flags &flags, const ErrorStack &err);
+  bool decode(Config *config, const ErrorStack &err);
+
+protected:
   virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
+  /** Allocates the bitmaps. This is also performed during a clear. */
+  virtual bool allocateBitmaps() = 0;
   /** Sets all bitmaps for the given config. */
   virtual void setBitmaps(Config *config) = 0;
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * within the radio that are not represented within the common Config are omitted. */
-  virtual void allocateForDecoding() = 0;
+
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */
   virtual void allocateUpdated() = 0;
+  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
+   * within the radio that are not represented within the common Config are omitted. */
+  virtual void allocateForDecoding() = 0;
   /** Allocate all code-plug elements that are defined through the common Config. */
   virtual void allocateForEncoding() = 0;
+
+  /** Encodes the given config (via context) to the binary codeplug. */
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the downloaded codeplug. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+protected:
+  /** Holds the image label. */
+  QString _label;
+
+  // Allow access to protected allocation methods.
+  friend class AnytoneRadio;
 };
 
 #endif // ANYTONECODEPLUG_HH

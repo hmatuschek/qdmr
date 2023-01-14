@@ -378,35 +378,22 @@ public:
     virtual bool updateConfig(Context &ctx);
   };
 
+protected:
+  /** Hidden constructor constructor. */
+  explicit D868UVCodeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D868UVCodeplug(QObject *parent = nullptr);
 
-  /** Clears and resets the complete codeplug to some default values. */
-  virtual void clear();
-
-  /** Sets all bitmaps for the given config. */
+protected:
+  bool allocateBitmaps();
   virtual void setBitmaps(Config *config);
-
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * within the radio that are not represented within the common Config are omitted. */
-  virtual void allocateForDecoding();
-  /** Allocate all code-plug elements that must be written back to the device to maintain a working
-   * codeplug. These elements might be updated during encoding. */
   virtual void allocateUpdated();
-  /** Allocate all code-plug elements that are defined through the common Config. */
+  virtual void allocateForDecoding();
   virtual void allocateForEncoding();
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
-  bool decode(Config *config, const ErrorStack &err=ErrorStack());
-
-  /** Encodes the given generic configuration as a binary codeplug. */
-  bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack());
-
-protected:
-  /** Encodes the given config (via context) to the binary codeplug. */
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Decodes the downloaded codeplug. */
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */

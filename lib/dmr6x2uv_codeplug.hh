@@ -588,16 +588,20 @@ public:
   };
 
 public:
+  /** Hidden constructor. */
+  explicit DMR6X2UVCodeplug(const QString &label, QObject *parent=nullptr);
+
+public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
 
-  void clear();
+protected:
+  bool allocateBitmaps();
   void setBitmaps(Config *config);
   void allocateForDecoding();
   void allocateUpdated();
   void allocateForEncoding();
 
-protected:
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
