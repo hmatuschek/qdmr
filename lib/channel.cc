@@ -18,8 +18,60 @@
 #include <QCompleter>
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
+#include <QRegularExpression>
 
 #include "opengd77_extension.hh"
+
+/* ********************************************************************************************* *
+ * Some helper functions
+ * ********************************************************************************************* */
+inline std::string formatFrequency(qulonglong F) {
+  qulonglong MHz = F/1000000ULL, Hz = F%1000000ULL;
+  return QString("%1.%2").arg(MHz).arg(Hz, 6, 10, QChar('0')).toStdString();
+}
+
+inline qulonglong readFrequency(
+    const YAML::Node &node, bool *ok=nullptr, const ErrorStack &err=ErrorStack())
+{
+  if (! node.IsScalar()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Invalid node type. Expected scalar, got " << node.Type() << ".";
+    if (ok) *ok = false;
+    return 0;
+  }
+  QString F = QString::fromStdString(node.as<std::string>());
+  QRegularExpression re("([0-9]+)(?:\\.([0-9]+))");
+  QRegularExpressionMatch match = re.match(F);
+
+  // Chcek if pattern matches
+  if (! match.hasMatch()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Malformed frequency '" << F << "'.";
+    if (ok) *ok = false;
+    return 0;
+  }
+
+  // Get MHz part (easy)
+  qulonglong MHz = match.captured(1).toULongLong(ok), Hz=0;
+  if (ok && !(*ok)) return 0;
+
+  // Get Hz part (hard)
+  if (! match.captured(2).isEmpty()) {
+    qulonglong factor = 100000ULL; //<- 100kHz
+    QString dec = match.captured(2);
+    while (factor && !dec.isEmpty()) {
+      if (! dec.front().isDigit()) {
+        if (ok) *ok = false;
+        return 0;
+      }
+      Hz += dec.front().digitValue()*factor;
+      factor /= 10;
+    }
+  }
+
+  if (ok) *ok = true;
+  return MHz*1000000UL + Hz;
+}
 
 
 /* ********************************************************************************************* *
@@ -78,23 +130,27 @@ Channel::clear() {
   _tytChannelExtension = nullptr;
 }
 
-double
+qulonglong
 Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
-Channel::setRXFrequency(double freq) {
+Channel::setRXFrequency(qulonglong freq) {
+  if (freq == _rxFreq)
+    return true;
   _rxFreq = freq;
   emit modified(this);
   return true;
 }
 
-double
+qulonglong
 Channel::txFrequency() const {
   return _txFreq;
 }
 bool
-Channel::setTXFrequency(double freq) {
+Channel::setTXFrequency(qulonglong freq) {
+  if (freq == _txFreq)
+    return true;
   _txFreq = freq;
   emit modified(this);
   return true;
@@ -246,6 +302,10 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
+  // Serialize freuqencies in MHz
+  node["rxFrequency"] = formatFrequency(_rxFreq);
+  node["txFrequency"] = formatFrequency(_txFreq);
+
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -283,6 +343,32 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
+  // Parse frequencies
+  if (ch["rxFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No rxFreuqency specified.";
+    return false;
+  }
+  bool ok = true;
+  setRXFrequency(readFrequency(ch["rxFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << ch["rxFrequency"].Mark().line << ":" << ch["rxFrequency"].Mark().column
+                << "Cannot parse channel. Invalid rxFrequency.";
+    return false;
+  }
+
+  if (ch["txFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No txFrequency specified.";
+    return false;
+  }
+  setTXFrequency(readFrequency(ch["txFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << ch["txFrequency"].Mark().line << ":" << ch["txFrequency"].Mark().column
+                << "Cannot parse channel. Invalid txFrequency.";
+    return false;
+  }
+
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {
