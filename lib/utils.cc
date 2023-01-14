@@ -378,8 +378,8 @@ validDTMFNumber(const QString &text) {
 }
 
 QString
-format_frequency(double MHz) {
-  return QString::number(MHz, 'f', 5);
+format_frequency(qulonglong Hz) {
+  return QString::number(double(Hz)/1e6, 'f', 5);
 }
 
 QString

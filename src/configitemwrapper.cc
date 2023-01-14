@@ -1,6 +1,7 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
+#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -216,10 +217,6 @@ ChannelListWrapper::columnCount(const QModelIndex &index) const {
   return 20;
 }
 
-inline QString formatFrequency(qlonglong f) {
-  return QString::number(double(f)/1e6, 'f', 4);
-}
-
 QVariant
 ChannelListWrapper::data(const QModelIndex &index, int role) const {
   if (nullptr == _list)
@@ -261,12 +258,12 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return channel->name();
   case 2:
-    return formatFrequency(channel->rxFrequency());
+    return format_frequency(channel->rxFrequency());
   case 3:
     if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(qlonglong(channel->txFrequency())-channel->rxFrequency());
+      return format_frequency(qlonglong(channel->txFrequency())-channel->rxFrequency());
     else
-      return formatFrequency(channel->txFrequency());
+      return format_frequency(channel->txFrequency());
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
