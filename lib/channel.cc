@@ -40,7 +40,7 @@ inline qulonglong readFrequency(
     return 0;
   }
   QString F = QString::fromStdString(node.as<std::string>());
-  QRegularExpression re("([0-9]+)(?:\\.([0-9]+))");
+  QRegularExpression re("([0-9]+)(?:\\.([0-9]+))?");
   QRegularExpressionMatch match = re.match(F);
 
   // Chcek if pattern matches
@@ -66,6 +66,7 @@ inline qulonglong readFrequency(
       }
       Hz += dec.front().digitValue()*factor;
       factor /= 10;
+      dec.remove(0,1);
     }
   }
 

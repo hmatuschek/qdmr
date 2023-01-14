@@ -216,9 +216,8 @@ ChannelListWrapper::columnCount(const QModelIndex &index) const {
   return 20;
 }
 
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
+inline QString formatFrequency(qlonglong f) {
+  return QString::number(double(f)/1e6, 'f', 4);
 }
 
 QVariant
@@ -256,16 +255,16 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   switch (index.column()) {
   case 0:
     if (channel->is<FMChannel>())
-      return tr("Analog");
+      return tr("FM");
     else
-      return tr("Digital");
+      return tr("DMR");
   case 1:
     return channel->name();
   case 2:
     return formatFrequency(channel->rxFrequency());
   case 3:
     if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
+      return formatFrequency(qlonglong(channel->txFrequency())-channel->rxFrequency());
     else
       return formatFrequency(channel->txFrequency());
   case 4:
