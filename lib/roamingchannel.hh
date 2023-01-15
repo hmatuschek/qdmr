@@ -38,13 +38,13 @@ public:
   ConfigItem *clone() const;
   void clear();
 
-  /** Returns the RX frequency in MHz. */
+  /** Returns the RX frequency in Hz. */
   qulonglong rxFrequency() const;
-  /** Sets the RX frquency in MHz. */
+  /** Sets the RX frquency in Hz. */
   void setRXFrequency(qulonglong f);
-  /** Returns the TX frequency in MHz. */
+  /** Returns the TX frequency in Hz. */
   qulonglong txFrequency() const;
-  /** Sets the TX frquency in MHz. */
+  /** Sets the TX frquency in Hz. */
   void setTXFrequency(qulonglong f);
 
   /** Returns @c true, if the color code of the channel gets overridden. */
