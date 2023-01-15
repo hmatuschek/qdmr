@@ -372,8 +372,8 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
 
   // Apply common settings
   ch->setName(name());
-  ch->setRXFrequency(double(rxFrequency())/1e6);
-  ch->setTXFrequency(double(txFrequency())/1e6);
+  ch->setRXFrequency(rxFrequency());
+  ch->setTXFrequency(txFrequency());
   ch->setPower(power());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
@@ -407,8 +407,8 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   clear();
 
   setName(c->name());
-  setRXFrequency(c->rxFrequency()*1e6);
-  setTXFrequency(c->txFrequency()*1e6);
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
   else
