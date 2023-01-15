@@ -14,6 +14,7 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <cmath>
+#include "utils.hh"
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>
@@ -21,59 +22,6 @@
 #include <QRegularExpression>
 
 #include "opengd77_extension.hh"
-
-/* ********************************************************************************************* *
- * Some helper functions
- * ********************************************************************************************* */
-inline std::string formatFrequency(qulonglong F) {
-  qulonglong MHz = F/1000000ULL, Hz = F%1000000ULL;
-  return QString("%1.%2").arg(MHz).arg(Hz, 6, 10, QChar('0')).toStdString();
-}
-
-inline qulonglong readFrequency(
-    const YAML::Node &node, bool *ok=nullptr, const ErrorStack &err=ErrorStack())
-{
-  if (! node.IsScalar()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << ": Invalid node type. Expected scalar, got " << node.Type() << ".";
-    if (ok) *ok = false;
-    return 0;
-  }
-  QString F = QString::fromStdString(node.as<std::string>());
-  QRegularExpression re("([0-9]+)(?:\\.([0-9]+))?");
-  QRegularExpressionMatch match = re.match(F);
-
-  // Chcek if pattern matches
-  if (! match.hasMatch()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << ": Malformed frequency '" << F << "'.";
-    if (ok) *ok = false;
-    return 0;
-  }
-
-  // Get MHz part (easy)
-  qulonglong MHz = match.captured(1).toULongLong(ok), Hz=0;
-  if (ok && !(*ok)) return 0;
-
-  // Get Hz part (hard)
-  if (! match.captured(2).isEmpty()) {
-    qulonglong factor = 100000ULL; //<- 100kHz
-    QString dec = match.captured(2);
-    while (factor && !dec.isEmpty()) {
-      if (! dec.front().isDigit()) {
-        if (ok) *ok = false;
-        return 0;
-      }
-      Hz += dec.front().digitValue()*factor;
-      factor /= 10;
-      dec.remove(0,1);
-    }
-  }
-
-  if (ok) *ok = true;
-  return MHz*1000000UL + Hz;
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of Channel
@@ -304,8 +252,8 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     return false;
 
   // Serialize freuqencies in MHz
-  node["rxFrequency"] = formatFrequency(_rxFreq);
-  node["txFrequency"] = formatFrequency(_txFreq);
+  node["rxFrequency"] = format_frequency(_rxFreq).toStdString();
+  node["txFrequency"] = format_frequency(_txFreq).toStdString();
 
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
@@ -351,7 +299,7 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     return false;
   }
   bool ok = true;
-  setRXFrequency(readFrequency(ch["rxFrequency"], &ok, err));
+  setRXFrequency(read_frequency(ch["rxFrequency"], &ok, err));
   if (! ok) {
     errMsg(err) << ch["rxFrequency"].Mark().line << ":" << ch["rxFrequency"].Mark().column
                 << "Cannot parse channel. Invalid rxFrequency.";
@@ -363,7 +311,7 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
                 << "Cannot parse channel. No txFrequency specified.";
     return false;
   }
-  setTXFrequency(readFrequency(ch["txFrequency"], &ok, err));
+  setTXFrequency(read_frequency(ch["txFrequency"], &ok, err));
   if (! ok) {
     errMsg(err) << ch["txFrequency"].Mark().line << ":" << ch["txFrequency"].Mark().column
                 << "Cannot parse channel. Invalid txFrequency.";

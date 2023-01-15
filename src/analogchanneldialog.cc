@@ -134,8 +134,8 @@ FMChannel *
 AnalogChannelDialog::channel()
 {
   _myChannel->setName(channelName->text());
-  _myChannel->setRXFrequency(rxFrequency->text().toDouble()*1e6);
-  _myChannel->setTXFrequency(txFrequency->text().toDouble()*1e6);
+  _myChannel->setRXFrequency(read_frequency(rxFrequency->text()));
+  _myChannel->setTXFrequency(read_frequency(txFrequency->text()));
   if (powerDefault->isChecked()) {
     _myChannel->setDefaultPower();
   } else {
