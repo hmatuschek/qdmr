@@ -1938,7 +1938,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/configitemwrapper.cc" line="708"/>
         <source>OOps!</source>
-        <translation>Oops!</translation>
+        <translation>Ups!</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="714"/>
@@ -1959,7 +1959,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/configitemwrapper.cc" line="729"/>
         <source>OOPS!</source>
-        <translation>Oops!</translation>
+        <translation>Ups!</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="749"/>
