@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>data/config_test.yaml</file>
+        <file>data/channel_frequency_test.yaml</file>
     </qresource>
 </RCC>

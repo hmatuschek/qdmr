@@ -19,8 +19,11 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
 
+  void testChannelFrequency();
+
 protected:
   Config _basicConfig;
+  Config _channelFrequencyConfig;
 };
 
 #endif // RD5RTEST_HH

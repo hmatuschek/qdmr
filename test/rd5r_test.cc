@@ -19,12 +19,17 @@ RD5RTest::initTestCase() {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
+  if (! _channelFrequencyConfig.readYAML(":/data/channel_frequency_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
 RD5RTest::cleanupTestCase() {
   // clear codeplug
   _basicConfig.clear();
+  _channelFrequencyConfig.clear();
 }
 
 void
@@ -53,6 +58,28 @@ RD5RTest::testBasicConfigDecoding() {
     QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: {}")
           .arg(err.format()).toStdString().c_str());
   }
+}
+
+void
+RD5RTest::testChannelFrequency() {
+  ErrorStack err;
+  RD5RCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           123456780ULL);
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           1234567890ULL);
 }
 
 QTEST_GUILESS_MAIN(RD5RTest)
