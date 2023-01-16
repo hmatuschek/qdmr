@@ -30,7 +30,7 @@ class DMRRadioID;
  * @ingroup conf */
 class Channel: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
 
   /** The receive frequency of the channel. */
   Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
@@ -50,6 +50,9 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
+
+  /** Specifies the prefix for every ID assigned to every channel during serialization. */
+  Q_CLASSINFO("IdPrefix", "ch")
 
 public:
   /** Possible power settings. */

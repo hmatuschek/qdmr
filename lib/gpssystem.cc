@@ -9,13 +9,13 @@
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
 PositioningSystem::PositioningSystem(QObject *parent)
-  : ConfigObject("aprs", parent), _period(0)
+  : ConfigObject(parent), _period(0)
 {
   // pass...
 }
 
 PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
-  : ConfigObject(name, "aprs", parent), _period(period)
+  : ConfigObject(name, parent), _period(period)
 {
   // pass...
 }
