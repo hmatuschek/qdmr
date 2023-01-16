@@ -4,7 +4,8 @@
  * \image html dm1701.png "DM-1701" width=200px
  * \image latex dm1701.png "DM-1701" width=200px
  *
- * The Baofeng DM-1701 and the identical Retevis RT84.
+ * The Baofeng DM-1701 and the identical Retevis RT84. This implementation supports CPS version 1.5
+ * and firmware version 2.3.
  *
  * Features:
  *   - VHF/UHF, 136-174 MHz and 400-480 MHz

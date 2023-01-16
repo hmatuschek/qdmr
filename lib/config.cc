@@ -371,8 +371,8 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     ctx.setVersion(QString::fromStdString(node["version"].as<std::string>()));
     logDebug() << "Using format version " << ctx.version() << ".";
   } else {
-    logWarn() << "No version string set, assuming 0.9.0.";
-    ctx.setVersion("0.9.0");
+    logWarn() << "No version string set, assuming " << VERSION_STRING << ".";
+    ctx.setVersion(VERSION_STRING);
   }
 
   if (node["settings"] && (! _settings->parse(node["settings"], ctx, err)))

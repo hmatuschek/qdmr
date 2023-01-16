@@ -1,0 +1,9 @@
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+channels:
+  - dmr:
+      id: ch1
+      name: "Test Channel"
+      rxFrequency: 123.456780   # <- Up to 10Hz precision
+      txFrequency: 1234.567890 
