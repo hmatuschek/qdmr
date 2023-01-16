@@ -58,7 +58,7 @@ UV390Test::testChannelFrequency() {
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
            123456780ULL);
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
-           1234567890ULL);
+           999999990ULL);
 }
 
 

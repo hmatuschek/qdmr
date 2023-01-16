@@ -43,9 +43,10 @@ D868UVETest::testBasicConfigDecoding() {
 void
 D868UVETest::testChannelFrequency() {
   ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   D868UVCodeplug codeplug;
   codeplug.clear();
-  if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone D868UV: {}")
           .arg(err.format()).toStdString().c_str());
   }
@@ -59,7 +60,7 @@ D868UVETest::testChannelFrequency() {
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
            123456780ULL);
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
-           1234567890ULL);
+           999999990ULL);
 }
 
 

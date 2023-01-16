@@ -59,7 +59,7 @@ GD77Test::testChannelFrequency() {
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
            123456780ULL);
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
-           1234567890ULL);
+           999999990ULL);
 }
 
 QTEST_GUILESS_MAIN(GD77Test)

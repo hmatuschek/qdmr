@@ -43,9 +43,10 @@ DMR6X2UVTest::testBasicConfigDecoding() {
 void
 DMR6X2UVTest::testChannelFrequency() {
   ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   D868UVCodeplug codeplug;
   codeplug.clear();
-  if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: {}")
           .arg(err.format()).toStdString().c_str());
   }
@@ -59,7 +60,7 @@ DMR6X2UVTest::testChannelFrequency() {
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
            123456780ULL);
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
-           1234567890ULL);
+           999999990ULL);
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)

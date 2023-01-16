@@ -5,5 +5,5 @@ channels:
   - dmr:
       id: ch1
       name: "Test Channel"
-      rxFrequency: 123.456780   # <- Up to 10Hz precision
-      txFrequency: 1234.567890 
+      rxFrequency: 123.4567801  # <- Up to 10Hz precision -> 123.45678 MHz
+      txFrequency: 999.99999    # <- Max frequency for 8-digit BCD in 10Hz
