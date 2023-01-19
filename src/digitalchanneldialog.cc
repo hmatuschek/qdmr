@@ -227,7 +227,7 @@ DMRChannelDialog::onVOXDefaultToggled(bool checked) {
 }
 
 void
-DigitalChannelDialog::onHideChannelHint() {
+DMRChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);

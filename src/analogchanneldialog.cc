@@ -213,7 +213,7 @@ FMChannelDialog::onVOXDefaultToggled(bool checked) {
 }
 
 void
-AnalogChannelDialog::onHideChannelHint() {
+FMChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
