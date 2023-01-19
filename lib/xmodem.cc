@@ -1,4 +1,6 @@
 #include "xmodem.hh"
+#include "logger.hh"
+
 
 XModem::XModem(const USBDeviceDescriptor& descriptor, const ErrorStack& err, QObject *parent)
   : USBSerial(descriptor, err, parent), _state(State::Init), _maxRetry(10)
@@ -27,6 +29,7 @@ XModem::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
   // Expected sequence number
   uint8_t seqNum = 1;
   QByteArray payload;
+  unsigned int retry_count = 0;
 
   while (true) {
     uint8_t rsp, seq, seq1c;
@@ -85,11 +88,17 @@ XModem::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
           }
           return false;
         }
-        seqNum += 1;
+        seqNum++;
 
         // Check CRC
         if (crc != crc_ccitt(payload)) {
           if (! txByte(NAK, timeout, err)) {
+            _state = State::Error;
+            return false;
+          }
+          retry_count++;
+          if (retry_count > _maxRetry) {
+            errMsg(err) << "Maximum retries (" << _maxRetry<<") reached.";
             _state = State::Error;
             return false;
           }
@@ -103,6 +112,7 @@ XModem::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
         if (State::Init == _state)
           _state = State::Transfer;
         // State updated to transfer -> continue transfer
+        retry_count = 0;
         break;
 
       case EOT:
@@ -115,8 +125,13 @@ XModem::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
         }
         // Done.
         return true;
-      }
 
+      default:
+        // Unknown command:
+        _state = State::Error;
+        errMsg(err) << "Unknown command " << rsp << ".";
+        return false;
+      }      
     case State::Error:
       return false;
     }
