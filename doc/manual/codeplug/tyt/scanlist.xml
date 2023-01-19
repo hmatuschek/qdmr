@@ -15,7 +15,7 @@
 </para>
 
 <example>
-  <title>TyT specific scan-list settings showing the default values.</title>
+  <title>Scan-list settings example showing the default values.</title>
   <programlisting><![CDATA[tyt:
   holdTime: 500
   prioritySampleTime: 2000

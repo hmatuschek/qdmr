@@ -5,7 +5,7 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "scanlist.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 GD77Limits::GD77Limits(QObject *parent)

@@ -162,13 +162,17 @@ UV390Codeplug::ChannelElement::enableDCDMLeader(bool enable) {
 
 
 Channel *
-UV390Codeplug::ChannelElement::toChannelObj() const {
-  if (! isValid())
+UV390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid channel.";
     return nullptr;
+  }
 
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
-  if (nullptr == ch)
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj(err);
+  if (nullptr == ch) {
+    errMsg(err) << "Cannot decode base TyT channel element.";
     return nullptr;
+  }
 
   // decode squelch setting
   if (ch->is<FMChannel>()) {

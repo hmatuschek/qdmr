@@ -232,12 +232,19 @@ public:
     virtual bool analogScambler() const;
     /** Enables/disables the analog scambler. */
     virtual void enableAnalogScamber(bool enable);
+
+    Channel *toChannelObj(Context &ctx) const;
   };
+
+protected:
+  /** Hidden constructor. */
+  explicit D578UVCodeplug(const QString &label, QObject *parent = nullptr);
 
 public:
   /** Empty constructor. */
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
+protected:
   void allocateUpdated();
 
   void allocateHotKeySettings();

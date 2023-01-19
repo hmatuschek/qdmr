@@ -229,6 +229,81 @@ ConfigItem::copy(const ConfigItem &other) {
   return true;
 }
 
+int
+ConfigItem::compare(const ConfigItem &other) const {
+  // Check if other has the same type
+  if (strcmp(other.metaObject()->className(), metaObject()->className()))
+    return strcmp(metaObject()->className(), other.metaObject()->className());
+
+  // Compare by properties
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    // This property
+    QMetaProperty prop = meta->property(p);
+    // the same property over at other
+    QMetaProperty oprop = other.metaObject()->property(p);
+
+    // Should never happen
+    if (! prop.isValid())
+      continue;
+
+    // Handle comparison of basic types
+    if ((prop.isEnumType()) || (QVariant::Bool == prop.type()) || (QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+      int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
+      if (a<b) return -1;
+      if (a>b) return 1;
+      continue;
+    }
+
+    if (QVariant::Double == prop.type()) {
+      double a=prop.read(this).toDouble(), b=oprop.read(&other).toDouble();
+      if (a<b) return -1;
+      if (a>b) return 1;
+      continue;
+    }
+
+    if (QVariant::String == prop.type()) {
+      int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
+      if (cmp) return cmp;
+      continue;
+    }
+
+    if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+      int cmp = ref->compare(*oprop.read(&other).value<ConfigObjectReference*>());
+      if (cmp) return cmp;
+      continue;
+    }
+
+    if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectList*>());
+      if (cmp) return cmp;
+      continue;
+    }
+
+    if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
+      int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectRefList*>());
+      if (cmp) return cmp;
+      continue;
+    }
+
+    if (propIsInstance<ConfigItem>(prop)) {
+      // If the owned item is writeable -> clone if set in other
+      if (prop.read(&other).isNull() && !oprop.read(&other).isNull())
+        return -1;
+      if (!prop.read(&other).isNull() && oprop.read(&other).isNull())
+        return 1;
+      if (prop.read(&other).isNull() && oprop.read(&other).isNull())
+        continue;
+      int cmp = prop.read(&other).value<ConfigItem*>()->compare(*oprop.read(&other).value<ConfigItem*>());
+      if (cmp) return cmp;
+      continue;
+    }
+  }
+
+  return 0;
+}
+
+
 bool
 ConfigItem::label(ConfigObject::Context &context, const ErrorStack &err) {
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
@@ -265,7 +340,7 @@ void
 ConfigItem::clear() {
   emit beginClear();
 
-  // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
+  // Delete or clear all object owned by properties, that is ConfigObjectList and ConfigObject
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
@@ -1265,6 +1340,19 @@ ConfigObjectList::copy(const AbstractConfigObjectList &other) {
   return true;
 }
 
+int
+ConfigObjectList::compare(const ConfigObjectList &other) const {
+  if (count() < other.count())
+    return -1;
+  if (count() > other.count())
+    return 1;
+  for (int i=0; i<count(); i++) {
+    int cmp = this->get(i)->compare(*other.get(i));
+    if (cmp) return cmp;
+  }
+
+  return 0;
+}
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectRefList
@@ -1299,5 +1387,16 @@ ConfigObjectRefList::serialize(const ConfigItem::Context &context, const ErrorSt
     list.push_back(context.getId(obj).toStdString());
   }
   return list;
+}
+
+int
+ConfigObjectRefList::compare(const ConfigObjectRefList &other) const {
+  if (count() < other.count()) return -1;
+  if (count() > other.count()) return 1;
+  for (int i=0; i<count(); i++) {
+    int cmp = get(i)->compare(*other.get(i));
+    if (cmp) return cmp;
+  }
+  return 0;
 }
 

@@ -25,6 +25,7 @@ protected slots:
   void onTimeoutDefaultToggled(bool checked);
   void onSquelchDefaultToggled(bool checked);
   void onVOXDefaultToggled(bool checked);
+  void onHideChannelHint();
 
 protected:
   Config *_config;

@@ -18,13 +18,11 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 20 | Color code                    |LWK|EEE|RGP|EAT| 0 |EST|SMC|TSL| AES Encryption key            | Name 16 x ASCII 0-padded   ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30  ...                                                                                            | Unused set to 0x00            |
+30  ...                                                                                            | Pad byte set to 0x00          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | 0   0   0   0   0 |DAD|ETM|RNG| 0   0   0   0   0   0   0 |TAP| DMR APRS IDX (0-based)        | Unused set to 0x00            |
+34 | Device specific settings                                                                                                   ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-38 | Unused set to 0x00            | Unused set to 0x00            | DMR encryption idx +1, 0=off  | 0   0   0   0   0 |SMF|RnK|Muk|
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Unused set to 0x00000000                                                                                                      |
+3c  ...                                                                                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
@@ -51,11 +49,3 @@ Field description:
  - EST: Enable simplex TDMA,
  - SMC: SMS confirmation,
  - TSL: Time slot where 0=TS1, 1=TS2
- - DAD: Data ACK disable (inverted!)
- - ETM: Enable through mode
- - RNG: Ranging
- - APRSRep: Enable APRS/GPS report,
- - TAP: TX APRS enable
- - MuK: Multiple keys
- - RnK: Random key
- - SMF: SMS forbid.

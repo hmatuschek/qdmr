@@ -29,7 +29,7 @@ Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
     _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
     _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
-    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
+    _tytChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -37,9 +37,9 @@ Channel::Channel(QObject *parent)
 
 Channel::Channel(const Channel &other, QObject *parent)
   : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
-    _tytChannelExtension(nullptr), _commercialExtension(nullptr)
+    _tytChannelExtension(nullptr)
 {
-  copy(other);
+  Channel::copy(other);
 
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -76,9 +76,6 @@ Channel::clear() {
   if (_tytChannelExtension)
     _tytChannelExtension->deleteLater();
   _tytChannelExtension = nullptr;
-  if (_commercialExtension)
-    _commercialExtension->deleteLater();
-  _commercialExtension = nullptr;
 }
 
 double
@@ -244,23 +241,6 @@ Channel::setTyTChannelExtension(TyTChannelExtension *ext) {
   }
 }
 
-CommercialChannelExtension *
-Channel::commercialExtension() const {
-  return _commercialExtension;
-}
-void
-Channel::setCommercialExtension(CommercialChannelExtension *ext) {
-  if (_commercialExtension == ext)
-    return;
-  if (_commercialExtension)
-    _commercialExtension->deleteLater();
-  _commercialExtension = ext;
-  if (_commercialExtension) {
-    _commercialExtension->setParent(this);
-    connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
-  }
-}
-
 bool
 Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
   if (! ConfigObject::populate(node, context, err))
@@ -356,6 +336,7 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of FMChannel
  * ********************************************************************************************* */
@@ -363,14 +344,14 @@ FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
     _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
     _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
-    _aprsSystem()
+    _aprsSystem(), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
 FMChannel::FMChannel(const FMChannel &other, QObject *parent)
-  : AnalogChannel(parent), _aprsSystem()
+  : AnalogChannel(parent), _aprsSystem(), _anytoneExtension(nullptr)
 {
   copy(other);
   // Link APRS system reference
@@ -408,6 +389,7 @@ FMChannel::clear() {
   setTXTone(Signaling::SIGNALING_NONE);
   setBandwidth(Bandwidth::Narrow);
   setAPRSSystem(nullptr);
+  setAnytoneChannelExtension(nullptr);
 }
 
 FMChannel::Admit
@@ -504,6 +486,23 @@ FMChannel::aprsSystem() const {
 void
 FMChannel::setAPRSSystem(APRSSystem *sys) {
   _aprsSystem.set(sys);
+}
+
+AnytoneFMChannelExtension *
+FMChannel::anytoneChannelExtension() const {
+  return _anytoneExtension;
+}
+void
+FMChannel::setAnytoneChannelExtension(AnytoneFMChannelExtension *ext) {
+  if (_anytoneExtension == ext)
+    return;
+  if (_anytoneExtension)
+    _anytoneExtension->deleteLater();
+  _anytoneExtension = ext;
+  if (_anytoneExtension) {
+    _anytoneExtension->setParent(this);
+    connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
 }
 
 YAML::Node
@@ -623,13 +622,14 @@ DigitalChannel::DigitalChannel(const DigitalChannel &other, QObject *parent)
 DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
-    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+    _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+    _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
@@ -643,13 +643,14 @@ DMRChannel::DMRChannel(QObject *parent)
 }
 
 DMRChannel::DMRChannel(const DMRChannel &other, QObject *parent)
-  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId()
+  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+  _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(metaObject()->className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(metaObject()->className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
+  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
 
   copy(other);
 
@@ -671,6 +672,8 @@ DMRChannel::clear() {
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
   setRadioIdObj(DefaultRadioID::get());
+  setCommercialExtension(nullptr);
+  setAnytoneChannelExtension(nullptr);
 }
 
 ConfigItem *
@@ -871,6 +874,40 @@ DMRChannel::setRadioIdObj(DMRRadioID *id) {
     return false;
   emit modified(this);
   return true;
+}
+
+CommercialChannelExtension *
+DMRChannel::commercialExtension() const {
+  return _commercialExtension;
+}
+void
+DMRChannel::setCommercialExtension(CommercialChannelExtension *ext) {
+  if (_commercialExtension == ext)
+    return;
+  if (_commercialExtension)
+    _commercialExtension->deleteLater();
+  _commercialExtension = ext;
+  if (_commercialExtension) {
+    _commercialExtension->setParent(this);
+    connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
+}
+
+AnytoneDMRChannelExtension *
+DMRChannel::anytoneChannelExtension() const {
+  return _anytoneExtension;
+}
+void
+DMRChannel::setAnytoneChannelExtension(AnytoneDMRChannelExtension *ext) {
+  if (_anytoneExtension == ext)
+    return;
+  if (_anytoneExtension)
+    _anytoneExtension->deleteLater();
+  _anytoneExtension = ext;
+  if (_anytoneExtension) {
+    _anytoneExtension->setParent(this);
+    connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onReferenceModified()));
+  }
 }
 
 YAML::Node

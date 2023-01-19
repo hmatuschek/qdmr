@@ -133,7 +133,7 @@ AnytoneFileReader::read(const QString &filename, Config *config, QString &messag
   } else if ("D578UV" == model) {
 
   } else {
-    message = QObject::tr("Cannot read codeplug file '%1': Uknown model '%2'.")
+    message = QObject::tr("Cannot read codeplug file '%1': Unknown model '%2'.")
         .arg(filename).arg(model);
     file.unmap(data);
     file.close();

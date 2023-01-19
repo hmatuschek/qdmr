@@ -1,4 +1,8 @@
 # QDMR, a GUI application and command line tool to program DMR radios
+<a href="https://translate.codeberg.org/projects/qdmr/">
+ <img src="https://translate.codeberg.org/widgets/qdmr/-/graphical-user-interface/svg-badge.svg"
+      alt="Translation status">
+</a>
 
 ![qdmr channel editor](https://raw.githubusercontent.com/hmatuschek/qdmr/master/doc/fig/qdmr-channels.png "The qdmr CPS software.")
 
@@ -23,7 +27,7 @@ Currently, there are only few radios that are supported
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
   * BTECH DM-1701 / Retevis RT84 (since version 0.10.0)
-  * BTECH DMR-6x2 (since version 0.5.0)
+  * BTECH DMR-6x2 (since version 0.11.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 
@@ -31,13 +35,15 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
 
   * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions).
   * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
+  * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
 
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.10.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.3)** -- Added support for BTech DM1701, some bugfixes.
+ * **[Version 0.11.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.1)** -- Added proper support for BTech DMR-6X2UV, some bugfixes.
+ * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
  * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
  * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
  * **[Version 0.7.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.7.0)** -- Added AT-D868UVE support and many bugfixes.

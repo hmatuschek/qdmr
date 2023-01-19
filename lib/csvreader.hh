@@ -25,10 +25,10 @@ class CSVLexer: public QObject
 
 public:
   /** The token. */
-  typedef struct {
+  struct Token {
   public:
     /** Possible token types. */
-    typedef enum {
+    enum TokenType {
       T_KEYWORD,         ///< A Keyword/Identifier.
       T_APRSCALL,        ///< A APRS call of form CALL-SSID.
       T_STRING,          ///< A quoted string.
@@ -46,7 +46,7 @@ public:
 
       T_END_OF_STREAM,   ///< Indicates the end-of-input.
       T_ERROR            ///< Indicates a lexer error.
-    } TokenType;
+    };
 
     /// The token type.
     TokenType type;
@@ -56,17 +56,17 @@ public:
     qint64 line;
     /// Column number.
     qint64 column;
-  } Token;
+  };
 
   /// Current state of lexer.
-  typedef struct {
+  struct State {
     /// The current stream offset.
     qint64 offset;
     /// The current line count.
     qint64 line;
     /// The current column number.
     qint64 column;
-  } State;
+  };
 
 public:
   /** Constructs a lexer for the given stream. */

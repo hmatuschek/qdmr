@@ -1,0 +1,58 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | RX Frequency 32bit BCD encoded in big-endian as MMMkkkhh                                                                      |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | Tx Frequency Offset 32bit BCD encoded in big-endian as MMMkkkhh                                                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08 | RMode | 0 |BWd|  PWR  | CMode |TAr|CaC|RXO|CTR|TDC|TCT|RDC|RCT| CTCSS transmit                | CTCSS receive                 |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c | DCS transmit code, little endian                              | DCS receive code, little endian                               |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+10 | Custom CTCSS frequency in 0.1Hz, little endian                | 2-tone decode index, 0-based, little endian                   |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14 | Contact index 0-based, little endian                                                                                          |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+18 | Radio ID table index.         | 0 |SquelchMode| 0   0   0   0 | 0   0 |OptSig | 0   0 | TxPer | 0   0   0   0   0 |XFR| 0 |RNG|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+1c | RX Group list index           | 2-tone ID                     | 5-tone ID                     | DTMF ID                       |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+20 | Color code                    |LWK|EEE|RGP|EAT| 0 |EST|SMC|TSL| AES Encryption key            | Name 16 x ASCII 0-padded   ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+30  ...                                                                                            | Unused set to 0x00            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+34 | 0   0   0   0   0 |DAD|ETM| 0 | Unused, set to 0x00           | Scanlist idx 0, 0xff=unset    | Scanlist idx 1, 0xff=unset    |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+38 | Scanlist idx 2, 0xff=unset    | Scanlist idx 3, 0xff=unset    | Scanlist idx 4, 0xff=unset    | Scanlist idx 5, 0xff=unset    |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0   0   0   0   0 |RGP|ATy|
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Field description:
+ - RMode: Repater mode where 0=simplex, 1=positive TX offset, 2=negative TX offset.
+ - BWd: Band width where 0=narrow (12.5kHz), 1=wide (25kHz).
+ - PWR: Power where 0=low, 1=mid, 2=high, 3=turbo.
+ - CMode: Channel mode, 0=analog, 1=digital, 2=analog + digi RX, 3=digital + analog RX.
+ - TAr: Enable talkaround.
+ - CaC: Enable call confirm.
+ - RXO: Enable RX only.
+ - CTR: Enable CTCSS phase reversal.
+ - TDC: Enable TX DCS code.
+ - TCT: Enable TX CTCSS tone.
+ - RDC: Enable RX DCS code.
+ - RCT: Enable RX CTCSS tone.
+ - SquelchMode: Squelch mode 0=Carrier, 1=CTCSS/DCS, 2=Optional Signaling, 3=CTCSS/DCS and Optional Signaling,
+   4 = CTCSS/DCS or Optional Signaling
+ - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
+ - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
+ - XFR: Exlcude channel from roaming
+ - LWK: Enable lone worker.
+ - EEE: Enable enhanced encryption
+ - RGP: Enable DMR-APRS RX
+ - EAT: Enable adaptive TDMA
+ - EST: Enable simplex TDMA
+ - SMC: SMS confirmation,
+ - TSL: Time slot where 0=TS1, 1=TS2
+ - DAD: Data ACK disable (inverted!)
+ - ETM: Enable through mode
+ - RNG: Ranging
+ - ATy: APRS Type: 0=DMR-APRS, 1=Analog APRS

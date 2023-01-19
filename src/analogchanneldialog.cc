@@ -32,6 +32,9 @@ FMChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
+  if (settings.hideChannelNote())
+    hintLabel->setVisible(false);
+
   Application *app = qobject_cast<Application *>(qApp);
   FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
@@ -122,6 +125,7 @@ FMChannelDialog::construct() {
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
   connect(squelchDefault, SIGNAL(toggled(bool)), this, SLOT(onSquelchDefaultToggled(bool)));
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
+  connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
@@ -208,3 +212,9 @@ FMChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 
+void
+AnalogChannelDialog::onHideChannelHint() {
+  Settings settings;
+  settings.setHideChannelNote(true);
+  hintLabel->setVisible(false);
+}

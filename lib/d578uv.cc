@@ -19,12 +19,16 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   _callsigns = new D878UV2CallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info;
+  if (_dev)
+    _dev->getInfo(info);
+
   switch (info.bands) {
   case 0x00:
   case 0x01:
     _limits = new D578UVLimits({ {136., 174.}, {400., 480.} },
                                { {136., 174.}, {400., 480.} }, info.version, this);
+    break;
   case 0x02:
     _limits = new D578UVLimits({ {136., 174.}, {430., 440.} },
                                { {136., 174.}, {430., 440.} }, info.version, this);
@@ -32,6 +36,7 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   case 0x03:
     _limits = new D578UVLimits({ {136., 174.}, {400., 480.} },
                                { {144., 146.}, {430., 440.} }, info.version, this);
+    break;
   case 0x04:
     _limits = new D578UVLimits({ {144., 146.}, {434., 438.} },
                                { {144., 146.}, {434., 438.} }, info.version, this);

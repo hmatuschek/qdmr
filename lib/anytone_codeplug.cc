@@ -5,6 +5,8 @@
 
 using namespace Signaling;
 
+#define CUSTOM_CTCSS_TONE 0x33
+
 Code _anytone_ctcss_num2code[52] = {
   SIGNALING_NONE, // 62.5 not supported
   CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
@@ -283,6 +285,10 @@ AnytoneCodeplug::ChannelElement::enableTalkaround(bool enable) {
   setBit(0x0009, 7, enable);
 }
 
+bool
+AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000a);
+}
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txCTCSS() const {
   return ctcss_num2code(getUInt8(0x000a));
@@ -290,6 +296,14 @@ AnytoneCodeplug::ChannelElement::txCTCSS() const {
 void
 AnytoneCodeplug::ChannelElement::setTXCTCSS(Code tone) {
   setUInt8(0x000a, ctcss_code2num(tone));
+}
+void
+AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
+  setUInt8(0x000a, CUSTOM_CTCSS_TONE);
+}
+bool
+AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000b);
 }
 Signaling::Code
 AnytoneCodeplug::ChannelElement::rxCTCSS() const {
@@ -299,6 +313,11 @@ void
 AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
   setUInt8(0x000b, ctcss_code2num(tone));
 }
+void
+AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
+  setUInt8(0x000b, CUSTOM_CTCSS_TONE);
+}
+
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
@@ -369,12 +388,12 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-AnytoneAnalogChannelExtension::SquelchMode
+AnytoneFMChannelExtension::SquelchMode
 AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (AnytoneAnalogChannelExtension::SquelchMode)getUInt3(0x0019, 4);
+  return (AnytoneFMChannelExtension::SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode) {
+AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) {
   setUInt3(0x0019, 4, (unsigned)mode);
 }
 
@@ -553,89 +572,13 @@ AnytoneCodeplug::ChannelElement::setName(const QString &name) {
   writeASCII(0x0023, name, 16, 0x00);
 }
 
-bool
-AnytoneCodeplug::ChannelElement::ranging() const {
-  return getBit(0x0034, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRanging(bool enable) {
-  setBit(0x0034, 0, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::throughMode() const {
-  return getBit(0x0034, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableThroughMode(bool enable) {
-  setBit(0x0034, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::dataACK() const {
-  return !getBit(0x0034, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableDataACK(bool enable) {
-  setBit(0x0034, 2, !enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(0x0035, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(0x0035, 0, enable);
-}
-unsigned
-AnytoneCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0036);
-}
-void
-AnytoneCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0036, idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(0x003a);
-}
-void
-AnytoneCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x003a, idx);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::multipleKeyEncryption() const {
-  return getBit(0x003b, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
-  setBit(0x003b, 0, enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::randomKey() const {
-  return getBit(0x003b, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRandomKey(bool enable) {
-  setBit(0x003b, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::sms() const {
-  return !getBit(0x003b, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
-  setBit(0x003b, 0, !enable);
-}
-
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
+  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
@@ -653,6 +596,17 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+
+    // Create extension
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    ach->setAnytoneChannelExtension(ext);
+    ext->enableReverseBurst(ctcssPhaseReversal());
+    ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
+    ext->enableTXCustomCTCSS(txCTCSSIsCustom());
+    ext->setCustomCTCSS(customCTCSSFrequency());
+    ext->setSquelchMode(squelchMode());
+
+    // done
     ch = ach;
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
@@ -670,6 +624,16 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+
+    // Create extension
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    dch->setAnytoneChannelExtension(ext);
+    ext->enableCallConfirm(callConfirm());
+    ext->enableSMSConfirm(smsConfirm());
+    ext->enableSimplexTDMA(simplexTDMA());
+    ext->enableAdaptiveTDMA(adaptiveTDMA());
+    ext->enableLoneWorker(loneWorker());
+    // Done
     ch = dch;
   } else {
     logError() << "Cannot create channel '" << name()
@@ -686,6 +650,11 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
+
+  // Apply common channel extension settings
+  if (nullptr != ch_ext) {
+    ch_ext->enableTalkaround(talkaround());
+  }
 
   return ch;
 }
@@ -709,12 +678,6 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-
-    // Link to GPS system
-    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
-      logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
@@ -774,11 +737,24 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     if (Signaling::SIGNALING_NONE != ac->rxTone())
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::SubTone);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::SubTone);
     else
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
+    // Handle extension
+    if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply FM settings
+      enableCTCSSPhaseReversal(ext->reverseBurst());
+      setCustomCTCSSFrequency(ext->customCTCSS());
+      if (ext->rxCustomCTCSS())
+        enableRXCustomCTCSS();
+      if (ext->txCustomCTCSS())
+        enableTXCustomCTCSS();
+      setSquelchMode(ext->squelchMode());
+    }
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     // pack digital channel config.
@@ -803,15 +779,6 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       clearGroupListIndex();
     else
       setGroupListIndex(ctx.index(dc->groupListObj()));
-    // Set GPS system index
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXDigitalAPRS(true);
-      enableRXAPRS(false);
-    } else {
-      enableTXDigitalAPRS(false);
-      enableRXAPRS(false);
-    }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
       if (nullptr == ctx.config()->radioIDs()->defaultId()) {
@@ -822,6 +789,17 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       }
     } else {
       setRadioIDIndex(ctx.index(dc->radioIdObj()));
+    }
+    // Handle extension
+    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply DMR settings
+      enableCallConfirm(ext->callConfirm());
+      enableSMSConfirm(ext->smsConfirm());
+      enableSimplexTDMA(ext->simplexTDMA());
+      enableAdaptiveTDMA(ext->adaptiveTDMA());
+      enableLoneWorker(ext->loneWorker());
     }
   }
 
@@ -3925,14 +3903,25 @@ AnytoneCodeplug::ContactMapElement::size() {
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
-AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
-  : Codeplug(parent)
+AnytoneCodeplug::AnytoneCodeplug(const QString &label, QObject *parent)
+  : Codeplug(parent), _label(label)
 {
   // pass...
 }
 
 AnytoneCodeplug::~AnytoneCodeplug() {
   // pass...
+}
+
+void
+AnytoneCodeplug::clear() {
+  while (this->numImages())
+    remImage(0);
+
+  addImage(_label);
+
+  // Allocate bitmaps
+  this->allocateBitmaps();
 }
 
 bool
@@ -3992,10 +3981,43 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i);
 
   return true;
 }
+
+bool
+AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
+  Context ctx(config);
+
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode anytone codeplug.";
+    return false;
+  }
+
+  // If codeplug is generated from scratch -> clear and reallocate
+  if (! flags.updateCodePlug) {
+    // Clear codeplug
+    this->clear();
+    // First set bitmaps
+    this->setBitmaps(config);
+    // Then allocate elements
+    this->allocateUpdated();
+    this->allocateForEncoding();
+  }
+
+  // Then encode everything.
+  return this->encodeElements(flags, ctx, err);
+}
+
+bool
+AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
+  // Maps code-plug indices to objects
+  Context ctx(config);
+  return this->decodeElements(ctx, err);
+}
+
+
 
 

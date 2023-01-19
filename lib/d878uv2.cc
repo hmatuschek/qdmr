@@ -19,7 +19,8 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioVariant info;
-  _dev->getInfo(info);
+  if (_dev)
+    _dev->getInfo(info);
 
   switch (info.bands) {
   case 0x00:

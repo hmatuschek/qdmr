@@ -9,7 +9,7 @@
 #include "encryptionextension.hh"
 #include <QTimeZone>
 #include <QtEndian>
-
+#include <QChar>
 
 #define CHANNEL_SIZE      0x000040
 #define SETTINGS_SIZE     0x000090
@@ -38,7 +38,7 @@ TyTCodeplug::ChannelElement::~ChannelElement() {
 
 bool
 TyTCodeplug::ChannelElement::isValid() const {
-  return Element::isValid() && (0x0000 != getUInt16_be(0x20)) && (0xffff != getUInt16_be(0x20));
+  return Element::isValid() && QChar::isPrint(getUInt16_le(0x20));
 }
 
 void
@@ -420,9 +420,11 @@ TyTCodeplug::ChannelElement::setName(const QString &name) {
 }
 
 Channel *
-TyTCodeplug::ChannelElement::toChannelObj() const {
-  if (! isValid())
+TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid channel.";
     return nullptr;
+  }
 
   Channel *ch = nullptr;
   TyTChannelExtension *ex = new TyTChannelExtension();
@@ -461,7 +463,17 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
     ex->enablePrivateCallConfirmed(privateCallConfirm());
     ex->enableDataCallConfirmed(dataCallConfirm());
     ex->enableEmergencyAlarmConfirmed(emergencyAlarmACK());
+
+    // If encryption is enabled, Add commercial extension to channel if needed
+    // the key will be linked later
+    if ((PRIV_NONE != privacyType()) && (nullptr == dch->commercialExtension()))
+      dch->setCommercialExtension(new CommercialChannelExtension());
+
+    // done
     ch = dch;
+  } else {
+    errMsg(err) << "Cannot decode channel. Channel type " << mode() << " unknown!";
+    return nullptr;
   }
 
   // Common settings
@@ -485,26 +497,23 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
   ex->setTXRefFrequency(txRefFrequency());
   ch->setTyTChannelExtension(ex);
 
-  // If encryption is enabled, Add commercial extension to channel if needed
-  // the key will be linked later
-  if ((MODE_DIGITAL == mode()) && (PRIV_NONE != privacyType()) &&
-      (nullptr == ch->commercialExtension()))
-    ch->setCommercialExtension(new CommercialChannelExtension());
-
   return ch;
 }
 
 bool
-TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
+TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err) const
 {
-  if (! isValid())
+  if (! isValid()) {
+    errMsg(err) << "Cannot link an invalid channel.";
     return false;
+  }
 
   if (scanListIndex() && ctx.has<ScanList>(scanListIndex())) {
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
+    // Nothing further to link for analog channels.
     return true;
   } else if ((MODE_DIGITAL == mode()) && (c->is<DMRChannel>())){
     DMRChannel *dc = c->as<DMRChannel>();
@@ -520,32 +529,35 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
 
     // Link encryption key if defined
     if (PRIV_NONE != privacyType()) {
-      if (nullptr == c->commercialExtension()) {
-        logError() << "Cannot link encryption key: No commercial extension set.";
+      if (nullptr == dc->commercialExtension()) {
+        errMsg(err) << "Cannot link encryption key: No commercial extension set.";
         return false;
       }
       if (PRIV_BASIC == privacyType()) {
         if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
-          logError() << "Cannot link encryption key: No basic key with index " << privacyIndex()
-                     << " defined.";
+          errMsg(err) << "Cannot link encryption key: No basic key with index " << privacyIndex()
+                      << " defined.";
           return false;
         }
-        c->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
+        dc->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
       } else if (PRIV_ENHANCED == privacyType()) {
         if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
-          logError() << "Cannot link encryption key: No AES (enhances) key with index "
-                     << privacyIndex() << " defined.";
+          errMsg(err) << "Cannot link encryption key: No AES (enhances) key with index "
+                      << privacyIndex() << " defined.";
           return false;
         }
-        c->commercialExtension()->setEncryptionKey(ctx.get<AESEncryptionKey>(privacyIndex()));
+        dc->commercialExtension()->setEncryptionKey(ctx.get<AESEncryptionKey>(privacyIndex()));
       } else {
-        logError() << "Unknown encryption key type " << privacyType() << ".";
+        errMsg(err) << "Unknown encryption key type " << privacyType() << ".";
         return false;
       }
     }
 
     return true;
   }
+
+  errMsg(err) << "Cannot link channel '" << c->name()
+              << "' invalid channel type " << mode() << ".";
 
   return false;
 }
@@ -599,21 +611,21 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
     }
     // Link encryption key if set
-    if (chan->commercialExtension() && chan->commercialExtension()->encryptionKey()) {
+    if (dchan->commercialExtension() && dchan->commercialExtension()->encryptionKey()) {
       // Check for index
-      if (0 > ctx.index(chan->commercialExtension()->encryptionKey())) {
+      if (0 > ctx.index(dchan->commercialExtension()->encryptionKey())) {
         logError() << "Cannot encode encryption key '"
-                   << chan->commercialExtension()->encryptionKey()->name()
+                   << dchan->commercialExtension()->encryptionKey()->name()
                    << "': Not indexed.";
-      } else if (chan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
+      } else if (dchan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
         setPrivacyType(PRIV_BASIC);
-        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
-      } else if (chan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
+        setPrivacyIndex(ctx.index(dchan->commercialExtension()->encryptionKey()));
+      } else if (dchan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
         setPrivacyType(PRIV_ENHANCED);
-        setPrivacyIndex(ctx.index(chan->commercialExtension()->encryptionKey()));
+        setPrivacyIndex(ctx.index(dchan->commercialExtension()->encryptionKey()));
       } else {
         logInfo() << "Ignore unknown encryption key type "
-                  << chan->commercialExtension()->encryptionKey()->metaObject()->className()
+                  << dchan->commercialExtension()->encryptionKey()->metaObject()->className()
                   << " for DMR channel.";
       }
     }
@@ -827,7 +839,8 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
 
   for (int i=0; ((i<16) && hasMemberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
-      logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
+      logWarn() << "Cannot link channel with index " << memberIndex(i)
+                << " to zone '" << zone->name() << "': channel not defined.";
       continue;
     }
     zone->A()->add(ctx.get<Channel>(memberIndex(i)));
@@ -2797,8 +2810,8 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i+1);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i+1);
 
   return true;
 }

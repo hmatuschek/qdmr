@@ -60,7 +60,7 @@ TalkGroupDatabase::talkgroup(int index) const {
 
 void
 TalkGroupDatabase::download() {
-  QUrl url("https://api.brandmeister.network/v1.0/groups/");
+  QUrl url("https://api.brandmeister.network/v2/talkgroup/");
   QNetworkRequest request(url);
   _network.get(request);
 }

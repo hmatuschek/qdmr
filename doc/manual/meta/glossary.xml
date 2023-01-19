@@ -41,7 +41,7 @@
       <para>
         Unfortunately, the local talk group (number 9) is frequently used on simplex channel although only 
         those radios will receive calls to this talk group if it is in the group list assigned to the 
-        simplex channel. To be on the save side, use the all-call for simplex calls.
+        simplex channel. To be on the safe side, use the all-call for simplex calls.
       </para>
     </glossdef>
   </glossentry>
@@ -90,8 +90,23 @@
     </glossdef>
   </glossentry>
 
+  <glossentry xml:id="glCTCSS">
+    <glossterm>Continuous Tone Coded Subaudio Squelch</glossterm>
+    <acronym>CTCSS</acronym>
+    <glossdef>
+      <para>
+        Means to control the squelch of a radio or to open a repeater, that does not rely on the 
+        strength of a carrier. Instead a tone is transmitted along with the audio, which is usually
+        filtered out (e.g., less than 300Hz) by the receiver. There are a set of common CTCSS tone
+        frequencies, but may radios allow for specifying arbitrary sub-tone frequencies. 
+      </para>
+    </glossdef>
+    <glossseealso otherterm="glDCS">DCS</glossseealso>
+  </glossentry>
+
   <glossentry>
-    <glossterm>DAPNET</glossterm>
+    <glossterm>Decentralized Amateur Paging Network</glossterm>
+    <acronym>DAPNET</acronym>
     <glossdef>
       <para>
         <acronym>DAPNET</acronym>, short for Decentralized Amateur Paging Network does exactly what
@@ -106,7 +121,7 @@
     </glossdef>
   </glossentry>
   
-  <glossentry>
+  <glossentry xml:id="glDCDM">
     <glossterm>DCDM</glossterm>
     <glossdef>
       <para>
@@ -117,6 +132,19 @@
         <emphasis>follower</emphasis>. They must synchronize to the clock of the 
         <emphasis>leader</emphasis>. This obviously requires that all participants can reach the 
         <emphasis>leader</emphasis> directly.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry xml:id="glDCS">
+    <glossterm>Digital Coded Squelch</glossterm>
+    <acronym>DCS</acronym>
+    <glossdef>
+      <para>
+        Similar to the CTCSS tones, the DCM allows to open the squelch or repeater by transmitting 
+        sub-tones along with the audio. These tones are usually filtered out by the receiver (e.g.,
+        below 300Hz). In contrast to CTCSS tones, DCS uses these tones to repeatedly transmit a 
+        digital code.
       </para>
     </glossdef>
   </glossentry>
@@ -134,19 +162,19 @@
     </glossdef>
   </glossentry>
 
-  <glossentry>
+  <glossentry xml:id="glGroupCall">
     <glossterm>Group Call</glossterm>
     <glossdef>
       <para>
         A group call is simply a call to a talk group. That is, not to a single participant but 
         rather to a group of participants. Every participant that has this talk group in their 
-        group list can receive this call. See also <glossterm>Group List</glossterm> and
-        <glossterm>Talk Group</glossterm>.
+        group list can receive this call. See also <xref linkend="glGroupList">Group List</xref>
+        and <xref linkend="glTalkGroup">Talk Group</xref>.
       </para>
     </glossdef>
   </glossentry>
   
-  <glossentry>
+  <glossentry xml:id="glGroupList">
     <glossterm>Group List</glossterm>
     <glossdef>
       <para>
@@ -162,6 +190,18 @@
     </glossdef>
   </glossentry>
   
+  <glossentry xml:id="glHangTime">
+    <glossterm>Hang Time</glossterm>
+    <glossdef>
+      <para>
+        The <emphasis>hang time</emphasis> specifies the time period, a DMR call remains 
+        <quote>active</quote> after it ended. For this time period, the call will replace the
+        default transmit contact on that channel. This allows to directly answer a call received on
+        a channel, even if that call is not the default transmit contact on the channel.  
+      </para>
+    </glossdef>
+  </glossentry>
+  
   <glossentry>
     <glossterm>Maidenhead Locator</glossterm>
     <glossdef>
@@ -169,6 +209,17 @@
         The Maidenhead locator, also known as <quote>QTH locator</quote> or 
         <quote>IARU locator</quote> is a means for transferring a geo-location over radio. Using a
         so-called grid-square system.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry xml:id="glLoneWorker">
+    <glossterm>Lone Worker</glossterm>
+    <glossdef>
+      <para>
+        <quote>Lone worker</quote> refers to a feature of many DMR radios used in some commercial 
+        settings, where a participant in the network needs to report regularly to some other 
+        station. This feature is certainly not very useful for the HAM radio context.
       </para>
     </glossdef>
   </glossentry>
@@ -198,44 +249,77 @@
   </glossentry>
 
   <glossentry>
+    <glossterm>Roaming Channel</glossterm>
+    <glossdef>
+      <para>
+        Specifies which settings of the current channel needs to be overridden to stay in contact 
+        with a particular talk group. These settings are usually those, specific for a repeater. 
+        That is, receive and transmit frequency and color code. The time-slot might also be 
+        overridden.
+      </para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
     <glossterm>Roaming Zone</glossterm>
     <glossdef>
       <para>
-        A collection of channels usually sharing the same transmit contact. When roaming is enabled
-        (and supported by the radio) this list of channels is scanned for a reachable channel once 
-        the current repeater gets out-of-range. This way, one can stay in contact with a particular 
-        talk group when being mobile.
+        A collection of <glossterm>roaming channels</glossterm> usually sharing the same transmit 
+        contact. When roaming is enabled (and supported by the radio) this list of channels is 
+        scanned for a reachable channel once the current repeater gets out-of-range. This way, one 
+        can stay in contact with a particular talk group when being mobile.
       </para>
     </glossdef>
   </glossentry>
 
   <glossentry>
-    <glossterm>SSID</glossterm>
+    <glossterm>Secondary Station Identifier</glossterm>
+    <acronym>SSID</acronym>
+    <glossdef>
+      <para>AX.25 addresses (and thus APRS) consists of a call sign and a so-called SSID (0-15). 
+        This number can be used as a replacement for the lack of ports in AX.25 or to provide 
+        some additional information about the station.</para>
+    </glossdef>
   </glossentry>
 
-  <glossentry>
-    <glossterm>Talk Group</glossterm>
+  <glossentry xml:id="glTalkaround">
+    <glossterm>Talkaround</glossterm>
   </glossentry>
-  
-  <glossentry>
-    <glossterm>TDMA</glossterm>
+
+  <glossentry xml:id="glTalkGroup">
+    <glossterm>Talk Group</glossterm>
+    <acronym>TG</acronym>
     <glossdef>
       <para>
-        See Time Slot.
+        The term <quote>Talk Group</quote> refers to a DMR ID, which represents a virtual contact.
+        DMR repeater may subscribe to one or more talk groups. Every call to these talk groups 
+        are then transmitted by those repeaters, that are subscribed to these talk groups. 
+        Usually, it is possible to subscribe a repeater to any talk group temporarily by simply
+        starting a transmission to this talk group on a repeater channel. For some time period 
+        after the initial transmission, the repeater will transmit all calls to this now 
+        subscribed talk group. The subscription gets renewed with every further call the talk 
+        group.
       </para>
+      <glossseealso otherterm="glGroupCall">Group Call</glossseealso>
     </glossdef>
   </glossentry>
+  
+  <glossentry xml:id="TDMA">
+    <glossterm>Time-Division Multiple Access</glossterm>
+    <acronym>TDMA</acronym>
+    <glosssee otherterm="glTimeSlot"/>
+  </glossentry>
 
-  <glossentry>
+  <glossentry xml:id="glTimeSlot">
     <glossterm>Time Slot</glossterm>
     <glossdef>
       <para>
         Due to the lossy compression of audio data, it is possible to send more than twice the 
-        amount of audio data through a single 12.5kHz wide channel that needed. This allows to 
+        amount of audio data through a single 12.5kHz wide channel than needed. This allows to 
         provide two independent audio streams within a single physical channel. 
       </para>
       <para>
-        There are basically two ways to separate these two audio stream. Either by frequency, 
+        There are basically two ways to separate these two audio streams. Either by frequency, 
         effectively splitting the single 12.5kHz channel into two 6.25kHz wide ones. Alternatively,
         one can split the channel in <quote>time</quote>. That is, the band width remains 12.5kHz
         but each of the two simultaneous participants sends one after the other. One in time slot 1
@@ -261,7 +345,7 @@
         to call whenever the PTT is pressed on that channel. 
       </para>
       <para>
-        It, however, possible to answer any received call directly by pressing the PTT button 
+        It is, however, possible to answer any received call directly by pressing the PTT button 
         within the so-called hang time, although the call may not match the transmit contact. 
         These hang times can be set within the radio settings, usually for private and group calls
         separately.

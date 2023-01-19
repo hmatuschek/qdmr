@@ -354,7 +354,17 @@ RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitUInt
+ * Implementation of RadioLimitDMRId
+ * ********************************************************************************************* */
+RadioLimitDMRId::RadioLimitDMRId(QObject *parent)
+  : RadioLimitUInt(1, 16777215, -1, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitEnum
  * ********************************************************************************************* */
 RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent)
   : RadioLimitValue(parent), _values(values)
@@ -626,7 +636,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
-        << QStringList::fromSet(_types).join(", ") << ".";
+        << QStringList(_types.begin(), _types.end()).join(", ") << ".";
 
     return true;
   }
@@ -634,7 +644,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if (! validType(ref->as<ConfigObject>()->metaObject())) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
-        << QStringList::fromSet(_types).join(", ") << ".";
+        << QStringList(_types.begin(), _types.end()).join(", ") << ".";
     return false;
   }
 
@@ -816,7 +826,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
     if (! validType(plist->get(i)->metaObject())) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
-          << "Must be one of " << QStringList::fromSet(_types).join(", ") << ".";
+          << "Must be one of " << QStringList(_types.begin(), _types.end()).join(", ") << ".";
       return false;
     }
   }

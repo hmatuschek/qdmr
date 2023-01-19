@@ -69,7 +69,7 @@ class DefaultRadioID: public DMRRadioID
   Q_OBJECT
 
 protected:
-  /** Contstructor. */
+  /** Constructor. */
   explicit DefaultRadioID(QObject *parent=nullptr);
 
 public:

@@ -11,6 +11,7 @@
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+#include "dmr6x2uv.hh"
 #include "dm1701.hh"
 
 
@@ -32,7 +33,7 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"rt84",     RadioInfo::RT84},
   {"d868uv",   RadioInfo::D868UV},
   {"d868uve",  RadioInfo::D868UVE},
-  {"dmr6x2",   RadioInfo::DMR6X2},
+  {"dmr6x2uv", RadioInfo::DMR6X2UV},
   {"d878uv",   RadioInfo::D878UV},
   {"d878uv2",  RadioInfo::D878UVII},
   {"d578uv",   RadioInfo::D578UV}
@@ -51,7 +52,8 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::D868UVE,  D868UV::defaultRadioInfo()},
   {RadioInfo::D878UV,   D878UV::defaultRadioInfo()},
   {RadioInfo::D878UVII, D878UV2::defaultRadioInfo()},
-  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()}
+  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()},
+  {RadioInfo::DMR6X2UV, DMR6X2UV::defaultRadioInfo()}
 };
 
 
@@ -98,7 +100,7 @@ RadioInfo::name() const {
 }
 
 const QString &
-RadioInfo::manufactuer() const {
+RadioInfo::manufacturer() const {
   return _manufacturer;
 }
 

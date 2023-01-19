@@ -1,7 +1,7 @@
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "channel.hh"
 #include <QSet>
-
+#include "config.hh"
 
 /* ********************************************************************************************* *
  * Implementation of RoamingZone
@@ -44,15 +44,15 @@ RoamingZone::clear() {
   _channel.clear();
 }
 
-DMRChannel *
+RoamingChannel*
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
     return nullptr;
-  return _channel.get(idx)->as<DMRChannel>();
+  return _channel.get(idx)->as<RoamingChannel>();
 }
 
 int
-RoamingZone::addChannel(DMRChannel *ch, int row) {
+RoamingZone::addChannel(RoamingChannel* ch, int row) {
   row = _channel.add(ch, row);
   if (0 > row)
     return row;
@@ -66,18 +66,87 @@ RoamingZone::remChannel(int row) {
 }
 
 bool
-RoamingZone::remChannel(DMRChannel *ch) {
+RoamingZone::remChannel(RoamingChannel* ch) {
   return _channel.del(ch);
 }
 
-const DMRChannelRefList *
+const RoamingChannelRefList *
 RoamingZone::channels() const {
   return &_channel;
 }
 
-DMRChannelRefList *
+RoamingChannelRefList*
 RoamingZone::channels() {
   return &_channel;
+}
+
+bool
+RoamingZone::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+  // First, run default link
+  if (! ConfigObject::link(node, ctx, err))
+    return false;
+
+  // Handle channel references separately
+
+  if (! node["channels"])
+    return true;
+
+  // check type
+  if (! node["channels"].IsSequence()) {
+    errMsg(err) << node["channels"].Mark().line << ":" << node["channels"].Mark().column
+                << ": Cannot link 'channels' of 'RoamingZone': Expected sequence.";
+    return false;
+  }
+  YAML::Node lst = node["channels"];
+  for (YAML::const_iterator it=lst.begin(); it!=lst.end(); it++) {
+    if (! it->IsScalar()) {
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot link 'channels' of 'RoamingZone': Expected ID string.";
+      return false;
+    }
+    QString id = QString::fromStdString(it->as<std::string>());
+    if (! ctx.contains(id)) {
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot link 'channels' of 'RoamingZone': Reference '"
+                  << id << "' not defined.";
+      return false;
+    }
+    // Handle referenced object (either DMR channel or roaming channel)
+    ConfigObject *obj = ctx.getObj(id);
+    if (obj->is<DMRChannel>()) {
+      RoamingChannel *rch = RoamingChannel::fromDMRChannel(obj->as<DMRChannel>());
+      config()->roamingChannels()->add(rch);
+      addChannel(rch);
+    } else if (obj->is<RoamingChannel>()) {
+      addChannel(obj->as<RoamingChannel>());
+    } else {
+      errMsg(err) << it->Mark().line << ":" << it->Mark().column
+                  << ": Cannot link 'channels' of 'RoamingZone': "
+                  << "Cannot add reference to '" << id << "' to list. "
+                  << "Not a roaming channel.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+RoamingZone::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! ConfigObject::populate(node, context, err))
+    return false;
+
+  // Serialize list of channel references.
+  for (int i=0; i<count(); i++) {
+    if (! context.contains(channel(i))) {
+      errMsg(err) << "Cannot store reference to roaming channel '" << channel(i)->name()
+                  << "': No ID assigned.";
+      return false;
+    }
+    node["channels"].push_back(context.getId(channel(i)).toStdString());
+  }
+
+  return true;
 }
 
 
@@ -107,23 +176,6 @@ RoamingZoneList::RoamingZoneList(QObject *parent)
   : ConfigObjectList(RoamingZone::staticMetaObject, parent)
 {
   // pass...
-}
-
-QSet<DMRChannel *>
-RoamingZoneList::uniqueChannels() const {
-  QSet<DMRChannel *> channels;
-  uniqueChannels(channels);
-  return channels;
-}
-
-void
-RoamingZoneList::uniqueChannels(QSet<DMRChannel *> &channels) const {
-  for (int i=0; i<count(); i++) {
-    RoamingZone *zone = this->zone(i);
-    for (int j=0; j<zone->count(); j++) {
-      channels.insert(zone->channel(j));
-    }
-  }
 }
 
 RoamingZone *

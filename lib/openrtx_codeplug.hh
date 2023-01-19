@@ -100,7 +100,7 @@ public:
     };
   };
 
-  /** Implements the binary rerpesentation of a channel.
+  /** Implements the binary representation of a channel.
    *
    * Binary representation (size 005ah bytes):
    * @verbinclude openrtx_channel.txt */
@@ -159,7 +159,7 @@ public:
     /** Enables/disables RX only for the channel. */
     virtual void setRXOnly(bool enable);
 
-    /** Retunrs the bandwidth of the channel. */
+    /** Returns the bandwidth of the channel. */
     virtual Bandwidth bandwidth() const;
     /** Sets the bandwidth of the channel. */
     virtual void setBandwidth(Bandwidth bw);
@@ -180,7 +180,7 @@ public:
 
     /** Retrusn @c true if the scan list is set. */
     virtual bool hasScanListIndex() const;
-    /** Retunrs the scan list index. */
+    /** Returns the scan list index. */
     virtual unsigned int scanListIndex() const;
     /** Sets the scan list index. */
     virtual void setScanListIndex(unsigned int index);
@@ -189,7 +189,7 @@ public:
 
     /** Retrusn @c true if the group list is set. */
     virtual bool hasGroupListIndex() const;
-    /** Retunrs the group list index. */
+    /** Returns the group list index. */
     virtual unsigned int groupListIndex() const;
     /** Sets the group list index. */
     virtual void setGroupListIndex(unsigned int index);
@@ -264,12 +264,12 @@ public:
     /** Sets the encryption mode for the channel. Only valid for M17 channels. */
     virtual void setEncryptionMode(EncryptionMode mode);
 
-    /** Returns the channe mode. Only valid for M17 channels. */
+    /** Returns the channel mode. Only valid for M17 channels. */
     virtual ChannelMode channelMode() const;
     /** Sets the channel mode. Only valid for M17 channels. */
     virtual void setChannelMode(ChannelMode mode);
 
-    /** Returns @c true if GPS position is send as meta-data. Only valid for M17 channels. */
+    /** Returns @c true if GPS position is sent as meta-data. Only valid for M17 channels. */
     virtual bool gpsDataEnabled() const;
     /** Enables/disables sending of GPS position as meta-data. Only valid for M17 channels. */
     virtual void enableGPSData(bool enable);
@@ -341,7 +341,7 @@ public:
     /** Sets the DMR ID. Only valid for DMR contacts. */
     virtual void setDMRId(unsigned int id);
 
-    /** Retruns @c true if the RX tone is enabled (ring). Only valid for DMR contacts. */
+    /** Returns @c true if the RX tone is enabled (ring). Only valid for DMR contacts. */
     virtual bool dmrRing() const;
     /** Enables/disables RX tone (ring). Only valid for DMR contacts. */
     virtual void enableDMRRing(bool enable);
@@ -457,7 +457,7 @@ public:
   /** Adds a digital contact to the configuration for each one in the codeplug. */
   virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  /** Returns the number of stored channes. */
+  /** Returns the number of stored channels. */
   virtual unsigned int numChannels();
   /** Returns the offset to the n-th channel element. */
   virtual unsigned int offsetChannel(unsigned int n);

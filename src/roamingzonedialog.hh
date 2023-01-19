@@ -2,7 +2,7 @@
 #define ROAMINGZONEDIALOG_HH
 
 #include <QDialog>
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "ui_roamingzonedialog.h"
 
 class Config;
@@ -19,7 +19,8 @@ public:
 protected slots:
   void construct();
 
-  void onAddChannel();
+  void onAddRoamingChannel();
+  void onAddDMRChannel();
   void onRemChannel();
 
 protected:

@@ -626,7 +626,7 @@ OpenGD77Interface::sendShowCPSScreen(const ErrorStack &err) {
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -660,7 +660,7 @@ OpenGD77Interface::sendClearScreen(const ErrorStack &err) {
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -692,7 +692,7 @@ OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -724,7 +724,7 @@ OpenGD77Interface::sendRenderCPS(const ErrorStack &err) {
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -755,7 +755,7 @@ OpenGD77Interface::sendCloseScreen(const ErrorStack &err) {
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 
@@ -786,7 +786,7 @@ OpenGD77Interface::sendCommand(CommandRequest::Option option, const ErrorStack &
     errMsg(err) << "Cannot send command: Device returned empty message.";
     return false;
   } else if ('-' != resp) {
-    errMsg(err) << "Cannot send command: Deviced returned unexpected response '" << (char)resp << "'.";
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
     return false;
   }
 

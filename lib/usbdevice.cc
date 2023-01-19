@@ -131,7 +131,7 @@ QString
 USBDeviceInfo::longDescription() const {
   QStringList radios;
   foreach (RadioInfo radio, RadioInfo::allRadios(*this, true)) {
-    radios.append(QString("%1 %2").arg(radio.manufactuer(), radio.name()));
+    radios.append(QString("%1 %2").arg(radio.manufacturer(), radio.name()));
   }
   // This should not happen
   if (radios.isEmpty())

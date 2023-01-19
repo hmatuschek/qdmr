@@ -50,10 +50,27 @@
   changes and closes the dialog.
 </para>
 
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-grouplist-add.png" width="3cm" align="center"/></imageobject>
+    <textobject>Screen-shot of the group call selection dialog.</textobject>
+  </mediaobject>
+  <title>Selecting the group calls to add.</title>
+</screenshot>
+
+<para>
+  When adding contacts to the group list, the a dialog appears, that allows for selecting the group
+  calls to add to the group list. Some radios (in particular the OpenGD77 firmware) also allow to 
+  add private calls to group lists. To this end, the <guilabel>Show private calls</guilabel> option
+  allows to add private calls too. All other devices do not allow for private calls in group lists.
+  They will simply ignored by <application>qdmr</application> when the codeplug is generated for 
+  these devices.
+</para>
+
 <para>
   If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
   <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the GPS system. 
+  the device specific settings for the group list. 
 </para>
 </section>
   

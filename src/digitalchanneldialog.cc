@@ -34,6 +34,9 @@ DMRChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
+  if (settings.hideChannelNote())
+    hintLabel->setVisible(false);
+
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
@@ -90,8 +93,8 @@ DMRChannelDialog::construct() {
   roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
   if (_myChannel && (_myChannel->roamingZone() == DefaultRoamingZone::get()))
     roaming->setCurrentIndex(1);
-  for (int i=0; i<_config->roaming()->count(); i++) {
-    RoamingZone *zone = _config->roaming()->zone(i);
+  for (int i=0; i<_config->roamingZones()->count(); i++) {
+    RoamingZone *zone = _config->roamingZones()->zone(i);
     roaming->addItem(zone->name(), QVariant::fromValue(zone));
     if (_myChannel && (_myChannel->roamingZone() == zone))
       roaming->setCurrentIndex(i+2);
@@ -149,6 +152,7 @@ DMRChannelDialog::construct() {
   connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
+  connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 }
 
 DMRChannel *
@@ -220,5 +224,12 @@ DMRChannelDialog::onTimeoutDefaultToggled(bool checked) {
 void
 DMRChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
+}
+
+void
+DigitalChannelDialog::onHideChannelHint() {
+  Settings settings;
+  settings.setHideChannelNote(true);
+  hintLabel->setVisible(false);
 }
 

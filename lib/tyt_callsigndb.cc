@@ -152,7 +152,7 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorS
   size_t n = db->count();
   if (selection.hasCountLimit())
     n = std::min(n, selection.countLimit());
-  alloate(n);
+  allocate(n);
 
   // Clear DB index
   clearIndex();
@@ -186,7 +186,7 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorS
 }
 
 void
-TyTCallsignDB::alloate(unsigned n) {
+TyTCallsignDB::allocate(unsigned n) {
   n = std::min(n, unsigned(MAX_CALLSIGNS));
   qint64 size = align_size(0x0003 + INDEX_ENTRY_SIZE*NUM_INDEX_ENTRIES + CALLSIGN_ENTRY_SIZE*n, 1024);
 

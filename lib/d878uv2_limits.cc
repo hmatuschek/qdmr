@@ -6,7 +6,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<double, double> > &rxFreqRanges,

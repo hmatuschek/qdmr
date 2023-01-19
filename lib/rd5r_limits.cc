@@ -5,7 +5,7 @@
 #include "zone.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 RD5RLimits::RD5RLimits(QObject *parent)

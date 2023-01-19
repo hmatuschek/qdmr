@@ -282,6 +282,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     case Channel::Power::Low: return tr("Low"); break;
     case Channel::Power::Min: return tr("Min"); break;
     }
+    break;
   case 5:
     if (channel->defaultTimeout())
       return tr("[Default]");
@@ -498,6 +499,92 @@ ChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int 
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelListWrapper
+ * ********************************************************************************************* */
+RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index);
+  return 5;
+}
+
+QVariant
+RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+
+  RoamingChannel *ch = _list->get(index.row())->as<RoamingChannel>();
+
+  // Dispatch by column
+  switch (index.column()) {
+  case 0: return ch->name();
+  case 1: return ch->rxFrequency();
+  case 2:
+    if (ch->rxFrequency() == ch->txFrequency())
+      return ch->txFrequency();
+    return ch->txFrequency()-ch->rxFrequency();
+  case 3:
+    if (ch->colorCodeOverridden())
+      return ch->colorCode();
+    return tr("[Selected]");
+  case 4:
+    if (ch->timeSlotOverridden()) {
+      switch(ch->timeSlot()) {
+      case DMRChannel::TimeSlot::TS1: return 1;
+      case DMRChannel::TimeSlot::TS2: return 2;
+      }
+    }
+    return tr("[Selected]");
+  default: break;
+  }
+
+  return QVariant();
+}
+
+QVariant
+RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  switch (section) {
+  case 0: return tr("Name");
+  case 1: return tr("RX Frequency");
+  case 2: return tr("TX Frequency");
+  case 3: return tr("TS");
+  case 4: return tr("CC");
+  default: break;
+  }
+  return QVariant();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelRefListWrapper
+ * ********************************************************************************************* */
+RoamingChannelRefListWrapper::RoamingChannelRefListWrapper(RoamingChannelRefList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+RoamingChannelRefListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<RoamingChannel>()->name();
+}
+
+QVariant
+RoamingChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("Roaming Channel");
+}
 
 
 /* ********************************************************************************************* *
@@ -545,6 +632,7 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
             case DMRContact::GroupCall: return tr("Group Call");
             case DMRContact::AllCall: return tr("All Call");
           }
+        break;
         case 1:
           return dmr->name();
         case 2:
@@ -662,6 +750,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
+    break;
   case 3:
     return sys->period();
   case 4:
@@ -672,6 +761,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
                 sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
+    break;
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");

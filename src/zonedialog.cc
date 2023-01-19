@@ -6,6 +6,7 @@
 #include "channel.hh"
 #include "channelselectiondialog.hh"
 #include "settings.hh"
+#include <QMessageBox>
 
 
 /* ********************************************************************************************* *
@@ -71,8 +72,11 @@ ZoneDialog::onAddChannelA() {
 
 void
 ZoneDialog::onRemChannelA() {
-  if (! listAView->hasSelection())
+  if (! listAView->hasSelection()) {
+    QMessageBox::information(nullptr, tr("Cannot remove channel"),
+                             tr("Select at least one channel first."));
     return;
+  }
   QPair<int, int> selection = listAView->selection();
   QList<Channel *> channels;
   for (int i=selection.first; i<=selection.second; i++)
@@ -99,8 +103,11 @@ ZoneDialog::onAddChannelB() {
 
 void
 ZoneDialog::onRemChannelB() {
-  if (! listAView->hasSelection())
+  if (! listBView->hasSelection()) {
+    QMessageBox::information(nullptr, tr("Cannot remove channel"),
+                             tr("Select at least one channel first."));
     return;
+  }
   QPair<int, int> selection = listBView->selection();
   QList<Channel *> channels;
   for (int i=selection.first; i<=selection.second; i++)

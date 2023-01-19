@@ -16,7 +16,7 @@ class ConfigItem;
  * construction/parsing of the device specific binary configuration. */
 class Codeplug: public DFUFile
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Certain flags passed to CodePlug::encode to control the transfer and encoding of the
@@ -255,11 +255,11 @@ public:
 
 protected:
   /** Hidden default constructor. */
-	explicit Codeplug(QObject *parent=nullptr);
+  explicit Codeplug(QObject *parent=nullptr);
 
 public:
   /** Destructor. */
-	virtual ~Codeplug();
+  virtual ~Codeplug();
 
   /** Indexes all elements of the codeplug.
    * This method must be implemented by any device or vendor specific codeplug to map config

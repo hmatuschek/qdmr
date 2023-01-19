@@ -2,6 +2,8 @@
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QDesktopServices>
+#include <QTranslator>
+#include <QStandardPaths>
 
 #include "logger.hh"
 #include "radio.hh"
@@ -32,16 +34,28 @@
 #include "zonelistview.hh"
 #include "scanlistsview.hh"
 #include "positioningsystemlistview.hh"
+#include "roamingchannellistview.hh"
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
 #include "extensionview.hh"
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
 
+inline QStringList getLanguages() {
+  QStringList languages = {QLocale::system().name()};
+  if (languages.last().contains("_")) {
+    languages.append(languages.last().split("_").first());
+  }
+  return languages;
+}
+
+inline QString getLocalePath(const QString &language) {
+  return QDir(LOCALE_DIRECTORY "/" + language + "/LC_MESSAGES/").absolutePath();
+}
 
 Application::Application(int &argc, char *argv[])
-  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _repeater(nullptr),
-    _lastDevice()
+  : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _translator(nullptr),
+    _repeater(nullptr), _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -51,18 +65,33 @@ Application::Application(int &argc, char *argv[])
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
 
-  // Register icon themes
+  // register icon themes
   QStringList iconPaths = QIcon::themeSearchPaths();
   iconPaths.prepend(":/icons");
   QIcon::setThemeSearchPaths(iconPaths);
   onPaletteChanged(palette());
 
+  // handle translations
+  _translator = new QTranslator(this);
+  foreach (QString language, getLanguages()) {
+    logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
+    if (_translator->load("qdmr", getLocalePath(language), "", "_qt.qm")) {
+      this->installTranslator(_translator);
+      logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
+      break;
+    }
+  }
+
+  // load settings
   Settings settings;
+  // load databases
   _repeater   = new RepeaterBookList(this);
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
-  _config = new Config(this);
+  // create empty codeplug
+  _config     = new Config(this);
 
+  // Handle args (if there are some)
   if (argc>1) {
     QFileInfo info(argv[1]);
     QFile file(argv[1]);
@@ -86,6 +115,7 @@ Application::Application(int &argc, char *argv[])
     }
   }
 
+  // load position
   _currentPosition = settings.position();
   _source = QGeoPositionInfoSource::createDefaultSource(this);
   if (_source) {    
@@ -246,8 +276,12 @@ Application::createMainWindow() {
   tabs->addTab(_posSysList, tr("GPS/APRS"));
 
   // Wire-up "Roaming Zone List" view
+  _roamingChannelList = new RoamingChannelListView(_config);
+  tabs->addTab(_roamingChannelList, tr("Roaming Channels"));
+
+  // Wire-up "Roaming Zone List" view
   _roamingZoneList = new RoamingZoneListView(_config);
-  tabs->addTab(_roamingZoneList, tr("Roaming"));
+  tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
 
   // Wire-up "extension view"
   _extensionView = new ExtensionView();
@@ -452,6 +486,9 @@ Application::detectRadio() {
   if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
     radio->deleteLater();
+  } else {
+    QMessageBox::information(nullptr, tr("No radio found"),
+                             tr("No matching device was found."));
   }
 }
 
@@ -463,9 +500,14 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
   // If no radio is given -> try to detect the radio
   if (nullptr == myRadio)
     myRadio = autoDetect();
-  if (nullptr == myRadio)
-    return false;
 
+  if (nullptr == myRadio) {
+    if (showSuccess) {
+      QMessageBox::warning(nullptr, tr("No radio found"),
+                           tr("No matching device was found."));
+    }
+    return false;
+  }
   Settings settings;
   RadioLimitContext ctx(settings.ignoreFrequencyLimits());
   myRadio->limits().verifyConfig(_config, ctx);
@@ -503,8 +545,11 @@ Application::downloadCodeplug() {
   }
 
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
@@ -560,8 +605,11 @@ Application::uploadCodeplug() {
   Settings settings;
 
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   if (! verifyCodeplug(radio, false)) {
     radio->deleteLater();
@@ -591,8 +639,11 @@ void
 Application::uploadCallsignDB() {
   // Start upload
   Radio *radio = autoDetect();
-  if (nullptr == radio)
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
     return;
+  }
 
   if (! radio->limits().hasCallSignDB()) {
     logDebug() << "Radio " << radio->name() << " does not support call-sign DB.";
@@ -748,18 +799,18 @@ Application::showAbout() {
   radioTab->setColumnCount(1);
   QHash<QString, QTreeWidgetItem*> items;
   foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
-    if (! items.contains(radio.manufactuer()))
-      items.insert(radio.manufactuer(),
-                   new QTreeWidgetItem(QStringList(radio.manufactuer())));
-    items[radio.manufactuer()]->addChild(
+    if (! items.contains(radio.manufacturer()))
+      items.insert(radio.manufacturer(),
+                   new QTreeWidgetItem(QStringList(radio.manufacturer())));
+    items[radio.manufacturer()]->addChild(
           new QTreeWidgetItem(QStringList(radio.name())));
     foreach (RadioInfo alias, radio.alias()) {
-      if (! items.contains(alias.manufactuer()))
-        items.insert(alias.manufactuer(),
-                     new QTreeWidgetItem(QStringList(alias.manufactuer())));
-      items[alias.manufactuer()]->addChild(
+      if (! items.contains(alias.manufacturer()))
+        items.insert(alias.manufacturer(),
+                     new QTreeWidgetItem(QStringList(alias.manufacturer())));
+      items[alias.manufacturer()]->addChild(
             new QTreeWidgetItem(QStringList(tr("%1 (alias for %2 %3)").arg(alias.name())
-                                            .arg(radio.manufactuer()).arg(radio.name()))));
+                                            .arg(radio.manufacturer()).arg(radio.name()))));
     }
   }
   radioTab->insertTopLevelItems(0, items.values());

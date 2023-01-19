@@ -12,8 +12,8 @@
   Creating the list of channels for the DMR radio is the most cumbersome task. Remember, each
   repeater has two time-slots with possibly multiple talk-groups assigned to each time slot. For
   the sake of convenience, it is reasonable to define a channel for each talk-group you are
-  interested in, for each time-slot on every repeater. Thus, instead of a single channel per
-  analog repeater, you will likely define at least 3-4 channels per DMR repeater. 
+  interested in on every repeater. Thus, instead of a single channel per
+  FM repeater, you will likely define at least 3-4 channels per DMR repeater. 
 </para>
 
 <para>
@@ -21,14 +21,14 @@
   features that should help you in creating these channel. One feature is the automatic retrieval 
   of repeater input and output frequencies from
   <link xlink:href="https://repeaterbook.com">repeaterbook.com</link>. This is a world-wide database
-  of ham-radio repeaters.
+  of ham-radio repeaters. Both, FM and DMR. 
 </para>
 
 <tip>
   <para>
     When you enter your locator into the settings dialog (see <xref linkend="guiSettingsDialog"/>), 
     <application>qdmr</application> will provide you with a list of nearby repeater and fill in the
-    input and output frequencies. This feature works for both, analog and DMR repeaters. 
+    input and output frequencies. This feature works for both, FM and DMR repeaters. 
   </para>  
 </tip>
 
@@ -42,9 +42,9 @@
 
 <para> 
   The <guilabel>Channels</guilabel> tab shows the list of all defined channels, irrespective of
-  whether they are analog or digital (DMR) channels. You may add an analog or digital channel by 
-  clicking on the <guibutton>Add Analog Channel</guibutton> or 
-  <guibutton>Add Digital Channel</guibutton> button on the bottom, respectively. 
+  whether they are FM or DMR channels. You may add an analog or digital channel by 
+  clicking on the <guibutton>Add FM Channel</guibutton> or 
+  <guibutton>Add DMR Channel</guibutton> button on the bottom, respectively. 
 </para>
 
 <para>
@@ -73,11 +73,11 @@
 
 <section xml:id="guiDigitalChannelDialog">
 <info>
-  <title>Edit digital channels</title>
+  <title>Edit DMR channels</title>
 </info>
 
 <para>
-  When you double-click on a digital channel or click on the <guibutton>Add Digital 
+  When you double-click on a DMR channel or click on the <guibutton>Add DMR 
   Channel</guibutton> button, the digital channel editor dialog will be shown. This dialog allows 
   you to edit or create digital channels.
 </para>
@@ -85,14 +85,19 @@
 <screenshot>
   <mediaobject>
     <imageobject><imagedata fileref="fig/qdmr-edit-digital-channel.png" width="7cm" align="center"/></imageobject>
-    <textobject>Screen-shot of the digital channel editor dialog.</textobject>
+    <textobject>Screen-shot of the DMR channel editor dialog.</textobject>
   </mediaobject>
- <title>The digital channel editor.</title>
+ <title>The DMR channel editor.</title>
 </screenshot>
 
 <para>
   The dialog is limited to the DMR-channel settings that are relevant for amateur radio. Thus, it
-  is much smaller that the typical dialogs to edit DMR channels in commercial CPSs.
+  is much smaller that the typical dialogs to edit DMR channels in commercial CPSs. However, if 
+  you enable the <guilabel>Show device extensions</guilabel> option in the settings dialog (see 
+  <xref linkend="guiSettingsDialog"/>), an additional tab will appear called 
+  <guilabel>Extensions</guilabel>. There all implemented device-specific settings are hidden. They 
+  can be used to set all options you also find in the manufacturer CPS. See also 
+  <xref linkend="guiExtensions"/>.
 </para>
 
 <para>
@@ -102,8 +107,16 @@
   the call-sign of a repeater. A list of matching nearby repeaters is shown. Select a repeater 
   from this list and the RX/TX frequencies will be set using the information from
   <link xlink:href="https://repeaterbook.com">repeaterbook.com</link>. For simplex-channels RX
-  and TX frequencies must be identical.
+  and TX frequencies must be identical. 
 </para>
+
+<note>
+  <para>
+    The retrieval of the repeater information may time some moments. Hence, the auto-completion 
+    list of repeaters near by may not appear immediately. The found repeaters are cached locally
+    for faster retrieval later on.
+  </para>
+</note>
 
 <para>
   The <guilabel>Power</guilabel> setting specifies the power used on that channel. For a nearby 
@@ -125,6 +138,7 @@
   If you check the <guilabel>Default</guilabel> box, the global VOX setting will be used. See 
   <xref linkend="guiRadioSettings"/> above.
 </para>
+
 <para>
   Checking <guilabel>Rx Only</guilabel> will disable transmission on this channel. 
 </para>
@@ -198,32 +212,32 @@
 
 <section xml:id="guiAnalogChannelDialog">
 <info>
-  <title>Edit analog channels</title>
+  <title>Edit FM channels</title>
 </info>
 
 <para>
-  When you double-click on an analog channel or click on the <guibutton>Add Analog 
-  Channel</guibutton> button, the analog-channel-editor dialog will be shown. This dialog allows 
-  for editing or creating analog (FM) channels.
+  When you double-click on an analog channel or click on the <guibutton>Add FM Channel</guibutton> 
+  button, the analog-channel-editor dialog will be shown. This dialog allows for editing or 
+  creating FM channels.
 </para>
 
 <screenshot>
   <mediaobject>
     <imageobject><imagedata fileref="fig/qdmr-edit-analog-channel.png" width="7cm" align="center"/></imageobject>
-    <textobject>Screen-shot of the analog channel editor dialog.</textobject>
+    <textobject>Screen-shot of the FM channel editor dialog.</textobject>
   </mediaobject>
- <title>The analog channel editor.</title>
+ <title>The FM channel editor.</title>
 </screenshot>
 
 <para>
-  The left column of field are identical to the digital channel dialog, that is 
+  The left column of the editor are identical to the DMR channel dialog, that is 
   <guilabel>Name</guilabel>, <guilabel>Rx</guilabel> and <guilabel>Tx Frequency</guilabel>, 
   <guilabel>Power</guilabel>, <guilabel>Tx Timeout</guilabel>, <guilabel>VOX Level</guilabel> 
   <guilabel>Rx Only</guilabel> and <guilabel>Scan List</guilabel>.
 </para>
 
 <para>
-  Like for digital channels, analog channels may also have an <guilabel>Tx Admit</guilabel> 
+  Like for DMR channels, analog channels may also have an <guilabel>Tx Admit</guilabel> 
   criterion. Possible options are <guilabel>Always</guilabel>, <guilabel>Channel Free</guilabel> 
   and <guilabel>Tone</guilabel>. For FM repeaters the <guilabel>Always</guilabel> option should be 
   chosen to allow for a quick turn-around in a QSO. For simplex channels <guilabel>Channel 
@@ -239,10 +253,10 @@
 </para>
 
 <para>
-  <guilabel>Rx</guilabel> and <guilabel>Tx Tone</guilabel> specify the 
+  <guilabel>RX</guilabel> and <guilabel>TX Tone</guilabel> specify the 
   <glossterm>CTCSS</glossterm>/<glossterm>DCS</glossterm>
-  tones for this channel/repeater. The <guilabel>Rx Tone</guilabel> specifies the sub-tone that is 
-  needed to open the squelch. The <guilabel>Tx Tone</guilabel> specifies the tone that gets 
+  sub-tones for this channel/repeater. The <guilabel>RX Tone</guilabel> specifies the sub-tone that
+  is needed to open the squelch. The <guilabel>TX Tone</guilabel> specifies the sub-tone that gets 
   transmitted (e.g., to open the repeater). If the auto-completion feature is used, these tones are
   set automatically.
 </para>
@@ -254,7 +268,7 @@
 
 <para>
   <guilabel>APRS</guilabel> allows to specify an APRS system to be used on this channel. If the 
-  radio supports analog APRS, your position will be send using the frequency, destination and path
+  radio supports analog APRS, your position will be sent using the frequency, destination and path
   specified in this APRS system. If <guilabel>None</guilabel> is selected, APRS is disabled for
   this channel. If your radio does not support APRS, this setting is ignored.
 </para>

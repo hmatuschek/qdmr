@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneChannel"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Channel extensions</title>
+</info>
+
+<para>
+  This extensions allows to set some device specific channel settings for 
+  <trademark>AnyTone</trademark> devices. There are some general settings, valid for FM and DMR 
+  channels as well some FM and DMR specific settings.
+</para>
+
+<example>
+  <title>Examples of the <trademark>AnyTone</trademark> extensions for FM and DMR channels.</title>
+  <programlisting><![CDATA[channels:
+  - dmr:
+    name: Example DMR channel 
+    # ...
+    anytone:
+      talkaround: false
+      frequencyCorrection: 0
+      handsFree: false
+      callConfirm: false
+      sms: true
+      smsConfirm: false
+      dataACK: true
+      simplexTDMA: false
+      adaptiveTDMA: false
+      loneWorker: false
+      throughMode: false
+  - fm:
+    name: Example FM channel 
+    # ...
+    anytone:
+      talkaround: false
+      frequencyCorrection: 0
+      handsFree: false
+      reverseBurst: false
+      rxCustomCTCSS: false
+      txCustomCTCSS: false
+      customCTCSS: 0.0
+      squelchMode: Carrier
+      scrambler: false
+]]></programlisting>
+</example>
+
+<section>
+<info>
+  <title>Common channel attributes</title>
+</info>
+
+<para>
+  This section describes the common channel attributes. Theses attributes are shared between FM
+  and DMR channels.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>talkaround</token></term>
+    <listitem>
+      <para>If <token>true</token>, talkaround is enabled for this channel. This will bypass the
+        repeater on repeater channels and allows to talk to other participants directly.  </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>frequencyCorrection</token></term>
+    <listitem>
+      <para>Specifies some sort of correction to the frequency in some unknown units. Consider 
+        contacting me, if you know more details about it.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>handsFree</token></term>
+    <listitem>
+      <para>If <token>true</token>, the hands-free feature is enabled for this channel. The actual
+        configuration of the hands-free feature happens in the general settings extension. This 
+        setting is only applicable to the <productname>AT-D578UV</productname> device.</para>
+    </listitem>
+  </varlistentry>  
+</variablelist>
+</section>
+
+<section>
+  <info>
+    <title>FM channel attributes</title>
+  </info>
+
+  <para>
+    These attributes are only valid for FM channels.
+  </para>
+
+  <variablelist>
+    <varlistentry>
+      <term><token>reverseBurst</token></term>
+      <listitem>
+        <para>If <token>true</token>, a CTCSS phase-reverse burst is send at the end of 
+          transmission. This phase reversal of the CTCSS tone at the end of the transmission
+          can be used to prevent a noise tail at the end of the transmission on the receiver 
+          side. See 
+          <ulink url="https://en.wikipedia.org/wiki/Continuous_Tone-Coded_Squelch_System#Reverse_CTCSS">Reverse CTCSS</ulink> 
+          for details.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>rxCustomCTCSS</token></term>
+      <listitem>
+        <para>If <token>true</token>, the custom CTCSS frequency (see <token>customCTCSS</token>) 
+          is used to control the squelch.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>txCustomCTCSS</token></term>
+      <listitem>
+        <para>If <token>true</token>, the custom CTCSS frequency (see <token>customCTCSS</token>) 
+          is transmitted.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>customCTCSS</token></term>
+      <listitem>
+        <para>Specifies a custom CTCSS frequency in Hz. The frequency can be specified with a 
+          resolution of 0.1Hz.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>squelchMode</token></term>
+      <listitem>
+        <para>Specifies the squelch mode. Must be one of <token>Carrier</token>, 
+          <token>SubTone</token>, <token>OptSig</token>, <token>SubToneAndOptSig</token> or 
+          <token>SubToneOrOptSig</token>.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>scrambler</token></term>
+      <listitem>
+        <para>If <token>true</token>, the analog scrambler is enabled. It is not legal to use 
+          scramblers in HAM radio.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</section>  
+
+<section>
+  <info><title>DMR channel attributes</title></info>
+
+  <para>This section describes the attributes, applicable to DMR channels on 
+    <trademark>AnyTone</trademark> devices.</para>
+
+  <variablelist>
+    <varlistentry>
+      <term><token>callConfirm</token></term>
+      <listitem>
+        <para>If <token>true</token>, the call confirmation is enabled.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>sms</token></term>
+      <listitem>
+        <para>If <token>true</token>, the SMS reception is enabled.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>smsConfirm</token></term>
+      <listitem>
+        <para>If <token>true</token>, the SMS confirmation is enabled.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>dataACK</token></term>
+      <listitem>
+        <para>If <token>true</token>, the transmission of data acknowledgement is enabled.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>simplexTDMA</token></term>
+      <listitem>
+        <para>If <token>true</token>, TDMA mode for simplex channels is enabled. This mode is also 
+          known as DCDM (dual-capacity direct mode, see <xref linkend="glDCDM">DCDM</xref>)</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>adaptiveTDMA</token></term>
+      <listitem>
+        <para>If <token>true</token>, the adaptive TDMA mode is enabled. This makes only sense, if 
+          <token>simplexTDMA</token> is enabled too. In this case, the radio is able to receive both
+          simplex TDMA as well as normal simplex DMR on the channel.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>loneWorker</token></term>
+      <listitem>
+        <para>If <token>true</token>, the lone-worker feature (see <xref linkend="glLoneWorker">Lone Worker</xref>) 
+          is enabled for this channel. Usually not used in HAM radio.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>throughMode</token></term>
+      <listitem>
+        <para>If <token>true</token>, the through mode is enabled. What ever that means. If you 
+          know more about it, consider extending this section.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</section>
+
+</section>

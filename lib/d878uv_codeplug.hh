@@ -558,9 +558,9 @@ public:
     /** Sets the display color for callsigns. */
     virtual void setCallDisplayColor(Color color);
 
-    /** Returns @c true if the GPS units are imperical. */
+    /** Returns @c true if the GPS units are imperial. */
     virtual bool gpsUnitsImperial() const;
-    /** Enables/disables imperical GPS units. */
+    /** Enables/disables imperial GPS units. */
     virtual void enableGPSUnitsImperial(bool enable);
 
     /** Returns @c true if the knob is locked. */
@@ -1182,9 +1182,9 @@ public:
     virtual void setName(const QString &name);
 
     /** Constructs a roaming channel from the given digital channel. */
-    virtual bool fromChannel(const DMRChannel *ch);
-    /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
-    virtual DMRChannel *toChannel(Context &ctx);
+    virtual bool fromChannel(const RoamingChannel *ch);
+    /** Constructs a @c RoamingChannel instance for this roaming channel. */
+    virtual RoamingChannel *toChannel(Context &ctx);
   };
 
   /** Represents a roaming zone within the binary codeplug.
@@ -1219,11 +1219,11 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DMRChannel *, unsigned> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, Context& ctx);
     /** Constructs a @c RoamingZone instance from this configuration. */
     virtual RoamingZone *toRoamingZone() const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DMRChannel *> &map);
+    virtual bool linkRoamingZone(RoamingZone *zone, Context& ctx);
   };
 
   /** Represents an AES encryption key.
@@ -1351,26 +1351,21 @@ public:
     virtual QString maintainerNote() const;
   };
 
+protected:
+  /** Hidden constructor. */
+  explicit D878UVCodeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
-  /** Clears and resets the complete codeplug to some default values. */
-  void clear();
-
-  /** Sets all bitmaps for the given config. */
+protected:
+  bool allocateBitmaps();
   void setBitmaps(Config *config);
-
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * with the radio that are not represented within the common Config are omitted. */
   void allocateForDecoding();
-  /** Allocate all code-plug elements that must be written back to the device to maintain a working
-   * codeplug. These elements might be updated during encoding. */
   void allocateUpdated();
-  /** Allocate all code-plug elements that are defined through the common Config. */
   void allocateForEncoding();
 
-protected:
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 

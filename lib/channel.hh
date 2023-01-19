@@ -9,6 +9,7 @@
 #include "signaling.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
+#include "anytone_extension.hh"
 #include "commercial_extension.hh"
 
 class Config;
@@ -50,8 +51,6 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
-  /** The commercial channel extension. */
-  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
 
 public:
   /** Possible power settings. */
@@ -145,11 +144,6 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
-  /** Returns the extension for commercial features. */
-  CommercialChannelExtension *commercialExtension() const;
-  /** Sets the commercial channel extension. */
-  void setCommercialExtension(CommercialChannelExtension *ext);
-
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -182,8 +176,6 @@ protected:
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
-  /** Owns the commercial channel extension. */
-  CommercialChannelExtension *_commercialExtension;
 };
 
 
@@ -222,6 +214,10 @@ class FMChannel: public AnalogChannel
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
   Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
+
+  /** The AnyTone FM channel extension. */
+  Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
+
 
 public:
   /** Admit criteria of analog channel. */
@@ -292,6 +288,12 @@ public:
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
+  /** Returns the FM channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneFMChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone FM channel extension. */
+  void setAnytoneChannelExtension(AnytoneFMChannelExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -312,6 +314,9 @@ protected:
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
   APRSSystemReference _aprsSystem;
+
+  /** Owns the AnyTone FM channel extension. */
+  AnytoneFMChannelExtension *_anytoneExtension;
 };
 
 
@@ -339,7 +344,7 @@ public:
  * @ingroup conf */
 class DMRChannel: public DigitalChannel
 {
-	Q_OBJECT
+  Q_OBJECT
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
@@ -357,6 +362,11 @@ class DMRChannel: public DigitalChannel
   Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
+
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
+  /** The AnyTone DMR channel extension. */
+  Q_PROPERTY(AnytoneDMRChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
 public:
   /** Possible admit criteria of digital channels. */
@@ -376,7 +386,7 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  DMRChannel(QObject *parent=nullptr);
+  explicit DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
@@ -453,6 +463,17 @@ public:
   /** Associates the given radio ID with this channel. */
   bool setRadioIdObj(DMRRadioID *id);
 
+  /** Returns the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
+  /** Returns the DMR channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneDMRChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone DMR channel extension. */
+  void setAnytoneChannelExtension(AnytoneDMRChannelExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
 
@@ -473,6 +494,11 @@ protected:
   RoamingZoneReference _roaming;
   /** Radio ID to use on this channel. */
   DMRRadioIDReference _radioId;
+
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
+  /** Owns the AnyTone DMR channel extension. */
+  AnytoneDMRChannelExtension *_anytoneExtension;
 };
 
 
@@ -599,7 +625,7 @@ protected:
  * @ingroup conf */
 class ChannelList: public ConfigObjectList
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Constructs an empty channel list. */

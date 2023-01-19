@@ -56,6 +56,9 @@ public:
     return _object->is<Type>();
   }
 
+  /** Compares the references. */
+  int compare(const ConfigObjectReference &other) const;
+
 signals:
   /** Gets emitted if the reference is changed.
    * This signal is not emitted if the referenced object is modified. */
@@ -182,7 +185,7 @@ public:
 };
 
 
-/** Represents a list of references to some digital channels.
+/** Represents a list of references to some DMR channels.
  * @ingroup config */
 class DMRChannelRefList: public ChannelRefList
 {
@@ -191,6 +194,18 @@ class DMRChannelRefList: public ChannelRefList
 public:
   /** Empty constructor. */
   explicit DMRChannelRefList(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of references to some roaming channels.
+ * @ingroup config */
+class RoamingChannelRefList: public ConfigObjectRefList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RoamingChannelRefList(QObject *parent=nullptr);
 };
 
 

@@ -100,10 +100,21 @@ protected:
   explicit ConfigItem(QObject *parent = nullptr);
 
 public:
-  /** Copies the given item into this. */
+  /** Copies the given item into this one.
+   * @returns @c true if copying was successful and false otherwise. The two items must be of the
+   *          same type (obviously). */
   virtual bool copy(const ConfigItem &other);
+
   /** Clones this item. */
   virtual ConfigItem *clone() const = 0;
+
+  /** Compares the items.
+   *
+   * This method returns 0 if the two items are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two items are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigItem &other) const;
 
 public:
   /** Recursively labels the config object.
@@ -338,6 +349,14 @@ public:
   void clear();
   bool copy(const AbstractConfigObjectList &other);
 
+  /** Compares the object lists.
+   *
+   * This method returns 0 if the two lists are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two lists are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigObjectList &other) const;
+
   /** Allocates a member objects for the given YAML node. */
   virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Parses the list from the YAML node. */
@@ -367,6 +386,14 @@ protected:
 public:
   bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
   YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+
+  /** Compares the object ref lists.
+   *
+   * This method returns 0 if the two lists are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two lists are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigObjectRefList &other) const;
 };
 
 

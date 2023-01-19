@@ -6,7 +6,7 @@
 #include "scanlist.hh"
 #include "zone.hh"
 #include "gpssystem.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 UV390Limits::UV390Limits(QObject *parent)

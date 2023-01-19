@@ -30,7 +30,7 @@ public:
     // Anytone devices
     D868UVE,
     D868UV = D868UVE, // Actually a different device. Implement!
-    DMR6X2 = D868UVE, // Actually a D868UV, implement!
+    DMR6X2UV,
     D878UV,
     D878UVII,
     D578UV,
@@ -59,7 +59,7 @@ public:
   /** Returns the radio name. */
   const QString &name() const;
   /** Returns the manufacturer name. */
-  const QString &manufactuer() const;
+  const QString &manufacturer() const;
   /** Returns some information about the interface to the radio. */
   const USBDeviceInfo &interface() const;
 

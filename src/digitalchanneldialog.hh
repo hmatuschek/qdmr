@@ -21,6 +21,7 @@ protected slots:
   void onPowerDefaultToggled(bool checked);
   void onTimeoutDefaultToggled(bool checked);
   void onVOXDefaultToggled(bool checked);
+  void onHideChannelHint();
 
 protected:
   void construct();
