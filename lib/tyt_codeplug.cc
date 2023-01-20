@@ -253,8 +253,6 @@ TyTCodeplug::ChannelElement::vox() const {
 }
 void
 TyTCodeplug::ChannelElement::enableVOX(bool enable) {
-  if (enable)
-    logDebug() << "Enable VOX!";
   setBit(4,4, enable);
 }
 
