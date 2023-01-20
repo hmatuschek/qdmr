@@ -59,7 +59,7 @@ public:
       Always = 0,                  ///< For both channel types.
       Free = 1,                    ///< For digital channels.
       DifferentColorCode = 2,      ///< For digital channels.
-      ColorCode = 3,               ///< For digital channels.
+      SameColorCode = 3,               ///< For digital channels.
       Tone = 1,                    ///< For analog channels
       Busy = 2                     ///< For analog channels.
     };
