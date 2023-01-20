@@ -4,7 +4,7 @@
 #include "utils.hh"
 
 
-#define MAX_CALLSIGNS                122197  // Maximum number of callsings in DB
+#define MAX_CALLSIGNS              122197LL  // Maximum number of callsings in DB
 
 #define ADDR_CALLSIGN_INDEX      0x00200000  // Start of callsign database
 #define NUM_INDEX_ENTRIES              4096
@@ -149,7 +149,7 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorS
   Q_UNUSED(err)
 
   // Allocate space for callsign db
-  size_t n = db->count();
+  size_t n = std::min(MAX_CALLSIGNS, db->count());
   if (selection.hasCountLimit())
     n = std::min(n, selection.countLimit());
   allocate(n);
