@@ -3,7 +3,6 @@
 
 #include "radioddity_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-77.

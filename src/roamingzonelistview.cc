@@ -15,7 +15,7 @@ RoamingZoneListView::RoamingZoneListView(Config *config, QWidget *parent)
   Settings settings;
   ui->setupUi(this);
 
-  ui->listView->setModel(new RoamingListWrapper(_config->roaming(), ui->listView));
+  ui->listView->setModel(new RoamingListWrapper(_config->roamingZones(), ui->listView));
 
   connect(ui->addRoamingZone, SIGNAL(clicked()), this, SLOT(onAddRoamingZone()));
   connect(ui->genRoamingZone, SIGNAL(clicked(bool)), this, SLOT(onGenRoamingZone()));
@@ -43,7 +43,7 @@ RoamingZoneListView::onAddRoamingZone() {
   int row=-1;
   if (ui->listView->hasSelection())
     row = ui->listView->selection().second+1;
-  _config->roaming()->add(dialog.zone(), row);
+  _config->roamingZones()->add(dialog.zone(), row);
 }
 
 void
@@ -61,8 +61,11 @@ RoamingZoneListView::onGenRoamingZone() {
     DMRChannel *dch = _config->channelList()->channel(i)->as<DMRChannel>();
     if (nullptr == dch)
       continue;
-    if (contacts.contains(dch->txContactObj()))
-      zone->addChannel(dch);
+    if (contacts.contains(dch->txContactObj())) {
+      RoamingChannel *rch = RoamingChannel::fromDMRChannel(dch);
+      _config->roamingChannels()->add(rch);
+      zone->addChannel(rch);
+    }
   }
 
   RoamingZoneDialog dialog(_config, zone);
@@ -74,7 +77,7 @@ RoamingZoneListView::onGenRoamingZone() {
   int row=-1;
   if (ui->listView->hasSelection())
     row = ui->listView->selection().second+1;
-  _config->roaming()->add(dialog.zone(), row);
+  _config->roamingZones()->add(dialog.zone(), row);
 }
 
 void
@@ -90,7 +93,7 @@ RoamingZoneListView::onRemRoamingZone() {
   QPair<int, int> rows = ui->listView->selection();
   int rowcount = rows.second - rows.first + 1;
   if (rows.first==rows.second) {
-    QString name = _config->roaming()->zone(rows.first)->name();
+    QString name = _config->roamingZones()->zone(rows.first)->name();
     if (QMessageBox::No == QMessageBox::question(
           nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
       return;
@@ -103,15 +106,15 @@ RoamingZoneListView::onRemRoamingZone() {
   // need to collect them first as rows change when deleting
   QList<RoamingZone *> lists; lists.reserve(rowcount);
   for (int row=rows.first; row<=rows.second; row++)
-    lists.push_back(_config->roaming()->zone(row));
+    lists.push_back(_config->roamingZones()->zone(row));
   // remove
   foreach (RoamingZone *zone, lists)
-    _config->roaming()->del(zone);
+    _config->roamingZones()->del(zone);
 }
 
 void
 RoamingZoneListView::onEditRoamingZone(unsigned row) {
-  RoamingZoneDialog dialog(_config, _config->roaming()->zone(row));
+  RoamingZoneDialog dialog(_config, _config->roamingZones()->zone(row));
   if (QDialog::Accepted != dialog.exec())
     return;
 

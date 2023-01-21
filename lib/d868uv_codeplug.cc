@@ -221,6 +221,163 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::ChannelElement
+ * ******************************************************************************************** */
+D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
+  : AnytoneCodeplug::ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : AnytoneCodeplug::ChannelElement(ptr)
+{
+  // pass...
+}
+
+bool
+D868UVCodeplug::ChannelElement::ranging() const {
+  return getBit(0x0034, 0);
+}
+void
+D868UVCodeplug::ChannelElement::enableRanging(bool enable) {
+  setBit(0x0034, 0, enable);
+}
+
+bool
+D868UVCodeplug::ChannelElement::throughMode() const {
+  return getBit(0x0034, 1);
+}
+void
+D868UVCodeplug::ChannelElement::enableThroughMode(bool enable) {
+  setBit(0x0034, 1, enable);
+}
+
+bool
+D868UVCodeplug::ChannelElement::dataACK() const {
+  return !getBit(0x0034, 2);
+}
+void
+D868UVCodeplug::ChannelElement::enableDataACK(bool enable) {
+  setBit(0x0034, 2, !enable);
+}
+
+bool
+D868UVCodeplug::ChannelElement::txDigitalAPRS() const {
+  return getBit(0x0035, 0);
+}
+void
+D868UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
+  setBit(0x0035, 0, enable);
+}
+unsigned
+D868UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
+  return getUInt8(0x0036);
+}
+void
+D868UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
+  setUInt8(0x0036, idx);
+}
+
+unsigned
+D868UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
+  return getUInt8(0x003a);
+}
+void
+D868UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
+  setUInt8(0x003a, idx);
+}
+
+bool
+D868UVCodeplug::ChannelElement::multipleKeyEncryption() const {
+  return getBit(0x003b, 0);
+}
+void
+D868UVCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
+  setBit(0x003b, 0, enable);
+}
+
+bool
+D868UVCodeplug::ChannelElement::randomKey() const {
+  return getBit(0x003b, 1);
+}
+void
+D868UVCodeplug::ChannelElement::enableRandomKey(bool enable) {
+  setBit(0x003b, 1, enable);
+}
+bool
+D868UVCodeplug::ChannelElement::sms() const {
+  return !getBit(0x003b, 2);
+}
+void
+D868UVCodeplug::ChannelElement::enableSMS(bool enable) {
+  setBit(0x003b, 0, !enable);
+}
+
+Channel *
+D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return nullptr;
+
+  if (ch->is<DMRChannel>()) {
+    DMRChannel *dch = ch->as<DMRChannel>();
+    if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
+      ext->enableSMS(sms());
+      ext->enableDataACK(dataACK());
+      ext->enableThroughMode(throughMode());
+    }
+  }
+
+  return ch;
+}
+
+bool
+D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+
+  if (c->is<DMRChannel>()) {
+    DMRChannel *dc = c->as<DMRChannel>();
+    // Link to GPS system
+    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+      logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
+    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
+      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+  }
+
+  return true;
+}
+
+bool
+D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (c->is<DMRChannel>()) {
+    const DMRChannel *dc = c->as<const DMRChannel>();
+    // Set GPS system index
+    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+      enableTXDigitalAPRS(true);
+      enableRXAPRS(false);
+    } else {
+      enableTXDigitalAPRS(false);
+      enableRXAPRS(false);
+    }
+
+    // Handle extension
+    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
+      enableSMS(ext->sms());
+      enableDataACK(ext->dataACK());
+      enableThroughMode(ext->throughMode());
+    }
+  }
+
+  return true;
+}
+
+/* ******************************************************************************************** *
  * Implementation of D868UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
@@ -471,43 +628,16 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
-D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : AnytoneCodeplug(parent)
+D868UVCodeplug::D868UVCodeplug(const QString &label, QObject *parent)
+  : AnytoneCodeplug(label, parent)
 {
+  // pass...
 }
 
-void
-D868UVCodeplug::clear() {
-  while (this->numImages())
-    remImage(0);
-
-  addImage("Anytone AT-D868UV Codeplug");
-
-  // Channel bitmap
-  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
-  // Zone bitmap
-  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
-  // Contacts bitmap
-  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
-  // Analog contacts bytemap
-  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
-  // RX group list bitmaps
-  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
-  // Scan list bitmaps
-  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
-  // Radio IDs bitmaps
-  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
-  // Message bitmaps
-  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
-  // Status messages
-  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
-  // FM Broadcast bitmaps
-  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
-  // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
-  // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+D868UVCodeplug::D868UVCodeplug(QObject *parent)
+  : AnytoneCodeplug("AnyTone AT-D868UV Codeplug", parent)
+{
+  // pass...
 }
 
 void
@@ -573,6 +703,38 @@ D868UVCodeplug::allocateForDecoding() {
 }
 
 
+bool
+D868UVCodeplug::allocateBitmaps() {
+  // Channel bitmap
+  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
+  // Zone bitmap
+  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
+  // Contacts bitmap
+  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  // Analog contacts bytemap
+  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
+  // RX group list bitmaps
+  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
+  // Scan list bitmaps
+  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
+  // Radio IDs bitmaps
+  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
+  // Message bitmaps
+  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
+  // Status messages
+  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
+  // FM Broadcast bitmaps
+  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  // 5-Tone function bitmaps
+  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
+  // 2-Tone function bitmaps
+  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+
+  return true;
+}
+
+
 void
 D868UVCodeplug::setBitmaps(Config *config)
 {
@@ -628,20 +790,6 @@ D868UVCodeplug::setBitmaps(Config *config)
   }
 }
 
-bool
-D868UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  Context ctx(config);
-  if (! index(config, ctx, err))
-    return false;
-
-  return encodeElements(flags, ctx, err);
-}
-
-bool D868UVCodeplug::decode(Config *config, const ErrorStack &err) {
-  // Maps code-plug indices to objects
-  Context ctx(config);
-  return decodeElements(ctx, err);
-}
 
 bool
 D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)

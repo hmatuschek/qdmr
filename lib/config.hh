@@ -47,7 +47,8 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
-#include "roaming.hh"
+#include "roamingchannel.hh"
+#include "roamingzone.hh"
 #include "radioid.hh"
 #include "radiosettings.hh"
 #include "tyt_extensions.hh"
@@ -83,8 +84,10 @@ class Config : public ConfigItem
   Q_PROPERTY(ScanLists* scanLists READ scanlists SCRIPTABLE false)
   /** The list of positioning systems. */
   Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
+  /** The list of roaming channels. */
+  Q_PROPERTY(RoamingChannelList* roamingChannels READ roamingChannels SCRIPTABLE false)
   /** The list of roaming zones. */
-  Q_PROPERTY(RoamingZoneList* roaming READ roaming SCRIPTABLE false)
+  Q_PROPERTY(RoamingZoneList* roamingZones READ roamingZones SCRIPTABLE false)
 
   /** Represents the config extension for encryption keys. */
   Q_PROPERTY(CommercialExtension* commercial READ commercialExtension)
@@ -119,8 +122,10 @@ public:
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
   PositioningSystems *posSystems() const;
+  /** Returns the list of roaming channels. */
+  RoamingChannelList *roamingChannels() const;
   /** Returns the list of roaming zones. */
-  RoamingZoneList *roaming() const;
+  RoamingZoneList *roamingZones() const;
 
   /** Returns @c true if one of the digital channels has a roaming zone assigned. */
   bool requiresRoaming() const;
@@ -184,8 +189,10 @@ protected:
   ScanLists *_scanlists;
   /** The list of GPS Systems. */
   PositioningSystems *_gpsSystems;
+  /** The list of roaming channels. */
+  RoamingChannelList *_roamingChannels;
   /** The list of roaming zones. */
-  RoamingZoneList *_roaming;
+  RoamingZoneList *_roamingZones;
   /** Owns the TyT settings extension. */
   TyTConfigExtension *_tytExtension;
   /** Owns the commercial extension. */

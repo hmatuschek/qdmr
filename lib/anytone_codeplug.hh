@@ -59,7 +59,7 @@ public:
       Always = 0,                  ///< For both channel types.
       Free = 1,                    ///< For digital channels.
       DifferentColorCode = 2,      ///< For digital channels.
-      ColorCode = 3,               ///< For digital channels.
+      SameColorCode = 3,               ///< For digital channels.
       Tone = 1,                    ///< For analog channels
       Busy = 2                     ///< For analog channels.
     };
@@ -300,45 +300,6 @@ public:
     virtual QString name() const;
     /** Sets the channel name. */
     virtual void setName(const QString &name);
-
-    /** Returns @c true if ranging is enabled. */
-    virtual bool ranging() const;
-    /** Enables/disables ranging. */
-    virtual void enableRanging(bool enable);
-    /** Returns @c true if through mode is enabled. */
-    virtual bool throughMode() const;
-    /** Enables/disables though mode. */
-    virtual void enableThroughMode(bool enable);
-    /** Returns @c true if data ACK is enabled. */
-    virtual bool dataACK() const;
-    /** Enables/disables data ACK. */
-    virtual void enableDataACK(bool enable);
-
-    /** Returns @c true if TX APRS is enabled. */
-    virtual bool txDigitalAPRS() const;
-    /** Enables/disables TX APRS. */
-    virtual void enableTXDigitalAPRS(bool enable);
-    /** Returns the DMR APRS system index. */
-    virtual unsigned digitalAPRSSystemIndex() const;
-    /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(unsigned idx);
-
-    /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned dmrEncryptionKeyIndex() const;
-    /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(unsigned idx);
-    /** Returns @c true if multiple key encryption is enabled. */
-    virtual bool multipleKeyEncryption() const;
-    /** Enables/disables multiple key encryption. */
-    virtual void enableMultipleKeyEncryption(bool enable);
-    /** Returns @c true if random key is enabled. */
-    virtual bool randomKey() const;
-    /** Enables/disables random key. */
-    virtual void enableRandomKey(bool enable);
-    /** Returns @c true if SMS is enabled. */
-    virtual bool sms() const;
-    /** Enables/disables SMS. */
-    virtual void enableSMS(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
     virtual Channel *toChannelObj(Context &ctx) const;
@@ -2069,27 +2030,46 @@ public:
 
 protected:
   /** Hidden constructor. */
-  explicit AnytoneCodeplug(QObject *parent=nullptr);
+  AnytoneCodeplug(const QString &label, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
   virtual ~AnytoneCodeplug();
 
   /** Clears and resets the complete codeplug to some default values. */
-  virtual void clear() = 0;
+  virtual void clear();
 
+  bool encode(Config *config, const Flags &flags, const ErrorStack &err);
+  bool decode(Config *config, const ErrorStack &err);
+
+protected:
   virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
+  /** Allocates the bitmaps. This is also performed during a clear. */
+  virtual bool allocateBitmaps() = 0;
   /** Sets all bitmaps for the given config. */
   virtual void setBitmaps(Config *config) = 0;
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * within the radio that are not represented within the common Config are omitted. */
-  virtual void allocateForDecoding() = 0;
+
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */
   virtual void allocateUpdated() = 0;
+  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
+   * within the radio that are not represented within the common Config are omitted. */
+  virtual void allocateForDecoding() = 0;
   /** Allocate all code-plug elements that are defined through the common Config. */
   virtual void allocateForEncoding() = 0;
+
+  /** Encodes the given config (via context) to the binary codeplug. */
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the downloaded codeplug. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+protected:
+  /** Holds the image label. */
+  QString _label;
+
+  // Allow access to protected allocation methods.
+  friend class AnytoneRadio;
 };
 
 #endif // ANYTONECODEPLUG_HH

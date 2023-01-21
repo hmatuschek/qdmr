@@ -234,276 +234,258 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>AnytoneInterface</name>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="156"/>
-        <source>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</source>
-        <translation>Unsupported AnyTone radio &apos;%1&apos;, HW rev. &apos;%2&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>AnytoneLimits</name>
-    <message>
-        <location filename="../lib/anytone_limits.cc" line="18"/>
-        <source>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</source>
-        <translation>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_limits.cc" line="23"/>
-        <source>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</source>
-        <translation>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</translation>
-    </message>
-</context>
-<context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="237"/>
+        <location filename="../src/application.cc" line="238"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="251"/>
-        <location filename="../src/application.cc" line="739"/>
+        <location filename="../src/application.cc" line="252"/>
+        <location filename="../src/application.cc" line="761"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="255"/>
+        <location filename="../src/application.cc" line="256"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="259"/>
+        <location filename="../src/application.cc" line="260"/>
         <source>Group Lists</source>
         <translation>Group Lists</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="263"/>
+        <location filename="../src/application.cc" line="264"/>
         <source>Channels</source>
         <translation>Channels</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="267"/>
+        <location filename="../src/application.cc" line="268"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="271"/>
+        <location filename="../src/application.cc" line="272"/>
         <source>Scan Lists</source>
         <translation>Scan Lists</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="275"/>
+        <location filename="../src/application.cc" line="276"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="279"/>
-        <source>Roaming</source>
-        <translation>Roaming</translation>
+        <location filename="../src/application.cc" line="280"/>
+        <source>Roaming Channels</source>
+        <translation>Roaming Channels</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
-        <location filename="../src/application.cc" line="753"/>
+        <source>Roaming Zones</source>
+        <translation>Roaming Zones</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="289"/>
+        <location filename="../src/application.cc" line="775"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="303"/>
-        <location filename="../src/application.cc" line="320"/>
-        <location filename="../src/application.cc" line="421"/>
-        <location filename="../src/application.cc" line="527"/>
+        <location filename="../src/application.cc" line="308"/>
+        <location filename="../src/application.cc" line="325"/>
+        <location filename="../src/application.cc" line="426"/>
+        <location filename="../src/application.cc" line="540"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="304"/>
-        <location filename="../src/application.cc" line="321"/>
-        <location filename="../src/application.cc" line="422"/>
-        <location filename="../src/application.cc" line="528"/>
+        <location filename="../src/application.cc" line="309"/>
+        <location filename="../src/application.cc" line="326"/>
+        <location filename="../src/application.cc" line="427"/>
+        <location filename="../src/application.cc" line="541"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="329"/>
+        <location filename="../src/application.cc" line="334"/>
         <source>Open codeplug</source>
         <translation>Open codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="331"/>
+        <location filename="../src/application.cc" line="336"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="337"/>
-        <location filename="../src/application.cc" line="397"/>
+        <location filename="../src/application.cc" line="342"/>
+        <location filename="../src/application.cc" line="402"/>
         <source>Cannot open file</source>
         <translation>Cannot open file</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="338"/>
-        <location filename="../src/application.cc" line="352"/>
-        <location filename="../src/application.cc" line="363"/>
+        <location filename="../src/application.cc" line="343"/>
+        <location filename="../src/application.cc" line="357"/>
+        <location filename="../src/application.cc" line="368"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Cannot read codeplug from file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="351"/>
-        <location filename="../src/application.cc" line="362"/>
+        <location filename="../src/application.cc" line="356"/>
+        <location filename="../src/application.cc" line="367"/>
         <source>Cannot read codeplug.</source>
         <translation>Cannot read codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="378"/>
+        <location filename="../src/application.cc" line="383"/>
         <source>Save codeplug</source>
         <translation>Save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="379"/>
+        <location filename="../src/application.cc" line="384"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Codeplug Files (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="385"/>
+        <location filename="../src/application.cc" line="390"/>
         <source>Please use new YAML format.</source>
         <translation>Please use new YAML format.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="386"/>
+        <location filename="../src/application.cc" line="391"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="398"/>
+        <location filename="../src/application.cc" line="403"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="407"/>
+        <location filename="../src/application.cc" line="412"/>
         <source>Cannot save codeplug</source>
         <translation>Cannot save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="408"/>
+        <location filename="../src/application.cc" line="413"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="450"/>
         <source>No matching devices found.</source>
         <translation>No matching devices found.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="471"/>
+        <location filename="../src/application.cc" line="476"/>
         <source>Cannot connect to radio</source>
         <translation>Cannot connect to radio</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="472"/>
+        <location filename="../src/application.cc" line="477"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Cannot connect to radio: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="482"/>
+        <location filename="../src/application.cc" line="487"/>
         <source>Radio found</source>
         <translation>Radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="482"/>
+        <location filename="../src/application.cc" line="487"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Found device &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="509"/>
+        <location filename="../src/application.cc" line="490"/>
+        <location filename="../src/application.cc" line="506"/>
+        <location filename="../src/application.cc" line="549"/>
+        <location filename="../src/application.cc" line="609"/>
+        <location filename="../src/application.cc" line="643"/>
+        <source>No radio found</source>
+        <translation>No radio found</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="491"/>
+        <location filename="../src/application.cc" line="507"/>
+        <location filename="../src/application.cc" line="550"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="644"/>
+        <source>No matching device was found.</source>
+        <translation>No matching device was found.</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="522"/>
         <source>Verification success</source>
         <translation>Verification success</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="510"/>
+        <location filename="../src/application.cc" line="523"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="546"/>
+        <location filename="../src/application.cc" line="562"/>
         <source>Read ...</source>
         <translation>Read …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="556"/>
+        <location filename="../src/application.cc" line="572"/>
         <source>Read error</source>
         <translation>Read error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="574"/>
+        <location filename="../src/application.cc" line="590"/>
         <source>Read complete</source>
         <translation>Read complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="611"/>
+        <location filename="../src/application.cc" line="630"/>
         <source>Upload ...</source>
         <translation>Write …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="628"/>
-        <location filename="../src/application.cc" line="638"/>
         <location filename="../src/application.cc" line="650"/>
+        <location filename="../src/application.cc" line="660"/>
+        <location filename="../src/application.cc" line="672"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Cannot write call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="629"/>
+        <location filename="../src/application.cc" line="651"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="639"/>
+        <location filename="../src/application.cc" line="661"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="651"/>
+        <location filename="../src/application.cc" line="673"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="687"/>
+        <location filename="../src/application.cc" line="709"/>
         <source>Write call-sign DB ...</source>
         <translation>Write call-sign DB …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="698"/>
+        <location filename="../src/application.cc" line="720"/>
         <source>Write error</source>
         <translation>Write error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="710"/>
+        <location filename="../src/application.cc" line="732"/>
         <source>Write complete</source>
         <translation>Write complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="790"/>
+        <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias for %2 %3)</translation>
-    </message>
-</context>
-<context>
-    <name>CSVLexer</name>
-    <message>
-        <location filename="../lib/csvreader.cc" line="72"/>
-        <source>Lexer error %1,%2: Unexpected char &apos;%3&apos;.</source>
-        <translation>Lexer error %1,%2: Unexpected char &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>CSVReader</name>
-    <message>
-        <location filename="../lib/csvreader.cc" line="1730"/>
-        <source>
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</source>
-        <translation>
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</translation>
     </message>
 </context>
 <context>
@@ -543,11 +525,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/channellistview.cc" line="127"/>
         <source>Delete %1 channels?</source>
         <translation>Delete %1 channels?</translation>
-    </message>
-    <message>
-        <location filename="../src/channellistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
@@ -604,10 +581,10 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
-        <location filename="../src/configitemwrapper.cc" line="283"/>
-        <location filename="../src/configitemwrapper.cc" line="348"/>
-        <location filename="../src/configitemwrapper.cc" line="372"/>
-        <location filename="../src/configitemwrapper.cc" line="383"/>
+        <location filename="../src/configitemwrapper.cc" line="284"/>
+        <location filename="../src/configitemwrapper.cc" line="349"/>
+        <location filename="../src/configitemwrapper.cc" line="373"/>
+        <location filename="../src/configitemwrapper.cc" line="384"/>
         <source>[Default]</source>
         <translation>[Default]</translation>
     </message>
@@ -637,176 +614,176 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="285"/>
-        <location filename="../src/configitemwrapper.cc" line="288"/>
-        <location filename="../src/configitemwrapper.cc" line="395"/>
-        <location filename="../src/configitemwrapper.cc" line="405"/>
+        <location filename="../src/configitemwrapper.cc" line="286"/>
+        <location filename="../src/configitemwrapper.cc" line="289"/>
+        <location filename="../src/configitemwrapper.cc" line="396"/>
+        <location filename="../src/configitemwrapper.cc" line="406"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="288"/>
+        <location filename="../src/configitemwrapper.cc" line="289"/>
         <source>On</source>
         <translation>On</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="292"/>
-        <location filename="../src/configitemwrapper.cc" line="298"/>
+        <location filename="../src/configitemwrapper.cc" line="293"/>
+        <location filename="../src/configitemwrapper.cc" line="299"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="293"/>
-        <location filename="../src/configitemwrapper.cc" line="299"/>
+        <location filename="../src/configitemwrapper.cc" line="294"/>
+        <location filename="../src/configitemwrapper.cc" line="300"/>
         <source>Free</source>
         <translation>Free</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="294"/>
+        <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="300"/>
+        <location filename="../src/configitemwrapper.cc" line="301"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="308"/>
-        <location filename="../src/configitemwrapper.cc" line="329"/>
-        <location filename="../src/configitemwrapper.cc" line="340"/>
-        <location filename="../src/configitemwrapper.cc" line="359"/>
-        <location filename="../src/configitemwrapper.cc" line="364"/>
-        <location filename="../src/configitemwrapper.cc" line="370"/>
+        <location filename="../src/configitemwrapper.cc" line="309"/>
+        <location filename="../src/configitemwrapper.cc" line="330"/>
+        <location filename="../src/configitemwrapper.cc" line="341"/>
+        <location filename="../src/configitemwrapper.cc" line="360"/>
+        <location filename="../src/configitemwrapper.cc" line="365"/>
+        <location filename="../src/configitemwrapper.cc" line="371"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="314"/>
-        <location filename="../src/configitemwrapper.cc" line="321"/>
-        <location filename="../src/configitemwrapper.cc" line="332"/>
-        <location filename="../src/configitemwrapper.cc" line="342"/>
-        <location filename="../src/configitemwrapper.cc" line="351"/>
-        <location filename="../src/configitemwrapper.cc" line="375"/>
-        <location filename="../src/configitemwrapper.cc" line="380"/>
-        <location filename="../src/configitemwrapper.cc" line="392"/>
-        <location filename="../src/configitemwrapper.cc" line="402"/>
-        <location filename="../src/configitemwrapper.cc" line="412"/>
+        <location filename="../src/configitemwrapper.cc" line="315"/>
+        <location filename="../src/configitemwrapper.cc" line="322"/>
+        <location filename="../src/configitemwrapper.cc" line="333"/>
+        <location filename="../src/configitemwrapper.cc" line="343"/>
+        <location filename="../src/configitemwrapper.cc" line="352"/>
+        <location filename="../src/configitemwrapper.cc" line="376"/>
+        <location filename="../src/configitemwrapper.cc" line="381"/>
+        <location filename="../src/configitemwrapper.cc" line="393"/>
+        <location filename="../src/configitemwrapper.cc" line="403"/>
+        <location filename="../src/configitemwrapper.cc" line="413"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="385"/>
+        <location filename="../src/configitemwrapper.cc" line="386"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="415"/>
+        <location filename="../src/configitemwrapper.cc" line="416"/>
         <source>Wide</source>
         <translation>Wide</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="417"/>
+        <location filename="../src/configitemwrapper.cc" line="418"/>
         <source>Narrow</source>
         <translation>Narrow</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="433"/>
+        <location filename="../src/configitemwrapper.cc" line="434"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="434"/>
+        <location filename="../src/configitemwrapper.cc" line="435"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="435"/>
+        <location filename="../src/configitemwrapper.cc" line="436"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="436"/>
+        <location filename="../src/configitemwrapper.cc" line="437"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="437"/>
+        <location filename="../src/configitemwrapper.cc" line="438"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="438"/>
+        <location filename="../src/configitemwrapper.cc" line="439"/>
         <source>Timeout</source>
         <translation>Timeout</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="439"/>
+        <location filename="../src/configitemwrapper.cc" line="440"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="440"/>
+        <location filename="../src/configitemwrapper.cc" line="441"/>
         <source>Admit</source>
         <translation>Admit</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="441"/>
+        <location filename="../src/configitemwrapper.cc" line="442"/>
         <source>Scanlist</source>
         <translation>Scanlist</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="442"/>
+        <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="443"/>
+        <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="444"/>
+        <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>RX Group List</source>
         <translation>Group List</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="445"/>
+        <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>TX Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="446"/>
+        <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="447"/>
+        <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="448"/>
+        <location filename="../src/configitemwrapper.cc" line="449"/>
         <source>Roaming</source>
         <translation>Roaming</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="449"/>
+        <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="450"/>
+        <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="451"/>
+        <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="452"/>
+        <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
@@ -814,7 +791,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>ChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="480"/>
+        <location filename="../src/configitemwrapper.cc" line="481"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
@@ -841,11 +818,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
     </message>
-    <message>
-        <location filename="../src/configobjectlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>ConfigObjectTableView</name>
@@ -860,11 +832,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -881,8 +848,8 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
-        <source>Dialog</source>
-        <translation></translation>
+        <source>Create extension object</source>
+        <translation>Create extension object</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
@@ -921,11 +888,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
         <translation>Delete %1 contacts?</translation>
-    </message>
-    <message>
-        <location filename="../src/contactlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>
@@ -971,117 +933,56 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>ContactListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="512"/>
+        <location filename="../src/configitemwrapper.cc" line="599"/>
         <source>DTMF</source>
         <translation>DTMF</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="518"/>
-        <location filename="../src/configitemwrapper.cc" line="536"/>
+        <location filename="../src/configitemwrapper.cc" line="605"/>
+        <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>On</source>
         <translation>On</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="518"/>
-        <location filename="../src/configitemwrapper.cc" line="536"/>
+        <location filename="../src/configitemwrapper.cc" line="605"/>
+        <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="527"/>
+        <location filename="../src/configitemwrapper.cc" line="614"/>
         <source>Private Call</source>
         <translation>Private Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="528"/>
+        <location filename="../src/configitemwrapper.cc" line="615"/>
         <source>Group Call</source>
         <translation>Group Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="529"/>
+        <location filename="../src/configitemwrapper.cc" line="616"/>
         <source>All Call</source>
         <translation>All Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <location filename="../src/configitemwrapper.cc" line="640"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="554"/>
+        <location filename="../src/configitemwrapper.cc" line="642"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="556"/>
+        <location filename="../src/configitemwrapper.cc" line="644"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="558"/>
+        <location filename="../src/configitemwrapper.cc" line="646"/>
         <source>RX Tone</source>
         <translation>RX Tone</translation>
-    </message>
-</context>
-<context>
-    <name>D878UVCodeplug</name>
-    <message>
-        <location filename="../lib/d878uv_codeplug.cc" line="1624"/>
-        <source>APRS %1</source>
-        <translation>APRS %1</translation>
-    </message>
-    <message>
-        <location filename="../lib/d878uv_codeplug.cc" line="1940"/>
-        <source>GPS Sys #%1</source>
-        <translation>GPS Sys #%1</translation>
-    </message>
-    <message>
-        <location filename="../lib/d878uv_codeplug.cc" line="1958"/>
-        <source>GPS #%1 Contact</source>
-        <translation>GPS #%1 Contact</translation>
-    </message>
-</context>
-<context>
-    <name>DFUFile</name>
-    <message>
-        <location filename="../lib/dfufile.cc" line="341"/>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read element prefix: %2</source>
-        <translation>Cannot read DFU file &apos;%1&apos;: Cannot read element prefix: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="354"/>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read element data: %2</source>
-        <translation>Cannot read DFU file &apos;%1&apos;: Cannot read element data: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="372"/>
-        <source>Cannot write element prefix to file &apos;%1&apos;: %2</source>
-        <translation>Cannot write element prefix to file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="380"/>
-        <source>Cannot write element data to file &apos;%1&apos;: %2</source>
-        <translation>Cannot write element data to file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="557"/>
-        <source>Cannot read DFU file &apos;%1&apos;: Cannot read image: %2</source>
-        <translation>Cannot read DFU file &apos;%1&apos;: Cannot read image: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="564"/>
-        <source>Cannot read DFU file &apos;%1&apos;: Invalid image signature value.</source>
-        <translation>Cannot read DFU file &apos;%1&apos;: Invalid image signature value.</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="586"/>
-        <source>Cannot read DFU file &apos;%1&apos;: Invalid image size %2b specified, expected %3b.</source>
-        <translation>Cannot read DFU file &apos;%1&apos;: Invalid image size %2b specified, expected %3b.</translation>
-    </message>
-    <message>
-        <location filename="../lib/dfufile.cc" line="608"/>
-        <source>Cannot write image prefix to &apos;%1&apos;: %2.</source>
-        <translation>Cannot write image prefix to &apos;%1&apos;: %2.</translation>
     </message>
 </context>
 <context>
@@ -1110,11 +1011,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/dmrcontactdialog.cc" line="81"/>
         <source>All Call</source>
         <translation>All Call</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrcontactdialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
@@ -1150,14 +1046,9 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>DMRIDDialog</name>
     <message>
-        <location filename="../src/dmriddialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
@@ -1188,14 +1079,9 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Edit DMR Contact</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
@@ -1216,22 +1102,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/dtmfcontactdialog.ui" line="61"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
-    </message>
-</context>
-<context>
-    <name>DefaultRadioID</name>
-    <message>
-        <location filename="../lib/radioid.cc" line="108"/>
-        <source>[Default]</source>
-        <translation>[Default]</translation>
-    </message>
-</context>
-<context>
-    <name>DefaultRoamingZone</name>
-    <message>
-        <location filename="../lib/roaming.cc" line="90"/>
-        <source>[Default]</source>
-        <translation>[Default]</translation>
     </message>
 </context>
 <context>
@@ -1276,7 +1146,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
@@ -1451,17 +1321,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Error: %1</translation>
     </message>
     <message>
-        <location filename="../src/errormessageview.ui" line="17"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/errormessageview.ui" line="23"/>
-        <location filename="../src/errormessageview.ui" line="48"/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/errormessageview.ui" line="30"/>
         <source>Traceback:</source>
         <translation>Traceback:</translation>
@@ -1488,11 +1347,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
         <translation>Cannot create list element, consider reporting a bug.</translation>
-    </message>
-    <message>
-        <location filename="../src/extensionview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>
@@ -1530,7 +1384,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
@@ -1560,11 +1414,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 </context>
 <context>
     <name>GeneralSettingsView</name>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
         <source>DMR Radio ID</source>
@@ -1715,7 +1564,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>GroupListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="740"/>
+        <location filename="../src/configitemwrapper.cc" line="830"/>
         <source>Contact</source>
         <translation>Contact</translation>
     </message>
@@ -1749,11 +1598,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Delete %1 group lists?</translation>
     </message>
     <message>
-        <location filename="../src/grouplistsview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/grouplistsview.ui" line="32"/>
         <source>Add RX Group</source>
         <translation>Add Group List</translation>
@@ -1777,7 +1621,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>GroupListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="716"/>
+        <location filename="../src/configitemwrapper.cc" line="806"/>
         <source>RX Group Lists</source>
         <translation>Group Lists</translation>
     </message>
@@ -1793,16 +1637,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../shared/ui/mainwindow.ui" line="27"/>
         <source>Main window</source>
         <translation>Main window</translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="55"/>
-        <source>Tablist</source>
-        <translation>Tablist</translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="58"/>
-        <source>There are 6 tabs providing general settings, contact, Rx group, channel zone and scan lists.</source>
-        <translation>There are several tabs providing general settings, contact, Rx group, channel, zone and scan lists etc.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="78"/>
@@ -1824,11 +1658,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../shared/ui/mainwindow.ui" line="106"/>
         <source>Databases</source>
         <translation>Databases</translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="123"/>
-        <source>toolBar</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="126"/>
@@ -2023,6 +1852,14 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
+    <name>MultiRoamingChannelSelectionDialog</name>
+    <message>
+        <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
+        <source>Select roaming channels</source>
+        <translation>Select roaming channels</translation>
+    </message>
+</context>
+<context>
     <name>PositioningSystemListView</name>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="73"/>
@@ -2049,11 +1886,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
         <translation>Delete %1 positioning systems?</translation>
-    </message>
-    <message>
-        <location filename="../src/positioningsystemlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="35"/>
@@ -2094,68 +1926,68 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>PositioningSystemListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="616"/>
+        <location filename="../src/configitemwrapper.cc" line="704"/>
         <source>DMR</source>
         <translation>DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="618"/>
+        <location filename="../src/configitemwrapper.cc" line="706"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="620"/>
+        <location filename="../src/configitemwrapper.cc" line="708"/>
         <source>OOps!</source>
         <translation>Oops!</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="626"/>
-        <location filename="../src/configitemwrapper.cc" line="643"/>
+        <location filename="../src/configitemwrapper.cc" line="714"/>
+        <location filename="../src/configitemwrapper.cc" line="733"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="629"/>
+        <location filename="../src/configitemwrapper.cc" line="717"/>
         <source>%1-%2</source>
         <translation>%1-%2</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="636"/>
+        <location filename="../src/configitemwrapper.cc" line="725"/>
         <source>[Selected]</source>
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="640"/>
+        <location filename="../src/configitemwrapper.cc" line="729"/>
         <source>OOPS!</source>
         <translation>Oops!</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="659"/>
+        <location filename="../src/configitemwrapper.cc" line="749"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="660"/>
+        <location filename="../src/configitemwrapper.cc" line="750"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="661"/>
+        <location filename="../src/configitemwrapper.cc" line="751"/>
         <source>Destination</source>
         <translation>Destination</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="662"/>
+        <location filename="../src/configitemwrapper.cc" line="752"/>
         <source>Period [s]</source>
         <translation>Period [s]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="663"/>
+        <location filename="../src/configitemwrapper.cc" line="753"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="664"/>
+        <location filename="../src/configitemwrapper.cc" line="754"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
@@ -2232,7 +2064,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
-        <location filename="../lib/signaling.cc" line="212"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
@@ -2671,165 +2502,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <source>Shelter</source>
         <translation>Shelter</translation>
     </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="88"/>
-        <source>Cannot open file &apos;%1&apos;: File does not exist.</source>
-        <translation>Cannot open file &apos;%1&apos;: File does not exist.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="94"/>
-        <source>Cannot open file &apos;%1&apos;: %2.</source>
-        <translation>Cannot open file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="100"/>
-        <source>Cannot read header from file &apos;%1&apos;: %2.</source>
-        <translation>Cannot read header from file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="108"/>
-        <source>Malformed header in file &apos;%1&apos;: Mismatching content size. Expected %2, got %3.</source>
-        <translation>Malformed header in file &apos;%1&apos;: Mismatching content size. Expected %2, got %3.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="116"/>
-        <source>Cannot mmap file &apos;%1&apos;: %2.</source>
-        <translation>Cannot mmap file &apos;%1&apos;: %2.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="136"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: Unknown model &apos;%2&apos;.</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: Unknown model &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="144"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: Model &apos;%2&apos; not implemented yet.</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: Model &apos;%2&apos; not implemented yet.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_filereader.cc" line="155"/>
-        <location filename="../lib/dm1701_filereader.cc" line="46"/>
-        <location filename="../lib/dm1701_filereader.cc" line="66"/>
-        <location filename="../lib/gd77_filereader.cc" line="44"/>
-        <location filename="../lib/gd77_filereader.cc" line="64"/>
-        <location filename="../lib/md2017_filereader.cc" line="46"/>
-        <location filename="../lib/md2017_filereader.cc" line="66"/>
-        <location filename="../lib/md390_filereader.cc" line="43"/>
-        <location filename="../lib/rd5r_filereader.cc" line="44"/>
-        <location filename="../lib/rd5r_filereader.cc" line="64"/>
-        <location filename="../lib/uv390_filereader.cc" line="46"/>
-        <location filename="../lib/uv390_filereader.cc" line="66"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: %2</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="23"/>
-        <source>Invalid read response: Expected command &apos;W&apos; got &apos;%1&apos;</source>
-        <translation>Invalid read response: Expected command &apos;W&apos; got &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="27"/>
-        <source>Invalid read response: Expected address &apos;%1&apos; got &apos;%2&apos;</source>
-        <translation>Invalid read response: Expected address &apos;%1&apos; got &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="32"/>
-        <source>Invalid read response: Expected size 64 got %1</source>
-        <translation>Invalid read response: Expected size 64 got %1.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="41"/>
-        <source>Invalid read response: Expected check-sum %1 got %2</source>
-        <translation>Invalid read response: Expected check-sum %1 got %2.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_interface.cc" line="47"/>
-        <source>Invalid read response: Expected ACK 6 got %1</source>
-        <translation>Invalid read response: Expected ACK 6 got %1.</translation>
-    </message>
-    <message>
-        <location filename="../lib/d868uv_filereader.cc" line="425"/>
-        <source>0x%1: Cannot add zone to config.</source>
-        <translation>0x%1: Cannot add zone to config.</translation>
-    </message>
-    <message>
-        <location filename="../lib/d868uv_filereader.cc" line="430"/>
-        <source>0x%1: Cannot add channel %2 to zone &apos;%3&apos;.</source>
-        <translation>0x%1: Cannot add channel &apos;%2&apos; to zone &apos;%3&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../lib/d868uv_filereader.cc" line="480"/>
-        <source>0x%1: Cannot add channel %2 to scan list &apos;%3&apos;.</source>
-        <translation>0x%1: Cannot add channel &apos;%2&apos; to scan list &apos;%3&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../lib/dm1701_filereader.cc" line="18"/>
-        <location filename="../lib/gd77_filereader.cc" line="16"/>
-        <location filename="../lib/md2017_filereader.cc" line="18"/>
-        <location filename="../lib/md390_filereader.cc" line="15"/>
-        <location filename="../lib/rd5r_filereader.cc" line="16"/>
-        <location filename="../lib/uv390_filereader.cc" line="18"/>
-        <source>Cannot open file &apos;%1&apos;: File does not exisist.</source>
-        <translation>Cannot open file &apos;%1&apos;: File does not exist.</translation>
-    </message>
-    <message>
-        <location filename="../lib/dm1701_filereader.cc" line="22"/>
-        <location filename="../lib/md2017_filereader.cc" line="22"/>
-        <location filename="../lib/uv390_filereader.cc" line="22"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 852533 bytes.</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: File size is not 852533 bytes.</translation>
-    </message>
-    <message>
-        <location filename="../lib/dm1701_filereader.cc" line="29"/>
-        <location filename="../lib/gd77_filereader.cc" line="27"/>
-        <location filename="../lib/md2017_filereader.cc" line="29"/>
-        <location filename="../lib/md390_filereader.cc" line="26"/>
-        <location filename="../lib/rd5r_filereader.cc" line="27"/>
-        <location filename="../lib/uv390_filereader.cc" line="29"/>
-        <source>Cannot open file &apos;%1&apos;: %2</source>
-        <translation>Cannot open file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/dm1701_filereader.cc" line="36"/>
-        <location filename="../lib/dm1701_filereader.cc" line="56"/>
-        <location filename="../lib/gd77_filereader.cc" line="34"/>
-        <location filename="../lib/gd77_filereader.cc" line="54"/>
-        <location filename="../lib/md2017_filereader.cc" line="36"/>
-        <location filename="../lib/md2017_filereader.cc" line="56"/>
-        <location filename="../lib/md390_filereader.cc" line="33"/>
-        <location filename="../lib/rd5r_filereader.cc" line="34"/>
-        <location filename="../lib/rd5r_filereader.cc" line="54"/>
-        <location filename="../lib/uv390_filereader.cc" line="36"/>
-        <location filename="../lib/uv390_filereader.cc" line="56"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: Cannot seek within file: %2</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: Cannot seek within file: %2</translation>
-    </message>
-    <message>
-        <location filename="../lib/gd77_filereader.cc" line="20"/>
-        <location filename="../lib/rd5r_filereader.cc" line="20"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 131072 bytes.</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: File size is not 131072 bytes.</translation>
-    </message>
-    <message>
-        <location filename="../lib/md390_filereader.cc" line="19"/>
-        <source>Cannot read codeplug file &apos;%1&apos;: File size is not 262709 bytes.</source>
-        <translation>Cannot read codeplug file &apos;%1&apos;: File size is not 262709 bytes.</translation>
-    </message>
-    <message>
-        <location filename="../lib/signaling.cc" line="206"/>
-        <source>CTCSS %1Hz</source>
-        <translation>CTCSS %1Hz</translation>
-    </message>
-    <message>
-        <location filename="../lib/signaling.cc" line="208"/>
-        <source>DCS %1 N</source>
-        <translation>DCS %1 N</translation>
-    </message>
-    <message>
-        <location filename="../lib/signaling.cc" line="210"/>
-        <source>DCS %1 I</source>
-        <translation>DCS %1 I</translation>
-    </message>
 </context>
 <context>
     <name>RXGroupListDialog</name>
@@ -2856,7 +2528,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
@@ -2887,19 +2559,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
-    </message>
-</context>
-<context>
-    <name>Radio</name>
-    <message>
-        <location filename="../lib/radio.cc" line="70"/>
-        <source>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</source>
-        <translation>Unhandled device %1 &apos;%2&apos;. Device known but not implemented yet.</translation>
-    </message>
-    <message>
-        <location filename="../lib/radio.cc" line="74"/>
-        <source>Unknown AnyTone (or similar) device.</source>
-        <translation>Unknown AnyTone (or similar) device.</translation>
     </message>
 </context>
 <context>
@@ -2935,11 +2594,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Delete %1 scan lists?</translation>
     </message>
     <message>
-        <location filename="../src/radioidlistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
         <source>Default Radio ID</source>
         <translation>Default Radio ID</translation>
@@ -2958,48 +2612,19 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>RadioIdListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="812"/>
+        <location filename="../src/configitemwrapper.cc" line="902"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="813"/>
+        <location filename="../src/configitemwrapper.cc" line="903"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="814"/>
+        <location filename="../src/configitemwrapper.cc" line="904"/>
         <source>Number</source>
         <translation>Number</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimitIgnored</name>
-    <message>
-        <location filename="../lib/radiolimits.cc" line="162"/>
-        <source>Ignore %1 &apos;%2&apos;. Not applicable/supported by this radio.</source>
-        <translation>Ignore %1 &apos;%2&apos;. Not applicable/supported by this radio.</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimitStringIgnored</name>
-    <message>
-        <location filename="../lib/radiolimits.cc" line="259"/>
-        <source>Expected value of &apos;%1&apos; to be string.</source>
-        <translation>Expected value of &apos;%1&apos; to be string.</translation>
-    </message>
-    <message>
-        <location filename="../lib/radiolimits.cc" line="266"/>
-        <source>Value of &apos;%1&apos; is ignored. Not applicable/supported by the radio.</source>
-        <translation>Value of &apos;%1&apos; is ignored. Not applicable/supported by the radio.</translation>
-    </message>
-</context>
-<context>
-    <name>RadioLimits</name>
-    <message>
-        <location filename="../lib/radiolimits.cc" line="954"/>
-        <source>The support for this radio is still under development. Some features may sill be missing or are not well tested.</source>
-        <translation>The support for this radio is still under development. Some features may sill be missing or are not well tested.</translation>
     </message>
 </context>
 <context>
@@ -3053,14 +2678,158 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
+    <name>RoamingChannelDialog</name>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="22"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="29"/>
+        <source>RX Frequency [MHz]</source>
+        <translation>RX Frequency [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="36"/>
+        <source>TX Frequency [MHz]</source>
+        <translation>TX Frequency [MHz]</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="43"/>
+        <source>Time Slot</source>
+        <translation>Time Slot</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="50"/>
+        <source>Color Code</source>
+        <translation>Color Code</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.ui" line="68"/>
+        <location filename="../src/roamingchanneldialog.ui" line="89"/>
+        <source>Selected</source>
+        <translation>Selected</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="37"/>
+        <source>Edit roaming channel</source>
+        <translation>Edit roaming channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="39"/>
+        <source>Create roaming channel</source>
+        <translation>Create roaming channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="44"/>
+        <source>TS 1</source>
+        <translation>TS 1</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchanneldialog.cc" line="45"/>
+        <source>TS 2</source>
+        <translation>TS 2</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelListView</name>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="26"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="51"/>
+        <source>Add Roaming Channel</source>
+        <translation>Add Roaming Channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.ui" line="58"/>
+        <source>Delete Roaming Channel</source>
+        <translation>Delete Roaming Channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="63"/>
+        <source>Cannot delete roaming channel</source>
+        <translation>Cannot delete roaming channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="64"/>
+        <source>Cannot delete roaming channel: You have to select a channel first.</source>
+        <translation>Cannot delete roaming channel: You have to select a channel first.</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="74"/>
+        <source>Delete roaming zone?</source>
+        <translation>Delete roaming zone?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="74"/>
+        <source>Delete roaming zone %1?</source>
+        <translation>Delete roaming zone &apos;%1&apos;?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming zones?</source>
+        <translation>Delete roaming zones?</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete %1 roaming zones?</source>
+        <translation>Delete %1 roaming zones?</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelListWrapper</name>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="518"/>
+        <location filename="../src/configitemwrapper.cc" line="526"/>
+        <source>[Selected]</source>
+        <translation>[Selected]</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="538"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="539"/>
+        <source>RX Frequency</source>
+        <translation>RX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="540"/>
+        <source>TX Frequency</source>
+        <translation>TX Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="541"/>
+        <source>TS</source>
+        <translation>TS</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="542"/>
+        <source>CC</source>
+        <translation>CC</translation>
+    </message>
+</context>
+<context>
+    <name>RoamingChannelRefListWrapper</name>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="569"/>
+        <source>Roaming Channel</source>
+        <translation>Roaming Channel</translation>
+    </message>
+</context>
+<context>
     <name>RoamingListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="758"/>
+        <location filename="../src/configitemwrapper.cc" line="848"/>
         <source>%1 (containing %2 channels)</source>
         <translation>%1 (containing %2 channels)</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="765"/>
+        <location filename="../src/configitemwrapper.cc" line="855"/>
         <source>Roaming zone</source>
         <translation>Roaming zone</translation>
     </message>
@@ -3068,24 +2837,29 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>RoamingZoneDialog</name>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="10"/>
+        <location filename="../src/roamingzonedialog.cc" line="12"/>
         <source>Create Roaming Zone</source>
         <translation>Create roaming zone</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="17"/>
+        <location filename="../src/roamingzonedialog.cc" line="19"/>
         <source>Set Roaming Zone</source>
         <translation>Edit roaming zone</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/roamingzonedialog.cc" line="82"/>
+        <source>Cannot remove channels.</source>
+        <translation>Cannot remove channels.</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.cc" line="83"/>
+        <source>Cannot remove channels. Select at least one channel first.</source>
+        <translation>Cannot remove channels. Select at least one channel first.</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="32"/>
@@ -3094,26 +2868,31 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="56"/>
-        <source>Add Channel</source>
-        <translation>Add Channel</translation>
+        <source>Add Roaming Channel</source>
+        <translation>Add Roaming Channel</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="59"/>
+        <location filename="../src/roamingzonedialog.ui" line="63"/>
+        <source>Add DMR Channel</source>
+        <translation>Add DMR Channel</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.ui" line="66"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="66"/>
+        <location filename="../src/roamingzonedialog.ui" line="73"/>
         <source>Remove Channel</source>
         <translation>Remove Channel</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="69"/>
+        <location filename="../src/roamingzonedialog.ui" line="76"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="79"/>
+        <location filename="../src/roamingzonedialog.ui" line="86"/>
         <source>Extension</source>
         <translation>Extension</translation>
     </message>
@@ -3131,39 +2910,34 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Create a roaming zone by collecting all channels with these group calls.</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="84"/>
+        <location filename="../src/roamingzonelistview.cc" line="87"/>
         <source>Cannot delete roaming zone</source>
         <translation>Cannot delete roaming zone</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="85"/>
+        <location filename="../src/roamingzonelistview.cc" line="88"/>
         <source>Cannot delete roaming zone: You have to select a zone first.</source>
         <translation>Cannot delete roaming zone: You have to select a zone first.</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="95"/>
+        <location filename="../src/roamingzonelistview.cc" line="98"/>
         <source>Delete roaming zone?</source>
         <translation>Delete roaming zone?</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="95"/>
+        <location filename="../src/roamingzonelistview.cc" line="98"/>
         <source>Delete roaming zone %1?</source>
         <translation>Delete roaming zone &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="99"/>
+        <location filename="../src/roamingzonelistview.cc" line="102"/>
         <source>Delete roaming zones?</source>
         <translation>Delete roaming zones?</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonelistview.cc" line="99"/>
+        <location filename="../src/roamingzonelistview.cc" line="102"/>
         <source>Delete %1 roaming zones?</source>
         <translation>Delete %1 roaming zones?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingzonelistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="23"/>
@@ -3207,7 +2981,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/scanlistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
@@ -3311,11 +3085,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Delete %1 scan lists?</translation>
     </message>
     <message>
-        <location filename="../src/scanlistsview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/scanlistsview.ui" line="35"/>
         <source>Add Scan List</source>
         <translation>Add Scan List</translation>
@@ -3339,7 +3108,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>ScanListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="692"/>
+        <location filename="../src/configitemwrapper.cc" line="782"/>
         <source>Scan-List</source>
         <translation>Scanlist</translation>
     </message>
@@ -3362,7 +3131,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="360"/>
+        <location filename="../src/settings.cc" line="370"/>
         <source>Warning!</source>
         <translation>Warning!</translation>
     </message>
@@ -3503,27 +3272,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
 </context>
 <context>
-    <name>TalkGroupDatabase</name>
-    <message>
-        <location filename="../lib/talkgroupdatabase.cc" line="171"/>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-</context>
-<context>
-    <name>UserDatabase</name>
-    <message>
-        <location filename="../lib/userdatabase.cc" line="232"/>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
-    </message>
-    <message>
-        <location filename="../lib/userdatabase.cc" line="237"/>
-        <source>%1 (%2, %3)</source>
-        <translation>%1 (%2, %3)</translation>
-    </message>
-</context>
-<context>
     <name>VerifyDialog</name>
     <message>
         <location filename="../src/verifydialog.ui" line="14"/>
@@ -3535,14 +3283,14 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <name>ZoneDialog</name>
     <message>
         <location filename="../src/zonedialog.ui" line="14"/>
-        <location filename="../src/zonedialog.cc" line="17"/>
+        <location filename="../src/zonedialog.cc" line="18"/>
         <source>Edit Zone</source>
         <translation>Edit zone</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="33"/>
@@ -3582,9 +3330,21 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Extension</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.cc" line="27"/>
+        <location filename="../src/zonedialog.cc" line="28"/>
         <source>Create Zone</source>
         <translation>Create zone</translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.cc" line="76"/>
+        <location filename="../src/zonedialog.cc" line="107"/>
+        <source>Cannot remove channel</source>
+        <translation>Cannot remove channel</translation>
+    </message>
+    <message>
+        <location filename="../src/zonedialog.cc" line="77"/>
+        <location filename="../src/zonedialog.cc" line="108"/>
+        <source>Select at least one channel first.</source>
+        <translation>Select at least one channel first.</translation>
     </message>
 </context>
 <context>
@@ -3620,11 +3380,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Delete %1 zones?</translation>
     </message>
     <message>
-        <location filename="../src/zonelistview.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/zonelistview.ui" line="32"/>
         <source>Add Zone</source>
         <translation>Add Zone</translation>
@@ -3648,7 +3403,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
 <context>
     <name>ZoneListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="585"/>
+        <location filename="../src/configitemwrapper.cc" line="673"/>
         <source>Zone</source>
         <translation>Zone</translation>
     </message>
@@ -3663,7 +3418,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/aprssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
@@ -3725,24 +3480,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/aprssystemdialog.ui" line="186"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
-    </message>
-</context>
-<context>
-    <name>pageStart</name>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="14"/>
-        <source>WizardPage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="17"/>
-        <source>Welcome</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configwizardstart.ui" line="20"/>
-        <source>Guided codeplug setup</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

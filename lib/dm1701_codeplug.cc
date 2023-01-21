@@ -1,5 +1,4 @@
 #include "dm1701_codeplug.hh"
-#include "codeplugcontext.hh"
 #include "logger.hh"
 #include <QTimeZone>
 

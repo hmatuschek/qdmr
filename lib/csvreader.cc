@@ -2262,7 +2262,9 @@ CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64
             .arg(line).arg(column).arg(name).arg(i);
         return false;
       }
-      _roamingZones[idx]->addChannel(_channels[i]->as<DMRChannel>());
+      RoamingChannel *rch = RoamingChannel::fromDMRChannel(_channels[i]->as<DMRChannel>());
+      _config->roamingChannels()->add(rch);
+      _roamingZones[idx]->addChannel(rch);
     }
     // done
     return true;
@@ -2272,7 +2274,7 @@ CSVReader::handleRoamingZone(qint64 idx, const QString &name, const QList<qint64
   if (! _roamingZones.contains(idx)) {
     RoamingZone *zone = new RoamingZone(name);
     _roamingZones[idx] = zone;
-    _config->roaming()->add(zone);
+    _config->roamingZones()->add(zone);
   }
 
   return true;

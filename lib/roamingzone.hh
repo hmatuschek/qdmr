@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include "configreference.hh"
-
+#include "roamingchannel.hh"
 
 /** Represents a RoamingZone within the abstract device configuration.
  *
@@ -15,8 +15,10 @@ class RoamingZone : public ConfigObject
 {
   Q_OBJECT
 
-  /** The channels in the roaming zone. */
-  Q_PROPERTY(DMRChannelRefList * channels READ channels)
+  /** The channels in the roaming zone.
+   * @todo This property is marked non-scriptable to handle references to DMR channels before
+   *       version 0.11.0. Remove in future. */
+  Q_PROPERTY(RoamingChannelRefList * channels READ channels SCRIPTABLE false)
 
 public:
   /** Default constructor. */
@@ -37,27 +39,34 @@ public:
   /** Clears the zone list. */
   void clear();
 
-  /** Returns the digital channel, which is the member at index @c idx (0-based).
+  /** Returns the roaming channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
-  DMRChannel *channel(int idx) const;
+  RoamingChannel *channel(int idx) const;
   /** Adds a channel to the roaming zone.
    * @param ch Specifies the channel to add.
    * @param row Speicifies the index where to insert the channel
    *        (optional, default insert at end). */
-  int addChannel(DMRChannel *ch, int row=-1);
+  int addChannel(RoamingChannel *ch, int row=-1);
   /** Removes the channel from the roaming zone at index @c row. */
   bool remChannel(int row);
   /** Removes the given channel from the roaming zone. */
-  bool remChannel(DMRChannel *ch);
+  bool remChannel(RoamingChannel *ch);
 
   /** Returns the list of digital channels in this roaming zone. */
-  const DMRChannelRefList *channels() const;
+  const RoamingChannelRefList *channels() const;
   /** Returns the list of digital channels in this roaming zone. */
-  DMRChannelRefList *channels();
+  RoamingChannelRefList *channels();
+
+  /** Links the channel reference list.
+   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+  bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err);
+  /** Serializes the channel reference list.
+   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
   /** Holds the actual channels of the roaming zone. */
-  DMRChannelRefList _channel;
+  RoamingChannelRefList _channel;
 };
 
 
@@ -94,11 +103,6 @@ class RoamingZoneList: public ConfigObjectList
 public:
   /** Constructor. */
   explicit RoamingZoneList(QObject *parent=nullptr);
-
-  /** Returns a set of unique channels used in all roaming zones. */
-  QSet<DMRChannel *> uniqueChannels() const;
-  /** Adds all channels of all roaming zones to the given set. */
-  void uniqueChannels(QSet<DMRChannel *> &channels) const;
 
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;

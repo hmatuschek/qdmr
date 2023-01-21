@@ -14,7 +14,7 @@
    <string>About qdrm</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -121,9 +121,7 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

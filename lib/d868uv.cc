@@ -19,7 +19,10 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   _callsigns = new D868UVCallsignDB(this);
 
   // Get device info and determine supported TX frequency bands
-  AnytoneInterface::RadioVariant info; _dev->getInfo(info);
+  AnytoneInterface::RadioVariant info;
+  if (_dev)
+    _dev->getInfo(info);
+
   switch (info.bands) {
   case 0x00:
     _limits = new D868UVLimits({ {136., 174.}, {400., 480.} },
@@ -92,7 +95,6 @@ D868UV::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone", AnytoneInterface::interfaceInfo(),
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::DMR6X2, "dmr6x2", "DMR-6X2", "BTech", AnytoneInterface::interfaceInfo()),
           RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone", AnytoneInterface::interfaceInfo())
         });
 }

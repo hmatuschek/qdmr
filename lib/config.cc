@@ -23,7 +23,8 @@ Config::Config(QObject *parent)
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)), _roaming(new RoamingZoneList(this)),
+    _gpsSystems(new PositioningSystems(this)),
+    _roamingChannels(new RoamingChannelList(this)), _roamingZones(new RoamingZoneList(this)),
     _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
@@ -48,9 +49,12 @@ Config::Config(QObject *parent)
   connect(_gpsSystems, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
   connect(_gpsSystems, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
   connect(_gpsSystems, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
-  connect(_roaming, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
-  connect(_roaming, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
-  connect(_roaming, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_roamingChannels, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
+  connect(_roamingZones, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
+  connect(_roamingZones, SIGNAL(elementRemoved(int)), this, SLOT(onConfigModified()));
+  connect(_roamingZones, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
 
   connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
 }
@@ -69,7 +73,8 @@ Config::copy(const ConfigItem &other) {
   _zones->copy(*conf->zones());
   _scanlists->copy(*conf->scanlists());
   _gpsSystems->copy(*conf->posSystems());
-  _roaming->copy(*conf->roaming());
+  _roamingChannels->copy(*conf->roamingChannels());
+  _roamingZones->copy(*conf->roamingZones());
 
   return true;
 }
@@ -146,8 +151,13 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
       return false;
   }
 
-  if (_roaming->count()) {
-    if ((node["roaming"] = _roaming->serialize(context, err)).IsNull())
+  if (_roamingChannels->count()) {
+    if ((node["roamingChannels"] = _roamingChannels->serialize(context, err)).IsNull())
+      return false;
+  }
+
+  if (_roamingZones->count()) {
+    if ((node["roamingZones"] = _roamingZones->serialize(context, err)).IsNull())
       return false;
   }
 
@@ -197,9 +207,14 @@ Config::posSystems() const {
   return _gpsSystems;
 }
 
+RoamingChannelList *
+Config::roamingChannels() const {
+  return _roamingChannels;
+}
+
 RoamingZoneList *
-Config::roaming() const {
-  return _roaming;
+Config::roamingZones() const {
+  return _roamingZones;
 }
 
 bool
@@ -248,7 +263,8 @@ Config::clear() {
   _zones->clear();
   _scanlists->clear();
   _gpsSystems->clear();
-  _roaming->clear();
+  _roamingChannels->clear();
+  _roamingZones->clear();
 
   emit modified(this);
 }
@@ -310,7 +326,14 @@ bool
 Config::readYAML(const QString &filename, const ErrorStack &err) {
   YAML::Node node;
   try {
-     node = YAML::LoadFile(filename.toStdString());
+    QFile file(filename);
+    if (! file.open(QIODevice::ReadOnly)) {
+      errMsg(err) << "Cannot open file '" << filename << "': " << file.errorString() << ".";
+      errMsg(err) << "Cannot read YAML codeplug from file '" << filename << "'.";
+      return false;
+    }
+    QByteArray content = file.readAll();
+    node = YAML::Load(content.constData());
   } catch (const YAML::Exception &exc) {
     errMsg(err) << "Cannot read YAML codeplug from file '"<< filename
                 << "': " << QString::fromStdString(exc.msg) << ".";
@@ -348,8 +371,8 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     ctx.setVersion(QString::fromStdString(node["version"].as<std::string>()));
     logDebug() << "Using format version " << ctx.version() << ".";
   } else {
-    logWarn() << "No version string set, assuming 0.9.0.";
-    ctx.setVersion("0.9.0");
+    logWarn() << "No version string set, assuming " << VERSION_STRING << ".";
+    ctx.setVersion(VERSION_STRING);
   }
 
   if (node["settings"] && (! _settings->parse(node["settings"], ctx, err)))
@@ -368,7 +391,12 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     return false;
   if (node["positioning"] && (! _gpsSystems->parse(node["positioning"], ctx, err)))
     return false;
-  if (node["roaming"] && (! _roaming->parse(node["roaming"], ctx, err)))
+  if (node["roamingChannels"] && (! _roamingChannels->parse(node["roamingChannels"], ctx, err)))
+    return false;
+  if (node["roamingZones"] && (! _roamingZones->parse(node["roamingZones"], ctx, err)))
+    return false;
+  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  else if (node["roaming"] && (! _roamingZones->parse(node["roaming"], ctx, err)))
     return false;
 
   // also parses extensions
@@ -418,7 +446,10 @@ Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) 
     return false;
   if (node["positioning"] && (! _gpsSystems->link(node["positioning"], ctx, err)))
     return false;
-  if (node["roaming"] && (! _roaming->link(node["roaming"], ctx, err)))
+  if (node["roamingZones"] && (! _roamingZones->link(node["roamingZones"], ctx, err)))
+    return false;
+  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  else if (node["roaming"] && (! _roamingZones->link(node["roaming"], ctx, err)))
     return false;
 
   // also links extensions

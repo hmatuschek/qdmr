@@ -1,7 +1,7 @@
 #ifndef ADDRESSMAP_HH
 #define ADDRESSMAP_HH
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <vector>
 
 /** This class represents a memory map.

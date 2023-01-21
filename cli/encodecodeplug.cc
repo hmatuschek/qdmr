@@ -19,6 +19,7 @@
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
+#include "dmr6x2uv_codeplug.hh"
 #include "crc32.hh"
 
 
@@ -48,8 +49,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
 
   Codeplug::Flags flags;
-  if (parser.isSet("init-codeplug"))
-    flags.updateCodePlug = false;
+  flags.updateCodePlug = false;
   if (parser.isSet("auto-enable-gps"))
     flags.autoEnableGPS = true;
   if (parser.isSet("auto-enable-roaming"))
@@ -138,11 +138,11 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D868UVE == radio) {
     D868UVCodeplug codeplug;
-    codeplug.clear();
-    codeplug.setBitmaps(&config);
-    codeplug.allocateUpdated();
-    codeplug.allocateForEncoding();
-    codeplug.encode(&config, flags, err);
+    if(! codeplug.encode(&config, flags, err)) {
+      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
     codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
@@ -151,10 +151,6 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D878UV == radio) {
     D878UVCodeplug codeplug;
-    codeplug.clear();
-    codeplug.setBitmaps(&config);
-    codeplug.allocateUpdated();
-    codeplug.allocateForEncoding();
     if (! codeplug.encode(&config, flags, err)) {
       logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << err.format();
@@ -168,11 +164,11 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D878UVII == radio) {
     D878UV2Codeplug codeplug;
-    codeplug.clear();
-    codeplug.setBitmaps(&config);
-    codeplug.allocateUpdated();
-    codeplug.allocateForEncoding();
-    codeplug.encode(&config, flags, err);
+    if (! codeplug.encode(&config, flags, err)) {
+      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
     codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
@@ -181,11 +177,24 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::D578UV == radio) {
     D578UVCodeplug codeplug;
-    codeplug.clear();
-    codeplug.setBitmaps(&config);
-    codeplug.allocateUpdated();
-    codeplug.allocateForEncoding();
-    codeplug.encode(&config, flags, err);
+    if (! codeplug.encode(&config, flags, err)) {
+      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+    codeplug.image(0).sort();
+    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DMR6X2UV == radio) {
+    DMR6X2UVCodeplug codeplug;
+    if (! codeplug.encode(&config, flags, err)) {
+      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
     codeplug.image(0).sort();
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)

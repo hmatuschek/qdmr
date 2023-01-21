@@ -1,5 +1,4 @@
 #include "md2017_codeplug.hh"
-#include "codeplugcontext.hh"
 #include "logger.hh"
 
 #define NUM_CHANNELS                3000
@@ -136,15 +135,20 @@ MD2017Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx,
 
 bool
 MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       continue;
-    if (Channel *obj = chan.toChannelObj()) {
-      config->channelList()->add(obj); ctx.add(obj, i+1);
+    ErrorStack err;
+    if (Channel *obj = chan.toChannelObj(err)) {
+      config->channelList()->add(obj);
+      ctx.add(obj, i+1);
     } else {
-      errMsg(err) << "Invalid channel at index %" << i << ".";
-      return false;
+      logWarn() << "Cannot decode channel at index " << i << ":\n"
+                << err.format(" ");
+      continue;
     }
   }
   return true;
@@ -152,13 +156,19 @@ MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
 
 bool
 MD2017Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (! chan.isValid())
+
+    if ((! chan.isValid()) || (! ctx.has<Channel>(i+1)))
       continue;
-    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
-      errMsg(err) << "Cannot link channel at index " << i << ".";
-      return false;
+
+    ErrorStack err;
+    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx, err)) {
+      logWarn() << "Cannot link channel at index " << i << ":\n"
+                << err.format(" ");
+      continue;
     }
   }
   return true;

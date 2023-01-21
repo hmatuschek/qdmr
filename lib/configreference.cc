@@ -6,7 +6,7 @@
 #include "gpssystem.hh"
 #include "radioid.hh"
 #include "rxgrouplist.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 #include "encryptionextension.hh"
 
 
@@ -71,6 +71,17 @@ ConfigObjectReference::copy(const ConfigObjectReference *ref) {
   if (nullptr == ref)
     return true;
   return set(ref->_object);
+}
+
+int
+ConfigObjectReference::compare(const ConfigObjectReference &other) const {
+  if (isNull() && other.isNull())
+    return 0;
+  if (!isNull() && other.isNull())
+    return 1;
+  if (isNull() && !other.isNull())
+    return -1;
+  return this->_object->compare(*other._object);
 }
 
 bool
@@ -189,6 +200,16 @@ ChannelRefList::ChannelRefList(QObject *parent)
  * ********************************************************************************************* */
 DMRChannelRefList::DMRChannelRefList(QObject *parent)
   : ChannelRefList(DMRChannel::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelRefList
+ * ********************************************************************************************* */
+RoamingChannelRefList::RoamingChannelRefList(QObject *parent)
+  : ConfigObjectRefList({RoamingChannel::staticMetaObject}, parent)
 {
   // pass...
 }

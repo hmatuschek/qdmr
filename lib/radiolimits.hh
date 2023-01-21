@@ -304,6 +304,20 @@ protected:
 };
 
 
+/** Represents a DMR ID.
+ *  That is an uint between 1 and 16777215 without any default value.
+ * @ingroup limits */
+class RadioLimitDMRId: public RadioLimitUInt
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param parent Specifies the QObject parent. */
+  explicit RadioLimitDMRId(QObject *parent=nullptr);
+};
+
+
 /** Represents a limit for a set of enum values.
  * @ingroup limits */
 class RadioLimitEnum: public RadioLimitValue

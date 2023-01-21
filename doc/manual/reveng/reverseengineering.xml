@@ -11,11 +11,11 @@
 
 <para>
   The majority of the development time needed for <application>qdmr</application>, consists of 
-  reverse engineering the codeplug and communication protocols of the radios. Fortunately, many 
+  reverse engineering the code plug and communication protocols of the radios. Fortunately, many 
   radios share the same communication protocol, in particular those from the same manufacturer.
-  But sometimes these protocols are also used by other manufacturers. Even if the protocol is 
+  Sometimes these protocols are even used by other manufacturers. Even if the protocol is 
   already implemented in <application>qdmr</application>, you may need to reverse engineer the 
-  codeplug format. This step has to be performed always, even if a already implemented codeplug
+  code plug format. This step has to be performed always, even if an already implemented code plug
   is reused, you will need to verify that format. Any mistake here, may brick your device.
 </para>
 <note>
@@ -24,12 +24,12 @@
     research. Reverse engineering is an cumbersome and frequently frustrating task, there is no
     need to waste your valuable time on something, that someone else has already done. Also, 
     consider documenting and publishing your results, so others can find it, even if it is 
-    incomplete.
+    incomplete. Someone else might pickup your work and complete it.
   </para>
 </note>
 <para>
   In the following sections, I attempt to describe, how I approach reverse engineering the 
-  communication protocols and codeplugs. To this end, I hope it might help you in your reverse 
+  communication protocols and code plugs. To this end, I hope it might help you in your reverse 
   engineering work. And if you like, you may contribute your work to qdmr.
 </para>
 

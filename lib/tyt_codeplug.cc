@@ -1,5 +1,4 @@
 #include "tyt_codeplug.hh"
-#include "codeplugcontext.hh"
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
@@ -10,7 +9,7 @@
 #include "encryptionextension.hh"
 #include <QTimeZone>
 #include <QtEndian>
-
+#include <QChar>
 
 #define CHANNEL_SIZE      0x000040
 #define SETTINGS_SIZE     0x000090
@@ -39,7 +38,7 @@ TyTCodeplug::ChannelElement::~ChannelElement() {
 
 bool
 TyTCodeplug::ChannelElement::isValid() const {
-  return Element::isValid() && (0x0000 != getUInt16_be(0x20)) && (0xffff != getUInt16_be(0x20));
+  return Element::isValid() && QChar::isPrint(getUInt16_le(0x20));
 }
 
 void
@@ -421,9 +420,11 @@ TyTCodeplug::ChannelElement::setName(const QString &name) {
 }
 
 Channel *
-TyTCodeplug::ChannelElement::toChannelObj() const {
-  if (! isValid())
+TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid channel.";
     return nullptr;
+  }
 
   Channel *ch = nullptr;
   TyTChannelExtension *ex = new TyTChannelExtension();
@@ -470,6 +471,9 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
 
     // done
     ch = dch;
+  } else {
+    errMsg(err) << "Cannot decode channel. Channel type " << mode() << " unknown!";
+    return nullptr;
   }
 
   // Common settings
@@ -497,16 +501,19 @@ TyTCodeplug::ChannelElement::toChannelObj() const {
 }
 
 bool
-TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
+TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err) const
 {
-  if (! isValid())
+  if (! isValid()) {
+    errMsg(err) << "Cannot link an invalid channel.";
     return false;
+  }
 
   if (scanListIndex() && ctx.has<ScanList>(scanListIndex())) {
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (MODE_ANALOG == mode()) {
+    // Nothing further to link for analog channels.
     return true;
   } else if ((MODE_DIGITAL == mode()) && (c->is<DMRChannel>())){
     DMRChannel *dc = c->as<DMRChannel>();
@@ -523,31 +530,34 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     // Link encryption key if defined
     if (PRIV_NONE != privacyType()) {
       if (nullptr == dc->commercialExtension()) {
-        logError() << "Cannot link encryption key: No commercial extension set.";
+        errMsg(err) << "Cannot link encryption key: No commercial extension set.";
         return false;
       }
       if (PRIV_BASIC == privacyType()) {
         if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
-          logError() << "Cannot link encryption key: No basic key with index " << privacyIndex()
-                     << " defined.";
+          errMsg(err) << "Cannot link encryption key: No basic key with index " << privacyIndex()
+                      << " defined.";
           return false;
         }
         dc->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
       } else if (PRIV_ENHANCED == privacyType()) {
         if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
-          logError() << "Cannot link encryption key: No AES (enhances) key with index "
-                     << privacyIndex() << " defined.";
+          errMsg(err) << "Cannot link encryption key: No AES (enhances) key with index "
+                      << privacyIndex() << " defined.";
           return false;
         }
         dc->commercialExtension()->setEncryptionKey(ctx.get<AESEncryptionKey>(privacyIndex()));
       } else {
-        logError() << "Unknown encryption key type " << privacyType() << ".";
+        errMsg(err) << "Unknown encryption key type " << privacyType() << ".";
         return false;
       }
     }
 
     return true;
   }
+
+  errMsg(err) << "Cannot link channel '" << c->name()
+              << "' invalid channel type " << mode() << ".";
 
   return false;
 }
@@ -823,7 +833,8 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
 
   for (int i=0; ((i<16) && memberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
-      logWarn() << "Cannot link channel with index " << memberIndex(i) << " channel not defined.";
+      logWarn() << "Cannot link channel with index " << memberIndex(i)
+                << " to zone '" << zone->name() << "': channel not defined.";
       continue;
     }
     zone->A()->add(ctx.get<Channel>(memberIndex(i)));
@@ -2780,8 +2791,8 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i+1);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i+1);
 
   return true;
 }

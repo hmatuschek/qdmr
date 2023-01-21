@@ -5,7 +5,6 @@
 
 #include "d878uv_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 class Channel;
 class DMRContact;
@@ -198,10 +197,15 @@ class D878UV2Codeplug : public D878UVCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Hidden constructor. */
+  explicit D878UV2Codeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D878UV2Codeplug(QObject *parent = nullptr);
 
+protected:
   void allocateContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 };

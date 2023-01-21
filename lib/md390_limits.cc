@@ -7,7 +7,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &freqRanges, QObject *parent)

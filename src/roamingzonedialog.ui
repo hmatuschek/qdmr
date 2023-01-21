@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string notr="true">Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -51,9 +51,16 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QPushButton" name="add">
+          <widget class="QPushButton" name="addRoam">
            <property name="text">
-            <string>Add Channel</string>
+            <string>Add Roaming Channel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="addDMR">
+           <property name="text">
+            <string>Add DMR Channel</string>
            </property>
            <property name="shortcut">
             <string>Alt++</string>

@@ -2,6 +2,7 @@
 #include "config.hh"
 #include <QtEndian>
 #include "logger.hh"
+#include "roamingchannel.hh"
 
 
 /* ********************************************************************************************* *
@@ -595,6 +596,7 @@ Codeplug::Context::Context(Config *config)
   addTable(&ScanList::staticMetaObject);
   addTable(&GPSSystem::staticMetaObject);
   addTable(&APRSSystem::staticMetaObject);
+  addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
 }
 

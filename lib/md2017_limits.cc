@@ -6,7 +6,7 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "gpssystem.hh"
-#include "roaming.hh"
+#include "roamingzone.hh"
 
 
 MD2017Limits::MD2017Limits(QObject *parent)
