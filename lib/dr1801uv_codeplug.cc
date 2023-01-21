@@ -14,6 +14,11 @@
 #define ADDR_CONTACT_ELEMENTS    0x04338
 #define CONTACT_ELEMENT_SIZE     0x00018
 
+#define NUM_GROUP_LISTS               64
+#define ADDR_GROUP_LIST_ELEMENTS 0x1c6e0
+#define GROUP_LIST_ELEMENT_SIZE  0x00044
+#define GROUP_LIST_MEMBER_COUNT       10
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelElement
@@ -537,6 +542,87 @@ DR1801UVCodeplug::ContactElement::linkContactObj(DMRContact *contact, Context &c
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::GroupListElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : Element(ptr, GROUP_LIST_ELEMENT_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::GroupListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::GroupListElement::isValid() const {
+  return 0 != getUInt16_le(0x0002);
+}
+
+uint16_t
+DR1801UVCodeplug::GroupListElement::index() const {
+  return getUInt16_le(0x0002)-1;
+}
+void
+DR1801UVCodeplug::GroupListElement::setIndex(uint16_t index) {
+  setUInt16_le(0x0002, index-1);
+}
+
+uint16_t
+DR1801UVCodeplug::GroupListElement::count() const {
+  return getUInt16_le(0x0000);
+}
+bool
+DR1801UVCodeplug::GroupListElement::hasMemberIndex(uint8_t n) const {
+  return 0 != getUInt16_le(0x0004 + n*0x02);
+}
+uint16_t
+DR1801UVCodeplug::GroupListElement::memberIndex(uint8_t n) const {
+  return getUInt16_le(0x0004 + n*0x02) - 1;
+}
+void
+DR1801UVCodeplug::GroupListElement::setMemberIndex(uint8_t n, uint16_t index) {
+  setUInt16_le(0x0004 + n*0x02, index+1);
+}
+void
+DR1801UVCodeplug::GroupListElement::clearMemberIndex(uint8_t n) {
+  setUInt16_le(0x0004 + n*0x02, 0);
+}
+
+RXGroupList *
+DR1801UVCodeplug::GroupListElement::toGroupListObj(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // Simply derive name from index
+  return new RXGroupList(QString("Group List %1").arg(index()+1));
+}
+
+bool
+DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err) {
+  if (! isValid())
+    return false;
+
+  for (int i=0; i<GROUP_LIST_MEMBER_COUNT; i++) {
+    if (! hasMemberIndex(i))
+      continue;
+    if (! ctx.has<DMRContact>(memberIndex(i))) {
+      errMsg(err) << "Member index " << memberIndex(i) << " is not known.";
+      return false;
+    }
+    list->addContact(ctx.get<DMRContact>(memberIndex(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
@@ -585,18 +671,28 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! decodeGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot decode group list elements.";
+    return false;
+  }
+
   return true;
 }
 
 bool
 DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
   if (! linkChannels(ctx, err)) {
-    errMsg(err) << "Cannot decode channel elements.";
+    errMsg(err) << "Cannot link channels.";
     return false;
   }
 
   if (! linkContacts(ctx, err)) {
-    errMsg(err) << "Cannot decode contact elements.";
+    errMsg(err) << "Cannot link contacts.";
+    return false;
+  }
+
+  if (! linkGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
@@ -703,6 +799,59 @@ DR1801UVCodeplug::linkContacts(Context &ctx, const ErrorStack &err) {
     // Link contact
     if (! con.linkContactObj(ctx.get<DMRContact>(i), ctx, err)) {
       errMsg(err) << "Cannot link contact '" << ctx.get<Contact>(i)->name()
+                  << " at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+DR1801UVCodeplug::decodeGroupLists(Context &ctx, const ErrorStack &err) {
+  // Decode all group list elements
+  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+    GroupListElement gl(data(ADDR_GROUP_LIST_ELEMENTS + i*GROUP_LIST_ELEMENT_SIZE));
+
+    // Skip invalid group lists
+    if (! gl.isValid())
+      continue;
+
+    // Decode group list
+    RXGroupList *obj = gl.toGroupListObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode group list at index " << i << ".";
+      return false;
+    }
+    logDebug() << "Register group list at index " << gl.index();
+
+    // Add group list to index table
+    ctx.add(obj, gl.index());
+    // Add group list to config
+    ctx.config()->rxGroupLists()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
+  // link all group lists
+  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+    GroupListElement gl(data(ADDR_GROUP_LIST_ELEMENTS + i*GROUP_LIST_ELEMENT_SIZE));
+
+    // Skip invalid group lists
+    if (! gl.isValid())
+      continue;
+
+    // Link group list if defined
+    if (! ctx.has<RXGroupList>(gl.index()))
+      continue;
+
+    // Link contact
+    if (! gl.linkGroupListObj(ctx.get<RXGroupList>(i), ctx, err)) {
+      errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i)->name()
                   << " at index " << i << ".";
       return false;
     }

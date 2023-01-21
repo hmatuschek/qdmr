@@ -28,6 +28,8 @@
  *      details.</td></tr>
  *  <tr><td>0x17660</td> <td>0x1c660</td>  <td>0x5000</td>  <td>1024 Channel names, 20 ASCII chars,
  *      0-terminated. Unset/unused names are filled with 0.</td></tr>
+ *  <tr><td>0x1c6e0</td> <td>0x1d7e0</td>  <td>0x1100</td>  <td>64 group lists. See
+ *      @c DR1801UVCodeplug::GroupListElement.</td></tr>
  * </table>
  *
  * @ingroup dr1801uv */
@@ -227,6 +229,7 @@ public:
     virtual bool linkChannelObj(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack()) const;
   };
 
+
   /** Implements the binary encoding of a contact.
    *
    * Memory representation of contact (0018h bytes):
@@ -274,8 +277,50 @@ public:
     /** Sets the name of the contact. */
     virtual void setName(const QString &name);
 
+    /** Constructs a DMR contact object from this contact elmeent. */
     virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links the DMR contact object. */
     virtual bool linkContactObj(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
+
+  /** Implements the binary encoding of a group list.
+   *
+   * Memory representation of group list (00h bytes):
+   * @verbinclude dr1801uv_grouplistelement.txt */
+  class GroupListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    bool isValid() const;
+    void clear();
+
+    /** Returns the index of the group list. */
+    virtual uint16_t index() const;
+    /** Sets the index of the group list. */
+    virtual void setIndex(uint16_t index);
+
+    /** Returns the number of elements in the list. */
+    virtual uint16_t count() const;
+    /** Returns @c true if the n-th member index is set. */
+    virtual bool hasMemberIndex(uint8_t n) const;
+    /** Retuns the n-th member index. */
+    virtual uint16_t memberIndex(uint8_t n) const;
+    /** Sets the n-th member index. */
+    virtual void setMemberIndex(uint8_t n, uint16_t index);
+    /** Clears the n-th member index. */
+    virtual void clearMemberIndex(uint8_t n);
+
+    /** Constructs a group list object from this elmeent. */
+    virtual RXGroupList *toGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links the group list object. */
+    virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
 public:
@@ -302,6 +347,10 @@ protected:
   /** Link contact elements. */
   virtual bool linkContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Decode group list elements. */
+  virtual bool decodeGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link group lists. */
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
 #endif // DR1801UVCODEPLUG_HH
