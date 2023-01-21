@@ -28,6 +28,7 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dr1801uv_codeplug.hh"
 
 
 int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -73,6 +74,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "':\n" << err.format();
+      return -1;
     }
   } else if (RadioInfo::UV390 == radio) {
     UV390Codeplug codeplug;
@@ -90,6 +92,7 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (! codeplug.decode(&config, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "':\n" << err.format();
+      return -1;
     }
   } else if (RadioInfo::MD2017 == radio) {
     MD2017Codeplug codeplug;
@@ -275,6 +278,23 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "':\n" << err.format();
+      return -1;
+    }
+    if (! codeplug.decode(&config, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "':\n" << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DR1801UV == radio) {
+    DR1801UVCodeplug codeplug;
+    if (parser.isSet("manufacturer")) {
+      logError() << "Cannot decode manufacturer codeplug file '" << filename
+                 << "': Not implemented yet.";
+      return -1;
+    }
+    if (! codeplug.read(filename, err)) {
+      logError() << "Cannot decode binary codeplug file '" << filename
+                 << "' :\n" << err.format();
       return -1;
     }
     if (! codeplug.decode(&config, err)) {
