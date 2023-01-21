@@ -144,7 +144,7 @@ DR1801UV::download() {
       errMsg(_errorStack) << "Cannot read codeplug from device.";
       return false;
     }
-    memcpy(_codeplug.data(offset), buffer, 1024);
+    memcpy(_codeplug.data(offset), buffer, n);
     offset += n; bytesToTransfer -= n;
     emit downloadProgress(float(offset*100)/total);
   }

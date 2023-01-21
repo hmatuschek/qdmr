@@ -98,7 +98,7 @@ DR1801UVInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
   }
 
   PrepareReadResponse resp;
-  if (! prepareReading(QSerialPort::Baud115200, resp, err)) {
+  if (! prepareReading(QSerialPort::Baud9600, resp, err)) {
     errMsg(err) << "Cannot start reading the codeplug from " << _identifier << ".";
     _state = ERROR;
     return false;
