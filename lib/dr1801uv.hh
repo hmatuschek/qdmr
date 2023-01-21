@@ -21,10 +21,12 @@ class DR1801UV : public Radio
   Q_OBJECT
 
 public:
+  /** Constructs a new instance representig a DR-1801UV. */
   explicit DR1801UV(DR1801UVInterface *device=nullptr, QObject *parent=nullptr);
 
 
 public:
+  /** Retunrs the default radio info. */
   static RadioInfo defaultRadioInfo();
 
   const QString &name() const;
@@ -47,8 +49,11 @@ private:
   virtual bool upload();
 
 protected:
+  /** Owns the interface to the device. */
   DR1801UVInterface *_device;
+  /** Holds the device name, once it got identified. */
   QString _name;
+  /** The binary codeplug. */
   DR1801UVCodeplug _codeplug;
 
 private:

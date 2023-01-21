@@ -28,6 +28,7 @@ protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
    * product IDs.
    * @param descriptor Specifies the device to open.
+   * @param rate Specifies the transferrate in baud.
    * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
   explicit USBSerial(const USBDeviceDescriptor &descriptor,

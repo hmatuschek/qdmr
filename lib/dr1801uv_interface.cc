@@ -126,7 +126,7 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
     return false;
   }
 
-  if (_bytesToRead < nbytes)
+  if (_bytesToRead < uint32_t(nbytes))
     nbytes = _bytesToRead;
 
   while (nbytes > bytesAvailable()) {
@@ -151,24 +151,27 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
 
 bool
 DR1801UVInterface::read_finish(const ErrorStack &err) {
-
+  Q_UNUSED(err);
   return (_state == IDLE) && (0 == _bytesToRead);
 }
 
 
 bool
 DR1801UVInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
-
+  errMsg(err) << "Not implemented yet.";
+  return false;
 }
 
 bool
 DR1801UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
-
+  errMsg(err) << "Not implemented yet.";
+  return false;
 }
 
 bool
 DR1801UVInterface::write_finish(const ErrorStack &err) {
-
+  errMsg(err) << "Not implemented yet.";
+  return false;
 }
 
 USBDeviceInfo
