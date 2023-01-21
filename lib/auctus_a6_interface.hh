@@ -35,6 +35,10 @@ protected:
   explicit AuctusA6Interface(const USBDeviceDescriptor &descriptor,
                              const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
+public:
+  /** Returns the interface state. */
+  State state() const;
+
 protected:
   /** Internal used method to send messages to and receive responses from radio. */
   bool send_receive(uint16_t command, const uint8_t *params, uint8_t plen,

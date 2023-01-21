@@ -1,12 +1,14 @@
 #include "auctus_a6_interface.hh"
+#include <QMetaEnum>
 #include <QtEndian>
+#include <QThread>
 #include "logger.hh"
 
 #define TIMEOUT 5000
 
 AuctusA6Interface::AuctusA6Interface(
     const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
-  : USBSerial(descriptor, err, parent), _state(CLOSED)
+  : USBSerial(descriptor, QSerialPort::Baud9600, err, parent), _state(CLOSED)
 {
   if (isOpen()) {
     _state = IDLE;
@@ -15,21 +17,15 @@ AuctusA6Interface::AuctusA6Interface(
     _state = ERROR;
     return;
   }
+  if (! clear(QSerialPort::AllDirections)) {
+    logWarn() << "Cannot clear RX/TX buffer of serial interface.";
+  }
   logDebug() << "Open interface to Auctus A6 based radio.";
+}
 
-  // Set device properties
-  if (!setParity(QSerialPort::NoParity)) {
-    logWarn() << "Cannot set parity of the serial port to none.";
-  }
-  if (! setStopBits(QSerialPort::OneStop)) {
-    logWarn() << "Cannot set stop bit.";
-  }
-  if (! setBaudRate(QSerialPort::Baud9600)) {
-    logWarn() << "Cannot set speed to 9600 baud.";
-  }
-  if (! setFlowControl(QSerialPort::HardwareControl)) {
-    logWarn() << "Cannot enable hardware flow control.";
-  }
+AuctusA6Interface::State
+AuctusA6Interface::state() const {
+  return _state;
 }
 
 
@@ -59,16 +55,21 @@ AuctusA6Interface::send_receive(uint16_t command,
   memcpy(ptr, params, plen); ptr += plen;
   // compute CRC
   for (int i=0; i<(3+plen); i++)
-    (*ptr) ^= buffer[1+i];
+    (*ptr) ^= buffer[1+i]; // Skip start-of-packet byte.
   ptr += sizeof(uint8_t);
   // end of packet
   *ptr = 0xbb;
 
   // send request
+  logDebug() << "Send " << QByteArray((const char *)buffer, total_length).toHex();
   if (total_length != QSerialPort::write((const char*)buffer, total_length)) {
     errMsg(err) << "QSerialPort: " << errorString();
     errMsg(err) << "Cannot send request " << QString::number(command, 16) << "h.";
     return false;
+  }
+  if (! flush()) {
+    logWarn() << "No data writen to the device, " << bytesToWrite()
+              << " of " << total_length << " left in buffer.";
   }
 
   // wait for start-of-packet and length bytes
@@ -91,15 +92,16 @@ AuctusA6Interface::send_receive(uint16_t command,
                 << QString::number(buffer[0],16) << "h.";
     return false;
   }
+
   // get length
-  total_length = 2+buffer[1];
+  total_length = buffer[1];
   if (6 > total_length) {
     errMsg(err) << "Invalid packet: Expected minimum lenght of 6h, got "
                 << QString::number(total_length, 16) << "h.";
     return false;
   }
   // wait for remaining packet
-  while (total_length > bytesAvailable()) {
+  while ((total_length-2) > bytesAvailable()) {
     if (! waitForReadyRead(TIMEOUT)) {
       errMsg(err) << "QSerialPort: " << errorString();
       errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
@@ -111,11 +113,13 @@ AuctusA6Interface::send_receive(uint16_t command,
     errMsg(err) << "QSerialPort: " << errorString();
     return false;
   }
+  logDebug() << "Got response " << QByteArray((const char *)buffer, total_length).toHex() << ".";
+
   // check response
   uint16_t responseCommand = qFromBigEndian((*(uint16_t *)(buffer+2)));
-  if ((! (responseCommand & 0x80)) || (command != (responseCommand&0x7f))) {
+  if ((! (responseCommand & 0x8000)) || (command != (responseCommand&0x7fff))) {
     errMsg(err) << "Unexpected response command " << QString::number(responseCommand, 16)
-                << "h, expected " << QString::number(command | 0x80, 16) << "h.";
+                << "h, expected " << QString::number(command | 0x8000, 16) << "h.";
     return false;
   }
 
@@ -137,7 +141,7 @@ AuctusA6Interface::send_receive(uint16_t command,
 
   // copy response payload
   rlen = total_length-6;
-  memcpy(response, buffer+5, rlen);
+  memcpy(response, buffer+4, rlen);
 
   // done.
   return true;

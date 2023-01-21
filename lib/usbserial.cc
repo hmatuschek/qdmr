@@ -2,6 +2,7 @@
 #include "logger.hh"
 #include <QFileInfo>
 #include <QSerialPortInfo>
+#include <QThread>
 
 /* ******************************************************************************************** *
  * Implementation of USBSerial::Info
@@ -15,7 +16,7 @@ USBSerial::Descriptor::Descriptor(uint16_t vid, uint16_t pid, const QString &dev
 /* ******************************************************************************************** *
  * Implementation of USBSerial
  * ******************************************************************************************** */
-USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, BaudRate rate, const ErrorStack &err, QObject *parent)
   : QSerialPort(parent), RadioInterface()
 {
   if (USBDeviceInfo::Class::Serial != descriptor.interfaceClass()) {
@@ -26,7 +27,18 @@ USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &er
   logDebug() << "Try to open " << descriptor.description() << ".";
   QSerialPortInfo port(descriptor.device().toString());
   this->setPort(port);
-  this->setBaudRate(115200);
+  if (! setParity(QSerialPort::NoParity)) {
+    logWarn() << "Cannot set parity of the serial port to none.";
+  }
+  if (! setStopBits(QSerialPort::OneStop)) {
+    logWarn() << "Cannot set stop bit.";
+  }
+  if (! setBaudRate(rate)) {
+    logWarn() << "Cannot set speed to " << rate << " baud.";
+  }
+  if (! setFlowControl(QSerialPort::HardwareControl)) {
+    logWarn() << "Cannot enable hardware flow control.";
+  }
 
   if (! this->open(QIODevice::ReadWrite)) {
 #ifdef Q_OS_UNIX
@@ -63,6 +75,8 @@ USBSerial::USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &er
   connect(this, SIGNAL(aboutToClose()), this, SLOT(onClose()));
   connect(this, SIGNAL(errorOccurred(QSerialPort::SerialPortError)),
           this, SLOT(onError(QSerialPort::SerialPortError)));
+  connect(this, SIGNAL(dataTerminalReadyChanged(bool)), this, SLOT(signalingChanged()));
+  connect(this, SIGNAL(requestToSendChanged(bool)), this, SLOT(signalingChanged()));
 }
 
 USBSerial::~USBSerial() {
@@ -91,6 +105,11 @@ USBSerial::onClose() {
   logDebug() << "Serial port will close now.";
 }
 
+void
+USBSerial::signalingChanged() {
+  logDebug() << "Pinout signals changed to " << formatPinoutSignals() << ".";
+}
+
 QList<USBDeviceDescriptor>
 USBSerial::detect(uint16_t vid, uint16_t pid) {
   QList<USBDeviceDescriptor> interfaces;
@@ -107,4 +126,34 @@ USBSerial::detect(uint16_t vid, uint16_t pid) {
     }
   }
   return interfaces;
+}
+
+QString
+USBSerial::formatPinoutSignals() {
+  if (QSerialPort::NoSignal == pinoutSignals())
+    return "None";
+
+  QStringList res;
+  if (QSerialPort::TransmittedDataSignal & pinoutSignals())
+    res.append("Transitter Detected");
+  if (QSerialPort::ReceivedDataSignal & pinoutSignals())
+    res.append("Received Data");
+  if (QSerialPort::DataTerminalReadySignal & pinoutSignals())
+    res.append("Data Terminal Ready");
+  if (QSerialPort::DataCarrierDetectSignal & pinoutSignals())
+    res.append("Data Carrier Detect");
+  if (QSerialPort::DataSetReadySignal & pinoutSignals())
+    res.append("Data Set Ready");
+  if (QSerialPort::RingIndicatorSignal & pinoutSignals())
+    res.append("Ring Indicator");
+  if (QSerialPort::RequestToSendSignal & pinoutSignals())
+    res.append("Request To Send");
+  if (QSerialPort::ClearToSendSignal & pinoutSignals())
+    res.append("Clear To Send");
+  if (QSerialPort::SecondaryTransmittedDataSignal & pinoutSignals())
+    res.append("Secondary Transmitted Data");
+  if (QSerialPort::SecondaryReceivedDataSignal & pinoutSignals())
+    res.append("Secondary Received Data");
+
+  return res.join(", ");
 }

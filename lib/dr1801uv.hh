@@ -3,6 +3,7 @@
 
 #include "radio.hh"
 #include "dr1801uv_interface.hh"
+#include "dr1801uv_codeplug.hh"
 
 
 class DR1801UV : public Radio
@@ -28,8 +29,17 @@ public:
   bool startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err);
 
 protected:
+  /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
+  void run();
+
+private:
+  virtual bool download();
+  virtual bool upload();
+
+protected:
   DR1801UVInterface *_device;
   QString _name;
+  DR1801UVCodeplug _codeplug;
 
 private:
   /** Holds the singleton instance of the radio limits. */

@@ -1,5 +1,6 @@
 #include "dr1801uv_interface.hh"
 #include <QtEndian>
+#include "logger.hh"
 #include "dr1801uv.hh"
 
 // Identifies itself as "Prolific USB-serial controller" (chip in cable).
@@ -76,12 +77,20 @@ DR1801UVInterface::identifier(const ErrorStack &err) {
   return RadioInfo();
 }
 
+uint32_t
+DR1801UVInterface::bytesToTransfer() const {
+  return _bytesToRead;
+}
+
 bool
 DR1801UVInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
+  Q_UNUSED(bank); Q_UNUSED(addr)
+
   if (! isOpen()) {
     errMsg(err) << "Cannot read codeplug from device: Interface not open.";
     return false;
   }
+
   if (IDLE != _state) {
     errMsg(err) << "Cannot read codeplug from device: Interface not in idle state. "
                 << "State=" << _state << ".";
@@ -89,18 +98,20 @@ DR1801UVInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
   }
 
   PrepareReadResponse resp;
-  if (! prepareReading(9600, resp, err)) {
+  if (! prepareReading(QSerialPort::Baud115200, resp, err)) {
     errMsg(err) << "Cannot start reading the codeplug from " << _identifier << ".";
     _state = ERROR;
     return false;
   }
 
-  _bytesToRead = resp.size;
+  _bytesToRead = resp.getSize();
   if (! startReading(err)) {
     errMsg(err) << "Cannot start reading the codeplug form " << _identifier << ".";
     _state = ERROR;
     return false;
   }
+
+  logDebug() << "Start reading " << _bytesToRead << "b of codeplug memory.";
 
   return true;
 }
@@ -109,13 +120,22 @@ bool
 DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
   // Note: Cannot control where to read. Once started, the device simply sends the entire codpelug.
   Q_UNUSED(bank); Q_UNUSED(addr);
+
   if ((!isOpen()) || (READ_THROUGH != _state)) {
     errMsg(err) << "Cannot read codeplug from device.";
     return false;
   }
+
   if (_bytesToRead < nbytes)
     nbytes = _bytesToRead;
 
+  while (nbytes > bytesAvailable()) {
+    if (! waitForReadyRead(2000)) {
+      errMsg(err) << QSerialPort::errorString();
+      errMsg(err) << "Cannot read from device '" << portName() << "'.";
+      return false;
+    }
+  }
   int n = QSerialPort::read((char *)data, nbytes);
   if (0 > n) {
     errMsg(err) << "Cannot read from serial port: " << QSerialPort::errorString() << ".";
@@ -131,6 +151,7 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
 
 bool
 DR1801UVInterface::read_finish(const ErrorStack &err) {
+
   return (_state == IDLE) && (0 == _bytesToRead);
 }
 
@@ -152,7 +173,7 @@ DR1801UVInterface::write_finish(const ErrorStack &err) {
 
 USBDeviceInfo
 DR1801UVInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID, false, false);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID, false, true);
 }
 
 QList<USBDeviceDescriptor>
@@ -185,8 +206,10 @@ DR1801UVInterface::getDeviceInfo(QString &info, const ErrorStack &err) {
     return false;
   }
 
-  if (1 < respLen)
-    info.fromLatin1((char *)(response+1), respLen-1);
+  if (1 < respLen) {
+    logDebug() << QByteArray((const char *)response+1, respLen-1);
+    info = QString::fromLatin1((char *)(response+1), respLen-1);
+  }
 
   return true;
 }
@@ -248,10 +271,26 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
     return false;
   }
 
+  if (! this->setBaudRate(baudrate)) {
+    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
+    return false;
+  }
+
   return true;
 }
 
 bool
 DR1801UVInterface::startReading(const ErrorStack &err) {
+  uint8_t cmd[6] = {0xaa, 0x06, (START_READ_DATA>>8), START_READ_DATA&0xff, 0x06, 0xbb};
 
+  logDebug() << "Send "  << QByteArray((const char *)cmd, 6).toHex() << ".";
+  if (6 != QSerialPort::write((const char *)cmd, 6)) {
+    errMsg(err) << QSerialPort::errorString();
+    errMsg(err) << "Cannot initalize codeplug read.";
+    return false;
+  }
+  flush();
+
+ _state = READ_THROUGH;
+ return true;
 }

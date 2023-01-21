@@ -86,7 +86,7 @@ AnytoneInterface::RadioVariant::isValid() const {
  * Implementation of AnytoneInterface
  * ********************************************************************************************* */
 AnytoneInterface::AnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
-  : USBSerial(descriptor, err, parent), _state(STATE_INITIALIZED), _info()
+  : USBSerial(descriptor, QSerialPort::Baud115200, err, parent), _state(STATE_INITIALIZED), _info()
 {
   if (isOpen()) {
     _state = STATE_OPEN;

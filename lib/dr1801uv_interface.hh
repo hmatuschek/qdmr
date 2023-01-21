@@ -17,7 +17,7 @@ protected:
     REQUEST_INFO           = 0x0000, ///< Returns some information about the device.
     ENTER_PROGRAMMING_MODE = 0x0104, ///< Puts the device into the programming mode.
     CHECK_PROG_PASSWORD    = 0x002b, ///< Checks the programming password.
-    PREPARE_CODEPLUG_READ  = 0x0100, ///< Prepares the codeplug read. Does not start reading.
+    PREPARE_CODEPLUG_READ  = 0x0100, ///< Sets baud rate and prepares codeplug read.
     START_READ_DATA        = 0x0101, ///< Actually starts reading the codeplug.
     START_WRITE_DATA       = 0x0102  ///< Starts writing the codeplug.
   };
@@ -45,6 +45,8 @@ public:
                     const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
   RadioInfo identifier(const ErrorStack &err);
+
+  uint32_t bytesToTransfer() const;
 
   bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());

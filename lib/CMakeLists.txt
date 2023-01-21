@@ -33,7 +33,7 @@ SET(libdmrconf_SOURCES
     d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
     dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc
     auctus_a6_interface.cc
-    dr1801uv.cc dr1801uv_interface.cc)
+    dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc)
 
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
@@ -59,7 +59,7 @@ SET(libdmrconf_MOC_HEADERS
     d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh
     dmr6x2uv.hh dmr6x2uv_codeplug.hh dmr6x2uv_limits.hh
     auctus_a6_interface.hh
-    dr1801uv.hh dr1801uv_interface.hh)
+    dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh)
 
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh

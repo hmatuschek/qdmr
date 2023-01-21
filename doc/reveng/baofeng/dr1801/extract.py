@@ -42,7 +42,7 @@ for p in cap:
   if isDataPacket(p):
     dump = hexDump(getData(p))
     if isFromHost(p):
-      print("> " + dump)
-    else:
       print("< " + dump)
+    else:
+      print("> " + dump)
         
