@@ -20,6 +20,10 @@
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
  *  <tr><td>0x00000</td> <td>0x00000</td>  <td>0x0000</td>  <td></td></tr>
+ *  <tr><td>0x003b4</td> <td>0x00418</td>  <td>0x0064</td>  <td>General settings, see
+ *      @cDR1801UVCodeplug::SettingsElement. </td></tr>
+ *  <tr><td>0x00420</td> <td>0x04110</td>  <td>0x3cf0</td>  <td>150 zones, see
+ *      @c DR1801UVCodeplug::ZoneElement. </td></tr>
  *  <tr><td>0x04330</td> <td>0x00008</td>  <td>0x0008</td>  <td>Number of contacts.</td></tr>
  *  <tr><td>0x04338</td> <td>0x0a338</td>  <td>0x6000</td>  <td>1024 contacts, see
  *      @c DR1801UVCodeplug::ContactElement. </td></tr>
@@ -286,7 +290,7 @@ public:
 
   /** Implements the binary encoding of a group list.
    *
-   * Memory representation of group list (00h bytes):
+   * Memory representation of group list (44h bytes):
    * @verbinclude dr1801uv_grouplistelement.txt */
   class GroupListElement: public Element
   {
@@ -323,6 +327,302 @@ public:
     virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
+
+  /** Implements the binary encoding of a zone.
+   *
+   * Memory representation of zone (68h bytes):
+   * @verbinclude dr1801uv_zoneelement.txt */
+  class ZoneElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Construtor. */
+    ZoneElement(uint8_t *ptr);
+
+    bool isValid() const;
+    void clear();
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void setName(const QString &name);
+
+    /** Retunrs the number of entries. */
+    virtual unsigned int numEntries() const;
+    /** Returns the channel index of the n-th entry. */
+    virtual unsigned int entryIndex(unsigned int n);
+    /** Sets the n-th entry index. */
+    virtual void setEntryIndex(unsigned int n, unsigned int index);
+
+    /** Returns the index of the zone. */
+    virtual unsigned int index() const;
+    /** Sets the index of the zone. */
+    virtual void setIndex(unsigned int index);
+
+    /** Constructs a zone object from this element. */
+    virtual Zone *toZoneObj(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the zone object. */
+    virtual bool linkZoneObj(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
+  /** Implements the binary encoding of the settings element.
+   *
+   * Memory representation of settings element (??h bytes):
+   * @verbinclude dr1801uv_settingselement.txt */
+  class SettingsElement: public Element
+  {
+  public:
+    /** Possible power-save modes. */
+    enum class PowerSaveMode {
+      Off = 0, Save50 = 1, Save25 = 2, Save12 = 3
+    };
+
+    /** Possible UI languages. */
+    enum class Language {
+      SimplifiedChinese = 0, English = 1
+    };
+
+    /** Possible squelch modes. */
+    enum class SquelchMode {
+      Normal = 0, Silent = 1
+    };
+
+    /** Possible ring tone variants. */
+    enum class RingTone {
+      Off = 0, RingTone1 = 1, RingTone2 = 2, RingTone3 = 3, RingTone4 = 4, RingTone5 = 5,
+      RingTone6 = 6, RingTone7 = 7, RingTone8 = 8, RingTone9 = 9, RingTone10 = 10, RingTone11 = 11,
+      RingTone12 = 12, RingTone13 = 13, RingTone14 = 14, RingTone15 = 15, RingTone16 = 16,
+      RingTone17 = 17, RingTone18 = 18, RingTone19 = 19, RingTone20 = 20
+    };
+
+    /** Possible backlight time settings. */
+    enum class BacklightTime {
+      Infinite = 0, Off = 1, On5s = 2, On10s = 3
+    };
+
+    /** Possible tuning modes. */
+    enum class TuningMode {
+      Channel = 0, VFO = 1
+    };
+
+    /** Possible display modes. */
+    enum class DisplayMode {
+      Number = 0, Name = 1, Frequency = 2
+    };
+
+    /** Possible dual-watch modes. */
+    enum class DualWatchMode {
+      Off = 0, DoubleDouble = 1, DoubleSingle = 2
+    };
+
+    /** Possible scan modes. */
+    enum class ScanMode {
+      Time = 0, Carrier = 1, Search = 2
+    };
+
+    /** Possible boot screen modes. */
+    enum class BootScreen {
+      Picture = 0, Text = 1
+    };
+
+  protected:
+    /** Hidden constructor. */
+    SettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    SettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the radios DMR ID. */
+    virtual unsigned int dmrID() const;
+    /** Sets the radios DMR ID. */
+    virtual void setDMRID(unsigned int id);
+
+    /** Retunrs the the power-save mode. */
+    virtual PowerSaveMode powerSaveMode() const;
+    /** Sets the power-save mode.  */
+    virtual void setPowerSaveMode(PowerSaveMode mode);
+
+    /** Returns the VOX sensitivity [0,10].
+     * 0 means VOX off. */
+    virtual unsigned int voxSensitivity() const;
+    /** Sets the VOX sensitivity [0,10].
+     * 0 means VOX off. */
+    virtual void setVOXSensitivity(unsigned int sens);
+    /** Returns the VOX delay in ms. */
+    virtual unsigned int voxDelay() const;
+    /** Sets the VOX delay in ms. */
+    virtual void setVOXDelay(unsigned int ms);
+
+    /** Returns @c true if encryption is enabled. */
+    virtual bool encryptionEnabled() const;
+    /** Enables/disables encryption globally. */
+    virtual void enableEncryption(bool enable);
+
+    /** Returns @c true if the key-lock is enabled. */
+    virtual bool keyLockEnabled() const;
+    /** Enable/disable key-lock. */
+    virtual void enableKeyLock(bool enable);
+    /** Returns the key-lock delay in seconds. */
+    virtual unsigned int keyLockDelay() const;
+    /** Sets the key-lock delay in seconds. */
+    virtual void setKeyLockDelay(unsigned int sec);
+    /** Retunrs @c true if the side-key 1 gets locked too. */
+    virtual bool lockSideKey1() const;
+    /** Enables/disables locking the side-key 1. */
+    virtual void enableLockSideKey1(bool enable);
+    /** Retunrs @c true if the side-key 2 gets locked too. */
+    virtual bool lockSideKey2() const;
+    /** Enables/disables locking the side-key 2. */
+    virtual void enableLockSideKey2(bool enable);
+    /** Retunrs @c true if the PTT gets locked too. */
+    virtual bool lockPTT() const;
+    /** Enables/disables locking the PTT. */
+    virtual void enableLockPTT(bool enable);
+
+    /** Returns the UI language. */
+    virtual Language language() const;
+    /** Sets the UI language. */
+    virtual void setLanguage(Language lang);
+
+    /** Returns the squelch mode. */
+    virtual SquelchMode squelchMode() const;
+    /** Sets the squelch mode. */
+    virtual void setSquelchMode(SquelchMode mode);
+
+    /** Returns @c true, if the roger tones are enabled. */
+    virtual bool rogerTonesEnabled() const;
+    /** Enables/disables roger tones. */
+    virtual void enableRogerTones(bool enable);
+    /** Returns @c true if the DMR call out roger tone is enabled. */
+    virtual bool dmrCallOutToneEnabled() const;
+    /** Enables/disables the DMR call out roger tone. */
+    virtual void enableDMRCallOutTone(bool enable);
+    /** Returns @c true if the DMR voice end roger tone is enabled. */
+    virtual bool dmrVoiceEndToneEnabled() const;
+    /** Enables/disables the DMR voice end roger tone. */
+    virtual void enableDMRVoiceEndTone(bool enable);
+    /** Returns @c true if the DMR call end roger tone is enabled. */
+    virtual bool dmrCallEndToneEnabled() const;
+    /** Enables/disables the DMR call end roger tone. */
+    virtual void enableDMRCallEndTone(bool enable);
+    /** Returns @c true if the FM voice end roger tone is enabled. */
+    virtual bool fmVoiceEndToneEnabled() const;
+    /** Enables/disables the FM voice end roger tone. */
+    virtual void enableFMVoiceEndTone(bool enable);
+    /** Returns @c true if the FM call out roger tone is enabled. */
+    virtual bool fmCallOutToneEnabled() const;
+    /** Enables/disables the FM call out roger tone. */
+    virtual void enableFMCallOutTone(bool enable);
+    /** Returns @c true if the message tone is enabled. */
+    virtual bool messageToneEnabled() const;
+    /** Enables/disables message tone. */
+    virtual void enableMessageTone(bool enable);
+
+    /** Retuns the ring tone. */
+    virtual RingTone ringTone() const;
+    /** Sets the ring tone. */
+    virtual void setRingTone(RingTone tone);
+
+    /** Retuns the radio name. */
+    virtual QString radioName() const;
+    /** Sets the radio name. */
+    virtual void setRadioName(const QString &name);
+
+    /** Returns the reverse burst frequency in Hz. */
+    virtual float reverseBurstFrequency() const;
+    /** Sets the reverse burst frequency in Hz. */
+    virtual void setReverseBurstFrequency(float Hz);
+
+    /** Returns the backlight time settings. */
+    virtual BacklightTime backlightTime() const;
+    /** Sets the backlight time. */
+    virtual void setBacklightTime(BacklightTime time);
+
+    /** Returns @c true, if campanding is enabled. */
+    virtual bool campandingEnabled() const;
+    /** Enables/disables campanding. */
+    virtual void enableCampanding(bool enable);
+
+    /** Retunrs the tuning mode up-direction. */
+    virtual TuningMode tunigModeUp() const;
+    /** Sets the tuning mode up-direction. */
+    virtual void setTuningModeUp(TuningMode mode);
+    /** Retunrs the tuning mode down-direction. */
+    virtual TuningMode tunigModeDown() const;
+    /** Sets the tuning mode down-direction. */
+    virtual void setTuningModeDown(TuningMode mode);
+
+    /** Returns the display mode. */
+    virtual DisplayMode displayMode() const;
+    /** Sets the display mode. */
+    virtual void setDisplayMode(DisplayMode mode);
+
+    /** Returns the dual-watch mode. */
+    virtual DualWatchMode dualWatchMode() const;
+    /** Sets the dual-watch mode. */
+    virtual void setDualWatchMode(DualWatchMode mode);
+
+    /** Returns the scan mode. */
+    virtual ScanMode scanMode() const;
+    /** Sets the scan mode. */
+    virtual void setScanMode(ScanMode mode);
+
+    /** Returns the boot-screen mode. */
+    virtual BootScreen bootScreen() const;
+    /** Sets the boot-screen mode. */
+    virtual void setBootScreen(BootScreen mode);
+
+    /** Returns the boot-screen line 1. */
+    virtual QString bootLine1() const;
+    /** Sets the boot-screen line 1. */
+    virtual void setBootLine1(const QString &line);
+    /** Returns the boot-screen line 2. */
+    virtual QString bootLine2() const;
+    /** Sets the boot-screen line 2. */
+    virtual void setBootLine2(const QString &line);
+
+    /** Returns @c true if the LED is enabled. */
+    virtual bool ledEnabled() const;
+    /** Enables/disables the LED. */
+    virtual void enableLED(bool enabled);
+
+    /** Returns the lone-worker response time in seconds. */
+    virtual unsigned int loneWorkerResponseTime() const;
+    /** Sets the lone-worker response time in seconds. */
+    virtual void setLoneWorkerResponseTime(unsigned int sec);
+    /** Returns the lone-worker reminder time in seconds. */
+    virtual unsigned int loneWorkerReminderTime() const;
+    /** Sets the lone-worker resminder time in seconds. */
+    virtual void setLoneWorkerReminderTime(unsigned int sec);
+
+    /** Returns @c true if the boot password is enabled. */
+    virtual bool bootPasswordEnabled() const;
+    /** Returns the boot password. */
+    virtual QString bootPassword() const;
+    /** Sets and enables boot password. */
+    virtual void setBootPassword(const QString &passwd);
+    /** Clears and disables boot password. */
+    virtual void clearBootPassword();
+
+    /** Returns @c true if the programming password is enabled. */
+    virtual bool progPasswordEnabled() const;
+    /** Returns the programming password. */
+    virtual QString progPassword() const;
+    /** Sets and enables programming password. */
+    virtual void setProgPassword(const QString &passwd);
+    /** Clears and disables programming password. */
+    virtual void clearProgPassword();
+
+    /** Updates configuration. */
+    virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
+  };
+
 public:
   /** Default constructor. */
   explicit DR1801UVCodeplug(QObject *parent = nullptr);
@@ -351,6 +651,15 @@ protected:
   virtual bool decodeGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link group lists. */
   virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Decode zone elements. */
+  virtual bool decodeZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link zones. */
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Decode settings element. */
+  virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
 };
 
 #endif // DR1801UVCODEPLUG_HH

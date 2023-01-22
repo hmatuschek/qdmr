@@ -19,6 +19,12 @@
 #define GROUP_LIST_ELEMENT_SIZE  0x00044
 #define GROUP_LIST_MEMBER_COUNT       10
 
+#define NUM_ZONES                    150
+#define ADDR_ZONE_ELEMENTS       0x00420
+#define ZONE_ELEMENT_SIZE        0x00068
+
+#define ADDR_SETTINGS_ELEMENT    0x003b4
+#define SETTINGS_ELEMENT_SIZE    0x00064
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelElement
@@ -623,6 +629,492 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ZoneElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
+  : Element(ptr, ZONE_ELEMENT_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ZoneElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::ZoneElement::isValid() const {
+  return 0 != getUInt16_le(0x0024);
+}
+
+QString
+DR1801UVCodeplug::ZoneElement::name() const {
+  uint8_t n = getUInt8(0x0020);
+  return readASCII(0x0000, n, 0x00);
+}
+void
+DR1801UVCodeplug::ZoneElement::setName(const QString &name) {
+  uint8_t n = std::min(32, name.length());
+  setUInt8(0x0020, n);
+  writeASCII(0x0000, name, 32, 0x00);
+}
+
+unsigned int
+DR1801UVCodeplug::ZoneElement::index() const {
+  return getUInt16_le(0x0024)-1;
+}
+void
+DR1801UVCodeplug::ZoneElement::setIndex(unsigned int index) {
+  setUInt16_le(0x0024, index+1);
+}
+
+unsigned int
+DR1801UVCodeplug::ZoneElement::numEntries() const {
+  return getUInt8(0x0022);
+}
+unsigned int
+DR1801UVCodeplug::ZoneElement::entryIndex(unsigned int n) {
+  n = std::min(32U, n);
+  return getUInt16_le(0x0028+2*n);
+}
+void
+DR1801UVCodeplug::ZoneElement::setEntryIndex(unsigned int n, unsigned int index) {
+  n = std::min(32U, n);
+  setUInt16_le(0x0028 + 2*n, index);
+}
+
+Zone *
+DR1801UVCodeplug::ZoneElement::toZoneObj(Context &ctx, const ErrorStack &err) {
+  if (! isValid()) {
+    errMsg(err) << "Cannot create zone from invalid zone element.";
+    return nullptr;
+  }
+
+  return new Zone(name());
+}
+
+bool
+DR1801UVCodeplug::ZoneElement::linkZoneObj(Zone *obj, Context &ctx, const ErrorStack &err) {
+  if (! isValid()) {
+    errMsg(err) << "Cannot link zone using invalid zone element.";
+    return false;
+  }
+
+  for (unsigned int i=0; i<numEntries(); i++) {
+    if (! ctx.has<Channel>(entryIndex(i))) {
+      errMsg(err) << "Channel with index " << entryIndex(i) << " not defined.";
+      return false;
+    }
+    obj->A()->add(ctx.get<Channel>(entryIndex(i)));
+  }
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::SettingsElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::SettingsElement::SettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::SettingsElement::SettingsElement(uint8_t *ptr)
+  : Element(ptr, SETTINGS_ELEMENT_SIZE)
+{
+  // psas...
+}
+
+void
+DR1801UVCodeplug::SettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::SettingsElement::dmrID() const {
+  return getUInt24_le(0x0000);
+}
+void
+DR1801UVCodeplug::SettingsElement::setDMRID(unsigned int id) {
+  setUInt24_le(0x0000, id);
+}
+
+DR1801UVCodeplug::SettingsElement::PowerSaveMode
+DR1801UVCodeplug::SettingsElement::powerSaveMode() const {
+  if (0x00 == getUInt8(0x0008)) {
+    // Power save disabled
+    return PowerSaveMode::Off;
+  }
+  return (PowerSaveMode)getUInt8(0x0009);
+}
+void
+DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
+  setUInt8(0x0008, PowerSaveMode::Off != mode ? 0x01 : 0x00);
+  setUInt8(0x0009, (uint8_t) mode);
+}
+
+unsigned int
+DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
+  if (0x00 == getUInt8(0x0030)) {
+    return 0;
+  }
+  return getUInt8(0x000a)*10/3;
+}
+void
+DR1801UVCodeplug::SettingsElement::setVOXSensitivity(unsigned int sens) {
+  if (0 == sens) {
+    setUInt8(0x0030, 0x00);
+  } else {
+    setUInt8(0x0030, 0x01);
+    setUInt8(0x000a, 1+sens*2/10);
+  }
+}
+unsigned int
+DR1801UVCodeplug::SettingsElement::voxDelay() const {
+  return getUInt8(0x000c)*500;
+}
+void
+DR1801UVCodeplug::SettingsElement::setVOXDelay(unsigned int ms) {
+  setUInt8(0x000c, ms/500);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::encryptionEnabled() const {
+  return 0x01 == getUInt8(0x000d);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableEncryption(bool enable) {
+  setUInt8(0x000d, enable ? 0x01 : 0x00);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::keyLockEnabled() const {
+  return 0x01 == getUInt8(0x0017);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableKeyLock(bool enable) {
+  setUInt8(0x0017, enable ? 0x01 : 0x00);
+}
+unsigned int
+DR1801UVCodeplug::SettingsElement::keyLockDelay() const {
+  return getUInt8(0x000e);
+}
+void
+DR1801UVCodeplug::SettingsElement::setKeyLockDelay(unsigned int sec) {
+  setUInt8(0x000e, sec);
+}
+bool
+DR1801UVCodeplug::SettingsElement::lockSideKey1() const {
+  return getBit(0x000f, 1);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableLockSideKey1(bool enable) {
+  setBit(0x000f, 1, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::lockSideKey2() const {
+  return getBit(0x000f, 2);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableLockSideKey2(bool enable) {
+  setBit(0x000f, 2, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::lockPTT() const {
+  return getBit(0x000f, 0);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableLockPTT(bool enable) {
+  setBit(0x000f, 0, enable);
+}
+
+DR1801UVCodeplug::SettingsElement::Language
+DR1801UVCodeplug::SettingsElement::language() const {
+  return (Language) getUInt8(0x0010);
+}
+void
+DR1801UVCodeplug::SettingsElement::setLanguage(Language lang) {
+  setUInt8(0x0010, (uint8_t)lang);
+}
+
+DR1801UVCodeplug::SettingsElement::SquelchMode
+DR1801UVCodeplug::SettingsElement::squelchMode() const {
+  return (SquelchMode) getUInt8(0x0011);
+}
+void
+DR1801UVCodeplug::SettingsElement::setSquelchMode(SquelchMode mode) {
+  setUInt8(0x0011, (uint8_t)mode);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::rogerTonesEnabled() const {
+  return 0x01 == getUInt8(0x0013);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableRogerTones(bool enable) {
+  setUInt8(0x0013, enable ? 0x01 : 0x00);
+}
+bool
+DR1801UVCodeplug::SettingsElement::dmrCallOutToneEnabled() const {
+  return getBit(0x0028, 1);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableDMRCallOutTone(bool enable) {
+  setBit(0x0028, 1, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::fmCallOutToneEnabled() const {
+  return getBit(0x0028, 2);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableFMCallOutTone(bool enable) {
+  setBit(0x0028, 2, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::dmrVoiceEndToneEnabled() const {
+  return getBit(0x0028, 3);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableDMRVoiceEndTone(bool enable) {
+  setBit(0x0028, 3, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::fmVoiceEndToneEnabled() const {
+  return getBit(0x0028, 4);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableFMVoiceEndTone(bool enable) {
+  setBit(0x0028, 4, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::dmrCallEndToneEnabled() const {
+  return getBit(0x0028, 5);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableDMRCallEndTone(bool enable) {
+  setBit(0x0028, 5, enable);
+}
+bool
+DR1801UVCodeplug::SettingsElement::messageToneEnabled() const {
+  return getBit(0x0028, 6);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableMessageTone(bool enable) {
+  setBit(0x0028, 6, enable);
+}
+
+DR1801UVCodeplug::SettingsElement::RingTone
+DR1801UVCodeplug::SettingsElement::ringTone() const {
+  return (RingTone) getUInt8(0x0016);
+}
+void
+DR1801UVCodeplug::SettingsElement::setRingTone(RingTone tone) {
+  setUInt8(0x0016, (uint8_t)tone);
+}
+
+QString
+DR1801UVCodeplug::SettingsElement::radioName() const {
+  return readASCII(0x0018, 16, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::setRadioName(const QString &name) {
+  writeASCII(0x0018, name, 16, 0x00);
+}
+
+float
+DR1801UVCodeplug::SettingsElement::reverseBurstFrequency() const {
+  return float(getUInt16_le(0x002c))/10;
+}
+void
+DR1801UVCodeplug::SettingsElement::setReverseBurstFrequency(float Hz) {
+  setUInt16_le(0x002c, Hz*10);
+}
+
+DR1801UVCodeplug::SettingsElement::BacklightTime
+DR1801UVCodeplug::SettingsElement::backlightTime() const {
+  return (BacklightTime) getUInt8(0x002f);
+}
+void
+DR1801UVCodeplug::SettingsElement::setBacklightTime(BacklightTime time) {
+  setUInt8(0x002f, (uint8_t)time);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::campandingEnabled() const {
+  return 0x01 == getUInt8(0x0032);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableCampanding(bool enable) {
+  setUInt8(0x0032, enable ? 0x01 : 0x00);
+}
+
+DR1801UVCodeplug::SettingsElement::TuningMode
+DR1801UVCodeplug::SettingsElement::tunigModeUp() const {
+  return (TuningMode) getUInt8(0x0036);
+}
+void
+DR1801UVCodeplug::SettingsElement::setTuningModeUp(TuningMode mode) {
+  setUInt8(0x0036, (uint8_t)mode);
+}
+DR1801UVCodeplug::SettingsElement::TuningMode
+DR1801UVCodeplug::SettingsElement::tunigModeDown() const {
+  return (TuningMode) getUInt8(0x0037);
+}
+void
+DR1801UVCodeplug::SettingsElement::setTuningModeDown(TuningMode mode) {
+  setUInt8(0x0037, (uint8_t)mode);
+}
+
+DR1801UVCodeplug::SettingsElement::DisplayMode
+DR1801UVCodeplug::SettingsElement::displayMode() const {
+  return (DisplayMode)getUInt8(0x003c);
+}
+void
+DR1801UVCodeplug::SettingsElement::setDisplayMode(DisplayMode mode) {
+  setUInt8(0x003c, (uint8_t)mode);
+}
+
+DR1801UVCodeplug::SettingsElement::DualWatchMode
+DR1801UVCodeplug::SettingsElement::dualWatchMode() const {
+  return (DualWatchMode) getUInt8(0x003d);
+}
+void
+DR1801UVCodeplug::SettingsElement::setDualWatchMode(DualWatchMode mode) {
+  setUInt8(0x003d, (uint8_t)mode);
+}
+
+DR1801UVCodeplug::SettingsElement::ScanMode
+DR1801UVCodeplug::SettingsElement::scanMode() const {
+  return (ScanMode) getUInt8(0x003e);
+}
+void
+DR1801UVCodeplug::SettingsElement::setScanMode(ScanMode mode) {
+  setUInt8(0x003e, (uint8_t)mode);
+}
+
+DR1801UVCodeplug::SettingsElement::BootScreen
+DR1801UVCodeplug::SettingsElement::bootScreen() const {
+  return (BootScreen) getUInt8(0x003f);
+}
+void
+DR1801UVCodeplug::SettingsElement::setBootScreen(BootScreen mode) {
+  setUInt8(0x003f, (uint8_t) mode);
+}
+
+QString
+DR1801UVCodeplug::SettingsElement::bootLine1() const {
+  return readASCII(0x0040, 8, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::setBootLine1(const QString &line) {
+  writeASCII(0x0040, line, 8, 0x00);
+}
+QString
+DR1801UVCodeplug::SettingsElement::bootLine2() const {
+  return readASCII(0x0048, 8, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::setBootLine2(const QString &line) {
+  writeASCII(0x0048, line, 8, 0x00);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::ledEnabled() const {
+  return 0x01 == getUInt8(0x0050);
+}
+void
+DR1801UVCodeplug::SettingsElement::enableLED(bool enabled) {
+  setUInt8(0x0050, enabled ? 0x01 : 0x00);
+}
+
+unsigned int
+DR1801UVCodeplug::SettingsElement::loneWorkerResponseTime() const {
+  return getUInt8(0x0051);
+}
+void
+DR1801UVCodeplug::SettingsElement::setLoneWorkerResponseTime(unsigned int sec) {
+  setUInt8(0x0051, sec);
+}
+unsigned int
+DR1801UVCodeplug::SettingsElement::loneWorkerReminderTime() const {
+  return getUInt8(0x005c);
+}
+void
+DR1801UVCodeplug::SettingsElement::setLoneWorkerReminderTime(unsigned int sec) {
+  setUInt8(0x005c, sec);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::bootPasswordEnabled() const {
+  return getBit(0x0052, 1);
+}
+QString
+DR1801UVCodeplug::SettingsElement::bootPassword() const {
+  return readASCII(0x005e, 6, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::setBootPassword(const QString &passwd) {
+  setBit(0x0052, 1, true);
+  setUInt8(0x005d, std::min(6, passwd.length()));
+  writeASCII(0x005e, passwd, 6, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::clearBootPassword() {
+  setBit(0x0052, 1, false);
+  setUInt8(0x005d, 0);
+  writeASCII(0x005e, "", 6, 0x00);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::progPasswordEnabled() const {
+  return getBit(0x0052, 0);
+}
+QString
+DR1801UVCodeplug::SettingsElement::progPassword() const {
+  return readASCII(0x0054, 6, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::setProgPassword(const QString &passwd) {
+  setBit(0x0052, 0, true);
+  setUInt8(0x0053, std::min(6, passwd.length()));
+  writeASCII(0x0054, passwd, 6, 0x00);
+}
+void
+DR1801UVCodeplug::SettingsElement::clearProgPassword() {
+  setBit(0x0052, 0, false);
+  setUInt8(0x0053, 0);
+  writeASCII(0x0054, "", 6, 0x00);
+}
+
+bool
+DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Store radio ID
+  int idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
+  config->radioIDs()->setDefaultId(idx);
+
+  // Handle VOX settings.
+  config->settings()->setVOX(voxSensitivity());
+
+  // Handle intro lines
+  config->settings()->setIntroLine1(bootLine1());
+  config->settings()->setIntroLine2(bootLine2());
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
@@ -676,6 +1168,16 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! decodeZones(ctx, err)) {
+    errMsg(err) << "Cannot decode zone elements.";
+    return false;
+  }
+
+  if (! decodeSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode settings element.";
+    return false;
+  }
+
   return true;
 }
 
@@ -693,6 +1195,11 @@ DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! linkGroupLists(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
+    return false;
+  }
+
+  if (! linkZones(ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
     return false;
   }
 
@@ -858,4 +1365,61 @@ DR1801UVCodeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   }
 
   return true;
+}
+
+
+bool
+DR1801UVCodeplug::decodeZones(Context &ctx, const ErrorStack &err) {
+  // Decode all zone elements
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement zone(data(ADDR_ZONE_ELEMENTS + i*ZONE_ELEMENT_SIZE));
+
+    // Skip invalid zones
+    if (! zone.isValid())
+      continue;
+
+    // Decode zone
+    Zone *obj = zone.toZoneObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode zone at index " << i << ".";
+      return false;
+    }
+
+    // Add zone to index table
+    ctx.add(obj, zone.index());
+    // Add zone to config
+    ctx.config()->zones()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
+  // link all zones
+  for (int i=0; i<NUM_ZONES; i++) {
+    ZoneElement zone(data(ADDR_ZONE_ELEMENTS + i*ZONE_ELEMENT_SIZE));
+
+    // Skip invalid zones
+    if (! zone.isValid())
+      continue;
+
+    // Link zone if defined
+    if (! ctx.has<Zone>(zone.index()))
+      continue;
+
+    // Link contact
+    if (! zone.linkZoneObj(ctx.get<Zone>(i), ctx, err)) {
+      errMsg(err) << "Cannot link zone '" << ctx.get<Zone>(i)->name()
+                  << " at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::decodeSettings(Context &ctx, const ErrorStack &err) {
+  return SettingsElement(data(ADDR_SETTINGS_ELEMENT)).updateConfig(ctx.config(), err);
 }
