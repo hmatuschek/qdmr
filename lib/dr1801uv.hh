@@ -4,7 +4,7 @@
  * for the BTECH DR-1801UV. This device is also known as BF-1801 A6 and is a completely different
  * device than the well known DM-1801. The former uses the Auctu A6 radio-on-a-chip.
  *
- * @ingroup dsc */
+ * @ingroup auctus */
 #ifndef DR1801UV_HH
 #define DR1801UV_HH
 

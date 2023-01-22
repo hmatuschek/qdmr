@@ -1,3 +1,5 @@
+/** @defgroup auctus Auctus A6/A7 Based devices.
+ * @ingroup dsc */
 #include "auctus_a6_interface.hh"
 #include <QMetaEnum>
 #include <QtEndian>
