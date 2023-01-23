@@ -1345,6 +1345,11 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! decodeScanLists(ctx, err)) {
+    errMsg(err) << "Cannot decode scan list elements.";
+    return false;
+  }
+
   return true;
 }
 
@@ -1367,6 +1372,11 @@ DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! linkZones(ctx, err)) {
     errMsg(err) << "Cannot link zones.";
+    return false;
+  }
+
+  if (! linkScanLists(ctx, err)) {
+    errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
