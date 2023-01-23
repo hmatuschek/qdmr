@@ -19,25 +19,21 @@
  *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
- *  <tr><td>0x00000</td> <td>0x00000</td>  <td>0x0000</td>  <td></td></tr>
- *  <tr><td>0x003b4</td> <td>0x00418</td>  <td>0x0064</td>  <td>General settings, see
- *      @cDR1801UVCodeplug::SettingsElement. </td></tr>
- *  <tr><td>0x00420</td> <td>0x04110</td>  <td>0x3cf0</td>  <td>150 zones, see
- *      @c DR1801UVCodeplug::ZoneElement. </td></tr>
- *  <tr><td>0x04110</td> <td>0x04274</td>  <td>0x0164</td>  <td>Message bank, see
+ *  <tr><td>0x00000</td> <td>0x00000</td>  <td>0x00000</td>  <td></td></tr>
+ *  <tr><td>0x003b4</td> <td>0x00418</td>  <td>0x00064</td>  <td>General settings, see
+ *      @c DR1801UVCodeplug::SettingsElement. </td></tr>
+ *  <tr><td>0x00418</td> <td>0x04110</td>  <td>0x00000</td>  <td>Zone bank, see
+ *      @c DR1801UVCodeplug::ZoneBankElement. </td></tr>
+ *  <tr><td>0x04110</td> <td>0x04274</td>  <td>0x00164</td>  <td>Message bank, see
  *      @c DR1801UVCodeplug::MessageBankElement. </td></tr>
- *  <tr><td>0x04330</td> <td>0x00008</td>  <td>0x0008</td>  <td>Number of contacts.</td></tr>
- *  <tr><td>0x04338</td> <td>0x0a338</td>  <td>0x6000</td>  <td>1024 contacts, see
- *      @c DR1801UVCodeplug::ContactElement. </td></tr>
- *  <tr><td>0x0a33c</td> <td>0x?????</td>  <td>0x????</td>  <td>?? scan lists, see
- *      @c DR1801UVCodeplug::ScanListElement. </td></tr>
- *  <tr><td>0x0a660</td> <td>0x17660</td>  <td>0xd000</td>  <td>1024 Channel settings.
- *      34h bytes each. Names are stored separately. See @c DR1801UVCodeplug::ChannelElement for
- *      details.</td></tr>
- *  <tr><td>0x17660</td> <td>0x1c660</td>  <td>0x5000</td>  <td>1024 Channel names, 20 ASCII chars,
- *      0-terminated. Unset/unused names are filled with 0.</td></tr>
- *  <tr><td>0x1c6e0</td> <td>0x1d7e0</td>  <td>0x1100</td>  <td>64 group lists. See
- *      @c DR1801UVCodeplug::GroupListElement.</td></tr>
+ *  <tr><td>0x04334</td> <td>0x0a338</td>  <td>0x06008</td>  <td>Contact bank, see
+ *      @c DR1801UVCodeplug::ContactBankElement. </td></tr>
+ *  <tr><td>0x0a338</td> <td>0x0a65c</td>  <td>0x00324</td>  <td>Scan-list bank, see
+ *      @c DR1801UVCodeplug::ScanListBankElement. </td></tr>
+ *  <tr><td>0x0a65c</td> <td>0x1c660</td>  <td>0x12004</td>  <td>Channel bank, see
+ *      @c DR1801UVCodeplug::ChannelBankElement. </td></tr>
+ *  <tr><td>0x1c6dc</td> <td>0x1d7e0</td>  <td>0x01104</td>  <td>Group list bank, see
+ *      @c DR1801UVCodeplug::GroupListBankElement. </td></tr>
  * </table>
  *
  * @ingroup dr1801uv */
@@ -237,6 +233,43 @@ public:
     virtual bool linkChannelObj(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack()) const;
   };
 
+  /** Implements the binary encoding of the channel bank.
+   *
+   * Holds up to 1024 @c DR1801UVCodeplug::ChannelElement.
+   *
+   * Memory representation of the channel bank (12004h bytes):
+   * @verbinclude dr1801uv_channelbankelement.txt */
+  class ChannelBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ChannelBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the number of channels. */
+    virtual unsigned int channelCount() const;
+    /** Sets the number of channels. */
+    virtual void setChannelCount(unsigned int count);
+
+    /** Returns a reference to the channel element that the given index. */
+    virtual ChannelElement channel(unsigned int index) const;
+
+    /** Returns the name of the channel at the given index. */
+    virtual QString channelName(unsigned int index) const;
+    /** Sets the name of the channel at the given index. */
+    virtual void setChannelName(unsigned int index, const QString &name);
+
+    /** Decodes all defined channels. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links channels. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+  };
+
 
   /** Implements the binary encoding of a contact.
    *
@@ -291,6 +324,44 @@ public:
     virtual bool linkContactObj(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
+  /** Implements the binary encoding of the contact bank.
+   *
+   * The bank holds the list of all contacts defined. See @c DR1801UVCodeplug::ContactElement for
+   * details.
+   *
+   * Memory representation of the contact bank (6008h bytes):
+   * @verbinclude dr1801uv_contactbankelement.txt */
+  class ContactBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ContactBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the number of contacts. */
+    virtual unsigned int contactCount() const;
+    /** Sets the number of contacts. */
+    virtual void setContactCount(unsigned int count);
+
+    /** Returns the index of the first contact. */
+    virtual unsigned int firstIndex() const;
+    /** Sets the index of the first element. */
+    virtual void setFirstIndex(unsigned int index);
+
+    /** Returns a reference to the n-th contact. */
+    virtual ContactElement contact(unsigned int index) const;
+
+    /** Decodes all contacts and stores them into the given context and config. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links all contacts. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+  };
+
 
   /** Implements the binary encoding of a group list.
    *
@@ -329,6 +400,36 @@ public:
     virtual RXGroupList *toGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the group list object. */
     virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
+  /** Implements the binary encoding of the group-list bank.
+   *
+   * Memory representation of the group-list bank (??h bytes):
+   * @verbinclude dr1801uv_grouplistbankelement.txt */
+  class GroupListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the number of group lists defined. */
+    virtual unsigned int groupListCount() const;
+    /** Sets the number of group lists. */
+    virtual void setGroupListCount(unsigned int count);
+
+    /** Returns a reference to the group list at the given index. */
+    virtual GroupListElement groupList(unsigned int index) const;
+
+    /** Decodes all group lists. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all group lists. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
 
@@ -371,6 +472,37 @@ public:
     /** Links the zone object. */
     virtual bool linkZoneObj(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
   };
+
+  /** Implements the binary encoding of the zone bank.
+   *
+   * Memory representation of the zone bank (3cf8h bytes):
+   * @verbinclude dr1801uv_zonebankelement.txt */
+  class ZoneBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ZoneBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the number of zones. */
+    virtual unsigned int zoneCount() const;
+    /** Sets the number of zones. */
+    virtual void setZoneCount(unsigned int count);
+
+    /** Returns a reference to the n-th zone. */
+    virtual ZoneElement zone(unsigned int index) const;
+
+    /** Decodes all zones. */
+    virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack()) const;
+    /** Links all zones. */
+    virtual bool link(Context &ctx, const ErrorStack &err = ErrorStack()) const;
+  };
+
 
   /** Implements the binary encoding of the settings element.
    *
@@ -627,6 +759,7 @@ public:
     virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
   };
 
+
   /** Implements the binary encoding of a scan list element.
    *
    * Memory representation of a scan list element (50h bytes):
@@ -708,17 +841,95 @@ public:
     virtual bool linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
+  /** Implements the binary encoding of the scan-list bank.
+   *
+   * Holds up to 10 @c DR1801UVCodeplug::ScanListElement.
+   *
+   * Memory representation of the scan list bank (324h bytes):
+   * @verbinclude dr1801uv_scanlistbankelement.txt */
+  class ScanListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the number of scan lists. */
+    virtual unsigned int scanListCount() const;
+    /** Sets the number of scan lists. */
+    virtual void setScanListCount(unsigned int count);
+
+    /** Returns a reference to the n-th scan list. */
+    virtual ScanListElement scanList(unsigned int index) const;
+
+    /** Decodes all scan lists. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the scan lists. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
+
+  /** Implements the binary representation of a single message.
+   *
+   * Memory representation of the message element (44h bytes):
+   * @verbinclude dr1801uv_messageelement.txt */
+  class MessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageElement(uint8_t *ptr);
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the index of the message. */
+    virtual unsigned int index() const;
+    /** Sets the index of the message. */
+    virtual void setIndex(unsigned int index);
+
+    /** Returns the message text. */
+    virtual QString text() const;
+    /** Sets the message text. */
+    virtual void setText(const QString &text);
+  };
+
   /** Implements the binary encoding of the preset message bank element.
    *
-   * Memory representation of the message bank element (4h bytes):
+   * The message bank contains all messages defined. See @c DR1801UVCodeplug::MessageElement for
+   * details.
+   *
+   * Memory representation of the message bank element (164h bytes):
    * @verbinclude dr1801uv_messagebankelement.txt */
-  class MessageBankElemnt: public Element {
+  class MessageBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBankElement(uint8_t *ptr, size_t size);
 
+  public:
+    /** Constructor. */
+    MessageBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Retunrs the number of elements in the bank. */
+    virtual unsigned int messageCount() const;
+    /** Sets the number of messages. */
+    virtual void setMessageCount(unsigned int count);
+
+    /** Returns a reference to the n-th message. */
+    virtual MessageElement message(unsigned int n) const;
   };
 
-  class MessageElement: public Element {
-
-  };
 
 public:
   /** Default constructor. */
@@ -733,35 +944,6 @@ protected:
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link decoded elements. */
   virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode channel elements. */
-  virtual bool decodeChannels(Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Link channel elements. */
-  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode contact elements. */
-  virtual bool decodeContacts(Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Link contact elements. */
-  virtual bool linkContacts(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode group list elements. */
-  virtual bool decodeGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Link group lists. */
-  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode zone elements. */
-  virtual bool decodeZones(Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Link zones. */
-  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode settings element. */
-  virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
-
-  /** Decode scan-list elements. */
-  virtual bool decodeScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
-  /** Link scan-lists. */
-  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
-
 };
 
 #endif // DR1801UVCODEPLUG_HH

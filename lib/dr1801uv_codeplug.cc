@@ -4,31 +4,130 @@
 
 #define TOTAL_SIZE 0x0001dd90
 
-#define NUM_CHANNELS                1024
-#define ADDR_CHANNEL_ELEMENTS    0x0a660
-#define CHANNEL_ELEMENT_SIZE     0x00034
-#define ADDR_CHANNEL_NAMES       0x17660
-#define CHANNEL_NAME_SIZE        0x00014
+#define NUM_CHANNELS                 1024
+#define ADDR_CHANNEL_BANK         0x0a65c
+#define CHANNEL_BANK_SIZE         0x12004
+#define CHANNEL_OFFSET            0x00004
+#define CHANNEL_ELEMENT_SIZE      0x00034
+#define CHANNEL_NAME_OFFSET       0x0d004
+#define CHANNEL_NAME_SIZE         0x00014
 
-#define NUM_CONTACTS                1024
-#define ADDR_CONTACT_ELEMENTS    0x04338
-#define CONTACT_ELEMENT_SIZE     0x00018
+#define NUM_CONTACTS                 1024
+#define ADDR_CONTACT_BANK         0x04334
+#define CONTACT_BANK_SIZE         0x06004
+#define CONTACT_ELEMENT_SIZE      0x00018
 
-#define NUM_GROUP_LISTS               64
-#define ADDR_GROUP_LIST_ELEMENTS 0x1c6e0
-#define GROUP_LIST_ELEMENT_SIZE  0x00044
-#define GROUP_LIST_MEMBER_COUNT       10
+#define NUM_GROUP_LISTS                64
+#define ADDR_GROUP_LIST_BANK      0x1c6dc
+#define GROUP_LIST_BANK_SIZE      0x01104
+#define GROUP_LIST_OFFSET         0x00004
+#define GROUP_LIST_ELEMENT_SIZE   0x00044
+#define GROUP_LIST_MEMBER_COUNT        10
 
-#define NUM_ZONES                    150
-#define ADDR_ZONE_ELEMENTS       0x00420
-#define ZONE_ELEMENT_SIZE        0x00068
+#define NUM_ZONES                     150
+#define ADDR_ZONE_BANK            0x00418
+#define ZONE_BANK_SIZE            0x03cf8
+#define ADDR_ZONE_ELEMENTS        0x00420
+#define ZONE_ELEMENT_SIZE         0x00068
 
-#define ADDR_SETTINGS_ELEMENT    0x003b4
-#define SETTINGS_ELEMENT_SIZE    0x00064
+#define ADDR_SETTINGS_ELEMENT     0x003b4
+#define SETTINGS_ELEMENT_SIZE     0x00064
 
-#define NUM_SCAN_LISTS                10
-#define ADDR_SCAN_LIST_ELEMENTS  0x0a33c
-#define SCAN_LIST_ELEMENT_SIZE   0x00050
+#define NUM_SCAN_LISTS                 10
+#define ADDR_SCAN_LIST_BANK       0x0a338
+#define SCAN_LIST_BANK_SIZE       0x00324
+#define SCAN_LIST_ELEMENT_SIZE    0x00050
+
+#define NUM_MESSAGES                    8
+#define ADDR_MESSAGE_BANK         0x04110
+#define MESSAGE_BANK_SIZE         0x00164
+#define MESSAGE_ELEMENT_SIZE      0x00044
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ChannelBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr)
+  : Element(ptr, CHANNEL_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ChannelBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::ChannelBankElement::channelCount() const {
+  return getUInt16_le(0x0000);
+}
+void
+DR1801UVCodeplug::ChannelBankElement::setChannelCount(unsigned int count) {
+  count = std::min((unsigned int)NUM_CHANNELS, count);
+  setUInt16_le(0x0000, count);
+}
+
+DR1801UVCodeplug::ChannelElement
+DR1801UVCodeplug::ChannelBankElement::channel(unsigned int index) const {
+  return ChannelElement(_data + CHANNEL_OFFSET + index*CHANNEL_ELEMENT_SIZE);
+}
+
+QString
+DR1801UVCodeplug::ChannelBankElement::channelName(unsigned int index) const {
+  return readASCII(CHANNEL_NAME_OFFSET + index*CHANNEL_NAME_SIZE, CHANNEL_NAME_SIZE, 0x00);
+}
+void
+DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const QString &name) {
+  writeASCII(CHANNEL_NAME_OFFSET + index*CHANNEL_NAME_SIZE, name, CHANNEL_NAME_SIZE, 0x00);
+}
+
+bool
+DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (int i=0; i<channelCount(); i++) {
+    ChannelElement ch = channel(i);
+    if (! ch.isValid()) {
+      errMsg(err) << "Cannot decode invalid channel at index " << i
+                  << ", got promissed " << channelCount() << " valid channels.";
+      return false;
+    }
+    Channel *obj = ch.toChannelObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode channel at index " << i << ".";
+      return false;
+    }
+    // Add channel to context and config
+    ctx.add(obj, ch.index());
+    ctx.config()->channelList()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) const {
+  for (int i=0; i<channelCount(); i++) {
+    ChannelElement ch = channel(i);
+    if (! ctx.has<Channel>(ch.index())) {
+      errMsg(err) << "Cannot link channel at index " << i
+                  << ". Channel not defined.";
+      return false;
+    }
+    Channel *obj = ctx.get<Channel>(ch.index());
+    if (ch.linkChannelObj(obj, ctx, err)) {
+      errMsg(err) << "Cannot link channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
 
 
 /* ******************************************************************************************** *
@@ -453,6 +552,96 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ContactBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr)
+  : Element(ptr, CONTACT_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ContactBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::ContactBankElement::contactCount() const {
+  return getUInt16_le(0x0000);
+}
+void
+DR1801UVCodeplug::ContactBankElement::setContactCount(unsigned int count) {
+  count = std::min((unsigned int)NUM_CONTACTS, count);
+  setUInt16_le(0x0000, count);
+}
+
+unsigned int
+DR1801UVCodeplug::ContactBankElement::firstIndex() const {
+  return getUInt16_le(0x0002)-1;
+}
+void
+DR1801UVCodeplug::ContactBankElement::setFirstIndex(unsigned int index) {
+  setUInt16_le(0x0002, index+1);
+}
+
+DR1801UVCodeplug::ContactElement
+DR1801UVCodeplug::ContactBankElement::contact(unsigned int index) const {
+  return ContactElement(_data + 4 + index*CONTACT_ELEMENT_SIZE);
+}
+
+bool
+DR1801UVCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  if (0 == contactCount())
+    return true;
+
+  unsigned int currentIndex = firstIndex();
+  while (true) {
+    ContactElement currentContact = contact(currentIndex);
+    DMRContact *obj = currentContact.toContactObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode contact element at index " << currentIndex;
+      return false;
+    }
+    // Add to context and config
+    ctx.add(obj, currentIndex);
+    ctx.config()->contacts()->add(obj);
+    // continue with successor
+    if (currentContact.hasSuccessor())
+      currentIndex = currentContact.successorIndex();
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ContactBankElement::link(Context &ctx, const ErrorStack &err) const {
+  if (0 == contactCount())
+    return true;
+
+  unsigned int currentIndex = firstIndex();
+  while (true) {
+    ContactElement currentContact = contact(currentIndex);
+    if (! ctx.has<DMRContact>(currentIndex)) {
+      errMsg(err) << "Cannot link contact at index " << currentIndex << ", not defined.";
+    }
+    DMRContact *obj = ctx.get<DMRContact>(currentIndex);
+    if (! currentContact.linkContactObj(obj, ctx, err)) {
+      errMsg(err) << "Cannot link contact element at index " << currentIndex;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ContactElement
  * ******************************************************************************************** */
 DR1801UVCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
@@ -553,6 +742,82 @@ DR1801UVCodeplug::ContactElement::linkContactObj(DMRContact *contact, Context &c
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::GroupListBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
+  : Element(ptr, GROUP_LIST_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::GroupListBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::GroupListBankElement::groupListCount() const {
+  return getUInt8(0x0000);
+}
+void
+DR1801UVCodeplug::GroupListBankElement::setGroupListCount(unsigned int count) {
+  count = std::min((unsigned int)NUM_GROUP_LISTS, count);
+  setUInt8(0x0000, count);
+}
+
+DR1801UVCodeplug::GroupListElement
+DR1801UVCodeplug::GroupListBankElement::groupList(unsigned int index) const {
+  return GroupListElement(_data + GROUP_LIST_OFFSET + index*GROUP_LIST_ELEMENT_SIZE);
+}
+
+bool
+DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<groupListCount(); i++) {
+    GroupListElement gl = groupList(i);
+    if (! gl.isValid()) {
+      errMsg(err) << "Cannot decode invalid group list at index " << i
+                  << ". Got " << groupListCount() << " valid group lists promissed.";
+      return false;
+    }
+    RXGroupList *obj = gl.toGroupListObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode group list at index " << i << ".";
+      return false;
+    }
+    // Add group list to context and config
+    ctx.add(obj, gl.index());
+    ctx.config()->rxGroupLists()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<groupListCount(); i++) {
+    GroupListElement gl = groupList(i);
+    if (! ctx.has<RXGroupList>(gl.index())) {
+      errMsg(err) << "Cannot link group list at index " << i
+                  << ". Group list not defined.";
+      return false;
+    }
+    if (! gl.linkGroupListObj(ctx.get<RXGroupList>(gl.index()), ctx, err)) {
+      errMsg(err) << "Cannot link group list at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::GroupListElement
  * ******************************************************************************************** */
 DR1801UVCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
@@ -627,6 +892,91 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
       return false;
     }
     list->addContact(ctx.get<DMRContact>(memberIndex(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ZoneBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
+  : Element(ptr, ZONE_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ZoneBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::ZoneBankElement::zoneCount() const {
+  return getUInt8(0x0000);
+}
+void
+DR1801UVCodeplug::ZoneBankElement::setZoneCount(unsigned int count) {
+  count = std::min((unsigned int)NUM_ZONES, count);
+  setUInt8(0x0000, count);
+}
+
+DR1801UVCodeplug::ZoneElement
+DR1801UVCodeplug::ZoneBankElement::zone(unsigned int index) const {
+  return ZoneElement(_data + 8 + index*ZONE_ELEMENT_SIZE);
+}
+
+bool
+DR1801UVCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i=0; i<zoneCount(); i++) {
+    ZoneElement zone(this->zone(i));
+    if (! zone.isValid()) {
+      errMsg(err) << "Unexpected invalid zone at index " << i
+                  << ", was promissed " << zoneCount() << " zones.";
+      return false;
+    }
+
+    Zone *obj = zone.toZoneObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot create zone at index " << i << ".";
+      return false;
+    }
+
+    // Store zone in context
+    ctx.add(obj, zone.index());
+    // Store zone in config
+    ctx.config()->zones()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i=0; i<zoneCount(); i++) {
+    ZoneElement zone(this->zone(i));
+    if (! zone.isValid()) {
+      errMsg(err) << "Unexpected invalid zone at index " << i
+                  << ", was promissed " << zoneCount() << " zones.";
+      return false;
+    }
+
+    if (! ctx.has<Zone>(zone.index())) {
+      errMsg(err) << "Cannot link zone at index " << i << ", not defined.";
+      return false;
+    }
+
+    if (! zone.linkZoneObj(ctx.get<Zone>(zone.index()), ctx, err)) {
+      errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
   }
 
   return true;
@@ -721,7 +1071,6 @@ DR1801UVCodeplug::ZoneElement::linkZoneObj(Zone *obj, Context &ctx, const ErrorS
 
   return true;
 }
-
 
 
 /* ******************************************************************************************** *
@@ -1120,6 +1469,87 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ScanListBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
+  : Element(ptr, SCAN_LIST_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ScanListBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::ScanListBankElement::scanListCount() const {
+  return getUInt8(0x0000);
+}
+void
+DR1801UVCodeplug::ScanListBankElement::setScanListCount(unsigned int count) {
+  count = std::min((unsigned int)NUM_SCAN_LISTS, count);
+  setUInt8(0x0000, count);
+}
+
+DR1801UVCodeplug::ScanListElement
+DR1801UVCodeplug::ScanListBankElement::scanList(unsigned int index) const {
+  return ScanListElement(_data + 4 + index*SCAN_LIST_ELEMENT_SIZE);
+}
+
+bool
+DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<scanListCount(); i++) {
+    ScanListElement sl = scanList(i);
+    if (! sl.isValid()) {
+      errMsg(err) << "Cannot decode invalid scan list at index " << i
+                  << ". Was promissed " << scanListCount() << " scan lists.";
+      return false;
+    }
+    ScanList *obj = sl.toScanListObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode scan list at index " << i << ".";
+      return false;
+    }
+    // Add scan list to ctx and config
+    ctx.add(obj, sl.index());
+    ctx.config()->scanlists()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<scanListCount(); i++) {
+    ScanListElement sl = scanList(i);
+    if (! sl.isValid()) {
+      errMsg(err) << "Cannot link invalid scan list at index " << i
+                  << ". Was promissed " << scanListCount() << " scan lists.";
+      return false;
+    }
+    if (! ctx.has<ScanList>(sl.index())) {
+      errMsg(err) << "Cannot link scan list at index " << i
+                  << ". Scan list not defined.";
+      return false;
+    }
+    if (! sl.linkScanListObj(ctx.get<ScanList>(sl.index()), ctx, err)) {
+      errMsg(err) << "Cannot link scan list at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ScanListElement
  * ******************************************************************************************** */
 DR1801UVCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, size_t size)
@@ -1282,6 +1712,86 @@ DR1801UVCodeplug::ScanListElement::linkScanListObj(ScanList *obj, Context &ctx, 
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::MessageBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, MESSAGE_BANK_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::MessageBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::MessageBankElement::messageCount() const {
+  return getUInt8(0x0000);
+}
+void
+DR1801UVCodeplug::MessageBankElement::setMessageCount(unsigned int count) {
+  setUInt8(0x0000, count);
+}
+
+DR1801UVCodeplug::MessageElement
+DR1801UVCodeplug::MessageBankElement::message(unsigned int n) const {
+  return MessageElement(_data + 4 + n*MESSAGE_ELEMENT_SIZE);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::MessageElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, MESSAGE_ELEMENT_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::MessageElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::MessageElement::isValid() const {
+  return 0x00 != getUInt8(0x0000);
+}
+
+unsigned int
+DR1801UVCodeplug::MessageElement::index() const {
+  return getUInt8(0x0000)-1;
+}
+void
+DR1801UVCodeplug::MessageElement::setIndex(unsigned int index) {
+  setUInt8(0x0000, index+1);
+}
+
+QString
+DR1801UVCodeplug::MessageElement::text() const {
+  return readASCII(0x0004, 64, 0x00);
+}
+void
+DR1801UVCodeplug::MessageElement::setText(const QString &text) {
+  setUInt8(0x0001, std::min(64, text.length()));
+  writeASCII(0x0004, text, 64, 0x00);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
@@ -1320,32 +1830,32 @@ DR1801UVCodeplug::decode(Config *config, const ErrorStack &err) {
 
 bool
 DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
-  if (! decodeChannels(ctx, err)) {
+  if (! ChannelBankElement(data(ADDR_CHANNEL_BANK)).decode(ctx, err)) {
     errMsg(err) << "Cannot decode channel elements.";
     return false;
   }
 
-  if (! decodeContacts(ctx, err)) {
+  if (! ContactBankElement(data(ADDR_CONTACT_BANK)).decode(ctx, err)) {
     errMsg(err) << "Cannot decode contact elements.";
     return false;
   }
 
-  if (! decodeGroupLists(ctx, err)) {
+  if (! GroupListBankElement(data(ADDR_GROUP_LIST_BANK)).decode(ctx, err)) {
     errMsg(err) << "Cannot decode group list elements.";
     return false;
   }
 
-  if (! decodeZones(ctx, err)) {
+  if (! ZoneBankElement(data(ADDR_ZONE_BANK)).decode(ctx, err)) {
     errMsg(err) << "Cannot decode zone elements.";
     return false;
   }
 
-  if (! decodeSettings(ctx, err)) {
+  if (! SettingsElement(data(ADDR_SETTINGS_ELEMENT)).updateConfig(ctx.config(), err)) {
     errMsg(err) << "Cannot decode settings element.";
     return false;
   }
 
-  if (! decodeScanLists(ctx, err)) {
+  if (! ScanListBankElement(data(ADDR_SCAN_LIST_BANK)).decode(ctx, err)) {
     errMsg(err) << "Cannot decode scan list elements.";
     return false;
   }
@@ -1355,27 +1865,27 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
 
 bool
 DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
-  if (! linkChannels(ctx, err)) {
+  if (! ChannelBankElement(data(ADDR_CHANNEL_BANK)).link(ctx, err)) {
     errMsg(err) << "Cannot link channels.";
     return false;
   }
 
-  if (! linkContacts(ctx, err)) {
+  if (! ContactBankElement(data(ADDR_CONTACT_BANK)).link(ctx, err)) {
     errMsg(err) << "Cannot link contacts.";
     return false;
   }
 
-  if (! linkGroupLists(ctx, err)) {
+  if (! GroupListBankElement(data(ADDR_GROUP_LIST_BANK)).link(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
-  if (! linkZones(ctx, err)) {
+  if (! ZoneBankElement(data(ADDR_ZONE_BANK)).link(ctx, err)) {
     errMsg(err) << "Cannot link zones.";
     return false;
   }
 
-  if (! linkScanLists(ctx, err)) {
+  if (! ScanListBankElement(data(ADDR_SCAN_LIST_BANK)).link(ctx, err)) {
     errMsg(err) << "Cannot link scan lists.";
     return false;
   }
@@ -1383,272 +1893,4 @@ DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-
-bool
-DR1801UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
-  // Decode all channel elements
-  for (int i=0; i<NUM_CHANNELS; i++) {
-    ChannelElement ch(data(ADDR_CHANNEL_ELEMENTS + i*CHANNEL_ELEMENT_SIZE));
-
-    // Skip invalid channels
-    if (! ch.isValid())
-      continue;
-
-    // Decode channel settings
-    Channel *obj = ch.toChannelObj(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot decode channel at index " << i << ".";
-      return false;
-    }
-
-    // Decode channel name
-    uint8_t *name_ptr = data(ADDR_CHANNEL_NAMES + i*CHANNEL_NAME_SIZE);
-    obj->setName(decode_ascii(name_ptr, CHANNEL_NAME_SIZE, 0x00));
-
-    // Add channel to index table
-    ctx.add(obj, ch.index());
-    // Add channel to config
-    ctx.config()->channelList()->add(obj);
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  // link all channel elements
-  for (int i=0; i<NUM_CHANNELS; i++) {
-    ChannelElement ch(data(ADDR_CHANNEL_ELEMENTS + i*CHANNEL_ELEMENT_SIZE));
-
-    // Skip invalid channels
-    if (! ch.isValid())
-      continue;
-
-    // Link channel if defined
-    if (! ctx.has<Channel>(ch.index()))
-      continue;
-
-    // Decode channel settings
-    if (! ch.linkChannelObj(ctx.get<Channel>(ch.index()), ctx, err)) {
-      errMsg(err) << "Cannot link channel '" << ctx.get<Channel>(ch.index())->name()
-                  << " at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-bool
-DR1801UVCodeplug::decodeContacts(Context &ctx, const ErrorStack &err) {
-  // Decode all contact elements
-  for (int i=0; i<NUM_CONTACTS; i++) {
-    ContactElement con(data(ADDR_CONTACT_ELEMENTS + i*CONTACT_ELEMENT_SIZE));
-
-    // Skip invalid contacts
-    if (! con.isValid())
-      continue;
-
-    // Decode contact
-    DMRContact *obj = con.toContactObj(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot decode contact at index " << i << ".";
-      return false;
-    }
-
-    // Add contact to index table
-    ctx.add(obj, i);
-    // Add contact to config
-    ctx.config()->contacts()->add(obj);
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::linkContacts(Context &ctx, const ErrorStack &err) {
-  // link all contact elements
-  for (int i=0; i<NUM_CONTACTS; i++) {
-    ContactElement con(data(ADDR_CONTACT_ELEMENTS + i*CONTACT_ELEMENT_SIZE));
-
-    // Skip invalid contacts
-    if (! con.isValid())
-      continue;
-
-    // Link contact if defined
-    if (! ctx.has<DMRContact>(i))
-      continue;
-
-    // Link contact
-    if (! con.linkContactObj(ctx.get<DMRContact>(i), ctx, err)) {
-      errMsg(err) << "Cannot link contact '" << ctx.get<Contact>(i)->name()
-                  << " at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-bool
-DR1801UVCodeplug::decodeGroupLists(Context &ctx, const ErrorStack &err) {
-  // Decode all group list elements
-  for (int i=0; i<NUM_GROUP_LISTS; i++) {
-    GroupListElement gl(data(ADDR_GROUP_LIST_ELEMENTS + i*GROUP_LIST_ELEMENT_SIZE));
-
-    // Skip invalid group lists
-    if (! gl.isValid())
-      continue;
-
-    // Decode group list
-    RXGroupList *obj = gl.toGroupListObj(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot decode group list at index " << i << ".";
-      return false;
-    }
-    logDebug() << "Register group list at index " << gl.index();
-
-    // Add group list to index table
-    ctx.add(obj, gl.index());
-    // Add group list to config
-    ctx.config()->rxGroupLists()->add(obj);
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
-  // link all group lists
-  for (int i=0; i<NUM_GROUP_LISTS; i++) {
-    GroupListElement gl(data(ADDR_GROUP_LIST_ELEMENTS + i*GROUP_LIST_ELEMENT_SIZE));
-
-    // Skip invalid group lists
-    if (! gl.isValid())
-      continue;
-
-    // Link group list if defined
-    if (! ctx.has<RXGroupList>(gl.index()))
-      continue;
-
-    // Link contact
-    if (! gl.linkGroupListObj(ctx.get<RXGroupList>(i), ctx, err)) {
-      errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i)->name()
-                  << " at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-bool
-DR1801UVCodeplug::decodeZones(Context &ctx, const ErrorStack &err) {
-  // Decode all zone elements
-  for (int i=0; i<NUM_ZONES; i++) {
-    ZoneElement zone(data(ADDR_ZONE_ELEMENTS + i*ZONE_ELEMENT_SIZE));
-
-    // Skip invalid zones
-    if (! zone.isValid())
-      continue;
-
-    // Decode zone
-    Zone *obj = zone.toZoneObj(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot decode zone at index " << i << ".";
-      return false;
-    }
-
-    // Add zone to index table
-    ctx.add(obj, zone.index());
-    // Add zone to config
-    ctx.config()->zones()->add(obj);
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
-  // link all zones
-  for (int i=0; i<NUM_ZONES; i++) {
-    ZoneElement zone(data(ADDR_ZONE_ELEMENTS + i*ZONE_ELEMENT_SIZE));
-
-    // Skip invalid zones
-    if (! zone.isValid())
-      continue;
-
-    // Link zone if defined
-    if (! ctx.has<Zone>(zone.index()))
-      continue;
-
-    // Link contact
-    if (! zone.linkZoneObj(ctx.get<Zone>(i), ctx, err)) {
-      errMsg(err) << "Cannot link zone '" << ctx.get<Zone>(i)->name()
-                  << " at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::decodeSettings(Context &ctx, const ErrorStack &err) {
-  return SettingsElement(data(ADDR_SETTINGS_ELEMENT)).updateConfig(ctx.config(), err);
-}
-
-bool
-DR1801UVCodeplug::decodeScanLists(Context &ctx, const ErrorStack &err) {
-  // Decode all scan-list elements
-  for (int i=0; i<NUM_SCAN_LISTS; i++) {
-    ScanListElement sl(data(ADDR_SCAN_LIST_ELEMENTS + i*SCAN_LIST_ELEMENT_SIZE));
-
-    // Skip invalid scan lists
-    if (! sl.isValid())
-      continue;
-
-    // Decode scan list
-    ScanList *obj = sl.toScanListObj(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot decode scan list at index " << i << ".";
-      return false;
-    }
-
-    // Add scan list to index table
-    ctx.add(obj, sl.index());
-    // Add scan list to config
-    ctx.config()->scanlists()->add(obj);
-  }
-
-  return true;
-}
-
-bool
-DR1801UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
-  // link all scan lists
-  for (int i=0; i<NUM_SCAN_LISTS; i++) {
-    ScanListElement sl(data(ADDR_SCAN_LIST_ELEMENTS + i*SCAN_LIST_ELEMENT_SIZE));
-
-    // Skip invalid scan lists
-    if (! sl.isValid())
-      continue;
-
-    // Link scan list if defined
-    if (! ctx.has<ScanList>(sl.index()))
-      continue;
-
-    // Link scan list
-    if (! sl.linkScanListObj(ctx.get<ScanList>(i), ctx, err)) {
-      errMsg(err) << "Cannot link scan list '" << ctx.get<ScanList>(i)->name()
-                  << " at index " << i << ".";
-      return false;
-    }
-  }
-
-  return true;
-}
 
