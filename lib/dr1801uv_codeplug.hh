@@ -24,6 +24,8 @@
  *      @cDR1801UVCodeplug::SettingsElement. </td></tr>
  *  <tr><td>0x00420</td> <td>0x04110</td>  <td>0x3cf0</td>  <td>150 zones, see
  *      @c DR1801UVCodeplug::ZoneElement. </td></tr>
+ *  <tr><td>0x04110</td> <td>0x04274</td>  <td>0x0164</td>  <td>Message bank, see
+ *      @c DR1801UVCodeplug::MessageBankElement. </td></tr>
  *  <tr><td>0x04330</td> <td>0x00008</td>  <td>0x0008</td>  <td>Number of contacts.</td></tr>
  *  <tr><td>0x04338</td> <td>0x0a338</td>  <td>0x6000</td>  <td>1024 contacts, see
  *      @c DR1801UVCodeplug::ContactElement. </td></tr>
@@ -704,6 +706,18 @@ public:
     virtual ScanList *toScanListObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the scan-list object. */
     virtual bool linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
+  /** Implements the binary encoding of the preset message bank element.
+   *
+   * Memory representation of the message bank element (4h bytes):
+   * @verbinclude dr1801uv_messagebankelement.txt */
+  class MessageBankElemnt: public Element {
+
+  };
+
+  class MessageElement: public Element {
+
   };
 
 public:
