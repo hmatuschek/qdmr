@@ -27,6 +27,8 @@
  *  <tr><td>0x04330</td> <td>0x00008</td>  <td>0x0008</td>  <td>Number of contacts.</td></tr>
  *  <tr><td>0x04338</td> <td>0x0a338</td>  <td>0x6000</td>  <td>1024 contacts, see
  *      @c DR1801UVCodeplug::ContactElement. </td></tr>
+ *  <tr><td>0x0a33c</td> <td>0x?????</td>  <td>0x????</td>  <td>?? scan lists, see
+ *      @c DR1801UVCodeplug::ScanListElement. </td></tr>
  *  <tr><td>0x0a660</td> <td>0x17660</td>  <td>0xd000</td>  <td>1024 Channel settings.
  *      34h bytes each. Names are stored separately. See @c DR1801UVCodeplug::ChannelElement for
  *      details.</td></tr>
@@ -370,7 +372,7 @@ public:
 
   /** Implements the binary encoding of the settings element.
    *
-   * Memory representation of settings element (??h bytes):
+   * Memory representation of settings element (64h bytes):
    * @verbinclude dr1801uv_settingselement.txt */
   class SettingsElement: public Element
   {
@@ -623,6 +625,87 @@ public:
     virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
   };
 
+  /** Implements the binary encoding of a scan list element.
+   *
+   * Memory representation of a scan list element (50h bytes):
+   * @verbinclude dr1801uv_scanlistelement.txt */
+  class ScanListElement: public Element
+  {
+  public:
+    /** Possible priority channel modes. */
+    enum class PriorityChannel {
+      None = 0, Fixed = 1, Selected = 2
+    };
+
+    /** Possible revert channel modes. */
+    enum class RevertChannel {
+      LastActive = 0, Fixed = 1, Selected = 2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ScanListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr);
+
+    bool isValid() const;
+    void clear();
+
+    /** Retunrs the index of the scan list. */
+    virtual unsigned int index() const;
+    /** Sets the index of the scan list. */
+    virtual void setIndex(unsigned int idx);
+
+    /** Returns the number of entries. */
+    virtual unsigned int entryCount() const;
+    /** Sets the number of entries. */
+    virtual void setEntryCount(unsigned int num);
+
+    /** Retunrs the priority channel 1 setting. */
+    virtual PriorityChannel priorityChannel1() const;
+    /** Sets the priority channel 1 setting. */
+    virtual void setPriorityChannel1(PriorityChannel mode);
+    /** Returns the priority channel 1 index. */
+    virtual unsigned int priorityChannel1Index() const;
+    /** Sets the priority channel 1 index. */
+    virtual void setPriorityChannel1Index(unsigned int index);
+
+    /** Retunrs the priority channel 2 setting. */
+    virtual PriorityChannel priorityChannel2() const;
+    /** Sets the priority channel 2 setting. */
+    virtual void setPriorityChannel2(PriorityChannel mode);
+    /** Returns the priority channel 2 index. */
+    virtual unsigned int priorityChannel2Index() const;
+    /** Sets the priority channel 2 index. */
+    virtual void setPriorityChannel2Index(unsigned int index);
+
+    /** Retunrs the revert channel setting. */
+    virtual RevertChannel revertChannel() const;
+    /** Sets the revert channel setting. */
+    virtual void setRevertChannel(RevertChannel mode);
+    /** Returns the revert channel index. */
+    virtual unsigned int revertChannelIndex() const;
+    /** Sets the revert channel index. */
+    virtual void setRevertChannelIndex(unsigned int index);
+
+    /** Returns the name of the scan list. */
+    virtual QString name() const;
+    /** Sets the name of the scan list. */
+    virtual void setName(const QString &name);
+
+    /** Returns the n-th entry index. */
+    virtual unsigned int entryIndex(unsigned int n);
+    /** Sets the n-th entry index. */
+    virtual void setEntryIndex(unsigned int n, unsigned int index);
+
+    /** Constructs a scan-list object from this element. */
+    virtual ScanList *toScanListObj(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the scan-list object. */
+    virtual bool linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
 public:
   /** Default constructor. */
   explicit DR1801UVCodeplug(QObject *parent = nullptr);
@@ -659,6 +742,11 @@ protected:
 
   /** Decode settings element. */
   virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Decode scan-list elements. */
+  virtual bool decodeScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link scan-lists. */
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
 };
 

@@ -26,6 +26,11 @@
 #define ADDR_SETTINGS_ELEMENT    0x003b4
 #define SETTINGS_ELEMENT_SIZE    0x00064
 
+#define NUM_SCAN_LISTS                10
+#define ADDR_SCAN_LIST_ELEMENTS  0x0a33c
+#define SCAN_LIST_ELEMENT_SIZE   0x00050
+
+
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelElement
  * ******************************************************************************************** */
@@ -1115,6 +1120,168 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::ScanListElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : Element(ptr, SCAN_LIST_ELEMENT_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::ScanListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::ScanListElement::isValid() const {
+  return 0 != getUInt8(0x0000); // Check index
+}
+
+unsigned int
+DR1801UVCodeplug::ScanListElement::index() const {
+  return getUInt8(0x0000)-1;
+}
+void
+DR1801UVCodeplug::ScanListElement::setIndex(unsigned int idx) {
+  setUInt8(0x0000, idx+1);
+}
+
+unsigned int
+DR1801UVCodeplug::ScanListElement::entryCount() const {
+  return getUInt8(0x0001);
+}
+void
+DR1801UVCodeplug::ScanListElement::setEntryCount(unsigned int num) {
+  setUInt8(0x0001, num);
+}
+
+DR1801UVCodeplug::ScanListElement::PriorityChannel
+DR1801UVCodeplug::ScanListElement::priorityChannel1() const {
+  return (PriorityChannel) getUInt8(0x0002);
+}
+void
+DR1801UVCodeplug::ScanListElement::setPriorityChannel1(PriorityChannel mode) {
+  setUInt8(0x0002, (uint8_t) mode);
+}
+unsigned int
+DR1801UVCodeplug::ScanListElement::priorityChannel1Index() const {
+  return getUInt16_le(0x0004);
+}
+void
+DR1801UVCodeplug::ScanListElement::setPriorityChannel1Index(unsigned int index) {
+  setUInt16_le(0x0004, index);
+}
+
+DR1801UVCodeplug::ScanListElement::PriorityChannel
+DR1801UVCodeplug::ScanListElement::priorityChannel2() const {
+  return (PriorityChannel) getUInt8(0x0003);
+}
+void
+DR1801UVCodeplug::ScanListElement::setPriorityChannel2(PriorityChannel mode) {
+  setUInt8(0x0003, (uint8_t) mode);
+}
+unsigned int
+DR1801UVCodeplug::ScanListElement::priorityChannel2Index() const {
+  return getUInt16_le(0x0006);
+}
+void
+DR1801UVCodeplug::ScanListElement::setPriorityChannel2Index(unsigned int index) {
+  setUInt16_le(0x0006, index);
+}
+
+DR1801UVCodeplug::ScanListElement::RevertChannel
+DR1801UVCodeplug::ScanListElement::revertChannel() const {
+  return (RevertChannel) getUInt8(0x0008);
+}
+void
+DR1801UVCodeplug::ScanListElement::setRevertChannel(RevertChannel mode) {
+  setUInt8(0x0008, (uint8_t) mode);
+}
+unsigned int
+DR1801UVCodeplug::ScanListElement::revertChannelIndex() const {
+  return getUInt16_le(0x000a);
+}
+void
+DR1801UVCodeplug::ScanListElement::setRevertChannelIndex(unsigned int index) {
+  setUInt16_le(0x000a, index);
+}
+
+QString
+DR1801UVCodeplug::ScanListElement::name() const {
+  return readASCII(0x0010, 32, 0x00);
+}
+void
+DR1801UVCodeplug::ScanListElement::setName(const QString &name) {
+  writeASCII(0x0010, name, 32, 0x00);
+}
+
+unsigned int
+DR1801UVCodeplug::ScanListElement::entryIndex(unsigned int n) {
+  return getUInt16_le(0x0030 + 2*n);
+}
+void
+DR1801UVCodeplug::ScanListElement::setEntryIndex(unsigned int n, unsigned int index) {
+  setUInt16_le(0x0030+2*n, index);
+}
+
+ScanList *
+DR1801UVCodeplug::ScanListElement::toScanListObj(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+  return new ScanList(name());
+}
+
+bool
+DR1801UVCodeplug::ScanListElement::linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err) {
+  // Link priority channels.
+  switch (priorityChannel1()) {
+  case PriorityChannel::Selected:
+    obj->setPrimaryChannel(SelectedChannel::get());
+    break;
+  case PriorityChannel::Fixed:
+    if (! ctx.has<Channel>(priorityChannel1Index())) {
+      errMsg(err) << "Cannot link to priority channel 1: Channel with index " << priorityChannel1Index() << " not defined.";
+      return false;
+    }
+    obj->setPrimaryChannel(ctx.get<Channel>(priorityChannel1Index()));
+    break;
+  case PriorityChannel::None: break;
+  }
+
+  switch (priorityChannel2()) {
+  case PriorityChannel::Selected:
+    obj->setSecondaryChannel(SelectedChannel::get());
+    break;
+  case PriorityChannel::Fixed:
+    if (! ctx.has<Channel>(priorityChannel2Index())) {
+      errMsg(err) << "Cannot link to priority channel 2: Channel with index " << priorityChannel2Index() << " not defined.";
+      return false;
+    }
+    obj->setSecondaryChannel(ctx.get<Channel>(priorityChannel2Index()));
+    break;
+  case PriorityChannel::None: break;
+  }
+
+  for (unsigned int i=0; i<entryCount(); i++) {
+    if (! ctx.has<Channel>(entryIndex(i))) {
+      errMsg(err) << "Cannot link scan-list entry " << i
+                  << ": Channel with index " << entryIndex(i) << " not defined.";
+      return false;
+    }
+    obj->addChannel(ctx.get<Channel>(entryIndex(i)));
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
@@ -1423,3 +1590,55 @@ bool
 DR1801UVCodeplug::decodeSettings(Context &ctx, const ErrorStack &err) {
   return SettingsElement(data(ADDR_SETTINGS_ELEMENT)).updateConfig(ctx.config(), err);
 }
+
+bool
+DR1801UVCodeplug::decodeScanLists(Context &ctx, const ErrorStack &err) {
+  // Decode all scan-list elements
+  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+    ScanListElement sl(data(ADDR_SCAN_LIST_ELEMENTS + i*SCAN_LIST_ELEMENT_SIZE));
+
+    // Skip invalid scan lists
+    if (! sl.isValid())
+      continue;
+
+    // Decode scan list
+    ScanList *obj = sl.toScanListObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode scan list at index " << i << ".";
+      return false;
+    }
+
+    // Add scan list to index table
+    ctx.add(obj, sl.index());
+    // Add scan list to config
+    ctx.config()->scanlists()->add(obj);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
+  // link all scan lists
+  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+    ScanListElement sl(data(ADDR_SCAN_LIST_ELEMENTS + i*SCAN_LIST_ELEMENT_SIZE));
+
+    // Skip invalid scan lists
+    if (! sl.isValid())
+      continue;
+
+    // Link scan list if defined
+    if (! ctx.has<ScanList>(sl.index()))
+      continue;
+
+    // Link scan list
+    if (! sl.linkScanListObj(ctx.get<ScanList>(i), ctx, err)) {
+      errMsg(err) << "Cannot link scan list '" << ctx.get<ScanList>(i)->name()
+                  << " at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
