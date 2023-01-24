@@ -494,6 +494,15 @@ public:
     /** Sets the number of zones. */
     virtual void setZoneCount(unsigned int count);
 
+    /** Returns the so-called up-zone index. */
+    virtual unsigned int upZoneIndex() const;
+    /** Sets the so-called up-zone index. */
+    virtual void setUpZoneIndex(unsigned int index);
+    /** Returns the so-called down-zone index. */
+    virtual unsigned int downZoneIndex() const;
+    /** Sets the so-called down-zone index. */
+    virtual void setDownZoneIndex(unsigned int index);
+
     /** Returns a reference to the n-th zone. */
     virtual ZoneElement zone(unsigned int index) const;
 

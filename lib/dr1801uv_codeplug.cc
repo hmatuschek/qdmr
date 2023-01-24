@@ -120,7 +120,7 @@ DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) 
       return false;
     }
     Channel *obj = ctx.get<Channel>(ch.index());
-    if (ch.linkChannelObj(obj, ctx, err)) {
+    if (! ch.linkChannelObj(obj, ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }
@@ -601,7 +601,7 @@ DR1801UVCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err
   unsigned int currentIndex = firstIndex();
   ContactElement currentContact = contact(currentIndex);
 
-  for (int i=0; i<contactCount(); i++) {
+  for (unsigned int i=0; i<contactCount(); i++) {
     DMRContact *obj = currentContact.toContactObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode contact element at index " << currentIndex;
@@ -626,7 +626,7 @@ DR1801UVCodeplug::ContactBankElement::link(Context &ctx, const ErrorStack &err) 
     return true;
 
   unsigned int currentIndex = firstIndex();
-  while (true) {
+  for (unsigned int i=0; i<contactCount(); i++) {
     ContactElement currentContact = contact(currentIndex);
     if (! ctx.has<DMRContact>(currentIndex)) {
       errMsg(err) << "Cannot link contact at index " << currentIndex << ", not defined.";
@@ -636,6 +636,7 @@ DR1801UVCodeplug::ContactBankElement::link(Context &ctx, const ErrorStack &err) 
       errMsg(err) << "Cannot link contact element at index " << currentIndex;
       return false;
     }
+    currentIndex = currentContact.successorIndex();
   }
 
   return true;
@@ -929,6 +930,24 @@ DR1801UVCodeplug::ZoneBankElement::setZoneCount(unsigned int count) {
   setUInt8(0x0000, count);
 }
 
+unsigned int
+DR1801UVCodeplug::ZoneBankElement::upZoneIndex() const {
+  return getUInt16_le(0x0002);
+}
+void
+DR1801UVCodeplug::ZoneBankElement::setUpZoneIndex(unsigned int index) {
+  setUInt16_le(0x0002, index);
+}
+
+unsigned int
+DR1801UVCodeplug::ZoneBankElement::downZoneIndex() const {
+  return getUInt16_le(0x0004);
+}
+void
+DR1801UVCodeplug::ZoneBankElement::setDownZoneIndex(unsigned int index) {
+  setUInt16_le(0x0004, index);
+}
+
 DR1801UVCodeplug::ZoneElement
 DR1801UVCodeplug::ZoneBankElement::zone(unsigned int index) const {
   return ZoneElement(_data + 8 + index*ZONE_ELEMENT_SIZE);
@@ -1006,7 +1025,8 @@ DR1801UVCodeplug::ZoneElement::clear() {
 
 bool
 DR1801UVCodeplug::ZoneElement::isValid() const {
-  return 0 != getUInt16_le(0x0024);
+  // Read name-length and channel count
+  return (0 != getUInt8(0x0020)) && (0 != getUInt8(0x0022));
 }
 
 QString
@@ -1023,11 +1043,11 @@ DR1801UVCodeplug::ZoneElement::setName(const QString &name) {
 
 unsigned int
 DR1801UVCodeplug::ZoneElement::index() const {
-  return getUInt16_le(0x0024)-1;
+  return getUInt16_le(0x0024);
 }
 void
 DR1801UVCodeplug::ZoneElement::setIndex(unsigned int index) {
-  setUInt16_le(0x0024, index+1);
+  setUInt16_le(0x0024, index);
 }
 
 unsigned int

@@ -1,8 +1,8 @@
-/** @defgroup auctus Interface to radios powered by Auctus chips.
+/** @defgroup auctus Auctus A6/A7 Based devices.
  *
  * Several devices use the radio-on-a-chip Auctus A6, which enables very cheap DMR radios.
  *
- * @ingroup rif */
+ * @ingroup dsc */
 #ifndef AUCTUS_A6_INTERFACE_HH
 #define AUCTUS_A6_INTERFACE_HH
 
