@@ -597,12 +597,11 @@ DR1801UVCodeplug::ContactBankElement::contact(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  if (0 == contactCount())
-    return true;
-
+  // Get first element in list
   unsigned int currentIndex = firstIndex();
-  while (true) {
-    ContactElement currentContact = contact(currentIndex);
+  ContactElement currentContact = contact(currentIndex);
+
+  for (int i=0; i<contactCount(); i++) {
     DMRContact *obj = currentContact.toContactObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode contact element at index " << currentIndex;
@@ -612,8 +611,10 @@ DR1801UVCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err
     ctx.add(obj, currentIndex);
     ctx.config()->contacts()->add(obj);
     // continue with successor
-    if (currentContact.hasSuccessor())
+    if (currentContact.hasSuccessor()) {
       currentIndex = currentContact.successorIndex();
+      currentContact = contact(currentIndex);
+    }
   }
 
   return true;
