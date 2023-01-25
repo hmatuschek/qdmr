@@ -32,6 +32,8 @@
  *      @c DR1801UVCodeplug::ScanListBankElement. </td></tr>
  *  <tr><td>0x0a65c</td> <td>0x1c660</td>  <td>0x12004</td>  <td>Channel bank, see
  *      @c DR1801UVCodeplug::ChannelBankElement. </td></tr>
+ *  <tr><td>0x1c6c4</td> <td>0x1c6dc</td>  <td>0x0018</td>  <td>Key settings, see
+ *      @c DR1801UVCodeplug::KeySettingsElement. </td></tr>
  *  <tr><td>0x1c6dc</td> <td>0x1d7e0</td>  <td>0x01104</td>  <td>Group list bank, see
  *      @c DR1801UVCodeplug::GroupListBankElement. </td></tr>
  * </table>
@@ -94,9 +96,9 @@ public:
     void clear();
 
     /** Retunrs the 0-based index of the channel. */
-    virtual uint16_t index() const;
+    virtual unsigned int index() const;
     /** Sets the index. */
-    virtual void setIndex(uint16_t idx);
+    virtual void setIndex(unsigned int idx);
 
     /** Returns the channel type. */
     virtual Type channelType() const;
@@ -143,9 +145,9 @@ public:
     /** Returns @c true if an ecryption key index is set. */
     virtual bool hasEncryptionKey() const;
     /** Returns the encryption key index. */
-    virtual uint8_t encryptionKeyIndex() const;
+    virtual unsigned int encryptionKeyIndex() const;
     /** Sets the encryption key index. */
-    virtual void setEncryptionKeyIndex(uint8_t index);
+    virtual void setEncryptionKeyIndex(unsigned int index);
     /** Clears the encryption key index. */
     virtual void clearEncryptionKeyIndex();
 
@@ -166,9 +168,9 @@ public:
     /** Returns @c true if the alarm system index is set. */
     virtual bool hasAlarmSystem() const;
     /** Returns the index of the alarm system. */
-    virtual uint8_t alarmSystemIndex() const;
+    virtual unsigned int alarmSystemIndex() const;
     /** Sets the alarm system index. */
-    virtual void setAlarmSystemIndex(uint8_t index);
+    virtual void setAlarmSystemIndex(unsigned int index);
     /** Clears the alarm system index. */
     virtual void clearAlarmSystemIndex();
 
@@ -184,9 +186,9 @@ public:
     /** Retunrs @c true if a scan list is assigned. */
     virtual bool hasScanList() const;
     /** Returns the scan list index. */
-    virtual uint8_t scanListIndex() const;
+    virtual unsigned int scanListIndex() const;
     /** Sets the scan list index. */
-    virtual void setScanListIndex(uint8_t index);
+    virtual void setScanListIndex(unsigned int index);
     /** Clears the scan list index. */
     virtual void clearScanListIndex();
 
@@ -207,18 +209,18 @@ public:
     /** Returns @c true if a PTT ID is set. */
     virtual bool hasPTTID() const;
     /** Returns the PTT-ID index. */
-    virtual uint8_t pttIDIndex() const;
+    virtual unsigned int pttIDIndex() const;
     /** Sets the PTT-ID index. */
-    virtual void setPTTIDIndex(uint8_t idx);
+    virtual void setPTTIDIndex(unsigned int idx);
     /** Clears the PTT ID. */
     virtual void clearPTTID();
 
     /** Retruns @c true if a group list is assigned. */
     virtual bool hasGroupList() const;
     /** Retunrs the group-list index. */
-    virtual uint8_t groupListIndex() const;
+    virtual unsigned int groupListIndex() const;
     /** Sets the group-list index. */
-    virtual void setGroupListIndex(uint8_t index);
+    virtual void setGroupListIndex(unsigned int index);
     /** Clears the group list index. */
     virtual void clearGroupListIndex();
 
@@ -939,6 +941,57 @@ public:
     virtual MessageElement message(unsigned int n) const;
   };
 
+
+  /** Implements the binary encoding of the key settings.
+   *
+   * Memory representation of the message bank element (0018h bytes):
+   * @verbinclude dr1801uv_keysettingselement.txt */
+  class KeySettingsElement: public Element
+  {
+  public:
+    /** Possible key functions. */
+    enum class Function {
+      None = 0, ToggleAlertTones = 1, EmergencyOn = 2, EmergencyOff = 3, TogglePower = 4,
+      Monitor = 5, DeleteNuisance = 6, OneTouch1 = 7, OneTouch2 = 8, OneTouch3 = 9, OneTouch4 = 10,
+      OneTouch5 = 11, ToggleTalkaround = 13, ToggleScan = 14, ToggleEncryption = 15, ToggleVOX = 16,
+      ZoneSelect = 17, ToggleLoneWorker = 19, PhoneExit = 20
+    };
+
+  protected:
+    /** Hidden constructor. */
+    KeySettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    KeySettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the function for the side-key 1, short press. */
+    virtual Function sideKey1Short() const;
+    /** Sets the function for the side-key 1, short press. */
+    virtual void setSideKey1Short(Function func);
+    /** Returns the function for the side-key 1, long press. */
+    virtual Function sideKey1Long() const;
+    /** Sets the function for the side-key 1, long press. */
+    virtual void setSideKey1Long(Function func);
+    /** Returns the function for the side-key 2, short press. */
+    virtual Function sideKey2Short() const;
+    /** Sets the function for the side-key 2, short press. */
+    virtual void setSideKey2Short(Function func);
+    /** Returns the function for the side-key 2, long press. */
+    virtual Function sideKey2Long() const;
+    /** Sets the function for the side-key 2, long press. */
+    virtual void setSideKey2Long(Function func);
+    /** Returns the function for the top-key, short press. */
+    virtual Function topKeyShort() const;
+    /** Sets the function for the top-key, short press. */
+    virtual void setTopKeyShort(Function func);
+    /** Returns the function for the top-key, long press. */
+    virtual Function topKeyLong() const;
+    /** Sets the function for the side-key, long press. */
+    virtual void setTopKeyLong(Function func);
+  };
 
 public:
   /** Default constructor. */

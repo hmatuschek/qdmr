@@ -43,6 +43,10 @@
 #define MESSAGE_BANK_SIZE         0x00164
 #define MESSAGE_ELEMENT_SIZE      0x00044
 
+#define ADDR_KEY_SETTINGS_ELEMENT 0x1c6c4
+#define KEY_SETTINGS_ELEMENT_SIZE 0x00018
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelBankElement
@@ -90,7 +94,7 @@ DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const Q
 
 bool
 DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0; i<channelCount(); i++) {
     ChannelElement ch = channel(i);
     if (! ch.isValid()) {
       errMsg(err) << "Cannot decode invalid channel at index " << i
@@ -102,6 +106,8 @@ DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err
       errMsg(err) << "Cannot decode channel at index " << i << ".";
       return false;
     }
+    // Set channel name
+    obj->setName(channelName(i));
     // Add channel to context and config
     ctx.add(obj, ch.index());
     ctx.config()->channelList()->add(obj);
@@ -112,7 +118,7 @@ DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err
 
 bool
 DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0; i<channelCount(); i++) {
     ChannelElement ch = channel(i);
     if (! ctx.has<Channel>(ch.index())) {
       errMsg(err) << "Cannot link channel at index " << i
@@ -156,12 +162,12 @@ DR1801UVCodeplug::ChannelElement::clear() {
   setIndex(0xffff);
 }
 
-uint16_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::index() const {
   return getUInt16_le(0x0000);
 }
 void
-DR1801UVCodeplug::ChannelElement::setIndex(uint16_t idx) {
+DR1801UVCodeplug::ChannelElement::setIndex(unsigned int idx) {
   setUInt16_le(0x0000, idx);
 }
 
@@ -270,12 +276,12 @@ bool
 DR1801UVCodeplug::ChannelElement::hasEncryptionKey() const {
   return 0 != getUInt8(0x0014);
 }
-uint8_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::encryptionKeyIndex() const {
   return getUInt8(0x0014)-1;
 }
 void
-DR1801UVCodeplug::ChannelElement::setEncryptionKeyIndex(uint8_t index) {
+DR1801UVCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned int index) {
   setUInt8(0x0014, index+1);
 }
 void
@@ -313,12 +319,12 @@ bool
 DR1801UVCodeplug::ChannelElement::hasAlarmSystem() const {
   return 0 != getUInt8(0x0018);
 }
-uint8_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::alarmSystemIndex() const {
   return getUInt8(0x0018)-1;
 }
 void
-DR1801UVCodeplug::ChannelElement::setAlarmSystemIndex(uint8_t index) {
+DR1801UVCodeplug::ChannelElement::setAlarmSystemIndex(unsigned int index) {
   setUInt8(0x0018, index+1);
 }
 void
@@ -354,12 +360,12 @@ bool
 DR1801UVCodeplug::ChannelElement::hasScanList() const {
   return 0x00 != getUInt8(0x001b);
 }
-uint8_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::scanListIndex() const {
   return getUInt8(0x001b)-1;
 }
 void
-DR1801UVCodeplug::ChannelElement::setScanListIndex(uint8_t index) {
+DR1801UVCodeplug::ChannelElement::setScanListIndex(unsigned int index) {
   setUInt8(0x001b, index+1);
 }
 void
@@ -440,12 +446,12 @@ bool
 DR1801UVCodeplug::ChannelElement::hasPTTID() const {
   return 0 != getUInt8(0x0028);
 }
-uint8_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::pttIDIndex() const {
   return getUInt8(0x0028)-1;
 }
 void
-DR1801UVCodeplug::ChannelElement::setPTTIDIndex(uint8_t idx) {
+DR1801UVCodeplug::ChannelElement::setPTTIDIndex(unsigned int idx) {
   setUInt8(0x0028, idx+1);
 }
 void
@@ -457,12 +463,12 @@ bool
 DR1801UVCodeplug::ChannelElement::hasGroupList() const {
   return 0 != getUInt8(0x002a);
 }
-uint8_t
+unsigned int
 DR1801UVCodeplug::ChannelElement::groupListIndex() const {
   return getUInt8(0x002a)-1;
 }
 void
-DR1801UVCodeplug::ChannelElement::setGroupListIndex(uint8_t index) {
+DR1801UVCodeplug::ChannelElement::setGroupListIndex(unsigned int index) {
   setUInt8(0x002a, index+1);
 }
 void
@@ -1810,6 +1816,85 @@ DR1801UVCodeplug::MessageElement::setText(const QString &text) {
   setUInt8(0x0001, std::min(64, text.length()));
   writeASCII(0x0004, text, 64, 0x00);
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::KeySettingsElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::KeySettingsElement::KeySettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::KeySettingsElement::KeySettingsElement(uint8_t *ptr)
+  : Element(ptr, KEY_SETTINGS_ELEMENT_SIZE)
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::KeySettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::sideKey1Short() const {
+  return (Function) getUInt8(0x0001);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setSideKey1Short(Function func) {
+  setUInt8(0x0001, (uint8_t) func);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::sideKey1Long() const {
+  return (Function) getUInt8(0x0002);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setSideKey1Long(Function func) {
+  setUInt8(0x0002, (uint8_t) func);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::sideKey2Short() const {
+  return (Function) getUInt8(0x0005);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setSideKey2Short(Function func) {
+  setUInt8(0x0005, (uint8_t) func);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::sideKey2Long() const {
+  return (Function) getUInt8(0x0006);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setSideKey2Long(Function func) {
+  setUInt8(0x0006, (uint8_t) func);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::topKeyShort() const {
+  return (Function) getUInt8(0x0009);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setTopKeyShort(Function func) {
+  setUInt8(0x0009, (uint8_t) func);
+}
+
+DR1801UVCodeplug::KeySettingsElement::Function
+DR1801UVCodeplug::KeySettingsElement::topKeyLong() const {
+  return (Function) getUInt8(0x000a);
+}
+void
+DR1801UVCodeplug::KeySettingsElement::setTopKeyLong(Function func) {
+  setUInt8(0x000a, (uint8_t) func);
+}
+
+
+
+
 
 
 /* ******************************************************************************************** *

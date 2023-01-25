@@ -34,6 +34,13 @@ Codeplug::Element::~Element() {
   // pass...
 }
 
+Codeplug::Element &
+Codeplug::Element::operator =(const Element &other) {
+  this->_data = other._data;
+  this->_size = other._size;
+  return *this;
+}
+
 bool
 Codeplug::Element::isValid() const {
   return nullptr != _data;

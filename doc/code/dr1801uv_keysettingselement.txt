@@ -1,0 +1,19 @@
+     7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+00 | Key 0 Index                   | Key 0, Short press function   | Key 0, Long press function    | Unused, set to 0x00           |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+04 | Key 1 Index                   | Key 1, Short press function   | Key 1, Long press function    | Unused, set to 0x00           |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+08 | Key 2 Index                   | Key 2, Short press function   | Key 2, Long press function    | Unused, set to 0x00           |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0c | Unused or further key settings. Filled with 0x00                                                                           ...
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+14  ...                                                                                                                            |
+   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Where:
+  - Key index: SideKey1 = 0, SideKey2 = 1, TopKey = 2
+  - Key function: None = 0, ToggleAlertTones = 1, EmergencyOn = 2, EmergencyOff = 3,
+      TogglePower = 4, Monitor = 5, DeleteNuisance = 6, OneTouch1 = 7, OneTouch2 = 8, OneTouch3 = 9,
+      OneTouch4 = 10, OneTouch5 = 11, ToggleTalkaround = 13, ToggleScan = 14, ToggleEncryption = 15,
+      ToggleVOX = 16, ZoneSelect = 17, ToggleLoneWorker = 19, PhoneExit = 20

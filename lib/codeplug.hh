@@ -39,9 +39,12 @@ public:
     Flags();
   };
 
-  /** Represents the abstract base class of all codeplug elements. That is a memory region within
-   * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provides some helper methods to access specific members of the element.
+  /** Represents the abstract base class of all codeplug elements.
+   *
+   * That is a memory region within the codeplug that encodes a specific element. E.g., channels,
+   * contacts, zones, etc. This class provides some helper methods to access specific members of
+   * the element.
+   *
    * @since 0.9.0 */
   class Element
   {
@@ -56,6 +59,9 @@ public:
     Element(const Element &other);
     /** Destructor. */
     virtual ~Element();
+
+    /** Copy assignment. */
+    Element &operator=(const Element &other);
 
     /** Returns @c true if the pointer is not null. */
     virtual bool isValid() const;
