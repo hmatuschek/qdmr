@@ -36,6 +36,8 @@
  *      @c DR1801UVCodeplug::KeySettingsElement. </td></tr>
  *  <tr><td>0x1c6dc</td> <td>0x1d7e0</td>  <td>0x01104</td>  <td>Group list bank, see
  *      @c DR1801UVCodeplug::GroupListBankElement. </td></tr>
+ *  <tr><td>0x1d7e0</td> <td>0x1d858</td>  <td>0x00078</td>  <td>Encryption keys,
+ *      @c see DR1801UVCodeplug::EncryptionKeyBankElement. </td></tr>
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -323,18 +325,10 @@ public:
       /// @endcond
     };
 
-    /** Sizes of some codeplug elements, usually strings. */
-    struct Size {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int channelName()  { return 0x00014; }
-      /// @endcond
-    };
-
     /** Limits of some elements. */
     struct Limit {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int channelCount() { return 1024; }
-      /// @endcond
+      static constexpr unsigned int channelCount()       { return 1024; }
+      static constexpr unsigned int channelNameLength()  { return 0x00014; }
     };
   };
 
@@ -1333,6 +1327,7 @@ public:
     };
   };
 
+
   /** Implements the binary encoding of the VFO settings.
    *
    * Memory representation of the VFO settings (0090h bytes):
@@ -1386,6 +1381,96 @@ public:
   };
 
 
+  /** Implements the binary encoding of an encryption key.
+   *
+   * Memory representation of the encryption key bank (000ch bytes):
+   * @verbinclude dr1801uv_encryptionkeyelement.txt */
+  class EncryptionKeyElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EncryptionKeyElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    EncryptionKeyElement(uint8_t *ptr);
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x000c; }
+
+    /** Returns the index of the key. */
+    virtual unsigned int index() const;
+    /** Sets the index of the key. */
+    virtual void setIndex(unsigned int index);
+
+    /** Retunrs the length of the key. */
+    virtual unsigned int keyLength() const;
+
+    /** Returns the key as a string. */
+    virtual QString key() const;
+    /** Sets the key. */
+    virtual void setKey(const QString &key);
+
+    /** Creates a key object for this element. */
+    virtual EncryptionKey *toKeyObj(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the key object. */
+    virtual bool linkKeyObj(EncryptionKey *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** The maximum length of the key. */
+      static constexpr unsigned int keyLength() { return 8; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int length() { return 0x0001; }
+      static constexpr unsigned int key() { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the binary encoding of the encryption keys.
+   *
+   * Memory representation of the encryption key bank (0078h bytes):
+   * @verbinclude dr1801uv_encryptionkeybankelement.txt */
+  class EncryptionKeyBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EncryptionKeyBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    EncryptionKeyBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0078;}
+
+    /** Returns a reference to the encryption key. */
+    virtual EncryptionKeyElement key(unsigned int index) const;
+
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the key bank. */
+    struct Limit {
+      /** The number of keys. */
+      static constexpr unsigned int keyCount() { return 10; }
+    };
+  };
+
+
 public:
   /** Default constructor. */
   explicit DR1801UVCodeplug(QObject *parent = nullptr);
@@ -1406,21 +1491,16 @@ protected:
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int size()              { return 0x1dd90; }
     static constexpr unsigned int settings()          { return 0x003b4; }
-    static constexpr unsigned int settingsSize()      { return 0x00064; }
     static constexpr unsigned int zoneBank()          { return 0x00418; }
-    static constexpr unsigned int zoneBankSize()      { return 0x03cf8; }
     static constexpr unsigned int messageBank()       { return 0x04110; }
-    static constexpr unsigned int messageBankSize()   { return 0x00164; }
     static constexpr unsigned int contactBank()       { return 0x04334; }
-    static constexpr unsigned int contactBankSize()   { return 0x06004; }
     static constexpr unsigned int scanListBank()      { return 0x0a338; }
-    static constexpr unsigned int scanListBankSize()  { return 0x00324; }
     static constexpr unsigned int channelBank()       { return 0x0a65c; }
-    static constexpr unsigned int channelBankSize()   { return 0x12004; }
     static constexpr unsigned int keySettings()       { return 0x1c6c4; }
-    static constexpr unsigned int keySettingsSize()   { return 0x00018; }
     static constexpr unsigned int groupListBank()     { return 0x1c6dc; }
-    static constexpr unsigned int groupListBankSize() { return 0x01104; }
+    static constexpr unsigned int encryptionKeyBank() { return 0x1d7e0; }
+    static constexpr unsigned int vfoBank()           { return 0x1dd00; }
+
     /// @endcond
   };
 };

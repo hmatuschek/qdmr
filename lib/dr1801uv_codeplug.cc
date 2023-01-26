@@ -40,11 +40,11 @@ DR1801UVCodeplug::ChannelBankElement::channel(unsigned int index) const {
 
 QString
 DR1801UVCodeplug::ChannelBankElement::channelName(unsigned int index) const {
-  return readASCII(Offset::channelName() + index*Size::channelName(), Size::channelName(), 0x00);
+  return readASCII(Offset::channelName() + index*Limit::channelNameLength(), Limit::channelNameLength(), 0x00);
 }
 void
 DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const QString &name) {
-  writeASCII(Offset::channelName() + index*Size::channelName(), name, Size::channelName(), 0x00);
+  writeASCII(Offset::channelName() + index*Limit::channelNameLength(), name, Limit::channelNameLength(), 0x00);
 }
 
 bool
@@ -1028,6 +1028,8 @@ DR1801UVCodeplug::ZoneElement::setEntryIndex(unsigned int n, unsigned int index)
 
 Zone *
 DR1801UVCodeplug::ZoneElement::toZoneObj(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx)
+
   if (! isValid()) {
     errMsg(err) << "Cannot create zone from invalid zone element.";
     return nullptr;
@@ -1901,6 +1903,132 @@ DR1801UVCodeplug::VFOBankElement::setNameB(const QString &name) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::EncryptionKeyBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr)
+  : Element(ptr, EncryptionKeyBankElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::EncryptionKeyBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+DR1801UVCodeplug::EncryptionKeyElement
+DR1801UVCodeplug::EncryptionKeyBankElement::key(unsigned int index) const {
+  return EncryptionKeyElement(_data + index*EncryptionKeyElement::size());
+}
+
+bool
+DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keyCount(); i++) {
+    EncryptionKey *obj = key(i).toKeyObj(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode encryption key at index " << i << ".";
+      return false;
+    }
+    // Add key to index and config
+    ctx.add(obj, key(i).index());
+    ctx.config()->commercialExtension()->encryptionKeys()->add(obj);
+  }
+  return false;
+}
+
+bool
+DR1801UVCodeplug::EncryptionKeyBankElement::link(Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  // Nothing to do
+  return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::EncryptionKeyElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, EncryptionKeyElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::EncryptionKeyElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::EncryptionKeyElement::isValid() const {
+  return 0x00 != getUInt8(Offset::index());
+}
+
+unsigned int
+DR1801UVCodeplug::EncryptionKeyElement::index() const {
+  return getUInt8(Offset::index())-1;
+}
+void
+DR1801UVCodeplug::EncryptionKeyElement::setIndex(unsigned int index) {
+  setUInt8(Offset::index(), index+1);
+}
+
+unsigned int
+DR1801UVCodeplug::EncryptionKeyElement::keyLength() const {
+  return getUInt16_le(Offset::length());
+}
+
+QString
+DR1801UVCodeplug::EncryptionKeyElement::key() const {
+  return readASCII(Offset::key(), Limit::keyLength(), 0x00);
+}
+void
+DR1801UVCodeplug::EncryptionKeyElement::setKey(const QString &key) {
+  setUInt8(Offset::length(), 8);
+  writeASCII(Offset::key(), key, Limit::keyLength(), 0x00);
+}
+
+EncryptionKey *
+DR1801UVCodeplug::EncryptionKeyElement::toKeyObj(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx);
+
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode an invalid encryption key.";
+    return nullptr;
+  }
+
+  DMREncryptionKey *obj = new DMREncryptionKey();
+  if (! obj->fromHex(key(), err)) {
+    errMsg(err) << "Cannot decode key '" << key() << "'.";
+    delete obj;
+    return nullptr;
+  }
+
+  return obj;
+}
+
+bool
+DR1801UVCodeplug::EncryptionKeyElement::linkKeyObj(EncryptionKey *obj, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(obj); Q_UNUSED(ctx); Q_UNUSED(err);
+  // There is nothing to do.
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
@@ -1959,7 +2087,7 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  if (! SettingsElement(data(Offset::settingsSize())).updateConfig(ctx.config(), err)) {
+  if (! SettingsElement(data(Offset::settings())).updateConfig(ctx.config(), err)) {
     errMsg(err) << "Cannot decode settings element.";
     return false;
   }
@@ -1967,6 +2095,12 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   if (! ScanListBankElement(data(Offset::scanListBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode scan list elements.";
     return false;
+  }
+
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeyBank())).decode(ctx, err)) {
+    logWarn() << "Cannot decode encryption keys:\n" << err.format(" ");
+    //errMsg(err) << "Cannot decode encryption keys.";
+    //return false;
   }
 
   return true;
