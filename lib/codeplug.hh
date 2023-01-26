@@ -49,6 +49,18 @@ public:
   class Element
   {
   protected:
+    /** Base class for Offsets. */
+    struct Offset {
+      /** Some type to specify a bit offset. That is the byte-offset and bit of that byte. */
+      struct BitOffset {
+        /** The byte offset. */
+        const unsigned int byte;
+        /** The bit within the byte. */
+        const unsigned int bit;
+      };
+    };
+
+  protected:
     /** Hidden constructor.
      * @param ptr Specifies the pointer to the element within the codeplug.
      * @param size Specifies the size of the element in bytes. */
@@ -73,7 +85,11 @@ public:
     bool fill(uint8_t value, unsigned offset=0, int size=-1);
 
     /** Reads a specific bit at the given byte-offset. */
+    bool getBit(const Offset::BitOffset &offset) const;
+    /** Reads a specific bit at the given byte-offset. */
     bool getBit(unsigned offset, unsigned bit) const;
+    /** Sets a specific bit at the given byte-offset. */
+    void setBit(const Offset::BitOffset &offset, bool value=true);
     /** Sets a specific bit at the given byte-offset. */
     void setBit(unsigned offset, unsigned bit, bool value=true);
     /** Clears a specific bit at the given byte-offset. */

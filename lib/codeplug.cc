@@ -65,6 +65,11 @@ Codeplug::Element::fill(uint8_t value, unsigned offset, int size) {
 }
 
 bool
+Codeplug::Element::getBit(const Offset::BitOffset &offset) const {
+  return getBit(offset.byte, offset.bit);
+}
+
+bool
 Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
   if (offset >= _size) {
     logFatal() << "Cannot get bit at " << QString::number(offset, 16)
@@ -76,6 +81,10 @@ Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
   return (1<<bit) & (*ptr);
 }
 
+void
+Codeplug::Element::setBit(const Offset::BitOffset &offset, bool value) {
+  setBit(offset.byte, offset.bit, value);
+}
 void
 Codeplug::Element::setBit(unsigned offset, unsigned bit, bool value) {
   if (offset >= _size) {

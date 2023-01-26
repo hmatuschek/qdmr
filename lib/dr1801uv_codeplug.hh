@@ -95,6 +95,9 @@ public:
     bool isValid() const;
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00034; }
+
     /** Retunrs the 0-based index of the channel. */
     virtual unsigned int index() const;
     /** Sets the index. */
@@ -233,6 +236,40 @@ public:
     virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the channel object. */
     virtual bool linkChannelObj(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  protected:
+    /** Some offsets within the codeplug. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int channelType() { return 0x0002; }
+      static constexpr unsigned int power() { return 0x0003; }
+      static constexpr unsigned int rxFrequency() { return 0x0004; }
+      static constexpr unsigned int txFrequency() { return 0x0008; }
+      static constexpr unsigned int transmitContactIndex() { return 0x000c; }
+      static constexpr unsigned int admitCriterion() { return 0x000e; }
+      static constexpr unsigned int colorCode() { return 0x0010; }
+      static constexpr unsigned int timeSlot() { return 0x0011; }
+      static constexpr unsigned int encryptionKeyIndex() { return 0x0014; }
+      static constexpr BitOffset dcdm() { return {0x0015, 1} ; }
+      static constexpr BitOffset confirmPivateCall() { return {0x0015, 0}; }
+      static constexpr unsigned int signalingMode() { return 0x0016; }
+      static constexpr unsigned int alarmSystemIndex() { return 0x0018; }
+      static constexpr unsigned int bandwidth() { return 0x0019; }
+      static constexpr unsigned int autoScan() { return 0x001a; }
+      static constexpr unsigned int scanListIndex() { return 0x001b; }
+      static constexpr unsigned int rxSubtoneCode() { return 0x001c; }
+      static constexpr unsigned int rxSubtoneType() { return 0x001e; }
+      static constexpr unsigned int rxDCSMode() { return 0x001f; }
+      static constexpr unsigned int txSubtoneCode() { return 0x0020; }
+      static constexpr unsigned int txSubtoneType() { return 0x0022; }
+      static constexpr unsigned int txDCSMode() { return 0x0023; }
+      static constexpr unsigned int talkaround() { return 0x0025; }
+      static constexpr unsigned int pttIDIndex() { return 0x0028; }
+      static constexpr unsigned int groupListIndex() { return 0x002a; }
+      static constexpr unsigned int loneWorker() { return 0x002f; }
+      /// @endcond
+    };
   };
 
   /** Implements the binary encoding of the channel bank.
@@ -253,6 +290,9 @@ public:
 
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x12004; }
+
     /** Returns the number of channels. */
     virtual unsigned int channelCount() const;
     /** Sets the number of channels. */
@@ -270,6 +310,30 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links channels. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  protected:
+    /** Offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channelCount() { return 0x00000; }
+      static constexpr unsigned int channel()      { return 0x00004; }
+      static constexpr unsigned int channelName()  { return 0x0d004; }
+      /// @endcond
+    };
+
+    /** Sizes of some codeplug elements, usually strings. */
+    struct Size {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channelName()  { return 0x00014; }
+      /// @endcond
+    };
+
+    /** Limits of some elements. */
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channelCount() { return 1024; }
+      /// @endcond
+    };
   };
 
 
@@ -295,6 +359,9 @@ public:
 
     bool isValid() const;
     void clear();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00018; }
 
     /** Returns @c true if the contact has a successor. */
     virtual bool hasSuccessor() const;
@@ -324,6 +391,18 @@ public:
     virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the DMR contact object. */
     virtual bool linkContactObj(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Defines offsets within the element. */
+    struct Offset : public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int successorIndex() { return 0x0000; }
+      static constexpr unsigned int nameLength() { return 0x0002; }
+      static constexpr unsigned int dmrID() { return 0x0004; }
+      static constexpr unsigned int callType() { return 0x0007; }
+      static constexpr unsigned int name() { return 0x0008; }
+      /// @endcond
+    };
   };
 
   /** Implements the binary encoding of the contact bank.
@@ -345,6 +424,9 @@ public:
 
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x06004; }
+
     /** Returns the number of contacts. */
     virtual unsigned int contactCount() const;
     /** Sets the number of contacts. */
@@ -362,6 +444,21 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links all contacts. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  protected:
+    /** Offsets within the element. */
+    struct Offset : public Element::Offset{
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contactCount() { return 0x0000; }
+      static constexpr unsigned int firstIndex() { return 0x0002; }
+      static constexpr unsigned int contacts() { return 0x0004; }
+      /// @endcond
+    };
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contactCount() { return 1024; }
+      /// @endcond
+    };
   };
 
 
@@ -381,6 +478,9 @@ public:
 
     bool isValid() const;
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00044; }
 
     /** Returns the index of the group list. */
     virtual uint16_t index() const;
@@ -402,6 +502,22 @@ public:
     virtual RXGroupList *toGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the group list object. */
     virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offset within the codeplug. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int count()   { return 0x0000; }
+      static constexpr unsigned int index()   { return 0x0002; }
+      static constexpr unsigned int members() { return 0x0004; }
+      /// @endcond
+    };
+    /** Some limits. */
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members() { return 10; }
+      /// @endcond
+    };
   };
 
   /** Implements the binary encoding of the group-list bank.
@@ -420,6 +536,9 @@ public:
 
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x01104; }
+
     /** Returns the number of group lists defined. */
     virtual unsigned int groupListCount() const;
     /** Sets the number of group lists. */
@@ -432,6 +551,21 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links all group lists. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int groupListCount() { return 0x0000; }
+      static constexpr unsigned int groupLists() { return 0x00004; }
+      /// @endcond
+    };
+    /** Some limits. */
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int groupListCount() { return 64; }
+      /// @endcond
+    };
   };
 
 
@@ -451,6 +585,9 @@ public:
 
     bool isValid() const;
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00068; }
 
     /** Returns the name of the zone. */
     virtual QString name() const;
@@ -473,6 +610,25 @@ public:
     virtual Zone *toZoneObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the zone object. */
     virtual bool linkZoneObj(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int nameLength() { return 0x0020; }
+      static constexpr unsigned int numEntries() { return 0x0022; }
+      static constexpr unsigned int index() { return 0x0024; }
+      static constexpr unsigned int members() { return 0x0028; }
+      /// @endcond
+    };
+    /** Some limits. */
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int nameLength() { return 32; }
+      static constexpr unsigned int memberCount() { return 32; }
+      /// @endcond
+    };
   };
 
   /** Implements the binary encoding of the zone bank.
@@ -490,6 +646,9 @@ public:
     ZoneBankElement(uint8_t *ptr);
 
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x03cf8; }
 
     /** Returns the number of zones. */
     virtual unsigned int zoneCount() const;
@@ -512,6 +671,23 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack()) const;
     /** Links all zones. */
     virtual bool link(Context &ctx, const ErrorStack &err = ErrorStack()) const;
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int zoneCount() { return 0x0000; }
+      static constexpr unsigned int upZoneIndex() { return 0x0002; }
+      static constexpr unsigned int downZoneIndex() { return 0x0004; }
+      static constexpr unsigned int zones() { return 0x0008; }
+      /// @endcond
+    };
+    /** Some limits. */
+    struct Limit {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int zoneCount() { return 150; }
+      /// @endcond
+    };
   };
 
 
@@ -584,6 +760,9 @@ public:
     SettingsElement(uint8_t *ptr);
 
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00064; }
 
     /** Returns the radios DMR ID. */
     virtual unsigned int dmrID() const;
@@ -768,6 +947,69 @@ public:
 
     /** Updates configuration. */
     virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int dmrID()                 { return 0x0000; }
+      static constexpr unsigned int powerSaveEnabled()      { return 0x0008; }
+      static constexpr unsigned int powerSaveMode()         { return 0x0009; }
+      static constexpr unsigned int voxSensitivity()        { return 0x000a; }
+      static constexpr unsigned int voxDelay()              { return 0x000c; }
+      static constexpr unsigned int encryptionEnabled()     { return 0x000d; }
+      static constexpr unsigned int keyLockDelay()          { return 0x000e; }
+      static constexpr BitOffset lockPTT()                  { return {0x000f, 0}; }
+      static constexpr BitOffset lockSideKey1()             { return {0x000f, 1}; }
+      static constexpr BitOffset lockSideKey2()             { return {0x000f, 2}; }
+      static constexpr unsigned int language()              { return 0x0010; }
+      static constexpr unsigned int squelchMode()           { return 0x0011; }
+      static constexpr unsigned int rogerTonesEnabled()     { return 0x0013; }
+      static constexpr unsigned int keyLockEnabled()        { return 0x0017; }
+      static constexpr unsigned int ringTone()              { return 0x0016; }
+      static constexpr unsigned int radioName()             { return 0x0018; }
+      static constexpr BitOffset dmrCallOutToneEnabled()    { return {0x0028, 1}; }
+      static constexpr BitOffset fmCallOutToneEnabled()     { return {0x0028, 2}; }
+      static constexpr BitOffset dmrVoiceEndToneEnabled()   { return {0x0028, 3}; }
+      static constexpr BitOffset fmVoiceEndToneEnabled()    { return {0x0028, 4}; }
+      static constexpr BitOffset dmrCallEndToneEnabled()    { return {0x0028, 5}; }
+      static constexpr BitOffset messageToneEnabled()       { return {0x0028, 6}; }
+      static constexpr unsigned int reverseBurstFrequency() { return 0x002c; }
+      static constexpr unsigned int backlightTime()         { return 0x002f; }
+      static constexpr unsigned int voxEnabled()            { return 0x0030; }
+      static constexpr unsigned int campandingEnabled()     { return 0x0032; }
+      static constexpr unsigned int tuningModeUp()          { return 0x0036; }
+      static constexpr unsigned int tunigModeDown()         { return 0x0037; }
+      static constexpr unsigned int displayMode()           { return 0x003c; }
+      static constexpr unsigned int dualWatchMode()         { return 0x003d; }
+      static constexpr unsigned int scanMode()              { return 0x003e; }
+      static constexpr unsigned int bootScreen()            { return 0x003f; }
+      static constexpr unsigned int bootLine1()             { return 0x0040; }
+      static constexpr unsigned int bootLine2()             { return 0x0048; }
+      static constexpr unsigned int ledEnabled()            { return 0x0050; }
+      static constexpr unsigned int loneWorkerResponseTime() { return 0x0051; }
+      static constexpr unsigned int loneWorkerReminderTime() { return 0x005c; }
+      static constexpr BitOffset progPasswordEnabled()       { return {0x0052, 0}; }
+      static constexpr BitOffset bootPasswordEnabled()       { return {0x0052, 1}; }
+      static constexpr unsigned int progPasswordLength()     { return 0x0053; }
+      static constexpr unsigned int progPassword()           { return 0x0054; }
+      static constexpr unsigned int boolPasswordLength()     { return 0x005d; }
+      static constexpr unsigned int bootPassword()           { return 0x005e; }
+      /// @endcond
+    };
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum radio name length. */
+      static constexpr unsigned int radioNameLength()     { return 16; }
+      /** Maximum boot-text lines length. */
+      static constexpr unsigned int bootLineLength()      { return 8; }
+      /** Maximum boot password length. */
+      static constexpr unsigned int bootPasswordLength()  { return 6; }
+      /** Maximum programming password length. */
+      static constexpr unsigned int progPasswordLength()  { return 6; }
+    };
   };
 
 
@@ -798,6 +1040,9 @@ public:
 
     bool isValid() const;
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00050; }
 
     /** Retunrs the index of the scan list. */
     virtual unsigned int index() const;
@@ -850,6 +1095,32 @@ public:
     virtual ScanList *toScanListObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the scan-list object. */
     virtual bool linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NO_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int name() { return 0x0010; }
+      static constexpr unsigned int priorityChannel1() { return 0x0002; }
+      static constexpr unsigned int priorityChannel1Index() { return 0x0004; }
+      static constexpr unsigned int priorityChannel2() { return 0x0003; }
+      static constexpr unsigned int priorityChannel2Index() { return 0x0006; }
+      static constexpr unsigned int revertChannel() { return 0x0008; }
+      static constexpr unsigned int revertChannelIndex() { return 0x000a; }
+      static constexpr unsigned int memberCount() { return 0x0001; }
+      static constexpr unsigned int memberIndices() { return 0x0030; }
+      /// @endcond
+    };
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum length of the name. */
+      static constexpr unsigned int nameLength() { return 32; }
+      /** Maximum number of channels in scan list. */
+      static constexpr unsigned int memberCount() { return 16; }
+    };
   };
 
   /** Implements the binary encoding of the scan-list bank.
@@ -870,6 +1141,9 @@ public:
 
     void clear();
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00324; }
+
     /** Returns the number of scan lists. */
     virtual unsigned int scanListCount() const;
     /** Sets the number of scan lists. */
@@ -882,6 +1156,22 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the scan lists. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int scanListCount() { return 0x0000; }
+      static constexpr unsigned int scanLists() { return 0x0004; }
+      /// @endcond
+    };
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum number of scan lists. */
+      static constexpr unsigned int scanListCount() { return 10; }
+    };
   };
 
 
@@ -902,6 +1192,9 @@ public:
     void clear();
     bool isValid() const;
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0044; }
+
     /** Returns the index of the message. */
     virtual unsigned int index() const;
     /** Sets the index of the message. */
@@ -911,6 +1204,23 @@ public:
     virtual QString text() const;
     /** Sets the message text. */
     virtual void setText(const QString &text);
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int textLength() { return 0x0001; }
+      static constexpr unsigned int text()  { return 0x0004; }
+      /// @endcond
+    };
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum message length. */
+      static constexpr unsigned int textLength() { return 64; }
+    };
   };
 
   /** Implements the binary encoding of the preset message bank element.
@@ -932,6 +1242,9 @@ public:
 
     void clear();
 
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x00164; }
+
     /** Retunrs the number of elements in the bank. */
     virtual unsigned int messageCount() const;
     /** Sets the number of messages. */
@@ -939,6 +1252,15 @@ public:
 
     /** Returns a reference to the n-th message. */
     virtual MessageElement message(unsigned int n) const;
+
+  protected:
+    /** Offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messageCount() { return 0x0000; }
+      static constexpr unsigned int messages() { return 0x0004; }
+      /// @endcond
+    };
   };
 
 
@@ -967,6 +1289,9 @@ public:
 
     void clear();
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00018; }
+
     /** Returns the function for the side-key 1, short press. */
     virtual Function sideKey1Short() const;
     /** Sets the function for the side-key 1, short press. */
@@ -991,6 +1316,19 @@ public:
     virtual Function topKeyLong() const;
     /** Sets the function for the side-key, long press. */
     virtual void setTopKeyLong(Function func);
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int sideKey1Short() { return 0x0001; }
+      static constexpr unsigned int sideKey1Long() { return 0x0002; }
+      static constexpr unsigned int sideKey2Short() { return 0x0005; }
+      static constexpr unsigned int sideKey2Long() { return 0x0006; }
+      static constexpr unsigned int topKeyShort() { return 0x0009; }
+      static constexpr unsigned int topKeyLong() { return 0x000a; }
+      /// @endcond
+    };
   };
 
 public:
@@ -1006,6 +1344,30 @@ protected:
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link decoded elements. */
   virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Defines the offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int size()              { return 0x1dd90; }
+    static constexpr unsigned int settings()          { return 0x003b4; }
+    static constexpr unsigned int settingsSize()      { return 0x00064; }
+    static constexpr unsigned int zoneBank()          { return 0x00418; }
+    static constexpr unsigned int zoneBankSize()      { return 0x03cf8; }
+    static constexpr unsigned int messageBank()       { return 0x04110; }
+    static constexpr unsigned int messageBankSize()   { return 0x00164; }
+    static constexpr unsigned int contactBank()       { return 0x04334; }
+    static constexpr unsigned int contactBankSize()   { return 0x06004; }
+    static constexpr unsigned int scanListBank()      { return 0x0a338; }
+    static constexpr unsigned int scanListBankSize()  { return 0x00324; }
+    static constexpr unsigned int channelBank()       { return 0x0a65c; }
+    static constexpr unsigned int channelBankSize()   { return 0x12004; }
+    static constexpr unsigned int keySettings()       { return 0x1c6c4; }
+    static constexpr unsigned int keySettingsSize()   { return 0x00018; }
+    static constexpr unsigned int groupListBank()     { return 0x1c6dc; }
+    static constexpr unsigned int groupListBankSize() { return 0x01104; }
+    /// @endcond
+  };
 };
 
 #endif // DR1801UVCODEPLUG_HH

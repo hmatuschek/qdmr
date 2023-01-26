@@ -2,51 +2,6 @@
 #include "logger.hh"
 #include "utils.hh"
 
-#define TOTAL_SIZE 0x0001dd90
-
-#define NUM_CHANNELS                 1024
-#define ADDR_CHANNEL_BANK         0x0a65c
-#define CHANNEL_BANK_SIZE         0x12004
-#define CHANNEL_OFFSET            0x00004
-#define CHANNEL_ELEMENT_SIZE      0x00034
-#define CHANNEL_NAME_OFFSET       0x0d004
-#define CHANNEL_NAME_SIZE         0x00014
-
-#define NUM_CONTACTS                 1024
-#define ADDR_CONTACT_BANK         0x04334
-#define CONTACT_BANK_SIZE         0x06004
-#define CONTACT_ELEMENT_SIZE      0x00018
-
-#define NUM_GROUP_LISTS                64
-#define ADDR_GROUP_LIST_BANK      0x1c6dc
-#define GROUP_LIST_BANK_SIZE      0x01104
-#define GROUP_LIST_OFFSET         0x00004
-#define GROUP_LIST_ELEMENT_SIZE   0x00044
-#define GROUP_LIST_MEMBER_COUNT        10
-
-#define NUM_ZONES                     150
-#define ADDR_ZONE_BANK            0x00418
-#define ZONE_BANK_SIZE            0x03cf8
-#define ADDR_ZONE_ELEMENTS        0x00420
-#define ZONE_ELEMENT_SIZE         0x00068
-
-#define ADDR_SETTINGS_ELEMENT     0x003b4
-#define SETTINGS_ELEMENT_SIZE     0x00064
-
-#define NUM_SCAN_LISTS                 10
-#define ADDR_SCAN_LIST_BANK       0x0a338
-#define SCAN_LIST_BANK_SIZE       0x00324
-#define SCAN_LIST_ELEMENT_SIZE    0x00050
-
-#define NUM_MESSAGES                    8
-#define ADDR_MESSAGE_BANK         0x04110
-#define MESSAGE_BANK_SIZE         0x00164
-#define MESSAGE_ELEMENT_SIZE      0x00044
-
-#define ADDR_KEY_SETTINGS_ELEMENT 0x1c6c4
-#define KEY_SETTINGS_ELEMENT_SIZE 0x00018
-
-
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelBankElement
@@ -58,38 +13,38 @@ DR1801UVCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, size_t si
 }
 
 DR1801UVCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr)
-  : Element(ptr, CHANNEL_BANK_SIZE)
+  : Element(ptr, ChannelBankElement::size())
 {
   // pass...
 }
 
 void
 DR1801UVCodeplug::ChannelBankElement::clear() {
-  memset(_data, 0, _size);
+  memset(_data, 0, ChannelBankElement::size());
 }
 
 unsigned int
 DR1801UVCodeplug::ChannelBankElement::channelCount() const {
-  return getUInt16_le(0x0000);
+  return getUInt16_le(Offset::channelCount());
 }
 void
 DR1801UVCodeplug::ChannelBankElement::setChannelCount(unsigned int count) {
-  count = std::min((unsigned int)NUM_CHANNELS, count);
-  setUInt16_le(0x0000, count);
+  count = std::min(Limit::channelCount(), count);
+  setUInt16_le(Offset::channelCount(), count);
 }
 
 DR1801UVCodeplug::ChannelElement
 DR1801UVCodeplug::ChannelBankElement::channel(unsigned int index) const {
-  return ChannelElement(_data + CHANNEL_OFFSET + index*CHANNEL_ELEMENT_SIZE);
+  return ChannelElement(_data + Offset::channel() + index*ChannelElement::size());
 }
 
 QString
 DR1801UVCodeplug::ChannelBankElement::channelName(unsigned int index) const {
-  return readASCII(CHANNEL_NAME_OFFSET + index*CHANNEL_NAME_SIZE, CHANNEL_NAME_SIZE, 0x00);
+  return readASCII(Offset::channelName() + index*Size::channelName(), Size::channelName(), 0x00);
 }
 void
 DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const QString &name) {
-  writeASCII(CHANNEL_NAME_OFFSET + index*CHANNEL_NAME_SIZE, name, CHANNEL_NAME_SIZE, 0x00);
+  writeASCII(Offset::channelName() + index*Size::channelName(), name, Size::channelName(), 0x00);
 }
 
 bool
@@ -146,7 +101,7 @@ DR1801UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Element(ptr, CHANNEL_ELEMENT_SIZE)
+  : Element(ptr, ChannelElement::size())
 {
   // pass...
 }
@@ -164,25 +119,25 @@ DR1801UVCodeplug::ChannelElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::ChannelElement::index() const {
-  return getUInt16_le(0x0000);
+  return getUInt16_le(Offset::index());
 }
 void
 DR1801UVCodeplug::ChannelElement::setIndex(unsigned int idx) {
-  setUInt16_le(0x0000, idx);
+  setUInt16_le(Offset::index(), idx);
 }
 
 DR1801UVCodeplug::ChannelElement::Type
 DR1801UVCodeplug::ChannelElement::channelType() const {
-  return (Type)getUInt8(0x002);
+  return (Type)getUInt8(Offset::channelType());
 }
 void
 DR1801UVCodeplug::ChannelElement::setChannelType(Type type) {
-  setUInt8(0x0002, (uint8_t)type);
+  setUInt8(Offset::channelType(), (uint8_t)type);
 }
 
 Channel::Power
 DR1801UVCodeplug::ChannelElement::power() const {
-  switch ((Power)getUInt8(0x003)) {
+  switch ((Power)getUInt8(Offset::power())) {
   case Power::Low: return Channel::Power::Low;
   case Power::High: return Channel::Power::High;
   }
@@ -194,71 +149,71 @@ DR1801UVCodeplug::ChannelElement::setPower(Channel::Power pwr) {
   switch (pwr) {
   case Channel::Power::Min:
   case Channel::Power::Low:
-    setUInt8(0x0003, (uint8_t)Power::Low);
+    setUInt8(Offset::power(), (uint8_t)Power::Low);
     break;
   case Channel::Power::Mid:
   case Channel::Power::High:
   case Channel::Power::Max:
-    setUInt8(0x0003, (uint8_t)Power::High);
+    setUInt8(Offset::power(), (uint8_t)Power::High);
     break;
   }
 }
 
 double
 DR1801UVCodeplug::ChannelElement::rxFrequency() const {
-  return double(getUInt32_le(0x0004))/1e6;
+  return double(getUInt32_le(Offset::rxFrequency()))/1e6;
 }
 void
 DR1801UVCodeplug::ChannelElement::setRXFrequency(double MHz) {
-  setUInt32_le(0x0004, MHz*1e6);
+  setUInt32_le(Offset::rxFrequency(), MHz*1e6);
 }
 double
 DR1801UVCodeplug::ChannelElement::txFrequency() const {
-  return double(getUInt32_le(0x0008))/1e6;
+  return double(getUInt32_le(Offset::txFrequency()))/1e6;
 }
 void
 DR1801UVCodeplug::ChannelElement::setTXFrequency(double MHz) {
-  setUInt32_le(0x0008, MHz*1e6);
+  setUInt32_le(Offset::txFrequency(), MHz*1e6);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::hasTransmitContact() const {
-  return 0 != getUInt16_le(0x000c);
+  return 0 != getUInt16_le(Offset::transmitContactIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::transmitContactIndex() const {
-  return getUInt16_le(0x000c)-1;
+  return getUInt16_le(Offset::transmitContactIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setTransmitContactIndex(unsigned int index) {
-  setUInt16_le(0x000c, index+1);
+  setUInt16_le(Offset::transmitContactIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearTransmitContactIndex() {
-  setUInt16_le(0x000c, 0);
+  setUInt16_le(Offset::transmitContactIndex(), 0);
 }
 
 DR1801UVCodeplug::ChannelElement::Admit
 DR1801UVCodeplug::ChannelElement::admitCriterion() const {
-  return (Admit) getUInt8(0x000e);
+  return (Admit) getUInt8(Offset::admitCriterion());
 }
 void
 DR1801UVCodeplug::ChannelElement::setAdmitCriterion(Admit admit) {
-  setUInt8(0x000e, (uint8_t)admit);
+  setUInt8(Offset::admitCriterion(), (uint8_t)admit);
 }
 
 unsigned int
 DR1801UVCodeplug::ChannelElement::colorCode() const {
-  return getUInt8(0x0010);
+  return getUInt8(Offset::colorCode());
 }
 void
 DR1801UVCodeplug::ChannelElement::setColorCode(unsigned int cc) {
-  setUInt8(0x0010, cc);
+  setUInt8(Offset::colorCode(), cc);
 }
 
 DMRChannel::TimeSlot
 DR1801UVCodeplug::ChannelElement::timeSlot() const {
-  switch ((TimeSlot)getUInt8(0x0011)) {
+  switch ((TimeSlot)getUInt8(Offset::timeSlot())) {
   case TimeSlot::TS1: return DMRChannel::TimeSlot::TS1;
   case TimeSlot::TS2: return DMRChannel::TimeSlot::TS2;
   }
@@ -267,74 +222,74 @@ DR1801UVCodeplug::ChannelElement::timeSlot() const {
 void
 DR1801UVCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   switch (ts) {
-  case DMRChannel::TimeSlot::TS1: setUInt8(0x0011, (uint8_t)TimeSlot::TS1); break;
-  case DMRChannel::TimeSlot::TS2: setUInt8(0x0011, (uint8_t)TimeSlot::TS2); break;
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::timeSlot(), (uint8_t)TimeSlot::TS1); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::timeSlot(), (uint8_t)TimeSlot::TS2); break;
   }
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::hasEncryptionKey() const {
-  return 0 != getUInt8(0x0014);
+  return 0 != getUInt8(Offset::encryptionKeyIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::encryptionKeyIndex() const {
-  return getUInt8(0x0014)-1;
+  return getUInt8(Offset::encryptionKeyIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned int index) {
-  setUInt8(0x0014, index+1);
+  setUInt8(Offset::encryptionKeyIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearEncryptionKeyIndex() {
-  setUInt8(0x0014, 0);
+  setUInt8(Offset::encryptionKeyIndex(), 0);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::dcdm() const {
-  return getBit(0x0015, 1);
+  return getBit(Offset::dcdm().byte, Offset::dcdm().bit);
 }
 void
 DR1801UVCodeplug::ChannelElement::enableDCDM(bool enable) {
-  setBit(0x0015, 1, enable);
+  setBit(Offset::dcdm().byte, Offset::dcdm().bit, enable);
 }
 bool
 DR1801UVCodeplug::ChannelElement::confirmPrivateCall() const {
-  return getBit(0x0015, 0);
+  return getBit(Offset::confirmPivateCall().byte, Offset::confirmPivateCall().bit);
 }
 void
 DR1801UVCodeplug::ChannelElement::enablePrivateCallConfirmation(bool enable) {
-  setBit(0x0015, 0, enable);
+  setBit(Offset::confirmPivateCall().byte, Offset::confirmPivateCall().bit, enable);
 }
 
 DR1801UVCodeplug::ChannelElement::SignalingMode
 DR1801UVCodeplug::ChannelElement::signalingMode() const {
-  return (SignalingMode) getUInt8(0x0016);
+  return (SignalingMode) getUInt8(Offset::signalingMode());
 }
 void
 DR1801UVCodeplug::ChannelElement::setSignalingMode(SignalingMode mode) {
-  setUInt8(0x0016, (uint8_t)mode);
+  setUInt8(Offset::signalingMode(), (uint8_t)mode);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::hasAlarmSystem() const {
-  return 0 != getUInt8(0x0018);
+  return 0 != getUInt8(Offset::alarmSystemIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::alarmSystemIndex() const {
-  return getUInt8(0x0018)-1;
+  return getUInt8(Offset::alarmSystemIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setAlarmSystemIndex(unsigned int index) {
-  setUInt8(0x0018, index+1);
+  setUInt8(Offset::alarmSystemIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearAlarmSystemIndex() {
-  setUInt8(0x0018, 0);
+  setUInt8(Offset::alarmSystemIndex(), 0);
 }
 
 FMChannel::Bandwidth
 DR1801UVCodeplug::ChannelElement::bandwidth() const {
-  switch ((Bandwidth)getUInt8(0x0019)) {
+  switch ((Bandwidth)getUInt8(Offset::bandwidth())) {
   case Bandwidth::Narrow: return FMChannel::Bandwidth::Narrow;
   case Bandwidth::Wide: return FMChannel::Bandwidth::Wide;
   }
@@ -343,41 +298,41 @@ DR1801UVCodeplug::ChannelElement::bandwidth() const {
 void
 DR1801UVCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
   switch (bw){
-  case FMChannel::Bandwidth::Narrow: setUInt8(0x0019, (uint8_t)Bandwidth::Narrow); break;
-  case FMChannel::Bandwidth::Wide:   setUInt8(0x0019, (uint8_t)Bandwidth::Wide); break;
+  case FMChannel::Bandwidth::Narrow: setUInt8(Offset::bandwidth(), (uint8_t)Bandwidth::Narrow); break;
+  case FMChannel::Bandwidth::Wide:   setUInt8(Offset::bandwidth(), (uint8_t)Bandwidth::Wide); break;
   }
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::autoScanEnabled() const {
-  return 0x01 == getUInt8(0x001a);
+  return 0x01 == getUInt8(Offset::autoScan());
 }
 void
 DR1801UVCodeplug::ChannelElement::enableAutoScan(bool enable) {
-  setUInt8(0x001a, enable ? 0x01 : 0x00);
+  setUInt8(Offset::autoScan(), enable ? 0x01 : 0x00);
 }
 bool
 DR1801UVCodeplug::ChannelElement::hasScanList() const {
-  return 0x00 != getUInt8(0x001b);
+  return 0x00 != getUInt8(Offset::scanListIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::scanListIndex() const {
-  return getUInt8(0x001b)-1;
+  return getUInt8(Offset::scanListIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setScanListIndex(unsigned int index) {
-  setUInt8(0x001b, index+1);
+  setUInt8(Offset::scanListIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearScanListIndex() {
-  setUInt8(0x001b, 0);
+  setUInt8(Offset::scanListIndex(), 0);
 }
 
 Signaling::Code
 DR1801UVCodeplug::ChannelElement::rxTone() const {
-  uint16_t ctcss_dcs = getUInt16_le(0x001c);
-  SubToneType type = (SubToneType)getUInt8(0x001e);
-  DCSMode dcsMode = (DCSMode)getUInt8(0x001f);
+  uint16_t ctcss_dcs = getUInt16_le(Offset::rxSubtoneCode());
+  SubToneType type = (SubToneType)getUInt8(Offset::rxSubtoneType());
+  DCSMode dcsMode = (DCSMode)getUInt8(Offset::rxDCSMode());
   switch (type) {
   case SubToneType::None: return Signaling::SIGNALING_NONE;
   case SubToneType::CTCSS: return Signaling::fromCTCSSFrequency(float(ctcss_dcs)/10);
@@ -398,16 +353,16 @@ DR1801UVCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
     ctcss_dcs = Signaling::toDCSNumber(code);
     dcsMode = Signaling::isDCSInverted(code) ? DCSMode::Inverted : DCSMode::Normal;
   }
-  setUInt16_le(0x001c, ctcss_dcs);
-  setUInt8(0x001e, (uint8_t)type);
-  setUInt8(0x001f, (uint8_t)dcsMode);
+  setUInt16_le(Offset::rxSubtoneCode(), ctcss_dcs);
+  setUInt8(Offset::rxSubtoneType(), (uint8_t)type);
+  setUInt8(Offset::rxDCSMode(), (uint8_t)dcsMode);
 }
 
 Signaling::Code
 DR1801UVCodeplug::ChannelElement::txTone() const {
-  uint16_t ctcss_dcs = getUInt16_le(0x0020);
-  SubToneType type = (SubToneType)getUInt8(0x0022);
-  DCSMode dcsMode = (DCSMode)getUInt8(0x0023);
+  uint16_t ctcss_dcs = getUInt16_le(Offset::txSubtoneCode());
+  SubToneType type = (SubToneType)getUInt8(Offset::txSubtoneType());
+  DCSMode dcsMode = (DCSMode)getUInt8(Offset::txDCSMode());
   switch (type) {
   case SubToneType::None: return Signaling::SIGNALING_NONE;
   case SubToneType::CTCSS: return Signaling::fromCTCSSFrequency(float(ctcss_dcs)/10);
@@ -428,61 +383,61 @@ DR1801UVCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
     ctcss_dcs = Signaling::toDCSNumber(code);
     dcsMode = Signaling::isDCSInverted(code) ? DCSMode::Inverted : DCSMode::Normal;
   }
-  setUInt16_le(0x0020, ctcss_dcs);
-  setUInt8(0x0022, (uint8_t)type);
-  setUInt8(0x0023, (uint8_t)dcsMode);
+  setUInt16_le(Offset::txSubtoneCode(), ctcss_dcs);
+  setUInt8(Offset::txSubtoneType(), (uint8_t)type);
+  setUInt8(Offset::txDCSMode(), (uint8_t)dcsMode);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::talkaround() const {
-  return getBit(0x0025, 7);
+  return getBit(Offset::talkaround(), 7);
 }
 void
 DR1801UVCodeplug::ChannelElement::enableTalkaround(bool enable) {
-  setBit(0x0025, 7, enable);
+  setBit(Offset::talkaround(), 7, enable);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::hasPTTID() const {
-  return 0 != getUInt8(0x0028);
+  return 0 != getUInt8(Offset::pttIDIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::pttIDIndex() const {
-  return getUInt8(0x0028)-1;
+  return getUInt8(Offset::pttIDIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setPTTIDIndex(unsigned int idx) {
-  setUInt8(0x0028, idx+1);
+  setUInt8(Offset::pttIDIndex(), idx+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearPTTID() {
-  setUInt8(0x0028, 0);
+  setUInt8(Offset::pttIDIndex(), 0);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::hasGroupList() const {
-  return 0 != getUInt8(0x002a);
+  return 0 != getUInt8(Offset::groupListIndex());
 }
 unsigned int
 DR1801UVCodeplug::ChannelElement::groupListIndex() const {
-  return getUInt8(0x002a)-1;
+  return getUInt8(Offset::groupListIndex())-1;
 }
 void
 DR1801UVCodeplug::ChannelElement::setGroupListIndex(unsigned int index) {
-  setUInt8(0x002a, index+1);
+  setUInt8(Offset::groupListIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ChannelElement::clearGroupListIndex() {
-  setUInt8(0x002a, 0);
+  setUInt8(Offset::groupListIndex(), 0);
 }
 
 bool
 DR1801UVCodeplug::ChannelElement::loneWorker() const {
-  return 0x01 == getUInt8(0x002f);
+  return 0x01 == getUInt8(Offset::loneWorker());
 }
 void
 DR1801UVCodeplug::ChannelElement::enableLoneWorker(bool enable) {
-  setUInt8(0x002f, enable ? 0x01 : 0x00);
+  setUInt8(Offset::loneWorker(), enable ? 0x01 : 0x00);
 }
 
 
@@ -567,38 +522,38 @@ DR1801UVCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t si
 }
 
 DR1801UVCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr)
-  : Element(ptr, CONTACT_BANK_SIZE)
+  : Element(ptr, ContactBankElement::size())
 {
   // pass...
 }
 
 void
 DR1801UVCodeplug::ContactBankElement::clear() {
-  memset(_data, 0, _size);
+  memset(_data, 0, ContactBankElement::size());
 }
 
 unsigned int
 DR1801UVCodeplug::ContactBankElement::contactCount() const {
-  return getUInt16_le(0x0000);
+  return getUInt16_le(Offset::contactCount());
 }
 void
 DR1801UVCodeplug::ContactBankElement::setContactCount(unsigned int count) {
-  count = std::min((unsigned int)NUM_CONTACTS, count);
-  setUInt16_le(0x0000, count);
+  count = std::min(Limit::contactCount(), count);
+  setUInt16_le(Offset::contactCount(), count);
 }
 
 unsigned int
 DR1801UVCodeplug::ContactBankElement::firstIndex() const {
-  return getUInt16_le(0x0002)-1;
+  return getUInt16_le(Offset::firstIndex())-1;
 }
 void
 DR1801UVCodeplug::ContactBankElement::setFirstIndex(unsigned int index) {
-  setUInt16_le(0x0002, index+1);
+  setUInt16_le(Offset::firstIndex(), index+1);
 }
 
 DR1801UVCodeplug::ContactElement
 DR1801UVCodeplug::ContactBankElement::contact(unsigned int index) const {
-  return ContactElement(_data + 4 + index*CONTACT_ELEMENT_SIZE);
+  return ContactElement(_data + Offset::contacts() + index*ContactElement::size());
 }
 
 bool
@@ -659,14 +614,14 @@ DR1801UVCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, CONTACT_ELEMENT_SIZE)
+  : Element(ptr, ContactElement::size())
 {
   // pass...
 }
 
 bool
 DR1801UVCodeplug::ContactElement::isValid() const {
-  return 0 != getUInt8(0x0002) &&  // has name
+  return 0 != getUInt8(Offset::nameLength()) &&  // has name
       0 != getUInt24_le(0x0004) && // has DMR ID
       0 != getUInt8(0x0007);       // has call type
 }
@@ -678,35 +633,35 @@ DR1801UVCodeplug::ContactElement::clear() {
 
 bool
 DR1801UVCodeplug::ContactElement::hasSuccessor() const {
-  return 0x0000 != getUInt16_le(0x0000);
+  return 0x0000 != getUInt16_le(Offset::successorIndex());
 }
 uint16_t
 DR1801UVCodeplug::ContactElement::successorIndex() const {
-  return getUInt16_le(0x0000)-1;
+  return getUInt16_le(Offset::successorIndex())-1;
 }
 void
 DR1801UVCodeplug::ContactElement::setSuccessorIndex(uint16_t index) {
-  setUInt16_le(0x0000, index+1);
+  setUInt16_le(Offset::successorIndex(), index+1);
 }
 void
 DR1801UVCodeplug::ContactElement::clearSuccessorIndex() {
-  setUInt16_le(0x0000, 0);
+  setUInt16_le(Offset::successorIndex(), 0);
 }
 
 uint32_t
 DR1801UVCodeplug::ContactElement::dmrID() const {
   if (DMRContact::AllCall == type())
     return 0xffffff;
-  return getUInt24_le(0x0004);
+  return getUInt24_le(Offset::dmrID());
 }
 void
 DR1801UVCodeplug::ContactElement::setDMRID(uint32_t id) {
-  setUInt24_le(0x0004, id);
+  setUInt24_le(Offset::dmrID(), id);
 }
 
 DMRContact::Type
 DR1801UVCodeplug::ContactElement::type() const {
-  switch ((CallType)getUInt8(0x0007)) {
+  switch ((CallType)getUInt8(Offset::callType())) {
   case CallType::AllCall: return DMRContact::AllCall;
   case CallType::PrivateCall: return DMRContact::PrivateCall;
   case CallType::GroupCall: return DMRContact::GroupCall;
@@ -717,23 +672,23 @@ void
 DR1801UVCodeplug::ContactElement::setCallType(DMRContact::Type type) {
   switch (type) {
   case DMRContact::AllCall:
-    setUInt8(0x0007, (uint8_t)CallType::AllCall);
+    setUInt8(Offset::callType(), (uint8_t)CallType::AllCall);
     setDMRID(0xffffff);
     break;
-  case DMRContact::PrivateCall: setUInt8(0x0007, (uint8_t)CallType::PrivateCall); break;
-  case DMRContact::GroupCall: setUInt8(0x0007, (uint8_t)CallType::GroupCall); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::callType(), (uint8_t)CallType::PrivateCall); break;
+  case DMRContact::GroupCall: setUInt8(Offset::callType(), (uint8_t)CallType::GroupCall); break;
   }
 }
 
 QString
 DR1801UVCodeplug::ContactElement::name() const {
-  return readASCII(0x0008, getUInt8(0x0002), 0x00);
+  return readASCII(Offset::name(), getUInt8(Offset::nameLength()), 0x00);
 }
 void
 DR1801UVCodeplug::ContactElement::setName(const QString &name) {
   uint8_t len = std::min(16, name.size());
-  setUInt8(0x0002, len);
-  writeASCII(0x0008, name, 16, 0x00);
+  setUInt8(Offset::nameLength(), len);
+  writeASCII(Offset::name(), name, 16, 0x00);
 }
 
 DMRContact *
@@ -759,7 +714,7 @@ DR1801UVCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, size_
 }
 
 DR1801UVCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
-  : Element(ptr, GROUP_LIST_BANK_SIZE)
+  : Element(ptr, GroupListBankElement::size())
 {
   // pass...
 }
@@ -771,17 +726,17 @@ DR1801UVCodeplug::GroupListBankElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::GroupListBankElement::groupListCount() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::groupListCount());
 }
 void
 DR1801UVCodeplug::GroupListBankElement::setGroupListCount(unsigned int count) {
-  count = std::min((unsigned int)NUM_GROUP_LISTS, count);
-  setUInt8(0x0000, count);
+  count = std::min(Limit::groupListCount(), count);
+  setUInt8(Offset::groupListCount(), count);
 }
 
 DR1801UVCodeplug::GroupListElement
 DR1801UVCodeplug::GroupListBankElement::groupList(unsigned int index) const {
-  return GroupListElement(_data + GROUP_LIST_OFFSET + index*GROUP_LIST_ELEMENT_SIZE);
+  return GroupListElement(_data + Offset::groupLists() + index*GroupListElement::size());
 }
 
 bool
@@ -835,7 +790,7 @@ DR1801UVCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, GROUP_LIST_ELEMENT_SIZE)
+  : Element(ptr, GroupListElement::size())
 {
   // pass...
 }
@@ -847,37 +802,37 @@ DR1801UVCodeplug::GroupListElement::clear() {
 
 bool
 DR1801UVCodeplug::GroupListElement::isValid() const {
-  return 0 != getUInt16_le(0x0002);
+  return 0 != getUInt16_le(Offset::index());
 }
 
 uint16_t
 DR1801UVCodeplug::GroupListElement::index() const {
-  return getUInt16_le(0x0002)-1;
+  return getUInt16_le(Offset::index())-1;
 }
 void
 DR1801UVCodeplug::GroupListElement::setIndex(uint16_t index) {
-  setUInt16_le(0x0002, index-1);
+  setUInt16_le(Offset::index(), index-1);
 }
 
 uint16_t
 DR1801UVCodeplug::GroupListElement::count() const {
-  return getUInt16_le(0x0000);
+  return getUInt16_le(Offset::count());
 }
 bool
 DR1801UVCodeplug::GroupListElement::hasMemberIndex(uint8_t n) const {
-  return 0 != getUInt16_le(0x0004 + n*0x02);
+  return 0 != getUInt16_le(Offset::members() + n*0x02);
 }
 uint16_t
 DR1801UVCodeplug::GroupListElement::memberIndex(uint8_t n) const {
-  return getUInt16_le(0x0004 + n*0x02) - 1;
+  return getUInt16_le(Offset::members() + n*0x02) - 1;
 }
 void
 DR1801UVCodeplug::GroupListElement::setMemberIndex(uint8_t n, uint16_t index) {
-  setUInt16_le(0x0004 + n*0x02, index+1);
+  setUInt16_le(Offset::members() + n*0x02, index+1);
 }
 void
 DR1801UVCodeplug::GroupListElement::clearMemberIndex(uint8_t n) {
-  setUInt16_le(0x0004 + n*0x02, 0);
+  setUInt16_le(Offset::members() + n*0x02, 0);
 }
 
 RXGroupList *
@@ -892,7 +847,7 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
   if (! isValid())
     return false;
 
-  for (int i=0; i<GROUP_LIST_MEMBER_COUNT; i++) {
+  for (int i=0; i<count(); i++) {
     if (! hasMemberIndex(i))
       continue;
     if (! ctx.has<DMRContact>(memberIndex(i))) {
@@ -916,7 +871,7 @@ DR1801UVCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
-  : Element(ptr, ZONE_BANK_SIZE)
+  : Element(ptr, ZoneBankElement::size())
 {
   // pass...
 }
@@ -928,35 +883,35 @@ DR1801UVCodeplug::ZoneBankElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::ZoneBankElement::zoneCount() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::zoneCount());
 }
 void
 DR1801UVCodeplug::ZoneBankElement::setZoneCount(unsigned int count) {
-  count = std::min((unsigned int)NUM_ZONES, count);
-  setUInt8(0x0000, count);
+  count = std::min(Limit::zoneCount(), count);
+  setUInt8(Offset::zoneCount(), count);
 }
 
 unsigned int
 DR1801UVCodeplug::ZoneBankElement::upZoneIndex() const {
-  return getUInt16_le(0x0002);
+  return getUInt16_le(Offset::upZoneIndex());
 }
 void
 DR1801UVCodeplug::ZoneBankElement::setUpZoneIndex(unsigned int index) {
-  setUInt16_le(0x0002, index);
+  setUInt16_le(Offset::upZoneIndex(), index);
 }
 
 unsigned int
 DR1801UVCodeplug::ZoneBankElement::downZoneIndex() const {
-  return getUInt16_le(0x0004);
+  return getUInt16_le(Offset::downZoneIndex());
 }
 void
 DR1801UVCodeplug::ZoneBankElement::setDownZoneIndex(unsigned int index) {
-  setUInt16_le(0x0004, index);
+  setUInt16_le(Offset::downZoneIndex(), index);
 }
 
 DR1801UVCodeplug::ZoneElement
 DR1801UVCodeplug::ZoneBankElement::zone(unsigned int index) const {
-  return ZoneElement(_data + 8 + index*ZONE_ELEMENT_SIZE);
+  return ZoneElement(_data + Offset::zones() + index*ZoneElement::size());
 }
 
 bool
@@ -1019,7 +974,7 @@ DR1801UVCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
-  : Element(ptr, ZONE_ELEMENT_SIZE)
+  : Element(ptr, ZoneElement::size())
 {
   // pass...
 }
@@ -1032,43 +987,43 @@ DR1801UVCodeplug::ZoneElement::clear() {
 bool
 DR1801UVCodeplug::ZoneElement::isValid() const {
   // Read name-length and channel count
-  return (0 != getUInt8(0x0020)) && (0 != getUInt8(0x0022));
+  return (0 != getUInt8(Offset::nameLength())) && (0 != getUInt8(Offset::numEntries()));
 }
 
 QString
 DR1801UVCodeplug::ZoneElement::name() const {
-  uint8_t n = getUInt8(0x0020);
-  return readASCII(0x0000, n, 0x00);
+  uint8_t n = getUInt8(Offset::nameLength());
+  return readASCII(Offset::name(), n, 0x00);
 }
 void
 DR1801UVCodeplug::ZoneElement::setName(const QString &name) {
   uint8_t n = std::min(32, name.length());
-  setUInt8(0x0020, n);
-  writeASCII(0x0000, name, 32, 0x00);
+  setUInt8(Offset::nameLength(), n);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 unsigned int
 DR1801UVCodeplug::ZoneElement::index() const {
-  return getUInt16_le(0x0024);
+  return getUInt16_le(Offset::index());
 }
 void
 DR1801UVCodeplug::ZoneElement::setIndex(unsigned int index) {
-  setUInt16_le(0x0024, index);
+  setUInt16_le(Offset::index(), index);
 }
 
 unsigned int
 DR1801UVCodeplug::ZoneElement::numEntries() const {
-  return getUInt8(0x0022);
+  return getUInt8(Offset::numEntries());
 }
 unsigned int
 DR1801UVCodeplug::ZoneElement::entryIndex(unsigned int n) {
-  n = std::min(32U, n);
-  return getUInt16_le(0x0028+2*n);
+  n = std::min(Limit::memberCount(), n);
+  return getUInt16_le(Offset::members()+2*n);
 }
 void
 DR1801UVCodeplug::ZoneElement::setEntryIndex(unsigned int n, unsigned int index) {
-  n = std::min(32U, n);
-  setUInt16_le(0x0028 + 2*n, index);
+  n = std::min(Limit::memberCount(), n);
+  setUInt16_le(Offset::members() + 2*n, index);
 }
 
 Zone *
@@ -1110,7 +1065,7 @@ DR1801UVCodeplug::SettingsElement::SettingsElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::SettingsElement::SettingsElement(uint8_t *ptr)
-  : Element(ptr, SETTINGS_ELEMENT_SIZE)
+  : Element(ptr, SettingsElement::size())
 {
   // psas...
 }
@@ -1122,358 +1077,360 @@ DR1801UVCodeplug::SettingsElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::SettingsElement::dmrID() const {
-  return getUInt24_le(0x0000);
+  return getUInt24_le(Offset::dmrID());
 }
 void
 DR1801UVCodeplug::SettingsElement::setDMRID(unsigned int id) {
-  setUInt24_le(0x0000, id);
+  setUInt24_le(Offset::dmrID(), id);
 }
 
 DR1801UVCodeplug::SettingsElement::PowerSaveMode
 DR1801UVCodeplug::SettingsElement::powerSaveMode() const {
-  if (0x00 == getUInt8(0x0008)) {
+  if (0x00 == getUInt8(Offset::powerSaveEnabled())) {
     // Power save disabled
     return PowerSaveMode::Off;
   }
-  return (PowerSaveMode)getUInt8(0x0009);
+  return (PowerSaveMode)getUInt8(Offset::powerSaveMode());
 }
 void
 DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
-  setUInt8(0x0008, PowerSaveMode::Off != mode ? 0x01 : 0x00);
-  setUInt8(0x0009, (uint8_t) mode);
+  setUInt8(Offset::powerSaveEnabled(), PowerSaveMode::Off != mode ? 0x01 : 0x00);
+  setUInt8(Offset::powerSaveMode(), (uint8_t) mode);
 }
 
 unsigned int
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
-  if (0x00 == getUInt8(0x0030)) {
+  if (0x00 == getUInt8(Offset::voxEnabled())) {
     return 0;
   }
-  return getUInt8(0x000a)*10/3;
+  return getUInt8(Offset::voxSensitivity())*10/3;
 }
 void
 DR1801UVCodeplug::SettingsElement::setVOXSensitivity(unsigned int sens) {
   if (0 == sens) {
-    setUInt8(0x0030, 0x00);
+    setUInt8(Offset::voxEnabled(), 0x00);
   } else {
-    setUInt8(0x0030, 0x01);
-    setUInt8(0x000a, 1+sens*2/10);
+    setUInt8(Offset::voxEnabled(), 0x01);
+    setUInt8(Offset::voxSensitivity(), 1+sens*2/10);
   }
 }
 unsigned int
 DR1801UVCodeplug::SettingsElement::voxDelay() const {
-  return getUInt8(0x000c)*500;
+  return getUInt8(Offset::voxDelay())*500;
 }
 void
 DR1801UVCodeplug::SettingsElement::setVOXDelay(unsigned int ms) {
-  setUInt8(0x000c, ms/500);
+  setUInt8(Offset::voxDelay(), ms/500);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::encryptionEnabled() const {
-  return 0x01 == getUInt8(0x000d);
+  return 0x01 == getUInt8(Offset::encryptionEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableEncryption(bool enable) {
-  setUInt8(0x000d, enable ? 0x01 : 0x00);
+  setUInt8(Offset::encryptionEnabled(), enable ? 0x01 : 0x00);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::keyLockEnabled() const {
-  return 0x01 == getUInt8(0x0017);
+  return 0x01 == getUInt8(Offset::keyLockEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableKeyLock(bool enable) {
-  setUInt8(0x0017, enable ? 0x01 : 0x00);
+  setUInt8(Offset::keyLockEnabled(), enable ? 0x01 : 0x00);
 }
 unsigned int
 DR1801UVCodeplug::SettingsElement::keyLockDelay() const {
-  return getUInt8(0x000e);
+  return getUInt8(Offset::keyLockDelay());
 }
 void
 DR1801UVCodeplug::SettingsElement::setKeyLockDelay(unsigned int sec) {
-  setUInt8(0x000e, sec);
+  setUInt8(Offset::keyLockDelay(), sec);
 }
 bool
 DR1801UVCodeplug::SettingsElement::lockSideKey1() const {
-  return getBit(0x000f, 1);
+  return getBit(Offset::lockSideKey1().byte, Offset::lockSideKey1().bit);
 }
 void
 DR1801UVCodeplug::SettingsElement::enableLockSideKey1(bool enable) {
-  setBit(0x000f, 1, enable);
+  setBit(Offset::lockSideKey1().byte, Offset::lockSideKey1().bit, enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::lockSideKey2() const {
-  return getBit(0x000f, 2);
+  return getBit(Offset::lockSideKey2().byte, Offset::lockSideKey2().bit);
 }
 void
 DR1801UVCodeplug::SettingsElement::enableLockSideKey2(bool enable) {
-  setBit(0x000f, 2, enable);
+  setBit(Offset::lockSideKey2().byte, Offset::lockSideKey2().bit, enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::lockPTT() const {
-  return getBit(0x000f, 0);
+  return getBit(Offset::lockPTT().byte, Offset::lockPTT().bit);
 }
 void
 DR1801UVCodeplug::SettingsElement::enableLockPTT(bool enable) {
-  setBit(0x000f, 0, enable);
+  setBit(Offset::lockPTT().byte, Offset::lockPTT().bit, enable);
 }
 
 DR1801UVCodeplug::SettingsElement::Language
 DR1801UVCodeplug::SettingsElement::language() const {
-  return (Language) getUInt8(0x0010);
+  return (Language) getUInt8(Offset::language());
 }
 void
 DR1801UVCodeplug::SettingsElement::setLanguage(Language lang) {
-  setUInt8(0x0010, (uint8_t)lang);
+  setUInt8(Offset::language(), (uint8_t)lang);
 }
 
 DR1801UVCodeplug::SettingsElement::SquelchMode
 DR1801UVCodeplug::SettingsElement::squelchMode() const {
-  return (SquelchMode) getUInt8(0x0011);
+  return (SquelchMode) getUInt8(Offset::squelchMode());
 }
 void
 DR1801UVCodeplug::SettingsElement::setSquelchMode(SquelchMode mode) {
-  setUInt8(0x0011, (uint8_t)mode);
+  setUInt8(Offset::squelchMode(), (uint8_t)mode);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::rogerTonesEnabled() const {
-  return 0x01 == getUInt8(0x0013);
+  return 0x01 == getUInt8(Offset::rogerTonesEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableRogerTones(bool enable) {
-  setUInt8(0x0013, enable ? 0x01 : 0x00);
+  setUInt8(Offset::rogerTonesEnabled(), enable ? 0x01 : 0x00);
 }
 bool
 DR1801UVCodeplug::SettingsElement::dmrCallOutToneEnabled() const {
-  return getBit(0x0028, 1);
+  return getBit(Offset::dmrCallOutToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableDMRCallOutTone(bool enable) {
-  setBit(0x0028, 1, enable);
+  setBit(Offset::dmrCallOutToneEnabled(), enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::fmCallOutToneEnabled() const {
-  return getBit(0x0028, 2);
+  return getBit(Offset::fmCallOutToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableFMCallOutTone(bool enable) {
-  setBit(0x0028, 2, enable);
+  setBit(Offset::fmCallOutToneEnabled(), enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::dmrVoiceEndToneEnabled() const {
-  return getBit(0x0028, 3);
+  return getBit(Offset::dmrVoiceEndToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableDMRVoiceEndTone(bool enable) {
-  setBit(0x0028, 3, enable);
+  setBit(Offset::dmrVoiceEndToneEnabled(), enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::fmVoiceEndToneEnabled() const {
-  return getBit(0x0028, 4);
+  return getBit(Offset::fmVoiceEndToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableFMVoiceEndTone(bool enable) {
-  setBit(0x0028, 4, enable);
+  setBit(Offset::fmVoiceEndToneEnabled(), enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::dmrCallEndToneEnabled() const {
-  return getBit(0x0028, 5);
+  return getBit(Offset::dmrCallEndToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableDMRCallEndTone(bool enable) {
-  setBit(0x0028, 5, enable);
+  setBit(Offset::dmrCallEndToneEnabled(), enable);
 }
 bool
 DR1801UVCodeplug::SettingsElement::messageToneEnabled() const {
-  return getBit(0x0028, 6);
+  return getBit(Offset::messageToneEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableMessageTone(bool enable) {
-  setBit(0x0028, 6, enable);
+  setBit(Offset::messageToneEnabled(), enable);
 }
 
 DR1801UVCodeplug::SettingsElement::RingTone
 DR1801UVCodeplug::SettingsElement::ringTone() const {
-  return (RingTone) getUInt8(0x0016);
+  return (RingTone) getUInt8(Offset::ringTone());
 }
 void
 DR1801UVCodeplug::SettingsElement::setRingTone(RingTone tone) {
-  setUInt8(0x0016, (uint8_t)tone);
+  setUInt8(Offset::ringTone(), (uint8_t)tone);
 }
 
 QString
 DR1801UVCodeplug::SettingsElement::radioName() const {
-  return readASCII(0x0018, 16, 0x00);
+  return readASCII(Offset::radioName(), Limit::radioNameLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::setRadioName(const QString &name) {
-  writeASCII(0x0018, name, 16, 0x00);
+  writeASCII(Offset::radioName(), name, Limit::radioNameLength(), 0x00);
 }
 
 float
 DR1801UVCodeplug::SettingsElement::reverseBurstFrequency() const {
-  return float(getUInt16_le(0x002c))/10;
+  return float(getUInt16_le(Offset::reverseBurstFrequency()))/10;
 }
 void
 DR1801UVCodeplug::SettingsElement::setReverseBurstFrequency(float Hz) {
-  setUInt16_le(0x002c, Hz*10);
+  setUInt16_le(Offset::reverseBurstFrequency(), Hz*10);
 }
 
 DR1801UVCodeplug::SettingsElement::BacklightTime
 DR1801UVCodeplug::SettingsElement::backlightTime() const {
-  return (BacklightTime) getUInt8(0x002f);
+  return (BacklightTime) getUInt8(Offset::backlightTime());
 }
 void
 DR1801UVCodeplug::SettingsElement::setBacklightTime(BacklightTime time) {
-  setUInt8(0x002f, (uint8_t)time);
+  setUInt8(Offset::backlightTime(), (uint8_t)time);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::campandingEnabled() const {
-  return 0x01 == getUInt8(0x0032);
+  return 0x01 == getUInt8(Offset::campandingEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableCampanding(bool enable) {
-  setUInt8(0x0032, enable ? 0x01 : 0x00);
+  setUInt8(Offset::campandingEnabled(), enable ? 0x01 : 0x00);
 }
 
 DR1801UVCodeplug::SettingsElement::TuningMode
 DR1801UVCodeplug::SettingsElement::tunigModeUp() const {
-  return (TuningMode) getUInt8(0x0036);
+  return (TuningMode) getUInt8(Offset::tuningModeUp());
 }
 void
 DR1801UVCodeplug::SettingsElement::setTuningModeUp(TuningMode mode) {
-  setUInt8(0x0036, (uint8_t)mode);
+  setUInt8(Offset::tuningModeUp(), (uint8_t)mode);
 }
 DR1801UVCodeplug::SettingsElement::TuningMode
 DR1801UVCodeplug::SettingsElement::tunigModeDown() const {
-  return (TuningMode) getUInt8(0x0037);
+  return (TuningMode) getUInt8(Offset::tunigModeDown());
 }
 void
 DR1801UVCodeplug::SettingsElement::setTuningModeDown(TuningMode mode) {
-  setUInt8(0x0037, (uint8_t)mode);
+  setUInt8(Offset::tunigModeDown(), (uint8_t)mode);
 }
 
 DR1801UVCodeplug::SettingsElement::DisplayMode
 DR1801UVCodeplug::SettingsElement::displayMode() const {
-  return (DisplayMode)getUInt8(0x003c);
+  return (DisplayMode)getUInt8(Offset::displayMode());
 }
 void
 DR1801UVCodeplug::SettingsElement::setDisplayMode(DisplayMode mode) {
-  setUInt8(0x003c, (uint8_t)mode);
+  setUInt8(Offset::displayMode(), (uint8_t)mode);
 }
 
 DR1801UVCodeplug::SettingsElement::DualWatchMode
 DR1801UVCodeplug::SettingsElement::dualWatchMode() const {
-  return (DualWatchMode) getUInt8(0x003d);
+  return (DualWatchMode) getUInt8(Offset::dualWatchMode());
 }
 void
 DR1801UVCodeplug::SettingsElement::setDualWatchMode(DualWatchMode mode) {
-  setUInt8(0x003d, (uint8_t)mode);
+  setUInt8(Offset::dualWatchMode(), (uint8_t)mode);
 }
 
 DR1801UVCodeplug::SettingsElement::ScanMode
 DR1801UVCodeplug::SettingsElement::scanMode() const {
-  return (ScanMode) getUInt8(0x003e);
+  return (ScanMode) getUInt8(Offset::scanMode());
 }
 void
 DR1801UVCodeplug::SettingsElement::setScanMode(ScanMode mode) {
-  setUInt8(0x003e, (uint8_t)mode);
+  setUInt8(Offset::scanMode(), (uint8_t)mode);
 }
 
 DR1801UVCodeplug::SettingsElement::BootScreen
 DR1801UVCodeplug::SettingsElement::bootScreen() const {
-  return (BootScreen) getUInt8(0x003f);
+  return (BootScreen) getUInt8(Offset::bootScreen());
 }
 void
 DR1801UVCodeplug::SettingsElement::setBootScreen(BootScreen mode) {
-  setUInt8(0x003f, (uint8_t) mode);
+  setUInt8(Offset::bootScreen(), (uint8_t) mode);
 }
 
 QString
 DR1801UVCodeplug::SettingsElement::bootLine1() const {
-  return readASCII(0x0040, 8, 0x00);
+  return readASCII(Offset::bootLine1(), Limit::bootLineLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::setBootLine1(const QString &line) {
-  writeASCII(0x0040, line, 8, 0x00);
+  writeASCII(Offset::bootLine1(), line, Limit::bootLineLength(), 0x00);
 }
 QString
 DR1801UVCodeplug::SettingsElement::bootLine2() const {
-  return readASCII(0x0048, 8, 0x00);
+  return readASCII(Offset::bootLine2(), Limit::bootLineLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::setBootLine2(const QString &line) {
-  writeASCII(0x0048, line, 8, 0x00);
+  writeASCII(Offset::bootLine2(), line, Limit::bootLineLength(), 0x00);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::ledEnabled() const {
-  return 0x01 == getUInt8(0x0050);
+  return 0x01 == getUInt8(Offset::ledEnabled());
 }
 void
 DR1801UVCodeplug::SettingsElement::enableLED(bool enabled) {
-  setUInt8(0x0050, enabled ? 0x01 : 0x00);
+  setUInt8(Offset::ledEnabled(), enabled ? 0x01 : 0x00);
 }
 
 unsigned int
 DR1801UVCodeplug::SettingsElement::loneWorkerResponseTime() const {
-  return getUInt8(0x0051);
+  return getUInt8(Offset::loneWorkerResponseTime());
 }
 void
 DR1801UVCodeplug::SettingsElement::setLoneWorkerResponseTime(unsigned int sec) {
-  setUInt8(0x0051, sec);
+  setUInt8(Offset::loneWorkerResponseTime(), sec);
 }
 unsigned int
 DR1801UVCodeplug::SettingsElement::loneWorkerReminderTime() const {
-  return getUInt8(0x005c);
+  return getUInt8(Offset::loneWorkerReminderTime());
 }
 void
 DR1801UVCodeplug::SettingsElement::setLoneWorkerReminderTime(unsigned int sec) {
-  setUInt8(0x005c, sec);
+  setUInt8(Offset::loneWorkerReminderTime(), sec);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::bootPasswordEnabled() const {
-  return getBit(0x0052, 1);
+  return getBit(Offset::bootPasswordEnabled());
 }
 QString
 DR1801UVCodeplug::SettingsElement::bootPassword() const {
-  return readASCII(0x005e, 6, 0x00);
+  return readASCII(Offset::bootPassword(), Limit::bootPasswordLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::setBootPassword(const QString &passwd) {
-  setBit(0x0052, 1, true);
-  setUInt8(0x005d, std::min(6, passwd.length()));
-  writeASCII(0x005e, passwd, 6, 0x00);
+  setBit(Offset::bootPasswordEnabled(), true);
+  setUInt8(Offset::boolPasswordLength(),
+           std::min(Limit::bootPasswordLength(), (unsigned int)passwd.length()));
+  writeASCII(Offset::bootPassword(), passwd, Limit::bootPasswordLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::clearBootPassword() {
-  setBit(0x0052, 1, false);
-  setUInt8(0x005d, 0);
-  writeASCII(0x005e, "", 6, 0x00);
+  setBit(Offset::bootPasswordEnabled(), false);
+  setUInt8(Offset::boolPasswordLength(), 0);
+  writeASCII(Offset::bootPassword(), "", Limit::bootPasswordLength(), 0x00);
 }
 
 bool
 DR1801UVCodeplug::SettingsElement::progPasswordEnabled() const {
-  return getBit(0x0052, 0);
+  return getBit(Offset::progPasswordEnabled());
 }
 QString
 DR1801UVCodeplug::SettingsElement::progPassword() const {
-  return readASCII(0x0054, 6, 0x00);
+  return readASCII(Offset::progPassword(), Limit::progPasswordLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::setProgPassword(const QString &passwd) {
-  setBit(0x0052, 0, true);
-  setUInt8(0x0053, std::min(6, passwd.length()));
-  writeASCII(0x0054, passwd, 6, 0x00);
+  setBit(Offset::progPasswordEnabled(), true);
+  setUInt8(Offset::progPasswordLength(),
+           std::min(Limit::progPasswordLength(), (unsigned int)passwd.length()));
+  writeASCII(Offset::progPassword(), passwd, Limit::progPasswordLength(), 0x00);
 }
 void
 DR1801UVCodeplug::SettingsElement::clearProgPassword() {
-  setBit(0x0052, 0, false);
-  setUInt8(0x0053, 0);
-  writeASCII(0x0054, "", 6, 0x00);
+  setBit(Offset::progPasswordEnabled(), false);
+  setUInt8(Offset::progPasswordLength(), 0);
+  writeASCII(Offset::progPassword(), "", Limit::progPasswordLength(), 0x00);
 }
 
 bool
@@ -1505,7 +1462,7 @@ DR1801UVCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, size_t 
 }
 
 DR1801UVCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
-  : Element(ptr, SCAN_LIST_BANK_SIZE)
+  : Element(ptr, ScanListBankElement::size())
 {
   // pass...
 }
@@ -1517,17 +1474,17 @@ DR1801UVCodeplug::ScanListBankElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::ScanListBankElement::scanListCount() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::scanListCount());
 }
 void
 DR1801UVCodeplug::ScanListBankElement::setScanListCount(unsigned int count) {
-  count = std::min((unsigned int)NUM_SCAN_LISTS, count);
-  setUInt8(0x0000, count);
+  count = std::min(Limit::scanListCount(), count);
+  setUInt8(Offset::scanListCount(), count);
 }
 
 DR1801UVCodeplug::ScanListElement
 DR1801UVCodeplug::ScanListBankElement::scanList(unsigned int index) const {
-  return ScanListElement(_data + 4 + index*SCAN_LIST_ELEMENT_SIZE);
+  return ScanListElement(_data + Offset::scanLists() + index*ScanListElement::size());
 }
 
 bool
@@ -1586,7 +1543,7 @@ DR1801UVCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
-  : Element(ptr, SCAN_LIST_ELEMENT_SIZE)
+  : Element(ptr, ScanListElement::size())
 {
   // pass...
 }
@@ -1598,94 +1555,94 @@ DR1801UVCodeplug::ScanListElement::clear() {
 
 bool
 DR1801UVCodeplug::ScanListElement::isValid() const {
-  return 0 != getUInt8(0x0000); // Check index
+  return 0 != getUInt8(Offset::index()); // Check index
 }
 
 unsigned int
 DR1801UVCodeplug::ScanListElement::index() const {
-  return getUInt8(0x0000)-1;
+  return getUInt8(Offset::index())-1;
 }
 void
 DR1801UVCodeplug::ScanListElement::setIndex(unsigned int idx) {
-  setUInt8(0x0000, idx+1);
+  setUInt8(Offset::index(), idx+1);
 }
 
 unsigned int
 DR1801UVCodeplug::ScanListElement::entryCount() const {
-  return getUInt8(0x0001);
+  return getUInt8(Offset::memberCount());
 }
 void
 DR1801UVCodeplug::ScanListElement::setEntryCount(unsigned int num) {
-  setUInt8(0x0001, num);
+  setUInt8(Offset::memberCount(), num);
 }
 
 DR1801UVCodeplug::ScanListElement::PriorityChannel
 DR1801UVCodeplug::ScanListElement::priorityChannel1() const {
-  return (PriorityChannel) getUInt8(0x0002);
+  return (PriorityChannel) getUInt8(Offset::priorityChannel1());
 }
 void
 DR1801UVCodeplug::ScanListElement::setPriorityChannel1(PriorityChannel mode) {
-  setUInt8(0x0002, (uint8_t) mode);
+  setUInt8(Offset::priorityChannel1(), (uint8_t) mode);
 }
 unsigned int
 DR1801UVCodeplug::ScanListElement::priorityChannel1Index() const {
-  return getUInt16_le(0x0004);
+  return getUInt16_le(Offset::priorityChannel1Index());
 }
 void
 DR1801UVCodeplug::ScanListElement::setPriorityChannel1Index(unsigned int index) {
-  setUInt16_le(0x0004, index);
+  setUInt16_le(Offset::priorityChannel1Index(), index);
 }
 
 DR1801UVCodeplug::ScanListElement::PriorityChannel
 DR1801UVCodeplug::ScanListElement::priorityChannel2() const {
-  return (PriorityChannel) getUInt8(0x0003);
+  return (PriorityChannel) getUInt8(Offset::priorityChannel2());
 }
 void
 DR1801UVCodeplug::ScanListElement::setPriorityChannel2(PriorityChannel mode) {
-  setUInt8(0x0003, (uint8_t) mode);
+  setUInt8(Offset::priorityChannel2(), (uint8_t) mode);
 }
 unsigned int
 DR1801UVCodeplug::ScanListElement::priorityChannel2Index() const {
-  return getUInt16_le(0x0006);
+  return getUInt16_le(Offset::priorityChannel2Index());
 }
 void
 DR1801UVCodeplug::ScanListElement::setPriorityChannel2Index(unsigned int index) {
-  setUInt16_le(0x0006, index);
+  setUInt16_le(Offset::priorityChannel2Index(), index);
 }
 
 DR1801UVCodeplug::ScanListElement::RevertChannel
 DR1801UVCodeplug::ScanListElement::revertChannel() const {
-  return (RevertChannel) getUInt8(0x0008);
+  return (RevertChannel) getUInt8(Offset::revertChannel());
 }
 void
 DR1801UVCodeplug::ScanListElement::setRevertChannel(RevertChannel mode) {
-  setUInt8(0x0008, (uint8_t) mode);
+  setUInt8(Offset::revertChannel(), (uint8_t) mode);
 }
 unsigned int
 DR1801UVCodeplug::ScanListElement::revertChannelIndex() const {
-  return getUInt16_le(0x000a);
+  return getUInt16_le(Offset::revertChannelIndex());
 }
 void
 DR1801UVCodeplug::ScanListElement::setRevertChannelIndex(unsigned int index) {
-  setUInt16_le(0x000a, index);
+  setUInt16_le(Offset::revertChannelIndex(), index);
 }
 
 QString
 DR1801UVCodeplug::ScanListElement::name() const {
-  return readASCII(0x0010, 32, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 DR1801UVCodeplug::ScanListElement::setName(const QString &name) {
-  writeASCII(0x0010, name, 32, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 unsigned int
 DR1801UVCodeplug::ScanListElement::entryIndex(unsigned int n) {
-  return getUInt16_le(0x0030 + 2*n);
+  return getUInt16_le(Offset::memberIndices() + 2*n);
 }
 void
 DR1801UVCodeplug::ScanListElement::setEntryIndex(unsigned int n, unsigned int index) {
-  setUInt16_le(0x0030+2*n, index);
+  setUInt16_le(Offset::memberIndices()+2*n, index);
 }
 
 ScanList *
@@ -1748,7 +1705,7 @@ DR1801UVCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t si
 }
 
 DR1801UVCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
-  : Element(ptr, MESSAGE_BANK_SIZE)
+  : Element(ptr, MessageBankElement::size())
 {
   // pass...
 }
@@ -1760,16 +1717,16 @@ DR1801UVCodeplug::MessageBankElement::clear() {
 
 unsigned int
 DR1801UVCodeplug::MessageBankElement::messageCount() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::messageCount());
 }
 void
 DR1801UVCodeplug::MessageBankElement::setMessageCount(unsigned int count) {
-  setUInt8(0x0000, count);
+  setUInt8(Offset::messageCount(), count);
 }
 
 DR1801UVCodeplug::MessageElement
 DR1801UVCodeplug::MessageBankElement::message(unsigned int n) const {
-  return MessageElement(_data + 4 + n*MESSAGE_ELEMENT_SIZE);
+  return MessageElement(_data + Offset::messages() + n*MessageElement::size());
 }
 
 
@@ -1783,7 +1740,7 @@ DR1801UVCodeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
 }
 
 DR1801UVCodeplug::MessageElement::MessageElement(uint8_t *ptr)
-  : Element(ptr, MESSAGE_ELEMENT_SIZE)
+  : Element(ptr, MessageElement::size())
 {
   // pass...
 }
@@ -1795,26 +1752,27 @@ DR1801UVCodeplug::MessageElement::clear() {
 
 bool
 DR1801UVCodeplug::MessageElement::isValid() const {
-  return 0x00 != getUInt8(0x0000);
+  return 0x00 != getUInt8(Offset::index());
 }
 
 unsigned int
 DR1801UVCodeplug::MessageElement::index() const {
-  return getUInt8(0x0000)-1;
+  return getUInt8(Offset::index())-1;
 }
 void
 DR1801UVCodeplug::MessageElement::setIndex(unsigned int index) {
-  setUInt8(0x0000, index+1);
+  setUInt8(Offset::index(), index+1);
 }
 
 QString
 DR1801UVCodeplug::MessageElement::text() const {
-  return readASCII(0x0004, 64, 0x00);
+  return readASCII(Offset::text(), Limit::textLength(), 0x00);
 }
 void
 DR1801UVCodeplug::MessageElement::setText(const QString &text) {
-  setUInt8(0x0001, std::min(64, text.length()));
-  writeASCII(0x0004, text, 64, 0x00);
+  setUInt8(Offset::textLength(),
+           std::min(Limit::textLength(), (unsigned int)text.length()));
+  writeASCII(Offset::text(), text, Limit::textLength(), 0x00);
 }
 
 
@@ -1828,7 +1786,7 @@ DR1801UVCodeplug::KeySettingsElement::KeySettingsElement(uint8_t *ptr, size_t si
 }
 
 DR1801UVCodeplug::KeySettingsElement::KeySettingsElement(uint8_t *ptr)
-  : Element(ptr, KEY_SETTINGS_ELEMENT_SIZE)
+  : Element(ptr, KeySettingsElement::size())
 {
   // pass...
 }
@@ -1840,56 +1798,56 @@ DR1801UVCodeplug::KeySettingsElement::clear() {
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::sideKey1Short() const {
-  return (Function) getUInt8(0x0001);
+  return (Function) getUInt8(Offset::sideKey1Short());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setSideKey1Short(Function func) {
-  setUInt8(0x0001, (uint8_t) func);
+  setUInt8(Offset::sideKey1Short(), (uint8_t) func);
 }
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::sideKey1Long() const {
-  return (Function) getUInt8(0x0002);
+  return (Function) getUInt8(Offset::sideKey1Long());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setSideKey1Long(Function func) {
-  setUInt8(0x0002, (uint8_t) func);
+  setUInt8(Offset::sideKey1Long(), (uint8_t) func);
 }
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::sideKey2Short() const {
-  return (Function) getUInt8(0x0005);
+  return (Function) getUInt8(Offset::sideKey2Short());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setSideKey2Short(Function func) {
-  setUInt8(0x0005, (uint8_t) func);
+  setUInt8(Offset::sideKey2Short(), (uint8_t) func);
 }
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::sideKey2Long() const {
-  return (Function) getUInt8(0x0006);
+  return (Function) getUInt8(Offset::sideKey2Long());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setSideKey2Long(Function func) {
-  setUInt8(0x0006, (uint8_t) func);
+  setUInt8(Offset::sideKey2Long(), (uint8_t) func);
 }
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::topKeyShort() const {
-  return (Function) getUInt8(0x0009);
+  return (Function) getUInt8(Offset::topKeyShort());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setTopKeyShort(Function func) {
-  setUInt8(0x0009, (uint8_t) func);
+  setUInt8(Offset::topKeyShort(), (uint8_t) func);
 }
 
 DR1801UVCodeplug::KeySettingsElement::Function
 DR1801UVCodeplug::KeySettingsElement::topKeyLong() const {
-  return (Function) getUInt8(0x000a);
+  return (Function) getUInt8(Offset::topKeyLong());
 }
 void
 DR1801UVCodeplug::KeySettingsElement::setTopKeyLong(Function func) {
-  setUInt8(0x000a, (uint8_t) func);
+  setUInt8(Offset::topKeyLong(), (uint8_t) func);
 }
 
 
@@ -1904,7 +1862,7 @@ DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
   : Codeplug(parent)
 {
   addImage("BTECH DR-1801UV Codeplug");
-  image(0).addElement(0, TOTAL_SIZE);
+  image(0).addElement(0, Offset::size());
 }
 
 bool
@@ -1936,32 +1894,32 @@ DR1801UVCodeplug::decode(Config *config, const ErrorStack &err) {
 
 bool
 DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
-  if (! ChannelBankElement(data(ADDR_CHANNEL_BANK)).decode(ctx, err)) {
+  if (! ChannelBankElement(data(Offset::channelBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode channel elements.";
     return false;
   }
 
-  if (! ContactBankElement(data(ADDR_CONTACT_BANK)).decode(ctx, err)) {
+  if (! ContactBankElement(data(Offset::contactBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode contact elements.";
     return false;
   }
 
-  if (! GroupListBankElement(data(ADDR_GROUP_LIST_BANK)).decode(ctx, err)) {
+  if (! GroupListBankElement(data(Offset::groupListBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode group list elements.";
     return false;
   }
 
-  if (! ZoneBankElement(data(ADDR_ZONE_BANK)).decode(ctx, err)) {
+  if (! ZoneBankElement(data(Offset::zoneBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode zone elements.";
     return false;
   }
 
-  if (! SettingsElement(data(ADDR_SETTINGS_ELEMENT)).updateConfig(ctx.config(), err)) {
+  if (! SettingsElement(data(Offset::settingsSize())).updateConfig(ctx.config(), err)) {
     errMsg(err) << "Cannot decode settings element.";
     return false;
   }
 
-  if (! ScanListBankElement(data(ADDR_SCAN_LIST_BANK)).decode(ctx, err)) {
+  if (! ScanListBankElement(data(Offset::scanListBank())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode scan list elements.";
     return false;
   }
@@ -1971,27 +1929,27 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
 
 bool
 DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
-  if (! ChannelBankElement(data(ADDR_CHANNEL_BANK)).link(ctx, err)) {
+  if (! ChannelBankElement(data(Offset::channelBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link channels.";
     return false;
   }
 
-  if (! ContactBankElement(data(ADDR_CONTACT_BANK)).link(ctx, err)) {
+  if (! ContactBankElement(data(Offset::contactBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link contacts.";
     return false;
   }
 
-  if (! GroupListBankElement(data(ADDR_GROUP_LIST_BANK)).link(ctx, err)) {
+  if (! GroupListBankElement(data(Offset::groupListBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
-  if (! ZoneBankElement(data(ADDR_ZONE_BANK)).link(ctx, err)) {
+  if (! ZoneBankElement(data(Offset::zoneBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link zones.";
     return false;
   }
 
-  if (! ScanListBankElement(data(ADDR_SCAN_LIST_BANK)).link(ctx, err)) {
+  if (! ScanListBankElement(data(Offset::scanListBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link scan lists.";
     return false;
   }
