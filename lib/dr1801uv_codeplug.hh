@@ -36,8 +36,11 @@
  *      @c DR1801UVCodeplug::KeySettingsElement. </td></tr>
  *  <tr><td>0x1c6dc</td> <td>0x1d7e0</td>  <td>0x01104</td>  <td>Group list bank, see
  *      @c DR1801UVCodeplug::GroupListBankElement. </td></tr>
- *  <tr><td>0x1d7e0</td> <td>0x1d858</td>  <td>0x00078</td>  <td>Encryption keys,
- *      @c see DR1801UVCodeplug::EncryptionKeyBankElement. </td></tr>
+ *  <tr><td>0x1d7e0</td> <td>0x1d858</td>  <td>0x00078</td>  <td>Encryption keys, see
+ *      @c DR1801UVCodeplug::EncryptionKeyBankElement. </td></tr>
+ *  <tr><td>0x1d858</td> <td>0x1daf4</td>  <td>0x0029c</td>  <td>DTMF signaling settings, see
+ *      @c DR1801UVCodeplug::DTMFSettingsElement. </td></tr>
+ *
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -1468,6 +1471,23 @@ public:
       /** The number of keys. */
       static constexpr unsigned int keyCount() { return 10; }
     };
+  };
+
+  /** Implements the binary encoding of the DTMF signaling settings.
+   *
+   * Memory representation of the settings (????h bytes):
+   * @verbinclude dr1801uv_dtmfsettingselement.txt */
+  class DTMFSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFSettingsElement(uint8_t *ptr);
+
+    void clear();
   };
 
 
