@@ -1851,8 +1851,53 @@ DR1801UVCodeplug::KeySettingsElement::setTopKeyLong(Function func) {
 }
 
 
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::VFOBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::VFOBankElement::VFOBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
 
+DR1801UVCodeplug::VFOBankElement::VFOBankElement(uint8_t *ptr)
+  : Element(ptr, VFOBankElement::size())
+{
+  // pass...
+}
 
+void
+DR1801UVCodeplug::VFOBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+DR1801UVCodeplug::ChannelElement
+DR1801UVCodeplug::VFOBankElement::vfoA() const {
+  return ChannelElement(_data + Offset::vfoA());
+}
+
+DR1801UVCodeplug::ChannelElement
+DR1801UVCodeplug::VFOBankElement::vfoB() const {
+  return ChannelElement(_data + Offset::vfoB());
+}
+
+QString
+DR1801UVCodeplug::VFOBankElement::nameA() const {
+  return readASCII(Offset::nameA(), Limit::nameLength(), 0x00);
+}
+void
+DR1801UVCodeplug::VFOBankElement::setNameA(const QString &name) {
+  writeASCII(Offset::nameB(), name, Limit::nameLength(), 0x00);
+}
+
+QString
+DR1801UVCodeplug::VFOBankElement::nameB() const {
+  return readASCII(Offset::nameB(), Limit::nameLength(), 0x00);
+}
+void
+DR1801UVCodeplug::VFOBankElement::setNameB(const QString &name) {
+  writeASCII(Offset::nameB(), name, Limit::nameLength(), 0x00);
+}
 
 
 /* ******************************************************************************************** *

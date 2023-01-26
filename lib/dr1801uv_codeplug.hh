@@ -36,6 +36,8 @@
  *      @c DR1801UVCodeplug::KeySettingsElement. </td></tr>
  *  <tr><td>0x1c6dc</td> <td>0x1d7e0</td>  <td>0x01104</td>  <td>Group list bank, see
  *      @c DR1801UVCodeplug::GroupListBankElement. </td></tr>
+ *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
+ *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
  *
  * @ingroup dr1801uv */
@@ -1330,6 +1332,59 @@ public:
       /// @endcond
     };
   };
+
+  /** Implements the binary encoding of the VFO settings.
+   *
+   * Memory representation of the VFO settings (0090h bytes):
+   * @verbinclude dr1801uv_vfobankelement.txt */
+  class VFOBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    VFOBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    VFOBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
+
+    /** Returns a reference to the VFO A settings. */
+    virtual ChannelElement vfoA() const;
+    /** Returns a reference to the VFO A settings. */
+    virtual ChannelElement vfoB() const;
+
+    /** Retunrs the name of the first VFO. */
+    virtual QString nameA() const;
+    /** Sets the name for the first VFO. */
+    virtual void setNameA(const QString &name);
+    /** Retunrs the name of the second VFO. */
+    virtual QString nameB() const;
+    /** Sets the name for the second VFO. */
+    virtual void setNameB(const QString &name);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** The maximum length of the VFO names (not set). */
+      static constexpr unsigned int nameLength() { return 20; }
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int vfoA() { return 0x0000; }
+      static constexpr unsigned int vfoB() { return 0x0034; }
+      static constexpr unsigned int nameA() { return 0x0068; }
+      static constexpr unsigned int nameB() { return 0x007c; }
+      /// @endcond
+    };
+  };
+
 
 public:
   /** Default constructor. */
