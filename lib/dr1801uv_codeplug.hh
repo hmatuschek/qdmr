@@ -40,7 +40,8 @@
  *      @c DR1801UVCodeplug::EncryptionKeyBankElement. </td></tr>
  *  <tr><td>0x1d858</td> <td>0x1daf4</td>  <td>0x0029c</td>  <td>DTMF signaling settings, see
  *      @c DR1801UVCodeplug::DTMFSettingsElement. </td></tr>
- *
+ *  <tr><td>0x1daf4</td> <td>0x1dbb8</td>  <td>0x00c4</td>   <td>Alarm settings, see
+ *      @c DR1801UVCodeplug::AlarmSettingsBankElement. </tr>
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -330,7 +331,9 @@ public:
 
     /** Limits of some elements. */
     struct Limit {
+      /** Returns the maximum number of channels. */
       static constexpr unsigned int channelCount()       { return 1024; }
+      /** Returns the maximum length of a channel name. */
       static constexpr unsigned int channelNameLength()  { return 0x00014; }
     };
   };
@@ -1462,7 +1465,9 @@ public:
     /** Returns a reference to the encryption key. */
     virtual EncryptionKeyElement key(unsigned int index) const;
 
+    /** Decodes the all encryption keys defined. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all encryption keys. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
@@ -1473,12 +1478,353 @@ public:
     };
   };
 
+
+  /** Implements the DTMF system.
+   *
+   * Memory representation of the DTMF system (000ch bytes):
+   * @verbinclude dr1801uv_dtmfsystemelement.txt */
+  class DTMFSystemElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFSystemElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFSystemElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0c; }
+
+    /** Returns @c true if the side-tone is enabled. */
+    virtual bool sideToneEnabled() const;
+    /** Enables/disable side-tone. */
+    virtual void enableSideTone(bool enable);
+
+    /** Returns the pre-time in milliseconds. */
+    virtual unsigned int preTime() const;
+    /** Sets the pre-time in milliseconds. */
+    virtual void setPreTime(unsigned int ms);
+
+    /** Returns the code duration in milliseconds. */
+    virtual unsigned int codeDuration() const;
+    /** Sets the code duration in milliseconds. */
+    virtual void setCodeDuration(unsigned int ms);
+
+    /** Returns the code intervall in milliseconds. */
+    virtual unsigned int codeItervall() const;
+    /** Sets the code intervall in milliseconds. */
+    virtual void setCodeItervall(unsigned int ms);
+
+    /** Returns the reset time in milliseconds. */
+    virtual unsigned int resetTime() const;
+    /** Sets the reset time in milliseconds. */
+    virtual void setResetTime(unsigned int ms);
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int sideTone() { return 0x0000; }
+      static constexpr unsigned int preTime() { return 0x0002; }
+      static constexpr unsigned int codeDuration() { return 0x0004; }
+      static constexpr unsigned int codeIntervall() { return 0x0006; }
+      static constexpr unsigned int resetTime() { return 0x0008; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the DTMF systems bank. Holding all defined DTMF systems
+   *  (see @c DTMFSystemElement).
+   *
+   * Memory representation of the DTMF system bank (0034h bytes):
+   * @verbinclude dr1801uv_dtmfsystembankelement.txt */
+  class DTMFSystemBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFSystemBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFSystemBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x34; }
+
+    /** Returns the number of DTMF systems. */
+    virtual unsigned int systemCount() const;
+    /** Sets the number of DTMF systems. */
+    virtual void setSystemCount(unsigned int count);
+
+    /** Returns a reference to the n-th system. */
+    virtual DTMFSystemElement system(unsigned int n) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of DTMF systems. */
+      static constexpr unsigned int systemCount() { return 4; }
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int systemCount() { return 0x0000; }
+      static constexpr unsigned int systems()     { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the DTMF ID.
+   *
+   * Memory representation of the DTMF ID (014h bytes):
+   * @verbinclude dr1801uv_dtmfidelement.txt */
+  class DTMFIDElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFIDElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFIDElement(uint8_t *ptr);
+
+    void clear();
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0014; }
+
+  public:
+    /** Returns the DTMF code/number. */
+    virtual QString number() const;
+    /** Sets the DTMF code/number. */
+    virtual void setNumber(const QString &number);
+
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of digits of the number. */
+      static constexpr unsigned int numberLength() { return 16; }
+    };
+
+  protected:
+    /** Returns the length of the number. */
+    virtual unsigned int numberLength() const;
+    /** Sets the number length. */
+    virtual void setNumberLength(unsigned int len);
+
+    /** Some internal offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int numberLength() { return 0x0000; }
+      static constexpr unsigned int number() { return 0x0004; }
+      /// @endcond
+    };
+
+    /** Translation table. */
+    static QVector<QChar> _bin_dtmf_tab;
+  };
+
+
+  /** Implements the DTMF ID bank. Holding all defined DTMF IDS
+   *  (@c see DTMFIDElement).
+   *
+   * Memory representation of the DTMF ID bank (0144h bytes):
+   * @verbinclude dr1801uv_dtmfidbankelement.txt */
+  class DTMFIDBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFIDBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFIDBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0144; }
+
+    /** Returns the number of IDs encoded. */
+    virtual unsigned int idCount() const;
+    /** Sets the ID count. */
+    virtual void setIDCount(unsigned int n);
+
+    /** Returns a reference to the n-th ID. */
+    virtual DTMFIDElement id(unsigned int n) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of IDs. */
+      static constexpr unsigned int idCount() { return 16; }
+    };
+
+  protected:
+    /** Some offsets within the codeplug. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int idCount() { return 0x0000; }
+      static constexpr unsigned int ids() { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the PTT ID.
+   *
+   * Memory representation of the PTT ID (014h bytes):
+   * @verbinclude dr1801uv_pttidelement.txt */
+  class PTTIDElement: public Element
+  {
+  public:
+    /** Possible modes of transmission. */
+    enum class Transmit {
+      None = 0, Start = 1, End = 2, Both = 3
+    };
+    /** Possible ID modes. */
+    enum class IDMode {
+      Forbidden = 0, Each = 1, Once = 2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    PTTIDElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    PTTIDElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x14; }
+
+    /** Returns @c true, if the DTMF system is set. */
+    virtual bool hasDTMFSystem() const;
+    /** Returns the DTMF system index. */
+    virtual unsigned int dtmfSystemIndex() const;
+    /** Sets the DTMF system index. */
+    virtual void setDTMFSystemIndex(unsigned int index);
+    /** Clears the DTMF system. */
+    virtual void clearDTMFSystem();
+
+    /** Returns the ID transmission mode. */
+    virtual Transmit transmitMode() const;
+    /** Sets the ID transmission mode. */
+    virtual void setTransmitMode(Transmit mode);
+
+    /** Returns the ID mode. */
+    virtual IDMode idMode() const;
+    /** Sets the ID mode. */
+    virtual void setIDMode(IDMode mode);
+
+    /** Returns @c true if the BOT DTMF ID is set. */
+    virtual bool hasBOTID() const;
+    /** Returns the BOT DTMF ID index. */
+    virtual unsigned int botIDIndex() const;
+    /** Sets the BOT DTMF ID index. */
+    virtual void setBOTIDIndex(unsigned int index);
+    /** Clears the BOT DTMF ID index. */
+    virtual void clearBOTID();
+
+    /** Returns @c true if the EOT DTMF ID is set. */
+    virtual bool hasEOTID() const;
+    /** Returns the EOT DTMF ID index. */
+    virtual unsigned int eotIDIndex() const;
+    /** Sets the EOT DTMF ID index. */
+    virtual void setEOTIDIndex(unsigned int index);
+    /** Clears the EOT DTMF ID index. */
+    virtual void clearEOTID();
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int dtmfSystemIndex() { return 0x0000; }
+      static constexpr unsigned int transmitMode()    { return 0x0001; }
+      static constexpr unsigned int idMode()          { return 0x0002; }
+      static constexpr unsigned int botIDIndex()      { return 0x0003; }
+      static constexpr unsigned int eotIDIndex()      { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the encoding of the DTMF PTT IDs. Holding all PTT IDs
+   *  (see @c PTTIDElement).
+   *
+   * Memory representation of the PTT ID bank (0104h bytes):
+   * @verbinclude dr1801uv_pttidbankelement.txt */
+  class PTTIDBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    PTTIDBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    PTTIDBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0104; }
+
+    /** Returns the number of PTT IDs defined. */
+    virtual unsigned int idCount() const;
+    /** Set the numbe of PTT IDs. */
+    virtual void setPTTIDCount(unsigned int n);
+
+    /** Returns a reference to the n-th PTT ID. */
+    virtual PTTIDElement pttID(unsigned int n);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of PTT IDs. */
+      static constexpr unsigned int idCount() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int idCount() { return 0x0000; }
+      static constexpr unsigned int ids()     { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+
+
   /** Implements the binary encoding of the DTMF signaling settings.
    *
    * Memory representation of the settings (????h bytes):
    * @verbinclude dr1801uv_dtmfsettingselement.txt */
   class DTMFSettingsElement: public Element
   {
+  public:
+    /** Possible DTMF non-number codes. Usually used as separator and group codes. */
+    enum class NonNumber {
+      None = 0, A=0xa, B=0xb, C=0xc, D=0xd, Asterisk=0xe, Gate=0xf
+    };
+    /** Possible responses. */
+    enum class Response {
+      None=0, Reminder=1, Reply=2, Both=3
+    };
+    /** Possible kill actions. */
+    enum class Kill {
+      DisableTX = 0, DisableRXandTX = 1
+    };
+
   protected:
     /** Hidden constructor. */
     DTMFSettingsElement(uint8_t *ptr, size_t size);
@@ -1488,6 +1834,91 @@ public:
     DTMFSettingsElement(uint8_t *ptr);
 
     void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x029c; }
+
+    /** Retunrs the DTMF radio ID as a string. */
+    virtual QString radioID() const;
+    /** Sets the DTMF radio ID as a string. */
+    virtual void setRadioID(const QString &id);
+    /** Retunrs the DTMF kill code as a string. */
+    virtual QString killCode() const;
+    /** Sets the DTMF kill code as a string. */
+    virtual void setKillCode(const QString &code);
+    /** Retunrs the DTMF wake code as a string. */
+    virtual QString wakeCode() const;
+    /** Sets the DTMF wake code as a string. */
+    virtual void setWakeCode(const QString &code);
+
+    /** Returns the delimiter code. */
+    virtual NonNumber delimiter() const;
+    /** Sets the delimiter code. */
+    virtual void setDelimiter(NonNumber code);
+    /** Returns the group code. */
+    virtual NonNumber groupCode() const;
+    /** Sets the group code. */
+    virtual void setGroupCode(NonNumber code);
+
+    /** Returns the decode response. */
+    virtual Response response() const;
+    /** Sets the decode response. */
+    virtual void setResponse(Response resp);
+
+    /** Returns the auto-reset time in seconds [5,60s]. */
+    virtual unsigned int autoResetTime() const;
+    /** Set the auto-reset time in seconds. */
+    virtual void setAutoResetTime(unsigned int sec);
+
+    /** Returns @c true if the kill/wake decoding is endabled. */
+    virtual bool killWakeEnabled() const;
+    /** Enables/disables the kill/wake decoding. */
+    virtual void enableKillWake(bool enable);
+
+    /** Returns the kill type. */
+    virtual Kill killType() const;
+    /** Sets the kill type. */
+    virtual void setKillType(Kill type);
+
+    /** Returns a reference to the DTMF systems. */
+    virtual DTMFSystemBankElement dtmfSystems() const;
+    /** Returns a reference to the DTMF IDs. */
+    virtual DTMFIDBankElement dtmfIDs() const;
+    /** Retunrs a reference to the PTT ID bank. */
+    virtual PTTIDBankElement pttIDs() const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum length of the radio ID. */
+      static constexpr unsigned int radioIDLength() { return 5; }
+      /** The maximum length of the kill code. */
+      static constexpr unsigned int killCodeLength() { return 6; }
+      /** The maximum length of the wake code. */
+      static constexpr unsigned int wakeCodeLength() { return 6; }
+    };
+
+  protected:
+    /** Internal offsets within the settings element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int radioID() { return 0x0000; }
+      static constexpr unsigned int radioIDLength() { return 0x0005; }
+      static constexpr unsigned int killCode() { return 0x0008; }
+      static constexpr unsigned int killCodeLength() { return 0x000e; }
+      static constexpr unsigned int wakeCode() { return 0x0010; }
+      static constexpr unsigned int wakeCodeLength() { return 0x0016; }
+      static constexpr unsigned int delimiter() { return 0x0018; }
+      static constexpr unsigned int groupCode() { return 0x0019; }
+      static constexpr unsigned int response() { return 0x001a; }
+      static constexpr unsigned int autoResetTime() { return 0x001b; }
+      static constexpr unsigned int killWake() { return 0x001c; }
+      static constexpr unsigned int killType() { return 0x001d; }
+      static constexpr unsigned int dtmfSystems() { return 0x0020; }
+      static constexpr unsigned int dtmfIDs() { return 0x0054; }
+      static constexpr unsigned int pttIDs() { return 0x0198; }
+      /// @endcond
+    };
   };
 
 

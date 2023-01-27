@@ -2029,6 +2029,445 @@ DR1801UVCodeplug::EncryptionKeyElement::linkKeyObj(EncryptionKey *obj, Context &
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DTMFSettingsElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr)
+  : Element(ptr, DR1801UVCodeplug::DTMFSettingsElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DTMFSettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+
+QString
+DR1801UVCodeplug::DTMFSettingsElement::radioID() const {
+  return readASCII(Offset::radioID(), Limit::radioIDLength(), 0x00);
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setRadioID(const QString &id) {
+  setUInt8(Offset::radioIDLength(),
+           std::min(Limit::radioIDLength(), (unsigned int)id.length()));
+  writeASCII(Offset::radioIDLength(), id, Limit::radioIDLength(), 0x00);
+}
+
+QString
+DR1801UVCodeplug::DTMFSettingsElement::killCode() const {
+  return readASCII(Offset::killCode(), Limit::killCodeLength(), 0x00);
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setKillCode(const QString &code) {
+  setUInt8(Offset::killCodeLength(),
+           std::min(Limit::killCodeLength(), (unsigned int)code.length()));
+  writeASCII(Offset::killCode(), code, Limit::killCodeLength(), 0x00);
+}
+
+QString
+DR1801UVCodeplug::DTMFSettingsElement::wakeCode() const {
+  return readASCII(Offset::wakeCode(), Limit::wakeCodeLength(), 0x00);
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setWakeCode(const QString &code) {
+  setUInt8(Offset::wakeCodeLength(),
+           std::min(Limit::wakeCodeLength(), (unsigned int)code.length()));
+  writeASCII(Offset::wakeCode(), code, Limit::wakeCodeLength(), 0x00);
+}
+
+DR1801UVCodeplug::DTMFSettingsElement::NonNumber
+DR1801UVCodeplug::DTMFSettingsElement::delimiter() const {
+  return (NonNumber) getUInt8(Offset::delimiter());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setDelimiter(NonNumber code) {
+  setUInt8(Offset::delimiter(), (uint8_t)code);
+}
+
+DR1801UVCodeplug::DTMFSettingsElement::NonNumber
+DR1801UVCodeplug::DTMFSettingsElement::groupCode() const {
+  return (NonNumber) getUInt8(Offset::groupCode());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setGroupCode(NonNumber code) {
+  setUInt8(Offset::groupCode(), (uint8_t)code);
+}
+
+DR1801UVCodeplug::DTMFSettingsElement::Response
+DR1801UVCodeplug::DTMFSettingsElement::response() const {
+  return (Response) getUInt8(Offset::response());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setResponse(Response resp) {
+  setUInt8(Offset::response(), (uint8_t)resp);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSettingsElement::autoResetTime() const {
+  return getUInt8(Offset::autoResetTime());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setAutoResetTime(unsigned int sec) {
+  setUInt8(Offset::autoResetTime(), sec);
+}
+
+bool
+DR1801UVCodeplug::DTMFSettingsElement::killWakeEnabled() const {
+  return 0x01 == getUInt8(Offset::killWake());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::enableKillWake(bool enable) {
+  setUInt8(Offset::killWake(), enable ? 0x01 : 0x00);
+}
+
+DR1801UVCodeplug::DTMFSettingsElement::Kill
+DR1801UVCodeplug::DTMFSettingsElement::killType() const {
+  return (Kill) getUInt8(Offset::killType());
+}
+void
+DR1801UVCodeplug::DTMFSettingsElement::setKillType(Kill type) {
+  setUInt8(Offset::killType(), (uint8_t)type);
+}
+
+DR1801UVCodeplug::DTMFSystemBankElement
+DR1801UVCodeplug::DTMFSettingsElement::dtmfSystems() const {
+  return DTMFSystemBankElement(_data+Offset::dtmfSystems());
+}
+
+DR1801UVCodeplug::DTMFIDBankElement
+DR1801UVCodeplug::DTMFSettingsElement::dtmfIDs() const {
+  return DTMFIDBankElement(_data + Offset::dtmfIDs());
+}
+
+DR1801UVCodeplug::PTTIDBankElement
+DR1801UVCodeplug::DTMFSettingsElement::pttIDs() const {
+  return PTTIDBankElement(_data + Offset::pttIDs());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DTMFSystemBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::DTMFSystemBankElement::DTMFSystemBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DTMFSystemBankElement::DTMFSystemBankElement(uint8_t *ptr)
+  : Element(ptr, DTMFSystemBankElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DTMFSystemBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSystemBankElement::systemCount() const {
+  return getUInt8(Offset::systemCount());
+}
+void
+DR1801UVCodeplug::DTMFSystemBankElement::setSystemCount(unsigned int count) {
+  setUInt8(Offset::systemCount(), count);
+}
+
+DR1801UVCodeplug::DTMFSystemElement
+DR1801UVCodeplug::DTMFSystemBankElement::system(unsigned int n) const {
+  return DTMFSystemElement(_data + Offset::systems() + n*DTMFSystemElement::size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DTMFSystemElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::DTMFSystemElement::DTMFSystemElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DTMFSystemElement::DTMFSystemElement(uint8_t *ptr)
+  : Element(ptr, DTMFSystemElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DTMFSystemElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::DTMFSystemElement::sideToneEnabled() const {
+  return 0x01 == getUInt8(Offset::sideTone());
+}
+void
+DR1801UVCodeplug::DTMFSystemElement::enableSideTone(bool enable) {
+  setUInt8(Offset::sideTone(), enable ? 0x01 : 0x00);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSystemElement::preTime() const {
+  return getUInt16_le(Offset::preTime());
+}
+void
+DR1801UVCodeplug::DTMFSystemElement::setPreTime(unsigned int ms) {
+  setUInt16_le(Offset::preTime(), ms);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSystemElement::codeDuration() const {
+  return getUInt16_le(Offset::codeDuration());
+}
+void
+DR1801UVCodeplug::DTMFSystemElement::setCodeDuration(unsigned int ms) {
+  setUInt16_le(Offset::codeDuration(), ms);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSystemElement::codeItervall() const {
+  return getUInt16_le(Offset::codeIntervall());
+}
+void
+DR1801UVCodeplug::DTMFSystemElement::setCodeItervall(unsigned int ms) {
+  setUInt16_le(Offset::codeIntervall(), ms);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFSystemElement::resetTime() const {
+  return getUInt16_le(Offset::resetTime());
+}
+void
+DR1801UVCodeplug::DTMFSystemElement::setResetTime(unsigned int ms) {
+  setUInt16_le(Offset::resetTime(), ms);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DTMFIDBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::DTMFIDBankElement::DTMFIDBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DTMFIDBankElement::DTMFIDBankElement(uint8_t *ptr)
+  : Element(ptr, DTMFIDBankElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DTMFIDBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFIDBankElement::idCount() const {
+  return getUInt8(Offset::idCount());
+}
+void
+DR1801UVCodeplug::DTMFIDBankElement::setIDCount(unsigned int n) {
+  setUInt8(Offset::idCount(), n);
+}
+
+DR1801UVCodeplug::DTMFIDElement
+DR1801UVCodeplug::DTMFIDBankElement::id(unsigned int n) const {
+  return DTMFIDElement(_data + Offset::ids() + n*DTMFIDElement::size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DTMFIDElement
+ * ******************************************************************************************** */
+QVector<QChar> DR1801UVCodeplug::DTMFIDElement::_bin_dtmf_tab = {
+  '0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'
+};
+
+DR1801UVCodeplug::DTMFIDElement::DTMFIDElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DTMFIDElement::DTMFIDElement(uint8_t *ptr)
+  : Element(ptr, DR1801UVCodeplug::DTMFIDElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DTMFIDElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::DTMFIDElement::numberLength() const {
+  return getUInt8(Offset::numberLength());
+}
+void
+DR1801UVCodeplug::DTMFIDElement::setNumberLength(unsigned int len) {
+  setUInt8(Offset::numberLength(), len);
+}
+
+QString
+DR1801UVCodeplug::DTMFIDElement::number() const {
+  QString number; number.reserve(16);
+  for (unsigned int i=0; i<numberLength(); i++) {
+    number.append(_bin_dtmf_tab[getUInt8(Offset::number()+i)&0xf]);
+  }
+  return number;
+}
+
+void
+DR1801UVCodeplug::DTMFIDElement::setNumber(const QString &number) {
+  QString lnumber = number.toLower();
+  QRegularExpression re("[0-9a-d*#]+");
+  if (! re.match(lnumber).isValid())
+    return;
+  setNumberLength(std::min(Limit::numberLength(), (unsigned int)lnumber.length()));
+  for (unsigned int i=0; i<numberLength(); i++) {
+    setUInt8(Offset::number() + i, _bin_dtmf_tab.indexOf(lnumber.at(i)));
+  }
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::PTTIDBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::PTTIDBankElement::PTTIDBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::PTTIDBankElement::PTTIDBankElement(uint8_t *ptr)
+  : Element(ptr, PTTIDBankElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::PTTIDBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::PTTIDBankElement::idCount() const {
+  return getUInt8(Offset::idCount());
+}
+void
+DR1801UVCodeplug::PTTIDBankElement::setPTTIDCount(unsigned int n) {
+  setUInt8(Offset::idCount(), n);
+}
+
+DR1801UVCodeplug::PTTIDElement
+DR1801UVCodeplug::PTTIDBankElement::pttID(unsigned int n) {
+  return PTTIDElement(_data + Offset::ids() + n*PTTIDElement::size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::PTTIDElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::PTTIDElement::PTTIDElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::PTTIDElement::PTTIDElement(uint8_t *ptr)
+  : Element(ptr, PTTIDElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::PTTIDElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::PTTIDElement::hasDTMFSystem() const {
+  return 0 != getUInt8(Offset::dtmfSystemIndex());
+}
+unsigned int
+DR1801UVCodeplug::PTTIDElement::dtmfSystemIndex() const {
+  return getUInt8(Offset::dtmfSystemIndex())-1;
+}
+void
+DR1801UVCodeplug::PTTIDElement::setDTMFSystemIndex(unsigned int index) {
+  setUInt8(Offset::dtmfSystemIndex(), index+1);
+}
+void
+DR1801UVCodeplug::PTTIDElement::clearDTMFSystem() {
+  setUInt8(Offset::dtmfSystemIndex(), 0);
+}
+
+DR1801UVCodeplug::PTTIDElement::Transmit
+DR1801UVCodeplug::PTTIDElement::transmitMode() const {
+  return (Transmit) getUInt8(Offset::transmitMode());
+}
+void
+DR1801UVCodeplug::PTTIDElement::setTransmitMode(Transmit mode) {
+  setUInt8(Offset::transmitMode(), (uint8_t)mode);
+}
+
+DR1801UVCodeplug::PTTIDElement::IDMode
+DR1801UVCodeplug::PTTIDElement::idMode() const {
+  return (IDMode) getUInt8(Offset::idMode());
+}
+void
+DR1801UVCodeplug::PTTIDElement::setIDMode(IDMode mode) {
+  setUInt8(Offset::idMode(), (uint8_t)mode);
+}
+
+bool
+DR1801UVCodeplug::PTTIDElement::hasBOTID() const {
+  return 0 != getUInt8(Offset::botIDIndex());
+}
+unsigned int
+DR1801UVCodeplug::PTTIDElement::botIDIndex() const {
+  return getUInt8(Offset::botIDIndex())-1;
+}
+void
+DR1801UVCodeplug::PTTIDElement::setBOTIDIndex(unsigned int index) {
+  setUInt8(Offset::botIDIndex(), index+1);
+}
+void
+DR1801UVCodeplug::PTTIDElement::clearBOTID() {
+  setUInt8(Offset::botIDIndex(), 0);
+}
+
+bool
+DR1801UVCodeplug::PTTIDElement::hasEOTID() const {
+  return 0 != getUInt8(Offset::eotIDIndex());
+}
+unsigned int
+DR1801UVCodeplug::PTTIDElement::eotIDIndex() const {
+  return getUInt8(Offset::eotIDIndex())-1;
+}
+void
+DR1801UVCodeplug::PTTIDElement::setEOTIDIndex(unsigned int index) {
+  setUInt8(Offset::eotIDIndex(), index+1);
+}
+void
+DR1801UVCodeplug::PTTIDElement::clearEOTID() {
+  setUInt8(Offset::eotIDIndex(), 0);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
