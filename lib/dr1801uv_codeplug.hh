@@ -42,6 +42,8 @@
  *      @c DR1801UVCodeplug::DTMFSettingsElement. </td></tr>
  *  <tr><td>0x1daf4</td> <td>0x1dbb8</td>  <td>0x00c4</td>   <td>Alarm settings, see
  *      @c DR1801UVCodeplug::AlarmSettingsBankElement. </tr>
+ *  <tr><td>0x1dbb8</td> <td>0x1dbc8</td>  <td>0x0010</td>  <td>DMR settings, see
+ *      @c DR1801UVCodeplug::DMRSettingsElement. </td></tr>
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -2035,6 +2037,153 @@ public:
   };
 
 
+  /** Implements the binary encoding of the DMR settings.
+   *
+   * Memory representation of the DMR settings (0010h bytes):
+   * @verbinclude dr1801uv_dmrsettingselement.txt */
+  class DMRSettingsElement: public Element
+  {
+  public:
+    /** Possible SMS encodings. */
+    enum class SMSFormat {
+      CompressedIP = 0, DefinedData = 1, IPData = 2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    DMRSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMRSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    /** Returns the hold-time in seconds. */
+    virtual unsigned int holdTime() const;
+    /** Sets the hold-time in seconds. */
+    virtual void setHoldTime(unsigned int sec);
+
+    /** Returns the remote-listen duration in seconds. */
+    virtual unsigned int remoteListen() const;
+    /** Sets the remote-listen duration in seconds. */
+    virtual void setRemoteListen(unsigned int sec);
+
+    /** Returns the active wait period in ms. */
+    virtual unsigned int activeWait() const;
+    /** Sets the active wait period in ms. */
+    virtual void setActiveWait(unsigned int ms);
+
+    /** Returns the active resend count. */
+    virtual unsigned int activeResend() const;
+    /** Sets the active resend cound. */
+    virtual void setActiveResend(unsigned int count);
+
+    /** Returns the pre-send count. */
+    virtual unsigned int preSend() const;
+    /** Sets the pre-send count. */
+    virtual void setPreSend(unsigned int count);
+
+    /** Returns the voice head count. */
+    virtual unsigned int voiceHead() const;
+    /** Sets the voice head count. */
+    virtual void setVoiceHead(unsigned int count);
+
+    /** Returns the SMS format. */
+    virtual SMSFormat smsFormat() const;
+    /** Sets the SMS format. */
+    virtual void setSMSFormat(SMSFormat format);
+
+    /** Returns @c true if the kill encoding is enabled. */
+    virtual bool killEnc() const;
+    /** Enables kill encoding. */
+    virtual void enableKillEnc(bool enable);
+    /** Returns @c true if the kill decoding is enabled. */
+    virtual bool killDec() const;
+    /** Enables kill decoding. */
+    virtual void enableKillDec(bool enable);
+
+    /** Returns @c true if the active encoding is enabled. */
+    virtual bool activeEnc() const;
+    /** Enables active encoding. */
+    virtual void enableActiveEnc(bool enable);
+    /** Returns @c true if the active decoding is enabled. */
+    virtual bool activeDec() const;
+    /** Enables active decoding. */
+    virtual void enableActiveDec(bool enable);
+
+    /** Returns @c true if the check encoding is enabled. */
+    virtual bool checkEnc() const;
+    /** Enables check encoding. */
+    virtual void enableCheckEnc(bool enable);
+    /** Returns @c true if the check decoding is enabled. */
+    virtual bool checkDec() const;
+    /** Enables check decoding. */
+    virtual void enableCheckDec(bool enable);
+
+    /** Returns @c true if the call alter encoding is enabled. */
+    virtual bool callAlterEnc() const;
+    /** Enables call alter encoding. */
+    virtual void enableCallAlterEnc(bool enable);
+    /** Returns @c true if the call alter decoding is enabled. */
+    virtual bool callAlterDec() const;
+    /** Enables call alter decoding. */
+    virtual void enableCallAlterDec(bool enable);
+
+    /** Returns @c true if the remote monitor encoding is enabled. */
+    virtual bool remoteMonitorEnc() const;
+    /** Enables remote monitor encoding. */
+    virtual void enableRemoteMonitorEnc(bool enable);
+    /** Returns @c true if the remote monitor decoding is enabled. */
+    virtual bool remoteMonitorDec() const;
+    /** Enables remote monitor decoding. */
+    virtual void enableRemoteMonitorDec(bool enable);
+
+  public:
+    /** Some limits. */
+    struct Limit: public Element::Limit {
+      /** The range of hold time. */
+      static constexpr Range<unsigned int> holdTime() { return {1, 90}; }
+      /** The range of remote listen duration. */
+      static constexpr Range<unsigned int> remoteListen() { return {10, 120}; }
+      /** The range of active wait period. */
+      static constexpr Range<unsigned int> activeWait() { return {120, 600}; }
+      /** The range of active resend count. */
+      static constexpr Range<unsigned int> activeResend() { return {1, 10}; }
+      /** The range of pre-send count. */
+      static constexpr Range<unsigned int> preSend() { return {4, 15}; }
+      /** The range of voice head count. */
+      static constexpr Range<unsigned int> voiceHead() { return {0, 20}; }
+    };
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int holdTime() { return 0x0000; }
+      static constexpr unsigned int remoteListen() { return 0x0001; }
+      static constexpr unsigned int activeWait() { return 0x0002; }
+      static constexpr unsigned int activeResend() { return 0x0003; }
+      static constexpr unsigned int preSend() { return 0x0004; }
+      static constexpr unsigned int killEnc() { return 0x0005; }
+      static constexpr unsigned int activeEnc() { return 0x0006; }
+      static constexpr unsigned int checkEnc() { return 0x0007; }
+      static constexpr unsigned int killDec() { return 0x0008; }
+      static constexpr unsigned int activeDec() { return 0x0009; }
+      static constexpr unsigned int checkDec() { return 0x000a; }
+      static constexpr unsigned int smsFormat() { return 0x000b; }
+      static constexpr unsigned int voiceHead() { return 0x000c; }
+      static constexpr BitOffset callAlterEnc() { return {0x000d, 0}; }
+      static constexpr BitOffset callAlterDec() { return {0x000d, 1}; }
+      static constexpr BitOffset remoteMonitorEnc() { return {0x000d, 2}; }
+      static constexpr BitOffset remoteMonitorDec() { return {0x000d, 3}; }
+      /// @endcond
+    };
+  };
+
 public:
   /** Default constructor. */
   explicit DR1801UVCodeplug(QObject *parent = nullptr);
@@ -2063,8 +2212,9 @@ protected:
     static constexpr unsigned int keySettings()       { return 0x1c6c4; }
     static constexpr unsigned int groupListBank()     { return 0x1c6dc; }
     static constexpr unsigned int encryptionKeyBank() { return 0x1d7e0; }
+    static constexpr unsigned int dtmfSettings()      { return 0x1d858; }
+    static constexpr unsigned int alarmSettings()     { return 0x1daf4; }
     static constexpr unsigned int vfoBank()           { return 0x1dd00; }
-
     /// @endcond
   };
 };

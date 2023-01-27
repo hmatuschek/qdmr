@@ -2585,6 +2585,181 @@ DR1801UVCodeplug::AlarmSystemElement::setName(const QString &name) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::DMRSettingsElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::DMRSettingsElement::DMRSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::DMRSettingsElement::DMRSettingsElement(uint8_t *ptr)
+  : Element(ptr, DMRSettingsElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::DMRSettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::holdTime() const {
+  return getUInt8(Offset::holdTime());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setHoldTime(unsigned int sec) {
+  sec = Limit::holdTime().limit(sec);
+  setUInt8(Offset::holdTime(), sec);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::remoteListen() const {
+  return getUInt8(Offset::remoteListen());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setRemoteListen(unsigned int sec) {
+  sec = Limit::remoteListen().limit(sec);
+  setUInt8(Offset::remoteListen(), sec);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::activeWait() const {
+  return getUInt8(Offset::activeWait());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setActiveWait(unsigned int ms) {
+  ms = Limit::activeWait().limit(ms);
+  setUInt8(Offset::activeWait(), ms);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::activeResend() const {
+  return getUInt8(Offset::activeResend());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setActiveResend(unsigned int count) {
+  count = Limit::activeResend().limit(count);
+  setUInt8(Offset::activeResend(), count);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::preSend() const {
+  return getUInt8(Offset::preSend());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setPreSend(unsigned int count) {
+  count = Limit::preSend().limit(count);
+  setUInt8(Offset::preSend(), count);
+}
+
+unsigned int
+DR1801UVCodeplug::DMRSettingsElement::voiceHead() const {
+  return getUInt8(Offset::voiceHead());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setVoiceHead(unsigned int count) {
+  count = Limit::voiceHead().limit(count);
+  setUInt8(Offset::voiceHead(), count);
+}
+
+DR1801UVCodeplug::DMRSettingsElement::SMSFormat
+DR1801UVCodeplug::DMRSettingsElement::smsFormat() const {
+  return (SMSFormat) getUInt8(Offset::smsFormat());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::setSMSFormat(SMSFormat format) {
+  setUInt8(Offset::smsFormat(), (uint8_t) format);
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::killEnc() const {
+  return 0x01 == getUInt8(Offset::killEnc());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableKillEnc(bool enable) {
+  setUInt8(Offset::killEnc(), enable ? 0x01 : 0x00);
+}
+bool
+DR1801UVCodeplug::DMRSettingsElement::killDec() const {
+  return 0x01 == getUInt8(Offset::killDec());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableKillDec(bool enable) {
+  setUInt8(Offset::killDec(), enable ? 0x01 : 0x00);
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::activeEnc() const {
+  return 0x01 == getUInt8(Offset::activeEnc());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableActiveEnc(bool enable) {
+  setUInt8(Offset::activeEnc(), enable ? 0x01 : 0x00);
+}
+bool
+DR1801UVCodeplug::DMRSettingsElement::activeDec() const {
+  return 0x01 == getUInt8(Offset::activeDec());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableActiveDec(bool enable) {
+  setUInt8(Offset::activeDec(), enable ? 0x01 : 0x00);
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::checkEnc() const {
+  return 0x01 == getUInt8(Offset::checkEnc());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableCheckEnc(bool enable) {
+  setUInt8(Offset::checkEnc(), enable ? 0x01 : 0x00);
+}
+bool
+DR1801UVCodeplug::DMRSettingsElement::checkDec() const {
+  return 0x01 == getUInt8(Offset::checkDec());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableCheckDec(bool enable) {
+  setUInt8(Offset::checkDec(), enable ? 0x01 : 0x00);
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::callAlterEnc() const {
+  return getBit(Offset::callAlterEnc());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableCallAlterEnc(bool enable) {
+  setBit(Offset::callAlterEnc(), enable);
+}
+bool
+DR1801UVCodeplug::DMRSettingsElement::callAlterDec() const {
+  return getBit(Offset::callAlterDec());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableCallAlterDec(bool enable) {
+  setBit(Offset::callAlterDec(), enable);
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::remoteMonitorEnc() const {
+  return getBit(Offset::remoteMonitorEnc());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableRemoteMonitorEnc(bool enable) {
+  setBit(Offset::remoteMonitorEnc(), enable);
+}
+bool
+DR1801UVCodeplug::DMRSettingsElement::remoteMonitorDec() const {
+  return getBit(Offset::remoteMonitorDec());
+}
+void
+DR1801UVCodeplug::DMRSettingsElement::enableRemoteMonitorDec(bool enable) {
+  setBit(Offset::remoteMonitorDec(), enable);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)

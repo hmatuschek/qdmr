@@ -60,6 +60,26 @@ public:
       };
     };
 
+  public:
+    /** Base class for Limits. */
+    struct Limit {
+      /** Holds a range of values [min, max]. */
+      template <class T> struct Range {
+        /// Lower bound.
+        const T min;
+        /// Upper bound.
+        const T max;
+        /// Limits the value to the range.
+        inline T limit(const T &value) const {
+          return std::min(max, std::max(min, value));
+        }
+        /// Checks if value is in range
+        inline bool in(const T &value) const {
+          return (value <= max) && (value >= min);
+        }
+      };
+    };
+
   protected:
     /** Hidden constructor.
      * @param ptr Specifies the pointer to the element within the codeplug.
