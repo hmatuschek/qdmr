@@ -2468,6 +2468,123 @@ DR1801UVCodeplug::PTTIDElement::clearEOTID() {
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::AlarmSystemBankElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::AlarmSystemBankElement::AlarmSystemBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::AlarmSystemBankElement::AlarmSystemBankElement(uint8_t *ptr)
+  : Element(ptr, AlarmSystemBankElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::AlarmSystemBankElement::clear() {
+  memset(_data, 0, _size);
+}
+
+unsigned int
+DR1801UVCodeplug::AlarmSystemBankElement::alarmSystemCount() const {
+  return getUInt8(Offset::alarmSystemCount());
+}
+void
+DR1801UVCodeplug::AlarmSystemBankElement::setAlarmSystemCount(unsigned int n) {
+  setUInt8(Offset::alarmSystemCount(), n);
+}
+
+DR1801UVCodeplug::AlarmSystemElement
+DR1801UVCodeplug::AlarmSystemBankElement::alarmSystem(unsigned int n) const {
+  return AlarmSystemElement(_data + Offset::alarmSystems() + n*AlarmSystemElement::size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::AlarmSystemElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::AlarmSystemElement::AlarmSystemElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::AlarmSystemElement::AlarmSystemElement(uint8_t *ptr)
+  : Element(ptr, AlarmSystemElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::AlarmSystemElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::AlarmSystemElement::isValid() const {
+  return 0 != getUInt8(Offset::index());
+}
+
+unsigned int
+DR1801UVCodeplug::AlarmSystemElement::index() const {
+  return getUInt8(Offset::index())-1;
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::setIndex(unsigned int index) {
+  setUInt8(Offset::index(), index+1);
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::clearIndex() {
+  setUInt8(Offset::index(), 0);
+}
+
+bool
+DR1801UVCodeplug::AlarmSystemElement::alarmEnabled() const {
+  return 0x01 == getUInt8(Offset::alarmEnabled());
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::enableAlarm(bool enable) {
+  setUInt8(Offset::alarmEnabled(), enable ? 0x01 : 0x00);
+}
+
+bool
+DR1801UVCodeplug::AlarmSystemElement::noAlarmChannel() const {
+  return 0 == getUInt16_le(Offset::alarmChannelIndex());
+}
+bool
+DR1801UVCodeplug::AlarmSystemElement::alarmChannelIsSelected() const {
+  return 0xffff == getUInt16_le(Offset::alarmChannelIndex());
+}
+unsigned int
+DR1801UVCodeplug::AlarmSystemElement::alarmChannelIndex() const {
+  return getUInt16_le(Offset::alarmChannelIndex())-1;
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::setAlarmChannelIndex(unsigned int index) {
+  setUInt16_le(Offset::alarmChannelIndex(), index+1);
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::setAlarmChannelSelected() {
+  setUInt16_le(Offset::alarmChannelIndex(), 0xffff);
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::clearAlarmChannel() {
+  setUInt16_le(Offset::alarmChannelIndex(), 0);
+}
+
+QString
+DR1801UVCodeplug::AlarmSystemElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+void
+DR1801UVCodeplug::AlarmSystemElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)

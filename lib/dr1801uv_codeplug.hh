@@ -1536,7 +1536,6 @@ public:
     };
   };
 
-
   /** Implements the DTMF systems bank. Holding all defined DTMF systems
    *  (see @c DTMFSystemElement).
    *
@@ -1631,7 +1630,6 @@ public:
     /** Translation table. */
     static QVector<QChar> _bin_dtmf_tab;
   };
-
 
   /** Implements the DTMF ID bank. Holding all defined DTMF IDS
    *  (@c see DTMFIDElement).
@@ -1804,10 +1802,9 @@ public:
   };
 
 
-
   /** Implements the binary encoding of the DTMF signaling settings.
    *
-   * Memory representation of the settings (????h bytes):
+   * Memory representation of the settings (029ch bytes):
    * @verbinclude dr1801uv_dtmfsettingselement.txt */
   class DTMFSettingsElement: public Element
   {
@@ -1917,6 +1914,122 @@ public:
       static constexpr unsigned int dtmfSystems() { return 0x0020; }
       static constexpr unsigned int dtmfIDs() { return 0x0054; }
       static constexpr unsigned int pttIDs() { return 0x0198; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the binary encoding of the alarm system.
+   *
+   * Memory representation of the alarm system (0018h bytes):
+   * @verbinclude dr1801uv_alarmsystembankelement.txt */
+  class AlarmSystemElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AlarmSystemElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AlarmSystemElement(uint8_t *ptr);
+
+    void clear();
+    bool isValid() const;
+
+    /** The size of the alarm system element. */
+    static constexpr unsigned int size() { return 0x0018; }
+
+    /** Returns the index of the system. */
+    virtual unsigned int index() const;
+    /** Sets the index of the element. */
+    virtual void setIndex(unsigned int index);
+    /** Clears the index. */
+    virtual void clearIndex();
+
+    /** Returns @c true if the alarm is enabled. */
+    virtual bool alarmEnabled() const;
+    /** Enables/disables the alarm. */
+    virtual void enableAlarm(bool enable);
+
+    /** Returns @c true if no alarm channel is specified. */
+    virtual bool noAlarmChannel() const;
+    /** Returns @c true if the alarm channel is the current channel. */
+    virtual bool alarmChannelIsSelected() const;
+    /** Returns the index of the alarm channel. */
+    virtual unsigned int alarmChannelIndex() const;
+    /** Sets the alarm channel index. */
+    virtual void setAlarmChannelIndex(unsigned int index);
+    /** Sets the alarm channel to the selected chanel. */
+    virtual void setAlarmChannelSelected();
+    /** Clears the alarm channel. */
+    virtual void clearAlarmChannel();
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the system name. */
+    virtual void setName(const QString &name);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the codeplug. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index()             { return 0x0000; }
+      static constexpr unsigned int alarmEnabled()      { return 0x0001; }
+      static constexpr unsigned int alarmChannelIndex() { return 0x0004; }
+      static constexpr unsigned int name()              { return 0x0008; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the binary encoding of the alarm system bank.
+   *
+   * Holding all alarm systems, see @c AlarmSystemElement.
+   *
+   * Memory representation of the alarm system bank (00c4h bytes):
+   * @verbinclude dr1801uv_alarmsystembankelement.txt */
+  class AlarmSystemBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AlarmSystemBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AlarmSystemBankElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the alarm system bank. */
+    static constexpr unsigned int size() { return 0x00c4; }
+
+    /** Returns the number of alarm systems defined. */
+    virtual unsigned int alarmSystemCount() const;
+    /** Sets the number of alarm systems. */
+    virtual void setAlarmSystemCount(unsigned int n);
+
+    /** Returns a reference to the n-th alarm system. */
+    virtual AlarmSystemElement alarmSystem(unsigned int n) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of alarm systems. */
+      static constexpr unsigned int alarmSystemCount() { return 8; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int alarmSystemCount() { return 0x0000; }
+      static constexpr unsigned int alarmSystems() { return 0x0004; }
       /// @endcond
     };
   };
