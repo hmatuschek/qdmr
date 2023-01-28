@@ -603,6 +603,24 @@ DR1801UVCodeplug::ContactBankElement::link(Context &ctx, const ErrorStack &err) 
   return true;
 }
 
+bool
+DR1801UVCodeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::contactCount(), ctx.count<DMRContact>());
+  setContactCount(n); setFirstIndex(0);
+  for (unsigned int i=0; i<n; i++) {
+    ContactElement contact = this->contact(i);
+    if (! contact.encode(ctx.get<DMRContact>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+    if ((i+1) < n)
+      contact.setSuccessorIndex(i+1);
+    else
+      contact.clearSuccessorIndex();
+  }
+  return true;
+}
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ContactElement
@@ -696,12 +714,21 @@ DR1801UVCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &e
   Q_UNUSED(ctx); Q_UNUSED(err)
   return new DMRContact(type(), name(), dmrID());
 }
+
 bool
 DR1801UVCodeplug::ContactElement::linkContactObj(DMRContact *contact, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(contact); Q_UNUSED(ctx); Q_UNUSED(err);
   return true;
 }
 
+bool
+DR1801UVCodeplug::ContactElement::encode(DMRContact *contact, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  setName(contact->name());
+  setCallType(contact->type());
+  setDMRID(contact->number());
+  return true;
+}
 
 
 /* ******************************************************************************************** *
@@ -963,6 +990,20 @@ DR1801UVCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) con
   return true;
 }
 
+bool
+DR1801UVCodeplug::ZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  setZoneCount(ctx.count<Zone>());
+  for (unsigned int i=0; i<ctx.count<Zone>(); i++) {
+    ZoneElement zone = this->zone(i);
+    if (! zone.encode(ctx.get<Zone>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode zone bank.";
+      return false;
+    }
+    zone.setIndex(i);
+  }
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ZoneElement
@@ -1051,6 +1092,20 @@ DR1801UVCodeplug::ZoneElement::linkZoneObj(Zone *obj, Context &ctx, const ErrorS
       return false;
     }
     obj->A()->add(ctx.get<Channel>(entryIndex(i)));
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ZoneElement::encode(Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  setName(zone->name());
+  unsigned int n = std::min(Limit::memberCount(), (unsigned int)zone->A()->count());
+  setUInt8(Offset::numEntries(), n);
+  for (unsigned int i=0; i<n; i++) {
+    setEntryIndex(i, ctx.index(zone->A()->get(i)->as<Channel>()));
   }
 
   return true;
@@ -1453,6 +1508,23 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   return true;
 }
 
+bool
+DR1801UVCodeplug::SettingsElement::fromConfig(Config *config, const ErrorStack &err) {
+  // Store radio ID
+  DMRRadioID *id = config->radioIDs()->defaultId();
+  if (nullptr == id) {
+    errMsg(err) << "Cannot encode radio ID and name. No default DMR radio ID.";
+    return false;
+  }
+  setRadioName(id->name());
+  setDMRID(id->number());
+
+  setVOXSensitivity(config->settings()->vox());
+  setBootLine1(config->settings()->introLine1());
+  setBootLine2(config->settings()->introLine2());
+
+  return true;
+}
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ScanListBankElement
@@ -2896,12 +2968,56 @@ DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
 
 bool
 DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
-  return false;
+  Q_UNUSED(err)
+
+  // All indices as 0-based. That is, the first channel gets index 0 etc.
+
+  // There can only be one DMR radio ID
+  ctx.add(config->radioIDs()->defaultId(), 0);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i);
+
+  return true;
 }
 
 bool
 DR1801UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  return false;
+  Q_UNUSED(flags);
+
+  Context ctx(config);
+
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug.";
+    return false;
+  }
+
+  if (! encodeElements(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 bool
@@ -2992,4 +3108,23 @@ DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
+bool
+DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
+  if (! SettingsElement(data(Offset::settings())).fromConfig(ctx.config(), err)) {
+    errMsg(err) << "Cannot encode settings element.";
+    return false;
+  }
+
+  if (! ZoneBankElement(data(Offset::zoneBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+
+  if (! ContactBankElement(data(Offset::contactBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  return true;
+}
 

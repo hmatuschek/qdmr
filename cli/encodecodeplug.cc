@@ -20,6 +20,7 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dr1801uv_codeplug.hh"
 #include "crc32.hh"
 
 
@@ -196,6 +197,14 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     codeplug.image(0).sort();
+    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
+      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DR1801UV == radio) {
+    DR1801UVCodeplug codeplug;
+    codeplug.encode(&config, flags, err);
     if (! codeplug.write(parser.positionalArguments().at(2), err)) {
       logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
                  << "': " << err.format();

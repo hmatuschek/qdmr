@@ -19,7 +19,10 @@
  *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
- *  <tr><td>0x00000</td> <td>0x00000</td>  <td>0x00000</td>  <td></td></tr>
+ *  <tr><td>0x00000</td> <td>0x00300</td>  <td>0x00300</td>  <td>Some unkown settings, not
+ *      configurable through the CPS. Likely some sort of calibration data. Must be conserved.</td></tr>
+ *  <tr><td>0x00300</td> <td>0x003bc</td>  <td>0x000bc</td>  <td>Some information about the radio.
+ *      Like serial number, firmware version, etc and timestamp. </td></tr>
  *  <tr><td>0x003b4</td> <td>0x00418</td>  <td>0x00064</td>  <td>General settings, see
  *      @c DR1801UVCodeplug::SettingsElement. </td></tr>
  *  <tr><td>0x00418</td> <td>0x04110</td>  <td>0x00000</td>  <td>Zone bank, see
@@ -46,6 +49,7 @@
  *      @c DR1801UVCodeplug::DMRSettingsElement. </td></tr>
  *  <tr><td>0x1dbc8</td> <td>0x1dbf0</td>  <td>0x00028</td>  <td>One-touch settings, see
  *      @c DR1801UVCodeplug::OneTouchSettingsElement. </td></tr>
+ *  <tr><td>0x1dbf0</td> <td>0x1dd00</td>  <td>0x00110</td>  <td>Some unknown settings.</td></tr>
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -397,6 +401,8 @@ public:
     virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the DMR contact object. */
     virtual bool linkContactObj(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the contact. */
+    virtual bool encode(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Defines offsets within the element. */
@@ -450,6 +456,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links all contacts. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all contacts. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Offsets within the element. */
@@ -616,6 +624,8 @@ public:
     virtual Zone *toZoneObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the zone object. */
     virtual bool linkZoneObj(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the zone. */
+    virtual bool encode(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offset within the element. */
@@ -677,6 +687,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack()) const;
     /** Links all zones. */
     virtual bool link(Context &ctx, const ErrorStack &err = ErrorStack()) const;
+    /** Encodes all zones. */
+    virtual bool encode(Context &ctx, const ErrorStack &err = ErrorStack());
 
   protected:
     /** Some offsets within the element. */
@@ -953,6 +965,8 @@ public:
 
     /** Updates configuration. */
     virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
+    /** Encode from config. */
+    virtual bool fromConfig(Config *config, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the element. */
@@ -2326,6 +2340,8 @@ protected:
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link decoded elements. */
   virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode all elements. */
+  virtual bool encodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Defines the offsets within the codeplug. */
