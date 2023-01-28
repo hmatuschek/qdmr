@@ -29,6 +29,7 @@
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
+#include "dr1801uv_filereader.hh"
 
 
 int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -288,11 +289,12 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   } else if (RadioInfo::DR1801UV == radio) {
     DR1801UVCodeplug codeplug;
     if (parser.isSet("manufacturer")) {
-      logError() << "Cannot decode manufacturer codeplug file '" << filename
-                 << "': Not implemented yet.";
-      return -1;
-    }
-    if (! codeplug.read(filename, err)) {
+      if (! DR1801UVFileReader::read(filename, &codeplug, err)) {
+        logError() << "Cannot decode manufacturer codeplug file '" << filename
+                   << "':\n" << err.format();
+        return -1;
+      }
+    } else if (! codeplug.read(filename, err)) {
       logError() << "Cannot decode binary codeplug file '" << filename
                  << "' :\n" << err.format();
       return -1;
