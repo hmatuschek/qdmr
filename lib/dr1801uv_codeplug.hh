@@ -252,6 +252,8 @@ public:
     virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the channel object. */
     virtual bool linkChannelObj(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the given channel. */
+    virtual bool encode(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the codeplug. */
@@ -326,6 +328,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links channels. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all channles. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Offsets within the element. */

@@ -90,6 +90,25 @@ DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) 
   return true;
 }
 
+bool
+DR1801UVCodeplug::ChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::channelCount(), ctx.count<Channel>());
+  setChannelCount(n);
+
+  for (unsigned int i=0; i<n; i++) {
+    ChannelElement ch = channel(i);
+    if (! ch.encode(ctx.get<Channel>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode channel '" << ctx.get<Channel>(i)
+                  << "' at index " << i << ".";
+      return false;
+    }
+    ch.setIndex(i);
+    setChannelName(i, ctx.get<Channel>(i)->name());
+  }
+
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::ChannelElement
@@ -510,6 +529,58 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
   return true;
 }
 
+bool
+DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Encode common properties
+  setPower(channel->power());
+  setRXFrequency(channel->rxFrequency());
+  setTXFrequency(channel->txFrequency());
+  if (channel->scanList())
+    setScanListIndex(ctx.index(channel->scanList()));
+  else
+    clearScanListIndex();
+
+  // Encode type specific settings
+  if (channel->is<FMChannel>()) {
+    FMChannel *fm = channel->as<FMChannel>();
+    setChannelType(Type::FM);
+    setBandwidth(fm->bandwidth());
+    setRXTone(fm->rxTone());
+    setTXTone(fm->txTone());
+    switch (fm->admit()) {
+    case FMChannel::Admit::Always: setAdmitCriterion(Admit::Always); break;
+    case FMChannel::Admit::Free:   setAdmitCriterion(Admit::ChannelFree); break;
+    case FMChannel::Admit::Tone:   setAdmitCriterion(Admit::ColorCode_or_Tone); break;
+    }
+  } else if (channel->is<DMRChannel>()) {
+    DMRChannel *dmr = channel->as<DMRChannel>();
+    setChannelType(Type::DMR);
+    setBandwidth(FMChannel::Bandwidth::Narrow);
+    if (dmr->txContactObj())
+      setTransmitContactIndex(ctx.index(dmr->txContactObj()));
+    else
+      clearTransmitContactIndex();
+    switch (dmr->admit()) {
+    case DMRChannel::Admit::Always:    setAdmitCriterion(Admit::Always); break;
+    case DMRChannel::Admit::Free:      setAdmitCriterion(Admit::ChannelFree); break;
+    case DMRChannel::Admit::ColorCode: setAdmitCriterion(Admit::ColorCode_or_Tone); break;
+    }
+    setColorCode(dmr->colorCode());
+    setTimeSlot(dmr->timeSlot());
+    if (dmr->commercialExtension() && dmr->commercialExtension()->encryptionKey())
+      setEncryptionKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
+    else
+      clearEncryptionKeyIndex();
+    if (dmr->groupListObj())
+      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    else
+      clearGroupListIndex();
+  }
+
+  return true;
+}
 
 
 /* ******************************************************************************************** *
@@ -3182,6 +3253,11 @@ DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! ScanListBankElement(data(Offset::scanListBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode scan lists.";
+    return false;
+  }
+
+  if (! ChannelBankElement(data(Offset::channelBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
