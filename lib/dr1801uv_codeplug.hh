@@ -1115,6 +1115,8 @@ public:
     virtual ScanList *toScanListObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the scan-list object. */
     virtual bool linkScanListObj(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the scan list. */
+    virtual bool encode(ScanList *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the element. */
@@ -1173,9 +1175,11 @@ public:
     virtual ScanListElement scanList(unsigned int index) const;
 
     /** Decodes all scan lists. */
-    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the scan lists. */
-    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all scan lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the element. */

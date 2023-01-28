@@ -1562,7 +1562,7 @@ DR1801UVCodeplug::ScanListBankElement::scanList(unsigned int index) const {
 }
 
 bool
-DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &err) const {
   for (unsigned int i=0; i<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
     if (! sl.isValid()) {
@@ -1584,7 +1584,7 @@ DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &er
 }
 
 bool
-DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) const {
   for (unsigned int i=0; i<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
     if (! sl.isValid()) {
@@ -1603,6 +1603,22 @@ DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err)
     }
   }
 
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ScanListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::scanListCount(), ctx.count<ScanList>());
+  setScanListCount(n);
+  for (unsigned int i=0; i<n; i++) {
+    ScanListElement scan = this->scanList(i);
+    if (! scan.encode(ctx.get<ScanList>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode scan list '" << ctx.get<ScanList>(i)->name()
+                  << " at index " << i << ".";
+      return false;
+    }
+    scan.setIndex(i);
+  }
   return true;
 }
 
@@ -1763,6 +1779,45 @@ DR1801UVCodeplug::ScanListElement::linkScanListObj(ScanList *obj, Context &ctx, 
       return false;
     }
     obj->addChannel(ctx.get<Channel>(entryIndex(i)));
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::ScanListElement::encode(ScanList *obj, Context &ctx, const ErrorStack &err) {
+  setName(obj->name());
+
+  if (nullptr == obj->primaryChannel())
+    setPriorityChannel1(PriorityChannel::None);
+  else if (obj->primaryChannel() && (SelectedChannel::get() == obj->primaryChannel())) {
+    setPriorityChannel1(PriorityChannel::Selected);
+  } else {
+    setPriorityChannel1(PriorityChannel::Fixed);
+    setPriorityChannel1Index(ctx.index(obj->primaryChannel()));
+  }
+
+  if (nullptr == obj->secondaryChannel())
+    setPriorityChannel2(PriorityChannel::None);
+  else if (obj->secondaryChannel() && (SelectedChannel::get() == obj->secondaryChannel())) {
+    setPriorityChannel2(PriorityChannel::Selected);
+  } else {
+    setPriorityChannel2(PriorityChannel::Fixed);
+    setPriorityChannel2Index(ctx.index(obj->secondaryChannel()));
+  }
+
+  if (nullptr == obj->revertChannel())
+    setRevertChannel(RevertChannel::LastActive);
+  else if (obj->revertChannel() && (SelectedChannel::get() == obj->revertChannel())) {
+    setRevertChannel(RevertChannel::Selected);
+  } else {
+    setRevertChannel(RevertChannel::Fixed);
+    setRevertChannelIndex(ctx.index(obj->revertChannel()));
+  }
+
+  unsigned int n = std::min(Limit::memberCount(), (unsigned int)obj->count());
+  for (unsigned int i=0; i<n; i++) {
+    setEntryIndex(i, ctx.index(obj->channel(i)));
   }
 
   return true;
@@ -3122,6 +3177,11 @@ DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! ContactBankElement(data(Offset::contactBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  if (! ScanListBankElement(data(Offset::scanListBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
