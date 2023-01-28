@@ -501,25 +501,30 @@ public:
     static constexpr unsigned int size() { return 0x00044; }
 
     /** Returns the index of the group list. */
-    virtual uint16_t index() const;
+    virtual unsigned int index() const;
     /** Sets the index of the group list. */
-    virtual void setIndex(uint16_t index);
+    virtual void setIndex(unsigned int index);
 
     /** Returns the number of elements in the list. */
-    virtual uint16_t count() const;
+    virtual unsigned int count() const;
+    /** Sets the number of elements in the list. */
+    virtual void setCount(unsigned int n);
+
     /** Returns @c true if the n-th member index is set. */
-    virtual bool hasMemberIndex(uint8_t n) const;
+    virtual bool hasMemberIndex(unsigned int n) const;
     /** Retuns the n-th member index. */
-    virtual uint16_t memberIndex(uint8_t n) const;
+    virtual unsigned int memberIndex(unsigned int n) const;
     /** Sets the n-th member index. */
-    virtual void setMemberIndex(uint8_t n, uint16_t index);
+    virtual void setMemberIndex(unsigned int n, unsigned int index);
     /** Clears the n-th member index. */
-    virtual void clearMemberIndex(uint8_t n);
+    virtual void clearMemberIndex(unsigned int n);
 
     /** Constructs a group list object from this elmeent. */
     virtual RXGroupList *toGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the group list object. */
-    virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links the group list object. */
+    virtual bool encode(RXGroupList *list, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offset within the codeplug. */
@@ -566,9 +571,11 @@ public:
     virtual GroupListElement groupList(unsigned int index) const;
 
     /** Decodes all group lists. */
-    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links all group lists. */
-    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all group lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the element. */

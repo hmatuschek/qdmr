@@ -838,7 +838,7 @@ DR1801UVCodeplug::GroupListBankElement::groupList(unsigned int index) const {
 }
 
 bool
-DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) const {
   for (unsigned int i=0; i<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
     if (! gl.isValid()) {
@@ -860,7 +860,7 @@ DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &e
 }
 
 bool
-DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) const {
   for (unsigned int i=0; i<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
     if (! ctx.has<RXGroupList>(gl.index())) {
@@ -872,6 +872,23 @@ DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err
       errMsg(err) << "Cannot link group list at index " << i << ".";
       return false;
     }
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::GroupListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::groupListCount(), ctx.count<RXGroupList>());
+  setGroupListCount(n);
+  for (unsigned int i=0; i<n; i++) {
+    GroupListElement lst = groupList(i);
+    if (! lst.encode(ctx.get<RXGroupList>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode group list '" << ctx.get<RXGroupList>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+    lst.setIndex(i);
   }
 
   return true;
@@ -903,33 +920,38 @@ DR1801UVCodeplug::GroupListElement::isValid() const {
   return 0 != getUInt16_le(Offset::index());
 }
 
-uint16_t
+unsigned int
 DR1801UVCodeplug::GroupListElement::index() const {
   return getUInt16_le(Offset::index())-1;
 }
 void
-DR1801UVCodeplug::GroupListElement::setIndex(uint16_t index) {
+DR1801UVCodeplug::GroupListElement::setIndex(unsigned int index) {
   setUInt16_le(Offset::index(), index-1);
 }
 
-uint16_t
+unsigned int
 DR1801UVCodeplug::GroupListElement::count() const {
   return getUInt16_le(Offset::count());
 }
+void
+DR1801UVCodeplug::GroupListElement::setCount(unsigned int n) {
+  n = std::min(Limit::members(), n);
+  setUInt16_le(Offset::count(), n);
+}
+
 bool
-DR1801UVCodeplug::GroupListElement::hasMemberIndex(uint8_t n) const {
+DR1801UVCodeplug::GroupListElement::hasMemberIndex(unsigned int n) const {
   return 0 != getUInt16_le(Offset::members() + n*0x02);
 }
-uint16_t
-DR1801UVCodeplug::GroupListElement::memberIndex(uint8_t n) const {
+unsigned int DR1801UVCodeplug::GroupListElement::memberIndex(unsigned int n) const {
   return getUInt16_le(Offset::members() + n*0x02) - 1;
 }
 void
-DR1801UVCodeplug::GroupListElement::setMemberIndex(uint8_t n, uint16_t index) {
+DR1801UVCodeplug::GroupListElement::setMemberIndex(unsigned int n, unsigned int index) {
   setUInt16_le(Offset::members() + n*0x02, index+1);
 }
 void
-DR1801UVCodeplug::GroupListElement::clearMemberIndex(uint8_t n) {
+DR1801UVCodeplug::GroupListElement::clearMemberIndex(unsigned int n) {
   setUInt16_le(Offset::members() + n*0x02, 0);
 }
 
@@ -941,7 +963,7 @@ DR1801UVCodeplug::GroupListElement::toGroupListObj(Context &ctx, const ErrorStac
 }
 
 bool
-DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context &ctx, const ErrorStack &err) const {
   if (! isValid())
     return false;
 
@@ -955,6 +977,16 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
     list->addContact(ctx.get<DMRContact>(memberIndex(i)));
   }
 
+  return true;
+}
+
+bool
+DR1801UVCodeplug::GroupListElement::encode(RXGroupList *list, Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::members(), (unsigned int)list->count());
+  setCount(n);
+  for (unsigned int i=0; i<n; i++) {
+    setMemberIndex(i, ctx.index(list->contact(i)));
+  }
   return true;
 }
 
@@ -3258,6 +3290,11 @@ DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! ChannelBankElement(data(Offset::channelBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode channels.";
+    return false;
+  }
+
+  if (! GroupListBankElement(data(Offset::groupListBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
