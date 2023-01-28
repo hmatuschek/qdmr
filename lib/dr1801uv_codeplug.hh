@@ -44,6 +44,8 @@
  *      @c DR1801UVCodeplug::AlarmSettingsBankElement. </tr>
  *  <tr><td>0x1dbb8</td> <td>0x1dbc8</td>  <td>0x0010</td>  <td>DMR settings, see
  *      @c DR1801UVCodeplug::DMRSettingsElement. </td></tr>
+ *  <tr><td>0x1dbc8</td> <td>0x1dbf0</td>  <td>0x00028</td>  <td>One-touch settings, see
+ *      @c DR1801UVCodeplug::OneTouchSettingsElement. </td></tr>
  *  <tr><td>0x1dd00</td> <td>0x1dd90</td>  <td>0x00090</td>  <td>VFO channels, see
  *      @c DR1801UVCodeplug::VFOBankElement. </td></tr>
  * </table>
@@ -2183,6 +2185,133 @@ public:
       /// @endcond
     };
   };
+
+
+  /** Implements the binary encoding of a one-touch setting.
+   *
+   * Memory representation of the one-touch setting (0008h bytes):
+   * @verbinclude dr1801uv_onetouchsettingelement.txt */
+  class OneTouchSettingElement: public Element
+  {
+  public:
+    /** Possible actions to perform. */
+    enum class Action {
+      Call = 0, Message = 1
+    };
+    /** Possible one-touch types. */
+    enum class Type {
+      Disabled = 0, DMR=1, FM=2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    OneTouchSettingElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    OneTouchSettingElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0008; }
+
+    /** Returns @c true if the setting is enabled. */
+    bool isValid() const;
+
+    /** Returns @c true if a contact is set. */
+    virtual bool hasContact() const;
+    /** Returns the DMR contact index. */
+    virtual unsigned int contactIndex() const;
+    /** Sets the contact index. */
+    virtual void setContactIndex(unsigned int index);
+    /** Clears the contact. */
+    virtual void clearContact();
+
+    /** Returns the one-touch action. */
+    virtual Action action() const;
+    /** Sets the one-touch action. */
+    virtual void setAction(Action action);
+
+    /** Returns @c true, if a message is set. */
+    virtual bool hasMessage() const;
+    /** Returns the message index. */
+    virtual unsigned int messageIndex() const;
+    /** Sets the message index. */
+    virtual void setMessageIndex(unsigned int index);
+    /** Clears the message. */
+    virtual void clearMessage();
+
+    /** Retuns the type of the one-touch setting. */
+    virtual Type type() const;
+    /** Sets the type of the one-touch setting. */
+    virtual void setType(Type type);
+
+    /** Returns @c true if a DTMF ID is set. */
+    virtual bool hasDTMFID() const;
+    /** Returns the DTMF ID index. */
+    virtual unsigned int dtmfIDIndex() const;
+    /** Sets the DTMF ID index. */
+    virtual void setDTMFIDIndex(unsigned int index);
+    /** Clears the DTMF ID index. */
+    virtual void clearDTMFIDIndex();
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contactIndex() { return 0x0000; }
+      static constexpr unsigned int action() { return 0x0002; }
+      static constexpr unsigned int messageIndex() { return 0x0003; }
+      static constexpr unsigned int type() { return 0x0004; }
+      static constexpr unsigned int dtmfIDIndex() { return 0x0005; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the binary encoding of the one-touch settings.
+   *
+   * Holding all one-touch settings, see @c OneTouchSettingElement.
+   *
+   * Memory representation of the one-touch settings (0028h bytes):
+   * @verbinclude dr1801uv_onetouchsettingselement.txt */
+  class OneTouchSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    OneTouchSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    OneTouchSettingsElement(uint8_t *ptr);
+
+    void clear();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0028; }
+
+    /** Returns the number of one-touch settings. */
+    virtual unsigned int settingsCount() const;
+
+    /** Returns a reference to the n-th one-touch setting. */
+    virtual OneTouchSettingElement setting(unsigned int n) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Returns the maximum number of one-touch settings. */
+      static constexpr unsigned int settingsCount() { return 5; }
+    };
+
+  protected:
+    /** Some internal offset. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int settings() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
 
 public:
   /** Default constructor. */

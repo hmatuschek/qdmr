@@ -2760,6 +2760,131 @@ DR1801UVCodeplug::DMRSettingsElement::enableRemoteMonitorDec(bool enable) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::OneTouchSettingsElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::OneTouchSettingsElement::OneTouchSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::OneTouchSettingsElement::OneTouchSettingsElement(uint8_t *ptr)
+  : Element(ptr, OneTouchSettingsElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::OneTouchSettingsElement::clear() {
+  memset(_data, 0, _size);
+}
+unsigned int
+DR1801UVCodeplug::OneTouchSettingsElement::settingsCount() const {
+  return Limit::settingsCount();
+}
+
+DR1801UVCodeplug::OneTouchSettingElement
+DR1801UVCodeplug::OneTouchSettingsElement::setting(unsigned int n) const {
+  return OneTouchSettingElement(_data + Offset::settings() + n*OneTouchSettingElement::size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DR1801UVCodeplug::OneTouchSettingElement
+ * ******************************************************************************************** */
+DR1801UVCodeplug::OneTouchSettingElement::OneTouchSettingElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DR1801UVCodeplug::OneTouchSettingElement::OneTouchSettingElement(uint8_t *ptr)
+  : Element(ptr, OneTouchSettingElement::size())
+{
+  // pass...
+}
+
+void
+DR1801UVCodeplug::OneTouchSettingElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DR1801UVCodeplug::OneTouchSettingElement::isValid() const {
+  return Element::isValid() && (Type::Disabled != type());
+}
+
+bool
+DR1801UVCodeplug::OneTouchSettingElement::hasContact() const {
+  return 0 != getUInt16_le(Offset::contactIndex());
+}
+unsigned int
+DR1801UVCodeplug::OneTouchSettingElement::contactIndex() const {
+  return getUInt16_le(Offset::contactIndex())-1;
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::setContactIndex(unsigned int index) {
+  setUInt16_le(Offset::contactIndex(), index+1);
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::clearContact() {
+  setUInt16_le(Offset::contactIndex(), 0);
+}
+
+DR1801UVCodeplug::OneTouchSettingElement::Action
+DR1801UVCodeplug::OneTouchSettingElement::action() const {
+  return (Action) getUInt8(Offset::action());
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::setAction(Action action) {
+  setUInt8(Offset::action(), (uint8_t) action);
+}
+
+bool
+DR1801UVCodeplug::OneTouchSettingElement::hasMessage() const {
+  return 0 != getUInt8(Offset::messageIndex());
+}
+unsigned int
+DR1801UVCodeplug::OneTouchSettingElement::messageIndex() const {
+  return getUInt8(Offset::messageIndex())-1;
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::setMessageIndex(unsigned int index) {
+  setUInt8(Offset::messageIndex(), index+1);
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::clearMessage() {
+  setUInt8(Offset::messageIndex(), 0);
+}
+
+DR1801UVCodeplug::OneTouchSettingElement::Type
+DR1801UVCodeplug::OneTouchSettingElement::type() const {
+  return (Type) getUInt8(Offset::type());
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::setType(Type type) {
+  setUInt8(Offset::type(), (uint8_t)type);
+}
+
+bool
+DR1801UVCodeplug::OneTouchSettingElement::hasDTMFID() const {
+  return 0 != getUInt8(Offset::dtmfIDIndex());
+}
+unsigned int
+DR1801UVCodeplug::OneTouchSettingElement::dtmfIDIndex() const {
+  return getUInt8(Offset::dtmfIDIndex())-1;
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::setDTMFIDIndex(unsigned int index) {
+  setUInt8(Offset::dtmfIDIndex(), index+1);
+}
+void
+DR1801UVCodeplug::OneTouchSettingElement::clearDTMFIDIndex() {
+  setUInt8(Offset::dtmfIDIndex(), 0);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug
  * ******************************************************************************************** */
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
