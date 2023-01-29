@@ -1457,6 +1457,8 @@ public:
     virtual EncryptionKey *toKeyObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the key object. */
     virtual bool linkKeyObj(EncryptionKey *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the key. */
+    virtual bool encode(EncryptionKey *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the element. */
@@ -1499,9 +1501,11 @@ public:
     virtual EncryptionKeyElement key(unsigned int index) const;
 
     /** Decodes the all encryption keys defined. */
-    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links all encryption keys. */
-    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all keys. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the key bank. */

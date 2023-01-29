@@ -55,6 +55,10 @@ protected:
   QString _name;
   /** The binary codeplug. */
   DR1801UVCodeplug _codeplug;
+  /** The generic configuration. */
+  Config *_config;
+  /** Some codeplug flags. */
+  Codeplug::Flags _codeplugFlags;
 
 private:
   /** Holds the singleton instance of the radio limits. */

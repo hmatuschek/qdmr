@@ -2158,7 +2158,7 @@ DR1801UVCodeplug::EncryptionKeyBankElement::key(unsigned int index) const {
 }
 
 bool
-DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) {
+DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) const {
   for (unsigned int i=0; i<Limit::keyCount(); i++) {
     EncryptionKey *obj = key(i).toKeyObj(ctx, err);
     if (nullptr == obj) {
@@ -2173,12 +2173,30 @@ DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStac
 }
 
 bool
-DR1801UVCodeplug::EncryptionKeyBankElement::link(Context &ctx, const ErrorStack &err)
+DR1801UVCodeplug::EncryptionKeyBankElement::link(Context &ctx, const ErrorStack &err) const
 {
   Q_UNUSED(ctx); Q_UNUSED(err);
 
   // Nothing to do
   return true;
+}
+
+bool
+DR1801UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int n = std::min(Limit::keyCount(), ctx.count<EncryptionKey>());
+  for (unsigned int i=0; i<Limit::keyCount(); i++) {
+    EncryptionKeyElement key = this->key(i);
+    if (i>=n) {
+      key.clear();
+      continue;
+    }
+    if (! key.encode(ctx.get<DMREncryptionKey>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode DMR encryption key '" << ctx.get<EncryptionKey>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+    key.setIndex(i);
+  }
 }
 
 
@@ -2257,6 +2275,15 @@ DR1801UVCodeplug::EncryptionKeyElement::linkKeyObj(EncryptionKey *obj, Context &
   return true;
 }
 
+bool
+DR1801UVCodeplug::EncryptionKeyElement::encode(EncryptionKey *obj, Context &ctx, const ErrorStack &err) {
+  if (!obj->is<DMREncryptionKey>()) {
+    errMsg(err) << "Cannot encode AES encryption key. Not supported by the device.";
+    return false;
+  }
+  DMREncryptionKey *key = obj->as<DMREncryptionKey>();
+  setKey(key->key().toHex());
+}
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::DTMFSettingsElement
@@ -3295,6 +3322,11 @@ DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! GroupListBankElement(data(Offset::groupListBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode group lists.";
+    return false;
+  }
+
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeyBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
     return false;
   }
 

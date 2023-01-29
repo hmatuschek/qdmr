@@ -34,6 +34,32 @@ AuctusA6Interface::send_receive(uint16_t command,
                                 const uint8_t *params, uint8_t plen,
                                 uint8_t *response, uint8_t &rlen, const ErrorStack &err)
 {
+  if (! send(command, params, plen, err)) {
+    errMsg(err) << "Cannot send command.";
+    return false;
+  }
+
+  uint16_t rcommand;
+  if (! receive(rcommand, response, rlen, err)) {
+    errMsg(err) << "Cannot receive response.";
+    return false;
+  }
+
+  if ((rcommand&0x7fff) != command) {
+    errMsg(err) << "Request and response commands mismatch. Expected "
+                << QString::number(command, 16) << " got "
+                << QString::number(command&0x7fff, 16) << ".";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+AuctusA6Interface::send(uint16_t command,
+                        const uint8_t *params, uint8_t plen, const ErrorStack &err)
+{
   // check parameter length
   if (plen>249) {
     errMsg(err) << "Parameter length cannot exceed 250 bytes.";
@@ -72,8 +98,17 @@ AuctusA6Interface::send_receive(uint16_t command,
               << " of " << total_length << " left in buffer.";
   }
 
+  return true;
+}
+
+
+bool
+AuctusA6Interface::receive(uint16_t &command,
+                           uint8_t *response, uint8_t &rlen, const ErrorStack &err)
+{
+  uint8_t buffer[255];
   // wait for start-of-packet and length bytes
-  total_length = 2;
+  uint8_t total_length = 2;
   while (total_length > bytesAvailable()) {
     if (! waitForReadyRead(TIMEOUT)) {
       errMsg(err) << "QSerialPort: " << errorString();
@@ -115,13 +150,8 @@ AuctusA6Interface::send_receive(uint16_t command,
   }
   logDebug() << "Got response " << QByteArray((const char *)buffer, total_length).toHex() << ".";
 
-  // check response
-  uint16_t responseCommand = qFromBigEndian((*(uint16_t *)(buffer+2)));
-  if ((! (responseCommand & 0x8000)) || (command != (responseCommand&0x7fff))) {
-    errMsg(err) << "Unexpected response command " << QString::number(responseCommand, 16)
-                << "h, expected " << QString::number(command | 0x8000, 16) << "h.";
-    return false;
-  }
+  // unpack command
+  command = qFromBigEndian((*(uint16_t *)(buffer+2)));
 
   // check CRC
   uint8_t crc = 0;

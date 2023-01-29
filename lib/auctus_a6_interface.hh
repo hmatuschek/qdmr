@@ -43,6 +43,11 @@ protected:
   /** Internal used method to send messages to and receive responses from radio. */
   bool send_receive(uint16_t command, const uint8_t *params, uint8_t plen,
                     uint8_t *response, uint8_t &rlen, const ErrorStack &err=ErrorStack());
+  /** Internal used method to send a command. */
+  bool send(uint16_t command, const uint8_t *params, uint8_t plen, const ErrorStack &err=ErrorStack());
+  /** Internal used method to receive a response. */
+  bool receive(uint16_t &command, uint8_t *response, uint8_t &rlen, const ErrorStack &err=ErrorStack());
+
 protected:
   /** Holds the state of the interface. */
   State _state;

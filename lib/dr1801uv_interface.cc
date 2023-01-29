@@ -7,6 +7,8 @@
 #define USB_VID 0x067b
 #define USB_PID 0x23a3
 
+#define WRITE_CODEPLUG_OFFSET 0x00000304
+#define WRITE_CODEPLUG_SIZE   0x0001da8c
 
 /* ********************************************************************************************* *
  * Implementation of DR1801UVInterface::PrepareReadRequest
@@ -37,11 +39,40 @@ DR1801UVInterface::PrepareReadResponse::getSize() const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of DR1801UVInterface::PrepareWriteRequest
+ * ********************************************************************************************* */
+DR1801UVInterface::PrepareWriteRequest::PrepareWriteRequest(uint32_t s, uint32_t speed)
+  : _unknown0(qToBigEndian((uint16_t)0x0100)), size(qToBigEndian(s)),
+    eraseBitmap(qToBigEndian((uint16_t)0x7ff6)), baudRate(qToBigEndian(speed))
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DR1801UVInterface::PrepareWriteResponse
+ * ********************************************************************************************* */
+bool
+DR1801UVInterface::PrepareWriteResponse::isSuccessful() const {
+  return 0x0100 == qFromBigEndian(responseCode);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DR1801UVInterface::CodeplugWriteResponse
+ * ********************************************************************************************* */
+bool
+DR1801UVInterface::CodeplugWriteResponse::isSuccessful() const {
+  return 0x01 == success;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of DR1801UVInterface
  * ********************************************************************************************* */
 DR1801UVInterface::DR1801UVInterface(const USBDeviceDescriptor &descriptor,
                                      const ErrorStack &err, QObject *parent)
-  : AuctusA6Interface(descriptor, err, parent), _identifier(), _bytesToRead(0)
+  : AuctusA6Interface(descriptor, err, parent), _identifier(), _bytesToTransfer(0)
 {
   if (! enterProgrammingMode(err)) {
     errMsg(err) << "Cannot connect to DR-1801UV.";
@@ -79,7 +110,7 @@ DR1801UVInterface::identifier(const ErrorStack &err) {
 
 uint32_t
 DR1801UVInterface::bytesToTransfer() const {
-  return _bytesToRead;
+  return _bytesToTransfer;
 }
 
 bool
@@ -104,14 +135,14 @@ DR1801UVInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
     return false;
   }
 
-  _bytesToRead = resp.getSize();
+  _bytesToTransfer = resp.getSize();
   if (! startReading(err)) {
     errMsg(err) << "Cannot start reading the codeplug form " << _identifier << ".";
     _state = ERROR;
     return false;
   }
 
-  logDebug() << "Start reading " << _bytesToRead << "b of codeplug memory.";
+  logDebug() << "Start reading " << _bytesToTransfer << "b of codeplug memory.";
 
   return true;
 }
@@ -126,8 +157,8 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
     return false;
   }
 
-  if (_bytesToRead < uint32_t(nbytes))
-    nbytes = _bytesToRead;
+  if (_bytesToTransfer < uint32_t(nbytes))
+    nbytes = _bytesToTransfer;
 
   while (nbytes > bytesAvailable()) {
     if (! waitForReadyRead(2000)) {
@@ -142,8 +173,8 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
     return false;
   }
 
-  _bytesToRead -= n;
-  if (0 == _bytesToRead)
+  _bytesToTransfer -= n;
+  if (0 == _bytesToTransfer)
     _state = IDLE;
 
   return true;
@@ -152,26 +183,79 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
 bool
 DR1801UVInterface::read_finish(const ErrorStack &err) {
   Q_UNUSED(err);
-  return (_state == IDLE) && (0 == _bytesToRead);
+  return (_state == IDLE) && (0 == _bytesToTransfer);
 }
 
 
 bool
 DR1801UVInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err) {
-  errMsg(err) << "Not implemented yet.";
-  return false;
+  Q_UNUSED(bank); Q_UNUSED(addr)
+
+  if (! isOpen()) {
+    errMsg(err) << "Cannot write codeplug to device: Interface not open.";
+    return false;
+  }
+
+  if (IDLE != _state) {
+    errMsg(err) << "Cannot write codeplug to device: Interface not in idle state. "
+                << "State=" << _state << ".";
+    return false;
+  }
+
+  PrepareWriteResponse resp;
+  if (! prepareWriting(WRITE_CODEPLUG_SIZE, QSerialPort::Baud9600, resp, err)) {
+    errMsg(err) << "Cannot start writing the codeplug to " << _identifier << ".";
+    _state = ERROR;
+    return false;
+  }
+
+  _bytesToTransfer = WRITE_CODEPLUG_SIZE;
+  logDebug() << "Start writing " << _bytesToTransfer << "b of codeplug memory.";
+
+  return true;
 }
 
 bool
 DR1801UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err) {
-  errMsg(err) << "Not implemented yet.";
-  return false;
+  Q_UNUSED(bank); Q_UNUSED(addr)
+  if ((!isOpen()) || (WRITE_THROUGH != _state)) {
+    errMsg(err) << "Cannot write codeplug to device.";
+    return false;
+  }
+
+  if (_bytesToTransfer < uint32_t(nbytes))
+    nbytes = _bytesToTransfer;
+
+  int n = QSerialPort::write((char *)data, nbytes);
+  if (0 > n) {
+    errMsg(err) << "Cannot write to serial port: " << QSerialPort::errorString() << ".";
+    return false;
+  }
+
+  _bytesToTransfer -= n;
+  if (0 == _bytesToTransfer)
+    _state = IDLE;
+
+  return true;
 }
 
 bool
 DR1801UVInterface::write_finish(const ErrorStack &err) {
-  errMsg(err) << "Not implemented yet.";
-  return false;
+  // Wait for device response
+  uint16_t rcode;
+  CodeplugWriteResponse response;
+  uint8_t size = sizeof(CodeplugWriteResponse);
+  if (! receive(rcode, (uint8_t*) &response, size, err)) {
+    errMsg(err) << "Cannot complete codeplug write.";
+    return false;
+  }
+
+  if (((rcode&0x7fff) != CODEPLUG_WRITTEN) || (! response.isSuccessful())) {
+    errMsg(err) << "Cannot complete codeplug write.";
+    return false;
+  }
+
+  return true;
 }
 
 USBDeviceInfo
@@ -279,6 +363,30 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
     return false;
   }
 
+  return true;
+}
+
+bool
+DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, PrepareWriteResponse &response, const ErrorStack &err) {
+  PrepareWriteRequest request(size, baudrate);
+  uint8_t respSize = sizeof(request);
+
+  if (! send_receive(PREPARE_CODEPLUG_WRITE, (uint8_t *)&request, sizeof(request), (uint8_t *)&response, respSize, err)) {
+    errMsg(err) << "Cannot prepare writing of codeplug.";
+    return false;
+  }
+
+  if ((sizeof(PrepareWriteResponse) != respSize) || (! response.isSuccessful())) {
+    errMsg(err) << "Prepare writing of codeplug failed.";
+    return false;
+  }
+
+  if (! this->setBaudRate(baudrate)) {
+    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
+    return false;
+  }
+
+  _state = WRITE_THROUGH;
   return true;
 }
 

@@ -62,7 +62,23 @@ DR1801UV::startDownload(bool blocking, const ErrorStack &err) {
 
 bool
 DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
-  return false;
+  if (StatusIdle != _task)
+    return false;
+
+  if (! (_config = config))
+    return false;
+  _codeplugFlags = flags;
+
+  _task = StatusUpload;
+  _errorStack = err;
+
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  start();
+  return true;
 }
 
 bool
@@ -159,5 +175,73 @@ DR1801UV::download() {
 
 bool
 DR1801UV::upload() {
-  return false;
+  emit uploadStarted();
+
+  // Init download
+  if (! _device->read_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot initialize codeplug read.";
+    _device->read_finish(_errorStack);
+    return false;
+  }
+
+  uint32_t offset = 0;
+  uint32_t bytesToTransfer = _device->bytesToTransfer(), total = bytesToTransfer;
+  if (_codeplug.image(0).element(0).memSize() != bytesToTransfer) {
+    errMsg(_errorStack) << "Codeplug size mismatch! Expected " << _codeplug.image(0).element(0).memSize()
+                        << " radio sends " << bytesToTransfer << ".";
+    return false;
+  }
+
+  while (DR1801UVInterface::READ_THROUGH == _device->state()) {
+    uint8_t buffer[128];
+    uint32_t n = std::min(128U, bytesToTransfer);
+    if (! _device->read(0, offset, buffer, n, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read codeplug from device.";
+      return false;
+    }
+    memcpy(_codeplug.data(offset), buffer, n);
+    offset += n; bytesToTransfer -= n;
+    emit uploadProgress(float(offset*50)/total);
+  }
+
+  if (! _device->read_finish(_errorStack)) {
+    errMsg(_errorStack) << "Cannot finish read operation properly. Partial read?";
+  }
+
+  // Encode config into codeplug
+  codeplug().encode(_config, _codeplugFlags);
+
+  // Init write
+  if (! _device->write_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot initialize codeplug write.";
+    return false;
+  }
+
+  offset = 0x304;
+  bytesToTransfer = _device->bytesToTransfer()-offset;
+  total = bytesToTransfer;
+  if (_codeplug.image(0).element(0).memSize()-offset != bytesToTransfer) {
+    errMsg(_errorStack) << "Codeplug size mismatch! Expected " << _codeplug.image(0).element(0).memSize()
+                        << " radio sends " << bytesToTransfer << ".";
+    return false;
+  }
+
+  // then write codeplug back
+  while (DR1801UVInterface::WRITE_THROUGH == _device->state()) {
+    uint8_t buffer[128];
+    uint32_t n = std::min(128U, bytesToTransfer);
+    memcpy(buffer, _codeplug.image(0).data(offset), n);
+    if (! _device->write(0, offset, buffer, n, _errorStack)) {
+      errMsg(_errorStack) << "Cannot write codeplug to device.";
+      return false;
+    }
+    offset += n; bytesToTransfer -= n;
+    emit uploadProgress(50+float(offset*50)/total);
+  }
+
+  if (! _device->write_finish(_errorStack)) {
+    errMsg(_errorStack) << "Cannot finish write operation properly. Partial write?";
+  }
+
+  return true;
 }
