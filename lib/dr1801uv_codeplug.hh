@@ -331,6 +331,15 @@ public:
     /** Encodes all channles. */
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  public:
+    /** Limits of some elements. */
+    struct Limit {
+      /** Returns the maximum number of channels. */
+      static constexpr unsigned int channelCount()       { return 1024; }
+      /** Returns the maximum length of a channel name. */
+      static constexpr unsigned int channelNameLength()  { return 0x00014; }
+    };
+
   protected:
     /** Offsets within the element. */
     struct Offset {
@@ -339,14 +348,6 @@ public:
       static constexpr unsigned int channel()      { return 0x00004; }
       static constexpr unsigned int channelName()  { return 0x0d004; }
       /// @endcond
-    };
-
-    /** Limits of some elements. */
-    struct Limit {
-      /** Returns the maximum number of channels. */
-      static constexpr unsigned int channelCount()       { return 1024; }
-      /** Returns the maximum length of a channel name. */
-      static constexpr unsigned int channelNameLength()  { return 0x00014; }
     };
   };
 
@@ -408,6 +409,13 @@ public:
     /** Encodes the contact. */
     virtual bool encode(DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
 
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum length of the contact name. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
   protected:
     /** Defines offsets within the element. */
     struct Offset : public Element::Offset {
@@ -463,6 +471,13 @@ public:
     /** Encodes all contacts. */
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  public:
+    /** Some Limits.*/
+    struct Limit {
+      /** The maximum number of contacts. */
+      static constexpr unsigned int contactCount() { return 1024; }
+    };
+
   protected:
     /** Offsets within the element. */
     struct Offset : public Element::Offset{
@@ -470,11 +485,6 @@ public:
       static constexpr unsigned int contactCount() { return 0x0000; }
       static constexpr unsigned int firstIndex() { return 0x0002; }
       static constexpr unsigned int contacts() { return 0x0004; }
-      /// @endcond
-    };
-    struct Limit {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int contactCount() { return 1024; }
       /// @endcond
     };
   };
@@ -577,18 +587,19 @@ public:
     /** Encodes all group lists. */
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of group lists. */
+      static constexpr unsigned int groupListCount() { return 64; }
+    };
+
   protected:
     /** Some offsets within the element. */
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int groupListCount() { return 0x0000; }
       static constexpr unsigned int groupLists() { return 0x00004; }
-      /// @endcond
-    };
-    /** Some limits. */
-    struct Limit {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int groupListCount() { return 64; }
       /// @endcond
     };
   };
@@ -638,6 +649,14 @@ public:
     /** Encodes the zone. */
     virtual bool encode(Zone *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
+    /** Some limits. */
+    struct Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength() { return 32; }
+      /** The maximum number of channels in the zone. */
+      static constexpr unsigned int memberCount() { return 32; }
+    };
+
   protected:
     /** Some offset within the element. */
     struct Offset {
@@ -647,13 +666,6 @@ public:
       static constexpr unsigned int numEntries() { return 0x0022; }
       static constexpr unsigned int index() { return 0x0024; }
       static constexpr unsigned int members() { return 0x0028; }
-      /// @endcond
-    };
-    /** Some limits. */
-    struct Limit {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int nameLength() { return 32; }
-      static constexpr unsigned int memberCount() { return 32; }
       /// @endcond
     };
   };
@@ -701,6 +713,13 @@ public:
     /** Encodes all zones. */
     virtual bool encode(Context &ctx, const ErrorStack &err = ErrorStack());
 
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of zones. */
+      static constexpr unsigned int zoneCount() { return 150; }
+    };
+
   protected:
     /** Some offsets within the element. */
     struct Offset {
@@ -709,12 +728,6 @@ public:
       static constexpr unsigned int upZoneIndex() { return 0x0002; }
       static constexpr unsigned int downZoneIndex() { return 0x0004; }
       static constexpr unsigned int zones() { return 0x0008; }
-      /// @endcond
-    };
-    /** Some limits. */
-    struct Limit {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int zoneCount() { return 150; }
       /// @endcond
     };
   };

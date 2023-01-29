@@ -11,7 +11,7 @@
 #include "radio.hh"
 #include "dr1801uv_interface.hh"
 #include "dr1801uv_codeplug.hh"
-
+#include "dr1801uv_limits.hh"
 
 /** Implements the BTECH DR-1801UV (BF-1801 A6).
  *

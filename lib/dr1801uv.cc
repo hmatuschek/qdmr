@@ -39,7 +39,7 @@ DR1801UV::codeplug() {
 const RadioLimits &
 DR1801UV::limits() const {
   if (nullptr == _limits)
-    _limits = nullptr;
+    _limits = new DR1801UVLimits();
   return *_limits;
 }
 
@@ -209,7 +209,7 @@ DR1801UV::upload() {
   }
 
   // Encode config into codeplug
-  codeplug().encode(_config, _codeplugFlags);
+  //codeplug().encode(_config, _codeplugFlags);
 
   // Init write
   if (! _device->write_start(0, 0, _errorStack)) {
@@ -218,11 +218,12 @@ DR1801UV::upload() {
   }
 
   offset = 0x304;
-  bytesToTransfer = _device->bytesToTransfer()-offset;
+  bytesToTransfer = _device->bytesToTransfer();
   total = bytesToTransfer;
+  _codeplug.image(0).element(0).data()[offset] = 0x00;
   if (_codeplug.image(0).element(0).memSize()-offset != bytesToTransfer) {
-    errMsg(_errorStack) << "Codeplug size mismatch! Expected " << _codeplug.image(0).element(0).memSize()
-                        << " radio sends " << bytesToTransfer << ".";
+    errMsg(_errorStack) << "Codeplug size mismatch! Expected " << (_codeplug.image(0).element(0).memSize()-offset)
+                        << " radio expects " << bytesToTransfer << ".";
     return false;
   }
 

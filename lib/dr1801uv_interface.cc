@@ -42,7 +42,7 @@ DR1801UVInterface::PrepareReadResponse::getSize() const {
  * Implementation of DR1801UVInterface::PrepareWriteRequest
  * ********************************************************************************************* */
 DR1801UVInterface::PrepareWriteRequest::PrepareWriteRequest(uint32_t s, uint32_t speed)
-  : _unknown0(qToBigEndian((uint16_t)0x0100)), size(qToBigEndian(s)),
+  : _unknown0(qToBigEndian((uint16_t)0x0001)), size(qToBigEndian(s)),
     eraseBitmap(qToBigEndian((uint16_t)0x7ff6)), baudRate(qToBigEndian(speed))
 {
   // pass...
@@ -230,6 +230,13 @@ DR1801UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes
   if (0 > n) {
     errMsg(err) << "Cannot write to serial port: " << QSerialPort::errorString() << ".";
     return false;
+  }
+
+  while (QSerialPort::bytesToWrite()) {
+    if (! QSerialPort::waitForBytesWritten(2000)) {
+      errMsg(err) << "Cannot write to the device: " << QSerialPort::errorString();
+      return false;
+    }
   }
 
   _bytesToTransfer -= n;

@@ -775,9 +775,9 @@ DR1801UVCodeplug::ContactElement::name() const {
 }
 void
 DR1801UVCodeplug::ContactElement::setName(const QString &name) {
-  uint8_t len = std::min(16, name.size());
+  uint8_t len = std::min(Limit::nameLength(), (unsigned int)name.size());
   setUInt8(Offset::nameLength(), len);
-  writeASCII(Offset::name(), name, 16, 0x00);
+  writeASCII(Offset::name(), name, len, 0x00);
 }
 
 DMRContact *
@@ -967,7 +967,7 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
   if (! isValid())
     return false;
 
-  for (int i=0; i<count(); i++) {
+  for (unsigned int i=0; i<count(); i++) {
     if (! hasMemberIndex(i))
       continue;
     if (! ctx.has<DMRContact>(memberIndex(i))) {
@@ -982,6 +982,7 @@ DR1801UVCodeplug::GroupListElement::linkGroupListObj(RXGroupList *list, Context 
 
 bool
 DR1801UVCodeplug::GroupListElement::encode(RXGroupList *list, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   unsigned int n = std::min(Limit::members(), (unsigned int)list->count());
   setCount(n);
   for (unsigned int i=0; i<n; i++) {
@@ -1889,6 +1890,8 @@ DR1801UVCodeplug::ScanListElement::linkScanListObj(ScanList *obj, Context &ctx, 
 
 bool
 DR1801UVCodeplug::ScanListElement::encode(ScanList *obj, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   setName(obj->name());
 
   if (nullptr == obj->primaryChannel())
@@ -2183,7 +2186,7 @@ DR1801UVCodeplug::EncryptionKeyBankElement::link(Context &ctx, const ErrorStack 
 
 bool
 DR1801UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
-  unsigned int n = std::min(Limit::keyCount(), ctx.count<EncryptionKey>());
+  unsigned int n = std::min(Limit::keyCount(), ctx.count<DMREncryptionKey>());
   for (unsigned int i=0; i<Limit::keyCount(); i++) {
     EncryptionKeyElement key = this->key(i);
     if (i>=n) {
@@ -2191,12 +2194,13 @@ DR1801UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStac
       continue;
     }
     if (! key.encode(ctx.get<DMREncryptionKey>(i), ctx, err)) {
-      errMsg(err) << "Cannot encode DMR encryption key '" << ctx.get<EncryptionKey>(i)->name()
+      errMsg(err) << "Cannot encode DMR encryption key '" << ctx.get<DMREncryptionKey>(i)->name()
                   << "' at index " << i << ".";
       return false;
     }
     key.setIndex(i);
   }
+  return true;
 }
 
 
@@ -2277,12 +2281,16 @@ DR1801UVCodeplug::EncryptionKeyElement::linkKeyObj(EncryptionKey *obj, Context &
 
 bool
 DR1801UVCodeplug::EncryptionKeyElement::encode(EncryptionKey *obj, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx);
+
   if (!obj->is<DMREncryptionKey>()) {
     errMsg(err) << "Cannot encode AES encryption key. Not supported by the device.";
     return false;
   }
   DMREncryptionKey *key = obj->as<DMREncryptionKey>();
   setKey(key->key().toHex());
+
+  return true;
 }
 
 /* ******************************************************************************************** *
@@ -3191,7 +3199,7 @@ DR1801UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &e
   Q_UNUSED(flags);
 
   Context ctx(config);
-
+  ctx.addTable(&DMREncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug.";
     return false;
