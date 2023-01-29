@@ -41,13 +41,20 @@ DR1801UVInterface::PrepareReadResponse::getSize() const {
 /* ********************************************************************************************* *
  * Implementation of DR1801UVInterface::PrepareWriteRequest
  * ********************************************************************************************* */
-DR1801UVInterface::PrepareWriteRequest::PrepareWriteRequest(uint32_t s, uint32_t speed)
+DR1801UVInterface::PrepareWriteRequest::PrepareWriteRequest(uint32_t s, uint32_t speed, uint16_t crc=0)
   : _unknown0(qToBigEndian((uint16_t)0x0001)), size(qToBigEndian(s)),
-    eraseBitmap(qToBigEndian((uint16_t)0x7ff6)), baudRate(qToBigEndian(speed))
+    checksum(crc), baudRate(qToBigEndian(speed))
 {
   // pass...
 }
 
+void
+DR1801UVInterface::PrepareWriteRequest::updateCRC(const uint8_t *data, size_t length) {
+  uint16_t *ptr = (uint16_t*)data;
+  for (unsigned int i=0; i<length/2;i++) {
+    checksum ^= ptr[i];
+  }
+}
 
 /* ********************************************************************************************* *
  * Implementation of DR1801UVInterface::PrepareWriteResponse
@@ -129,7 +136,7 @@ DR1801UVInterface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
   }
 
   PrepareReadResponse resp;
-  if (! prepareReading(QSerialPort::Baud9600, resp, err)) {
+  if (! prepareReading(QSerialPort::Baud115200, resp, err)) {
     errMsg(err) << "Cannot start reading the codeplug from " << _identifier << ".";
     _state = ERROR;
     return false;
@@ -182,7 +189,14 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
 
 bool
 DR1801UVInterface::read_finish(const ErrorStack &err) {
-  Q_UNUSED(err);
+  // Set the baud-rate back to 9600
+  logDebug() << "Set baudrate to 9600.";
+  if (! this->setBaudRate(QSerialPort::Baud9600)) {
+    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
+    return false;
+  }
+  QThread::msleep(250);
+
   return (_state == IDLE) && (0 == _bytesToTransfer);
 }
 
@@ -199,13 +213,6 @@ DR1801UVInterface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &e
   if (IDLE != _state) {
     errMsg(err) << "Cannot write codeplug to device: Interface not in idle state. "
                 << "State=" << _state << ".";
-    return false;
-  }
-
-  PrepareWriteResponse resp;
-  if (! prepareWriting(WRITE_CODEPLUG_SIZE, QSerialPort::Baud9600, resp, err)) {
-    errMsg(err) << "Cannot start writing the codeplug to " << _identifier << ".";
-    _state = ERROR;
     return false;
   }
 
@@ -248,6 +255,14 @@ DR1801UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes
 
 bool
 DR1801UVInterface::write_finish(const ErrorStack &err) {
+  // Set the baud-rate back to 9600
+  logDebug() << "Set baudrate to 9600.";
+  if (! this->setBaudRate(QSerialPort::Baud9600)) {
+    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
+    return false;
+  }
+  QThread::msleep(250);
+
   // Wait for device response
   uint16_t rcode;
   CodeplugWriteResponse response;
@@ -365,17 +380,20 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
     return false;
   }
 
+  logDebug() << "Set baudrate to " << baudrate << ".";
   if (! this->setBaudRate(baudrate)) {
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
+  QThread::msleep(250);
 
   return true;
 }
 
 bool
-DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, PrepareWriteResponse &response, const ErrorStack &err) {
-  PrepareWriteRequest request(size, baudrate);
+DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc, const ErrorStack &err) {
+  PrepareWriteRequest request(size, baudrate, crc);
+  PrepareReadResponse response;
   uint8_t respSize = sizeof(request);
 
   if (! send_receive(PREPARE_CODEPLUG_WRITE, (uint8_t *)&request, sizeof(request), (uint8_t *)&response, respSize, err)) {
@@ -388,10 +406,12 @@ DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, PrepareWrite
     return false;
   }
 
+  logDebug() << "Set baudrate to " << baudrate << ".";
   if (! this->setBaudRate(baudrate)) {
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
+  QThread::msleep(250);
 
   _state = WRITE_THROUGH;
   return true;

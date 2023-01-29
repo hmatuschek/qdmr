@@ -100,7 +100,9 @@ Only send before reading the codeplug. Contains 4bytes of parameters. Seen
 `00 01 c2 00` = 115200 big endian. Set UART speed?!? 
 
 Response parameters are quiet long, e.g. 
-`01 00 01 dd 90 00 00 00 68 00 02 e6 9e 09 2d`. 0x0001dd90 is the size of the codeplug file. 
+`01 00 01 dd 90 00 00 00 68 00 02 e6 9e 09 2d`. 0x0001dd90 is the size of the codeplug file. Then,
+it appears like two uint32 numbers i.e., 0x00000068 and 0x0002e69e. These numbers do not change. The
+last two bytes, however, appear to be a checksum.
 
 ### 0101h Command
 Only send right before reading of the codeplug starts. There is no actual response to this request,

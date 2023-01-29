@@ -5,6 +5,28 @@ from rawstreamdump import RawStreamDump
 from datagram import Datagram, RawDatagramDump, DatagramHandler
 from struct import unpack
 from utilities import hexDump
+from binascii import crc_hqx
+
+def crc16_simple_sum8(data:bytearray):
+  return sum(data)&0xffff
+
+def crc16_simple_sum16(data:bytearray):
+  s = 0
+  for i in range(len(data)//2):
+    s += unpack(">H", data[2*i:(2*(i+1))])[0]
+  return s&0xffff
+
+def crc16_simple_xor16(data:bytearray):
+  s = 0
+  for i in range(len(data)//2):
+    s ^= unpack(">H", data[2*i:(2*(i+1))])[0]
+  return s
+
+def crc_summary(data:bytearray):
+  print("CRC16-HQX  : {:04X}".format(crc_hqx(data, 0)))
+  print("CRC16-SUM8 : {:04X}".format(crc16_simple_sum8(data)))
+  print("CRC16-SUM16: {:04X}".format(crc16_simple_sum16(data)))
+  print("CRC16-XOR16: {:04X}".format(crc16_simple_xor16(data)))
 
 
 class AuctusA6Datagram(Datagram):
@@ -70,6 +92,7 @@ class AuctusA6Handler(StreamHandler):
         for handler in self._handler:
           if isinstance(handler, StreamHandler):
             handler.handleToHost(self._tobuffer)
+        crc_summary(self._tobuffer)
         self._tobuffer.clear()
 
   def handleFromHost(self, data:bytearray):
@@ -88,6 +111,7 @@ class AuctusA6Handler(StreamHandler):
         for handler in self._handler:
           if isinstance(handler, StreamHandler):
             handler.handleFromHost(self._frombuffer)
+        crc_summary(self._frombuffer)
         self._frombuffer.clear()
 
   @staticmethod 
@@ -118,7 +142,7 @@ class AuctusA6Handler(StreamHandler):
 
 if "__main__" == __name__:
   import sys
-  stream = DeviceFilter(1).attach(
+  stream = DeviceFilter(14).attach(
         CDCACMFilter().attach(
           AuctusA6Handler()
             .attach(RawDatagramDump())

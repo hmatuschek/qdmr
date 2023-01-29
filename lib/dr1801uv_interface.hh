@@ -52,12 +52,13 @@ protected:
   struct Q_PACKED PrepareWriteRequest {
     uint16_t _unknown0;              ///< Just set to 0x0001
     uint32_t size;                   ///< Contains the size of the codeplug in big-endian.
-    uint16_t eraseBitmap;            ///< Likely some bitmap to indicate, which pages to erase
-                                     ///  before writing the codeplug. Usually 0x7ff6.
+    uint16_t checksum;               ///< A checksum over the codeplug to be written.
     uint32_t baudRate;               ///< The baud rate for the transfer.
 
     /** Constructor. */
-    PrepareWriteRequest(uint32_t size, uint32_t speed);
+    PrepareWriteRequest(uint32_t size, uint32_t speed, uint16_t crc);
+    /** Updates the crc with the data. */
+    void updateCRC(const uint8_t *data, size_t length);
   };
 
   /** Response to a prepare-write request. Just contains a status word. */
@@ -96,6 +97,11 @@ public:
   bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool write_finish(const ErrorStack &err=ErrorStack());
 
+  /** Puts the device into programming mode. */
+  bool enterProgrammingMode(const ErrorStack &err=ErrorStack());
+  /** Repares the codeplug write. */
+  bool prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc, const ErrorStack &err=ErrorStack());
+
 public:
   /** Returns some information about this interface. */
   static USBDeviceInfo interfaceInfo();
@@ -105,14 +111,10 @@ public:
 protected:
   /** Reads some information about the device. */
   bool getDeviceInfo(QString &info, const ErrorStack &err=ErrorStack());
-  /** Puts the device into programming mode. */
-  bool enterProgrammingMode(const ErrorStack &err=ErrorStack());
   /** Checks the if a programming password is set. */
   bool checkProgrammingPassword(const ErrorStack &err=ErrorStack());
   /** Prepares reading the codeplug. */
   bool prepareReading(uint32_t baudrate, PrepareReadResponse &response, const ErrorStack &err=ErrorStack());
-  /** Repares the codeplug write. */
-  bool prepareWriting(uint32_t size, uint32_t baudrate, PrepareWriteResponse &response, const ErrorStack &err=ErrorStack());
   /** Starts the read operation. Once the operation is complete, the device will close the
    * connection. */
   bool startReading(const ErrorStack &err=ErrorStack());

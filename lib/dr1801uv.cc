@@ -1,5 +1,7 @@
 #include "dr1801uv.hh"
 #include "dr1801uv_interface.hh"
+#include "logger.hh"
+
 
 RadioLimits * DR1801UV::_limits = nullptr;
 
@@ -209,25 +211,30 @@ DR1801UV::upload() {
   }
 
   // Encode config into codeplug
-  //codeplug().encode(_config, _codeplugFlags);
+  codeplug().encode(_config, _codeplugFlags);
+
+  // Reenter programming mode
+  if (! _device->enterProgrammingMode(_errorStack)) {
+    errMsg(_errorStack) << "Cannot write codeplug.";
+    return false;
+  }
 
   // Init write
-  if (! _device->write_start(0, 0, _errorStack)) {
+  uint16_t crc = 0;
+  offset = 0x304;
+  bytesToTransfer = codeplug().image(0).memSize()-offset;
+  for (unsigned int i=0; i<bytesToTransfer/2; i++) {
+    crc ^= *((const uint16_t*)codeplug().image(0).data(offset +2*i));
+  }
+  if ( !_device->write_start(0,0, _errorStack) ||
+       !_device->prepareWriting(bytesToTransfer, QSerialPort::Baud9600, crc, _errorStack) ) {
     errMsg(_errorStack) << "Cannot initialize codeplug write.";
     return false;
   }
 
-  offset = 0x304;
-  bytesToTransfer = _device->bytesToTransfer();
-  total = bytesToTransfer;
-  _codeplug.image(0).element(0).data()[offset] = 0x00;
-  if (_codeplug.image(0).element(0).memSize()-offset != bytesToTransfer) {
-    errMsg(_errorStack) << "Codeplug size mismatch! Expected " << (_codeplug.image(0).element(0).memSize()-offset)
-                        << " radio expects " << bytesToTransfer << ".";
-    return false;
-  }
-
+  logDebug() << "Write intialized. Go...";
   // then write codeplug back
+  total = bytesToTransfer;
   while (DR1801UVInterface::WRITE_THROUGH == _device->state()) {
     uint8_t buffer[128];
     uint32_t n = std::min(128U, bytesToTransfer);
