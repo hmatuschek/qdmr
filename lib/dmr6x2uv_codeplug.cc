@@ -670,43 +670,29 @@ DMR6X2UVCodeplug::ChannelElement::enableRanging(bool enable) {
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug
  * ********************************************************************************************* */
-DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
-  : D868UVCodeplug(parent)
+DMR6X2UVCodeplug::DMR6X2UVCodeplug(const QString &label, QObject *parent)
+  : D868UVCodeplug(label, parent)
 {
   // pass...
 }
 
-void
-DMR6X2UVCodeplug::clear() {
-  D868UVCodeplug::clear();
+DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
+  : D868UVCodeplug("BTECH DMR-6X2UV", parent)
+{
+  // pass...
+}
 
-  // Rename image
-  image(0).setName("BTECH DMR-6X2UV Codeplug");
+bool
+DMR6X2UVCodeplug::allocateBitmaps() {
+  if (! D868UVCodeplug::allocateBitmaps())
+    return false;
 
   // Roaming channel bitmaps
   image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
   // Roaming zone bitmaps
   image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
-}
 
-void
-DMR6X2UVCodeplug::allocateUpdated() {
-  // First allocate everything common between D868UV and DMR-6X2UV codeplugs.
-  D868UVCodeplug::allocateUpdated();
-}
-
-void
-DMR6X2UVCodeplug::allocateForEncoding() {
-  // First allocate everything common between D868UV and D878UV codeplugs.
-  D868UVCodeplug::allocateForEncoding();
-  this->allocateRoaming();
-}
-
-void
-DMR6X2UVCodeplug::allocateForDecoding() {
-  // First allocate everything common between D868UV and D878UV codeplugs.
-  D868UVCodeplug::allocateForDecoding();
-  this->allocateRoaming();
+  return true;
 }
 
 void
@@ -729,6 +715,25 @@ DMR6X2UVCodeplug::setBitmaps(Config *config)
     roaming_ch_bitmap[i/8] |= (1<<(i%8));
 }
 
+void
+DMR6X2UVCodeplug::allocateUpdated() {
+  // First allocate everything common between D868UV and DMR-6X2UV codeplugs.
+  D868UVCodeplug::allocateUpdated();
+}
+
+void
+DMR6X2UVCodeplug::allocateForEncoding() {
+  // First allocate everything common between D868UV and D878UV codeplugs.
+  D868UVCodeplug::allocateForEncoding();
+  this->allocateRoaming();
+}
+
+void
+DMR6X2UVCodeplug::allocateForDecoding() {
+  // First allocate everything common between D868UV and D878UV codeplugs.
+  D868UVCodeplug::allocateForDecoding();
+  this->allocateRoaming();
+}
 
 bool
 DMR6X2UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)

@@ -2138,22 +2138,29 @@ D878UVCodeplug::RadioInfoElement::maintainerNote() const {
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug
  * ******************************************************************************************** */
-D878UVCodeplug::D878UVCodeplug(QObject *parent)
-  : D868UVCodeplug(parent)
+D878UVCodeplug::D878UVCodeplug(const QString &label, QObject *parent)
+  : D868UVCodeplug(label, parent)
 {
+  // pass...
 }
 
-void
-D878UVCodeplug::clear() {
-  D868UVCodeplug::clear();
+D878UVCodeplug::D878UVCodeplug(QObject *parent)
+  : D868UVCodeplug("Anytone AT-D878UV Codeplug", parent)
+{
+  // pass...
+}
 
-  // Rename image
-  image(0).setName("Anytone AT-D878UV Codeplug");
+bool
+D878UVCodeplug::allocateBitmaps() {
+  if (! D868UVCodeplug::allocateBitmaps())
+    return false;
 
   // Roaming channel bitmaps
   image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
   // Roaming zone bitmaps
   image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
+
+  return true;
 }
 
 void

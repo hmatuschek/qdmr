@@ -374,7 +374,7 @@ public:
 
   /** Represents a scan list within the codeplug.
    *
-   * Memory layout of encoded scan list:
+   * Memory layout of encoded scan list (0x0068 bytes):
    * @verbinclude tyt_scanlist.txt */
   class ScanListElement: public Codeplug::Element
   {

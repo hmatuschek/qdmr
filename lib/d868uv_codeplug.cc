@@ -628,43 +628,16 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 /* ******************************************************************************************** *
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
-D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : AnytoneCodeplug(parent)
+D868UVCodeplug::D868UVCodeplug(const QString &label, QObject *parent)
+  : AnytoneCodeplug(label, parent)
 {
+  // pass...
 }
 
-void
-D868UVCodeplug::clear() {
-  while (this->numImages())
-    remImage(0);
-
-  addImage("Anytone AT-D868UV Codeplug");
-
-  // Channel bitmap
-  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
-  // Zone bitmap
-  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
-  // Contacts bitmap
-  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
-  // Analog contacts bytemap
-  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
-  // RX group list bitmaps
-  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
-  // Scan list bitmaps
-  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
-  // Radio IDs bitmaps
-  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
-  // Message bitmaps
-  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
-  // Status messages
-  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
-  // FM Broadcast bitmaps
-  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
-  // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
-  // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+D868UVCodeplug::D868UVCodeplug(QObject *parent)
+  : AnytoneCodeplug("AnyTone AT-D868UV Codeplug", parent)
+{
+  // pass...
 }
 
 void
@@ -730,6 +703,38 @@ D868UVCodeplug::allocateForDecoding() {
 }
 
 
+bool
+D868UVCodeplug::allocateBitmaps() {
+  // Channel bitmap
+  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
+  // Zone bitmap
+  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
+  // Contacts bitmap
+  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  // Analog contacts bytemap
+  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
+  // RX group list bitmaps
+  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
+  // Scan list bitmaps
+  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
+  // Radio IDs bitmaps
+  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
+  // Message bitmaps
+  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
+  // Status messages
+  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
+  // FM Broadcast bitmaps
+  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  // 5-Tone function bitmaps
+  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
+  // 2-Tone function bitmaps
+  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
+  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+
+  return true;
+}
+
+
 void
 D868UVCodeplug::setBitmaps(Config *config)
 {
@@ -785,20 +790,6 @@ D868UVCodeplug::setBitmaps(Config *config)
   }
 }
 
-bool
-D868UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  Context ctx(config);
-  if (! index(config, ctx, err))
-    return false;
-
-  return encodeElements(flags, ctx, err);
-}
-
-bool D868UVCodeplug::decode(Config *config, const ErrorStack &err) {
-  // Maps code-plug indices to objects
-  Context ctx(config);
-  return decodeElements(ctx, err);
-}
 
 bool
 D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)

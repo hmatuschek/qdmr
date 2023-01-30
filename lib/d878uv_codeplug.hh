@@ -1351,26 +1351,21 @@ public:
     virtual QString maintainerNote() const;
   };
 
+protected:
+  /** Hidden constructor. */
+  explicit D878UVCodeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
-  /** Clears and resets the complete codeplug to some default values. */
-  void clear();
-
-  /** Sets all bitmaps for the given config. */
+protected:
+  bool allocateBitmaps();
   void setBitmaps(Config *config);
-
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * with the radio that are not represented within the common Config are omitted. */
   void allocateForDecoding();
-  /** Allocate all code-plug elements that must be written back to the device to maintain a working
-   * codeplug. These elements might be updated during encoding. */
   void allocateUpdated();
-  /** Allocate all code-plug elements that are defined through the common Config. */
   void allocateForEncoding();
 
-protected:
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 

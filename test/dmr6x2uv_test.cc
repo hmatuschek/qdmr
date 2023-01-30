@@ -30,13 +30,9 @@ DMR6X2UVTest::cleanupTestCase() {
 void
 DMR6X2UVTest::testBasicConfigEncoding() {
   ErrorStack err;
-  DMR6X2UV radio;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   DMR6X2UVCodeplug codeplug;
-  codeplug.clear();
-  codeplug.setBitmaps(&_basicConfig);
-  codeplug.allocateUpdated();
-  codeplug.allocateForEncoding();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: {}")
           .arg(err.format()).toStdString().c_str());
   }
@@ -45,13 +41,9 @@ DMR6X2UVTest::testBasicConfigEncoding() {
 void
 DMR6X2UVTest::testBasicConfigDecoding() {
   ErrorStack err;
-  DMR6X2UV radio;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
   DMR6X2UVCodeplug codeplug;
-  codeplug.clear();
-  codeplug.setBitmaps(&_basicConfig);
-  codeplug.allocateUpdated();
-  codeplug.allocateForEncoding();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: {}")
           .arg(err.format()).toStdString().c_str());
   }

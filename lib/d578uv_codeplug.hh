@@ -236,10 +236,15 @@ public:
     Channel *toChannelObj(Context &ctx) const;
   };
 
+protected:
+  /** Hidden constructor. */
+  explicit D578UVCodeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
+protected:
   void allocateUpdated();
 
   void allocateHotKeySettings();
