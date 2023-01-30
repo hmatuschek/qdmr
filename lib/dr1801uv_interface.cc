@@ -270,6 +270,7 @@ DR1801UVInterface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
 bool
 DR1801UVInterface::read_finish(const ErrorStack &err) {
   Q_UNUSED(err);
+  return false;
 }
 
 
@@ -288,6 +289,7 @@ DR1801UVInterface::write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes
 bool
 DR1801UVInterface::write_finish(const ErrorStack &err) {
   Q_UNUSED(err);
+  return false;
 }
 
 USBDeviceInfo
