@@ -24,7 +24,6 @@ public:
   /** Constructs a new instance representig a DR-1801UV. */
   explicit DR1801UV(DR1801UVInterface *device=nullptr, QObject *parent=nullptr);
 
-
 public:
   /** Retunrs the default radio info. */
   static RadioInfo defaultRadioInfo();

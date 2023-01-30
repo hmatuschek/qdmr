@@ -2,7 +2,11 @@
 #define DR1801UVINTERFACE_HH
 
 #include "auctus_a6_interface.hh"
+#include <functional>
 
+
+// Forward declarations
+class Codeplug;
 
 /** Implements the actual interface to the DR-1801UV, which builds upon the @c AuctusA6Interface.
  *
@@ -11,7 +15,46 @@ class DR1801UVInterface : public AuctusA6Interface
 {
   Q_OBJECT
 
+public:
+  /** Constructs an interface to the BTECH DR-1801UV from the specifeid USB descriptor. */
+  DR1801UVInterface(const USBDeviceDescriptor &descriptor,
+                    const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+
+  RadioInfo identifier(const ErrorStack &err);
+
+  /** Reads the codeplug from the device blocking. */
+  bool readCodeplug(Codeplug &codeplug, std::function<void (unsigned int, unsigned int)> progress,
+                    const ErrorStack &err=ErrorStack());
+
+  /** Writes the codeplug to the device blocking. */
+  bool writeCodeplug(const Codeplug &codeplug, std::function<void(unsigned int, unsigned int)> progress,
+                     const ErrorStack &err=ErrorStack());
+
+  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool read_finish(const ErrorStack &err=ErrorStack());
+
+  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
+  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
+  bool write_finish(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect();
+
 protected:
+  /** Some default speeds. */
+  enum DefaultTransferSpeed {
+    /** Initial speed, used to send commands. */
+    DefaultSpeed = QSerialPort::Baud9600,
+    /** Speed for reading the codeplug. */
+    ReadSpeed = QSerialPort::Baud115200,
+    /** Speed for writing the codeplug. */
+    WriteSpeed = QSerialPort::Baud9600
+  };
+
   /** Implemented commands. */
   enum Command {
     REQUEST_INFO           = 0x0000, ///< Returns some information about the device.
@@ -78,52 +121,27 @@ protected:
     bool isSuccessful() const;
   };
 
-
-public:
-  /** Constructs an interface to the BTECH DR-1801UV from the specifeid USB descriptor. */
-  DR1801UVInterface(const USBDeviceDescriptor &descriptor,
-                    const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
-
-  RadioInfo identifier(const ErrorStack &err);
-
-  /** Once the codeplug transfer started, contains the amount of data to be transferred. */
-  uint32_t bytesToTransfer() const;
-
-  bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
-  bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
-  bool read_finish(const ErrorStack &err=ErrorStack());
-
-  bool write_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
-  bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
-  bool write_finish(const ErrorStack &err=ErrorStack());
-
   /** Puts the device into programming mode. */
   bool enterProgrammingMode(const ErrorStack &err=ErrorStack());
-  /** Repares the codeplug write. */
-  bool prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc, const ErrorStack &err=ErrorStack());
-
-public:
-  /** Returns some information about this interface. */
-  static USBDeviceInfo interfaceInfo();
-  /** Tries to find all interfaces connected AnyTone radios. */
-  static QList<USBDeviceDescriptor> detect();
-
-protected:
   /** Reads some information about the device. */
   bool getDeviceInfo(QString &info, const ErrorStack &err=ErrorStack());
   /** Checks the if a programming password is set. */
   bool checkProgrammingPassword(const ErrorStack &err=ErrorStack());
+
   /** Prepares reading the codeplug. */
   bool prepareReading(uint32_t baudrate, PrepareReadResponse &response, const ErrorStack &err=ErrorStack());
   /** Starts the read operation. Once the operation is complete, the device will close the
    * connection. */
   bool startReading(const ErrorStack &err=ErrorStack());
 
+  /** Repares the codeplug write. */
+  bool prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc, const ErrorStack &err=ErrorStack());
+  /** Receives the ACK for writing the codeplug. */
+  bool receiveWriteACK(const ErrorStack &err=ErrorStack());
+
 protected:
   /** Holds the device identifier, once read. */
   QString _identifier;
-  /** Once the codeplug transfer is started, contains the amount of data to read. */
-  uint32_t _bytesToTransfer;
 };
 
 #endif // DR1801UVINTERFACE_HH
