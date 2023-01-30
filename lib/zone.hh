@@ -14,7 +14,8 @@ class Config;
  * @ingroup conf */
 class Zone : public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "zone");
 
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
