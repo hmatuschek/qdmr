@@ -30,12 +30,12 @@ class DMRRadioID;
  * @ingroup conf */
 class Channel: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
 
-  /** The receive frequency of the channel. */
-  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
-  /** The transmit frequency of the channel. */
-  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** The receive frequency of the channel in Hz. */
+  Q_PROPERTY(qulonglong rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  /** The transmit frequency of the channel in Hz. */
+  Q_PROPERTY(qulonglong txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
@@ -50,6 +50,9 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
+
+  /** Specifies the prefix for every ID assigned to every channel during serialization. */
+  Q_CLASSINFO("IdPrefix", "ch")
 
 public:
   /** Possible power settings. */
@@ -73,14 +76,14 @@ public:
   bool copy(const ConfigItem &other);
   void clear();
 
-  /** Returns the RX frequency of the channel in MHz. */
-  double rxFrequency() const;
-  /** (Re-)Sets the RX frequency of the channel in MHz. */
-  bool setRXFrequency(double freq);
-  /** Returns the TX frequency of the channel in MHz. */
-  double txFrequency() const;
-  /** (Re-)Sets the TX frequency of the channel in MHz. */
-  bool setTXFrequency(double freq);
+  /** Returns the RX frequency of the channel in Hz. */
+  qulonglong rxFrequency() const;
+  /** (Re-)Sets the RX frequency of the channel in Hz. */
+  bool setRXFrequency(qulonglong freq);
+  /** Returns the TX frequency of the channel in Hz. */
+  qulonglong txFrequency() const;
+  /** (Re-)Sets the TX frequency of the channel in Hz. */
+  bool setTXFrequency(qulonglong freq);
 
   /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
@@ -155,10 +158,10 @@ protected slots:
   void onReferenceModified();
 
 protected:
-  /** The RX frequency in MHz. */
-  double _rxFreq;
-  /** The TX frequency in MHz. */
-  double _txFreq;
+  /** The RX frequency in Hz. */
+  qulonglong _rxFreq;
+  /** The TX frequency in Hz. */
+  qulonglong _txFreq;
   /** If @c true, the channel uses the global power setting. */
   bool _defaultPower;
   /** The transmit power setting. */

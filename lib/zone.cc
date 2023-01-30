@@ -16,7 +16,7 @@
  * Implementation of Zone
  * ********************************************************************************************* */
 Zone::Zone(QObject *parent)
-  : ConfigObject("zone", parent), _A(), _B(), _anytone(nullptr)
+  : ConfigObject(parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -25,7 +25,7 @@ Zone::Zone(QObject *parent)
 }
 
 Zone::Zone(const QString &name, QObject *parent)
-  : ConfigObject(name, "zone", parent), _A(), _B(), _anytone(nullptr)
+  : ConfigObject(name, parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));

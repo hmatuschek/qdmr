@@ -14,6 +14,7 @@
 class RoamingZone : public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "roam")
 
   /** The channels in the roaming zone.
    * @todo This property is marked non-scriptable to handle references to DMR channels before

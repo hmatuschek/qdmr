@@ -6,7 +6,7 @@
  * Implementation of EncryptionKey
  * ********************************************************************************************* */
 EncryptionKey::EncryptionKey(QObject *parent)
-  : ConfigObject("key", parent)
+  : ConfigObject(parent)
 {
   // pass...
 }

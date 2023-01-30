@@ -17,7 +17,7 @@
  * Implementation of RXGroupList
  * ********************************************************************************************* */
 RXGroupList::RXGroupList(QObject *parent)
-  : ConfigObject("grp", parent), _contacts()
+  : ConfigObject(parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -25,7 +25,7 @@ RXGroupList::RXGroupList(QObject *parent)
 }
 
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
-  : ConfigObject(name, "grp", parent), _contacts()
+  : ConfigObject(name, parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));

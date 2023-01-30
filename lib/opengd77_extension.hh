@@ -40,7 +40,7 @@ public:
     P3W     =  7,              ///< About 3W.
     P4W     =  8,              ///< About 4W.
     P5W     =  9,              ///< About 5W.
-    Max     = 10,              ///< Maximum power (5.5W on UHF, 7W on VHF).
+    Max     = 10               ///< Maximum power (5.5W on UHF, 7W on VHF).
   };
   Q_ENUM(Power)
 

@@ -157,8 +157,8 @@ DigitalChannelDialog::channel()
 {
   _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
-  _myChannel->setRXFrequency(rxFrequency->text().toDouble());
-  _myChannel->setTXFrequency(txFrequency->text().toDouble());
+  _myChannel->setRXFrequency(read_frequency(rxFrequency->text()));
+  _myChannel->setTXFrequency(read_frequency(txFrequency->text()));
   if (powerDefault->isChecked())
     _myChannel->setDefaultPower();
   else

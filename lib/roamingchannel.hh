@@ -15,11 +15,12 @@
 class RoamingChannel : public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "rch")
 
-  /** Holds the RX frequency in MHz. */
-  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
-  /** Holds the TX frequency in MHz. */
-  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** Holds the RX frequency in Hz. */
+  Q_PROPERTY(qulonglong rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  /** Holds the TX frequency in Hz. */
+  Q_PROPERTY(qulonglong txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** If @c true, the color code of the channel gets overridden by the one specified in @c colorCode. */
   Q_PROPERTY(bool overrideColorCode READ colorCodeOverridden WRITE overrideColorCode SCRIPTABLE false)
   /** If @c overrideColorCode is @c true, specifies the color code. */
@@ -38,14 +39,14 @@ public:
   ConfigItem *clone() const;
   void clear();
 
-  /** Returns the RX frequency in MHz. */
-  double rxFrequency() const;
-  /** Sets the RX frquency in MHz. */
-  void setRXFrequency(double f);
-  /** Returns the TX frequency in MHz. */
-  double txFrequency() const;
-  /** Sets the TX frquency in MHz. */
-  void setTXFrequency(double f);
+  /** Returns the RX frequency in Hz. */
+  qulonglong rxFrequency() const;
+  /** Sets the RX frquency in Hz. */
+  void setRXFrequency(qulonglong f);
+  /** Returns the TX frequency in Hz. */
+  qulonglong txFrequency() const;
+  /** Sets the TX frquency in Hz. */
+  void setTXFrequency(qulonglong f);
 
   /** Returns @c true, if the color code of the channel gets overridden. */
   bool colorCodeOverridden() const;
@@ -76,10 +77,10 @@ protected:
   bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
-  /** Holds the RX frequency in MHz. */
-  double _rxFrequency;
-  /** Holds the TX frequency in MHz. */
-  double _txFrequency;
+  /** Holds the RX frequency in Hz. */
+  qulonglong _rxFrequency;
+  /** Holds the TX frequency in Hz. */
+  qulonglong _txFrequency;
   /** If @c true, the color code of the channel gets overridden by the one specified in @c _colorCode. */
   bool _overrideColorCode;
   /** If @c _overrideColorCode is @c true, specifies the color code. */

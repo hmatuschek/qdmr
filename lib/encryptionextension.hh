@@ -9,6 +9,7 @@
 class EncryptionKey: public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "key")
 
   /** The key representation as a hex string. */
   Q_PROPERTY(QString key READ toHex WRITE fromHex)
@@ -50,7 +51,7 @@ class DMREncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-   Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
@@ -77,7 +78,7 @@ class AESEncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());

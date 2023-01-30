@@ -17,9 +17,9 @@ class RadioID: public ConfigObject
 protected:
   /** Hidden default constructor.
    * Use one of the derived classes to instantiate radio IDs. */
-  explicit RadioID(const QString &idBase, QObject *parent=nullptr);
+  explicit RadioID(QObject *parent=nullptr);
   /** Hidden constructor with name. */
-  RadioID(const QString &name, const QString &idBase, QObject *parent=nullptr);
+  RadioID(const QString &name, QObject *parent=nullptr);
 };
 
 
@@ -31,6 +31,7 @@ protected:
 class DMRRadioID : public RadioID
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "id")
 
   /** The number of the radio ID. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
@@ -89,6 +90,7 @@ private:
 class DTMFRadioID: public RadioID
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "dtmf")
 
   /** The DTMF number of the radio ID. */
   Q_PROPERTY(QString number READ number WRITE setNumber)

@@ -7,24 +7,9 @@
 #include <QTest>
 
 D868UVETest::D868UVETest(QObject *parent)
-  : QObject(parent)
+  : UnitTestBase(parent)
 {
   // pass...
-}
-
-void
-D868UVETest::initTestCase() {
-  ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-D868UVETest::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
 }
 
 void
@@ -54,6 +39,30 @@ D868UVETest::testBasicConfigDecoding() {
           .arg(err.format()).toStdString().c_str());
   }
 }
+
+void
+D868UVETest::testChannelFrequency() {
+  ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  D868UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D868UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D868UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           123456780ULL);
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           999999990ULL);
+}
+
 
 QTEST_GUILESS_MAIN(D868UVETest)
 
