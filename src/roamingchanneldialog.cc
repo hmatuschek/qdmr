@@ -1,7 +1,7 @@
 #include "roamingchanneldialog.hh"
 #include "ui_roamingchanneldialog.h"
 #include "roamingchannel.hh"
-
+#include "utils.hh"
 
 RoamingChannelDialog::RoamingChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), ui(new Ui::RoamingChannelDialog), _myChannel(new RoamingChannel(this)),
@@ -39,8 +39,10 @@ RoamingChannelDialog::construct() {
     setWindowTitle(tr("Create roaming channel"));
 
   ui->name->setText(_myChannel->name());
-  ui->rxFrequency->setText(QString::number(_myChannel->rxFrequency(), 'f'));
-  ui->txFrequency->setText(QString::number(_myChannel->txFrequency(), 'f'));
+  ui->rxFrequency->setValidator(new QDoubleValidator(0,500,5));
+  ui->rxFrequency->setText(format_frequency(_myChannel->rxFrequency()));
+  ui->txFrequency->setValidator(new QDoubleValidator(0,500,5));
+  ui->txFrequency->setText(format_frequency(_myChannel->txFrequency()));
   ui->timeSlot->addItem(tr("TS 1"), QVariant::fromValue(DMRChannel::TimeSlot::TS1));
   ui->timeSlot->addItem(tr("TS 2"), QVariant::fromValue(DMRChannel::TimeSlot::TS2));
   ui->timeSlot->setCurrentIndex(
@@ -75,8 +77,8 @@ RoamingChannelDialog::onOverrideColorCodeToggled(bool override) {
 RoamingChannel *
 RoamingChannelDialog::channel() {
   _myChannel->setName(ui->name->text().simplified());
-  _myChannel->setRXFrequency(ui->rxFrequency->text().toDouble());
-  _myChannel->setTXFrequency(ui->txFrequency->text().toDouble());
+  _myChannel->setRXFrequency(read_frequency(ui->rxFrequency->text()));
+  _myChannel->setTXFrequency(read_frequency(ui->txFrequency->text()));
   _myChannel->setTimeSlot(ui->timeSlot->currentData().value<DMRChannel::TimeSlot>());
   _myChannel->overrideTimeSlot(! ui->overrideTimeSlot->isChecked());
   _myChannel->setColorCode(ui->colorCode->value());

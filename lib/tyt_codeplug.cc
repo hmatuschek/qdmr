@@ -478,8 +478,8 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
 
   // Common settings
   ch->setName(name());
-  ch->setRXFrequency(double(rxFrequency())/1e6);
-  ch->setTXFrequency(double(txFrequency())/1e6);
+  ch->setRXFrequency(rxFrequency());
+  ch->setTXFrequency(txFrequency());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
   // Power setting must be overridden by specialized class
@@ -565,8 +565,8 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
 void
 TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setName(chan->name());
-  setRXFrequency(chan->rxFrequency()*1e6);
-  setTXFrequency(chan->txFrequency()*1e6);
+  setRXFrequency(chan->rxFrequency());
+  setTXFrequency(chan->txFrequency());
   enableRXOnly(chan->rxOnly());
   if (chan->defaultTimeout())
     setTXTimeOut(ctx.config()->settings()->tot());

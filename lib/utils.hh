@@ -75,8 +75,12 @@ bool validDMRNumber(const QString &text);
 /** Validates a DTMF number. */
 bool validDTMFNumber(const QString &text);
 
-/** Formats a frequency in MHz passed as double. */
-QString format_frequency(double MHz);
+/** Formats a frequency in MHz passed as uint64 in Hz. */
+QString format_frequency(qlonglong Hz);
+/** Reads the frequency in MHz (float) and returns it as uint64 in Hz. */
+qulonglong read_frequency(const QString &MHz, bool *ok=nullptr, const ErrorStack &err=ErrorStack());
+/** Reads the frequency in MHz (float) and returns it as uint64 in Hz. */
+qulonglong read_frequency(const YAML::Node &node, bool *ok=nullptr, const ErrorStack &err=ErrorStack());
 
 QString aprsicon2config(APRSSystem::Icon icon);
 QString aprsicon2name(APRSSystem::Icon icon);

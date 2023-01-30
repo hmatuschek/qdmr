@@ -6,24 +6,9 @@
 #include <QTest>
 
 UV390Test::UV390Test(QObject *parent)
-  : QObject(parent)
+  : UnitTestBase(parent)
 {
   // pass...
-}
-
-void
-UV390Test::initTestCase() {
-  ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-UV390Test::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
 }
 
 void
@@ -53,6 +38,29 @@ UV390Test::testBasicConfigDecoding() {
           .arg(err.format()).toStdString().c_str());
   }
 }
+
+void
+UV390Test::testChannelFrequency() {
+  ErrorStack err;
+  UV390Codeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for TyT MD-UV390: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for TyT MD-UV390: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           123456780ULL);
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           999999990ULL);
+}
+
 
 QTEST_GUILESS_MAIN(UV390Test)
 

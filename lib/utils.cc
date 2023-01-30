@@ -3,6 +3,8 @@
 #include <QVector>
 #include <QHash>
 #include <cmath>
+#include <QRegularExpression>
+#include <yaml-cpp/yaml.h>
 
 // Maps APRS icon number to code-char
 static QVector<char> aprsIconCodeTable{
@@ -378,9 +380,65 @@ validDTMFNumber(const QString &text) {
 }
 
 QString
-format_frequency(double MHz) {
-  return QString::number(MHz, 'f', 5);
+format_frequency(qlonglong Hz) {
+  return QString::number(double(Hz)/1e6, 'f', 5);
 }
+
+qulonglong
+read_frequency(const QString &F, bool *ok, const ErrorStack &err) {
+  QRegularExpression re("([0-9]+)(?:\\.([0-9]+))?");
+  QRegularExpressionMatch match = re.match(F);
+
+  // Chcek if pattern matches
+  if (! match.hasMatch()) {
+    errMsg(err) << "Malformed frequency '" << F << "'.";
+    if (ok) *ok = false;
+    return 0;
+  }
+
+  // Get MHz part (easy)
+  qulonglong MHz = match.captured(1).toULongLong(ok), Hz=0;
+  if (ok && !(*ok)) return 0;
+
+  // Get Hz part (hard)
+  if (! match.captured(2).isEmpty()) {
+    qulonglong factor = 100000ULL; //<- 100kHz
+    QString dec = match.captured(2);
+    while (factor && !dec.isEmpty()) {
+      if (! dec.front().isDigit()) {
+        if (ok) *ok = false;
+        return 0;
+      }
+      Hz += dec.front().digitValue()*factor;
+      factor /= 10;
+      dec.remove(0,1);
+    }
+  }
+
+  if (ok) *ok = true;
+  return MHz*1000000UL + Hz;
+}
+
+qulonglong
+read_frequency(const YAML::Node &node, bool *ok, const ErrorStack &err) {
+  if (! node.IsScalar()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Invalid node type. Expected scalar, got " << node.Type() << ".";
+    if (ok) *ok = false;
+    return 0;
+  }
+
+  qulonglong Hz = read_frequency(QString::fromStdString(node.as<std::string>()), ok, err);
+  if (ok && !(*ok)) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot read frequency.";
+    if (ok) *ok = false;
+    return 0;
+  }
+
+  return Hz;
+}
+
 
 QString
 aprsicon2config(APRSSystem::Icon icon) {

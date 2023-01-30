@@ -1,6 +1,7 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
+#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -216,11 +217,6 @@ ChannelListWrapper::columnCount(const QModelIndex &index) const {
   return 20;
 }
 
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
-}
-
 QVariant
 ChannelListWrapper::data(const QModelIndex &index, int role) const {
   if (nullptr == _list)
@@ -256,18 +252,18 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   switch (index.column()) {
   case 0:
     if (channel->is<FMChannel>())
-      return tr("Analog");
+      return tr("FM");
     else
-      return tr("Digital");
+      return tr("DMR");
   case 1:
     return channel->name();
   case 2:
-    return formatFrequency(channel->rxFrequency());
+    return format_frequency(channel->rxFrequency());
   case 3:
     if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
+      return format_frequency(qlonglong(channel->txFrequency())-channel->rxFrequency());
     else
-      return formatFrequency(channel->txFrequency());
+      return format_frequency(channel->txFrequency());
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
@@ -507,11 +503,11 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
   // Dispatch by column
   switch (index.column()) {
   case 0: return ch->name();
-  case 1: return ch->rxFrequency();
+  case 1: return format_frequency(ch->rxFrequency());
   case 2:
     if (ch->rxFrequency() == ch->txFrequency())
-      return ch->txFrequency();
-    return ch->txFrequency()-ch->rxFrequency();
+      return format_frequency(ch->txFrequency());
+    return format_frequency(ch->txFrequency()-ch->rxFrequency());
   case 3:
     if (ch->colorCodeOverridden())
       return ch->colorCode();
