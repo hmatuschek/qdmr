@@ -20,7 +20,7 @@ SET(libdmrconf_SOURCES
     md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
     md390.cc md390_codeplug.cc md390_filereader.cc md390_limits.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc uv390_limits.cc
-    dm1701.cc dm1701_codeplug.cc dm1701_filereader.cc dm1701_limits.cc
+    dm1701.cc dm1701_codeplug.cc dm1701_callsigndb.cc dm1701_filereader.cc dm1701_limits.cc
     radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc rd5r_limits.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc gd77_limits.cc
@@ -44,7 +44,7 @@ SET(libdmrconf_MOC_HEADERS
     md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_limits.hh
     md390.hh md390_codeplug.hh md390_limits.hh
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh uv390_limits.hh
-    dm1701.hh dm1701_codeplug.hh dm1701_filereader.hh dm1701_limits.hh
+    dm1701.hh dm1701_codeplug.hh dm1701_callsigndb.hh dm1701_filereader.hh dm1701_limits.hh
     radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh rd5r_limits.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_limits.hh
