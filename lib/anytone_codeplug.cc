@@ -616,9 +616,9 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     switch (this->admit()) {
     case Admit::Always: dch->setAdmit(DMRChannel::Admit::Always); break;
     case Admit::Free: dch->setAdmit(DMRChannel::Admit::Free); break;
-    case Admit::ColorCode: dch->setAdmit(DMRChannel::Admit::ColorCode); break;
-    case Admit::DifferentColorCode:
-      logWarn() << "Cannot decode admit cirit. 'different CC', use 'same CC' instead.";
+    case Admit::DifferentColorCode:dch->setAdmit(DMRChannel::Admit::ColorCode); break;
+    case Admit::SameColorCode:
+      logWarn() << "Cannot decode admit cirit. 'same CC', use 'different CC' instead.";
       dch->setAdmit(DMRChannel::Admit::ColorCode);
       break;
     }
@@ -763,7 +763,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     switch(dc->admit()) {
     case DMRChannel::Admit::Always: setAdmit(Admit::Always); break;
     case DMRChannel::Admit::Free: setAdmit(Admit::Free); break;
-    case DMRChannel::Admit::ColorCode: setAdmit(Admit::ColorCode); break;
+    case DMRChannel::Admit::ColorCode: setAdmit(Admit::DifferentColorCode); break;
     }
     // set color code
     setColorCode(dc->colorCode());
