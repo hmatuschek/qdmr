@@ -15,6 +15,7 @@
 class RoamingChannel : public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "rch")
 
   /** Holds the RX frequency in Hz. */
   Q_PROPERTY(qulonglong rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)

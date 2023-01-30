@@ -5,14 +5,14 @@
  * Implementation of RoamingChannel
  * ********************************************************************************************* */
 RoamingChannel::RoamingChannel(QObject *parent)
-  : ConfigObject("rc", parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
+  : ConfigObject(parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
     _colorCode(0), _overrideTimeSlot(false), _timeSlot(DMRChannel::TimeSlot::TS1)
 {
   // pass...
 }
 
 RoamingChannel::RoamingChannel(const RoamingChannel &other, QObject *parent)
-  : ConfigObject("rc", parent)
+  : ConfigObject(parent)
 {
   copy(other);
 }

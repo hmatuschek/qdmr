@@ -13,7 +13,7 @@ RoamingZone::RoamingZone(QObject *parent)
 }
 
 RoamingZone::RoamingZone(const QString &name, QObject *parent)
-  : ConfigObject(name, "roam", parent), _channel()
+  : ConfigObject(name, parent), _channel()
 {
   // pass...
 }

@@ -13,7 +13,8 @@ class Channel;
  * @ingroup conf */
 class ScanList : public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "scan")
 
   /** The primary channel. */
   Q_PROPERTY(ChannelReference* primary READ primary)
