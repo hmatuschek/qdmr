@@ -248,6 +248,9 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
       setFrequencyCorrection(ext->frequencyCorrection());
+      /// Handles bug in AnyTone firmware.
+      /// @todo Remove once fixed by AnyTone.
+      enableRXAPRS(! ext->sms());
     }
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
