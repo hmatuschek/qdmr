@@ -368,7 +368,7 @@ public:
     TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
     TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32
   };
-
+  Q_ENUM(KeyFunction)
 
 public:
   explicit AnytoneKeySettingsExtension(QObject *parent=nullptr);
@@ -474,12 +474,13 @@ public:
   enum class PowerSave {
     Off = 0, Save50 = 1, Save66 = 2
   };
+  Q_ENUM(PowerSave)
 
   /** Encodes the possible VFO scan types. */
   enum class VFOScanType {
     TO = 0, CO = 1, SE = 2
   };
-
+  Q_ENUM(VFOScanType)
 
 public:
   /** Constructor. */
