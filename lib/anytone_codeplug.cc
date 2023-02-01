@@ -1518,12 +1518,12 @@ AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
   setUInt8(0x000a, level);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::PowerSave
+AnytoneSettingsExtension::PowerSave
 AnytoneCodeplug::GeneralSettingsElement::powerSave() const {
-  return (PowerSave) getUInt8(0x000b);
+  return (AnytoneSettingsExtension::PowerSave) getUInt8(0x000b);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setPowerSave(PowerSave mode) {
+AnytoneCodeplug::GeneralSettingsElement::setPowerSave(AnytoneSettingsExtension::PowerSave mode) {
   setUInt8(0x000b, (unsigned)mode);
 }
 
@@ -1547,12 +1547,12 @@ AnytoneCodeplug::GeneralSettingsElement::setVOXDelay(unsigned ms) {
   setUInt8(0x000d, (ms-100)/500);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::VFOScanType
+AnytoneSettingsExtension::VFOScanType
 AnytoneCodeplug::GeneralSettingsElement::vfoScanType() const {
-  return (VFOScanType) getUInt8(0x000e);
+  return (AnytoneSettingsExtension::VFOScanType) getUInt8(0x000e);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setVFOScanType(VFOScanType type) {
+AnytoneCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension::VFOScanType type) {
   setUInt8(0x000e, (unsigned)type);
 }
 
@@ -1565,48 +1565,48 @@ AnytoneCodeplug::GeneralSettingsElement::setMICGain(unsigned gain) {
   setUInt8(0x000f, (gain*4)/10);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
-  return (KeyFunction)getUInt8(0x0010);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0010);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Short(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0010, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
-  return (KeyFunction)getUInt8(0x0011);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0011);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Short(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0011, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Short() const {
-  return (KeyFunction)getUInt8(0x0012);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0012);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Short(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0012, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey1Short() const {
-  return (KeyFunction)getUInt8(0x0013);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0013);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Short(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0013, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey2Short() const {
-  return (KeyFunction)getUInt8(0x0014);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0014);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0014, (unsigned)func);
 }
 
@@ -1828,48 +1828,48 @@ AnytoneCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
   return setUInt8(0x003f, (enable ? 0x01 : 0x00));
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Long() const {
-  return (KeyFunction)getUInt8(0x0041);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0041);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Long(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0041, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Long() const {
-  return (KeyFunction)getUInt8(0x0042);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0042);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Long(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0042, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Long() const {
-  return (KeyFunction)getUInt8(0x0043);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0043);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Long(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0043, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey1Long() const {
-  return (KeyFunction)getUInt8(0x0044);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0044);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Long(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0044, (unsigned)func);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
+AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey2Long() const {
-  return (KeyFunction)getUInt8(0x0045);
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0045);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Long(KeyFunction func) {
+AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(0x0045, (unsigned)func);
 }
 
@@ -2114,8 +2114,21 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableDisplayFrequency(ext->displayFrequencyEnabled());
     enableAutoKeyLock(ext->autoKeyLockEnabled());
     setAutoShutdownDelay(ext->autoShutDownDelay());
+    // Encode boot settings
     setBootDisplay(ext->bootSettings()->bootDisplay());
     enableBootPassword(ext->bootSettings()->bootPasswordEnabled());
+    // Encode key settings
+    setProgFuncKey1Short(ext->keySettings()->progFuncKey1Short());
+    setProgFuncKey1Long(ext->keySettings()->progFuncKey1Long());
+    setProgFuncKey2Short(ext->keySettings()->progFuncKey2Short());
+    setProgFuncKey2Long(ext->keySettings()->progFuncKey2Long());
+    setProgFuncKey3Short(ext->keySettings()->progFuncKey3Short());
+    setProgFuncKey3Long(ext->keySettings()->progFuncKey3Long());
+    setFuncKey1Short(ext->keySettings()->funcKey1Short());
+    setFuncKey1Long(ext->keySettings()->funcKey1Long());
+    setFuncKey2Short(ext->keySettings()->funcKey2Short());
+    setFuncKey2Long(ext->keySettings()->funcKey2Long());
+    setLongPressDuration(ext->keySettings()->longPressDuration());
   }
 
   return true;
@@ -2141,8 +2154,22 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->enableDisplayFrequency(displayFrequency());
   ext->enableAutoKeyLock(autoKeyLock());
   ext->setAutoShutDownDelay(autoShutdownDelay());
+  // Store boot settings
   ext->bootSettings()->setBootDisplay(bootDisplay());
   ext->bootSettings()->enableBootPassword(bootPassword());
+  // Store key settings
+  ext->keySettings()->setProgFuncKey1Short(progFuncKey1Short());
+  ext->keySettings()->setProgFuncKey1Long(progFuncKey1Long());
+  ext->keySettings()->setProgFuncKey2Short(progFuncKey2Short());
+  ext->keySettings()->setProgFuncKey2Long(progFuncKey2Long());
+  ext->keySettings()->setProgFuncKey3Short(progFuncKey3Short());
+  ext->keySettings()->setProgFuncKey3Long(progFuncKey3Long());
+  ext->keySettings()->setFuncKey1Short(funcKey1Short());
+  ext->keySettings()->setFuncKey1Long(funcKey1Long());
+  ext->keySettings()->setFuncKey2Short(funcKey2Short());
+  ext->keySettings()->setFuncKey2Long(funcKey2Long());
+  ext->keySettings()->setLongPressDuration(longPressDuration());
+
   return true;
 }
 

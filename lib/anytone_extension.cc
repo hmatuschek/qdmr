@@ -322,7 +322,9 @@ AnytoneContactExtension::setAlertType(AlertType type) {
  * ********************************************************************************************* */
 AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _bootSettings(new AnytoneBootSettingsExtension(this)),
-    _keyTone(false), _displayFrequency(false), _autoKeyLock(false), _autoShutDownDelay(0)
+    _keySettings(new AnytoneKeySettingsExtension(this)),
+    _keyTone(false), _displayFrequency(false), _autoKeyLock(false), _autoShutDownDelay(0),
+    _powerSave(PowerSave::Save50), _voxDelay(0), _vfoScanType(VFOScanType::TO)
 {
   // pass...
 }
@@ -340,6 +342,11 @@ AnytoneSettingsExtension::clone() const {
 AnytoneBootSettingsExtension *
 AnytoneSettingsExtension::bootSettings() const {
   return _bootSettings;
+}
+
+AnytoneKeySettingsExtension *
+AnytoneSettingsExtension::keySettings() const {
+  return _keySettings;
 }
 
 bool
@@ -387,6 +394,42 @@ AnytoneSettingsExtension::setAutoShutDownDelay(unsigned int min) {
   if (_autoShutDownDelay == min)
     return;
   _autoShutDownDelay = min;
+  emit modified(this);
+}
+
+AnytoneSettingsExtension::PowerSave
+AnytoneSettingsExtension::powerSave() const {
+  return _powerSave;
+}
+void
+AnytoneSettingsExtension::setPowerSave(PowerSave save) {
+  if (_powerSave == save)
+    return;
+  _powerSave = save;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneSettingsExtension::voxDelay() const {
+  return _voxDelay;
+}
+void
+AnytoneSettingsExtension::setVOXDelay(unsigned int ms) {
+  if (_voxDelay == ms)
+    return;
+  _voxDelay = ms;
+  emit modified(this);
+}
+
+AnytoneSettingsExtension::VFOScanType
+AnytoneSettingsExtension::vfoScanType() const {
+  return _vfoScanType;
+}
+void
+AnytoneSettingsExtension::setVFOScanType(VFOScanType type) {
+  if (_vfoScanType == type)
+    return;
+  _vfoScanType = type;
   emit modified(this);
 }
 
@@ -443,5 +486,152 @@ AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
   if (_bootPassword == pass)
     return;
   _bootPassword = pass;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneKeySettingsExtension
+ * ********************************************************************************************* */
+AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
+  : ConfigItem(parent)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneKeySettingsExtension::clone() const {
+  AnytoneKeySettingsExtension *ext = new AnytoneKeySettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey1Short() const {
+  return _progFuncKey1Short;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey1Short(KeyFunction func) {
+  if (_progFuncKey1Short == func)
+    return;
+  _progFuncKey1Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey1Long() const {
+  return _progFuncKey1Long;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey1Long(KeyFunction func) {
+  if (_progFuncKey1Long == func)
+    return;
+  _progFuncKey1Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey2Short() const {
+  return _progFuncKey2Short;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey2Short(KeyFunction func) {
+  if (_progFuncKey2Short == func)
+    return;
+  _progFuncKey2Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey2Long() const {
+  return _progFuncKey2Long;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey2Long(KeyFunction func) {
+  if (_progFuncKey2Long == func)
+    return;
+  _progFuncKey2Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey3Short() const {
+  return _progFuncKey3Short;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey3Short(KeyFunction func) {
+  if (_progFuncKey3Short == func)
+    return;
+  _progFuncKey3Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::progFuncKey3Long() const {
+  return _progFuncKey3Long;
+}
+void
+AnytoneKeySettingsExtension::setProgFuncKey3Long(KeyFunction func) {
+  if (_progFuncKey3Long == func)
+    return;
+  _progFuncKey3Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey1Short() const {
+  return _funcKey1Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey1Short(KeyFunction func) {
+  if (_funcKey1Short == func)
+    return;
+  _funcKey1Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey1Long() const {
+  return _funcKey1Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey1Long(KeyFunction func) {
+  if (_funcKey1Long == func)
+    return;
+  _funcKey1Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey2Short() const {
+  return _funcKey2Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey2Short(KeyFunction func) {
+  if (_funcKey2Short == func)
+    return;
+  _funcKey2Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey2Long() const {
+  return _funcKey2Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey2Long(KeyFunction func) {
+  if (_funcKey2Long == func)
+    return;
+  _funcKey2Long = func;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneKeySettingsExtension::longPressDuration() const {
+  return _longPressDuration;
+}
+void
+AnytoneKeySettingsExtension::setLongPressDuration(unsigned int ms) {
+  if (_longPressDuration == ms)
+    return;
+  _longPressDuration = ms;
   emit modified(this);
 }

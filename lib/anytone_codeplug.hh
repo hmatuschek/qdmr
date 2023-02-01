@@ -603,31 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** Possible power save modes. */
-    enum class PowerSave {
-      Off = 0, Save50 = 1, Save66 = 2
-    };
-
-    /** Encodes the possible VFO scan types. */
-    enum class VFOScanType {
-      TO = 0, CO = 1, SE = 2
-    };
-
-    /** All possible key functions. */
-    enum class KeyFunction {
-      Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
-      DigitalEncryption = 0x05, Call = 0x06, VOX = 0x07, VFOChannel = 0x08, SubPTT = 0x09,
-      Scan = 0x0a, FM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-      Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, MainChannelSwitch = 0x13, HotKey1 = 0x14,
-      HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
-      WorkAlone = 0x1a, NuisanceDelete = 0x1b, DigitalMonitor = 0x1c, SubChannelSwitch = 0x1d,
-      PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-      ChannelTypeSwitch = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
-      MaxVolume = 0x26, SlotSwitch = 0x27, APRSTypeSwitch = 0x28, ZoneSelect = 0x29,
-      TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
-      TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32
-    };
-
     /** Source for the VOX. */
     enum class VoxSource {
       Internal = 0, External = 1, Both = 2
@@ -713,9 +688,9 @@ public:
     /** Returns the squelch level for VFO B, (0=off). */
     virtual void setSquelchLevelB(unsigned level);
     /** Returns the power-save mode. */
-    virtual PowerSave powerSave() const;
+    virtual AnytoneSettingsExtension::PowerSave powerSave() const;
     /** Sets the power-save mode. */
-    virtual void setPowerSave(PowerSave mode);
+    virtual void setPowerSave(AnytoneSettingsExtension::PowerSave mode);
     /** Returns the VOX level. */
     virtual unsigned voxLevel() const;
     /** Sets the VOX level. */
@@ -725,34 +700,34 @@ public:
     /** Sets the VOX delay in ms. */
     virtual void setVOXDelay(unsigned ms);
     /** Returns the VFO scan type. */
-    virtual VFOScanType vfoScanType() const;
+    virtual AnytoneSettingsExtension::VFOScanType vfoScanType() const;
     /** Sets the VFO scan type. */
-    virtual void setVFOScanType(VFOScanType type);
+    virtual void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
     /** Returns the mirophone gain. */
     virtual unsigned micGain() const;
     /** Sets the microphone gain. */
     virtual void setMICGain(unsigned gain);
 
     /** Returns the key function for a short press on the programmable function key 1. */
-    virtual KeyFunction progFuncKey1Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey1Short() const;
     /** Sets the key function for a short press on the programmable function key 1. */
-    virtual void setProgFuncKey1Short(KeyFunction func);
+    virtual void setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a short press on the programmable function key 2. */
-    virtual KeyFunction progFuncKey2Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey2Short() const;
     /** Sets the key function for a short press on the programmable function key 2. */
-    virtual void setProgFuncKey2Short(KeyFunction func);
+    virtual void setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a short press on the programmable function key 3. */
-    virtual KeyFunction progFuncKey3Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Short() const;
     /** Sets the key function for a short press on the programmable function key 3. */
-    virtual void setProgFuncKey3Short(KeyFunction func);
+    virtual void setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a short press on the function key 1. */
-    virtual KeyFunction funcKey1Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
     /** Sets the key function for a short press on the function key 1. */
-    virtual void setFuncKey1Short(KeyFunction func);
+    virtual void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a short press on the function key 2. */
-    virtual KeyFunction funcKey2Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
     /** Sets the key function for a short press on the function key 2. */
-    virtual void setFuncKey2Short(KeyFunction func);
+    virtual void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns @c true if the VFO A is in VFO mode. */
     virtual bool vfoModeA() const;
     /** Enables/disables VFO mode for VFO A. */
@@ -853,25 +828,25 @@ public:
     virtual void enableGetGPSPosition(bool enable);
 
     /** Returns the key function for a long press on the programmable function key 1. */
-    virtual KeyFunction progFuncKey1Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey1Long() const;
     /** Sets the key function for a long press on the programmable function key 1. */
-    virtual void setProgFuncKey1Long(KeyFunction func);
+    virtual void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a long press on the programmable function key 2. */
-    virtual KeyFunction progFuncKey2Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const;
     /** Sets the key function for a long press on the programmable function key 2. */
-    virtual void setProgFuncKey2Long(KeyFunction func);
+    virtual void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a long press on the programmable function key 3. */
-    virtual KeyFunction progFuncKey3Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Long() const;
     /** Sets the key function for a long press on the programmable function key 3. */
-    virtual void setProgFuncKey3Long(KeyFunction func);
+    virtual void setProgFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a long press on the function key 1. */
-    virtual KeyFunction funcKey1Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
     /** Sets the key function for a long press on the function key 1. */
-    virtual void setFuncKey1Long(KeyFunction func);
+    virtual void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the key function for a long press on the function key 2. */
-    virtual KeyFunction funcKey2Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
     /** Sets the key function for a long press on the function key 2. */
-    virtual void setFuncKey2Long(KeyFunction func);
+    virtual void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the long-press duration in ms. */
     virtual unsigned longPressDuration() const;
     /** Sets the long-press duration in ms. */

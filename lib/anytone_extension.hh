@@ -322,6 +322,124 @@ protected:
 };
 
 
+/** Implements the key settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone. */
+class AnytoneKeySettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** Programmable function key 1, short press function. */
+  Q_PROPERTY(KeyFunction progFuncKey1Short READ progFuncKey1Short WRITE setProgFuncKey1Short)
+  /** Programmable function key 1, long press function. */
+  Q_PROPERTY(KeyFunction progFuncKey1Long READ progFuncKey1Long WRITE setProgFuncKey1Long)
+  /** Programmable function key 2, short press function. */
+  Q_PROPERTY(KeyFunction progFuncKey2Short READ progFuncKey2Short WRITE setProgFuncKey2Short)
+  /** Programmable function key 2, long press function. */
+  Q_PROPERTY(KeyFunction progFuncKey2Long READ progFuncKey2Long WRITE setProgFuncKey2Long)
+  /** Programmable function key 3, short press function. */
+  Q_PROPERTY(KeyFunction progFuncKey3Short READ progFuncKey3Short WRITE setProgFuncKey3Short)
+  /** Programmable function key 3, long press function. */
+  Q_PROPERTY(KeyFunction progFuncKey3Long READ progFuncKey3Long WRITE setProgFuncKey3Long)
+  /** Function key 1, short press function. */
+  Q_PROPERTY(KeyFunction funcKey1Short READ funcKey1Short WRITE setFuncKey1Short)
+  /** Programmable function key 1, long press function. */
+  Q_PROPERTY(KeyFunction funcKey1Long READ funcKey1Long WRITE setFuncKey1Long)
+  /** Function key 2, short press function. */
+  Q_PROPERTY(KeyFunction funcKey2Short READ funcKey2Short WRITE setFuncKey2Short)
+  /** Programmable function key 2, long press function. */
+  Q_PROPERTY(KeyFunction funcKey2Long READ funcKey2Long WRITE setFuncKey2Long)
+  /** The long press duration in ms. */
+  Q_PROPERTY(unsigned int longPressDuration READ longPressDuration WRITE setLongPressDuration);
+
+public:
+  /** All possible key functions. */
+  enum class KeyFunction {
+    Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+    DigitalEncryption = 0x05, Call = 0x06, VOX = 0x07, VFOChannel = 0x08, SubPTT = 0x09,
+    Scan = 0x0a, FM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
+    Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, MainChannelSwitch = 0x13, HotKey1 = 0x14,
+    HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
+    WorkAlone = 0x1a, NuisanceDelete = 0x1b, DigitalMonitor = 0x1c, SubChannelSwitch = 0x1d,
+    PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
+    ChannelTypeSwitch = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
+    MaxVolume = 0x26, SlotSwitch = 0x27, APRSTypeSwitch = 0x28, ZoneSelect = 0x29,
+    TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
+    TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32
+  };
+
+
+public:
+  explicit AnytoneKeySettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the key function for a short press on the programmable function key 1. */
+  KeyFunction progFuncKey1Short() const;
+  /** Sets the key function for a short press on the programmable function key 1. */
+  void setProgFuncKey1Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 1. */
+  KeyFunction progFuncKey1Long() const;
+  /** Sets the key function for a long press on the programmable function key 1. */
+  void setProgFuncKey1Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 2. */
+  KeyFunction progFuncKey2Short() const;
+  /** Sets the key function for a short press on the programmable function key 2. */
+  void setProgFuncKey2Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 2. */
+  KeyFunction progFuncKey2Long() const;
+  /** Sets the key function for a long press on the programmable function key 2. */
+  void setProgFuncKey2Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 3. */
+  KeyFunction progFuncKey3Short() const;
+  /** Sets the key function for a short press on the programmable function key 3. */
+  void setProgFuncKey3Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 3. */
+  KeyFunction progFuncKey3Long() const;
+  /** Sets the key function for a long press on the programmable function key 3. */
+  void setProgFuncKey3Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key 1. */
+  KeyFunction funcKey1Short() const;
+  /** Sets the key function for a short press on the function key 1. */
+  void setFuncKey1Short(KeyFunction func);
+  /** Returns the key function for a long press on the function key 1. */
+  KeyFunction funcKey1Long() const;
+  /** Sets the key function for a long press on the function key 1. */
+  void setFuncKey1Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key 2. */
+  KeyFunction funcKey2Short() const;
+  /** Sets the key function for a short press on the function key 2. */
+  void setFuncKey2Short(KeyFunction func);
+  /** Returns the key function for a long press on the function key 2. */
+  KeyFunction funcKey2Long() const;
+  /** Sets the key function for a long press on the function key 2. */
+  void setFuncKey2Long(KeyFunction func);
+
+  /** Returns the long-press duration in ms. */
+  unsigned int longPressDuration() const;
+  /** Sets the long-press duration in ms. */
+  void setLongPressDuration(unsigned int ms);
+
+protected:
+  KeyFunction _progFuncKey1Short;          ///< Function of the programmable key 1, short press.
+  KeyFunction _progFuncKey1Long;           ///< Function of the programmable key 1, long press.
+  KeyFunction _progFuncKey2Short;          ///< Function of the programmable key 2, short press.
+  KeyFunction _progFuncKey2Long;           ///< Function of the programmable key 2, long press.
+  KeyFunction _progFuncKey3Short;          ///< Function of the programmable key 3, short press.
+  KeyFunction _progFuncKey3Long;           ///< Function of the programmable key 3, long press.
+  KeyFunction _funcKey1Short;              ///< Function of the function key 1, short press.
+  KeyFunction _funcKey1Long;               ///< Function of the function key 1, long press.
+  KeyFunction _funcKey2Short;              ///< Function of the function key 2, short press.
+  KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
+  unsigned int _longPressDuration;         ///< The long-press duration in ms.
+};
+
+
 /** Implements the device specific extension for the gerneral settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
@@ -340,8 +458,28 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
   /** The auto shut-down delay in minutes. */
   Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+  /** The power-save mode. */
+  Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
+  /** The VOX delay in ms. */
+  Q_PROPERTY(unsigned int voxDelay READ voxDelay WRITE setVOXDelay)
+  /** The VFO scan type. */
+  Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
   /** The boot settings. */
-  Q_PROPERTY(AnytoneBootSettingsExtension * bootSettings READ bootSettings)
+  Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
+  /** The key settings. */
+  Q_PROPERTY(AnytoneKeySettingsExtension* keySettings READ keySettings)
+
+public:
+  /** Possible power save modes. */
+  enum class PowerSave {
+    Off = 0, Save50 = 1, Save66 = 2
+  };
+
+  /** Encodes the possible VFO scan types. */
+  enum class VFOScanType {
+    TO = 0, CO = 1, SE = 2
+  };
+
 
 public:
   /** Constructor. */
@@ -351,6 +489,8 @@ public:
 
   /** A reference to the boot settings. */
   AnytoneBootSettingsExtension *bootSettings() const;
+  /** A reference to the key settings. */
+  AnytoneKeySettingsExtension *keySettings() const;
 
   /** Returns @c true if the key tone is enabled. */
   bool keyToneEnabled() const;
@@ -372,14 +512,34 @@ public:
   /** Sets the auto shut-down delay. */
   void setAutoShutDownDelay(unsigned int min);
 
+  /** Returns the power-save mode. */
+  PowerSave powerSave() const;
+  /** Sets the power-save mode. */
+  void setPowerSave(PowerSave mode);
+
+  /** Returns the VOX delay in ms. */
+  unsigned int voxDelay() const;
+  /** Sets the VOX delay in ms. */
+  void setVOXDelay(unsigned int ms);
+
+  /** Returns the VFO scan type. */
+  VFOScanType vfoScanType() const;
+  /** Sets the VFO scan type. */
+  void setVFOScanType(VFOScanType type);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
+  /** The key settings. */
+  AnytoneKeySettingsExtension *_keySettings;
 
   bool _keyTone;                   ///< Key tone property.
   bool _displayFrequency;          ///< Display frequency property.
   bool _autoKeyLock;               ///< Auto key-lock property.
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
+  PowerSave _powerSave;            ///< Power save mode property.
+  unsigned int _voxDelay;          ///< VOX delay in ms.
+  VFOScanType _vfoScanType;        ///< The VFO scan-type property.
 };
 
 #endif // ANYTONEEXTENSION_HH
