@@ -5,7 +5,7 @@
 #include "channel.hh"
 #include "tyt_extensions.hh"
 #include "radioddity_extensions.hh"
-
+#include "anytone_extension.hh"
 
 /** Represents the common radio-global settings.
  * @ingroup conf */
@@ -33,6 +33,7 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
   /** The settings extension for Radioddity devices. */
   Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
+  Q_PROPERTY(AnytoneSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
 
 public:
   /** Default constructor. */
@@ -102,6 +103,11 @@ public:
   /** Sets the Radioddity device specific radio settings. */
   void setRadioddityExtension(RadiodditySettingsExtension *ext);
 
+  /** Returns the AnyTone device specific radio settings. */
+  AnytoneSettingsExtension *anytoneExtension() const;
+  /** Sets the AnyTone device specific radio settings. */
+  void setAnytoneExtension(AnytoneSettingsExtension *ext);
+
 protected slots:
   /** Internal used callback whenever an extension is modified. */
   void onExtensionModified();
@@ -127,6 +133,8 @@ protected:
   TyTSettingsExtension *_tytExtension;
   /** Device specific settings extension for Radioddity devices. */
   RadiodditySettingsExtension *_radioddityExtension;
+  /** Device specific settings extension for AnyTone devices. */
+  AnytoneSettingsExtension *_anytoneExtension;
 };
 
 #endif // RADIOCONFIG_HH

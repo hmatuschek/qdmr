@@ -238,6 +238,7 @@ protected:
   bool _hidden;
 };
 
+
 /** Implements the AnyTone contact extension.
  * @ingroup anytone */
 class AnytoneContactExtension: public ConfigExtension
@@ -270,6 +271,115 @@ public:
 protected:
   /** Holds the alert type for the contact. */
   AlertType _alertType;
+};
+
+
+/** Implements the boot settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone. */
+class AnytoneBootSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** The boot display setting. */
+  Q_PROPERTY(BootDisplay bootDisplay READ bootDisplay WRITE setBootDisplay)
+  /** If @c true, the boot password is enabled. */
+  Q_PROPERTY(bool bootPasswordEnabled READ bootPasswordEnabled WRITE enableBootPassword)
+  /** Holds the boot password. */
+  Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
+
+public:
+  /** What to display during boot. */
+  enum class BootDisplay {
+    Default = 0, CustomText = 1, CustomImage = 2
+  };
+  Q_ENUM(BootDisplay)
+
+public:
+  /** Constructor. */
+  explicit AnytoneBootSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Retunrs the boot display setting. */
+  BootDisplay bootDisplay() const;
+  /** Sets the boot display. */
+  void setBootDisplay(BootDisplay mode);
+  /** Returns @c true if the boot password is enabled.*/
+  bool bootPasswordEnabled() const;
+  /** Enables the boot password. */
+  void enableBootPassword(bool enable);
+  /** Returns the boot password. */
+  const QString &bootPassword() const;
+  /** Sets the boot password. */
+  void setBootPassword(const QString &pass);
+
+protected:
+  BootDisplay _bootDisplay;        ///< The boot display property.
+  bool _bootPasswordEnabled;       ///< If true, the boot password is enabled.
+  QString _bootPassword;           ///< The boot password
+};
+
+
+/** Implements the device specific extension for the gerneral settings of AnyTone devices.
+ *
+ * As there are a huge amount of different settings, they are split into separate extensions.
+ * One for each topic.
+ *
+ * @ingroup anytone */
+class AnytoneSettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The key tone setting. */
+  Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
+  /** The display frequency setting. */
+  Q_PROPERTY(bool displayFrequency READ displayFrequencyEnabled WRITE enableDisplayFrequency)
+  /** The auto key-lock property. */
+  Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
+  /** The auto shut-down delay in minutes. */
+  Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+  /** The boot settings. */
+  Q_PROPERTY(AnytoneBootSettingsExtension * bootSettings READ bootSettings)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit AnytoneSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** A reference to the boot settings. */
+  AnytoneBootSettingsExtension *bootSettings() const;
+
+  /** Returns @c true if the key tone is enabled. */
+  bool keyToneEnabled() const;
+  /** Enables/disables the key tone. */
+  void enableKeyTone(bool enable);
+
+  /** Returns @c true, if the frequency is displayed instead of the channel name. */
+  bool displayFrequencyEnabled() const;
+  /** Enables/disables display of frequency. */
+  void enableDisplayFrequency(bool enable);
+
+  /** Retruns @c true, if the automatic key-lock feature is enabled. */
+  bool autoKeyLockEnabled() const;
+  /** Enables/disables auto key-lock. */
+  void enableAutoKeyLock(bool enabled);
+
+  /** Returns the auto shut-down delay in minutes. */
+  unsigned int autoShutDownDelay() const;
+  /** Sets the auto shut-down delay. */
+  void setAutoShutDownDelay(unsigned int min);
+
+protected:
+  /** The boot settings. */
+  AnytoneBootSettingsExtension *_bootSettings;
+
+  bool _keyTone;                   ///< Key tone property.
+  bool _displayFrequency;          ///< Display frequency property.
+  bool _autoKeyLock;               ///< Auto key-lock property.
+  bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
 };
 
 #endif // ANYTONEEXTENSION_HH

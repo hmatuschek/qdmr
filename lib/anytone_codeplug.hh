@@ -603,11 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** What to display during boot. */
-    enum class BootDisplay {
-      Default = 0, CustomText = 1, CustomImage = 2
-    };
-
     /** Possible power save modes. */
     enum class PowerSave {
       Off = 0, Save50 = 1, Save66 = 2
@@ -702,9 +697,9 @@ public:
     /** Sets the auto-shutdown delay in minutes. */
     virtual void setAutoShutdownDelay(unsigned min);
     /** Returns the boot display mode. */
-    virtual BootDisplay bootDisplay() const;
+    virtual AnytoneBootSettingsExtension::BootDisplay bootDisplay() const;
     /** Sets the boot display mode. */
-    virtual void setBootDisplay(BootDisplay mode);
+    virtual void setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode);
     /** Returns @c true if boot password is enabled. */
     virtual bool bootPassword() const;
     /** Enables/disables boot password. */

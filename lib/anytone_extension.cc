@@ -315,3 +315,133 @@ void
 AnytoneContactExtension::setAlertType(AlertType type) {
   _alertType = type;
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneSettingsExtension
+ * ********************************************************************************************* */
+AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
+  : ConfigExtension(parent), _bootSettings(new AnytoneBootSettingsExtension(this)),
+    _keyTone(false), _displayFrequency(false), _autoKeyLock(false), _autoShutDownDelay(0)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneSettingsExtension::clone() const {
+  AnytoneSettingsExtension *ext = new AnytoneSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+AnytoneBootSettingsExtension *
+AnytoneSettingsExtension::bootSettings() const {
+  return _bootSettings;
+}
+
+bool
+AnytoneSettingsExtension::keyToneEnabled() const {
+  return _keyTone;
+}
+void
+AnytoneSettingsExtension::enableKeyTone(bool enable) {
+  if (_keyTone==enable)
+    return;
+  _keyTone = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::displayFrequencyEnabled() const {
+  return _displayFrequency;
+}
+void
+AnytoneSettingsExtension::enableDisplayFrequency(bool enable) {
+  if (_displayFrequency == enable)
+    return;
+  _displayFrequency = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::autoKeyLockEnabled() const {
+  return _autoKeyLock;
+}
+void
+AnytoneSettingsExtension::enableAutoKeyLock(bool enabled) {
+  if (_autoKeyLock==enabled)
+    return;
+  _autoKeyLock = enabled;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneSettingsExtension::autoShutDownDelay() const {
+  return _autoShutDownDelay;
+}
+void
+AnytoneSettingsExtension::setAutoShutDownDelay(unsigned int min) {
+  if (_autoShutDownDelay == min)
+    return;
+  _autoShutDownDelay = min;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneBootSettingsExtension
+ * ********************************************************************************************* */
+AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _bootDisplay(BootDisplay::Default), _bootPasswordEnabled(false)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneBootSettingsExtension::clone() const {
+  AnytoneBootSettingsExtension *ext = new AnytoneBootSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+AnytoneBootSettingsExtension::BootDisplay
+AnytoneBootSettingsExtension::bootDisplay() const {
+  return _bootDisplay;
+}
+void
+AnytoneBootSettingsExtension::setBootDisplay(BootDisplay mode) {
+  if (_bootDisplay == mode)
+    return;
+  _bootDisplay = mode;
+  emit modified(this);
+}
+
+bool
+AnytoneBootSettingsExtension::bootPasswordEnabled() const {
+  return _bootPasswordEnabled;
+}
+void
+AnytoneBootSettingsExtension::enableBootPassword(bool enable) {
+  if (_bootPasswordEnabled == enable)
+    return;
+  _bootPasswordEnabled = enable;
+  emit modified(this);
+}
+
+const QString &
+AnytoneBootSettingsExtension::bootPassword() const {
+  return _bootPassword;
+}
+void
+AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
+  if (_bootPassword == pass)
+    return;
+  _bootPassword = pass;
+  emit modified(this);
+}

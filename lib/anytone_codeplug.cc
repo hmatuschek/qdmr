@@ -1484,12 +1484,12 @@ AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(unsigned min) {
   }
 }
 
-AnytoneCodeplug::GeneralSettingsElement::BootDisplay
+AnytoneBootSettingsExtension::BootDisplay
 AnytoneCodeplug::GeneralSettingsElement::bootDisplay() const {
-  return (BootDisplay) getUInt8(0x0006);
+  return (AnytoneBootSettingsExtension::BootDisplay) getUInt8(0x0006);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay mode) {
+AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode) {
   setUInt8(0x0006, (unsigned)mode);
 }
 
@@ -2107,6 +2107,17 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setSquelchLevelB(ctx.config()->settings()->squelch()/2);
   }
 
+  // Handle extensions
+  if (ctx.config()->settings()->anytoneExtension()) {
+    AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+    enableKeyTone(ext->keyToneEnabled());
+    enableDisplayFrequency(ext->displayFrequencyEnabled());
+    enableAutoKeyLock(ext->autoKeyLockEnabled());
+    setAutoShutdownDelay(ext->autoShutDownDelay());
+    setBootDisplay(ext->bootSettings()->bootDisplay());
+    enableBootPassword(ext->bootSettings()->bootPasswordEnabled());
+  }
+
   return true;
 }
 
@@ -2118,6 +2129,20 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setVOX(voxLevel());
   ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+
+  // Set extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension())
+    ext = ctx.config()->settings()->anytoneExtension();
+  else
+    ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
+
+  ext->enableKeyTone(keyTone());
+  ext->enableDisplayFrequency(displayFrequency());
+  ext->enableAutoKeyLock(autoKeyLock());
+  ext->setAutoShutDownDelay(autoShutdownDelay());
+  ext->bootSettings()->setBootDisplay(bootDisplay());
+  ext->bootSettings()->enableBootPassword(bootPassword());
   return true;
 }
 
@@ -2230,6 +2255,13 @@ AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ct
   Q_UNUSED(flags)
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
+
+  // Handle extensions
+  if (ctx.config()->settings()->anytoneExtension()) {
+    AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+    setPassword(ext->bootSettings()->bootPassword());
+  }
+
   return true;
 }
 
@@ -2237,6 +2269,15 @@ bool
 AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setIntroLine1(introLine1());
   ctx.config()->settings()->setIntroLine2(introLine2());
+
+  // Create/update extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension())
+    ext = ctx.config()->settings()->anytoneExtension();
+  else
+    ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
+  ext->bootSettings()->setBootPassword(password());
+
   return true;
 }
 
