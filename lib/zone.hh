@@ -48,6 +48,9 @@ public:
   /** Returns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
 
+  /** Returns @c true, if the zone contains the given channel. */
+  bool contains(Channel *obj) const;
+
   /** Returns the AnyTone extension. */
   AnytoneZoneExtension *anytoneExtension() const;
   /** Sets the AnyTone extension. */

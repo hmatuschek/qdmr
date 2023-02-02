@@ -74,6 +74,11 @@ Zone::B() {
   return &_B;
 }
 
+bool
+Zone::contains(Channel *obj) const {
+  return _A.has(obj) || _B.has(obj);
+}
+
 AnytoneZoneExtension *
 Zone::anytoneExtension() const {
   return _anytone;
