@@ -1097,7 +1097,7 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
 
 bool
 AbstractConfigObjectList::has(ConfigObject *obj) const {
-  return 0 < indexOf(obj);
+  return 0 <= indexOf(obj);
 }
 
 ConfigObject *
