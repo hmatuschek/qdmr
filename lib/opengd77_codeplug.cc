@@ -333,8 +333,8 @@ OpenGD77Codeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
   else
     setName(zone->name());
 
-  for (int i=0; i<80; i++) {
-    if (i < zone->A()->count())
+  for (unsigned int i=0; i<Limit::channelCount(); i++) {
+    if (i < (unsigned int)zone->A()->count())
       setMember(i, ctx.index(zone->A()->get(i)));
     else
       clearMember(i);
@@ -406,11 +406,11 @@ OpenGD77Codeplug::ContactElement::markValid(bool valid) {
 
 bool
 OpenGD77Codeplug::ContactElement::overridesTimeSlot() const {
-  return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(Offset::TimeSlotOverride);
+  return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(Offset::timslotOverride());
 }
 DMRChannel::TimeSlot
 OpenGD77Codeplug::ContactElement::timeSlot() const {
-  switch ((TimeSlotOverride)getUInt8(Offset::TimeSlotOverride)) {
+  switch ((TimeSlotOverride)getUInt8(Offset::timslotOverride())) {
   case TimeSlotOverride::TS1: return DMRChannel::TimeSlot::TS1;
   case TimeSlotOverride::TS2: return DMRChannel::TimeSlot::TS2;
   default: break;
@@ -420,13 +420,13 @@ OpenGD77Codeplug::ContactElement::timeSlot() const {
 void
 OpenGD77Codeplug::ContactElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   if (DMRChannel::TimeSlot::TS1 == ts)
-    setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS1);
+    setUInt8(Offset::timslotOverride(), (unsigned)TimeSlotOverride::TS1);
   else
-    setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS2);
+    setUInt8(Offset::timslotOverride(), (unsigned)TimeSlotOverride::TS2);
 }
 void
 OpenGD77Codeplug::ContactElement::disableTimeSlotOverride() {
-  setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::None);
+  setUInt8(Offset::timslotOverride(), (unsigned)TimeSlotOverride::None);
 }
 
 DMRContact *

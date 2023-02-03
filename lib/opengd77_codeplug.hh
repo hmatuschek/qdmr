@@ -155,6 +155,13 @@ public:
     bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
     void fromZoneObjA(const Zone *zone, Context &ctx);
     void fromZoneObjB(const Zone *zone, Context &ctx);
+
+  public:
+    /** Some limits for the zone element. */
+    struct Limit: public GD77Codeplug::ZoneElement::Limit {
+      /** The maximum number of channels per zone. */
+      static constexpr unsigned int channelCount() { return 80; }
+    };
   };
 
   /** Implements the OpenGD77 specific zone bank.
@@ -202,13 +209,6 @@ public:
     /** Reuse enum from extension. */
     typedef OpenGD77ContactExtension::TimeSlotOverride TimeSlotOverride;
 
-    /** Holds some offsets within the element. */
-    struct Offset {
-      enum {
-        TimeSlotOverride = 0x0017
-      };
-    };
-
   public:
     /** Constructor. */
     explicit ContactElement(uint8_t *ptr);
@@ -233,6 +233,14 @@ public:
 
     DMRContact *toContactObj(Context &ctx) const;
     void fromContactObj(const DMRContact *c, Context &ctx);
+
+  protected:
+    /** Holds some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int timslotOverride() { return 0x0017; }
+      /// @endcond
+    };
   };
 
   /** Implements the OpenGD77 specific group list.
