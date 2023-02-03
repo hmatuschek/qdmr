@@ -19,7 +19,7 @@ RadioddityCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
 }
 
 RadioddityCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Element(ptr, 0x38)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -59,63 +59,63 @@ RadioddityCodeplug::ChannelElement::clear() {
 
 QString
 RadioddityCodeplug::ChannelElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::ChannelElement::setName(const QString &n) {
-  writeASCII(0x0000, n, 16, 0xff);
+  writeASCII(Offset::name(), n, Limit::nameLength(), 0xff);
 }
 
 uint32_t
 RadioddityCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_le(0x0010)*10;
+  return getBCD8_le(Offset::rxFrequency())*10;
 }
 void
 RadioddityCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
-  setBCD8_le(0x0010, freq/10);
+  setBCD8_le(Offset::rxFrequency(), freq/10);
 }
 uint32_t
 RadioddityCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_le(0x0014)*10;
+  return getBCD8_le(Offset::txFrequency())*10;
 }
 void
 RadioddityCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setBCD8_le(0x0014, freq/10);
+  setBCD8_le(Offset::txFrequency(), freq/10);
 }
 
 RadioddityCodeplug::ChannelElement::Mode
 RadioddityCodeplug::ChannelElement::mode() const {
-  return (Mode)getUInt8(0x0018);
+  return (Mode)getUInt8(Offset::mode());
 }
 void
 RadioddityCodeplug::ChannelElement::setMode(Mode mode) {
-  setUInt8(0x0018, (unsigned)mode);
+  setUInt8(Offset::mode(), (unsigned)mode);
 }
 
 unsigned
 RadioddityCodeplug::ChannelElement::txTimeOut() const {
-  return getUInt8(0x001b)*15;
+  return getUInt8(Offset::txTimeout())*15;
 }
 void
 RadioddityCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
-  setUInt8(0x001b, tot/15);
+  setUInt8(Offset::txTimeout(), tot/15);
 }
 unsigned
 RadioddityCodeplug::ChannelElement::txTimeOutRekeyDelay() const {
-  return getUInt8(0x001c);
+  return getUInt8(Offset::txTimeoutRekeyDelay());
 }
 void
 RadioddityCodeplug::ChannelElement::setTXTimeOutRekeyDelay(unsigned delay) {
-  setUInt8(0x001c, delay);
+  setUInt8(Offset::txTimeoutRekeyDelay(), delay);
 }
 
 RadioddityCodeplug::ChannelElement::Admit
 RadioddityCodeplug::ChannelElement::admitCriterion() const {
-  return (Admit) getUInt8(0x001d);
+  return (Admit) getUInt8(Offset::admitCriterion());
 }
 void
 RadioddityCodeplug::ChannelElement::setAdmitCriterion(Admit admit) {
-  setUInt8(0x001d, (unsigned)admit);
+  setUInt8(Offset::admitCriterion(), (unsigned)admit);
 }
 
 bool
@@ -124,63 +124,63 @@ RadioddityCodeplug::ChannelElement::hasScanList() const {
 }
 unsigned
 RadioddityCodeplug::ChannelElement::scanListIndex() const {
-  return getUInt8(0x001f);
+  return getUInt8(Offset::scanList());
 }
 void
 RadioddityCodeplug::ChannelElement::setScanListIndex(unsigned index) {
-  setUInt8(0x001f, index);
+  setUInt8(Offset::scanList(), index);
 }
 
 Signaling::Code
 RadioddityCodeplug::ChannelElement::rxTone() const {
-  return decode_ctcss_tone_table(getUInt16_le(0x0020));
+  return decode_ctcss_tone_table(getUInt16_le(Offset::rxTone()));
 }
 void
 RadioddityCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
-  setUInt16_le(0x0020, encode_ctcss_tone_table(code));
+  setUInt16_le(Offset::rxTone(), encode_ctcss_tone_table(code));
 }
 Signaling::Code
 RadioddityCodeplug::ChannelElement::txTone() const {
-  return decode_ctcss_tone_table(getUInt16_le(0x0022));
+  return decode_ctcss_tone_table(getUInt16_le(Offset::txTone()));
 }
 void
 RadioddityCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
-  setUInt16_le(0x0022, encode_ctcss_tone_table(code));
+  setUInt16_le(Offset::txTone(), encode_ctcss_tone_table(code));
 }
 
 unsigned
 RadioddityCodeplug::ChannelElement::txSignalingIndex() const {
-  return getUInt8(0x0025);
+  return getUInt8(Offset::txSignaling());
 }
 void
 RadioddityCodeplug::ChannelElement::setTXSignalingIndex(unsigned index) {
-  setUInt8(0x0025, index);
+  setUInt8(Offset::txSignaling(), index);
 }
 unsigned
 RadioddityCodeplug::ChannelElement::rxSignalingIndex() const {
-  return getUInt8(0x0027);
+  return getUInt8(Offset::rxSignaling());
 }
 void
 RadioddityCodeplug::ChannelElement::setRXSignalingIndex(unsigned index) {
-  setUInt8(0x0027, index);
+  setUInt8(Offset::rxSignaling(), index);
 }
 
 RadioddityCodeplug::ChannelElement::PrivacyGroup
 RadioddityCodeplug::ChannelElement::privacyGroup() const {
-  return (PrivacyGroup) getUInt8(0x0029);
+  return (PrivacyGroup) getUInt8(Offset::privacyGroup());
 }
 void
 RadioddityCodeplug::ChannelElement::setPrivacyGroup(PrivacyGroup grp) {
-  setUInt8(0x0029, (unsigned)grp);
+  setUInt8(Offset::privacyGroup(), (unsigned)grp);
 }
 
 unsigned
 RadioddityCodeplug::ChannelElement::txColorCode() const {
-  return getUInt8(0x002a);
+  return getUInt8(Offset::txColorCode());
 }
 void
 RadioddityCodeplug::ChannelElement::setTXColorCode(unsigned cc) {
-  setUInt8(0x002a, cc);
+  setUInt8(Offset::txColorCode(), cc);
 }
 
 bool
@@ -189,20 +189,20 @@ RadioddityCodeplug::ChannelElement::hasGroupList() const {
 }
 unsigned
 RadioddityCodeplug::ChannelElement::groupListIndex() const {
-  return getUInt8(0x002b);
+  return getUInt8(Offset::groupList());
 }
 void
 RadioddityCodeplug::ChannelElement::setGroupListIndex(unsigned index) {
-  setUInt8(0x002b, index);
+  setUInt8(Offset::groupList(), index);
 }
 
 unsigned
 RadioddityCodeplug::ChannelElement::rxColorCode() const {
-  return getUInt8(0x002c);
+  return getUInt8(Offset::rxColorCode());
 }
 void
 RadioddityCodeplug::ChannelElement::setRXColorCode(unsigned cc) {
-  setUInt8(0x002c, cc);
+  setUInt8(Offset::rxColorCode(), cc);
 }
 
 bool
@@ -211,11 +211,11 @@ RadioddityCodeplug::ChannelElement::hasEmergencySystem() const {
 }
 unsigned
 RadioddityCodeplug::ChannelElement::emergencySystemIndex() const {
-  return getUInt8(0x002d);
+  return getUInt8(Offset::emergencySystem());
 }
 void
 RadioddityCodeplug::ChannelElement::setEmergencySystemIndex(unsigned index) {
-  setUInt8(0x002d, index);
+  setUInt8(Offset::emergencySystem(), index);
 }
 
 bool
@@ -224,11 +224,11 @@ RadioddityCodeplug::ChannelElement::hasContact() const {
 }
 unsigned
 RadioddityCodeplug::ChannelElement::contactIndex() const {
-  return getUInt16_le(0x002e);
+  return getUInt16_le(Offset::transmitContact());
 }
 void
 RadioddityCodeplug::ChannelElement::setContactIndex(unsigned index) {
-  setUInt16_le(0x002e, index);
+  setUInt16_le(Offset::transmitContact(), index);
 }
 
 bool
@@ -344,7 +344,7 @@ RadioddityCodeplug::ChannelElement::setPower(Channel::Power pwr) {
 }
 
 Channel *
-RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
+RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const ErrorStack& err) const {
   Q_UNUSED(ctx)
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
@@ -386,7 +386,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
 }
 
 bool
-RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack& err) const {
   // Link common
   if (hasScanList() && ctx.has<ScanList>(scanListIndex()))
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
@@ -403,7 +403,7 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) con
 }
 
 bool
-RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, const ErrorStack& err) {
   clear();
 
   setName(c->name());
@@ -418,6 +418,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   else
     setTXTimeOut(c->timeout());
   enableRXOnly(c->rxOnly());
+
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
@@ -453,9 +454,15 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
       setGroupListIndex(ctx.index(dc->groupListObj()));
     if (dc->txContactObj())
       setContactIndex(ctx.index(dc->txContactObj()));
+  } else {
+    errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
+                << "': Not supported by the radio.";
+    return false;
   }
+
   return true;
 }
+
 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ChannelBankElement
@@ -467,7 +474,7 @@ RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr, unsigne
 }
 
 RadioddityCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr)
-  : Element(ptr, 0x1c10)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -478,23 +485,28 @@ RadioddityCodeplug::ChannelBankElement::~ChannelBankElement() {
 
 void
 RadioddityCodeplug::ChannelBankElement::clear() {
-  memset(_data, 0, 0x10);
+  memset(_data, 0, size());
 }
 
 bool
 RadioddityCodeplug::ChannelBankElement::isEnabled(unsigned idx) const {
-  unsigned byte = idx/8, bit = idx%8;
+  unsigned byte = Offset::bitmask() + idx/8, bit = idx%8;
   return getBit(byte, bit);
 }
 void
 RadioddityCodeplug::ChannelBankElement::enable(unsigned idx, bool enabled) {
-  unsigned byte = idx/8, bit = idx%8;
+  unsigned byte = Offset::bitmask() + idx/8, bit = idx%8;
   return setBit(byte, bit, enabled);
 }
 
 uint8_t *
 RadioddityCodeplug::ChannelBankElement::get(unsigned idx) const {
-  return (_data+0x10)+idx*0x38;
+  return (_data+Offset::channels())+idx*ChannelElement::size();
+}
+
+RadioddityCodeplug::ChannelElement
+RadioddityCodeplug::ChannelBankElement::channel(unsigned int n) {
+  return ChannelElement((_data+Offset::channels())+n*ChannelElement::size());
 }
 
 
@@ -772,7 +784,7 @@ RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, unsigned size)
 }
 
 RadioddityCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -783,8 +795,8 @@ RadioddityCodeplug::ZoneElement::~ZoneElement() {
 
 void
 RadioddityCodeplug::ZoneElement::clear() {
-  memset(_data+0x0000, 0xff, 0x0010);
-  memset(_data+0x0010, 0x00, 0x0020);
+  memset(_data+Offset::name(), 0xff, Limit::nameLength());
+  memset(_data+Offset::channels(), 0x00, sizeof(uint16_t)*Limit::memberCount());
 }
 bool
 RadioddityCodeplug::ZoneElement::isValid() const {
@@ -793,11 +805,11 @@ RadioddityCodeplug::ZoneElement::isValid() const {
 
 QString
 RadioddityCodeplug::ZoneElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::ZoneElement::setName(const QString &name) {
-  writeASCII(0x0000, name, 16, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 bool
@@ -806,11 +818,11 @@ RadioddityCodeplug::ZoneElement::hasMember(unsigned n) const {
 }
 unsigned
 RadioddityCodeplug::ZoneElement::member(unsigned n) const {
-  return getUInt16_le(0x0010+2*n);
+  return getUInt16_le(Offset::channels()+sizeof(uint16_t)*n);
 }
 void
 RadioddityCodeplug::ZoneElement::setMember(unsigned n, unsigned idx) {
-  setUInt16_le(0x0010+n*2, idx);
+  setUInt16_le(Offset::channels()+sizeof(uint16_t)*n, idx);
 }
 void
 RadioddityCodeplug::ZoneElement::clearMember(unsigned n) {
@@ -832,7 +844,7 @@ RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putI
     return false;
   }
 
-  for (int i=0; (i<16) && hasMember(i); i++) {
+  for (unsigned int i=0; (i<Limit::memberCount()) && hasMember(i); i++) {
     if (ctx.has<Channel>(member(i))) {
       if (! putInB)
         zone->A()->add(ctx.get<Channel>(member(i)));
@@ -853,8 +865,8 @@ RadioddityCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
   else
     setName(zone->name());
 
-  for (int i=0; i<16; i++) {
-    if (i < zone->A()->count())
+  for (unsigned int i=0; i<Limit::memberCount(); i++) {
+    if (i < (unsigned int)zone->A()->count())
       setMember(i, ctx.index(zone->A()->get(i)));
     else
       clearMember(i);
@@ -868,8 +880,8 @@ RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
   else
     setName(zone->name());
 
-  for (int i=0; i<16; i++) {
-    if (i < zone->B()->count())
+  for (unsigned int i=0; i<Limit::memberCount(); i++) {
+    if (i < (unsigned int)zone->B()->count())
       setMember(i, ctx.index(zone->B()->get(i)));
     else
       clearMember(i);
@@ -886,7 +898,7 @@ RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, unsigned size
 }
 
 RadioddityCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
-  : Element(ptr, 0x2f00)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -897,22 +909,23 @@ RadioddityCodeplug::ZoneBankElement::~ZoneBankElement() {
 
 void
 RadioddityCodeplug::ZoneBankElement::clear() {
-  memset(_data, 0, 0x0020);
+  memset(_data, 0, size());
 }
 
 bool
 RadioddityCodeplug::ZoneBankElement::isEnabled(unsigned idx) const {
-  unsigned byte=idx/8, bit = idx%8;
+  unsigned byte=Offset::bitmap() + idx/8, bit = idx%8;
   return getBit(byte, bit);
 }
 void
 RadioddityCodeplug::ZoneBankElement::enable(unsigned idx, bool enabled) {
-  unsigned byte=idx/8, bit = idx%8;
+  unsigned byte=Offset::bitmap() + idx/8, bit = idx%8;
   setBit(byte, bit, enabled);
 }
+
 uint8_t *
 RadioddityCodeplug::ZoneBankElement::get(unsigned idx) const {
-  return _data + 0x0020 + idx*0x0030;
+  return _data + Offset::zones() + idx*ZoneElement::size();
 }
 
 

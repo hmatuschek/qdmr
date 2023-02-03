@@ -78,8 +78,8 @@ RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
 }
 
 bool
-RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! RadioddityCodeplug::ChannelElement::fromChannelObj(c, ctx))
+RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, const ErrorStack& err) {
+  if (! RadioddityCodeplug::ChannelElement::fromChannelObj(c, ctx, err))
     return false;
 
   if (c->is<FMChannel>()) {
@@ -99,8 +99,8 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 }
 
 Channel *
-RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = RadioddityCodeplug::ChannelElement::toChannelObj(ctx);
+RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack& err) const {
+  Channel *ch = RadioddityCodeplug::ChannelElement::toChannelObj(ctx, err);
   if (nullptr == ch)
     return nullptr;
 
@@ -113,8 +113,8 @@ RD5RCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 }
 
 bool
-RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx))
+RD5RCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack& err) const {
+  if (! RadioddityCodeplug::ChannelElement::linkChannelObj(c, ctx, err))
     return false;
   /*
   if (c->is<AnalogChannel>()) {
@@ -369,8 +369,8 @@ RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, c
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       ChannelElement el(bank.get(i));
       if (c < config->channelList()->count()) {
-        if (! el.fromChannelObj(config->channelList()->channel(c), ctx)) {
-          logError() << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+        if (! el.fromChannelObj(config->channelList()->channel(c), ctx, err)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
@@ -394,7 +394,11 @@ RD5RCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx);
+      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx, err);
+      if (nullptr == ch) {
+        errMsg(err) << "Cannot create channel at index " << i << ".";
+        return false;
+      }
       config->channelList()->add(ch); ctx.add(ch, c+1);
     }
   }
@@ -412,7 +416,7 @@ RD5RCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) 
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx))
+      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx, err))
         return false;
     }
   }

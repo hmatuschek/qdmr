@@ -59,6 +59,9 @@ public:
     /** Destructor. */
     virtual ~ChannelElement();
 
+    /** Size of the codeplug element. */
+    static constexpr unsigned int size() { return 0x0038; }
+
     /** Resets the channel. */
     virtual void clear();
 
@@ -211,11 +214,44 @@ public:
     virtual void setPower(Channel::Power pwr);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx) const;
+    virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+    virtual bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      /** The maximum length of the name. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the channel element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int rxFrequency() { return 0x0010; }
+      static constexpr unsigned int txFrequency() { return 0x0014; }
+      static constexpr unsigned int mode() { return 0x0018; }
+      static constexpr unsigned int txTimeout() { return 0x001b; }
+      static constexpr unsigned int txTimeoutRekeyDelay() { return 0x001c; }
+      static constexpr unsigned int admitCriterion() { return 0x001d; }
+      static constexpr unsigned int scanList() { return 0x001f; }
+      static constexpr unsigned int rxTone() { return 0x0020; }
+      static constexpr unsigned int txTone() { return 0x0022; }
+      static constexpr unsigned int txSignaling() { return 0x0025; }
+      static constexpr unsigned int rxSignaling() { return 0x0027; }
+      static constexpr unsigned int privacyGroup() { return 0x0029; }
+      static constexpr unsigned int txColorCode() { return 0x002a; }
+      static constexpr unsigned int groupList() { return 0x002b; }
+      static constexpr unsigned int rxColorCode() { return 0x002c; }
+      static constexpr unsigned int emergencySystem() { return 0x002d; }
+      static constexpr unsigned int transmitContact() { return 0x002e; }
+      ///@bug static constexpr BitOffset dataCallConfirm() { BitOffset(0x0030, 7); }
+      /// @endcond
+    };
   };
 
   /** Implements the base for channel banks in Radioddity codeplugs.
@@ -234,6 +270,9 @@ public:
     /** Destructor. */
     virtual ~ChannelBankElement();
 
+    /** The size of the channel bank. */
+    static constexpr unsigned int size() { return 0x1c10; }
+
     /** Clears the bank. */
     void clear();
 
@@ -243,6 +282,24 @@ public:
     virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
+    /** Retunrs the n-th channel. */
+    ChannelElement channel(unsigned int n);
+
+  public:
+    /** Some limits for the channel bank. */
+    struct Limit {
+      /** The maximum number of channels. */
+      static constexpr unsigned int channelCount() { return 128; }
+    };
+
+  protected:
+    /** Some internal offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmask() { return 0x0000; }
+      static constexpr unsigned int channels() { return 0x0010; }
+      /// @endcond
+    };
   };
 
   /** VFO Channel representation within the binary codeplug.
@@ -408,6 +465,9 @@ public:
     explicit ZoneElement(uint8_t *ptr);
     virtual ~ZoneElement();
 
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
     /** Resets the zone. */
     void clear();
     /** Returns @c true if the zone is valid. */
@@ -437,6 +497,25 @@ public:
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjB(const Zone *zone, Context &ctx);
+
+  public:
+    /** Some limits for zone elements. */
+    struct Limit {
+      /** The maximum length of the zone name. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()  { return 0x0000; }
+      static constexpr unsigned int channels() { return 0x0010; }
+      /// @endcond
+    };
+
   };
 
   /** Implements the base class for all zone banks of Radioddity codeplugs.
@@ -456,6 +535,9 @@ public:
     /** Destructor. */
     ~ZoneBankElement();
 
+    /** The size of the zone. */
+    static constexpr unsigned int size() { return 0x2f00; }
+
     /** Resets the bank. */
     void clear();
 
@@ -463,8 +545,27 @@ public:
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
+
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
+    /** Retunrs the n-th zone. */
+    ZoneElement zone(unsigned int n);
+
+  public:
+    /** Some limits for the zone bank. */
+    struct Limit {
+      /** The maximum number of zones in this bank. */
+      static constexpr unsigned int zoneCount() { return 250; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmap() { return 0x0000; }
+      static constexpr unsigned int zones()  { return 0x0020; }
+      /// @endcond
+    };
   };
 
   /** Represents a base class for all group lists within Radioddity codeplugs.

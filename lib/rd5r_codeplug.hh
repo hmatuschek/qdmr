@@ -100,9 +100,9 @@ public:
     /** Sets the squelch level. */
     virtual void setSquelch(unsigned level);
 
-    bool fromChannelObj(const Channel *c, Context &ctx);
-    Channel *toChannelObj(Context &ctx) const;
-    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+    Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
   };
 
   /** Implements the timestamp for RD-5R codeplugs.

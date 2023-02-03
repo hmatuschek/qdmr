@@ -42,12 +42,6 @@
 #define IMAGE_VFO_B                      0
 #define ADDR_VFO_B                0x0075c8
 
-#define NUM_ZONES                       68
-#define IMAGE_ZONE_BANK                  0
-#define ADDR_ZONE_BANK            0x008010
-#define ZONE_SIZE                 0x0000b0
-#define ZONE_BANK_SIZE            (0x20+NUM_ZONES*ZONE_SIZE)
-
 #define NUM_CONTACTS                  1024
 #define IMAGE_CONTACTS                   1
 #define ADDR_CONTACTS             0x087620
@@ -176,8 +170,8 @@ OpenGD77Codeplug::ChannelElement::clearRadioId() {
 }
 
 Channel *
-OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = GD77Codeplug::ChannelElement::toChannelObj(ctx);
+OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack& err) const {
+  Channel *ch = GD77Codeplug::ChannelElement::toChannelObj(ctx, err);
   if (nullptr == ch)
     return nullptr;
 
@@ -202,8 +196,8 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
 }
 
 bool
-OpenGD77Codeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! GD77Codeplug::ChannelElement::linkChannelObj(c, ctx))
+OpenGD77Codeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack& err) const {
+  if (! GD77Codeplug::ChannelElement::linkChannelObj(c, ctx, err))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -226,8 +220,8 @@ OpenGD77Codeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
 }
 
 bool
-OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx))
+OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, const ErrorStack& err) {
+  if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx, err))
     return false;
 
   if (c->is<FMChannel>()) {
@@ -300,7 +294,7 @@ OpenGD77Codeplug::ChannelElement::setPrivacyGroup(PrivacyGroup grp) {
  * Implementation of OpenGD77Codeplug::ZoneElement
  * ******************************************************************************************** */
 OpenGD77Codeplug::ZoneElement::ZoneElement(uint8_t *ptr)
-  : RadioddityCodeplug::ZoneElement(ptr, ZONE_SIZE)
+  : RadioddityCodeplug::ZoneElement(ptr, ZoneElement::size())
 {
   // pass...
 }
@@ -308,13 +302,13 @@ OpenGD77Codeplug::ZoneElement::ZoneElement(uint8_t *ptr)
 void
 OpenGD77Codeplug::ZoneElement::clear() {
   RadioddityCodeplug::ZoneElement::clear();
-  memset(_data+0x0010, 0x00, 0xa0);
+  memset(_data, 0x00, size());
 }
 
 bool
 OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
   if (! isValid()) {
-    logWarn() << "Cannot link zone: Zone is invalid.";
+    logError() << "Cannot link zone: Zone is invalid.";
     return false;
   }
 
@@ -367,14 +361,19 @@ OpenGD77Codeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
  * Implementation of OpenGD77Codeplug::ZoneBankElement
  * ******************************************************************************************** */
 OpenGD77Codeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
-  : RadioddityCodeplug::ZoneBankElement(ptr, ZONE_BANK_SIZE)
+  : RadioddityCodeplug::ZoneBankElement(ptr, ZoneBankElement::size())
 {
   // pass...
 }
 
 uint8_t *
 OpenGD77Codeplug::ZoneBankElement::get(unsigned n) const {
-  return (_data+0x20 + n*ZONE_SIZE);
+  return (_data + Offset::zones() + n*ZoneElement::size());
+}
+
+OpenGD77Codeplug::ZoneElement
+OpenGD77Codeplug::ZoneBankElement::zone(unsigned int n) const {
+  return ZoneElement(_data + Offset::zones() + n*ZoneElement::size());
 }
 
 
@@ -639,12 +638,12 @@ OpenGD77Codeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorSt
 
 void
 OpenGD77Codeplug::clearChannels() {
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
+    if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1());
     ChannelBankElement bank(ptr); bank.clear();
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++)
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++)
       ChannelElement(bank.get(i)).clear();
   }
 }
@@ -653,16 +652,16 @@ bool
 OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
+    if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1());
     ChannelBankElement bank(ptr); bank.clear();
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<Limit::channelBanks())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
-      if (c < config->channelList()->count()) {
-        if (! el.fromChannelObj(config->channelList()->channel(c), ctx)) {
-          logError() << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+      if (c < (unsigned int)config->channelList()->count()) {
+        if (! el.fromChannelObj(config->channelList()->channel(c), ctx, err)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
@@ -679,15 +678,20 @@ bool
 OpenGD77Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
+    if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1());
     ChannelBankElement bank(ptr);
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx);
+      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx, err);
+      if (nullptr == ch) {
+        errMsg(err) << "Cannot decode channel at index " << i
+                    << " of bank " << b << ".";
+        return false;
+      }
       config->channelList()->add(ch); ctx.add(ch, c+1);
     }
   }
@@ -698,15 +702,15 @@ bool
 OpenGD77Codeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err)
 
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
+    if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1());
     ChannelBankElement bank(ptr);
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx))
+      if (! ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx, err))
         return false;
     }
   }
@@ -752,9 +756,9 @@ OpenGD77Codeplug::clearVFOSettings() {
 
 void
 OpenGD77Codeplug::clearZones() {
-  ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
   bank.clear();
-  for (int i=0; i<NUM_ZONES; i++)
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++)
     ZoneElement(bank.get(i)).clear();
 }
 
@@ -762,14 +766,14 @@ bool
 OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
 
   // Pack Zones
   bool pack_zone_a = true;
-  for (int i=0, j=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0, j=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     ZoneElement z(bank.get(i));
 next:
-    if (j >= config->zones()->count()) {
+    if (j >= (unsigned int)config->zones()->count()) {
       bank.enable(i, false);
       continue;
     }
@@ -801,12 +805,12 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &er
 
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
 
-  for (int i=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
-    ZoneElement z(bank.get(i));
+    ZoneElement z = bank.zone(i);
 
     // Determine whether this zone should be combined with the previous one
     QString zonename = z.name();
@@ -820,6 +824,10 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &er
     // Create zone obj
     if (! extend_last_zone) {
       last_zone = z.toZoneObj(ctx);
+      if (nullptr == last_zone) {
+        errMsg(err) << "Cannot decode zone at index " << i << ".";
+        return false;
+      }
       config->zones()->add(last_zone);
       ctx.add(last_zone, i+1);
     } else {
@@ -836,9 +844,9 @@ OpenGD77Codeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err)
 
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
 
-  for (int i=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));

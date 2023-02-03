@@ -367,8 +367,8 @@ GD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, c
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       ChannelElement el(bank.get(i));
       if (c < config->channelList()->count()) {
-        if (! el.fromChannelObj(config->channelList()->channel(c), ctx)) {
-          logError() << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+        if (! el.fromChannelObj(config->channelList()->channel(c), ctx, err)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
@@ -393,7 +393,11 @@ GD77Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx);
+      Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx, err);
+      if (nullptr == ch) {
+        errMsg(err) << "Cannot decode channel at index " << i << ".";
+        return false;
+      }
       config->channelList()->add(ch); ctx.add(ch, c+1);
     }
   }
@@ -412,8 +416,11 @@ GD77Codeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) 
     for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
-      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx))
+      if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx, err)) {
+        errMsg(err) << "Cannot link channel '" << ctx.get<Channel>(c+1)->name()
+                    << "' at index " << i << ".";
         return false;
+      }
     }
   }
   return true;

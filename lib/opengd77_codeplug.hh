@@ -55,13 +55,11 @@
  * @ingroup ogd77 */
 class OpenGD77Codeplug: public GD77Codeplug
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-  /** EEPROM memory bank. */
-  static const uint32_t EEPROM = 0;
-  /** Flash memory bank. */
-  static const uint32_t FLASH  = 1;
+  /** Possible image types. */
+  enum ImageType { EEPROM = 0, FLASH = 1 };
 
 public:
   /** Implements the OpenGD77 specific channel.
@@ -115,9 +113,9 @@ public:
     /** Clears the radio ID. */
     virtual void clearRadioId();
 
-    Channel *toChannelObj(Context &ctx) const;
-    bool linkChannelObj(Channel *c, Context &ctx) const;
-    bool fromChannelObj(const Channel *c, Context &ctx);
+    Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
 
     /* Reused fields in OpenGD77.
      * The following properties are reused in the OpenGD77 firmware for other purposes.*/
@@ -149,8 +147,11 @@ public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
 
-    /** Clears the zone. */
     void clear();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x0000b0; }
+
     bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
     void fromZoneObjA(const Zone *zone, Context &ctx);
     void fromZoneObjB(const Zone *zone, Context &ctx);
@@ -166,7 +167,28 @@ public:
     /** Constructor. */
     explicit ZoneBankElement(uint8_t *ptr);
 
+    /** The size of the zone bank element. */
+    static constexpr unsigned int size() { return 0x20 + Limit::zoneCount()*ZoneElement::size(); }
+
     uint8_t *get(unsigned n) const;
+    /** Returns the n-th zone element. */
+    ZoneElement zone(unsigned int n) const;
+
+  public:
+    /** Some limts for the zone bank. */
+    struct Limit {
+      /** The maximum number of zones in this bank. */
+      static constexpr unsigned int zoneCount() { return 68; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmap() { return 0x0000; }
+      static constexpr unsigned int zones() { return 0x0020; }
+      /// @endcond
+    };
   };
 
   /** Implements the OpenGD77 specific DMR contact.
@@ -283,6 +305,34 @@ public:
   bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
   bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+
+public:
+  /** Some limtis for the codeplug. */
+  struct Limit {
+    /** The maximum number of channel banks. Internal use only. */
+    static constexpr unsigned int channelBanks() { return 8; }
+    /** The maximum number of channels. */
+    static constexpr unsigned int channelCount() { return 8; }
+  };
+
+protected:
+  /** Internal used image indices. */
+  struct ImageIndex {
+    /// @cond DO_NOT_DOCUEMNT
+    static constexpr unsigned int channelBank0() { return EEPROM; }
+    static constexpr unsigned int channelBank1() { return FLASH; }
+    static constexpr unsigned int zoneBank()     { return EEPROM; }
+    /// @endcond
+  };
+
+  /** Some offsets. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUEMNT
+    static constexpr unsigned int channelBank0() { return 0x003780; } // Channels 1-128
+    static constexpr unsigned int channelBank1() { return 0x07b1b0; } // Channels 129-1024
+    static constexpr unsigned int zoneBank()     { return 0x008010; }
+    /// @endcond
+  };
 };
 
 #endif // OPENGD77_CODEPLUG_HH
