@@ -345,7 +345,7 @@ RadioddityCodeplug::ChannelElement::setPower(Channel::Power pwr) {
 
 Channel *
 RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const ErrorStack& err) const {
-  Q_UNUSED(ctx)
+  Q_UNUSED(ctx); Q_UNUSED(err)
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
     FMChannel *ach = new FMChannel(); ch = ach;
@@ -381,12 +381,15 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     ch->setVOXDefault();
   else
     ch->disableVOX();
+
   // done.
   return ch;
 }
 
 bool
 RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack& err) const {
+  Q_UNUSED(err)
+
   // Link common
   if (hasScanList() && ctx.has<ScanList>(scanListIndex()))
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
@@ -398,8 +401,8 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, con
     if (hasContact() && ctx.has<DMRContact>(contactIndex()))
       dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
   }
-  return true;
 
+  return true;
 }
 
 bool
@@ -606,7 +609,7 @@ RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
 }
 
 RadioddityCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, 0x0018)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -632,25 +635,25 @@ RadioddityCodeplug::ContactElement::isValid() const {
 
 QString
 RadioddityCodeplug::ContactElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::ContactElement::setName(const QString name) {
-  writeASCII(0x0000, name, 16, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 unsigned
 RadioddityCodeplug::ContactElement::number() const {
-  return getBCD8_be(0x0010);
+  return getBCD8_be(Offset::number());
 }
 void
 RadioddityCodeplug::ContactElement::setNumber(unsigned id) {
-  setBCD8_be(0x0010, id);
+  setBCD8_be(Offset::number(), id);
 }
 
 DMRContact::Type
 RadioddityCodeplug::ContactElement::type() const {
-  switch (getUInt8(0x0014)) {
+  switch (getUInt8(Offset::type())) {
   case 0: return DMRContact::GroupCall;
   case 1: return DMRContact::PrivateCall;
   case 2: return DMRContact::AllCall;
@@ -661,45 +664,44 @@ RadioddityCodeplug::ContactElement::type() const {
 void
 RadioddityCodeplug::ContactElement::setType(DMRContact::Type type) {
   switch (type) {
-  case DMRContact::GroupCall: setUInt8(0x0014, 0); break;
-  case DMRContact::PrivateCall: setUInt8(0x0014, 1); break;
-  case DMRContact::AllCall: setUInt8(0x0014, 2); break;
+  case DMRContact::GroupCall: setUInt8(Offset::type(), 0); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::type(), 1); break;
+  case DMRContact::AllCall: setUInt8(Offset::type(), 2); break;
   }
 }
 
 bool
 RadioddityCodeplug::ContactElement::ring() const {
-  return 0x00 != getUInt8(0x0015);
+  return 0x00 != getUInt8(Offset::ring());
 }
 void
 RadioddityCodeplug::ContactElement::enableRing(bool enable) {
-  if (enable)
-    setUInt8(0x0015, 1);
-  else
-    setUInt8(0x0015, 0);
+  setUInt8(Offset::ring(), enable ? 0x01 : 0x00);
 }
 
 unsigned
 RadioddityCodeplug::ContactElement::ringStyle() const {
-  return getUInt8(0x0016);
+  return getUInt8(Offset::ringStyle());
 }
 void
 RadioddityCodeplug::ContactElement::setRingStyle(unsigned style) {
-  style = std::min(style, 10u);
-  setUInt8(0x0016, style);
+  style = std::min(style, Limit::ringStyle());
+  setUInt8(Offset::ringStyle(), style);
 }
 
 DMRContact *
-RadioddityCodeplug::ContactElement::toContactObj(Context &ctx) const {
+RadioddityCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
-  if (! isValid())
+  if (! isValid()) {
+    errMsg(err) << "Cannot create contact from an invalid element.";
     return nullptr;
+  }
   return new DMRContact(type(), name(), number(), ring());
 }
 
-void
-RadioddityCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx) {
-  Q_UNUSED(ctx)
+bool
+RadioddityCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   setName(cont->name());
   setNumber(cont->number());
   setType(cont->type());
@@ -709,6 +711,7 @@ RadioddityCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Conte
   } else {
     enableRing(false);
   }
+  return true;
 }
 
 
@@ -722,7 +725,7 @@ RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigne
 }
 
 RadioddityCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -733,7 +736,7 @@ RadioddityCodeplug::DTMFContactElement::~DTMFContactElement() {
 
 void
 RadioddityCodeplug::DTMFContactElement::clear() {
-  memset(_data, 0xff, 0x20);
+  memset(_data, 0xff, size());
 }
 bool
 RadioddityCodeplug::DTMFContactElement::isValid() const {
@@ -742,35 +745,38 @@ RadioddityCodeplug::DTMFContactElement::isValid() const {
 
 QString
 RadioddityCodeplug::DTMFContactElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::DTMFContactElement::setName(const QString &name) {
-  writeASCII(0x0000, name, 16, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 QString
 RadioddityCodeplug::DTMFContactElement::number() const {
-  return readASCII(0x0010, 16, 0xff);
+  return readASCII(Offset::number(), Limit::numberLength(), 0xff);
 }
 void
 RadioddityCodeplug::DTMFContactElement::setNumber(const QString &number) {
-  writeASCII(0x0010, number, 16, 0xff);
+  writeASCII(Offset::number(), number, Limit::numberLength(), 0xff);
 }
 
 DTMFContact *
-RadioddityCodeplug::DTMFContactElement::toContactObj(Context &ctx) const {
+RadioddityCodeplug::DTMFContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
-  if (! isValid())
+  if (! isValid()) {
+    errMsg(err) << "Cannot create a DTMF contact from an invalid element.";
     return nullptr;
+  }
   return new DTMFContact(name(), number());
 }
 
-void
-RadioddityCodeplug::DTMFContactElement::fromContactObj(const DTMFContact *cont, Context &ctx) {
-  Q_UNUSED(ctx)
+bool
+RadioddityCodeplug::DTMFContactElement::fromContactObj(const DTMFContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   setName(cont->name());
   setNumber(cont->number());
+  return true;
 }
 
 
@@ -830,17 +836,19 @@ RadioddityCodeplug::ZoneElement::clearMember(unsigned n) {
 }
 
 Zone *
-RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
+RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
-  if (! isValid())
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode an invalid zone.";
     return nullptr;
+  }
   return new Zone(name());
 }
 
 bool
-RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB, const ErrorStack &err) const {
   if (! isValid()) {
-    logWarn() << "Cannot link zone: Zone is invalid.";
+    errMsg(err) << "Cannot link invalid zone.";
     return false;
   }
 
@@ -855,11 +863,14 @@ RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putI
                 << member(i) << " out of bounds.";
     }
   }
+
   return true;
 }
 
-void
-RadioddityCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
+bool
+RadioddityCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   if (zone->A()->count() && zone->B()->count())
     setName(zone->name() + " A");
   else
@@ -871,10 +882,14 @@ RadioddityCodeplug::ZoneElement::fromZoneObjA(const Zone *zone, Context &ctx) {
     else
       clearMember(i);
   }
+
+  return true;
 }
 
-void
-RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
+bool
+RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   if (zone->A()->count() && zone->B()->count())
     setName(zone->name() + " B");
   else
@@ -886,6 +901,8 @@ RadioddityCodeplug::ZoneElement::fromZoneObjB(const Zone *zone, Context &ctx) {
     else
       clearMember(i);
   }
+
+  return true;
 }
 
 /* ********************************************************************************************* *
@@ -939,7 +956,7 @@ RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned si
 }
 
 RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -956,11 +973,11 @@ RadioddityCodeplug::GroupListElement::clear() {
 
 QString
 RadioddityCodeplug::GroupListElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::GroupListElement::setName(const QString &name) {
-  writeASCII(0x0000, name, 16, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 bool
@@ -969,11 +986,11 @@ RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
 }
 unsigned
 RadioddityCodeplug::GroupListElement::member(unsigned n) const {
-  return getUInt16_le(0x0010 + 2*n);
+  return getUInt16_le(Offset::members() + sizeof(uint16_t)*n);
 }
 void
 RadioddityCodeplug::GroupListElement::setMember(unsigned n, unsigned idx) {
-  return setUInt16_le(0x0010+2*n, idx);
+  return setUInt16_le(Offset::members() + sizeof(uint16_t)*n, idx);
 }
 void
 RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
@@ -981,31 +998,35 @@ RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
 }
 
 RXGroupList *
-RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
-  Q_UNUSED(ctx)
+RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   return new RXGroupList(name());
 }
 
 bool
-RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
-  for (int i=0; (i<16) && (i<ncnt); i++) {
+RadioddityCodeplug::GroupListElement::linkRXGroupListObj(unsigned int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i=0; (i<Limit::memberCount()) && (i<ncnt); i++) {
     if (ctx.has<DMRContact>(member(i))) {
       lst->addContact(ctx.get<DMRContact>(member(i)));
     } else {
-      logError() << "Cannot link group list '" << lst->name()
-                << "': Member index " << member(i) << " does not refer to a digital contact.";
+      errMsg(err) << "Cannot link group list '" << lst->name()
+                  << "': Member index " << member(i) << " does not refer to a digital contact.";
       return false;
     }
   }
+
   return true;
 }
 
-void
-RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+bool
+RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   setName(lst->name());
+
   int j = 0;
-  // Iterate over all 15 entries in the codeplug
-  for (int i=0; i<15; i++) {
+  // Iterate over all entries in the codeplug
+  for (unsigned int i=0; i<Limit::memberCount(); i++) {
     if (lst->count() > j) {
       // Skip non-private-call entries
       while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
@@ -1019,6 +1040,8 @@ RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst,
       clearMember(i);
     }
   }
+
+  return false;
 }
 
 
@@ -1032,7 +1055,7 @@ RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uns
 }
 
 RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
-  : Element(ptr, 0x0c80)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -1048,24 +1071,24 @@ RadioddityCodeplug::GroupListBankElement::clear() {
 
 bool
 RadioddityCodeplug::GroupListBankElement::isEnabled(unsigned n) const {
-  return 0 != getUInt8(n);
+  return 0 != getUInt8(Offset::contactCounts() + n);
 }
 unsigned
 RadioddityCodeplug::GroupListBankElement::contactCount(unsigned n) const {
-  return getUInt8(n)-1;
+  return getUInt8(Offset::contactCounts() + n) - 1;
 }
 void
 RadioddityCodeplug::GroupListBankElement::setContactCount(unsigned n, unsigned size) {
-  setUInt8(n, size+1);
+  setUInt8(Offset::contactCounts() + n, size+1);
 }
 void
 RadioddityCodeplug::GroupListBankElement::disable(unsigned n) {
-  setUInt8(n, 0);
+  setUInt8(Offset::contactCounts() + n, 0);
 }
 
 uint8_t *
 RadioddityCodeplug::GroupListBankElement::get(unsigned n) const {
-  return _data + 0x80 + n*0x30;
+  return _data + Offset::groupLists() + n*GroupListElement::size();
 }
 
 
@@ -1079,7 +1102,7 @@ RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size
 }
 
 RadioddityCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
-  : Element(ptr, 0x0058)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -1103,11 +1126,11 @@ RadioddityCodeplug::ScanListElement::clear() {
 
 QString
 RadioddityCodeplug::ScanListElement::name() const {
-  return readASCII(0x0000, 15, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::ScanListElement::setName(const QString &name) {
-  writeASCII(0x0000, name, 15, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 bool
@@ -1139,158 +1162,186 @@ RadioddityCodeplug::ScanListElement::enableTalkback(bool enable) {
 
 bool
 RadioddityCodeplug::ScanListElement::hasMember(unsigned n) const {
-  return 0 != getUInt16_le(0x0010+2*n);
+  return 0 != getUInt16_le(Offset::channels()+sizeof(uint16_t)*n);
 }
 bool
 RadioddityCodeplug::ScanListElement::isSelected(unsigned n) const {
-  return 1 == getUInt16_le(0x0010+2*n);
+  return 1 == getUInt16_le(Offset::channels()+sizeof(uint16_t)*n);
 }
 unsigned
 RadioddityCodeplug::ScanListElement::member(unsigned n) const {
-  return getUInt16_le(0x0010 + 2*n)-1;
+  return getUInt16_le(Offset::channels()+sizeof(uint16_t)*n)-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setMember(unsigned n, unsigned idx) {
-  setUInt16_le(0x0010+2*n, idx+1);
+  setUInt16_le(Offset::channels()+sizeof(uint16_t)*n, idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setSelected(unsigned n) {
-  setUInt16_le(0x0010+2*n, 1);
+  setUInt16_le(Offset::channels()+sizeof(uint16_t)*n, 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearMember(unsigned n) {
-  setUInt16_le(0x0010+2*n, 0);
+  setUInt16_le(Offset::channels()+sizeof(uint16_t)*n, 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasPrimary() const {
-  return 0 != getUInt16_le(0x0050);
+  return 0 != getUInt16_le(Offset::primary());
 }
 bool
 RadioddityCodeplug::ScanListElement::primaryIsSelected() const {
-  return 1 == getUInt16_le(0x0050);
+  return 1 == getUInt16_le(Offset::primary());
 }
 unsigned
 RadioddityCodeplug::ScanListElement::primary() const {
-  return getUInt16_le(0x0050)-1;
+  return getUInt16_le(Offset::primary())-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setPrimary(unsigned idx) {
-  setUInt16_le(0x0050, idx+1);
+  setUInt16_le(Offset::primary(), idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setPrimarySelected() {
-  setUInt16_le(0x0050, 1);
+  setUInt16_le(Offset::primary(), 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearPrimary() {
-  setUInt16_le(0x0050, 0);
+  setUInt16_le(Offset::primary(), 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasSecondary() const {
-  return 0 != getUInt16_le(0x0052);
+  return 0 != getUInt16_le(Offset::secondary());
 }
 bool
 RadioddityCodeplug::ScanListElement::secondaryIsSelected() const {
-  return 1 == getUInt16_le(0x0052);
+  return 1 == getUInt16_le(Offset::secondary());
 }
 unsigned
 RadioddityCodeplug::ScanListElement::secondary() const {
-  return getUInt16_le(0x0052)-1;
+  return getUInt16_le(Offset::secondary())-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setSecondary(unsigned idx) {
-  setUInt16_le(0x0052, idx+1);
+  setUInt16_le(Offset::secondary(), idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setSecondarySelected() {
-  setUInt16_le(0x0052, 1);
+  setUInt16_le(Offset::secondary(), 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearSecondary() {
-  setUInt16_le(0x0052, 0);
+  setUInt16_le(Offset::secondary(), 0);
 }
 
 bool
 RadioddityCodeplug::ScanListElement::hasRevert() const {
-  return 0 != getUInt16_le(0x0054);
+  return 0 != getUInt16_le(Offset::revert());
 }
 bool
 RadioddityCodeplug::ScanListElement::revertIsSelected() const {
-  return 1 == getUInt16_le(0x0054);
+  return 1 == getUInt16_le(Offset::revert());
 }
 unsigned
 RadioddityCodeplug::ScanListElement::revert() const {
-  return getUInt16_le(0x0054)-1;
+  return getUInt16_le(Offset::revert())-1;
 }
 void
 RadioddityCodeplug::ScanListElement::setRevert(unsigned idx) {
-  setUInt16_le(0x0054, idx+1);
+  setUInt16_le(Offset::revert(), idx+1);
 }
 void
 RadioddityCodeplug::ScanListElement::setRevertSelected() {
-  setUInt16_le(0x0054, 1);
+  setUInt16_le(Offset::revert(), 1);
 }
 void
 RadioddityCodeplug::ScanListElement::clearRevert() {
-  setUInt16_le(0x0054, 0);
+  setUInt16_le(Offset::revert(), 0);
 }
 
 unsigned
 RadioddityCodeplug::ScanListElement::holdTime() const {
-  return unsigned(getUInt8(0x0056))*25;
+  return unsigned(getUInt8(Offset::holdTime()))*25;
 }
 void
 RadioddityCodeplug::ScanListElement::setHoldTime(unsigned ms) {
-  setUInt8(0x0056, ms/25);
+  setUInt8(Offset::holdTime(), ms/25);
 }
 
 unsigned
 RadioddityCodeplug::ScanListElement::prioritySampleTime() const {
-  return unsigned(getUInt8(0x0057))*250;
+  return unsigned(getUInt8(Offset::prioritySampleTime()))*250;
 }
 void
 RadioddityCodeplug::ScanListElement::setPrioritySampleTime(unsigned ms) {
-  setUInt8(0x0057, ms/250);
+  setUInt8(Offset::prioritySampleTime(), ms/250);
 }
 
 ScanList *
-RadioddityCodeplug::ScanListElement::toScanListObj(Context &ctx) const {
-  Q_UNUSED(ctx)
+RadioddityCodeplug::ScanListElement::toScanListObj(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   return new ScanList(name());
 }
 
 bool
-RadioddityCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) const {
-  if (primaryIsSelected())
+RadioddityCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx, const ErrorStack &err) const {
+  if (primaryIsSelected()) {
     lst->setPrimaryChannel(SelectedChannel::get());
-  else if (hasPrimary())
+  } else if (hasPrimary()) {
+    if (! ctx.has<Channel>(primary())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "', primary priority channel index " << primary() << " not defined.";
+      return false;
+    }
     lst->setPrimaryChannel(ctx.get<Channel>(primary()));
+  }
 
-  if (secondaryIsSelected())
+  if (secondaryIsSelected()) {
     lst->setSecondaryChannel(SelectedChannel::get());
-  else if (hasSecondary())
+  } else if (hasSecondary()) {
+    if (! ctx.has<Channel>(secondary())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "', secondary priority channel index " << secondary() << " not defined.";
+      return false;
+    }
     lst->setSecondaryChannel(ctx.get<Channel>(secondary()));
+  }
 
-  if (revertIsSelected())
+  if (revertIsSelected()) {
     lst->setRevertChannel(SelectedChannel::get());
-  else if (hasRevert())
+  } else if (hasRevert()) {
+    if (! ctx.has<Channel>(revert())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "', revert channel index " << revert() << " not defined.";
+      return false;
+    }
     lst->setRevertChannel(ctx.get<Channel>(revert()));
+  }
 
   for (int i=0; (i<32) && hasMember(i); i++) {
-    if (isSelected(i))
+    if (isSelected(i)) {
       lst->addChannel(SelectedChannel::get());
-    else if (hasMember(i))
+    } else if (hasMember(i)) {
+      if (! ctx.has<Channel>(member(i))) {
+        errMsg(err) << "Cannot link scan list '" << lst->name()
+                    << "', " << (i+1) << "-th member index " << member(i) << " not defined.";
+        return false;
+      }
       lst->addChannel(ctx.get<Channel>(member(i)));
+    }
   }
+
   return true;
 }
 
-void
-RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx) {
+bool
+RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   clear();
   setName(lst->name());
+
   if (lst->primaryChannel() && (SelectedChannel::get() == lst->primaryChannel()))
     setPrimarySelected();
   else if (lst->primaryChannel())
@@ -1314,6 +1365,8 @@ RadioddityCodeplug::ScanListElement::fromScanListObj(const ScanList *lst, Contex
     else
       setMember(i, ctx.index(lst->channel(i)));
   }
+
+  return true;
 }
 
 
@@ -1327,7 +1380,7 @@ RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, unsig
 }
 
 RadioddityCodeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
-  : Element(ptr, 0x56f0)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -1338,24 +1391,24 @@ RadioddityCodeplug::ScanListBankElement::~ScanListBankElement() {
 
 void
 RadioddityCodeplug::ScanListBankElement::clear() {
-  memset(_data, 0, 256);
+  memset(_data, 0, Limit::scanListCount());
 }
 
 bool
 RadioddityCodeplug::ScanListBankElement::isEnabled(unsigned n) const {
-  return 0x00 != getUInt8(n);
+  return 0x00 != getUInt8(Offset::bytemap() + n);
 }
 void
 RadioddityCodeplug::ScanListBankElement::enable(unsigned n, bool enabled) {
   if (enabled)
-    setUInt8(n, 0x01);
+    setUInt8(Offset::bytemap() + n, 0x01);
   else
-    setUInt8(n, 0x00);
+    setUInt8(Offset::bytemap() + n, 0x00);
 }
 
 uint8_t *
 RadioddityCodeplug::ScanListBankElement::get(unsigned n) const {
-  return _data+0x0100 + n*0x0058;
+  return _data+Offset::scanLists() + n*ScanListElement::size();
 }
 
 
@@ -1369,7 +1422,7 @@ RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr,
 }
 
 RadioddityCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0028)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -1711,7 +1764,7 @@ RadioddityCodeplug::GeneralSettingsElement::clearProgPassword() {
 }
 
 bool
-RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx) {
+RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx, const ErrorStack &err) {
   if (conf->radioIDs()->defaultId()) {
     setName(conf->radioIDs()->defaultId()->name());
     setRadioID(conf->radioIDs()->defaultId()->number());
@@ -1719,7 +1772,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
     setName(conf->radioIDs()->getId(0)->name());
     setRadioID(conf->radioIDs()->getId(0)->number());
   } else {
-    logError() << "Cannot encode radioddity codeplug: No radio ID defined.";
+    errMsg(err) << "Cannot encode radioddity codeplug: No radio ID defined.";
     return false;
   }
 
@@ -1766,8 +1819,9 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
 }
 
 bool
-RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
-  Q_UNUSED(ctx)
+RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
   if (! conf->radioIDs()->defaultId()) {
     int idx = conf->radioIDs()->add(new DMRRadioID(name(), radioID()));
     conf->radioIDs()->setDefaultId(idx);
@@ -2361,7 +2415,7 @@ RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr, unsigned size
 }
 
 RadioddityCodeplug::BootTextElement::BootTextElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -2378,32 +2432,36 @@ RadioddityCodeplug::BootTextElement::clear() {
 
 QString
 RadioddityCodeplug::BootTextElement::line1() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::line1(), Limit::lineLength(), 0xff);
 }
 void
 RadioddityCodeplug::BootTextElement::setLine1(const QString &text) {
-  writeASCII(0x0000, text, 16, 0xff);
+  writeASCII(Offset::line1(), text, Limit::lineLength(), 0xff);
 }
 
 QString
 RadioddityCodeplug::BootTextElement::line2() const {
-  return readASCII(0x0010, 16, 0xff);
+  return readASCII(Offset::line2(), Limit::lineLength(), 0xff);
 }
 void
 RadioddityCodeplug::BootTextElement::setLine2(const QString &text) {
-  writeASCII(0x0010, text, 16, 0xff);
+  writeASCII(Offset::line2(), text, Limit::lineLength(), 0xff);
 }
 
-void
-RadioddityCodeplug::BootTextElement::fromConfig(Config *conf) {
-  setLine1(conf->settings()->introLine1());
-  setLine2(conf->settings()->introLine2());
+bool
+RadioddityCodeplug::BootTextElement::fromConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  setLine1(ctx.config()->settings()->introLine1());
+  setLine2(ctx.config()->settings()->introLine2());
+  return true;
 }
 
-void
-RadioddityCodeplug::BootTextElement::updateConfig(Config *conf) {
-  conf->settings()->setIntroLine1(line1());
-  conf->settings()->setIntroLine2(line2());
+bool
+RadioddityCodeplug::BootTextElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  ctx.config()->settings()->setIntroLine1(line1());
+  ctx.config()->settings()->setIntroLine2(line2());
+  return true;
 }
 
 
@@ -2470,7 +2528,7 @@ RadioddityCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t si
 }
 
 RadioddityCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
-  : Element(ptr, 0x88)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -2482,70 +2540,73 @@ RadioddityCodeplug::EncryptionElement::~EncryptionElement() {
 void
 RadioddityCodeplug::EncryptionElement::clear() {
   setPrivacyType(PrivacyType::None);
-  for (int i=0; i<16; i++) {
+  for (unsigned int i=0; i<Limit::keyCount(); i++) {
     clearBasicKey(i);
   }
 }
 
 RadioddityCodeplug::EncryptionElement::PrivacyType
 RadioddityCodeplug::EncryptionElement::privacyType() const {
-  return PrivacyType(getUInt8(0x0000));
+  return PrivacyType(getUInt8(Offset::privacyType()));
 }
 void
 RadioddityCodeplug::EncryptionElement::setPrivacyType(PrivacyType type) {
-  setUInt8(0x0000, (uint8_t)type);
+  setUInt8(Offset::privacyType(), (uint8_t)type);
 }
 
 bool
 RadioddityCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
-  if (n>=16)
+  if (n >= Limit::keyCount())
     return false;
   unsigned byte=n/8, bit =n%8;
-  return getBit(0x0002+byte, bit);
+  return getBit(Offset::bitmap()+byte, bit);
 }
 QByteArray
 RadioddityCodeplug::EncryptionElement::basicKey(unsigned n) const {
-  if (n >= 16)
+  if (n >= Limit::keyCount())
     return QByteArray();
-  return QByteArray((const char *)_data+0x0008+0x08*n, 4);
+  return QByteArray((const char *)_data+Offset::keys()+Offset::key()*n, Limit::keySize());
 }
 void
 RadioddityCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
-  if ((n>=16) || (4 != key.size()))
+  if ((n >= Limit::keyCount()) || (Limit::keySize() != key.size()))
     return;
   unsigned byte=n/8, bit =n%8;
-  memcpy(_data+0x0008 + 0x08*n, key.data(), 4);
-  memcpy(_data+0x0008 + 0x08*n + 0x04, key.data(), 4);
-  setBit(0x0002+byte, bit);
+  // Store key (twice?)
+  memcpy(_data+Offset::keys() + Offset::key()*n, key.data(), Limit::keySize());
+  memcpy(_data+Offset::keys() + Offset::key()*n + Limit::keySize(), key.data(), Limit::keySize());
+  // Update bitmap
+  setBit(Offset::bitmap()+byte, bit);
   setPrivacyType(PrivacyType::Basic);
 }
 void
 RadioddityCodeplug::EncryptionElement::clearBasicKey(unsigned n) {
-  if (n>=16)
+  if (n >= Limit::keyCount())
     return;
   unsigned byte=n/8, bit =n%8;
-  memset(_data+0x0008 + 0x08*n, 0xff, 4);
-  memset(_data+0x0008 + 0x08*n + 0x04, 0xff, 4);
-  clearBit(0x0002+byte, bit);
+  memset(_data+Offset::keys() + Offset::key()*n, 0xff, Limit::keySize());
+  memset(_data+Offset::keys() + Offset::key()*n + Limit::keySize(), 0xff, Limit::keySize());
+  clearBit(Offset::bitmap()+byte, bit);
 }
 
 bool
-RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ext, Context &ctx) {
+RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ext, Context &ctx, const ErrorStack &err) {
   clear();
 
-  if (ext->encryptionKeys()->count() > 16) {
-    logError() << "Cannot encode encryption extension. Can only encode 16 keys.";
+  if ((unsigned int)ext->encryptionKeys()->count() > Limit::keyCount()) {
+    errMsg(err) << "Cannot encode encryption extension. Can only encode "
+                << Limit::keyCount() << " keys.";
     return false;
   }
 
   for (int i=0; i<ext->encryptionKeys()->count(); i++) {
     if (! ext->encryptionKeys()->get(i)->is<DMREncryptionKey>()) {
-      logError() << "Can only encode basic encryption keys.";
+      errMsg(err) << "Can only encode basic encryption keys.";
       return false;
     }
     DMREncryptionKey *key = ext->encryptionKeys()->get(i)->as<DMREncryptionKey>();
-    if (key->key().size() != 4) {
-      logError() << "Can only encode 32bit basic encryption keys.";
+    if (key->key().size() != Limit::keySize()) {
+      errMsg(err) << "Can only encode " << 8*Limit::keySize() << "bit basic encryption keys.";
       return false;
     }
     setBasicKey(i, key->key());
@@ -2555,12 +2616,14 @@ RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ex
   return true;
 }
 
-bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
+bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   if (PrivacyType::None == privacyType())
     return false;
 
   CommercialExtension *ext = ctx.config()->commercialExtension();
-  for (int i=0; i<16; i++) {
+  for (unsigned int i=0; i<Limit::keyCount(); i++) {
     if (! isBasicKeySet(i))
       continue;
     // Assemble key
@@ -2577,8 +2640,8 @@ bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
 }
 
 bool
-RadioddityCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Context &ctx) {
-  Q_UNUSED(ext); Q_UNUSED(ctx);
+RadioddityCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ext); Q_UNUSED(ctx); Q_UNUSED(err)
   // Keys do not need any linking step
   return true;
 }

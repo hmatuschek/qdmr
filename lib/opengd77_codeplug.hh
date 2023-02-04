@@ -135,6 +135,16 @@ public:
     PrivacyGroup privacyGroup() const ;
     /** Overridden, reused in OpenGD77. */
     void setPrivacyGroup(PrivacyGroup grp);
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public GD77Codeplug::ChannelElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int extendedPower() { return 0x0019; }
+      static constexpr unsigned int squelch() { return 0x0037; }
+      static constexpr unsigned int radioID() { return 0x0027; }
+      /// @endcond
+    };
   };
 
   /** Implements the OpenGD77 specific zone.
@@ -152,9 +162,9 @@ public:
     /** The size of the zone element. */
     static constexpr unsigned int size() { return 0x0000b0; }
 
-    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
-    void fromZoneObjA(const Zone *zone, Context &ctx);
-    void fromZoneObjB(const Zone *zone, Context &ctx);
+    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB, const ErrorStack &err=ErrorStack()) const;
+    bool fromZoneObjA(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+    bool fromZoneObjB(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the zone element. */
@@ -217,6 +227,7 @@ public:
     void clear();
     /** Returns @c true if the contact is valid. I.e., has a name. */
     bool isValid() const;
+
     void markValid(bool valid=true);
 
     /** Returns @c true if this contact overrides the channel time slot. */
@@ -231,8 +242,8 @@ public:
     /** Disables time slot override feature. */
     virtual void disableTimeSlotOverride();
 
-    DMRContact *toContactObj(Context &ctx) const;
-    void fromContactObj(const DMRContact *c, Context &ctx);
+    DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    bool fromContactObj(const DMRContact *c, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Holds some offsets within the element. */
@@ -257,7 +268,7 @@ public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
 
-    void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+    bool fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
 public:
@@ -316,29 +327,45 @@ public:
 
 public:
   /** Some limtis for the codeplug. */
-  struct Limit {
-    /** The maximum number of channel banks. Internal use only. */
-    static constexpr unsigned int channelBanks() { return 8; }
-    /** The maximum number of channels. */
-    static constexpr unsigned int channelCount() { return 8; }
+  struct Limit: public GD77Codeplug::Limit {
   };
 
 protected:
   /** Internal used image indices. */
   struct ImageIndex {
     /// @cond DO_NOT_DOCUEMNT
+    static constexpr unsigned int settings()     { return EEPROM; }
+    static constexpr unsigned int messages()     { return EEPROM; }
+    static constexpr unsigned int dtmfContacts() { return EEPROM; }
     static constexpr unsigned int channelBank0() { return EEPROM; }
-    static constexpr unsigned int channelBank1() { return FLASH; }
+    static constexpr unsigned int bootSettings() { return EEPROM; }
+    static constexpr unsigned int menuSettings() { return EEPROM; }
+    static constexpr unsigned int bootText()     { return EEPROM; }
+    static constexpr unsigned int vfoA()         { return EEPROM; }
+    static constexpr unsigned int vfoB()         { return EEPROM; }
     static constexpr unsigned int zoneBank()     { return EEPROM; }
+    static constexpr unsigned int channelBank1() { return FLASH; }
+    static constexpr unsigned int contacts()     { return FLASH; }
+    static constexpr unsigned int groupLists()   { return FLASH; }
     /// @endcond
   };
 
   /** Some offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUEMNT
+    static constexpr unsigned int settings()     { return 0x0000e0; }
+    static constexpr unsigned int messages()     { return 0x000128; }
+    static constexpr unsigned int dtmfContacts() { return 0x002f88; }
     static constexpr unsigned int channelBank0() { return 0x003780; } // Channels 1-128
-    static constexpr unsigned int channelBank1() { return 0x07b1b0; } // Channels 129-1024
+    static constexpr unsigned int bootSettings() { return 0x007518; }
+    static constexpr unsigned int menuSettings() { return 0x007538;}
+    static constexpr unsigned int bootText()     { return 0x007540; }
+    static constexpr unsigned int vfoA()         { return 0x007590; }
+    static constexpr unsigned int vfoB()         { return 0x0075c8; }
     static constexpr unsigned int zoneBank()     { return 0x008010; }
+    static constexpr unsigned int channelBank1() { return 0x07b1b0; } // Channels 129-1024
+    static constexpr unsigned int contacts()     { return 0x087620; }
+    static constexpr unsigned int groupLists()   { return 0x08d620; }
     /// @endcond
   };
 };

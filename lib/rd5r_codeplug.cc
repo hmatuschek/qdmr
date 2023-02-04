@@ -5,46 +5,6 @@
 #include "logger.hh"
 #include <QDateTime>
 
-#define ADDR_TIMESTMP             0x000088
-#define ADDR_SETTINGS             0x0000e0
-#define ADDR_BUTTONS              0x000108
-#define ADDR_MESSAGES             0x000128
-
-#define ADDR_ENCRYPTION           0x001370
-#define ENCRYPTION_SIZE               0x88
-
-#define NUM_CONTACTS                   256
-#define ADDR_CONTACTS             0x001788
-#define CONTACT_SIZE              0x000018
-#define NUM_DTMF_CONTACTS               32
-#define ADDR_DTMF_CONTACTS        0x002f88
-#define DTMF_CONTACT_SIZE         0x000020
-
-#define NUM_CHANNELS                  1024
-#define NUM_CHANNEL_BANKS                8
-#define NUM_CHANNELS_PER_BANK          128
-#define ADDR_CHANNEL_BANK_0       0x003780 // Channels 1-128
-#define ADDR_CHANNEL_BANK_1       0x00b1b0 // Channels 129-1024
-#define CHANNEL_SIZE              0x000038
-#define CHANNEL_BANK_SIZE         0x001c10
-
-#define ADDR_BOOTSETTINGS         0x007518
-#define ADDR_MENU_SETTINGS        0x007538
-#define ADDR_BOOT_TEXT            0x007540
-#define ADDR_VFO_A                0x007590
-#define ADDR_VFO_B                0x0075c8
-
-#define NUM_ZONES                      250
-#define ADDR_ZONE_BANK            0x008010
-#define ZONE_SIZE                 0x000030
-
-#define NUM_SCAN_LISTS                 250
-#define ADDR_SCAN_LIST_BANK       0x017620
-#define SCAN_LIST_SIZE            0x000058
-
-#define ADDR_GROUP_LIST_BANK      0x01d620
-#define NUM_GROUP_LISTS                 64
-
 
 /* ******************************************************************************************** *
  * Implementation of RD5RCodeplug::ChannelElement
@@ -69,12 +29,12 @@ RD5RCodeplug::ChannelElement::clear() {
 
 unsigned
 RD5RCodeplug::ChannelElement::squelch() const {
-  return getUInt8(0x0037);
+  return getUInt8(Offset::squelch());
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
   level = std::min(9u, level);
-  setUInt8(0x0037, level);
+  setUInt8(Offset::squelch(), level);
 }
 
 bool
@@ -137,7 +97,7 @@ RD5RCodeplug::TimestampElement::TimestampElement(uint8_t *ptr, unsigned size)
 }
 
 RD5RCodeplug::TimestampElement::TimestampElement(uint8_t *ptr)
-  : Element(ptr, 0x0006)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -153,16 +113,16 @@ RD5RCodeplug::TimestampElement::clear() {
 
 QDateTime
 RD5RCodeplug::TimestampElement::get() const {
-  return QDateTime(QDate(getBCD4_be(0x0000), getBCD2(0x0002), getBCD2(0x0003)),
-                   QTime(getBCD2(0x0004), getBCD2(0x0005)));
+  return QDateTime(QDate(getBCD4_be(Offset::year()), getBCD2(Offset::month()), getBCD2(Offset::day())),
+                   QTime(getBCD2(Offset::hour()), getBCD2(Offset::minute())));
 }
 void
 RD5RCodeplug::TimestampElement::set(const QDateTime &ts) {
-  setBCD4_be(0x0000, ts.date().year());
-  setBCD2(0x0002, ts.date().month());
-  setBCD2(0x0003, ts.date().day());
-  setBCD2(0x0004, ts.time().hour());
-  setBCD2(0x0005, ts.time().minute());
+  setBCD4_be(Offset::year(), ts.date().year());
+  setBCD2(Offset::month(), ts.date().month());
+  setBCD2(Offset::day(), ts.date().day());
+  setBCD2(Offset::hour(), ts.time().hour());
+  setBCD2(Offset::minute(), ts.time().minute());
 }
 
 
@@ -245,19 +205,19 @@ RD5RCodeplug::clearTimestamp() {
 bool
 RD5RCodeplug::encodeTimestamp(const ErrorStack &err) {
   Q_UNUSED(err)
-  TimestampElement(data(ADDR_TIMESTMP)).set();
+  TimestampElement(data(Offset::timestamp())).set();
   return true;
 }
 
 void
 RD5RCodeplug::clearGeneralSettings() {
-  TimestampElement(data(ADDR_SETTINGS)).clear();
+  TimestampElement(data(Offset::settings())).clear();
 }
 
 bool
 RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  GeneralSettingsElement el(data(ADDR_SETTINGS));
+  GeneralSettingsElement el(data(Offset::settings()));
   if (! flags.updateCodePlug)
     el.clear();
   return el.fromConfig(config, ctx);
@@ -266,34 +226,38 @@ RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context 
 bool
 RD5RCodeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config, ctx);
+  return GeneralSettingsElement(data(Offset::settings())).updateConfig(config, ctx);
 }
 
 void
 RD5RCodeplug::clearButtonSettings() {
-  ButtonSettingsElement(data(ADDR_BUTTONS)).clear();
+  ButtonSettingsElement(data(Offset::buttons())).clear();
 }
 
 void
 RD5RCodeplug::clearMessages() {
-  MessageBankElement(data(ADDR_MESSAGES)).clear();
+  MessageBankElement(data(Offset::messages())).clear();
 }
 
 void
 RD5RCodeplug::clearContacts() {
-  for (int i=0; i<NUM_CONTACTS; i++)
-    ContactElement(data(ADDR_CONTACTS + i*CONTACT_SIZE)).clear();
+  for (unsigned int i=0; i<Limit::contactCount(); i++)
+    ContactElement(data(Offset::contacts() + i*ContactElement::size())).clear();
 }
 
 bool
 RD5RCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0; i<NUM_CONTACTS; i++) {
-    ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
     el.clear();
-    if (i >= config->contacts()->digitalCount())
+    if (i >= (unsigned int) config->contacts()->digitalCount())
       continue;
-    el.fromContactObj(config->contacts()->digitalContact(i), ctx);
+    if (! el.fromContactObj(config->contacts()->digitalContact(i), ctx, err)) {
+      errMsg(err) << "Cannot encode contact '" << config->contacts()->digitalContact(i)->name()
+                  << "' at index " << i  << ".";
+      return false;
+    }
   }
   return true;
 }
@@ -302,9 +266,9 @@ bool
 RD5RCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   /* Unpack Contacts */
-  for (int i=0; i<NUM_CONTACTS; i++) {
-    ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
-    if (!el.isValid())
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
+    if (! el.isValid())
       continue;
 
     DMRContact *cont = el.toContactObj(ctx);
@@ -315,19 +279,23 @@ RD5RCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err
 
 void
 RD5RCodeplug::clearDTMFContacts() {
-  for (int i=0; i<NUM_DTMF_CONTACTS; i++)
-    DTMFContactElement(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE)).clear();
+  for (unsigned int i=0; i<Limit::dtmfContactCount(); i++)
+    DTMFContactElement(data(Offset::dtmfContacts() + i*DTMFContactElement::size())).clear();
 }
 
 bool
 RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
-    DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
+  for (unsigned int i=0; i<Limit::dtmfContactCount(); i++) {
+    DTMFContactElement el(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
     el.clear();
-    if (i >= config->contacts()->dtmfCount())
+    if (i >= (unsigned int) config->contacts()->dtmfCount())
       continue;
-    el.fromContactObj(config->contacts()->dtmfContact(i), ctx);
+    if (! el.fromContactObj(config->contacts()->dtmfContact(i), ctx, err)) {
+      errMsg(err) << "Cannot encode DTMF contact '" << config->contacts()->dtmfContact(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
   }
   return true;
 }
@@ -335,12 +303,16 @@ RD5RCodeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ct
 bool
 RD5RCodeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  for (int i=0; i<NUM_DTMF_CONTACTS; i++) {
-    DTMFContactElement el(data(ADDR_DTMF_CONTACTS+i*DTMF_CONTACT_SIZE));
+  for (unsigned int i=0; i<Limit::dtmfContactCount(); i++) {
+    DTMFContactElement el(data(Offset::dtmfContacts()+i*DTMFContactElement::size()));
     // If contact is disabled
     if (! el.isValid())
       continue;
-    DTMFContact *cont = el.toContactObj(ctx);
+    DTMFContact *cont = el.toContactObj(ctx, err);
+    if (nullptr == cont) {
+      errMsg(err) << "Cannot decode DTMF contact at index " << i << ".";
+      return false;
+    }
     ctx.add(cont, i+1); config->contacts()->add(cont);
   }
   return true;
@@ -348,12 +320,12 @@ RD5RCodeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorStack 
 
 void
 RD5RCodeplug::clearChannels() {
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    if (0 == b) ptr = data(Offset::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size());
     ChannelBankElement bank(ptr); bank.clear();
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++)
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++)
       ChannelElement(bank.get(i)).clear();
   }
 }
@@ -361,14 +333,14 @@ RD5RCodeplug::clearChannels() {
 bool
 RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    if (0 == b) ptr = data(Offset::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size());
     ChannelBankElement bank(ptr); bank.clear();
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
-      if (c < config->channelList()->count()) {
+      if (c < (unsigned int) config->channelList()->count()) {
         if (! el.fromChannelObj(config->channelList()->channel(c), ctx, err)) {
           errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
@@ -386,12 +358,12 @@ RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, c
 bool
 RD5RCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    if (0 == b) ptr = data(Offset::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size());
     ChannelBankElement bank(ptr);
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
       Channel *ch = ChannelElement(bank.get(i)).toChannelObj(ctx, err);
@@ -408,12 +380,12 @@ RD5RCodeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err
 bool
 RD5RCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err)
-  for (int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE);
+    if (0 == b) ptr = data(Offset::channelBank0());
+    else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size());
     ChannelBankElement bank(ptr);
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
+    for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       if (! bank.isEnabled(i))
         continue;
       if (!ChannelElement(bank.get(i)).linkChannelObj(ctx.get<Channel>(c+1), ctx, err))
@@ -425,59 +397,59 @@ RD5RCodeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) 
 
 void
 RD5RCodeplug::clearBootSettings() {
-  BootSettingsElement(data(ADDR_BOOTSETTINGS)).clear();
+  BootSettingsElement(data(Offset::bootSettings())).clear();
 }
 
 void
 RD5RCodeplug::clearMenuSettings() {
-  MenuSettingsElement(data(ADDR_MENU_SETTINGS)).clear();
+  MenuSettingsElement(data(Offset::menuSettings())).clear();
 }
 
 void
 RD5RCodeplug::clearBootText() {
-  BootTextElement(data(ADDR_BOOT_TEXT)).clear();
+  BootTextElement(data(Offset::bootText())).clear();
 }
 
 bool
 RD5RCodeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
-  BootTextElement(data(ADDR_BOOT_TEXT)).fromConfig(config);
+  Q_UNUSED(flags); Q_UNUSED(config);
+  BootTextElement(data(Offset::bootText())).fromConfig(ctx, err);
   return true;
 }
 
 bool
 RD5RCodeplug::decodeBootText(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err)
-  BootTextElement(data(ADDR_BOOT_TEXT)).updateConfig(config);
+  Q_UNUSED(config)
+  BootTextElement(data(Offset::bootText())).updateConfig(ctx, err);
   return true;
 }
 
 void
 RD5RCodeplug::clearVFOSettings() {
-  ChannelElement(data(ADDR_VFO_A)).clear();
-  ChannelElement(data(ADDR_VFO_B)).clear();
+  ChannelElement(data(Offset::vfoA())).clear();
+  ChannelElement(data(Offset::vfoB())).clear();
 }
 
 void
 RD5RCodeplug::clearZones() {
-  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank()));
   bank.clear();
-  for (int i=0; i<NUM_ZONES; i++)
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++)
     ZoneElement(bank.get(i)).clear();
 }
 
 bool
 RD5RCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
 
-  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank()));
 
   // Pack Zones
   bool pack_zone_a = true;
-  for (int i=0, j=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0, j=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     ZoneElement z(bank.get(i));
 next:
-    if (j >= config->zones()->count()) {
+    if (j >= (unsigned int)config->zones()->count()) {
       bank.enable(i, false);
       continue;
     }
@@ -487,31 +459,30 @@ next:
     if (pack_zone_a) {
       pack_zone_a = false;
       if (zone->A()->count())
-        z.fromZoneObjA(zone, ctx);
+        z.fromZoneObjA(zone, ctx, err);
       else
         goto next;
     } else {
       pack_zone_a = true;
       j++;
       if (zone->B()->count())
-        z.fromZoneObjB(zone, ctx);
+        z.fromZoneObjB(zone, ctx, err);
       else
         goto next;
     }
     bank.enable(i, true);
   }
+
   return true;
 }
 
 bool
 RD5RCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank()));
 
-  for (int i=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
@@ -527,7 +498,7 @@ RD5RCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
 
     // Create zone obj
     if (! extend_last_zone) {
-      last_zone = z.toZoneObj(ctx);
+      last_zone = z.toZoneObj(ctx, err);
       config->zones()->add(last_zone);
       ctx.add(last_zone, i+1);
     } else {
@@ -544,9 +515,9 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
 
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  ZoneBankElement bank(data(ADDR_ZONE_BANK));
+  ZoneBankElement bank(data(Offset::zoneBank()));
 
-  for (int i=0; i<NUM_ZONES; i++) {
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
@@ -564,7 +535,7 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
     if (! extend_last_zone) {
       last_zone = ctx.get<Zone>(i+1);
     }
-    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone, err)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
@@ -575,21 +546,25 @@ RD5RCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
 
 void
 RD5RCodeplug::clearScanLists() {
-  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK)); bank.clear();
-  for (int i=0; i<NUM_SCAN_LISTS; i++)
+  ScanListBankElement bank(data(Offset::scanListBank())); bank.clear();
+  for (unsigned int i=0; i<ScanListBankElement::Limit::scanListCount(); i++)
     ScanListElement(bank.get(i)).clear();
 }
 
 bool
 RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags);
 
-  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
-  for (int i=0; i<NUM_SCAN_LISTS; i++) {
-    if (i >= config->scanlists()->count()) {
-      bank.enable(i, false); continue;
+  ScanListBankElement bank(data(Offset::scanListBank()));
+  for (unsigned int i=0; i<ScanListBankElement::Limit::scanListCount(); i++) {
+    if (i >= (unsigned int) config->scanlists()->count()) {
+      bank.enable(i, false);
+      continue;
     }
-    ScanListElement(bank.get(i)).fromScanListObj(config->scanlists()->scanlist(i), ctx);
+    if (! ScanListElement(bank.get(i)).fromScanListObj(config->scanlists()->scanlist(i), ctx, err)) {
+      errMsg(err) << "Cannot encode scan list at index " << i << ".";
+      return false;
+    }
     bank.enable(i, true);
   }
   return true;
@@ -597,14 +572,16 @@ RD5RCodeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, 
 
 bool
 RD5RCodeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
-  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
-  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+  ScanListBankElement bank(data(Offset::scanListBank()));
+  for (unsigned int i=0; i<ScanListBankElement::Limit::scanListCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ScanListElement el(bank.get(i));
     ScanList *scan = el.toScanListObj(ctx);
+    if (nullptr == scan) {
+      errMsg(err) << "Cannot decode scan list at index " << i << ".";
+      return false;
+    }
     config->scanlists()->add(scan); ctx.add(scan, i+1);
   }
   return true;
@@ -612,35 +589,39 @@ RD5RCodeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &er
 
 bool
 RD5RCodeplug::linkScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(err)
+  Q_UNUSED(config);
 
-  ScanListBankElement bank(data(ADDR_SCAN_LIST_BANK));
-  for (int i=0; i<NUM_SCAN_LISTS; i++) {
+  ScanListBankElement bank(data(Offset::scanListBank()));
+  for (unsigned int i=0; i<ScanListBankElement::Limit::scanListCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
-    if (! ScanListElement(bank.get(i)).linkScanListObj(ctx.get<ScanList>(i+1), ctx))
+    if (! ScanListElement(bank.get(i)).linkScanListObj(ctx.get<ScanList>(i+1), ctx, err)) {
+      errMsg(err) << "Cannot link scan list '" << ctx.get<ScanList>(i+1)
+                  << "' at index " << i << ".";
       return false;
+    }
   }
+
   return true;
 }
 
 void
 RD5RCodeplug::clearGroupLists() {
-  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
-  for (int i=0; i<NUM_GROUP_LISTS; i++)
+  GroupListBankElement bank(data(Offset::groupListBank())); bank.clear();
+  for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++)
     GroupListElement(bank.get(i)).clear();
 }
 
 bool
 RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags);
 
-  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
-  for (int i=0; i<NUM_GROUP_LISTS; i++) {
-    if (i >= config->rxGroupLists()->count())
+  GroupListBankElement bank(data(Offset::groupListBank())); bank.clear();
+  for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++) {
+    if (i >= (unsigned int)config->rxGroupLists()->count())
       continue;
     GroupListElement el(bank.get(i));
-    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err);
     // Only group calls are encoded
     int count = 0;
     for (int j=0; j<config->rxGroupLists()->list(i)->count(); j++)
@@ -648,19 +629,18 @@ RD5RCodeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
         count++;
     bank.setContactCount(i, count);
   }
+
   return true;
 }
 
 bool
 RD5RCodeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
-  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
-  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+  GroupListBankElement bank(data(Offset::groupListBank()));
+  for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    RXGroupList *list = el.toRXGroupListObj(ctx);
+    RXGroupList *list = el.toRXGroupListObj(ctx, err);
     config->rxGroupLists()->add(list); ctx.add(list, i+1);
   }
   return true;
@@ -670,14 +650,14 @@ bool
 RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config)
 
-  GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
-  for (int i=0; i<NUM_GROUP_LISTS; i++) {
+  GroupListBankElement bank(data(Offset::groupListBank()));
+  for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }
@@ -688,25 +668,25 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
 
 void
 RD5RCodeplug::clearEncryption() {
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  EncryptionElement enc(data(Offset::encryption()));
   enc.clear();
 }
 
 bool
 RD5RCodeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err);
+  Q_UNUSED(flags);
   clearEncryption();
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
-  return enc.fromCommercialExt(config->commercialExtension(), ctx);
+  EncryptionElement enc(data(Offset::encryption()));
+  return enc.fromCommercialExt(config->commercialExtension(), ctx, err);
 }
 
 bool
 RD5RCodeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err);
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  EncryptionElement enc(data(Offset::encryption()));
   if (EncryptionElement::PrivacyType::None == enc.privacyType())
     return true;
-  return enc.updateCommercialExt(ctx);
+  return enc.updateCommercialExt(ctx, err);
 }
 
 bool
