@@ -15,6 +15,7 @@ class FMChannel;
 class PositioningSystem: public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "aprs")
 
   /** The update period in seconds. */
   Q_PROPERTY(unsigned period READ period WRITE setPeriod)

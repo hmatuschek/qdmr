@@ -14,7 +14,8 @@ class Config;
  * @ingroup conf */
 class Zone : public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "zone");
 
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
@@ -46,6 +47,9 @@ public:
   const ChannelRefList *B() const;
   /** Returns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
+
+  /** Returns @c true, if the zone contains the given channel. */
+  bool contains(Channel *obj) const;
 
   /** Returns the AnyTone extension. */
   AnytoneZoneExtension *anytoneExtension() const;

@@ -202,17 +202,18 @@ class ConfigObject: public ConfigItem
   /** The name of the object. */
   Q_PROPERTY(QString name READ name WRITE setName)
 
+  /** Specifies the prefix for every ID assigned to every object during serialization. */
+  Q_CLASSINFO("IdPrefix", "obj")
+
 protected:
   /** Hidden constructor.
-   * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
    * @param parent Specifies the QObject parent. */
-  ConfigObject(const QString &idBase="id", QObject *parent = nullptr);
+  ConfigObject(QObject *parent = nullptr);
 
   /** Hidden constructor.
    * @param name Name of the object.
-   * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
    * @param parent Specifies the QObject parent. */
-  ConfigObject(const QString &name, const QString &idBase="id", QObject *parent = nullptr);
+  ConfigObject(const QString &name, QObject *parent = nullptr);
 
 public:
   /** Returns the name of the object. */
@@ -221,16 +222,18 @@ public:
   virtual void setName(const QString &name);
 
 public:
+  /** Returns the ID prefix for this object. */
+  QString idPrefix() const;
   bool label(Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
+  /** Helper for find the @c IdPrefix class info in the class hierachy. */
+  static QString findIdPrefix(const QMetaObject* meta);
+
 protected:
-  /** Holds the base string to derive an ID from. All objects need some ID to be referenced within
-   * a codeplug file. */
-  QString _idBase;
   /** Holds the name of the object. */
   QString _name;
 };
@@ -241,7 +244,7 @@ protected:
  * properties. */
 class ConfigExtension : public ConfigItem
 {
-Q_OBJECT
+  Q_OBJECT
 
 protected:
   /** Hidden constructor. */
@@ -283,6 +286,8 @@ public:
   /** Searches the config tree to find all instances of the given type names. */
   virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
+  /** Returns @c true, if the list contains the given object. */
+  virtual bool has(ConfigObject *obj) const;
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
   /** Adds an element to the list. */

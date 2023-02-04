@@ -376,7 +376,7 @@ protected:
 
 /** Specialization for transmit frequency limits.
  * The verification is only performed if the channel is not "RX Only".
- * @ingroup limits. */
+ * @ingroup limits */
 class RadioLimitTransmitFrequencies: public RadioLimitFrequencies
 {
   Q_OBJECT

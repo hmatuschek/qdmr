@@ -14,13 +14,14 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <cmath>
+#include "utils.hh"
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
+#include <QRegularExpression>
 
 #include "opengd77_extension.hh"
-
 
 /* ********************************************************************************************* *
  * Implementation of Channel
@@ -78,23 +79,27 @@ Channel::clear() {
   _tytChannelExtension = nullptr;
 }
 
-double
+qulonglong
 Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
-Channel::setRXFrequency(double freq) {
+Channel::setRXFrequency(qulonglong freq) {
+  if (freq == _rxFreq)
+    return true;
   _rxFreq = freq;
   emit modified(this);
   return true;
 }
 
-double
+qulonglong
 Channel::txFrequency() const {
   return _txFreq;
 }
 bool
-Channel::setTXFrequency(double freq) {
+Channel::setTXFrequency(qulonglong freq) {
+  if (freq == _txFreq)
+    return true;
   _txFreq = freq;
   emit modified(this);
   return true;
@@ -246,6 +251,10 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
+  // Serialize freuqencies in MHz
+  node["rxFrequency"] = format_frequency(_rxFreq).toStdString();
+  node["txFrequency"] = format_frequency(_txFreq).toStdString();
+
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -283,6 +292,32 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
+  // Parse frequencies
+  if (ch["rxFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No rxFreuqency specified.";
+    return false;
+  }
+  bool ok = true;
+  setRXFrequency(read_frequency(ch["rxFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << ch["rxFrequency"].Mark().line << ":" << ch["rxFrequency"].Mark().column
+                << "Cannot parse channel. Invalid rxFrequency.";
+    return false;
+  }
+
+  if (ch["txFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No txFrequency specified.";
+    return false;
+  }
+  setTXFrequency(read_frequency(ch["txFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << ch["txFrequency"].Mark().line << ":" << ch["txFrequency"].Mark().column
+                << "Cannot parse channel. Invalid txFrequency.";
+    return false;
+  }
+
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {

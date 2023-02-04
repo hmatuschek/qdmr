@@ -12,6 +12,7 @@ SET(libdmrconf_SOURCES
     utils.cc crc32.cc signaling.cc addressmap.cc radiointerface.cc errorstack.cc
     radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc usbdevice.cc radiolimits.cc
     csvreader.cc dfufile.cc userdatabase.cc logger.cc xmodem.cc packetstream.cc
+    visitor.cc configlabelingvisitor.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
     channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc roamingzone.cc roamingchannel.cc
     callsigndb.cc talkgroupdatabase.cc radioid.cc encryptionextension.cc commercial_extension.cc
@@ -19,7 +20,7 @@ SET(libdmrconf_SOURCES
     md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
     md390.cc md390_codeplug.cc md390_filereader.cc md390_limits.cc
     uv390.cc uv390_codeplug.cc uv390_callsigndb.cc uv390_filereader.cc uv390_limits.cc
-    dm1701.cc dm1701_codeplug.cc dm1701_filereader.cc dm1701_limits.cc
+    dm1701.cc dm1701_codeplug.cc dm1701_callsigndb.cc dm1701_filereader.cc dm1701_limits.cc
     radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc rd5r_limits.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc gd77_limits.cc
@@ -35,6 +36,7 @@ SET(libdmrconf_SOURCES
 SET(libdmrconf_MOC_HEADERS
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh xmodem.hh packetstream.hh
+    visitor.hh configlabelingvisitor.hh
     configobject.hh configreference.hh config.hh radiosettings.hh contact.hh rxgrouplist.hh
     channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh roamingzone.hh roamingchannel.hh
     callsigndb.hh talkgroupdatabase.hh radioid.hh encryptionextension.hh commercial_extension.hh
@@ -42,7 +44,7 @@ SET(libdmrconf_MOC_HEADERS
     md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_limits.hh
     md390.hh md390_codeplug.hh md390_limits.hh
     uv390.hh uv390_codeplug.hh uv390_callsigndb.hh uv390_limits.hh
-    dm1701.hh dm1701_codeplug.hh dm1701_filereader.hh dm1701_limits.hh
+    dm1701.hh dm1701_codeplug.hh dm1701_callsigndb.hh dm1701_filereader.hh dm1701_limits.hh
     radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh rd5r_limits.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_limits.hh

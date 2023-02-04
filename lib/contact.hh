@@ -16,7 +16,8 @@ class Config;
  * @ingroup conf */
 class Contact: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "cont");
 
   /** If @c true and supported by radio, ring on call from this contact. */
   Q_PROPERTY(bool ring READ ring WRITE setRing)

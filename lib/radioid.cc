@@ -7,14 +7,14 @@
 /* ********************************************************************************************* *
  * Implementation of RadioID
  * ********************************************************************************************* */
-RadioID::RadioID(const QString &idBase, QObject *parent)
-  : ConfigObject(idBase, parent)
+RadioID::RadioID(QObject *parent)
+  : ConfigObject(parent)
 {
   // pass...
 }
 
-RadioID::RadioID(const QString &name, const QString &idBase, QObject *parent)
-  : ConfigObject(name, idBase, parent)
+RadioID::RadioID(const QString &name, QObject *parent)
+  : ConfigObject(name, parent)
 {
   // pass...
 }
@@ -24,13 +24,13 @@ RadioID::RadioID(const QString &name, const QString &idBase, QObject *parent)
  * Implementation of DMRRadioID
  * ********************************************************************************************* */
 DMRRadioID::DMRRadioID(QObject *parent)
-  : RadioID("id", parent), _number(0)
+  : RadioID(parent), _number(0)
 {
   // pass...
 }
 
 DMRRadioID::DMRRadioID(const QString &name, uint32_t id, QObject *parent)
-  : RadioID(name, "id", parent), _number(id)
+  : RadioID(name, parent), _number(id)
 {
   // pass...
 }
@@ -123,13 +123,13 @@ DefaultRadioID::get() {
  * Implementation of M17RadioID
  * ********************************************************************************************* */
 M17RadioID::M17RadioID(QObject *parent)
-  : RadioID("id", parent), _call()
+  : RadioID(parent), _call()
 {
   // pass...
 }
 
 M17RadioID::M17RadioID(const QString &name, const QString &call, QObject *parent)
-  : RadioID(name, "id", parent), _call()
+  : RadioID(name, parent), _call()
 {
   setCall(call);
 }
@@ -203,13 +203,13 @@ M17RadioID::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
  * Implementation of DTMFRadioID
  * ********************************************************************************************* */
 DTMFRadioID::DTMFRadioID(QObject *parent)
-  : RadioID("id", parent)
+  : RadioID(parent)
 {
   // pass...
 }
 
 DTMFRadioID::DTMFRadioID(const QString &name, const QString &number, QObject *parent)
-  : RadioID(name, "id", parent), _number()
+  : RadioID(name, parent), _number()
 {
   setNumber(number.simplified());
 }

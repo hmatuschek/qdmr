@@ -351,8 +351,8 @@ D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
 bool
 D878UVCodeplug::RoamingChannelElement::fromChannel(const RoamingChannel* ch) {
   setName(ch->name());
-  setRXFrequency(ch->rxFrequency()*1e6);
-  setTXFrequency(ch->txFrequency()*1e6);
+  setRXFrequency(ch->rxFrequency());
+  setTXFrequency(ch->txFrequency());
   if (ch->colorCodeOverridden())
     setColorCode(ch->colorCode());
   else
@@ -365,8 +365,8 @@ RoamingChannel *
 D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   RoamingChannel *roam = new RoamingChannel();
   roam->setName(name());
-  roam->setRXFrequency(rxFrequency()/1e6);
-  roam->setTXFrequency(txFrequency()/1e6);
+  roam->setRXFrequency(rxFrequency());
+  roam->setTXFrequency(txFrequency());
   if (hasColorCode())
     roam->setColorCode(colorCode());
   else
@@ -1600,7 +1600,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys,
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  setFrequency(sys->revertChannel()->txFrequency()*1e6);
+  setFrequency(sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setManualTXInterval(sys->period());
@@ -1629,8 +1629,8 @@ D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Conte
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(frequency()/1e6);
-    ch->setTXFrequency(frequency()/1e6);
+    ch->setRXFrequency(frequency());
+    ch->setTXFrequency(frequency());
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(FMChannel::Bandwidth::Wide);

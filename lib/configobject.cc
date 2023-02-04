@@ -935,14 +935,14 @@ ConfigItem::longDescription(const QMetaProperty &prop) const {
 /* ********************************************************************************************* *
  * Implementation of ConfigObject
  * ********************************************************************************************* */
-ConfigObject::ConfigObject(const QString &idBase, QObject *parent)
-  : ConfigItem(parent), _idBase(idBase), _name()
+ConfigObject::ConfigObject(QObject *parent)
+  : ConfigItem(parent), _name()
 {
   // pass...
 }
 
-ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *parent)
-  : ConfigItem(parent), _idBase(idBase), _name(name)
+ConfigObject::ConfigObject(const QString &name, QObject *parent)
+  : ConfigItem(parent), _name(name)
 {
   // pass...
 }
@@ -960,16 +960,18 @@ ConfigObject::setName(const QString &name) {
   emit modified(this);
 }
 
+QString
+ConfigObject::idPrefix() const {
+  return findIdPrefix(this->metaObject());
+}
+
 bool
 ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
-  // With empty ID base, skip labeling.
-  if (_idBase.isEmpty())
-    return true;
-
   unsigned n=1;
-  QString id=QString("%1%2").arg(_idBase).arg(n);
+  QString prefix = this->idPrefix();
+  QString id=QString("%1%2").arg(prefix).arg(n);
   while (context.contains(id)) {
-    id=QString("%1%2").arg(_idBase).arg(++n);
+    id=QString("%1%2").arg(prefix).arg(++n);
   }
 
   if (! context.add(id, this)) {
@@ -1008,6 +1010,18 @@ ConfigObject::populate(YAML::Node &node, const Context &context, const ErrorStac
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
   return ConfigItem::populate(node, context, err);
+}
+
+QString
+ConfigObject::findIdPrefix(const QMetaObject *meta) {
+  for (int i=meta->classInfoOffset(); i<meta->classInfoCount(); i++) {
+    if (0 == strcmp("IdPrefix", meta->classInfo(i).name())) {
+      return meta->classInfo(i).value();
+    }
+  }
+  if (meta->superClass())
+    return findIdPrefix(meta->superClass());
+  return "";
 }
 
 
@@ -1079,6 +1093,11 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
       items.insert(obj);
     obj->findItemsOfTypes(typeNames, items);
   }
+}
+
+bool
+AbstractConfigObjectList::has(ConfigObject *obj) const {
+  return 0 <= indexOf(obj);
 }
 
 ConfigObject *

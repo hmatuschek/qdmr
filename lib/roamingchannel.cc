@@ -1,17 +1,18 @@
 #include "roamingchannel.hh"
+#include "utils.hh"
 
 /* ********************************************************************************************* *
  * Implementation of RoamingChannel
  * ********************************************************************************************* */
 RoamingChannel::RoamingChannel(QObject *parent)
-  : ConfigObject("rc", parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
+  : ConfigObject(parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
     _colorCode(0), _overrideTimeSlot(false), _timeSlot(DMRChannel::TimeSlot::TS1)
 {
   // pass...
 }
 
 RoamingChannel::RoamingChannel(const RoamingChannel &other, QObject *parent)
-  : ConfigObject("rc", parent)
+  : ConfigObject(parent)
 {
   copy(other);
 }
@@ -34,24 +35,24 @@ RoamingChannel::clone() const {
   return c;
 }
 
-double
+qulonglong
 RoamingChannel::rxFrequency() const {
   return _rxFrequency;
 }
 void
-RoamingChannel::setRXFrequency(double f) {
+RoamingChannel::setRXFrequency(qulonglong f) {
   if (f == _rxFrequency)
     return;
   _rxFrequency = f;
   emit modified(this);
 }
 
-double
+qulonglong
 RoamingChannel::txFrequency() const {
   return _txFrequency;
 }
 void
-RoamingChannel::setTXFrequency(double f) {
+RoamingChannel::setTXFrequency(qulonglong f) {
   if (f == _txFrequency)
     return;
   _txFrequency = f;
@@ -129,6 +130,26 @@ RoamingChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &er
   if (! ConfigObject::parse(node, ctx, err))
     return false;
 
+  bool ok = true;
+  setRXFrequency(read_frequency(node["rxFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << node["rxFrequency"].Mark().line << ":" << node["rxFrequency"].Mark().column
+                << "Cannot parse roaming channel. Invalid rxFrequency.";
+    return false;
+  }
+
+  if (node["txFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse roaming channel. No txFrequency specified.";
+    return false;
+  }
+  setTXFrequency(read_frequency(node["txFrequency"], &ok, err));
+  if (! ok) {
+    errMsg(err) << node["txFrequency"].Mark().line << ":" << node["txFrequency"].Mark().column
+                << "Cannot parse roaming channel. Invalid txFrequency.";
+    return false;
+  }
+
   if (! node["timeSlot"]) {
     this->overrideTimeSlot(false);
   } else {
@@ -177,6 +198,10 @@ RoamingChannel::populate(YAML::Node &node, const Context &context, const ErrorSt
   // First, populate scriptable properties
   if (! ConfigObject::populate(node, context, err))
     return false;
+
+  // Serialize frequency in MHz
+  node["rxFrequency"] = format_frequency(_rxFrequency).toStdString();
+  node["txFrequency"] = format_frequency(_txFrequency).toStdString();
 
   if (timeSlotOverridden()) {
     QMetaEnum e = QMetaEnum::fromType<DMRChannel::TimeSlot>();

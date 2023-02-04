@@ -10,13 +10,13 @@
  * Implementation of Contact
  * ********************************************************************************************* */
 Contact::Contact(QObject *parent)
-  : ConfigObject("cont", parent), _ring(false)
+  : ConfigObject(parent), _ring(false)
 {
   // pass...
 }
 
 Contact::Contact(const QString &name, bool rxTone, QObject *parent)
-  : ConfigObject(name, "cont", parent), _ring(rxTone)
+  : ConfigObject(name, parent), _ring(rxTone)
 {
   // pass...
 }
