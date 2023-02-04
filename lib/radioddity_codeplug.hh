@@ -1095,9 +1095,9 @@ public:
     virtual void clearProgPassword();
 
     /** Encodes the general setting from the given config. */
-    virtual bool fromConfig(const Config *conf, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Updates the given config from this settings. */
-    virtual bool updateConfig(Config *conf, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Implements the base class of button settings for all Radioddity codeplugs.
@@ -1491,7 +1491,6 @@ public:
     virtual void appendMessage(const QString msg);
   };
 
-
   /** Represents all encryption keys and settings within the codeplug on the device.
    *
    * Memory representation of encryption settings:
@@ -1592,9 +1591,9 @@ public:
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the button settings. */
   virtual void clearButtonSettings() = 0;
@@ -1605,25 +1604,25 @@ public:
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all DTMF contacts in the codeplug. */
   virtual void clearDTMFContacts() = 0;
   /** Encodes all DTMF contacts. */
-  virtual bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all DTMF contacts to the configuration. */
-  virtual bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear all channels. */
   virtual void clearChannels() = 0;
   /** Encode all channels. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all defined channels to the configuration. */
-  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all channels. */
-  virtual bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear boot settings. */
   virtual void clearBootSettings() = 0;
@@ -1634,9 +1633,9 @@ public:
   /** Clears boot text. */
   virtual void clearBootText() = 0;
   /** Encodes boot text. */
-  virtual bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the boot text settings. */
-  virtual bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the VFO settings. */
   virtual void clearVFOSettings() = 0;
@@ -1644,38 +1643,38 @@ public:
   /** Clears all zones. */
   virtual void clearZones() = 0;
   /** Encodes zones. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds zones to the configuration. */
-  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all zones within the configuration. */
-  virtual bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all scan lists. */
   virtual void clearScanLists() = 0;
   /** Encodes all scan lists. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all scan lists. */
-  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all scan lists. */
-  virtual bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all group lists. */
   virtual void clearGroupLists() = 0;
   /** Encodes all group lists. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all group lists. */
-  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all group lists. */
-  virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all encryption keys. */
   virtual void clearEncryption() = 0;
   /** Encodes all encryption keys defined. */
-  virtual bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all encryption keys. */
-  virtual bool createEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createEncryption(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all encryption keys. */
-  virtual bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkEncryption(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // RADIODDITYCODEPLUG_HH

@@ -493,18 +493,17 @@ OpenGD77Codeplug::clearGeneralSettings() {
 }
 
 bool
-OpenGD77Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   GeneralSettingsElement el(data(Offset::settings(), ImageIndex::settings()));
   if (! flags.updateCodePlug)
     el.clear();
-  return el.fromConfig(config, ctx);
+  return el.fromConfig(ctx, err);
 }
 
 bool
-OpenGD77Codeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-  return GeneralSettingsElement(data(Offset::settings(), ImageIndex::settings())).updateConfig(config, ctx);
+OpenGD77Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(Offset::settings(), ImageIndex::settings())).updateConfig(ctx, err);
 }
 
 void
@@ -522,20 +521,20 @@ OpenGD77Codeplug::clearScanLists() {
   // Scan lists are not touched with OpenGD77 codeplug
 }
 bool
-OpenGD77Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
-OpenGD77Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::createScanLists(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
 bool
-OpenGD77Codeplug::linkScanLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Scan lists are not touched with OpenGD77 codeplug
   return true;
 }
@@ -547,16 +546,16 @@ OpenGD77Codeplug::clearContacts() {
 }
 
 bool
-OpenGD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size(), ImageIndex::contacts()));
     el.clear();
-    if (i >= (unsigned int)config->contacts()->digitalCount())
+    if (i >= ctx.count<DMRContact>())
       continue;
-    if (! el.fromContactObj(config->contacts()->digitalContact(i), ctx, err)) {
-      errMsg(err) << "Cannot encode contact at index " << i << ".";
+    if (! el.fromContactObj(ctx.get<DMRContact>(i+1), ctx, err)) {
+      errMsg(err) << "Cannot encode contact at index " << i+1 << ".";
       return false;
     }
   }
@@ -564,14 +563,14 @@ OpenGD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ct
 }
 
 bool
-OpenGD77Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::createContacts(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size(), ImageIndex::contacts()));
     if (! el.isValid())
       continue;
     DMRContact *cont = el.toContactObj(ctx, err);
     if (nullptr == cont) {
-      errMsg(err) << "Cannot decode contact at index " << i << ".";
+      errMsg(err) << "Cannot decode contact at index " << i+1 << ".";
       return false;
     }
     ctx.add(cont, i+1); ctx.config()->contacts()->add(cont);
@@ -586,16 +585,16 @@ OpenGD77Codeplug::clearDTMFContacts() {
 }
 
 bool
-OpenGD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
   for (unsigned int i=0; i<Limit::dtmfContactCount(); i++) {
     DTMFContactElement el(data(Offset::dtmfContacts() + i*DTMFContactElement::size(), ImageIndex::dtmfContacts()));
     el.clear();
-    if (i >= (unsigned int)config->contacts()->dtmfCount())
+    if (i >= ctx.count<DTMFContact>())
       continue;
-    if (! el.fromContactObj(config->contacts()->dtmfContact(i), ctx, err)) {
-      errMsg(err) << "Cannot encode DTMF contact at index " << i << ".";
+    if (! el.fromContactObj(ctx.get<DTMFContact>(i+1), ctx, err)) {
+      errMsg(err) << "Cannot encode DTMF contact at index " << i+1 << ".";
       return false;
     }
   }
@@ -603,7 +602,7 @@ OpenGD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context
 }
 
 bool
-OpenGD77Codeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::createDTMFContacts(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   for (unsigned int i=0; i<Limit::dtmfContactCount(); i++) {
@@ -616,7 +615,7 @@ OpenGD77Codeplug::createDTMFContacts(Config *config, Context &ctx, const ErrorSt
       errMsg(err) << "Cannot decode DTMF contact at index " << i << ".";
       return false;
     }
-    ctx.add(cont, i+1); config->contacts()->add(cont);
+    ctx.add(cont, i+1); ctx.config()->contacts()->add(cont);
   }
   return true;
 }
@@ -634,8 +633,8 @@ OpenGD77Codeplug::clearChannels() {
 }
 
 bool
-OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+OpenGD77Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags);
 
   for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
@@ -644,9 +643,9 @@ OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ct
     ChannelBankElement bank(ptr); bank.clear();
     for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
-      if (c < (unsigned int)config->channelList()->count()) {
-        if (! el.fromChannelObj(config->channelList()->channel(c), ctx, err)) {
-          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
+      if (c < ctx.count<Channel>()) {
+        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx, err)) {
+          errMsg(err) << "Cannot encode channel " << c+1 << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
@@ -660,9 +659,7 @@ OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ct
 }
 
 bool
-OpenGD77Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
+OpenGD77Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
   for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
@@ -677,16 +674,14 @@ OpenGD77Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack 
                     << " of bank " << b << ".";
         return false;
       }
-      config->channelList()->add(ch); ctx.add(ch, c+1);
+      ctx.config()->channelList()->add(ch); ctx.add(ch, c+1);
     }
   }
   return true;
 }
 
 bool
-OpenGD77Codeplug::linkChannels(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(err)
-
+OpenGD77Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(Offset::channelBank0(), ImageIndex::channelBank0());
@@ -718,14 +713,13 @@ OpenGD77Codeplug::clearBootText() {
 }
 
 bool
-OpenGD77Codeplug::encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(config);
+OpenGD77Codeplug::encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags);
   return BootTextElement(data(Offset::bootText(), ImageIndex::bootText())).fromConfig(ctx, err);
 }
 
 bool
-OpenGD77Codeplug::decodeBootText(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(err)
+OpenGD77Codeplug::decodeBootText(Context &ctx, const ErrorStack &err) {
   return BootTextElement(data(Offset::bootText(), ImageIndex::bootText())).updateConfig(ctx, err);
 }
 
@@ -744,7 +738,7 @@ OpenGD77Codeplug::clearZones() {
 }
 
 bool
-OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
   ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
@@ -754,13 +748,13 @@ OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, 
   for (unsigned int i=0, j=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     ZoneElement z(bank.get(i));
 next:
-    if (j >= (unsigned int)config->zones()->count()) {
+    if (j >= ctx.count<Zone>()) {
       bank.enable(i, false);
       continue;
     }
 
     // Construct from Zone obj
-    Zone *zone = config->zones()->zone(j);
+    Zone *zone = ctx.get<Zone>(j+1);
     if (pack_zone_a) {
       pack_zone_a = false;
       if (zone->A()->count())
@@ -781,7 +775,7 @@ next:
 }
 
 bool
-OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::createZones(Context &ctx, const ErrorStack &err) {
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
@@ -807,7 +801,7 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &er
         errMsg(err) << "Cannot decode zone at index " << i << ".";
         return false;
       }
-      config->zones()->add(last_zone);
+      ctx.config()->zones()->add(last_zone);
       ctx.add(last_zone, i+1);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
@@ -818,9 +812,7 @@ OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &er
 }
 
 bool
-OpenGD77Codeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config)
-
+OpenGD77Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
   ZoneBankElement bank(data(Offset::zoneBank(), ImageIndex::zoneBank()));
@@ -860,16 +852,16 @@ OpenGD77Codeplug::clearGroupLists() {
 }
 
 bool
-OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
   GroupListBankElement bank(data(Offset::groupLists(), ImageIndex::groupLists())); bank.clear();
   for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++) {
     GroupListElement el(bank.get(i));
-    if (i < (unsigned int)config->rxGroupLists()->count()) {
-      if (! el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err))
+    if (i < ctx.count<RXGroupList>()) {
+      if (! el.fromRXGroupListObj(ctx.get<RXGroupList>(i+1), ctx, err))
         return false;
-      bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
+      bank.setContactCount(i, ctx.get<RXGroupList>(i+1)->count());
     }
   }
 
@@ -877,7 +869,7 @@ OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &
 }
 
 bool
-OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+OpenGD77Codeplug::createGroupLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   GroupListBankElement bank(data(Offset::groupLists(), ImageIndex::groupLists()));
@@ -888,15 +880,14 @@ OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStac
     RXGroupList *list = el.toRXGroupListObj(ctx, err);
     if (nullptr == list)
       return false;
-    config->rxGroupLists()->add(list); ctx.add(list, i+1);
+    ctx.config()->rxGroupLists()->add(list);
+    ctx.add(list, i+1);
   }
   return true;
 }
 
 bool
-OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config)
-
+OpenGD77Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   GroupListBankElement bank(data(Offset::groupLists(), ImageIndex::groupLists()));
   for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++) {
     if (! bank.isEnabled(i))
@@ -915,20 +906,20 @@ OpenGD77Codeplug::clearEncryption() {
   // Encryption not supported in OpenGD77 codeplug
 }
 bool
-OpenGD77Codeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encryption not supported in OpenGD77 codeplug
   return true;
 }
 bool
-OpenGD77Codeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::createEncryption(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Encryption not supported in OpenGD77 codeplug
   return true;
 }
 bool
-OpenGD77Codeplug::linkEncryption(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77Codeplug::linkEncryption(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Encryption not supported in OpenGD77 codeplug
   return true;
 }

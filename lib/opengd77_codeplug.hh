@@ -277,53 +277,53 @@ public:
 
 public:
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
   void clearMessages();
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearDTMFContacts();
-  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
   void clearMenuSettings();
 
   void clearBootText();
-  bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearEncryption();
-  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
-  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
-  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Context &ctx, const ErrorStack &err);
 
 public:
   /** Some limtis for the codeplug. */

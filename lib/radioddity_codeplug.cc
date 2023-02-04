@@ -1764,13 +1764,13 @@ RadioddityCodeplug::GeneralSettingsElement::clearProgPassword() {
 }
 
 bool
-RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx, const ErrorStack &err) {
-  if (conf->radioIDs()->defaultId()) {
-    setName(conf->radioIDs()->defaultId()->name());
-    setRadioID(conf->radioIDs()->defaultId()->number());
-  } else if (conf->radioIDs()->count()) {
-    setName(conf->radioIDs()->getId(0)->name());
-    setRadioID(conf->radioIDs()->getId(0)->number());
+RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const ErrorStack &err) {
+  if (ctx.config()->radioIDs()->defaultId()) {
+    setName(ctx.config()->radioIDs()->defaultId()->name());
+    setRadioID(ctx.config()->radioIDs()->defaultId()->number());
+  } else if (ctx.config()->radioIDs()->count()) {
+    setName(ctx.config()->radioIDs()->getId(0)->name());
+    setRadioID(ctx.config()->radioIDs()->getId(0)->number());
   } else {
     errMsg(err) << "Cannot encode radioddity codeplug: No radio ID defined.";
     return false;
@@ -1780,7 +1780,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
   // There is no global squelch settings either
 
   // Handle Radioddity extension
-  if (RadiodditySettingsExtension *ext = conf->settings()->radioddityExtension()) {
+  if (RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension()) {
     setPreambleDuration(ext->preambleDuration());
     setMonitorType(ext->monitorType());
     setLowBatteryWarnInterval(ext->lowBatteryWarnInterval());
@@ -1819,25 +1819,25 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
 }
 
 bool
-RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
 
-  if (! conf->radioIDs()->defaultId()) {
-    int idx = conf->radioIDs()->add(new DMRRadioID(name(), radioID()));
-    conf->radioIDs()->setDefaultId(idx);
+  if (! ctx.config()->radioIDs()->defaultId()) {
+    int idx = ctx.config()->radioIDs()->add(new DMRRadioID(name(), radioID()));
+    ctx.config()->radioIDs()->setDefaultId(idx);
   } else {
-    conf->radioIDs()->defaultId()->setName(name());
-    conf->radioIDs()->defaultId()->setNumber(radioID());
+    ctx.config()->radioIDs()->defaultId()->setName(name());
+    ctx.config()->radioIDs()->defaultId()->setNumber(radioID());
   }
-  conf->settings()->setVOX(voxSensitivity());
+  ctx.config()->settings()->setVOX(voxSensitivity());
   // There is no global squelch settings either, so set it to 1
-  conf->settings()->setSquelch(1);
+  ctx.config()->settings()->setSquelch(1);
 
   // Allocate Radioddity extension if needed
-  RadiodditySettingsExtension *ext = conf->settings()->radioddityExtension();
+  RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext) {
     ext = new RadiodditySettingsExtension();
-    conf->settings()->setRadioddityExtension(ext);
+    ctx.config()->settings()->setRadioddityExtension(ext);
   }
   // Update settings extension
   ext->setPreambleDuration(preambleDuration());
@@ -2761,48 +2761,48 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack 
 bool
 RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeGeneralSettings(flags, ctx, err)) {
     errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeContacts(flags, ctx, err)) {
     errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
-  if (! this->encodeDTMFContacts(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeDTMFContacts(flags, ctx, err)) {
     errMsg(err) << "Cannot encode DTMF contacts.";
     return false;
   }
 
-  if (! this->encodeChannels(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeChannels(flags, ctx, err)) {
     errMsg(err) << "Cannot encode channels";
     return false;
   }
 
-  if (! this->encodeBootText(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeBootText(flags, ctx, err)) {
     errMsg(err) << "Cannot encode boot text.";
     return false;
   }
 
-  if (! this->encodeZones(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeZones(flags, ctx, err)) {
     errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
-  if (! this->encodeScanLists(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeScanLists(flags, ctx, err)) {
     errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
-  if (! this->encodeGroupLists(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeGroupLists(flags, ctx, err)) {
     errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
-  if (! this->encodeEncryption(ctx.config(), flags, ctx, err)) {
+  if (! this->encodeEncryption(flags, ctx, err)) {
     errMsg(err) << "Cannot encode encryption keys.";
     return true;
   }
@@ -2823,72 +2823,72 @@ RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
 
 bool
 RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
-  if (! this->decodeGeneralSettings(ctx.config(), ctx, err)) {
+  if (! this->decodeGeneralSettings(ctx, err)) {
     errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
-  if (! this->createContacts(ctx.config(), ctx, err)) {
+  if (! this->createContacts(ctx, err)) {
     errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
-  if (! this->createDTMFContacts(ctx.config(), ctx, err)) {
+  if (! this->createDTMFContacts(ctx, err)) {
     errMsg(err) << "Cannot create DTMF contacts";
     return false;
   }
 
-  if (! this->createChannels(ctx.config(), ctx, err)) {
+  if (! this->createChannels(ctx, err)) {
     errMsg(err) << "Cannot create channels.";
     return false;
   }
 
-  if (! this->decodeBootText(ctx.config(), ctx, err)) {
+  if (! this->decodeBootText(ctx, err)) {
     errMsg(err) << "Cannot decode boot text.";
     return false;
   }
 
-  if (! this->createEncryption(ctx.config(), ctx, err)) {
+  if (! this->createEncryption(ctx, err)) {
     errMsg(err) << "Cannot decode encryption keys.";
     return false;
   }
 
-  if (! this->createZones(ctx.config(), ctx, err)) {
+  if (! this->createZones(ctx, err)) {
     errMsg(err) << "Cannot create zones.";
     return false;
   }
 
-  if (! this->createScanLists(ctx.config(), ctx, err)) {
+  if (! this->createScanLists(ctx, err)) {
     errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
-  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+  if (! this->createGroupLists(ctx, err)) {
     errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
-  if (! this->linkChannels(ctx.config(), ctx, err)) {
+  if (! this->linkChannels(ctx, err)) {
     errMsg(err) << "Cannot link channels.";
     return false;
   }
 
-  if (! this->linkZones(ctx.config(), ctx, err)) {
+  if (! this->linkZones(ctx, err)) {
     errMsg(err) << "Cannot link zones.";
     return false;
   }
 
-  if (! this->linkScanLists(ctx.config(), ctx, err)) {
+  if (! this->linkScanLists(ctx, err)) {
     errMsg(err) << "Cannot link scan lists.";
     return false;
   }
 
-  if (! this->linkGroupLists(ctx.config(), ctx, err)) {
+  if (! this->linkGroupLists(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
-  if (! this->linkEncryption(ctx.config(), ctx, err)) {
+  if (! this->linkEncryption(ctx, err)) {
     errMsg(err) << "Cannot link encryption keys.";
     return false;
   }
