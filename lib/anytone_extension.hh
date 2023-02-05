@@ -755,6 +755,7 @@ public:
   enum class VFO {
     A = 0, B = 1
   };
+  Q_ENUM(VFO)
 
 public:
   /** Constructor. */
