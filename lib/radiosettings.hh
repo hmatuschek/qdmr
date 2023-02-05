@@ -33,6 +33,7 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
   /** The settings extension for Radioddity devices. */
   Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
+  /** Settings for AnyTone devices. */
   Q_PROPERTY(AnytoneSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
 
 public:

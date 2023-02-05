@@ -323,10 +323,23 @@ AnytoneContactExtension::setAlertType(AlertType type) {
 AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _bootSettings(new AnytoneBootSettingsExtension(this)),
     _keySettings(new AnytoneKeySettingsExtension(this)),
-    _keyTone(false), _displayFrequency(false), _autoKeyLock(false), _autoShutDownDelay(0),
-    _powerSave(PowerSave::Save50), _voxDelay(0), _vfoScanType(VFOScanType::TO)
+    _toneSettings(new AnytoneToneSettingsExtension(this)),
+    _displaySettings(new AnytoneDisplaySettingsExtension(this)),
+    _audioSettings(new AnytoneAudioSettingsExtension(this)),
+    _autoShutDownDelay(0), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
+    _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
+    _subChannel(true)
 {
-  // pass...
+  connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_keySettings, &AnytoneKeySettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_toneSettings, &AnytoneToneSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_displaySettings, &AnytoneDisplaySettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_audioSettings, &AnytoneAudioSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
 }
 
 ConfigItem *
@@ -336,6 +349,7 @@ AnytoneSettingsExtension::clone() const {
     ext->deleteLater();
     return nullptr;
   }
+
   return ext;
 }
 
@@ -349,40 +363,19 @@ AnytoneSettingsExtension::keySettings() const {
   return _keySettings;
 }
 
-bool
-AnytoneSettingsExtension::keyToneEnabled() const {
-  return _keyTone;
-}
-void
-AnytoneSettingsExtension::enableKeyTone(bool enable) {
-  if (_keyTone==enable)
-    return;
-  _keyTone = enable;
-  emit modified(this);
+AnytoneToneSettingsExtension *
+AnytoneSettingsExtension::toneSettings() const {
+  return _toneSettings;
 }
 
-bool
-AnytoneSettingsExtension::displayFrequencyEnabled() const {
-  return _displayFrequency;
-}
-void
-AnytoneSettingsExtension::enableDisplayFrequency(bool enable) {
-  if (_displayFrequency == enable)
-    return;
-  _displayFrequency = enable;
-  emit modified(this);
+AnytoneDisplaySettingsExtension *
+AnytoneSettingsExtension::displaySettings() const {
+  return _displaySettings;
 }
 
-bool
-AnytoneSettingsExtension::autoKeyLockEnabled() const {
-  return _autoKeyLock;
-}
-void
-AnytoneSettingsExtension::enableAutoKeyLock(bool enabled) {
-  if (_autoKeyLock==enabled)
-    return;
-  _autoKeyLock = enabled;
-  emit modified(this);
+AnytoneAudioSettingsExtension *
+AnytoneSettingsExtension::audioSettings() const {
+  return _audioSettings;
 }
 
 unsigned int
@@ -409,18 +402,6 @@ AnytoneSettingsExtension::setPowerSave(PowerSave save) {
   emit modified(this);
 }
 
-unsigned int
-AnytoneSettingsExtension::voxDelay() const {
-  return _voxDelay;
-}
-void
-AnytoneSettingsExtension::setVOXDelay(unsigned int ms) {
-  if (_voxDelay == ms)
-    return;
-  _voxDelay = ms;
-  emit modified(this);
-}
-
 AnytoneSettingsExtension::VFOScanType
 AnytoneSettingsExtension::vfoScanType() const {
   return _vfoScanType;
@@ -430,6 +411,59 @@ AnytoneSettingsExtension::setVFOScanType(VFOScanType type) {
   if (_vfoScanType == type)
     return;
   _vfoScanType = type;
+  emit modified(this);
+}
+
+AnytoneSettingsExtension::VFOMode
+AnytoneSettingsExtension::modeA() const {
+  return _modeA;
+}
+void
+AnytoneSettingsExtension::setModeA(VFOMode mode) {
+  if (_modeA == mode)
+    return;
+  _modeA = mode;
+  emit modified(this);
+}
+
+AnytoneSettingsExtension::VFOMode
+AnytoneSettingsExtension::modeB() const {
+  return _modeB;
+}
+void
+AnytoneSettingsExtension::setModeB(VFOMode mode) {
+  if (_modeB == mode)
+    return;
+  _modeB = mode;
+  emit modified(this);
+}
+
+ZoneReference *
+AnytoneSettingsExtension::zoneA() {
+  return &_zoneA;
+}
+const ZoneReference *
+AnytoneSettingsExtension::zoneA() const {
+  return &_zoneA;
+}
+ZoneReference *
+AnytoneSettingsExtension::zoneB() {
+  return &_zoneB;
+}
+const ZoneReference *
+AnytoneSettingsExtension::zoneB() const {
+  return &_zoneB;
+}
+
+AnytoneSettingsExtension::VFO
+AnytoneSettingsExtension::selectedVFO() const {
+  return _selectedVFO;
+}
+void
+AnytoneSettingsExtension::setSelectedVFO(VFO vfo) {
+  if (_selectedVFO == vfo)
+    return;
+  _selectedVFO = vfo;
   emit modified(this);
 }
 
@@ -494,7 +528,7 @@ AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
  * Implementation of AnytoneKeySettingsExtension
  * ********************************************************************************************* */
 AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
-  : ConfigItem(parent)
+  : ConfigItem(parent), _autoKeyLock(false)
 {
   // pass...
 }
@@ -633,5 +667,174 @@ AnytoneKeySettingsExtension::setLongPressDuration(unsigned int ms) {
   if (_longPressDuration == ms)
     return;
   _longPressDuration = ms;
+  emit modified(this);
+}
+
+bool
+AnytoneKeySettingsExtension::autoKeyLockEnabled() const {
+  return _autoKeyLock;
+}
+void
+AnytoneKeySettingsExtension::enableAutoKeyLock(bool enabled) {
+  if (_autoKeyLock==enabled)
+    return;
+  _autoKeyLock = enabled;
+  emit modified(this);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneToneSettingsExtension
+ * ********************************************************************************************* */
+AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneToneSettingsExtension::clone() const {
+  AnytoneToneSettingsExtension *ext = new AnytoneToneSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+bool
+AnytoneToneSettingsExtension::keyToneEnabled() const {
+  return _keyTone;
+}
+void
+AnytoneToneSettingsExtension::enableKeyTone(bool enable) {
+  if (_keyTone==enable)
+    return;
+  _keyTone = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::smsAlertEnabled() const {
+  return _smsAlert;
+}
+void
+AnytoneToneSettingsExtension::enableSMSAlert(bool enable) {
+  if (_smsAlert == enable)
+    return;
+  _smsAlert = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::callAlertEnabled() const {
+  return _callAlert;
+}
+void
+AnytoneToneSettingsExtension::enableCallAlert(bool enable) {
+  if (_callAlert == enable)
+    return;
+  _callAlert = enable;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneDisplaySettingsExtension
+ * ********************************************************************************************* */
+AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
+  : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneDisplaySettingsExtension::clone() const {
+  AnytoneDisplaySettingsExtension *ext = new AnytoneDisplaySettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+unsigned int
+AnytoneDisplaySettingsExtension::brightness() const {
+  return _brightness;
+}
+void
+AnytoneDisplaySettingsExtension::setBrightness(unsigned int level) {
+  if (_brightness == level)
+    return;
+  _brightness = level;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::displayFrequencyEnabled() const {
+  return _displayFrequency;
+}
+void
+AnytoneDisplaySettingsExtension::enableDisplayFrequency(bool enable) {
+  if (_displayFrequency == enable)
+    return;
+  _displayFrequency = enable;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneDisplaySettingsExtension::backlightDuration() const {
+  return _backlightDuration;
+}
+void
+AnytoneDisplaySettingsExtension::setBacklightDuration(unsigned int sec) {
+  if (_backlightDuration == sec)
+    return;
+  _backlightDuration = sec;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAudioSettingsExtension
+ * ********************************************************************************************* */
+AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
+  : ConfigItem(parent),  _voxDelay(0), _recording(false)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAudioSettingsExtension::clone() const {
+  AnytoneAudioSettingsExtension *ext = new AnytoneAudioSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+unsigned int
+AnytoneAudioSettingsExtension::voxDelay() const {
+  return _voxDelay;
+}
+void
+AnytoneAudioSettingsExtension::setVOXDelay(unsigned int ms) {
+  if (_voxDelay == ms)
+    return;
+  _voxDelay = ms;
+  emit modified(this);
+}
+
+bool
+AnytoneAudioSettingsExtension::recordingEnabled() const {
+  return _recording;
+}
+void
+AnytoneAudioSettingsExtension::enableRecording(bool enable) {
+  if (_recording == enable)
+    return;
+  _recording = enable;
   emit modified(this);
 }

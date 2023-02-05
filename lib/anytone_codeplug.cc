@@ -2110,13 +2110,26 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   // Handle extensions
   if (ctx.config()->settings()->anytoneExtension()) {
     AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
-    enableKeyTone(ext->keyToneEnabled());
-    enableDisplayFrequency(ext->displayFrequencyEnabled());
-    enableAutoKeyLock(ext->autoKeyLockEnabled());
     setAutoShutdownDelay(ext->autoShutDownDelay());
+    setPowerSave(ext->powerSave());
+    setVFOScanType(ext->vfoScanType());
+    enableVFOModeA(AnytoneSettingsExtension::VFOMode::VFO == ext->modeA());
+    enableVFOModeB(AnytoneSettingsExtension::VFOMode::VFO == ext->modeB());
+    if ((AnytoneSettingsExtension::VFOMode::VFO == ext->modeA()) || ext->zoneA()->isNull())
+      setMemoryZoneA(0);
+    else
+      setMemoryZoneA(ctx.index(ext->zoneA()->as<Zone>()));
+    if ((AnytoneSettingsExtension::VFOMode::VFO == ext->modeB()) || ext->zoneB()->isNull())
+      setMemoryZoneB(0);
+    else
+      setMemoryZoneB(ctx.index(ext->zoneB()->as<Zone>()));
+    enableActiveChannelB(AnytoneSettingsExtension::VFO::B == ext->selectedVFO());
+    enableSubChannel(ext->subChannelEnabled());
+
     // Encode boot settings
     setBootDisplay(ext->bootSettings()->bootDisplay());
     enableBootPassword(ext->bootSettings()->bootPasswordEnabled());
+
     // Encode key settings
     setProgFuncKey1Short(ext->keySettings()->progFuncKey1Short());
     setProgFuncKey1Long(ext->keySettings()->progFuncKey1Long());
@@ -2129,6 +2142,21 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setFuncKey2Short(ext->keySettings()->funcKey2Short());
     setFuncKey2Long(ext->keySettings()->funcKey2Long());
     setLongPressDuration(ext->keySettings()->longPressDuration());
+    enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
+
+    // Encode tone settings
+    enableKeyTone(ext->toneSettings()->keyToneEnabled());
+    enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
+    enableCallAlert(ext->toneSettings()->callAlertEnabled());
+
+    // Encode display settings
+    enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
+    setBrightness(ext->displaySettings()->brightness());
+    setBacklightDuration(ext->displaySettings()->backlightDuration());
+
+    // Encode audio settings
+    setVOXDelay(ext->audioSettings()->voxDelay());
+    enableRecording(ext->audioSettings()->recordingEnabled());
   }
 
   return true;
@@ -2150,13 +2178,25 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   else
     ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
 
-  ext->enableKeyTone(keyTone());
-  ext->enableDisplayFrequency(displayFrequency());
-  ext->enableAutoKeyLock(autoKeyLock());
   ext->setAutoShutDownDelay(autoShutdownDelay());
+  ext->setPowerSave(powerSave());
+  ext->setVFOScanType(vfoScanType());
+  ext->setModeA(vfoModeA() ? AnytoneSettingsExtension::VFOMode::VFO
+                           : AnytoneSettingsExtension::VFOMode::Memory);
+  ext->setModeB(vfoModeB() ? AnytoneSettingsExtension::VFOMode::VFO
+                           : AnytoneSettingsExtension::VFOMode::Memory);
+  if ((! vfoModeA()) && ctx.has<Zone>(memoryZoneA()))
+    ext->zoneA()->set(ctx.get<Zone>(memoryZoneA()));
+  if ((! vfoModeB()) && ctx.has<Zone>(memoryZoneB()))
+    ext->zoneB()->set(ctx.get<Zone>(memoryZoneB()));
+  ext->setSelectedVFO(activeChannelB() ? AnytoneSettingsExtension::VFO::B
+                                       : AnytoneSettingsExtension::VFO::A);
+  ext->enableSubChannel(subChannel());
+
   // Store boot settings
   ext->bootSettings()->setBootDisplay(bootDisplay());
   ext->bootSettings()->enableBootPassword(bootPassword());
+
   // Store key settings
   ext->keySettings()->setProgFuncKey1Short(progFuncKey1Short());
   ext->keySettings()->setProgFuncKey1Long(progFuncKey1Long());
@@ -2169,7 +2209,21 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->keySettings()->setFuncKey2Short(funcKey2Short());
   ext->keySettings()->setFuncKey2Long(funcKey2Long());
   ext->keySettings()->setLongPressDuration(longPressDuration());
+  ext->keySettings()->enableAutoKeyLock(autoKeyLock());
 
+  // Store tone settings
+  ext->toneSettings()->enableKeyTone(keyTone());
+  ext->toneSettings()->enableSMSAlert(smsAlert());
+  ext->toneSettings()->enableCallAlert(callAlert());
+
+  // Store display settings
+  ext->displaySettings()->enableDisplayFrequency(displayFrequency());
+  ext->displaySettings()->setBrightness(brightness());
+  ext->displaySettings()->setBacklightDuration(backlightDuration());
+
+  // Store audio settings
+  ext->audioSettings()->setVOXDelay(voxDelay());
+  ext->audioSettings()->enableRecording(recording());
   return true;
 }
 

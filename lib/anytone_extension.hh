@@ -2,6 +2,7 @@
 #define ANYTONEEXTENSION_HH
 
 #include "configobject.hh"
+#include "configreference.hh"
 
 
 /** Implements the common properties for analog and digital AnyTone channels.
@@ -277,7 +278,7 @@ protected:
 /** Implements the boot settings extension of AnyTone devices.
  * This extension is part of the @c AnytoneSettingsExtension.
  *
- * @ingroup anytone. */
+ * @ingroup anytone */
 class AnytoneBootSettingsExtension: public ConfigItem
 {
   Q_OBJECT
@@ -325,7 +326,7 @@ protected:
 /** Implements the key settings extension of AnyTone devices.
  * This extension is part of the @c AnytoneSettingsExtension.
  *
- * @ingroup anytone. */
+ * @ingroup anytone */
 class AnytoneKeySettingsExtension: public ConfigItem
 {
   Q_OBJECT
@@ -351,7 +352,9 @@ class AnytoneKeySettingsExtension: public ConfigItem
   /** Programmable function key 2, long press function. */
   Q_PROPERTY(KeyFunction funcKey2Long READ funcKey2Long WRITE setFuncKey2Long)
   /** The long press duration in ms. */
-  Q_PROPERTY(unsigned int longPressDuration READ longPressDuration WRITE setLongPressDuration);
+  Q_PROPERTY(unsigned int longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  /** The auto key-lock property. */
+  Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
 
 public:
   /** All possible key functions. */
@@ -366,11 +369,13 @@ public:
     ChannelTypeSwitch = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
     MaxVolume = 0x26, SlotSwitch = 0x27, APRSTypeSwitch = 0x28, ZoneSelect = 0x29,
     TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
-    TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32
+    TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32,
+    APRSSend = 0x33, APRSInfo = 0x34, GPSRoaming = 0x35
   };
   Q_ENUM(KeyFunction)
 
 public:
+  /** Empty constructor. */
   explicit AnytoneKeySettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
@@ -425,6 +430,11 @@ public:
   /** Sets the long-press duration in ms. */
   void setLongPressDuration(unsigned int ms);
 
+  /** Retruns @c true, if the automatic key-lock feature is enabled. */
+  bool autoKeyLockEnabled() const;
+  /** Enables/disables auto key-lock. */
+  void enableAutoKeyLock(bool enabled);
+
 protected:
   KeyFunction _progFuncKey1Short;          ///< Function of the programmable key 1, short press.
   KeyFunction _progFuncKey1Long;           ///< Function of the programmable key 1, long press.
@@ -437,6 +447,128 @@ protected:
   KeyFunction _funcKey2Short;              ///< Function of the function key 2, short press.
   KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
   unsigned int _longPressDuration;         ///< The long-press duration in ms.
+  bool _autoKeyLock;               ///< Auto key-lock property.
+};
+
+
+/** Implements the tone settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneToneSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** The key tone setting. */
+  Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
+  /** If @c true, the SMS alert tone is enabled. */
+  Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
+  /** If @c true, the call alert tone is enabled. */
+  Q_PROPERTY(bool callAlert READ callAlertEnabled WRITE enableCallAlert)
+
+public:
+  /** Empty constructor. */
+  explicit AnytoneToneSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the key tone is enabled. */
+  bool keyToneEnabled() const;
+  /** Enables/disables the key tone. */
+  void enableKeyTone(bool enable);
+
+  /** Returns @c true if SMS alert is enabled. */
+  bool smsAlertEnabled() const;
+  /** Enables/disables SMS alert. */
+  void enableSMSAlert(bool enable);
+
+  /** Returns @c true if call alert is enabled. */
+  bool callAlertEnabled() const;
+  /** Enables/disables call alert. */
+  void enableCallAlert(bool enable);
+
+protected:
+  bool _keyTone;                   ///< Key tone property.
+  bool _smsAlert;                  ///< SMS alert tone enabled.
+  bool _callAlert;                 ///< Call alert tone enabled.
+};
+
+
+/** Implements the display settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneDisplaySettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** The display frequency setting. */
+  Q_PROPERTY(bool displayFrequency READ displayFrequencyEnabled WRITE enableDisplayFrequency)
+  /** The display brightness [1-10]. */
+  Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
+  /** The backlight duration in seconds. */
+  Q_PROPERTY(unsigned int backlightDuration READ backlightDuration WRITE setBacklightDuration)
+
+public:
+  /** Constructor. */
+  explicit AnytoneDisplaySettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true, if the frequency is displayed instead of the channel name. */
+  bool displayFrequencyEnabled() const;
+  /** Enables/disables display of frequency. */
+  void enableDisplayFrequency(bool enable);
+
+  /** Returns the display brightness [1-10]. */
+  unsigned int brightness() const;
+  /** Sets the display brightness [1-10]. */
+  void setBrightness(unsigned int level);
+
+  /** Returns the backlight duration in seconds, 0 means permanent. */
+  unsigned int backlightDuration() const;
+  /** Sets the backlight duration in seconds, 0 means permanent. */
+  void setBacklightDuration(unsigned int sec);
+
+protected:
+  bool _displayFrequency;          ///< Display frequency property.
+  unsigned int _brightness;        ///< The display brightness.
+  unsigned int _backlightDuration; ///< Backlight duration in seconds, 0=permanent.
+};
+
+
+/** Implements the audio settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneAudioSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** The VOX delay in ms. */
+  Q_PROPERTY(unsigned int voxDelay READ voxDelay WRITE setVOXDelay)
+  /** If @c true, recording is enabled. */
+  Q_PROPERTY(bool recording READ recordingEnabled WRITE enableRecording)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneAudioSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the VOX delay in ms. */
+  unsigned int voxDelay() const;
+  /** Sets the VOX delay in ms. */
+  void setVOXDelay(unsigned int ms);
+
+  /** Returns @c true if recording is enabled. */
+  bool recordingEnabled() const;
+  /** Enables/disables recording. */
+  void enableRecording(bool enable);
+
+protected:
+  unsigned int _voxDelay;           ///< VOX delay in ms.
+  bool _recording;                  ///< Recording enabled.
 };
 
 
@@ -450,24 +582,35 @@ class AnytoneSettingsExtension: public ConfigExtension
 {
   Q_OBJECT
 
-  /** The key tone setting. */
-  Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
-  /** The display frequency setting. */
-  Q_PROPERTY(bool displayFrequency READ displayFrequencyEnabled WRITE enableDisplayFrequency)
-  /** The auto key-lock property. */
-  Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
   /** The auto shut-down delay in minutes. */
   Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
   /** The power-save mode. */
   Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
-  /** The VOX delay in ms. */
-  Q_PROPERTY(unsigned int voxDelay READ voxDelay WRITE setVOXDelay)
   /** The VFO scan type. */
   Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
+  /** The mode of VFO A. */
+  Q_PROPERTY(VFOMode modeA READ modeA WRITE setModeA)
+  /** The mode of VFO B. */
+  Q_PROPERTY(VFOMode modeB READ modeB WRITE setModeB)
+  /** The current zone for VFO A. */
+  Q_PROPERTY(ZoneReference* zoneA READ zoneA)
+  /** The current zone for VFO B. */
+  Q_PROPERTY(ZoneReference* zoneB READ zoneB)
+  /** The current active VFO. */
+  Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
+  /** If @c true, the sub-channel is enabled. */
+  Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The key settings. */
   Q_PROPERTY(AnytoneKeySettingsExtension* keySettings READ keySettings)
+  /** The tone settings. */
+  Q_PROPERTY(AnytoneToneSettingsExtension* toneSettings READ toneSettings)
+  /** The display settings. */
+  Q_PROPERTY(AnytoneDisplaySettingsExtension* displaySettings READ displaySettings)
+  /** The audio settings. */
+  Q_PROPERTY(AnytoneAudioSettingsExtension* audioSettings READ audioSettings)
 
 public:
   /** Possible power save modes. */
@@ -482,6 +625,17 @@ public:
   };
   Q_ENUM(VFOScanType)
 
+  /** Possible VFO modes. */
+  enum class VFOMode {
+    Memory = 0, VFO = 1
+  };
+  Q_ENUM(VFOMode)
+
+  /** Possible VFOs. */
+  enum class VFO {
+    A = 0, B = 1
+  };
+
 public:
   /** Constructor. */
   Q_INVOKABLE explicit AnytoneSettingsExtension(QObject *parent=nullptr);
@@ -492,21 +646,12 @@ public:
   AnytoneBootSettingsExtension *bootSettings() const;
   /** A reference to the key settings. */
   AnytoneKeySettingsExtension *keySettings() const;
-
-  /** Returns @c true if the key tone is enabled. */
-  bool keyToneEnabled() const;
-  /** Enables/disables the key tone. */
-  void enableKeyTone(bool enable);
-
-  /** Returns @c true, if the frequency is displayed instead of the channel name. */
-  bool displayFrequencyEnabled() const;
-  /** Enables/disables display of frequency. */
-  void enableDisplayFrequency(bool enable);
-
-  /** Retruns @c true, if the automatic key-lock feature is enabled. */
-  bool autoKeyLockEnabled() const;
-  /** Enables/disables auto key-lock. */
-  void enableAutoKeyLock(bool enabled);
+  /** A reference to the tone settings. */
+  AnytoneToneSettingsExtension *toneSettings() const;
+  /** A reference to the display settings. */
+  AnytoneDisplaySettingsExtension *displaySettings() const;
+  /** A reference to the audio settings. */
+  AnytoneAudioSettingsExtension *audioSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   unsigned int autoShutDownDelay() const;
@@ -518,29 +663,60 @@ public:
   /** Sets the power-save mode. */
   void setPowerSave(PowerSave mode);
 
-  /** Returns the VOX delay in ms. */
-  unsigned int voxDelay() const;
-  /** Sets the VOX delay in ms. */
-  void setVOXDelay(unsigned int ms);
-
   /** Returns the VFO scan type. */
   VFOScanType vfoScanType() const;
   /** Sets the VFO scan type. */
   void setVFOScanType(VFOScanType type);
+
+  /** Returns mode for VFO A. */
+  VFOMode modeA() const;
+  /** Sets the mode for VFO A. */
+  void setModeA(VFOMode mode);
+  /** Returns mode for VFO B. */
+  VFOMode modeB() const;
+  /** Sets the mode for VFO B. */
+  void setModeB(VFOMode mode);
+
+  /** Retruns a reference to the current zone for VFO A. */
+  ZoneReference *zoneA();
+  /** Retruns a reference to the current zone for VFO A. */
+  const ZoneReference *zoneA() const;
+  /** Returns a reference to the current zone for VFO B. */
+  ZoneReference *zoneB();
+  /** Returns a reference to the current zone for VFO B. */
+  const ZoneReference *zoneB() const;
+
+  /** Returns the selected VFO. */
+  VFO selectedVFO() const;
+  /** Sets the selected VFO. */
+  void setSelectedVFO(VFO vfo);
+
+  /** Returns @c true if the sub-channel is enabled. */
+  bool subChannelEnabled() const;
+  /** Enables/disables the sub-channel. */
+  void enableSubChannel(bool enable);
 
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
   /** The key settings. */
   AnytoneKeySettingsExtension *_keySettings;
+  /** The tone settings. */
+  AnytoneToneSettingsExtension *_toneSettings;
+  /** The display settings. */
+  AnytoneDisplaySettingsExtension *_displaySettings;
+  /** The audio settings. */
+  AnytoneAudioSettingsExtension *_audioSettings;
 
-  bool _keyTone;                   ///< Key tone property.
-  bool _displayFrequency;          ///< Display frequency property.
-  bool _autoKeyLock;               ///< Auto key-lock property.
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
-  unsigned int _voxDelay;          ///< VOX delay in ms.
   VFOScanType _vfoScanType;        ///< The VFO scan-type property.
+  VFOMode _modeA;                  ///< Mode of VFO A.
+  VFOMode _modeB;                  ///< Mode of VFO B.
+  ZoneReference _zoneA;            ///< The current zone for VFO A.
+  ZoneReference _zoneB;            ///< The current zone for VFO B.
+  VFO _selectedVFO;                ///< The current VFO.
+  bool _subChannel;                ///< If @c true, the sub-channel is enabled.
 };
 
 #endif // ANYTONEEXTENSION_HH
