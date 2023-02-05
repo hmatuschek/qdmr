@@ -326,9 +326,12 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _toneSettings(new AnytoneToneSettingsExtension(this)),
     _displaySettings(new AnytoneDisplaySettingsExtension(this)),
     _audioSettings(new AnytoneAudioSettingsExtension(this)),
+    _menuSettings(new AnytoneMenuSettingsExtension(this)),
     _autoShutDownDelay(0), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
-    _subChannel(true)
+    _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(430000000U),
+    _maxVFOScanFrequencyUHF(440000000U), _minVFOScanFrequencyVHF(144000000U),
+    _maxVFOScanFrequencyVHF(146000000U)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -339,6 +342,8 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   connect(_displaySettings, &AnytoneDisplaySettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
   connect(_audioSettings, &AnytoneAudioSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_menuSettings, &AnytoneMenuSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
 }
 
@@ -376,6 +381,11 @@ AnytoneSettingsExtension::displaySettings() const {
 AnytoneAudioSettingsExtension *
 AnytoneSettingsExtension::audioSettings() const {
   return _audioSettings;
+}
+
+AnytoneMenuSettingsExtension *
+AnytoneSettingsExtension::menuSettings() const {
+  return _menuSettings;
 }
 
 unsigned int
@@ -467,6 +477,38 @@ AnytoneSettingsExtension::setSelectedVFO(VFO vfo) {
   emit modified(this);
 }
 
+bool
+AnytoneSettingsExtension::subChannelEnabled() const {
+  return _subChannel;
+}
+void
+AnytoneSettingsExtension::enableSubChannel(bool enable) {
+  if (_subChannel == enable)
+    return;
+  _subChannel = enable;
+  emit modified(this);
+}
+
+QTimeZone
+AnytoneSettingsExtension::timeZone() const {
+  return _timeZone;
+}
+QString
+AnytoneSettingsExtension::ianaTimeZone() const {
+  return QString::fromLocal8Bit(_timeZone.id());
+}
+void
+AnytoneSettingsExtension::setTimeZone(const QTimeZone &zone) {
+  if (_timeZone == zone)
+    return;
+  _timeZone = zone;
+  emit modified(this);
+}
+void
+AnytoneSettingsExtension::setIANATimeZone(const QString &id) {
+  setTimeZone(QTimeZone(id.toLocal8Bit()));
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneBootSettingsExtension
@@ -520,6 +562,52 @@ AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
   if (_bootPassword == pass)
     return;
   _bootPassword = pass;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneSettingsExtension::minVFOScanFrequencyUHF() const {
+  return _minVFOScanFrequencyUHF;
+}
+void
+AnytoneSettingsExtension::setMinVFOScanFrequencyUHF(unsigned hz) {
+  if (_minVFOScanFrequencyUHF == hz)
+    return;
+  _minVFOScanFrequencyUHF = hz;
+  emit modified(this);
+}
+unsigned int
+AnytoneSettingsExtension::maxVFOScanFrequencyUHF() const {
+  return _maxVFOScanFrequencyUHF;
+}
+void
+AnytoneSettingsExtension::setMaxVFOScanFrequencyUHF(unsigned hz) {
+  if (_maxVFOScanFrequencyUHF == hz)
+    return;
+  _maxVFOScanFrequencyUHF = hz;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneSettingsExtension::minVFOScanFrequencyVHF() const {
+  return _minVFOScanFrequencyVHF;
+}
+void
+AnytoneSettingsExtension::setMinVFOScanFrequencyVHF(unsigned hz) {
+  if (_minVFOScanFrequencyVHF == hz)
+    return;
+  _minVFOScanFrequencyVHF = hz;
+  emit modified(this);
+}
+unsigned int
+AnytoneSettingsExtension::maxVFOScanFrequencyVHF() const {
+  return _maxVFOScanFrequencyVHF;
+}
+void
+AnytoneSettingsExtension::setMaxVFOScanFrequencyVHF(unsigned hz) {
+  if (_maxVFOScanFrequencyVHF == hz)
+    return;
+  _maxVFOScanFrequencyVHF = hz;
   emit modified(this);
 }
 
@@ -688,7 +776,9 @@ AnytoneKeySettingsExtension::enableAutoKeyLock(bool enabled) {
  * Implementation of AnytoneToneSettingsExtension
  * ********************************************************************************************* */
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false)
+  : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
+    _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
+    _idleChannelTone(false), _startupTone(false)
 {
   // pass...
 }
@@ -739,12 +829,73 @@ AnytoneToneSettingsExtension::enableCallAlert(bool enable) {
   emit modified(this);
 }
 
+bool
+AnytoneToneSettingsExtension::talkPermitDigitalEnabled() const {
+  return _talkPermitDigital;
+}
+void
+AnytoneToneSettingsExtension::enableTalkPermitDigital(bool enable) {
+  if (_talkPermitDigital == enable)
+    return;
+  _talkPermitDigital = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::talkPermitAnalogEnabled() const {
+  return _talkPermitAnalog;
+}
+void
+AnytoneToneSettingsExtension::enableTalkPermitAnalog(bool enable) {
+  if (_talkPermitAnalog == enable)
+    return;
+  _talkPermitAnalog = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::digitalResetToneEnabled() const {
+  return _resetToneDigital;
+}
+void
+AnytoneToneSettingsExtension::enableDigitalResetTone(bool enable) {
+  if (_resetToneDigital == enable)
+    return;
+  _resetToneDigital = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::idleChannelToneEnabled() const {
+  return _idleChannelTone;
+}
+void
+AnytoneToneSettingsExtension::enableIdleChannelTone(bool enable) {
+  if (_idleChannelTone == enable)
+    return;
+  _idleChannelTone = enable;
+  return modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::startupToneEnabled() const {
+  return _startupTone;
+}
+void
+AnytoneToneSettingsExtension::enableStartupTone(bool enable) {
+  if (_startupTone == enable)
+    return;
+  _startupTone = enable;
+  return modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneDisplaySettingsExtension
  * ********************************************************************************************* */
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
-  : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10)
+  : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10),
+    _callEndPrompt(true)
 {
   // pass...
 }
@@ -795,12 +946,25 @@ AnytoneDisplaySettingsExtension::setBacklightDuration(unsigned int sec) {
   emit modified(this);
 }
 
+bool
+AnytoneDisplaySettingsExtension::callEndPromptEnabled() const {
+  return _callEndPrompt;
+}
+void
+AnytoneDisplaySettingsExtension::enableCallEndPrompt(bool enable) {
+  if (_callEndPrompt == enable)
+    return;
+  _callEndPrompt = enable;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAudioSettingsExtension
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
-  : ConfigItem(parent),  _voxDelay(0), _recording(false)
+  : ConfigItem(parent),  _voxDelay(0), _recording(false), _voxSource(VoxSource::Both),
+    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true)
 {
   // pass...
 }
@@ -838,3 +1002,83 @@ AnytoneAudioSettingsExtension::enableRecording(bool enable) {
   _recording = enable;
   emit modified(this);
 }
+
+AnytoneAudioSettingsExtension::VoxSource
+AnytoneAudioSettingsExtension::voxSource() const {
+  return _voxSource;
+}
+void
+AnytoneAudioSettingsExtension::setVOXSource(VoxSource source) {
+  if (_voxSource == source)
+    return;
+  _voxSource = source;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneAudioSettingsExtension::maxVolume() const {
+  return _maxVolume;
+}
+void
+AnytoneAudioSettingsExtension::setMaxVolume(unsigned int vol) {
+  if (_maxVolume == vol)
+    return;
+  _maxVolume = vol;
+  emit modified(this);
+}
+unsigned int
+AnytoneAudioSettingsExtension::maxHeadPhoneVolume() const {
+  return _maxHeadPhoneVolume;
+}
+void
+AnytoneAudioSettingsExtension::setMaxHeadPhoneVolume(unsigned int vol) {
+  if (_maxHeadPhoneVolume == vol)
+    return;
+  _maxHeadPhoneVolume = vol;
+  emit modified(this);
+}
+
+bool
+AnytoneAudioSettingsExtension::enhanceAudioEnabled() const {
+  return _enhanceAudio;
+}
+void
+AnytoneAudioSettingsExtension::enableEnhanceAudio(bool enable) {
+  if (_enhanceAudio == enable)
+    return;
+  _enhanceAudio = enable;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAudioSettingsExtension
+ * ********************************************************************************************* */
+AnytoneMenuSettingsExtension::AnytoneMenuSettingsExtension(QObject *parent)
+  : ConfigItem(parent),  _menuDuration(15)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneMenuSettingsExtension::clone() const {
+  AnytoneMenuSettingsExtension *ext = new AnytoneMenuSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+unsigned int
+AnytoneMenuSettingsExtension::duration() const {
+  return _menuDuration;
+}
+void
+AnytoneMenuSettingsExtension::setDuration(unsigned int sec) {
+  if (_menuDuration == sec)
+    return;
+  _menuDuration = sec;
+  emit modified(this);
+}
+

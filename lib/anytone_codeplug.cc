@@ -1394,7 +1394,7 @@ AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
 AnytoneCodeplug::GeneralSettingsElement::Melody::Melody()
 {
   for (int i=0; i<5; i++)
-    notes[i] = Note{0,0};
+    notes[i] = Melody::Note{0,0};
 }
 
 AnytoneCodeplug::GeneralSettingsElement::Melody::Melody(const Melody &other)
@@ -1763,12 +1763,12 @@ AnytoneCodeplug::GeneralSettingsElement::enableDigitalResetTone(bool enable) {
   return setUInt8(0x0032, (enable ? 0x01 : 0x00));
 }
 
-AnytoneCodeplug::GeneralSettingsElement::VoxSource
+AnytoneAudioSettingsExtension::VoxSource
 AnytoneCodeplug::GeneralSettingsElement::voxSource() const {
-  return (VoxSource)getUInt8(0x0033);
+  return (AnytoneAudioSettingsExtension::VoxSource)getUInt8(0x0033);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setVOXSource(VoxSource source) {
+AnytoneCodeplug::GeneralSettingsElement::setVOXSource(AnytoneAudioSettingsExtension::VoxSource source) {
   setUInt8(0x0033, (unsigned)source);
 }
 
@@ -1921,7 +1921,7 @@ AnytoneCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
 }
 
 unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxHeadphoneVolume() const {
+AnytoneCodeplug::GeneralSettingsElement::maxHeadPhoneVolume() const {
   return (((unsigned)getUInt8(0x0052))*10)/8;
 }
 void
@@ -2125,6 +2125,11 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       setMemoryZoneB(ctx.index(ext->zoneB()->as<Zone>()));
     enableActiveChannelB(AnytoneSettingsExtension::VFO::B == ext->selectedVFO());
     enableSubChannel(ext->subChannelEnabled());
+    setGPSTimeZone(ext->timeZone());
+    setMinVFOScanFrequencyUHF(ext->minVFOScanFrequencyUHF());
+    setMaxVFOScanFrequencyUHF(ext->maxVFOScanFrequencyUHF());
+    setMinVFOScanFrequencyVHF(ext->minVFOScanFrequencyVHF());
+    setMaxVFOScanFrequencyVHF(ext->maxVFOScanFrequencyVHF());
 
     // Encode boot settings
     setBootDisplay(ext->bootSettings()->bootDisplay());
@@ -2148,15 +2153,28 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableKeyTone(ext->toneSettings()->keyToneEnabled());
     enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
     enableCallAlert(ext->toneSettings()->callAlertEnabled());
+    enableTalkPermitDigital(ext->toneSettings()->talkPermitDigitalEnabled());
+    enableTalkPermitAnalog(ext->toneSettings()->talkPermitAnalogEnabled());
+    enableDigitalResetTone(ext->toneSettings()->digitalResetToneEnabled());
+    enableIdleChannelTone(ext->toneSettings()->idleChannelToneEnabled());
+    enableStartupTone(ext->toneSettings()->startupToneEnabled());
 
     // Encode display settings
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
     setBrightness(ext->displaySettings()->brightness());
     setBacklightDuration(ext->displaySettings()->backlightDuration());
+    enableCallEndPrompt(ext->displaySettings()->callEndPromptEnabled());
 
     // Encode audio settings
     setVOXDelay(ext->audioSettings()->voxDelay());
     enableRecording(ext->audioSettings()->recordingEnabled());
+    setVOXSource(ext->audioSettings()->voxSource());
+    setMaxVolume(ext->audioSettings()->maxVolume());
+    setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
+    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
+
+    // Encode menu settings
+    setMenuExitTime(ext->menuSettings()->duration());
   }
 
   return true;
@@ -2192,6 +2210,11 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->setSelectedVFO(activeChannelB() ? AnytoneSettingsExtension::VFO::B
                                        : AnytoneSettingsExtension::VFO::A);
   ext->enableSubChannel(subChannel());
+  ext->setTimeZone(gpsTimeZone());
+  ext->setMinVFOScanFrequencyUHF(this->minVFOScanFrequencyUHF());
+  ext->setMaxVFOScanFrequencyUHF(this->maxVFOScanFrequencyUHF());
+  ext->setMinVFOScanFrequencyVHF(this->minVFOScanFrequencyVHF());
+  ext->setMaxVFOScanFrequencyVHF(this->maxVFOScanFrequencyVHF());
 
   // Store boot settings
   ext->bootSettings()->setBootDisplay(bootDisplay());
@@ -2215,15 +2238,29 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->toneSettings()->enableKeyTone(keyTone());
   ext->toneSettings()->enableSMSAlert(smsAlert());
   ext->toneSettings()->enableCallAlert(callAlert());
+  ext->toneSettings()->enableTalkPermitDigital(this->talkPermitDigital());
+  ext->toneSettings()->enableTalkPermitAnalog(this->talkPermitAnalog());
+  ext->toneSettings()->enableDigitalResetTone(this->digitalResetTone());
+  ext->toneSettings()->enableIdleChannelTone(this->idleChannelTone());
+  ext->toneSettings()->enableStartupTone(this->startupTone());
 
   // Store display settings
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());
   ext->displaySettings()->setBrightness(brightness());
   ext->displaySettings()->setBacklightDuration(backlightDuration());
+  ext->displaySettings()->enableCallEndPrompt(this->callEndPrompt());
 
   // Store audio settings
   ext->audioSettings()->setVOXDelay(voxDelay());
   ext->audioSettings()->enableRecording(recording());
+  ext->audioSettings()->setVOXSource(voxSource());
+  ext->audioSettings()->setMaxVolume(this->maxVolume());
+  ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
+  ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
+
+  // Store menu settings
+  ext->menuSettings()->setDuration(menuExitTime());
+
   return true;
 }
 

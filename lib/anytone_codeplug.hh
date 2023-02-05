@@ -603,11 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** Source for the VOX. */
-    enum class VoxSource {
-      Internal = 0, External = 1, Both = 2
-    };
-
     /** Encodes the auto-repeater offset sign. */
     enum class AutoRepDir {
       Off = 0,       ///< Disabled.
@@ -799,9 +794,9 @@ public:
     /** Enables/disables the reset tone for digital calls. */
     virtual void enableDigitalResetTone(bool enable);
     /** Returns the VOX source. */
-    virtual VoxSource voxSource() const;
+    virtual AnytoneAudioSettingsExtension::VoxSource voxSource() const;
     /** Sets the VOX source. */
-    virtual void setVOXSource(VoxSource source);
+    virtual void setVOXSource(AnytoneAudioSettingsExtension::VoxSource source);
     /** Returns @c true if the idle channel tone is enabled. */
     virtual bool idleChannelTone() const;
     /** Enables/disables the idle channel tone. */
@@ -869,7 +864,7 @@ public:
     /** Enables/disables clock display. */
     virtual void enableDisplayClock(bool enable);
     /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadphoneVolume() const;
+    virtual unsigned maxHeadPhoneVolume() const;
     /** Sets the maximum headphone volume. */
     virtual void setMaxHeadPhoneVolume(unsigned max);
     /** Returns @c true if the audio is "enhanced". */

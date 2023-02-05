@@ -4,6 +4,8 @@
 #include "configobject.hh"
 #include "configreference.hh"
 
+#include <QTimeZone>
+
 
 /** Implements the common properties for analog and digital AnyTone channels.
  * This class cannot be instantiated directly, use one of the derived classes.
@@ -465,6 +467,16 @@ class AnytoneToneSettingsExtension: public ConfigItem
   Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
   /** If @c true, the call alert tone is enabled. */
   Q_PROPERTY(bool callAlert READ callAlertEnabled WRITE enableCallAlert)
+  /** If @c true, the DMR talk permit tone is enabled. */
+  Q_PROPERTY(bool dmrTalkPermit READ talkPermitDigitalEnabled WRITE enableTalkPermitDigital)
+  /** If @c true, the FM talk permit tone is enabled. */
+  Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
+  /** If @c true, the DMR reset tone is enabled. */
+  Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
+  /** If @c true, the idle tone is enabled. */
+  Q_PROPERTY(bool idle READ idleChannelToneEnabled WRITE enableIdleChannelTone)
+  /** If @c true, the startup tone is enabled. */
+  Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
 
 public:
   /** Empty constructor. */
@@ -481,16 +493,41 @@ public:
   bool smsAlertEnabled() const;
   /** Enables/disables SMS alert. */
   void enableSMSAlert(bool enable);
-
   /** Returns @c true if call alert is enabled. */
   bool callAlertEnabled() const;
   /** Enables/disables call alert. */
   void enableCallAlert(bool enable);
 
+  /** Returns @c true if the talk permit tone is enabled for digital channels. */
+  bool talkPermitDigitalEnabled() const;
+  /** Enables/disables the talk permit tone for digital channels. */
+  void enableTalkPermitDigital(bool enable);
+  /** Returns @c true if the talk permit tone is enabled for digital channels. */
+  bool talkPermitAnalogEnabled() const;
+  /** Enables/disables the talk permit tone for analog channels. */
+  void enableTalkPermitAnalog(bool enable);
+  /** Returns @c true if the reset tone is enabled for digital calls. */
+  bool digitalResetToneEnabled() const;
+  /** Enables/disables the reset tone for digital calls. */
+  void enableDigitalResetTone(bool enable);
+  /** Returns @c true if the idle channel tone is enabled. */
+  bool idleChannelToneEnabled() const;
+  /** Enables/disables the idle channel tone. */
+  void enableIdleChannelTone(bool enable);
+  /** Retunrs @c true if the startup tone is enabled. */
+  bool startupToneEnabled() const;
+  /** Enables/disables the startup tone. */
+  void enableStartupTone(bool enable);
+
 protected:
   bool _keyTone;                   ///< Key tone property.
   bool _smsAlert;                  ///< SMS alert tone enabled.
   bool _callAlert;                 ///< Call alert tone enabled.
+  bool _talkPermitDigital;         ///< DMR talk permit tone.
+  bool _talkPermitAnalog;          ///< FM talk permit tone.
+  bool _resetToneDigital;          ///< DMR reset tone.
+  bool _idleChannelTone;           ///< Idle channel tone.
+  bool _startupTone;               ///< Startup tone enabled.
 };
 
 
@@ -530,10 +567,16 @@ public:
   /** Sets the backlight duration in seconds, 0 means permanent. */
   void setBacklightDuration(unsigned int sec);
 
+  /** Returns @c true if the call-end prompt is shown. */
+  bool callEndPromptEnabled() const;
+  /** Enables/disables the call-end prompt. */
+  void enableCallEndPrompt(bool enable);
+
 protected:
   bool _displayFrequency;          ///< Display frequency property.
   unsigned int _brightness;        ///< The display brightness.
   unsigned int _backlightDuration; ///< Backlight duration in seconds, 0=permanent.
+  bool _callEndPrompt;             ///< Call-end prompt enabled.
 };
 
 
@@ -549,6 +592,21 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   Q_PROPERTY(unsigned int voxDelay READ voxDelay WRITE setVOXDelay)
   /** If @c true, recording is enabled. */
   Q_PROPERTY(bool recording READ recordingEnabled WRITE enableRecording)
+  /** The VOX source. */
+  Q_PROPERTY(VoxSource voxSource READ voxSource WRITE setVOXSource)
+  /** The maximum volume setting [0-10]. */
+  Q_PROPERTY(unsigned int maxVolume READ maxVolume WRITE setMaxVolume)
+  /** The maximum head-phone volume setting [0-10]. */
+  Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
+  /** If @c true, the audio is "enhanced". */
+  Q_PROPERTY(bool enhance READ enhanceAudioEnabled WRITE enableEnhanceAudio)
+
+public:
+  /** Source for the VOX. */
+  enum class VoxSource {
+    Internal = 0, External = 1, Both = 2
+  };
+  Q_ENUM(VoxSource)
 
 public:
   /** Default constructor. */
@@ -566,9 +624,59 @@ public:
   /** Enables/disables recording. */
   void enableRecording(bool enable);
 
+  /** Returns the VOX source. */
+  VoxSource voxSource() const;
+  /** Sets the VOX source. */
+  void setVOXSource(VoxSource source);
+
+  /** Returns the maximum volume setting [0-10]. */
+  unsigned int maxVolume() const;
+  /** Sets the maximum volume. */
+  void setMaxVolume(unsigned int vol);
+  /** Returns the maximum head-phone volume setting [0-10]. */
+  unsigned int maxHeadPhoneVolume() const;
+  /** Sets the maximum head-phone volume. */
+  void setMaxHeadPhoneVolume(unsigned int vol);
+
+  /** Returns @c true if the audio is "enhanced". */
+  bool enhanceAudioEnabled() const;
+  /** Enables/disables enhanced audio. */
+  void enableEnhanceAudio(bool enable);
+
 protected:
   unsigned int _voxDelay;           ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
+  VoxSource _voxSource;             ///< The VOX source.
+  unsigned int _maxVolume;          ///< The maximum volume.
+  unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
+  bool _enhanceAudio;               ///< Enhance audio.
+};
+
+
+/** Implements the menu settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneMenuSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** Menu exit time in seconds. */
+  Q_PROPERTY(unsigned int duration READ duration WRITE setDuration)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneMenuSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the menu duration in seconds. */
+  unsigned int duration() const;
+  /** Sets the menu duration in seconds. */
+  void setDuration(unsigned int sec);
+
+protected:
+  unsigned int _menuDuration;      ///< Menu display duration in seconds.
 };
 
 
@@ -600,6 +708,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
   /** If @c true, the sub-channel is enabled. */
   Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
+  /** The time-zone IANA Id. */
+  Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
 
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
@@ -611,6 +721,16 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneDisplaySettingsExtension* displaySettings READ displaySettings)
   /** The audio settings. */
   Q_PROPERTY(AnytoneAudioSettingsExtension* audioSettings READ audioSettings)
+  /** The menu settings. */
+  Q_PROPERTY(AnytoneMenuSettingsExtension* menuSettings READ menuSettings)
+  /** The minimum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
+  /** The maximum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
+  /** The minimum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
+  /** The maximum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
 public:
   /** Possible power save modes. */
@@ -652,6 +772,8 @@ public:
   AnytoneDisplaySettingsExtension *displaySettings() const;
   /** A reference to the audio settings. */
   AnytoneAudioSettingsExtension *audioSettings() const;
+  /** A reference to the menu settings. */
+  AnytoneMenuSettingsExtension *menuSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   unsigned int autoShutDownDelay() const;
@@ -696,6 +818,33 @@ public:
   /** Enables/disables the sub-channel. */
   void enableSubChannel(bool enable);
 
+  /** Returns the IANA ID of the time zone. */
+  QString ianaTimeZone() const;
+  /** Returns the time-zone. */
+  QTimeZone timeZone() const;
+  /** Sets the time zone by IANA ID. */
+  void setIANATimeZone(const QString &id);
+  /** Sets the time zone. */
+  void setTimeZone(const QTimeZone &zone);
+
+  /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
+  unsigned minVFOScanFrequencyUHF() const;
+  /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
+  void setMinVFOScanFrequencyUHF(unsigned hz);
+  /** Returns the maximum VFO scan frequency for the UHF band in Hz. */
+  unsigned maxVFOScanFrequencyUHF() const;
+  /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
+  void setMaxVFOScanFrequencyUHF(unsigned hz);
+
+  /** Returns the minimum VFO scan frequency for the VHF band in Hz. */
+  unsigned minVFOScanFrequencyVHF() const;
+  /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
+  void setMinVFOScanFrequencyVHF(unsigned hz);
+  /** Returns the maximum VFO scan frequency for the VHF band in Hz. */
+  unsigned maxVFOScanFrequencyVHF() const;
+  /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
+  void setMaxVFOScanFrequencyVHF(unsigned hz);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
@@ -707,6 +856,8 @@ protected:
   AnytoneDisplaySettingsExtension *_displaySettings;
   /** The audio settings. */
   AnytoneAudioSettingsExtension *_audioSettings;
+  /** The audio settings. */
+  AnytoneMenuSettingsExtension *_menuSettings;
 
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
@@ -717,6 +868,11 @@ protected:
   ZoneReference _zoneB;            ///< The current zone for VFO B.
   VFO _selectedVFO;                ///< The current VFO.
   bool _subChannel;                ///< If @c true, the sub-channel is enabled.
+  QTimeZone _timeZone;             ///< The time zone.
+  unsigned int _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
+  unsigned int _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
+  unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
+  unsigned int _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
 };
 
 #endif // ANYTONEEXTENSION_HH
