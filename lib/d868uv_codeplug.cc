@@ -526,12 +526,12 @@ D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned 
   setBCD8_be(0x00c4, Hz/10);
 }
 
-D868UVCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneSettingsExtension::AutoRepDir
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00c8);
+  return (AnytoneSettingsExtension::AutoRepDir)getUInt8(0x00c8);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneSettingsExtension::AutoRepDir dir) {
   setUInt8(0x00c8, (unsigned)dir);
 }
 

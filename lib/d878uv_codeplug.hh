@@ -623,9 +623,9 @@ public:
     virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
 
     /** Returns the auto-repeater direction for VFO B. */
-    virtual AutoRepDir autoRepeaterDirectionB() const;
+    virtual AnytoneSettingsExtension::AutoRepDir autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionB(AnytoneSettingsExtension::AutoRepDir dir);
 
     /** Returns @c true if a boot channel is set. */
     virtual bool defaultChannel() const;

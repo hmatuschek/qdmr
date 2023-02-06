@@ -1871,21 +1871,21 @@ AnytoneCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
   setUInt8(0x0047, (enable ? 0x01 : 0x01));
 }
 
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneSettingsExtension::AutoRepDir
 AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
-  return (AutoRepDir) getUInt8(0x0048);
+  return (AnytoneSettingsExtension::AutoRepDir) getUInt8(0x0048);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AutoRepDir dir) {
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AnytoneSettingsExtension::AutoRepDir dir) {
   setUInt8(0x0048, (unsigned)dir);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::LastCallerDisplayMode
+AnytoneDisplaySettingsExtension::LastCallerDisplayMode
 AnytoneCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
-  return (LastCallerDisplayMode)getUInt8(0x004d);
+  return (AnytoneDisplaySettingsExtension::LastCallerDisplayMode)getUInt8(0x004d);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(LastCallerDisplayMode mode) {
+AnytoneCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) {
   setUInt8(0x004d, (unsigned)mode);
 }
 
@@ -2153,7 +2153,11 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
     setBrightness(ext->displaySettings()->brightness());
     setBacklightDuration(ext->displaySettings()->backlightDuration());
+    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
     enableCallEndPrompt(ext->displaySettings()->callEndPromptEnabled());
+    setLastCallerDisplayMode(ext->displaySettings()->lastCallerDisplay());
+    enableDisplayClock(ext->displaySettings()->showClockEnabled());
+    enableDisplayCall(ext->displaySettings()->showCallEnabled());
 
     // Encode audio settings
     setVOXDelay(ext->audioSettings()->voxDelay());
@@ -2241,7 +2245,11 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());
   ext->displaySettings()->setBrightness(brightness());
   ext->displaySettings()->setBacklightDuration(backlightDuration());
+  ext->displaySettings()->enableVolumeChangePrompt(this->volumeChangePrompt());
   ext->displaySettings()->enableCallEndPrompt(this->callEndPrompt());
+  ext->displaySettings()->setLastCallerDisplay(this->lastCallerDisplayMode());
+  ext->displaySettings()->enableShowClock(displayClock());
+  ext->displaySettings()->enableShowCall(displayCall());
 
   // Store audio settings
   ext->audioSettings()->setVOXDelay(voxDelay());

@@ -216,12 +216,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setUHFAutoRepeaterFrequencyRange(doubl
   setUInt32_le(0x00c4, uint32_t(lower*1e5));
   setUInt32_le(0x00c8, uint32_t(upper*1e5));
 }
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneSettingsExtension::AutoRepDir
 DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00cc);
+  return (AnytoneSettingsExtension::AutoRepDir)getUInt8(0x00cc);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneSettingsExtension::AutoRepDir dir) {
   setUInt8(0x00cc, (uint8_t)dir);
 }
 

@@ -508,6 +508,18 @@ AnytoneSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
+AnytoneSettingsExtension::AutoRepDir
+AnytoneSettingsExtension::autoRepeaterDirection() const {
+  return _autoRepDirection;
+}
+void
+AnytoneSettingsExtension::setAutoRepeaterDirection(AutoRepDir dir) {
+  if (_autoRepDirection == dir)
+    return;
+  _autoRepDirection = dir;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneBootSettingsExtension
@@ -910,7 +922,8 @@ AnytoneToneSettingsExtension::resetMelody() const {
  * ********************************************************************************************* */
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
   : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10),
-    _callEndPrompt(true)
+    _volumeChangePrompt(true), _callEndPrompt(true),
+    _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true)
 {
   // pass...
 }
@@ -962,6 +975,18 @@ AnytoneDisplaySettingsExtension::setBacklightDuration(unsigned int sec) {
 }
 
 bool
+AnytoneDisplaySettingsExtension::volumeChangePromptEnabled() const {
+  return _volumeChangePrompt;
+}
+void
+AnytoneDisplaySettingsExtension::enableVolumeChangePrompt(bool enable) {
+  if (_volumeChangePrompt == enable)
+    return;
+  _volumeChangePrompt = enable;
+  emit modified(this);
+}
+
+bool
 AnytoneDisplaySettingsExtension::callEndPromptEnabled() const {
   return _callEndPrompt;
 }
@@ -970,6 +995,42 @@ AnytoneDisplaySettingsExtension::enableCallEndPrompt(bool enable) {
   if (_callEndPrompt == enable)
     return;
   _callEndPrompt = enable;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::LastCallerDisplayMode
+AnytoneDisplaySettingsExtension::lastCallerDisplay() const {
+  return _lastCallerDisplay;
+}
+void
+AnytoneDisplaySettingsExtension::setLastCallerDisplay(LastCallerDisplayMode mode) {
+  if (_lastCallerDisplay == mode)
+    return;
+  _lastCallerDisplay = mode;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showClockEnabled() const {
+  return _showClock;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowClock(bool enable) {
+  if (_showClock == enable)
+    return;
+  _showClock = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showCallEnabled() const {
+  return _showCall;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowCall(bool enable) {
+  if (_showCall == enable)
+    return;
+  _showCall = enable;
   emit modified(this);
 }
 

@@ -603,18 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** Encodes the auto-repeater offset sign. */
-    enum class AutoRepDir {
-      Off = 0,       ///< Disabled.
-      Positive = 1,  ///< Positive frequency offset.
-      Negative = 2   ///< Negative frequency offset.
-    };
-
-    /** What to show from the last caller. */
-    enum class LastCallerDisplayMode {
-      Off = 0, ID = 1, Call = 2, Both = 3
-    };
-
     /** Possible display colors. */
     enum class Color {
       Black = 0, Red = 1
@@ -832,13 +820,13 @@ public:
     /** Enables/disables the volume change prompt. */
     virtual void enableVolumeChangePrompt(bool enable);
     /** Returns the auto repeater offset direction for VFO A. */
-    virtual AutoRepDir autoRepeaterDirectionA() const;
+    virtual AnytoneSettingsExtension::AutoRepDir autoRepeaterDirectionA() const;
     /** Sets the auto-repeater offset direction for VFO A. */
-    virtual void setAutoRepeaterDirectionA(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionA(AnytoneSettingsExtension::AutoRepDir dir);
     /** Returns the last-caller display mode. */
-    virtual LastCallerDisplayMode lastCallerDisplayMode() const;
+    virtual AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const;
     /** Sets the last-caller display mode. */
-    virtual void setLastCallerDisplayMode(LastCallerDisplayMode mode);
+    virtual void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode);
 
     /** Returns @c true if the clock is shown. */
     virtual bool displayClock() const;

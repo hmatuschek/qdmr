@@ -561,6 +561,23 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
   /** The backlight duration in seconds. */
   Q_PROPERTY(unsigned int backlightDuration READ backlightDuration WRITE setBacklightDuration)
+  /** The volume-change prompt is shown. */
+  Q_PROPERTY(bool volumeChangePrompt READ volumeChangePromptEnabled WRITE enableVolumeChangePrompt)
+  /** The call-end prompt is shown. */
+  Q_PROPERTY(bool callEndPrompt READ callEndPromptEnabled WRITE enableCallEndPrompt)
+  /** The last-caller display mode. */
+  Q_PROPERTY(LastCallerDisplayMode lastCallerDisplay READ lastCallerDisplay WRITE setLastCallerDisplay)
+  /** If @c true, the clock is shown. */
+  Q_PROPERTY(bool showClock READ showClockEnabled WRITE enableShowClock)
+  /** If @c true, the call is shown. */
+  Q_PROPERTY(bool showCall READ showCallEnabled WRITE enableShowCall)
+
+public:
+  /** What to show from the last caller. */
+  enum class LastCallerDisplayMode {
+    Off = 0, ID = 1, Call = 2, Both = 3
+  };
+  Q_ENUM(LastCallerDisplayMode)
 
 public:
   /** Constructor. */
@@ -583,16 +600,40 @@ public:
   /** Sets the backlight duration in seconds, 0 means permanent. */
   void setBacklightDuration(unsigned int sec);
 
+  /** Returns @c true if the volume-change prompt is shown. */
+  bool volumeChangePromptEnabled() const;
+  /** Enables/disables the volume-change prompt. */
+  void enableVolumeChangePrompt(bool enable);
+
   /** Returns @c true if the call-end prompt is shown. */
   bool callEndPromptEnabled() const;
   /** Enables/disables the call-end prompt. */
   void enableCallEndPrompt(bool enable);
 
+  /** Returns the last caller display mode. */
+  LastCallerDisplayMode lastCallerDisplay() const;
+  /** Sets the last caller display mode. */
+  void setLastCallerDisplay(LastCallerDisplayMode mode);
+
+  /** Returns @c true if the clock is shown. */
+  bool showClockEnabled() const;
+  /** Enables/disables clock. */
+  void enableShowClock(bool enable);
+
+  /** Returns @c true if the call is shown. */
+  bool showCallEnabled() const;
+  /** Enables/disables display of call. */
+  void enableShowCall(bool enable);
+
 protected:
-  bool _displayFrequency;          ///< Display frequency property.
-  unsigned int _brightness;        ///< The display brightness.
-  unsigned int _backlightDuration; ///< Backlight duration in seconds, 0=permanent.
-  bool _callEndPrompt;             ///< Call-end prompt enabled.
+  bool _displayFrequency;                   ///< Display frequency property.
+  unsigned int _brightness;                 ///< The display brightness.
+  unsigned int _backlightDuration;          ///< Backlight duration in seconds, 0=permanent.
+  bool _volumeChangePrompt;                 ///< Volume-change prompt enabled.
+  bool _callEndPrompt;                      ///< Call-end prompt enabled.
+  LastCallerDisplayMode _lastCallerDisplay; ///< Last-caller display mode.
+  bool _showClock;                          ///< Display clock.
+  bool _showCall;                           ///< Display call.
 };
 
 
@@ -710,8 +751,11 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
   /** The power-save mode. */
   Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
-  /** The VFO scan type. */
-  Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
+
+  /** If @c true, the sub-channel is enabled. */
+  Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
+  /** The current active VFO. */
+  Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
   /** The mode of VFO A. */
   Q_PROPERTY(VFOMode modeA READ modeA WRITE setModeA)
   /** The mode of VFO B. */
@@ -720,12 +764,23 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(ZoneReference* zoneA READ zoneA)
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
-  /** The current active VFO. */
-  Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
-  /** If @c true, the sub-channel is enabled. */
-  Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
+
   /** The time-zone IANA Id. */
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
+
+  /** The VFO scan type. */
+  Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
+  /** The minimum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
+  /** The maximum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
+  /** The minimum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
+  /** The maximum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
+
+  /** The auto-repeater direction. */
+  Q_PROPERTY(AutoRepDir autoRepeaterDirection READ autoRepeaterDirection WRITE setAutoRepeaterDirection)
 
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
@@ -739,14 +794,6 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneAudioSettingsExtension* audioSettings READ audioSettings)
   /** The menu settings. */
   Q_PROPERTY(AnytoneMenuSettingsExtension* menuSettings READ menuSettings)
-  /** The minimum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
-  /** The maximum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
-  /** The minimum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
-  /** The maximum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
 public:
   /** Possible power save modes. */
@@ -772,6 +819,14 @@ public:
     A = 0, B = 1
   };
   Q_ENUM(VFO)
+
+  /** Encodes the auto-repeater offset sign. */
+  enum class AutoRepDir {
+    Off = 0,       ///< Disabled.
+    Positive = 1,  ///< Positive frequency offset.
+    Negative = 2   ///< Negative frequency offset.
+  };
+  Q_ENUM(AutoRepDir)
 
 public:
   /** Constructor. */
@@ -844,6 +899,11 @@ public:
   /** Sets the time zone. */
   void setTimeZone(const QTimeZone &zone);
 
+  /** Returns the auto-repeater direction. */
+  AutoRepDir autoRepeaterDirection() const;
+  /** Sets the auto-repeater direction. */
+  void setAutoRepeaterDirection(AutoRepDir dir);
+
   /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
   unsigned minVFOScanFrequencyUHF() const;
   /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
@@ -886,6 +946,7 @@ protected:
   VFO _selectedVFO;                ///< The current VFO.
   bool _subChannel;                ///< If @c true, the sub-channel is enabled.
   QTimeZone _timeZone;             ///< The time zone.
+  AutoRepDir _autoRepDirection;    ///< The auto-repeater direction.
   unsigned int _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
   unsigned int _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
   unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
