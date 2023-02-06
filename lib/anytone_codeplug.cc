@@ -1,6 +1,7 @@
 #include "anytone_codeplug.hh"
 #include "utils.hh"
 #include "logger.hh"
+#include "melody.hh"
 #include <QTimeZone>
 
 using namespace Signaling;

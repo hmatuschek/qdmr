@@ -7,7 +7,6 @@
 
 #include <QTimeZone>
 
-
 /** Implements the common properties for analog and digital AnyTone channels.
  * This class cannot be instantiated directly, use one of the derived classes.
  * @ingroup anytone */
@@ -479,11 +478,11 @@ class AnytoneToneSettingsExtension: public ConfigItem
   /** If @c true, the startup tone is enabled. */
   Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
   /** The call melody. */
-  Q_PROPERTY(Melody* callMelody READ callMelody)
+  Q_PROPERTY(Melody * callMelody READ callMelody)
   /** The idle melody. */
-  Q_PROPERTY(Melody* idleMelody READ idleMelody)
+  Q_PROPERTY(Melody * idleMelody READ idleMelody)
   /** The reset melody. */
-  Q_PROPERTY(Melody* resetMelody READ resetMelody)
+  Q_PROPERTY(Melody * resetMelody READ resetMelody)
 
 public:
   /** Empty constructor. */
