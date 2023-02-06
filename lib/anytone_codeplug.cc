@@ -1389,29 +1389,6 @@ AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
 
 
 /* ********************************************************************************************* *
- * Implementation of AnytoneCodeplug::GeneralSettingsElement::Melody
- * ********************************************************************************************* */
-AnytoneCodeplug::GeneralSettingsElement::Melody::Melody()
-{
-  for (int i=0; i<5; i++)
-    notes[i] = Melody::Note{0,0};
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody::Melody(const Melody &other)
-{
-  for (int i=0; i<5; i++)
-    notes[i] = other.notes[i];
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody &
-AnytoneCodeplug::GeneralSettingsElement::Melody::operator =(const Melody &other) {
-  for (int i=0; i<5; i++)
-    notes[i] = other.notes[i];
-  return *this;
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
@@ -2008,54 +1985,63 @@ AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVH
   setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
 }
 
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::callToneMelody() const {
-  Melody melody;
+void
+AnytoneCodeplug::GeneralSettingsElement::callToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x0072+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x007c+2*i);
+    double freq = getUInt16_le(0x0072+2*i);
+    unsigned int duration = getUInt16_le(0x007c+2*i);
+    if (duration) tones.append({freq, duration});
   }
-  return melody;
+  melody.infer(tones);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x0072+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x007c+2*i, melody.notes[i].duration);
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(0x0072+2*i, tones.at(i).first);
+    setUInt16_le(0x007c+2*i, tones.at(i).second);
   }
 }
 
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::idleToneMelody() const {
-  Melody melody;
+void
+AnytoneCodeplug::GeneralSettingsElement::idleToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x0086+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x0090+2*i);
+    double frequency = getUInt16_le(0x0086+2*i);
+    unsigned int duration  = getUInt16_le(0x0090+2*i);
+    if (duration) tones.append({frequency, duration});
   }
-  return melody;
+  melody.infer(tones);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x0086+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x0090+2*i, melody.notes[i].duration);
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(0x0086+2*i, tones.at(i).first);
+    setUInt16_le(0x0090+2*i, tones.at(i).second);
   }
 }
 
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::resetToneMelody() const {
-  Melody melody;
+void
+AnytoneCodeplug::GeneralSettingsElement::resetToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x009a+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x00a4+2*i);
+    double frequency = getUInt16_le(0x009a+2*i);
+    unsigned int duration  = getUInt16_le(0x00a4+2*i);
+    if (duration) tones.append({frequency, duration});
   }
-  return melody;
+  melody.infer(tones);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x009a+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x00a4+2*i, melody.notes[i].duration);
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(0x009a+2*i, tones.at(i).first);
+    setUInt16_le(0x00a4+2*i, tones.at(i).second);
   }
 }
 
@@ -2158,6 +2144,9 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableDigitalResetTone(ext->toneSettings()->digitalResetToneEnabled());
     enableIdleChannelTone(ext->toneSettings()->idleChannelToneEnabled());
     enableStartupTone(ext->toneSettings()->startupToneEnabled());
+    setCallToneMelody(*(ext->toneSettings()->callMelody()));
+    setIdleToneMelody(*(ext->toneSettings()->idleMelody()));
+    setResetToneMelody(*(ext->toneSettings()->resetMelody()));
 
     // Encode display settings
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
@@ -2243,6 +2232,9 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->toneSettings()->enableDigitalResetTone(this->digitalResetTone());
   ext->toneSettings()->enableIdleChannelTone(this->idleChannelTone());
   ext->toneSettings()->enableStartupTone(this->startupTone());
+  this->callToneMelody(*(ext->toneSettings()->callMelody()));
+  this->idleToneMelody(*(ext->toneSettings()->idleMelody()));
+  this->resetToneMelody(*(ext->toneSettings()->resetMelody()));
 
   // Store display settings
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());

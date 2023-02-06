@@ -778,9 +778,12 @@ AnytoneKeySettingsExtension::enableAutoKeyLock(bool enabled) {
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
     _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
-    _idleChannelTone(false), _startupTone(false)
+    _idleChannelTone(false), _startupTone(false), _callMelody(new Melody(100, this)),
+    _idleMelody(new Melody(100, this)), _resetMelody(new Melody(100, this))
 {
-  // pass...
+  connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
+  connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
+  connect(_resetMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
 }
 
 ConfigItem *
@@ -887,6 +890,19 @@ AnytoneToneSettingsExtension::enableStartupTone(bool enable) {
     return;
   _startupTone = enable;
   return modified(this);
+}
+
+Melody *
+AnytoneToneSettingsExtension::callMelody() const {
+  return _callMelody;
+}
+Melody *
+AnytoneToneSettingsExtension::idleMelody() const {
+  return _idleMelody;
+}
+Melody *
+AnytoneToneSettingsExtension::resetMelody() const {
+  return _resetMelody;
 }
 
 

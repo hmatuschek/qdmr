@@ -3,6 +3,7 @@
 
 #include "configobject.hh"
 #include "configreference.hh"
+#include "melody.hh"
 
 #include <QTimeZone>
 
@@ -477,6 +478,12 @@ class AnytoneToneSettingsExtension: public ConfigItem
   Q_PROPERTY(bool idle READ idleChannelToneEnabled WRITE enableIdleChannelTone)
   /** If @c true, the startup tone is enabled. */
   Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
+  /** The call melody. */
+  Q_PROPERTY(Melody* callMelody READ callMelody)
+  /** The idle melody. */
+  Q_PROPERTY(Melody* idleMelody READ idleMelody)
+  /** The reset melody. */
+  Q_PROPERTY(Melody* resetMelody READ resetMelody)
 
 public:
   /** Empty constructor. */
@@ -519,6 +526,13 @@ public:
   /** Enables/disables the startup tone. */
   void enableStartupTone(bool enable);
 
+  /** Returns a reference to the call melody. */
+  Melody *callMelody() const;
+  /** Returns a reference to the idle melody. */
+  Melody *idleMelody() const;
+  /** Returns a reference to the reset melody. */
+  Melody *resetMelody() const;
+
 protected:
   bool _keyTone;                   ///< Key tone property.
   bool _smsAlert;                  ///< SMS alert tone enabled.
@@ -528,6 +542,9 @@ protected:
   bool _resetToneDigital;          ///< DMR reset tone.
   bool _idleChannelTone;           ///< Idle channel tone.
   bool _startupTone;               ///< Startup tone enabled.
+  Melody *_callMelody;             ///< Call melody.
+  Melody *_idleMelody;             ///< Idle melody.
+  Melody *_resetMelody;            ///< Reset melody.
 };
 
 

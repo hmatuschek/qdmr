@@ -615,25 +615,6 @@ public:
       Off = 0, ID = 1, Call = 2, Both = 3
     };
 
-    /** Represents a configurable ring tone melody. */
-    struct Melody {
-      /** Represents a note of the melody. */
-      struct Note {
-        unsigned frequency; ///< Tone frequency in Hz.
-        unsigned duration;  ///< Tone duration in ms.
-      };
-
-      /** Holds the 5 notes of the melody. */
-      Note notes[5];
-
-      /** Empty constructor. */
-      Melody();
-      /** Copy constructor. */
-      Melody(const Melody &other);
-      /** Assignment operator. */
-      Melody &operator =(const Melody &other);
-    };
-
     /** Possible display colors. */
     enum class Color {
       Black = 0, Red = 1
@@ -906,15 +887,15 @@ public:
     virtual void clearAutoRepeaterOffsetFrequencyIndexVHF();
 
     /** Returns the call-tone melody. */
-    virtual Melody callToneMelody() const;
+    virtual void callToneMelody(Melody &melody) const;
     /** Sets the call-tone melody. */
     virtual void setCallToneMelody(const Melody &melody);
     /** Returns the idle-tone melody. */
-    virtual Melody idleToneMelody() const;
+    virtual void idleToneMelody(Melody &melody) const;
     /** Sets the idle-tone melody. */
     virtual void setIdleToneMelody(const Melody &melody);
     /** Returns the reset-tone melody. */
-    virtual Melody resetToneMelody() const;
+    virtual void resetToneMelody(Melody &melody) const;
     /** Sets the reset-tone melody. */
     virtual void setResetToneMelody(const Melody &melody);
     /** Returns the recording delay in ms. */
