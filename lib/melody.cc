@@ -140,11 +140,13 @@ Melody::infer(const QVector<QPair<double, unsigned int> > &tones) {
 
 unsigned int
 Melody::quantizationTimingError(const QVector<QPair<double, unsigned int> > &tones, unsigned int bpm) {
+  if (0 == tones.count())
+    return 0;
   unsigned int error=0;
   for (const QPair<double,unsigned int> &tone: tones) {
     error += Note::quantizationTimingError(tone.second, bpm);
   }
-  return error/=tones.count();
+  return error / tones.count();
 }
 
 

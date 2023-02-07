@@ -7,6 +7,14 @@
 /** A config item that encodes a melody. This can be used to configure several melodies like
  * ring tones and boot-up melodies. Have fun with it. In contrast to the common manufacturer CPSs,
  * qdmr uses a proper musical notation for that.
+ *
+ * This however, comes with some difficulties. While the translation from musical notation to
+ * tone frequencies and durations is easy, the reverse direction is not. The note duration is the
+ * most difficult. In musical notation, durations are expressed in terms of fractions of a bar,
+ * implicitly defined by the beat frequency. This additional information must be infered. To achive
+ * this, this class searches for the BPM, that minimizes the quantization error in the duration
+ * while keeping the BPM as close as possible to 100 BPM. Yes, this is utterly over-engineered.
+ *
  * @ingroup config */
 class Melody : public ConfigItem
 {
