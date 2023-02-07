@@ -19,6 +19,8 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
 
+  void testAutoRepeaterOffset();
+
 protected:
   Config _basicConfig;
 };

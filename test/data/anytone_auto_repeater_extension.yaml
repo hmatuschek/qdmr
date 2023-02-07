@@ -1,0 +1,104 @@
+---
+version: 0.9.0
+settings:
+  introLine1: DM3MAT
+  introLine2: qDMR
+  micLevel: 3
+  speech: false
+  power: High
+  squelch: 1
+  vox: 0
+  tot: 0
+  defaultID: id1
+  anytone:
+    autoRepeaterSettings:
+      directionA: Negative
+      directionB: Negative
+      vhf: off0
+      uhf: off1
+      offsets:
+        - {id: off0, name: VHF Offset, offset: 600000}
+        - {id: off1, name: UHF Offset, offset: 7600000}
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+contacts:
+  - dmr: {id: cont1, name: Local, ring: false, type: GroupCall, number: 9}
+  - dmr: {id: cont2, name: Regional, ring: false, type: GroupCall, number: 8}
+  - dmr: {id: cont3, name: BB, ring: false, type: GroupCall, number: 2621}
+  - dmr: {id: cont4, name: DL, ring: false, type: GroupCall, number: 262}
+  - dmr: {id: cont5, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
+  - dmr: {id: cont6, name: HamRadioVillage, ring: false, type: GroupCall, number: 3177826}
+groupLists:
+  - {id: grp1, name: Local, contacts: [cont1, cont2, cont3]}
+  - {id: grp2, name: DL, contacts: [cont4]}
+  - {id: grp3, name: HamRadioVillage, contacts: [cont6]}
+channels:
+  - dmr:
+      id: ch1
+      name: L9 DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS2
+      groupList: grp1
+      contact: cont1
+      power: High
+      timeout: 0
+      vox: 0
+  - dmr:
+      id: ch2
+      name: BB DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS2
+      groupList: grp1
+      contact: cont3
+      aprs: aprs1
+      power: High
+      timeout: 0
+      vox: 0
+  - dmr:
+      id: ch3
+      name: DL DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS1
+      groupList: grp2
+      contact: cont4
+      power: High
+      timeout: 0
+      vox: 0
+  - dmr:
+      id: ch4
+      name: HRV DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS1
+      groupList: grp3
+      contact: cont6
+      power: High
+      timeout: 0
+      vox: 0
+zones:
+  - id: zone1
+    name: Zu Hause
+    A: [ch1, ch2, ch4]
+    B: [ch3]
+positioning:
+  - dmr:
+      id: aprs1
+      name: GPS System
+      period: 300
+      contact: cont5
+...

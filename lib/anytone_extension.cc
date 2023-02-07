@@ -516,18 +516,6 @@ AnytoneSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
-AnytoneSettingsExtension::AutoRepDir
-AnytoneSettingsExtension::autoRepeaterDirection() const {
-  return _autoRepDirection;
-}
-void
-AnytoneSettingsExtension::setAutoRepeaterDirection(AutoRepDir dir) {
-  if (_autoRepDirection == dir)
-    return;
-  _autoRepDirection = dir;
-  emit modified(this);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneBootSettingsExtension

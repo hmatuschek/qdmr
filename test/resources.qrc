@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>data/config_test.yaml</file>
         <file>data/channel_frequency_test.yaml</file>
+        <file>data/anytone_auto_repeater_extension.yaml</file>
     </qresource>
 </RCC>

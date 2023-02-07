@@ -33,7 +33,7 @@ D878UVTest::testBasicConfigEncoding() {
   Codeplug::Flags flags; flags.updateCodePlug=false;
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: {}")
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -44,13 +44,13 @@ D878UVTest::testBasicConfigDecoding() {
   Codeplug::Flags flags; flags.updateCodePlug=false;
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: {}")
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: {}")
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }

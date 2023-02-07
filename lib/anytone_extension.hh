@@ -882,14 +882,6 @@ class AnytoneSettingsExtension: public ConfigExtension
 
   /** The time-zone IANA Id. */
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
-  /** The minimum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
-  /** The maximum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
-  /** The minimum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
-  /** The maximum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
   /** The VFO scan type. */
   Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
@@ -901,9 +893,6 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
   /** The maximum VHF VFO-scan frequency in Hz. */
   Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
-
-  /** The auto-repeater direction. */
-  Q_PROPERTY(AutoRepDir autoRepeaterDirection READ autoRepeaterDirection WRITE setAutoRepeaterDirection)
 
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
@@ -944,14 +933,6 @@ public:
     A = 0, B = 1
   };
   Q_ENUM(VFO)
-
-  /** Encodes the auto-repeater offset sign. */
-  enum class AutoRepDir {
-    Off = 0,       ///< Disabled.
-    Positive = 1,  ///< Positive frequency offset.
-    Negative = 2   ///< Negative frequency offset.
-  };
-  Q_ENUM(AutoRepDir)
 
 public:
   /** Constructor. */
@@ -1026,11 +1007,6 @@ public:
   /** Sets the time zone. */
   void setTimeZone(const QTimeZone &zone);
 
-  /** Returns the auto-repeater direction. */
-  AutoRepDir autoRepeaterDirection() const;
-  /** Sets the auto-repeater direction. */
-  void setAutoRepeaterDirection(AutoRepDir dir);
-
   /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
   unsigned minVFOScanFrequencyUHF() const;
   /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
@@ -1075,7 +1051,6 @@ protected:
   VFO _selectedVFO;                ///< The current VFO.
   bool _subChannel;                ///< If @c true, the sub-channel is enabled.
   QTimeZone _timeZone;             ///< The time zone.
-  AutoRepDir _autoRepDirection;    ///< The auto-repeater direction.
   unsigned int _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
   unsigned int _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
   unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.

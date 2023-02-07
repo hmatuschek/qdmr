@@ -861,9 +861,6 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
   if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
     return false;
 
-  if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
-    return false;
-
   if (! this->decodeBootSettings(ctx, err))
     return false;
 
@@ -1673,7 +1670,7 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
   // Decode offsets.
   for (int i=0; i<NUM_OFFSET_FREQ; i++) {
     uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ+i*sizeof(uint32_t));
-    if (0 == offsetFreqPtr)
+    if (0 == *offsetFreqPtr)
       continue;
     AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
     offset->setOffset(qFromLittleEndian(*offsetFreqPtr));

@@ -2183,6 +2183,9 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     else
       setAutoRepeaterOffsetFrequenyIndexUHF(
             ctx.index(ext->autoRepeaterSettings()->uhfRef()->as<AnytoneAutoRepeaterOffset>()));
+  } else if (! flags.updateCodePlug) {
+    clearAutoRepeaterOffsetFrequencyIndexVHF();
+    clearAutoRepeaterOffsetFrequencyIndexUHF();
   }
 
   return true;
@@ -4134,9 +4137,6 @@ bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
 
-  // Add table for repeater offsets
-  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
-
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // Map radio IDs
@@ -4181,12 +4181,21 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   for (int i=0; i<config->roamingZones()->count(); i++)
     ctx.add(config->roamingZones()->zone(i), i);
 
+  // Map auto-repeater offsets
+  if (config->settings()->anytoneExtension()) {
+    auto *autoRep = config->settings()->anytoneExtension()->autoRepeaterSettings();
+    for (int i=0; i<autoRep->offsets()->count(); i++)
+      ctx.add(autoRep->offsets()->get(i)->as<AnytoneAutoRepeaterOffset>(), i);
+  }
+
   return true;
 }
 
 bool
 AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   Context ctx(config);
+  // Register table for auto-repeater offsets
+  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
 
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode anytone codeplug.";
@@ -4212,6 +4221,9 @@ bool
 AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
   // Maps code-plug indices to objects
   Context ctx(config);
+  // Register table for auto-repeater offsets
+  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
+
   return this->decodeElements(ctx, err);
 }
 
