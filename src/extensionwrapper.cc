@@ -468,9 +468,11 @@ PropertyWrapper::flags(const QModelIndex &index) const {
   if (isProperty(index)) {
     // check if property is a config object or atomic (or reference)
     QMetaProperty prop = propertyAt(index);
-    if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop)) {
+    if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    }
+
+    if (propIsInstance<ConfigObjectReference>(prop) && prop.isScriptable() && (1 == index.column()))
+      return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
 
     if (prop.isWritable() && (1 == index.column()))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
