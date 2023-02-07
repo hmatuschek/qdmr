@@ -955,12 +955,12 @@ D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned 
   setBCD8_be(0x00d0, Hz/10);
 }
 
-D878UVCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneAutoRepeaterSettingsExtension::Direction
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00d4);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(0x00d4);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
   setUInt8(0x00d4, (unsigned)dir);
 }
 
@@ -1188,7 +1188,21 @@ bool
 D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+
   ctx.config()->settings()->setTOT(transmitTimeout());
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
   return true;
 }
 

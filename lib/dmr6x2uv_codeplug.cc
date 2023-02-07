@@ -216,12 +216,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setUHFAutoRepeaterFrequencyRange(doubl
   setUInt32_le(0x00c4, uint32_t(lower*1e5));
   setUInt32_le(0x00c8, uint32_t(upper*1e5));
 }
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneAutoRepeaterSettingsExtension::Direction
 DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00cc);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(0x00cc);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
   setUInt8(0x00cc, (uint8_t)dir);
 }
 
@@ -359,7 +359,19 @@ bool
 DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
-  // Extract DMR-6X2UV specific settings.
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
   return true;
 }
 

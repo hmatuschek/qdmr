@@ -327,6 +327,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _displaySettings(new AnytoneDisplaySettingsExtension(this)),
     _audioSettings(new AnytoneAudioSettingsExtension(this)),
     _menuSettings(new AnytoneMenuSettingsExtension(this)),
+    _autoRepeaterSettings(new AnytoneAutoRepeaterSettingsExtension(this)),
     _autoShutDownDelay(0), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
     _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(430000000U),
@@ -344,6 +345,8 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   connect(_audioSettings, &AnytoneAudioSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
   connect(_menuSettings, &AnytoneMenuSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_autoRepeaterSettings, &AnytoneAutoRepeaterSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
 }
 
@@ -386,6 +389,11 @@ AnytoneSettingsExtension::audioSettings() const {
 AnytoneMenuSettingsExtension *
 AnytoneSettingsExtension::menuSettings() const {
   return _menuSettings;
+}
+
+AnytoneAutoRepeaterSettingsExtension *
+AnytoneSettingsExtension::autoRepeaterSettings() const {
+  return _autoRepeaterSettings;
 }
 
 unsigned int
@@ -616,7 +624,13 @@ AnytoneSettingsExtension::setMaxVFOScanFrequencyVHF(unsigned hz) {
  * Implementation of AnytoneKeySettingsExtension
  * ********************************************************************************************* */
 AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
-  : ConfigItem(parent), _autoKeyLock(false)
+  : ConfigItem(parent),
+    _progFuncKey1Short(KeyFunction::Off), _progFuncKey1Long(KeyFunction::DigitalEncryption),
+    _progFuncKey2Short(KeyFunction::Voltage), _progFuncKey2Long(KeyFunction::Call),
+    _progFuncKey3Short(KeyFunction::Power), _progFuncKey3Long(KeyFunction::VOX),
+    _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::VFOChannel),
+    _funcKey2Short(KeyFunction::Reverse), _funcKey2Long(KeyFunction::Off),
+    _longPressDuration(1000), _autoKeyLock(false)
 {
   // pass...
 }
@@ -1098,3 +1112,118 @@ AnytoneMenuSettingsExtension::setDuration(unsigned int sec) {
   emit modified(this);
 }
 
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAutoRepeaterSettingsExtension
+ * ********************************************************************************************* */
+AnytoneAutoRepeaterSettingsExtension::AnytoneAutoRepeaterSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _directionA(Direction::Off), _directionB(Direction::Off),
+    _vhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
+    _uhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
+    _offsets(new AnytoneAutoRepeaterOffsetList(this))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAutoRepeaterSettingsExtension::clone() const {
+  AnytoneAutoRepeaterSettingsExtension *ext = new AnytoneAutoRepeaterSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+AnytoneAutoRepeaterSettingsExtension::Direction
+AnytoneAutoRepeaterSettingsExtension::directionA() const {
+  return _directionA;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setDirectionA(Direction dir) {
+  if (_directionA == dir)
+    return;
+  _directionA = dir;
+  emit modified(this);
+}
+AnytoneAutoRepeaterSettingsExtension::Direction
+AnytoneAutoRepeaterSettingsExtension::directionB() const {
+  return _directionB;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setDirectionB(Direction dir) {
+  if (_directionB == dir)
+    return;
+  _directionB = dir;
+  emit modified(this);
+}
+
+AnytoneAutoRepeaterOffsetRef *
+AnytoneAutoRepeaterSettingsExtension::vhfRef() const {
+  return _vhfOffset;
+}
+
+AnytoneAutoRepeaterOffsetRef *
+AnytoneAutoRepeaterSettingsExtension::uhfRef() const {
+  return _uhfOffset;
+}
+
+AnytoneAutoRepeaterOffsetList *
+AnytoneAutoRepeaterSettingsExtension::offsets() const {
+  return _offsets;
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAutoRepeaterOffset
+ * ********************************************************************************************* */
+AnytoneAutoRepeaterOffset::AnytoneAutoRepeaterOffset(QObject *parent)
+  : ConfigObject(parent), _offset(0)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAutoRepeaterOffset::clone() const {
+  AnytoneAutoRepeaterOffset *off = new AnytoneAutoRepeaterOffset();
+  if (! off->copy(*this)) {
+    off->deleteLater();
+    return nullptr;
+  }
+  return off;
+}
+
+unsigned int
+AnytoneAutoRepeaterOffset::offset() const {
+  return _offset;
+}
+void
+AnytoneAutoRepeaterOffset::setOffset(unsigned int offset) {
+  if (_offset == offset)
+    return;
+  _offset = offset;
+  emit modified(this);
+}
+
+ConfigItem *
+AnytoneAutoRepeaterOffsetList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err);
+  return new AnytoneAutoRepeaterOffset();
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAutoRepeaterOffsetRef
+ * ********************************************************************************************* */
+AnytoneAutoRepeaterOffsetRef::AnytoneAutoRepeaterOffsetRef(QObject *parent)
+  : ConfigObjectReference(AnytoneAutoRepeaterOffset::staticMetaObject, parent)
+{
+  // pass...
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAutoRepeaterOffsetList
+ * ********************************************************************************************* */
+AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
+  : ConfigObjectList(AnytoneAutoRepeaterOffset::staticMetaObject, parent)
+{
+  // pass...
+}

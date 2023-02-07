@@ -603,13 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** Encodes the auto-repeater offset sign. */
-    enum class AutoRepDir {
-      Off = 0,       ///< Disabled.
-      Positive = 1,  ///< Positive frequency offset.
-      Negative = 2   ///< Negative frequency offset.
-    };
-
     /** What to show from the last caller. */
     enum class LastCallerDisplayMode {
       Off = 0, ID = 1, Call = 2, Both = 3
@@ -832,9 +825,9 @@ public:
     /** Enables/disables the volume change prompt. */
     virtual void enableVolumeChangePrompt(bool enable);
     /** Returns the auto repeater offset direction for VFO A. */
-    virtual AutoRepDir autoRepeaterDirectionA() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
     /** Sets the auto-repeater offset direction for VFO A. */
-    virtual void setAutoRepeaterDirectionA(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
     /** Returns the last-caller display mode. */
     virtual LastCallerDisplayMode lastCallerDisplayMode() const;
     /** Sets the last-caller display mode. */
@@ -911,6 +904,8 @@ public:
     virtual bool fromConfig(const Flags &flags, Context &ctx);
     /** Updates the abstract config from general settings. */
     virtual bool updateConfig(Context &ctx);
+    /** Links the general settings. */
+    virtual bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Represents the base class for zone channel list for all AnyTone codeplugs.

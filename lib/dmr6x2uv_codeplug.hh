@@ -313,9 +313,9 @@ public:
     /** Sets the UHF auto-repeater frequency range in MHz. */
     virtual void setUHFAutoRepeaterFrequencyRange(double lower, double upper);
     /** Returns auto-repeater direction for VFO B. */
-    virtual AutoRepDir autoRepeaterDirectionB() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
     /** Returns @c true if the address book is send with its own code (WTF?). */
     virtual bool addressBookIsSendWithOwnCode() const;

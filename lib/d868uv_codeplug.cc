@@ -121,6 +121,7 @@
 #define STATUSMESSAGE_BITMAP_SIZE 0x00000010
 
 #define ADDR_OFFSET_FREQ          0x024C2000
+#define NUM_OFFSET_FREQ                  250
 #define OFFSET_FREQ_SIZE          0x000003F0
 
 #define ADDR_ALARM_SETTING        0x024C1400
@@ -526,12 +527,12 @@ D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned 
   setBCD8_be(0x00c4, Hz/10);
 }
 
-D868UVCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneAutoRepeaterSettingsExtension::Direction
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00c8);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(0x00c8);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
   setUInt8(0x00c8, (unsigned)dir);
 }
 
@@ -614,6 +615,11 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
 
+  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Encode auto-repeater settings
+    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+  }
+
   return true;
 }
 
@@ -621,6 +627,19 @@ bool
 D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
   return true;
 }
 
@@ -654,7 +673,7 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
-  this->allocateRepeaterOffsetSettings();
+  this->allocateRepeaterOffsetFrequencies();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
 
@@ -800,6 +819,9 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
   if (! this->encodeGeneralSettings(flags, ctx, err))
     return false;
 
+  if (! this->encodeRepeaterOffsetFrequencies(flags, ctx, err))
+    return false;
+
   if (! this->encodeBootSettings(flags, ctx, err))
     return false;
 
@@ -834,6 +856,12 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
     return false;
 
   if (! this->decodeGeneralSettings(ctx, err))
+    return false;
+
+  if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
+    return false;
+
+  if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
     return false;
 
   if (! this->decodeBootSettings(ctx, err))
@@ -874,6 +902,10 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 
   if (! this->linkGPSSystems(ctx, err))
     return false;
+
+  if (! this->linkGeneralSettings(ctx, err)) {
+    return false;
+  }
 
   return true;
 }
@@ -1483,6 +1515,10 @@ D868UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
 }
 
+bool
+D868UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err);
+}
 
 void
 D868UVCodeplug::allocateZoneChannelList() {
@@ -1598,10 +1634,56 @@ D868UVCodeplug::allocateHotKeySettings() {
 }
 
 void
-D868UVCodeplug::allocateRepeaterOffsetSettings() {
+D868UVCodeplug::allocateRepeaterOffsetFrequencies() {
   // Offset frequencies
   image(0).addElement(ADDR_OFFSET_FREQ, OFFSET_FREQ_SIZE);
 }
+
+bool
+D868UVCodeplug::encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+
+  if (! ctx.config()->settings()->anytoneExtension())
+    return true;
+  for (int i=0; i<NUM_OFFSET_FREQ; i++) {
+    uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ+i*sizeof(uint32_t));
+    if (i < (int)ctx.count<AnytoneAutoRepeaterOffset>()) {
+      *offsetFreqPtr = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset());
+    } else {
+      *offsetFreqPtr = 0;
+    }
+  }
+
+  return true;
+}
+
+bool
+D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Allocate extension, if not present.
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode offsets.
+  for (int i=0; i<NUM_OFFSET_FREQ; i++) {
+    uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ+i*sizeof(uint32_t));
+    if (0 == offsetFreqPtr)
+      continue;
+    AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
+    offset->setOffset(qFromLittleEndian(*offsetFreqPtr));
+    ext->autoRepeaterSettings()->offsets()->add(offset);
+    ctx.add(offset, i);
+  }
+
+  return true;
+}
+
 
 void
 D868UVCodeplug::allocateAlarmSettings() {

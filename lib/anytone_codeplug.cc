@@ -1,6 +1,7 @@
 #include "anytone_codeplug.hh"
 #include "utils.hh"
 #include "logger.hh"
+#include "anytone_extension.hh"
 #include <QTimeZone>
 
 using namespace Signaling;
@@ -1870,12 +1871,12 @@ AnytoneCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
   setUInt8(0x0047, (enable ? 0x01 : 0x01));
 }
 
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneAutoRepeaterSettingsExtension::Direction
 AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
-  return (AutoRepDir) getUInt8(0x0048);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction) getUInt8(0x0048);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AutoRepDir dir) {
+AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
   setUInt8(0x0048, (unsigned)dir);
 }
 
@@ -2164,6 +2165,19 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
+
+    // Encode auto-repeater settings
+    setAutoRepeaterDirectionA(ext->autoRepeaterSettings()->directionA());
+    if (ext->autoRepeaterSettings()->vhfRef()->isNull())
+      clearAutoRepeaterOffsetFrequencyIndexVHF();
+    else
+      setAutoRepeaterOffsetFrequenyIndexVHF(
+            ctx.index(ext->autoRepeaterSettings()->vhfRef()->as<AnytoneAutoRepeaterOffset>()));
+    if (ext->autoRepeaterSettings()->uhfRef()->isNull())
+      clearAutoRepeaterOffsetFrequencyIndexUHF();
+    else
+      setAutoRepeaterOffsetFrequenyIndexUHF(
+            ctx.index(ext->autoRepeaterSettings()->uhfRef()->as<AnytoneAutoRepeaterOffset>()));
   }
 
   return true;
@@ -2252,6 +2266,38 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Store menu settings
   ext->menuSettings()->setDuration(menuExitTime());
+
+  // Store auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionA(this->autoRepeaterDirectionA());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  if (! settings->anytoneExtension())
+    return false;
+
+  // Link repeater offsets
+  if (this->hasAutoRepeaterOffsetFrequencyIndexVHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset for VHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
+      return false;
+    }
+    settings->anytoneExtension()->autoRepeaterSettings()->vhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
+  }
+
+  if (this->hasAutoRepeaterOffsetFrequencyIndexUHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset for UHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
+      return false;
+    }
+    settings->anytoneExtension()->autoRepeaterSettings()->uhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
+  }
 
   return true;
 }
@@ -4078,6 +4124,9 @@ AnytoneCodeplug::clear() {
 bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
+
+  // Add table for repeater offsets
+  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
 
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 

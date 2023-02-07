@@ -336,9 +336,9 @@ public:
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
     virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
     /** Returns the auto-repeater direction for VFO B. */
-    virtual AutoRepDir autoRepeaterDirectionB() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
     /** Returns @c true if the default boot channel is enabled. */
     virtual bool defaultChannel() const;
     /** Enables/disables default boot channel. */
@@ -468,6 +468,8 @@ protected:
   virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes the general settings section. */
   virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link the general settings. */
+  virtual bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates zone channel list memory section. */
   virtual void allocateZoneChannelList();
@@ -495,8 +497,14 @@ protected:
   virtual void allocateSMSMessages();
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();
+
   /** Allocates repeater offset settings memory section. */
-  virtual void allocateRepeaterOffsetSettings();
+  virtual void allocateRepeaterOffsetFrequencies();
+  /** Encodes auto-repeater offset frequencies. */
+  virtual bool encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decodes auto-repeater offset frequencies. */
+  virtual bool decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err=ErrorStack());
+
   /** Allocates alarm settings memory section. */
   virtual void allocateAlarmSettings();
   /** Allocates FM broadcast settings memory section. */

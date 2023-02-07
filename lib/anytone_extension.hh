@@ -450,7 +450,7 @@ protected:
   KeyFunction _funcKey2Short;              ///< Function of the function key 2, short press.
   KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
   unsigned int _longPressDuration;         ///< The long-press duration in ms.
-  bool _autoKeyLock;               ///< Auto key-lock property.
+  bool _autoKeyLock;                       ///< Auto key-lock property.
 };
 
 
@@ -697,6 +697,121 @@ protected:
 };
 
 
+/** Implements the config representation of a repeater offset. This is just a transmit
+ *  offset-frequency in Hz.
+ * @ingroup anytone */
+class AnytoneAutoRepeaterOffset: public ConfigObject
+{
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "off")
+
+  /** The offset frequency. */
+  Q_PROPERTY(unsigned int offset READ offset WRITE setOffset)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE AnytoneAutoRepeaterOffset(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the transmit frequency offset in Hz. */
+  unsigned int offset() const;
+  /** Sets the transmit frequency offset in Hz. */
+  void setOffset(unsigned int offset);
+
+protected:
+  /** The transmit frequency offset in Hz. */
+  unsigned int _offset;
+};
+
+
+/** Represents a reference to a repeater offset.
+ * @ingroup anytone */
+class AnytoneAutoRepeaterOffsetRef: public ConfigObjectReference
+{
+  Q_OBJECT
+
+public:
+  /** Default constructor. */
+  explicit AnytoneAutoRepeaterOffsetRef(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of auto-repeater offsets.
+ * @ingroup anytone */
+class AnytoneAutoRepeaterOffsetList: public ConfigObjectList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit AnytoneAutoRepeaterOffsetList(QObject *parent=nullptr);
+
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err);
+};
+
+
+/** Implements the auto-repeater settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** A reference to the auto-repater frequency for VHF. */
+  Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* vhf READ vhfRef)
+  /** A reference to the auto-repater frequency for UHF. */
+  Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* uhf READ uhfRef)
+  /** The repeater transmit offset frequencies. */
+  Q_PROPERTY(AnytoneAutoRepeaterOffsetList* offsets READ offsets)
+
+public:
+  /** Encodes the auto-repeater offset sign. */
+  enum class Direction {
+    Off = 0,       ///< Disabled.
+    Positive = 1,  ///< Positive frequency offset.
+    Negative = 2   ///< Negative frequency offset.
+  };
+  Q_ENUM(Direction)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneAutoRepeaterSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** The auto-repeater offset direction for VFO A. */
+  Direction directionA() const;
+  /** Set the auto-repeater offset direction for VFO A. */
+  void setDirectionA(Direction dir);
+  /** The auto-repeater offset direction for VFO B. */
+  Direction directionB() const;
+  /** Set the auto-repeater offset direction for VFO V. */
+  void setDirectionB(Direction dir);
+
+  /** Returns the reference for the UHF offset freuqency. */
+  AnytoneAutoRepeaterOffsetRef *uhfRef() const;
+  /** Returns the reference for the VHF offset freuqency. */
+  AnytoneAutoRepeaterOffsetRef *vhfRef() const;
+
+  /** Returns a weak reference to the offset list. */
+  AnytoneAutoRepeaterOffsetList *offsets() const;
+
+protected:
+  /** The auto-repeater direction for VFO A. */
+  Direction _directionA;
+  /** The auto-repeater direction for VFO B. */
+  Direction _directionB;
+  /** A reference to the VHF offset frequency. */
+  AnytoneAutoRepeaterOffsetRef *_vhfOffset;
+  /** A reference to the UHF offset frequency. */
+  AnytoneAutoRepeaterOffsetRef *_uhfOffset;
+  /** The list of repeater offsets. */
+  AnytoneAutoRepeaterOffsetList *_offsets;
+};
+
+
 /** Implements the device specific extension for the gerneral settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
@@ -727,6 +842,14 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
   /** The time-zone IANA Id. */
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
+  /** The minimum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
+  /** The maximum UHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
+  /** The minimum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
+  /** The maximum VHF VFO-scan frequency in Hz. */
+  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
@@ -740,14 +863,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneAudioSettingsExtension* audioSettings READ audioSettings)
   /** The menu settings. */
   Q_PROPERTY(AnytoneMenuSettingsExtension* menuSettings READ menuSettings)
-  /** The minimum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
-  /** The maximum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
-  /** The minimum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
-  /** The maximum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
+  /** The auto-repeater settings. */
+  Q_PROPERTY(AnytoneAutoRepeaterSettingsExtension*autoRepeaterSettings READ autoRepeaterSettings)
 
 public:
   /** Possible power save modes. */
@@ -792,6 +909,8 @@ public:
   AnytoneAudioSettingsExtension *audioSettings() const;
   /** A reference to the menu settings. */
   AnytoneMenuSettingsExtension *menuSettings() const;
+  /** A reference to the auto-repeater settings. */
+  AnytoneAutoRepeaterSettingsExtension *autoRepeaterSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   unsigned int autoShutDownDelay() const;
@@ -874,8 +993,10 @@ protected:
   AnytoneDisplaySettingsExtension *_displaySettings;
   /** The audio settings. */
   AnytoneAudioSettingsExtension *_audioSettings;
-  /** The audio settings. */
+  /** The menu settings. */
   AnytoneMenuSettingsExtension *_menuSettings;
+  /** The auto-repeater settings. */
+  AnytoneAutoRepeaterSettingsExtension *_autoRepeaterSettings;
 
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
