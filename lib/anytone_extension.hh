@@ -799,9 +799,13 @@ class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** A reference to the auto-repater frequency for VHF. */
+  /** Specifies the auto-repeater transmit-frequency offset direction for VFO A. */
+  Q_PROPERTY(Direction directionA READ directionA WRITE setDirectionA)
+  /** Specifies the auto-repeater transmit-frequency offset direction for VFO B. */
+  Q_PROPERTY(Direction directionB READ directionB WRITE setDirectionB)
+  /** A reference to the auto-repeater frequency for VHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* vhf READ vhfRef)
-  /** A reference to the auto-repater frequency for UHF. */
+  /** A reference to the auto-repeater frequency for UHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* uhf READ uhfRef)
   /** The repeater transmit offset frequencies. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetList* offsets READ offsets)
