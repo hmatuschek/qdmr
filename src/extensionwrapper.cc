@@ -468,18 +468,21 @@ PropertyWrapper::flags(const QModelIndex &index) const {
   if (isProperty(index)) {
     // check if property is a config object or atomic (or reference)
     QMetaProperty prop = propertyAt(index);
+    // Object can be selected and expanded, but not edited directly
     if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-
+    // References are edited directly by combo-box. See PropertyDelegate. They cannot be expanded.
     if (propIsInstance<ConfigObjectReference>(prop) && prop.isScriptable() && (1 == index.column()))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
-
+    // Atomic properties are directly editable, see also PropertyDelegate. They cannot be expanded.
     if (prop.isWritable() && (1 == index.column()))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+    // Some default values.
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
   } else if (isListElement(index)) {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   }
+
   return Qt::NoItemFlags;
 }
 
