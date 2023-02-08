@@ -745,6 +745,11 @@ class AnytoneAutoRepeaterOffset: public ConfigObject
   Q_OBJECT
   Q_CLASSINFO("IdPrefix", "off")
 
+  Q_CLASSINFO("offsetDecription",
+              "Transmit-frequency offset in Hz.")
+  Q_CLASSINFO("offsetLongDecription",
+              "The transmit-frequency offset is specified as a positive integer in Hz. The offset "
+              "direction is specified for each VFO separately.")
   /** The offset frequency. */
   Q_PROPERTY(unsigned int offset READ offset WRITE setOffset)
 
@@ -798,15 +803,25 @@ public:
 class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
 {
   Q_OBJECT
+  Q_CLASSINFO("description", "Auto-repeater settings for AnyTone devices.")
 
+  Q_CLASSINFO("directionADescription", "Auto-repeater transmit-frequency offset direction for VFO A.")
   /** Specifies the auto-repeater transmit-frequency offset direction for VFO A. */
   Q_PROPERTY(Direction directionA READ directionA WRITE setDirectionA)
+
+  Q_CLASSINFO("directionBDescription", "Auto-repeater transmit-frequency offset direction for VFO B.")
   /** Specifies the auto-repeater transmit-frequency offset direction for VFO B. */
   Q_PROPERTY(Direction directionB READ directionB WRITE setDirectionB)
+
+  Q_CLASSINFO("vhfDescription", "A reference to an offset frequency for the VHF band.")
   /** A reference to the auto-repeater frequency for VHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* vhf READ vhfRef)
+
+  Q_CLASSINFO("uhfDescription", "A reference to an offset frequency for the UHF band.")
   /** A reference to the auto-repeater frequency for UHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* uhf READ uhfRef)
+
+  Q_CLASSINFO("offsetDescription", "The lists of offset frequencies.")
   /** The repeater transmit offset frequencies. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetList* offsets READ offsets)
 
@@ -866,21 +881,31 @@ class AnytoneSettingsExtension: public ConfigExtension
 {
   Q_OBJECT
 
+  Q_CLASSINFO("description", "Device specific settings for AnyTone devices.")
+
+  Q_CLASSINFO("autoShutDownDelayDescription", "The auto shut-down delay in minutes.")
   /** The auto shut-down delay in minutes. */
   Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+
   /** The power-save mode. */
   Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
 
+  Q_CLASSINFO("subChannelDescription", "Enables/disables the sub-channel.")
   /** If @c true, the sub-channel is enabled. */
   Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
+
   /** The current active VFO. */
   Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
+
   /** The mode of VFO A. */
   Q_PROPERTY(VFOMode modeA READ modeA WRITE setModeA)
+
   /** The mode of VFO B. */
   Q_PROPERTY(VFOMode modeB READ modeB WRITE setModeB)
+
   /** The current zone for VFO A. */
   Q_PROPERTY(ZoneReference* zoneA READ zoneA)
+
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
 

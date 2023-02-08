@@ -673,7 +673,6 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
-  this->allocateRepeaterOffsetFrequencies();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
 
@@ -716,6 +715,7 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateGeneralSettings();
   this->allocateZoneChannelList();
   this->allocateBootSettings();
+  this->allocateRepeaterOffsetFrequencies();
 
   // GPS settings
   this->allocateGPSSystems();
