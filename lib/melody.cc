@@ -235,7 +235,7 @@ Melody::Note::toLilypond(Duration currentDuration) const {
   }
   if (Tone::Rest != tone) {
     if (0 > octave) {
-      for (int i=0; i<-octave; i++)
+      for (int i=0; i<(-octave); i++)
         res.append(",");
     } else if (0 < octave) {
       for (int i=0; i<octave; i++)
@@ -299,25 +299,28 @@ Melody::Note::toTone(unsigned int bpm) const {
 unsigned int
 Melody::Note::infer(double frequency, unsigned int ms, unsigned int bpm) {
   // Try to infer half-tones from A4
-  int halfTones = std::round(std::log2(frequency/440.)*12.0);
-  int halfTonesC4 = halfTones+9;
-  octave = halfTonesC4/12;
-  halfTonesC4 = std::abs(halfTonesC4)%12;
-  switch(halfTonesC4) {
-  case 0: tone = Tone::C; break;
-  case 1: tone = Tone::Cis; break;
-  case 2: tone = Tone::D; break;
-  case 3: tone = Tone::Dis; break;
-  case 4: tone = Tone::E; break;
-  case 5: tone = Tone::F; break;
-  case 6: tone = Tone::Fis; break;
-  case 7: tone = Tone::G; break;
-  case 8: tone = Tone::Gis; break;
-  case 9: tone = Tone::A; break;
-  case 10: tone = Tone::Ais; break;
-  case 11: tone = Tone::B; break;
+  if (frequency) {
+    int halfTones = std::round(std::log2(frequency/440.)*12.0);
+    int halfTonesC4 = halfTones+9;
+    octave = halfTonesC4/12;
+    halfTonesC4 = std::abs(halfTonesC4)%12;
+    switch(halfTonesC4) {
+    case 0: tone = Tone::C; break;
+    case 1: tone = Tone::Cis; break;
+    case 2: tone = Tone::D; break;
+    case 3: tone = Tone::Dis; break;
+    case 4: tone = Tone::E; break;
+    case 5: tone = Tone::F; break;
+    case 6: tone = Tone::Fis; break;
+    case 7: tone = Tone::G; break;
+    case 8: tone = Tone::Gis; break;
+    case 9: tone = Tone::A; break;
+    case 10: tone = Tone::Ais; break;
+    case 11: tone = Tone::B; break;
+    }
+  } else {
+    octave = 0; tone = Tone::Rest;
   }
-
   // Try to infer note duration from duration and BPM
   static const unsigned int bar = (4*60000)/bpm;
   int fraction = std::round(std::log2(bar)-std::log2(ms));
