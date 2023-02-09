@@ -1,4 +1,6 @@
 #include "melody.hh"
+#include "logger.hh"
+
 #include <QRegularExpression>
 
 
@@ -298,8 +300,8 @@ Melody::Note::toTone(unsigned int bpm) const {
 
 unsigned int
 Melody::Note::infer(double frequency, unsigned int ms, unsigned int bpm) {
-  // Try to infer half-tones from A4
   if (frequency) {
+    // Try to infer half-tones from A4
     int halfTones = std::round(std::log2(frequency/440.)*12.0);
     int halfTonesC4 = halfTones+9;
     octave = halfTonesC4/12;
@@ -318,9 +320,14 @@ Melody::Note::infer(double frequency, unsigned int ms, unsigned int bpm) {
     case 10: tone = Tone::Ais; break;
     case 11: tone = Tone::B; break;
     }
-  } else {
+  } else if (ms) {
+    // Obviously a rest
     octave = 0; tone = Tone::Rest;
+  } else {
+    logWarn() << "Cannot infer a note of frequency and duration 0.";
+    octave = 0; tone = Tone::Rest; duration = Duration::Quater; dotted=false;
   }
+
   // Try to infer note duration from duration and BPM
   static const unsigned int bar = (4*60000)/bpm;
   int fraction = std::round(std::log2(bar)-std::log2(ms));

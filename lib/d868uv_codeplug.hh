@@ -275,9 +275,9 @@ public:
     void clear();
 
     /** Returns the display color for callsigns. */
-    virtual Color callDisplayColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     /** Sets the display color for callsigns. */
-    virtual void setCallDisplayColor(Color color);
+    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
     /** Returns the GPS update period in seconds. */
     virtual unsigned gpsUpdatePeriod() const;
     /** Sets the GPS update period in seconds. */

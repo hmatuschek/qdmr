@@ -825,12 +825,12 @@ D878UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
   setUInt8(0x00bb, 0);
 }
 
-D878UVCodeplug::GeneralSettingsElement::Color
+AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (Color)getUInt8(0x00bc);
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00bc);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
+D878UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
   setUInt8(0x00bc, (unsigned)color);
 }
 
@@ -885,21 +885,21 @@ D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(unsigned sec) {
   setUInt8(0x00bf, sec);
 }
 
-D878UVCodeplug::GeneralSettingsElement::Color
+AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
-  return (Color)getUInt8(0x00c0);
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00c0);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setStandbyTextColor(Color color) {
+D878UVCodeplug::GeneralSettingsElement::setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color) {
   setUInt8(0x00c0, (unsigned)color);
 }
 
-D878UVCodeplug::GeneralSettingsElement::Color
+AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::standbyImageColor() const {
-  return (Color)getUInt8(0x00c1);
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00c1);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setStandbyImageColor(Color color) {
+D878UVCodeplug::GeneralSettingsElement::setStandbyImageColor(AnytoneDisplaySettingsExtension::Color color) {
   setUInt8(0x00c1, (unsigned)color);
 }
 
@@ -1097,12 +1097,12 @@ D878UVCodeplug::GeneralSettingsElement::enableKeepCaller(bool enable) {
   setUInt8(0x00e3, (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsElement::Color
+AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::channelNameColor() const {
-  return (Color) getUInt8(0x00e4);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(0x00e4);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setChannelNameColor(Color color) {
+D878UVCodeplug::GeneralSettingsElement::setChannelNameColor(AnytoneDisplaySettingsExtension::Color color) {
   setUInt8(0x00e4, (unsigned)color);
 }
 

@@ -554,9 +554,9 @@ public:
     virtual void setKeyToneLevelAdjustable();
 
     /** Returns the display color for callsigns. */
-    virtual Color callDisplayColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     /** Sets the display color for callsigns. */
-    virtual void setCallDisplayColor(Color color);
+    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the GPS units are imperial. */
     virtual bool gpsUnitsImperial() const;
@@ -586,13 +586,13 @@ public:
     virtual void setAutoRoamDelay(unsigned sec);
 
     /** Returns the standby text color. */
-    virtual Color standbyTextColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
     /** Sets the standby text color. */
-    virtual void setStandbyTextColor(Color color);
+    virtual void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
     /** Returns the standby image color. */
-    virtual Color standbyImageColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color standbyImageColor() const;
     /** Sets the standby image color. */
-    virtual void setStandbyImageColor(Color color);
+    virtual void setStandbyImageColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the last heard is shown. */
     virtual bool showLastHeard() const;
@@ -697,9 +697,9 @@ public:
     virtual void enableKeepCaller(bool enable);
 
     /** Returns the channel name color. */
-    virtual Color channelNameColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color channelNameColor() const;
     /** Sets the channel name color. */
-    virtual void setChannelNameColor(Color color);
+    virtual void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if repeater check notification is enabled. */
     virtual bool repeaterCheckNotification() const;

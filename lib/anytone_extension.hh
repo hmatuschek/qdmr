@@ -460,19 +460,36 @@ protected:
 class AnytoneToneSettingsExtension: public ConfigItem
 {
   Q_OBJECT
+  Q_CLASSINFO("description", "Tone settings for AnyTone devices.")
 
+  Q_CLASSINFO("keyToneDescription", "If true, enables the key tones.")
   /** The key tone setting. */
   Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
+
+  Q_CLASSINFO("keyToneLevelDescription", "Specifies the key-tone level, 0=user adjustable.")
+  /** The key tone level setting. */
+  Q_PROPERTY(unsigned int keyToneLevel READ keyToneLevel WRITE setKeyToneLevel)
+
+  Q_CLASSINFO("smsAlertDescription", "Enables/disables the SMS alert tone.")
   /** If @c true, the SMS alert tone is enabled. */
   Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
+
+  Q_CLASSINFO("callAlertDescription", "Enables/disables the call alert tone.")
   /** If @c true, the call alert tone is enabled. */
   Q_PROPERTY(bool callAlert READ callAlertEnabled WRITE enableCallAlert)
+
+  Q_CLASSINFO("dmrTalkPermitDescription", "Enables/disables the talk-permit tone for DMR channels.")
   /** If @c true, the DMR talk permit tone is enabled. */
   Q_PROPERTY(bool dmrTalkPermit READ talkPermitDigitalEnabled WRITE enableTalkPermitDigital)
+
+  Q_CLASSINFO("fmTalkPermitDescription", "Enables/disables the talk-permit tone for FM channels.")
   /** If @c true, the FM talk permit tone is enabled. */
   Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
+
+  Q_CLASSINFO("dmrResetDescription", "Enables/disables the reset tone for DMR channels.")
   /** If @c true, the DMR reset tone is enabled. */
   Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
+
   /** If @c true, the idle tone is enabled. */
   Q_PROPERTY(bool idle READ idleChannelToneEnabled WRITE enableIdleChannelTone)
   /** If @c true, the startup tone is enabled. */
@@ -532,6 +549,11 @@ public:
   /** Returns a reference to the reset melody. */
   Melody *resetMelody() const;
 
+  /** Returns the key-tone level. */
+  unsigned int keyToneLevel() const;
+  /** Sets the key-tone level. */
+  void setKeyToneLevel(unsigned int level);
+
 protected:
   bool _keyTone;                   ///< Key tone property.
   bool _smsAlert;                  ///< SMS alert tone enabled.
@@ -544,6 +566,7 @@ protected:
   Melody *_callMelody;             ///< Call melody.
   Melody *_idleMelody;             ///< Idle melody.
   Melody *_resetMelody;            ///< Reset melody.
+  unsigned int _keyToneLevel;      ///< The level of key-tones, 0=user adjustable.
 };
 
 
@@ -571,6 +594,10 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(bool showClock READ showClockEnabled WRITE enableShowClock)
   /** If @c true, the call is shown. */
   Q_PROPERTY(bool showCall READ showCallEnabled WRITE enableShowCall)
+  /** The color of the call. */
+  Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
+  /** If @c true, the zone and contact names is shown. */
+  Q_PROPERTY(bool showZoneAndContact READ showZoneAndContactEnabled WRITE enableShowZoneAndContact)
 
 public:
   /** What to show from the last caller. */
@@ -578,6 +605,12 @@ public:
     Off = 0, ID = 1, Call = 2, Both = 3
   };
   Q_ENUM(LastCallerDisplayMode)
+
+  /** Possible display colors. */
+  enum class Color {
+    Black = 0, Red = 1
+  };
+  Q_ENUM(Color)
 
 public:
   /** Constructor. */
@@ -625,6 +658,16 @@ public:
   /** Enables/disables display of call. */
   void enableShowCall(bool enable);
 
+  /** Returns the color of the call. */
+  Color callColor() const;
+  /** Sets the color of the call. */
+  void setCallColor(Color color);
+
+  /** Returns @c true if the zone and contact names are shown. */
+  bool showZoneAndContactEnabled() const;
+  /** Enables/disables showing the zone and contact names. */
+  void enableShowZoneAndContact(bool enable);
+
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
   unsigned int _brightness;                 ///< The display brightness.
@@ -634,6 +677,8 @@ protected:
   LastCallerDisplayMode _lastCallerDisplay; ///< Last-caller display mode.
   bool _showClock;                          ///< Display clock.
   bool _showCall;                           ///< Display call.
+  Color _callColor;                         ///< Color of call.
+  bool _showZoneAndContact;                 ///< Display zone and contact
 };
 
 

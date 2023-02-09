@@ -603,11 +603,6 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** Possible display colors. */
-    enum class Color {
-      Black = 0, Red = 1
-    };
-
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);

@@ -398,12 +398,12 @@ D868UVCodeplug::GeneralSettingsElement::clear() {
   AnytoneCodeplug::GeneralSettingsElement::clear();
 }
 
-D868UVCodeplug::GeneralSettingsElement::Color
+AnytoneDisplaySettingsExtension::Color
 D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (Color)getUInt8(0x00b0);
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00b0);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
+D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
   setUInt8(0x00b0, (unsigned)color);
 }
 
@@ -616,6 +616,13 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
 
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Encode tone settings
+    setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+    // Encode display settings
+    setCallDisplayColor(ext->displaySettings()->callColor());
+    enableShowZoneAndContact(ext->displaySettings()->showZoneAndContactEnabled());
+
     // Encode auto-repeater settings
     setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
   }
@@ -636,6 +643,12 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Decode display settings
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+  ext->displaySettings()->enableShowZoneAndContact(this->showZoneAndContact());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());

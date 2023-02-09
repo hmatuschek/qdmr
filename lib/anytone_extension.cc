@@ -792,7 +792,7 @@ AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
     _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
     _idleChannelTone(false), _startupTone(false), _callMelody(new Melody(100, this)),
-    _idleMelody(new Melody(100, this)), _resetMelody(new Melody(100, this))
+    _idleMelody(new Melody(100, this)), _resetMelody(new Melody(100, this)), _keyToneLevel(0)
 {
   connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
   connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
@@ -918,6 +918,18 @@ AnytoneToneSettingsExtension::resetMelody() const {
   return _resetMelody;
 }
 
+unsigned int
+AnytoneToneSettingsExtension::keyToneLevel() const {
+  return _keyToneLevel;
+}
+void
+AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
+  if (_keyToneLevel == level)
+    return;
+  _keyToneLevel = level;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneDisplaySettingsExtension
@@ -925,7 +937,8 @@ AnytoneToneSettingsExtension::resetMelody() const {
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
   : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10),
     _volumeChangePrompt(true), _callEndPrompt(true),
-    _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true)
+    _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
+    _callColor(Color::Red), _showZoneAndContact(true)
 {
   // pass...
 }
@@ -1033,6 +1046,30 @@ AnytoneDisplaySettingsExtension::enableShowCall(bool enable) {
   if (_showCall == enable)
     return;
   _showCall = enable;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Color
+AnytoneDisplaySettingsExtension::callColor() const {
+  return _callColor;
+}
+void
+AnytoneDisplaySettingsExtension::setCallColor(Color color) {
+  if (_callColor == color)
+    return;
+  _callColor = color;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showZoneAndContactEnabled() const {
+  return _showZoneAndContact;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowZoneAndContact(bool enable) {
+  if (_showZoneAndContact == enable)
+    return;
+  _showZoneAndContact = enable;
   emit modified(this);
 }
 
