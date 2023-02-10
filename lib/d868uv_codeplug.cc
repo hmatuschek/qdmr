@@ -616,6 +616,34 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
 
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Encode boot settings
+    enableDefaultChannel(
+          ext->bootSettings()->defaultChannelEnabled() &&
+          (! ext->bootSettings()->zoneA()->isNull()) &&
+          (! ext->bootSettings()->zoneB()->isNull()));
+
+    if (defaultChannel()) {
+      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelA()->isNull() ||
+          (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelA()->as<Channel>())))
+        setDefaultChannelAToVFO();
+      else
+        setDefaultChannelAIndex(
+              ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
+                ext->bootSettings()->channelA()->as<Channel>()));
+
+      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelB()->isNull() ||
+          (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelB()->as<Channel>())))
+        setDefaultChannelBToVFO();
+      else
+        setDefaultChannelBIndex(
+              ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
+                ext->bootSettings()->channelB()->as<Channel>()));
+    }
+
     // Encode key settings
     enableKnobLock(ext->keySettings()->knobLockEnabled());
     enableKeypadLock(ext->keySettings()->keypadLockEnabled());
@@ -656,6 +684,10 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Decode boot settings
+  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
+
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
   ext->keySettings()->enableKeypadLock(this->keypadLock());
@@ -683,6 +715,58 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   return true;
 }
 
+bool
+D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (settings->anytoneExtension()) {
+    ext = settings->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    settings->setAnytoneExtension(ext);
+  }
+
+  // Link boot settings
+  if (this->defaultChannel()) {
+    if (! ctx.has<Zone>(this->defaultZoneIndexA())) {
+      errMsg(err) << "Cannot link default zone A. Zone index " << this->defaultZoneIndexA()
+                  << " not defined.";
+      return false;
+    }
+    Zone *zone = ctx.get<Zone>(this->defaultZoneIndexA());
+    ext->bootSettings()->zoneA()->set(zone);
+    if (this->defaultChannelAIsVFO()) {
+      // pass...
+    } else if (this->defaultChannelAIndex() >= (unsigned int)zone->A()->count()) {
+      errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
+                  << " out of bounds.";
+      return false;
+    } else {
+      ext->bootSettings()->channelA()->set(
+            zone->A()->get(this->defaultChannelAIndex())->as<Channel>());
+    }
+
+    if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
+      errMsg(err) << "Cannot link default zone B. Zone index " << this->defaultZoneIndexB()
+                  << " not defined.";
+      return false;
+    }
+    zone = ctx.get<Zone>(this->defaultZoneIndexB());
+    ext->bootSettings()->zoneB()->set(zone);
+    if (this->defaultChannelBIsVFO()) {
+      // pass...
+    } else if (this->defaultChannelBIndex() >= (unsigned int)zone->A()->count()) {
+      errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
+                  << " out of bounds.";
+      return false;
+    } else {
+      ext->bootSettings()->channelB()->set(
+            zone->A()->get(this->defaultChannelBIndex())->as<Channel>());
+    }
+  }
+
+  return true;
+}
 
 /* ******************************************************************************************** *
  * Implementation of D868UVCodeplug

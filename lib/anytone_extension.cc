@@ -516,62 +516,6 @@ AnytoneSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
-
-/* ********************************************************************************************* *
- * Implementation of AnytoneBootSettingsExtension
- * ********************************************************************************************* */
-AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _bootDisplay(BootDisplay::Default), _bootPasswordEnabled(false)
-{
-  // pass...
-}
-
-ConfigItem *
-AnytoneBootSettingsExtension::clone() const {
-  AnytoneBootSettingsExtension *ext = new AnytoneBootSettingsExtension();
-  if (! ext->copy(*this)) {
-    ext->deleteLater();
-    return nullptr;
-  }
-  return ext;
-}
-
-AnytoneBootSettingsExtension::BootDisplay
-AnytoneBootSettingsExtension::bootDisplay() const {
-  return _bootDisplay;
-}
-void
-AnytoneBootSettingsExtension::setBootDisplay(BootDisplay mode) {
-  if (_bootDisplay == mode)
-    return;
-  _bootDisplay = mode;
-  emit modified(this);
-}
-
-bool
-AnytoneBootSettingsExtension::bootPasswordEnabled() const {
-  return _bootPasswordEnabled;
-}
-void
-AnytoneBootSettingsExtension::enableBootPassword(bool enable) {
-  if (_bootPasswordEnabled == enable)
-    return;
-  _bootPasswordEnabled = enable;
-  emit modified(this);
-}
-
-const QString &
-AnytoneBootSettingsExtension::bootPassword() const {
-  return _bootPassword;
-}
-void
-AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
-  if (_bootPassword == pass)
-    return;
-  _bootPassword = pass;
-  emit modified(this);
-}
-
 unsigned int
 AnytoneSettingsExtension::minVFOScanFrequencyUHF() const {
   return _minVFOScanFrequencyUHF;
@@ -628,6 +572,93 @@ AnytoneSettingsExtension::setUnits(Units units) {
     return;
   _gpsUnits = units;
   emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneBootSettingsExtension
+ * ********************************************************************************************* */
+AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _bootDisplay(BootDisplay::Default), _bootPasswordEnabled(false),
+    _defaultChannel(false), _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
+    _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneBootSettingsExtension::clone() const {
+  AnytoneBootSettingsExtension *ext = new AnytoneBootSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+AnytoneBootSettingsExtension::BootDisplay
+AnytoneBootSettingsExtension::bootDisplay() const {
+  return _bootDisplay;
+}
+void
+AnytoneBootSettingsExtension::setBootDisplay(BootDisplay mode) {
+  if (_bootDisplay == mode)
+    return;
+  _bootDisplay = mode;
+  emit modified(this);
+}
+
+bool
+AnytoneBootSettingsExtension::bootPasswordEnabled() const {
+  return _bootPasswordEnabled;
+}
+void
+AnytoneBootSettingsExtension::enableBootPassword(bool enable) {
+  if (_bootPasswordEnabled == enable)
+    return;
+  _bootPasswordEnabled = enable;
+  emit modified(this);
+}
+
+const QString &
+AnytoneBootSettingsExtension::bootPassword() const {
+  return _bootPassword;
+}
+void
+AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
+  if (_bootPassword == pass)
+    return;
+  _bootPassword = pass;
+  emit modified(this);
+}
+
+bool
+AnytoneBootSettingsExtension::defaultChannelEnabled() const {
+  return _defaultChannel;
+}
+void
+AnytoneBootSettingsExtension::enableDefaultChannel(bool enable) {
+  if (_defaultChannel == enable)
+    return;
+  _defaultChannel = enable;
+  emit modified(this);
+}
+
+ZoneReference *
+AnytoneBootSettingsExtension::zoneA() const {
+  return _zoneA;
+}
+ChannelReference *
+AnytoneBootSettingsExtension::channelA() const {
+  return _channelA;
+}
+ZoneReference *
+AnytoneBootSettingsExtension::zoneB() const {
+  return _zoneB;
+}
+ChannelReference *
+AnytoneBootSettingsExtension::channelB() const {
+  return _channelB;
 }
 
 

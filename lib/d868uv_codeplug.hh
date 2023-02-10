@@ -374,8 +374,9 @@ public:
     /** Enables/disables keeping the last caller when changing the channel. */
     virtual void enableKeepLastCaller(bool enable);
 
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
-    virtual bool updateConfig(Context &ctx);
+    bool fromConfig(const Flags &flags, Context &ctx);
+    bool updateConfig(Context &ctx);
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
 protected:

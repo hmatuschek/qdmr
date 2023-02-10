@@ -292,6 +292,17 @@ class AnytoneBootSettingsExtension: public ConfigItem
   /** Holds the boot password. */
   Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
 
+  /** If enables, the default channels are selected at boot. */
+  Q_PROPERTY(bool defaultChannel READ defaultChannelEnabled WRITE enableDefaultChannel)
+  /** The default zone for VFO A. */
+  Q_PROPERTY(ZoneReference* zoneA READ zoneA)
+  /** The default channel for VFO A. */
+  Q_PROPERTY(ChannelReference* channelA READ channelA)
+  /** The current zone for VFO B. */
+  Q_PROPERTY(ZoneReference* zoneB READ zoneB)
+  /** The default channel for VFO B. */
+  Q_PROPERTY(ChannelReference* channelB READ channelB)
+
 public:
   /** What to display during boot. */
   enum class BootDisplay {
@@ -319,15 +330,27 @@ public:
   void setBootPassword(const QString &pass);
 
   /** If @c true, the radio switches to the default channel at boot. */
-  bool defaultChannel() const;
+  bool defaultChannelEnabled() const;
   /** Enables/disables boot default channel. */
   void enableDefaultChannel(bool enable);
+  /** Returns a reference to the default zone for VFO A. */
+  ZoneReference *zoneA() const;
+  /** Returns a reference to the default channel for VFO A. */
+  ChannelReference *channelA() const;
+  /** Returns a reference to the default zone for VFO B. */
+  ZoneReference *zoneB() const;
+  /** Returns a reference to the default channel for VFO B. */
+  ChannelReference *channelB() const;
 
 protected:
   BootDisplay _bootDisplay;        ///< The boot display property.
   bool _bootPasswordEnabled;       ///< If true, the boot password is enabled.
   QString _bootPassword;           ///< The boot password
   bool _defaultChannel;            ///< Change to the default channel on boot.
+  ZoneReference *_zoneA;           ///< Default zone for VFO A.
+  ChannelReference *_channelA;     ///< Default channel for VFO A, must be member of zone for VFO A.
+  ZoneReference *_zoneB;           ///< Default zone for VFO B.
+  ChannelReference *_channelB;     ///< Default channel for VFO B, must be member of zone for VFO B.
 };
 
 
