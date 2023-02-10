@@ -625,6 +625,9 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
     // Encode auto-repeater settings
     setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+
+    // Encode other settings
+    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
   }
 
   return true;
@@ -652,6 +655,10 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
+  // Decode other settings
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
+                                           AnytoneSettingsExtension::Units::Metric);
 
   return true;
 }

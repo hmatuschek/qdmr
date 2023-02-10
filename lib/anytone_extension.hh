@@ -968,6 +968,10 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The maximum VHF VFO-scan frequency in Hz. */
   Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
+  Q_CLASSINFO("unitsDescription", "Specifies the GPS units.")
+  /** The GPS units used. */
+  Q_PROPERTY(Units units READ units WRITE setUnits)
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The key settings. */
@@ -1007,6 +1011,12 @@ public:
     A = 0, B = 1
   };
   Q_ENUM(VFO)
+
+  /** Possible unit systems. */
+  enum class Units {
+    Metric = 0, Imperial = 1
+  };
+  Q_ENUM(Units)
 
 public:
   /** Constructor. */
@@ -1099,6 +1109,11 @@ public:
   /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
   void setMaxVFOScanFrequencyVHF(unsigned hz);
 
+  /** Returns the GPS units used. */
+  Units units() const;
+  /** Sets the GPS units. */
+  void setUnits(Units units);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
@@ -1129,6 +1144,7 @@ protected:
   unsigned int _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
   unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
   unsigned int _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
+  Units _gpsUnits;                 ///< The GPS units.
 };
 
 #endif // ANYTONEEXTENSION_HH
