@@ -618,6 +618,18 @@ AnytoneSettingsExtension::setMaxVFOScanFrequencyVHF(unsigned hz) {
   emit modified(this);
 }
 
+AnytoneSettingsExtension::Units
+AnytoneSettingsExtension::units() const {
+  return _gpsUnits;
+}
+void
+AnytoneSettingsExtension::setUnits(Units units) {
+  if (_gpsUnits == units)
+    return;
+  _gpsUnits = units;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneKeySettingsExtension
@@ -629,7 +641,8 @@ AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
     _progFuncKey3Short(KeyFunction::Power), _progFuncKey3Long(KeyFunction::VOX),
     _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::VFOChannel),
     _funcKey2Short(KeyFunction::Reverse), _funcKey2Long(KeyFunction::Off),
-    _longPressDuration(1000), _autoKeyLock(false)
+    _longPressDuration(1000), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
+    _sideKeysLock(false), _forcedKeyLock(false)
 {
   // pass...
 }
@@ -780,6 +793,51 @@ AnytoneKeySettingsExtension::enableAutoKeyLock(bool enabled) {
   if (_autoKeyLock==enabled)
     return;
   _autoKeyLock = enabled;
+  emit modified(this);
+}
+
+bool
+AnytoneKeySettingsExtension::knobLockEnabled() const {
+  return _knobLock;
+}
+void
+AnytoneKeySettingsExtension::enableKnobLock(bool enable) {
+  if (_knobLock == enable)
+    return;
+  _knobLock = enable;
+  emit modified(this);
+}
+bool
+AnytoneKeySettingsExtension::keypadLockEnabled() const {
+  return _keypadLock;
+}
+void
+AnytoneKeySettingsExtension::enableKeypadLock(bool enable) {
+  if (_keypadLock == enable)
+    return;
+  _keypadLock = enable;
+  emit modified(this);
+}
+bool
+AnytoneKeySettingsExtension::sideKeysLockEnabled() const {
+  return _sideKeysLock;
+}
+void
+AnytoneKeySettingsExtension::enableSideKeysLock(bool enable) {
+  if (_sideKeysLock == enable)
+    return;
+  _sideKeysLock = enable;
+  emit modified(this);
+}
+bool
+AnytoneKeySettingsExtension::forcedKeyLockEnabled() const {
+  return _forcedKeyLock;
+}
+void
+AnytoneKeySettingsExtension::enableForcedKeyLock(bool enable) {
+  if (_forcedKeyLock == enable)
+    return;
+  _forcedKeyLock = enable;
   emit modified(this);
 }
 
@@ -1203,6 +1261,7 @@ AnytoneMenuSettingsExtension::setDuration(unsigned int sec) {
  * ********************************************************************************************* */
 AnytoneAutoRepeaterSettingsExtension::AnytoneAutoRepeaterSettingsExtension(QObject *parent)
   : ConfigItem(parent), _directionA(Direction::Off), _directionB(Direction::Off),
+    _minVHF(136000000U), _maxVHF(174000000U), _minUHF(400000000U), _maxUHF(480000000U),
     _vhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
     _uhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
     _offsets(new AnytoneAutoRepeaterOffsetList(this))
@@ -1240,6 +1299,51 @@ AnytoneAutoRepeaterSettingsExtension::setDirectionB(Direction dir) {
   if (_directionB == dir)
     return;
   _directionB = dir;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneAutoRepeaterSettingsExtension::vhfMin() const {
+  return _minVHF;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setVHFMin(unsigned int Hz) {
+  if (_minVHF == Hz)
+    return;
+  _minVHF = Hz;
+  emit modified(this);
+}
+unsigned int
+AnytoneAutoRepeaterSettingsExtension::vhfMax() const {
+  return _maxVHF;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setVHFMax(unsigned int Hz) {
+  if (_maxVHF == Hz)
+    return;
+  _maxVHF = Hz;
+  emit modified(this);
+}
+unsigned int
+AnytoneAutoRepeaterSettingsExtension::uhfMin() const {
+  return _minUHF;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setUHFMin(unsigned int Hz) {
+  if (_minUHF == Hz)
+    return;
+  _minUHF = Hz;
+  emit modified(this);
+}
+unsigned int
+AnytoneAutoRepeaterSettingsExtension::uhfMax() const {
+  return _maxUHF;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setUHFMax(unsigned int Hz) {
+  if (_maxUHF == Hz)
+    return;
+  _maxUHF = Hz;
   emit modified(this);
 }
 

@@ -616,6 +616,12 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
 
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Encode key settings
+    enableKnobLock(ext->keySettings()->knobLockEnabled());
+    enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+    enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+    enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
     // Encode tone settings
     setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
@@ -625,6 +631,10 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
     // Encode auto-repeater settings
     setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
@@ -646,6 +656,12 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+  // Decode key settings
+  ext->keySettings()->enableKnobLock(this->knobLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
+  ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
+
   // Decode tone settings
   ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
@@ -655,6 +671,10 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :

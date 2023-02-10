@@ -318,10 +318,16 @@ public:
   /** Sets the boot password. */
   void setBootPassword(const QString &pass);
 
+  /** If @c true, the radio switches to the default channel at boot. */
+  bool defaultChannel() const;
+  /** Enables/disables boot default channel. */
+  void enableDefaultChannel(bool enable);
+
 protected:
   BootDisplay _bootDisplay;        ///< The boot display property.
   bool _bootPasswordEnabled;       ///< If true, the boot password is enabled.
   QString _bootPassword;           ///< The boot password
+  bool _defaultChannel;            ///< Change to the default channel on boot.
 };
 
 
@@ -357,6 +363,22 @@ class AnytoneKeySettingsExtension: public ConfigItem
   Q_PROPERTY(unsigned int longPressDuration READ longPressDuration WRITE setLongPressDuration)
   /** The auto key-lock property. */
   Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
+
+  Q_CLASSINFO("knobLockDescription", "If enabled, the knob gets locked too.")
+  /** If @c true, the knob gets locked too. */
+  Q_PROPERTY(bool knobLock READ knobLockEnabled WRITE enableKnobLock)
+
+  Q_CLASSINFO("keypadLockDescription", "If enabled, the key-pad gets locked.")
+  /** If @c true, the key-pad gets locked too. */
+  Q_PROPERTY(bool keypadLock READ keypadLockEnabled WRITE enableKeypadLock)
+
+  Q_CLASSINFO("sideKeysLockDescription", "If enabled, the side-keys get locked.")
+  /** If @c true, the side-keys get locked too. */
+  Q_PROPERTY(bool sideKeysLock READ sideKeysLockEnabled WRITE enableSideKeysLock)
+
+  Q_CLASSINFO("forcedKeyLockDescription", "If enabled, the key-lock is forced.")
+  /** If @c true, the key-lock is forced. */
+  Q_PROPERTY(bool forcedKeyLock READ forcedKeyLockEnabled WRITE enableForcedKeyLock)
 
 public:
   /** All possible key functions. */
@@ -437,6 +459,23 @@ public:
   /** Enables/disables auto key-lock. */
   void enableAutoKeyLock(bool enabled);
 
+  /** Returns @c true if the knob gets locked too. */
+  bool knobLockEnabled() const;
+  /** Enables/disables the knob lock. */
+  void enableKnobLock(bool enable);
+  /** Returns @c true if the key-pad gets locked too. */
+  bool keypadLockEnabled() const;
+  /** Enables/disables the key-pad lock. */
+  void enableKeypadLock(bool enable);
+  /** Returns @c true if the side-keys gets locked too. */
+  bool sideKeysLockEnabled() const;
+  /** Enables/disables the side-keys lock. */
+  void enableSideKeysLock(bool enable);
+  /** Returns @c true if the key-lock is forced. */
+  bool forcedKeyLockEnabled() const;
+  /** Enables/disables the forced key-lock. */
+  void enableForcedKeyLock(bool enable);
+
 protected:
   KeyFunction _progFuncKey1Short;          ///< Function of the programmable key 1, short press.
   KeyFunction _progFuncKey1Long;           ///< Function of the programmable key 1, long press.
@@ -450,6 +489,10 @@ protected:
   KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
   unsigned int _longPressDuration;         ///< The long-press duration in ms.
   bool _autoKeyLock;                       ///< Auto key-lock property.
+  bool _knobLock;                          ///< Knob locked too.
+  bool _keypadLock;                        ///< Key-pad is locked.
+  bool _sideKeysLock;                      ///< Side-keys are locked.
+  bool _forcedKeyLock;                     ///< Forced key-lock.
 };
 
 
@@ -608,7 +651,7 @@ public:
 
   /** Possible display colors. */
   enum class Color {
-    Black = 0, Red = 1
+    White = 0, Red = 1
   };
   Q_ENUM(Color)
 
@@ -858,6 +901,22 @@ class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
   /** Specifies the auto-repeater transmit-frequency offset direction for VFO B. */
   Q_PROPERTY(Direction directionB READ directionB WRITE setDirectionB)
 
+  Q_CLASSINFO("vhfMin", "The minimum frequency in Hz of the VHF auto-repeater frequency range.")
+  /** The minimum frequency in Hz of the VHF auto-repeater frequency range. */
+  Q_PROPERTY(unsigned int vhfMin READ vhfMin WRITE setVHFMin)
+
+  Q_CLASSINFO("vhfMax", "The maximum frequency in Hz of the VHF auto-repeater frequency range.")
+  /** The maximum frequency in Hz of the VHF auto-repeater frequency range. */
+  Q_PROPERTY(unsigned int vhfMax READ vhfMax WRITE setVHFMax)
+
+  Q_CLASSINFO("uhfMin", "The minimum frequency in Hz of the UHF auto-repeater frequency range.")
+  /** The minimum frequency in Hz of the UHF auto-repeater frequency range. */
+  Q_PROPERTY(unsigned int uhfMin READ uhfMin WRITE setUHFMin)
+
+  Q_CLASSINFO("uhfMax", "The maximum frequency in Hz of the UHF auto-repeater frequency range.")
+  /** The maximum frequency in Hz of the UHF auto-repeater frequency range. */
+  Q_PROPERTY(unsigned int uhfMax READ uhfMax WRITE setUHFMax)
+
   Q_CLASSINFO("vhfDescription", "A reference to an offset frequency for the VHF band.")
   /** A reference to the auto-repeater frequency for VHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* vhf READ vhfRef)
@@ -894,6 +953,23 @@ public:
   /** Set the auto-repeater offset direction for VFO V. */
   void setDirectionB(Direction dir);
 
+  /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
+  unsigned int vhfMin() const;
+  /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
+  void setVHFMin(unsigned int Hz);
+  /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
+  unsigned int vhfMax() const;
+  /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
+  void setVHFMax(unsigned int Hz);
+  /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
+  unsigned int uhfMin() const;
+  /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
+  void setUHFMin(unsigned int Hz);
+  /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
+  unsigned int uhfMax() const;
+  /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
+  void setUHFMax(unsigned int Hz);
+
   /** Returns the reference for the UHF offset freuqency. */
   AnytoneAutoRepeaterOffsetRef *uhfRef() const;
   /** Returns the reference for the VHF offset freuqency. */
@@ -907,6 +983,14 @@ protected:
   Direction _directionA;
   /** The auto-repeater direction for VFO B. */
   Direction _directionB;
+  /** Minimum frequency of the VHF auto-repeater range. */
+  unsigned int _minVHF;
+  /** Maximum frequency of the VHF auto-repeater range. */
+  unsigned int _maxVHF;
+  /** Minimum frequency of the UHF auto-repeater range. */
+  unsigned int _minUHF;
+  /** Maximum frequency of the UHF auto-repeater range. */
+  unsigned int _maxUHF;
   /** A reference to the VHF offset frequency. */
   AnytoneAutoRepeaterOffsetRef *_vhfOffset;
   /** A reference to the UHF offset frequency. */
