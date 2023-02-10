@@ -40,7 +40,7 @@
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Inget]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
@@ -113,24 +113,24 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Tidsgräns</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Avstängd</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="144"/>
         <source> s</source>
         <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> s</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="163"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX-nivå</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="191"/>
@@ -254,12 +254,12 @@
     <message>
         <location filename="../src/application.cc" line="280"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming-kanaler</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Roamingzoner</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="289"/>
@@ -379,7 +379,7 @@
         <location filename="../src/application.cc" line="609"/>
         <location filename="../src/application.cc" line="643"/>
         <source>No radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen radio hittades</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="491"/>
@@ -388,7 +388,7 @@
         <location filename="../src/application.cc" line="610"/>
         <location filename="../src/application.cc" line="644"/>
         <source>No matching device was found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen matchande enhet hittades.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="522"/>
@@ -460,7 +460,7 @@
     <message>
         <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (alias för %2 %3)</translation>
     </message>
 </context>
 <context>
@@ -504,42 +504,42 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Analog Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till analog kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="35"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
         <source>Add Digital Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till digital kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="45"/>
         <source>Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+D</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="52"/>
         <source>Clone Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Klona kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="55"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+C</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="62"/>
         <source>Delete Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="65"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -553,7 +553,7 @@
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>DMR</source>
         <translation type="unfinished"></translation>
-    </message>
+   </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
         <location filename="../src/configitemwrapper.cc" line="284"/>
@@ -561,32 +561,32 @@
         <location filename="../src/configitemwrapper.cc" line="382"/>
         <location filename="../src/configitemwrapper.cc" line="393"/>
         <source>[Default]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Standard]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
         <source>Max</source>
-        <translation type="unfinished">max.</translation>
+        <translation>max.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
         <source>High</source>
-        <translation type="unfinished">Hög</translation>
+        <translation>Hög</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="277"/>
         <source>Mid</source>
-        <translation type="unfinished">Mitten</translation>
+        <translation>Mitten</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="278"/>
         <source>Low</source>
-        <translation type="unfinished">Lågt</translation>
+        <translation>Lågt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>Min</source>
-        <translation type="unfinished">Minimalt</translation>
+        <translation>Minimalt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="286"/>
@@ -594,34 +594,34 @@
         <location filename="../src/configitemwrapper.cc" line="405"/>
         <location filename="../src/configitemwrapper.cc" line="415"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="289"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiverat</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
         <location filename="../src/configitemwrapper.cc" line="299"/>
         <source>Always</source>
-        <translation type="unfinished">Alltid</translation>
+        <translation>Alltid</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="294"/>
         <location filename="../src/configitemwrapper.cc" line="300"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Fri</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Färg</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="301"/>
         <source>Tone</source>
-        <translation type="unfinished">Ton</translation>
+        <translation>Ton</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="309"/>
@@ -631,7 +631,7 @@
         <location filename="../src/configitemwrapper.cc" line="374"/>
         <location filename="../src/configitemwrapper.cc" line="380"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="324"/>
@@ -645,57 +645,57 @@
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <location filename="../src/configitemwrapper.cc" line="422"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Ingen]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="395"/>
         <source>Open</source>
-        <translation type="unfinished">Öppet</translation>
+        <translation>Öppet</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="425"/>
         <source>Wide</source>
-        <translation type="unfinished"></translation>
+        <translation>bred</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="427"/>
         <source>Narrow</source>
-        <translation type="unfinished"></translation>
+        <translation>smal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>typ</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">RX-frekvens</translation>
+        <translation>RX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">TX-frekvens</translation>
+        <translation>TX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>Power</source>
-        <translation type="unfinished">Effekt</translation>
+        <translation>Effekt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>timeouttid</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="449"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Bara RX</translation>
+        <translation>Bara RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="450"/>
@@ -705,7 +705,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Scanlist</source>
-        <translation type="unfinished"></translation>
+        <translation>skanningslistan</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
@@ -715,57 +715,57 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="454"/>
         <source>TS</source>
-        <translation type="unfinished"></translation>
+        <translation>TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="455"/>
         <source>RX Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupplistan</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="456"/>
         <source>TX Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>TX kontakt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="457"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR ID</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="458"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished">GPS/APRS</translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="459"/>
         <source>Roaming</source>
-        <translation type="unfinished">Roaming</translation>
+        <translation>Roaming</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="460"/>
         <source>Squelch</source>
-        <translation type="unfinished">Squelch</translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="461"/>
         <source>Rx Tone</source>
-        <translation type="unfinished">RX Ton</translation>
+        <translation>RX Ton</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="462"/>
         <source>Tx Tone</source>
-        <translation type="unfinished">TX Ton</translation>
+        <translation>TX Ton</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="463"/>
         <source>Bandwidth</source>
-        <translation type="unfinished">Bandbredd</translation>
+        <translation>Bandbredd</translation>
     </message>
 </context>
 <context>
@@ -773,7 +773,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="491"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal</translation>
     </message>
 </context>
 <context>
@@ -781,7 +781,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="23"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj kanal:</translation>
     </message>
 </context>
 <context>
@@ -790,7 +790,7 @@
         <location filename="../src/configobjectlistview.cc" line="63"/>
         <location filename="../src/configobjectlistview.cc" line="84"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.cc" line="64"/>
