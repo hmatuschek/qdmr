@@ -29,22 +29,7 @@
         <translation>Om qdmr</translation>
     </message>
     <message>
-        <location filename="../shared/ui/aboutdialog.ui" line="52"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;title&gt;About qdmr&lt;/title&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:600;&quot;&gt;qdmr&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:600;&quot;&gt;Version %1&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:600;&quot;&gt;Hannes Matuschek, DM3MAT&lt;br /&gt; dm3mat@darc.de&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:600;&quot;&gt;qdmr&lt;/span&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt;&quot;&gt; – A platform independent configuration and programming tool for codeplugs of cheap DMR radios.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt;&quot;&gt;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt;&quot;&gt;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt;&quot;&gt;You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;/span&gt;&lt;a href=&quot;https://www.gnu.org/licenses/&quot;&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.gnu.org/licenses/&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/aboutdialog.ui" line="73"/>
+        <location filename="../shared/ui/aboutdialog.ui" line="76"/>
         <source>Supported Radios</source>
         <translation>Radio som stöds</translation>
     </message>
@@ -55,7 +40,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Inget]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
@@ -128,24 +113,24 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Tidsgräns</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Avstängd</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="144"/>
         <source> s</source>
         <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> s</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="163"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX-nivå</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="191"/>
@@ -269,12 +254,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="280"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming-kanaler</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Roamingzoner</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="289"/>
@@ -394,7 +379,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="609"/>
         <location filename="../src/application.cc" line="643"/>
         <source>No radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen radio hittades</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="491"/>
@@ -403,7 +388,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/application.cc" line="610"/>
         <location filename="../src/application.cc" line="644"/>
         <source>No matching device was found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen matchande enhet hittades.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="522"/>
@@ -475,7 +460,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (alias för %2 %3)</translation>
     </message>
 </context>
 <context>
@@ -519,271 +504,276 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Analog Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till analog kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="35"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
         <source>Add Digital Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till digital kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="45"/>
         <source>Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+D</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="52"/>
         <source>Clone Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Klona kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="55"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+C</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="62"/>
         <source>Delete Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kanal</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="65"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
     <name>ChannelListWrapper</name>
     <message>
         <location filename="../src/configitemwrapper.cc" line="259"/>
-        <source>Analog</source>
+        <source>FM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="261"/>
-        <source>Digital</source>
+        <source>DMR</source>
         <translation type="unfinished"></translation>
-    </message>
+   </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
         <location filename="../src/configitemwrapper.cc" line="284"/>
-        <location filename="../src/configitemwrapper.cc" line="349"/>
-        <location filename="../src/configitemwrapper.cc" line="373"/>
-        <location filename="../src/configitemwrapper.cc" line="384"/>
+        <location filename="../src/configitemwrapper.cc" line="358"/>
+        <location filename="../src/configitemwrapper.cc" line="382"/>
+        <location filename="../src/configitemwrapper.cc" line="393"/>
         <source>[Default]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Standard]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
         <source>Max</source>
-        <translation type="unfinished">max.</translation>
+        <translation>max.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
         <source>High</source>
-        <translation type="unfinished">Hög</translation>
+        <translation>Hög</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="277"/>
         <source>Mid</source>
-        <translation type="unfinished">Mitten</translation>
+        <translation>Mitten</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="278"/>
         <source>Low</source>
-        <translation type="unfinished">Lågt</translation>
+        <translation>Lågt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>Min</source>
-        <translation type="unfinished">Minimalt</translation>
+        <translation>Minimalt</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="286"/>
         <location filename="../src/configitemwrapper.cc" line="289"/>
-        <location filename="../src/configitemwrapper.cc" line="396"/>
-        <location filename="../src/configitemwrapper.cc" line="406"/>
+        <location filename="../src/configitemwrapper.cc" line="405"/>
+        <location filename="../src/configitemwrapper.cc" line="415"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="289"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiverat</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
         <location filename="../src/configitemwrapper.cc" line="299"/>
         <source>Always</source>
-        <translation type="unfinished">Alltid</translation>
+        <translation>Alltid</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="294"/>
         <location filename="../src/configitemwrapper.cc" line="300"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Fri</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Färg</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="301"/>
         <source>Tone</source>
-        <translation type="unfinished">Ton</translation>
+        <translation>Ton</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="309"/>
-        <location filename="../src/configitemwrapper.cc" line="330"/>
-        <location filename="../src/configitemwrapper.cc" line="341"/>
-        <location filename="../src/configitemwrapper.cc" line="360"/>
-        <location filename="../src/configitemwrapper.cc" line="365"/>
-        <location filename="../src/configitemwrapper.cc" line="371"/>
+        <location filename="../src/configitemwrapper.cc" line="339"/>
+        <location filename="../src/configitemwrapper.cc" line="350"/>
+        <location filename="../src/configitemwrapper.cc" line="369"/>
+        <location filename="../src/configitemwrapper.cc" line="374"/>
+        <location filename="../src/configitemwrapper.cc" line="380"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="315"/>
-        <location filename="../src/configitemwrapper.cc" line="322"/>
-        <location filename="../src/configitemwrapper.cc" line="333"/>
-        <location filename="../src/configitemwrapper.cc" line="343"/>
+        <location filename="../src/configitemwrapper.cc" line="324"/>
+        <location filename="../src/configitemwrapper.cc" line="331"/>
+        <location filename="../src/configitemwrapper.cc" line="342"/>
         <location filename="../src/configitemwrapper.cc" line="352"/>
-        <location filename="../src/configitemwrapper.cc" line="376"/>
-        <location filename="../src/configitemwrapper.cc" line="381"/>
-        <location filename="../src/configitemwrapper.cc" line="393"/>
-        <location filename="../src/configitemwrapper.cc" line="403"/>
-        <location filename="../src/configitemwrapper.cc" line="413"/>
+        <location filename="../src/configitemwrapper.cc" line="361"/>
+        <location filename="../src/configitemwrapper.cc" line="385"/>
+        <location filename="../src/configitemwrapper.cc" line="390"/>
+        <location filename="../src/configitemwrapper.cc" line="402"/>
+        <location filename="../src/configitemwrapper.cc" line="412"/>
+        <location filename="../src/configitemwrapper.cc" line="422"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Ingen]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="386"/>
+        <location filename="../src/configitemwrapper.cc" line="395"/>
         <source>Open</source>
-        <translation type="unfinished">Öppet</translation>
+        <translation>Öppet</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="416"/>
+        <location filename="../src/configitemwrapper.cc" line="425"/>
         <source>Wide</source>
-        <translation type="unfinished"></translation>
+        <translation>bred</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="418"/>
+        <location filename="../src/configitemwrapper.cc" line="427"/>
         <source>Narrow</source>
-        <translation type="unfinished"></translation>
+        <translation>smal</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="434"/>
+        <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>typ</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="435"/>
+        <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="436"/>
+        <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">RX-frekvens</translation>
+        <translation>RX-frekvens</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="437"/>
+        <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">TX-frekvens</translation>
+        <translation>TX-frekvens</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="438"/>
+        <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>Power</source>
-        <translation type="unfinished">Effekt</translation>
+        <translation>Effekt</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="439"/>
+        <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>timeouttid</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="440"/>
+        <location filename="../src/configitemwrapper.cc" line="449"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Bara RX</translation>
+        <translation>Bara RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="441"/>
+        <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Admit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="442"/>
-        <source>Scanlist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="443"/>
-        <source>CC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="444"/>
-        <source>TS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="445"/>
-        <source>RX Group List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="446"/>
-        <source>TX Contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="447"/>
-        <source>DMR ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="448"/>
-        <source>GPS/APRS</source>
-        <translation type="unfinished">GPS/APRS</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="449"/>
-        <source>Roaming</source>
-        <translation type="unfinished">Roaming</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="450"/>
-        <source>Squelch</source>
-        <translation type="unfinished">Squelch</translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
-        <source>Rx Tone</source>
-        <translation type="unfinished">RX Ton</translation>
+        <source>Scanlist</source>
+        <translation>skanningslistan</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
-        <source>Tx Tone</source>
-        <translation type="unfinished">TX Ton</translation>
+        <source>Zones</source>
+        <translation type="unfinished">Zoner</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
+        <source>CC</source>
+        <translation>CC</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="454"/>
+        <source>TS</source>
+        <translation>TS</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="455"/>
+        <source>RX Group List</source>
+        <translation>Grupplistan</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="456"/>
+        <source>TX Contact</source>
+        <translation>TX kontakt</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="457"/>
+        <source>DMR ID</source>
+        <translation>DMR ID</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="458"/>
+        <source>GPS/APRS</source>
+        <translation>GPS/APRS</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="459"/>
+        <source>Roaming</source>
+        <translation>Roaming</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="460"/>
+        <source>Squelch</source>
+        <translation>Squelch</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="461"/>
+        <source>Rx Tone</source>
+        <translation>RX Ton</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="462"/>
+        <source>Tx Tone</source>
+        <translation>TX Ton</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="463"/>
         <source>Bandwidth</source>
-        <translation type="unfinished">Bandbredd</translation>
+        <translation>Bandbredd</translation>
     </message>
 </context>
 <context>
     <name>ChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="481"/>
+        <location filename="../src/configitemwrapper.cc" line="491"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal</translation>
     </message>
 </context>
 <context>
@@ -791,7 +781,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/channelselectiondialog.cc" line="23"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj kanal:</translation>
     </message>
 </context>
 <context>
@@ -800,7 +790,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/configobjectlistview.cc" line="63"/>
         <location filename="../src/configobjectlistview.cc" line="84"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.cc" line="64"/>
@@ -923,54 +913,54 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ContactListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="599"/>
+        <location filename="../src/configitemwrapper.cc" line="609"/>
         <source>DTMF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="605"/>
-        <location filename="../src/configitemwrapper.cc" line="624"/>
+        <location filename="../src/configitemwrapper.cc" line="615"/>
+        <location filename="../src/configitemwrapper.cc" line="634"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="605"/>
-        <location filename="../src/configitemwrapper.cc" line="624"/>
+        <location filename="../src/configitemwrapper.cc" line="615"/>
+        <location filename="../src/configitemwrapper.cc" line="634"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="614"/>
+        <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>Private Call</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="615"/>
+        <location filename="../src/configitemwrapper.cc" line="625"/>
         <source>Group Call</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="616"/>
+        <location filename="../src/configitemwrapper.cc" line="626"/>
         <source>All Call</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="640"/>
+        <location filename="../src/configitemwrapper.cc" line="650"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="642"/>
+        <location filename="../src/configitemwrapper.cc" line="652"/>
         <source>Name</source>
         <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="644"/>
+        <location filename="../src/configitemwrapper.cc" line="654"/>
         <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="646"/>
+        <location filename="../src/configitemwrapper.cc" line="656"/>
         <source>RX Tone</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1554,7 +1544,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>GroupListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="830"/>
+        <location filename="../src/configitemwrapper.cc" line="840"/>
         <source>Contact</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1611,7 +1601,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>GroupListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="806"/>
+        <location filename="../src/configitemwrapper.cc" line="816"/>
         <source>RX Group Lists</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1916,68 +1906,68 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PositioningSystemListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="704"/>
+        <location filename="../src/configitemwrapper.cc" line="714"/>
         <source>DMR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="706"/>
+        <location filename="../src/configitemwrapper.cc" line="716"/>
         <source>APRS</source>
         <translation type="unfinished">APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="708"/>
+        <location filename="../src/configitemwrapper.cc" line="718"/>
         <source>OOps!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="714"/>
-        <location filename="../src/configitemwrapper.cc" line="733"/>
+        <location filename="../src/configitemwrapper.cc" line="724"/>
+        <location filename="../src/configitemwrapper.cc" line="743"/>
         <source>[None]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="717"/>
+        <location filename="../src/configitemwrapper.cc" line="727"/>
         <source>%1-%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="725"/>
+        <location filename="../src/configitemwrapper.cc" line="735"/>
         <source>[Selected]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="729"/>
+        <location filename="../src/configitemwrapper.cc" line="739"/>
         <source>OOPS!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="749"/>
+        <location filename="../src/configitemwrapper.cc" line="759"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="750"/>
+        <location filename="../src/configitemwrapper.cc" line="760"/>
         <source>Name</source>
         <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="751"/>
+        <location filename="../src/configitemwrapper.cc" line="761"/>
         <source>Destination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="752"/>
+        <location filename="../src/configitemwrapper.cc" line="762"/>
         <source>Period [s]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="753"/>
+        <location filename="../src/configitemwrapper.cc" line="763"/>
         <source>Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="754"/>
+        <location filename="../src/configitemwrapper.cc" line="764"/>
         <source>Message</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2602,17 +2592,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RadioIdListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="902"/>
+        <location filename="../src/configitemwrapper.cc" line="912"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="903"/>
+        <location filename="../src/configitemwrapper.cc" line="913"/>
         <source>Name</source>
         <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="904"/>
+        <location filename="../src/configitemwrapper.cc" line="914"/>
         <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2769,33 +2759,33 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RoamingChannelListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="518"/>
-        <location filename="../src/configitemwrapper.cc" line="526"/>
+        <location filename="../src/configitemwrapper.cc" line="528"/>
+        <location filename="../src/configitemwrapper.cc" line="536"/>
         <source>[Selected]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="538"/>
+        <location filename="../src/configitemwrapper.cc" line="548"/>
         <source>Name</source>
         <translation type="unfinished">Namn</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="539"/>
+        <location filename="../src/configitemwrapper.cc" line="549"/>
         <source>RX Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="540"/>
+        <location filename="../src/configitemwrapper.cc" line="550"/>
         <source>TX Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="541"/>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>TS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="542"/>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>CC</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2803,7 +2793,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RoamingChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="569"/>
+        <location filename="../src/configitemwrapper.cc" line="579"/>
         <source>Roaming Channel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2811,12 +2801,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RoamingListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="848"/>
+        <location filename="../src/configitemwrapper.cc" line="858"/>
         <source>%1 (containing %2 channels)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="855"/>
+        <location filename="../src/configitemwrapper.cc" line="865"/>
         <source>Roaming zone</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3095,7 +3085,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ScanListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="782"/>
+        <location filename="../src/configitemwrapper.cc" line="792"/>
         <source>Scan-List</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3390,7 +3380,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZoneListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="673"/>
+        <location filename="../src/configitemwrapper.cc" line="683"/>
         <source>Zone</source>
         <translation type="unfinished"></translation>
     </message>
