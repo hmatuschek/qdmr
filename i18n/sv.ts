@@ -553,7 +553,7 @@
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>DMR</source>
         <translation type="unfinished"></translation>
-   </message>
+    </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
         <location filename="../src/configitemwrapper.cc" line="284"/>
@@ -796,7 +796,7 @@
         <location filename="../src/configobjectlistview.cc" line="64"/>
         <location filename="../src/configobjectlistview.cc" line="85"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt: Du måste välja minst ett objekt först.</translation>
     </message>
 </context>
 <context>
@@ -805,13 +805,13 @@
         <location filename="../src/configobjecttableview.cc" line="70"/>
         <location filename="../src/configobjecttableview.cc" line="94"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="71"/>
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt: Du måste välja minst ett objekt först.</translation>
     </message>
 </context>
 <context>
@@ -819,12 +819,12 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="44"/>
         <source>An instance of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>En förekomst av &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="55"/>
         <source>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
@@ -834,7 +834,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj objektklassen som ska skapas</translation>
     </message>
 </context>
 <context>
@@ -842,47 +842,47 @@
     <message>
         <location filename="../src/contactlistview.cc" line="63"/>
         <source>Cannot delete contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="64"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kontakt: Du måste först välja en kontakt.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakten &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakter?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort %1 kontakter?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>
         <source>Adds a contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägger till en kontakt i listan.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till kontakt-knappen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
         <source>Add Digital Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till digital kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="41"/>
@@ -892,17 +892,17 @@
     <message>
         <location filename="../src/contactlistview.ui" line="48"/>
         <source>Add DTMF Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till DTMF-kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="55"/>
         <source>Delete contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt-knappen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="58"/>
         <source>Delete Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="61"/>
@@ -915,7 +915,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="609"/>
         <source>DTMF</source>
-        <translation type="unfinished"></translation>
+        <translation>DTMF</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="615"/>
@@ -932,17 +932,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat samtal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="625"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppsamtal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="626"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>All Call</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="650"/>
@@ -957,12 +957,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="654"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="656"/>
         <source>RX Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>RX-ton</translation>
     </message>
 </context>
 <context>
@@ -970,27 +970,27 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="23"/>
         <source>Create DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa DMR-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="48"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera DMR-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="79"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat samtal</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="80"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppsamtal</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="81"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>All Call</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
