@@ -239,7 +239,6 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableTXDigitalAPRS(true);
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
     } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      enableRXAPRS(true);
       enableTXAnalogAPRS(true);
     }
     // Enable roaming
@@ -257,7 +256,9 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     enableRXAPRS(false);
     if (nullptr != ac->aprsSystem()) {
       enableTXAnalogAPRS(true);
-      enableRXAPRS(true);
+      if (ac == ac->aprsSystem()->revertChannel()) {
+        enableRXAPRS(true);
+      }
     }
     // Apply extension settings
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
