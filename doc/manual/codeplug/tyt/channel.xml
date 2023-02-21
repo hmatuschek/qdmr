@@ -121,8 +121,8 @@
 </variablelist>
 
 <variablelist>
-  <title>Channel settings for <trademark>TyT</trademark> <productname>MD-390</productname> and 
-    <trademark>Retevis</trademark> <productname>RT8</productname></title>
+  <title>Channel settings for <trademark>TyT</trademark> <productname>MD-UV390</productname> and 
+    <trademark>Retevis</trademark> <productname>DM-2017</productname></title>
   <varlistentry>
     <term><token>killTone</token></term>
     <listitem>
@@ -161,6 +161,13 @@
     <listitem>
       <para>If DCDM is enabled, this flag specifies whether this radio is the channel leader. That 
         is, if this radio provides the clock for the time-slots.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dmrSquelch</token></term>
+    <listitem>
+      <para>Allows to set the squelch level for DMR channels. This prevents the LED to light all 
+      the time. The radio, however, remains silent irrespective of this setting. </para>
     </listitem>
   </varlistentry>
 </variablelist>
