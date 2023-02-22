@@ -664,6 +664,8 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
   /** If @c true, the zone and contact names is shown. */
   Q_PROPERTY(bool showZoneAndContact READ showZoneAndContactEnabled WRITE enableShowZoneAndContact)
+  /** Specifies the UI language. */
+  Q_PROPERTY(Language language READ language WRITE setLanguage)
 
 public:
   /** What to show from the last caller. */
@@ -677,6 +679,13 @@ public:
     White = 0, Red = 1
   };
   Q_ENUM(Color)
+
+  /** Possible UI languages. */
+  enum class Language {
+    English = 0,                 ///< UI Language is english.
+    German  = 1                  ///< UI Language is german.
+  };
+  Q_ENUM(Language)
 
 public:
   /** Constructor. */
@@ -734,6 +743,11 @@ public:
   /** Enables/disables showing the zone and contact names. */
   void enableShowZoneAndContact(bool enable);
 
+  /** Returns the UI language. */
+  Language language() const;
+  /** Sets the UI language. */
+  void setLanguage(Language lang);
+
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
   unsigned int _brightness;                 ///< The display brightness.
@@ -745,6 +759,7 @@ protected:
   bool _showCall;                           ///< Display call.
   Color _callColor;                         ///< Color of call.
   bool _showZoneAndContact;                 ///< Display zone and contact
+  Language _language;                       ///< UI language.
 };
 
 
@@ -1023,6 +1038,22 @@ protected:
 };
 
 
+/** Implements the DMR settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneDMRSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit AnytoneDMRSettingsExtension(QObject *parent = nullptr);
+
+  ConfigItem *clone() const;
+
+};
+
 /** Implements the device specific extension for the gerneral settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
@@ -1079,6 +1110,14 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The GPS units used. */
   Q_PROPERTY(Units units READ units WRITE setUnits)
 
+  Q_CLASSINFO("keepLastCallerDescription", "Keeps the last caller on channel switch")
+  /** The keep-last-caller setting. */
+  Q_PROPERTY(bool keepLastCaller READ keepLastCallerEnabled WRITE enableKeepLastCaller)
+
+  Q_CLASSINFO("vfoStep", "Specifes the VFO tuning steps in kHz.")
+  /** The VFO tuning step-size in kHz. */
+  Q_PROPERTY(double vfoStep READ vfoStep WRITE setVFOStep)
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The key settings. */
@@ -1092,7 +1131,9 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The menu settings. */
   Q_PROPERTY(AnytoneMenuSettingsExtension* menuSettings READ menuSettings)
   /** The auto-repeater settings. */
-  Q_PROPERTY(AnytoneAutoRepeaterSettingsExtension*autoRepeaterSettings READ autoRepeaterSettings)
+  Q_PROPERTY(AnytoneAutoRepeaterSettingsExtension* autoRepeaterSettings READ autoRepeaterSettings)
+  /** The DMR settings. */
+  Q_PROPERTY(AnytoneDMRSettingsExtension* dmrSettings READ dmrSettings)
 
 public:
   /** Possible power save modes. */
@@ -1145,6 +1186,8 @@ public:
   AnytoneMenuSettingsExtension *menuSettings() const;
   /** A reference to the auto-repeater settings. */
   AnytoneAutoRepeaterSettingsExtension *autoRepeaterSettings() const;
+  /** A reference to the DMR settings. */
+  AnytoneDMRSettingsExtension *dmrSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   unsigned int autoShutDownDelay() const;
@@ -1221,6 +1264,16 @@ public:
   /** Sets the GPS units. */
   void setUnits(Units units);
 
+  /** Returns @c true if the last caller is kept on channel switch. */
+  bool keepLastCallerEnabled() const;
+  /** Enables/disables keeping the last caller on channel switch. */
+  void enableKeepLastCaller(bool enable);
+
+  /** Returns the VFO tuning step in kHz. */
+  double vfoStep() const;
+  /** Sets the VFO tuning step in kHz. */
+  void setVFOStep(double step);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
@@ -1236,6 +1289,8 @@ protected:
   AnytoneMenuSettingsExtension *_menuSettings;
   /** The auto-repeater settings. */
   AnytoneAutoRepeaterSettingsExtension *_autoRepeaterSettings;
+  /** The DMR settings. */
+  AnytoneDMRSettingsExtension *_dmrSettings;
 
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
@@ -1252,6 +1307,8 @@ protected:
   unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
   unsigned int _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
   Units _gpsUnits;                 ///< The GPS units.
+  bool _keepLastCaller;            ///< If @c true, the last caller is kept on channel switch.
+  double _vfoStep;                 ///< The VFO tuning step in kHz.
 };
 
 #endif // ANYTONEEXTENSION_HH

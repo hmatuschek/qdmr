@@ -327,12 +327,6 @@ public:
   class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
   {
   public:
-    /** Possible UI languages. */
-    enum class Language {
-      English = 0,                 ///< UI Language is english.
-      German  = 1                  ///< UI Language is german.
-    };
-
     /** Possible VFO frequency steps. */
     enum FreqStep {
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
@@ -397,9 +391,9 @@ public:
     virtual void setTransmitTimeout(unsigned tot);
 
     /** Returns the UI language. */
-    virtual Language language() const;
+    virtual AnytoneDisplaySettingsExtension::Language language() const;
     /** Sets the UI language. */
-    virtual void setLanguage(Language lang);
+    virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
 
     /** Returns the VFO frequency step in kHz. */
     virtual double vfoFrequencyStep() const;
@@ -514,7 +508,7 @@ public:
     /** Returns @c true if the call channel is maintained. */
     virtual bool maintainCallChannel() const;
     /** Enables/disables maintaining the call channel. */
-    virtual void enableMaintainCalLChannel(bool enable);
+    virtual void enableMaintainCallChannel(bool enable);
 
     /** Returns the priority Zone A index. */
     virtual unsigned priorityZoneAIndex() const;
@@ -692,9 +686,9 @@ public:
     virtual void enableSeparateDisplay(bool enable);
 
     /** Returns @c true if keep caller is enabled. */
-    virtual bool keepCaller() const;
+    virtual bool keepLastCaller() const;
     /** Enables/disables keep caller. */
-    virtual void enableKeepCaller(bool enable);
+    virtual void enableKeepLastCaller(bool enable);
 
     /** Returns the channel name color. */
     virtual AnytoneDisplaySettingsExtension::Color channelNameColor() const;

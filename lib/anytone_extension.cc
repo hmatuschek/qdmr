@@ -317,6 +317,26 @@ AnytoneContactExtension::setAlertType(AlertType type) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneDMRSettingsExtension
+ * ********************************************************************************************* */
+AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
+  : ConfigItem(parent)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneDMRSettingsExtension::clone() const {
+  AnytoneDMRSettingsExtension *ext = new AnytoneDMRSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneSettingsExtension
  * ********************************************************************************************* */
 AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
@@ -327,11 +347,12 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _audioSettings(new AnytoneAudioSettingsExtension(this)),
     _menuSettings(new AnytoneMenuSettingsExtension(this)),
     _autoRepeaterSettings(new AnytoneAutoRepeaterSettingsExtension(this)),
+    _dmrSettings(new AnytoneDMRSettingsExtension(this)),
     _autoShutDownDelay(0), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
     _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(430000000U),
     _maxVFOScanFrequencyUHF(440000000U), _minVFOScanFrequencyVHF(144000000U),
-    _maxVFOScanFrequencyVHF(146000000U)
+    _maxVFOScanFrequencyVHF(146000000U), _keepLastCaller(false), _vfoStep(2.5)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -346,6 +367,8 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   connect(_menuSettings, &AnytoneMenuSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
   connect(_autoRepeaterSettings, &AnytoneAutoRepeaterSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_dmrSettings, &AnytoneDMRSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
 }
 
@@ -393,6 +416,11 @@ AnytoneSettingsExtension::menuSettings() const {
 AnytoneAutoRepeaterSettingsExtension *
 AnytoneSettingsExtension::autoRepeaterSettings() const {
   return _autoRepeaterSettings;
+}
+
+AnytoneDMRSettingsExtension *
+AnytoneSettingsExtension::dmrSettings() const {
+  return _dmrSettings;
 }
 
 unsigned int
@@ -571,6 +599,30 @@ AnytoneSettingsExtension::setUnits(Units units) {
   if (_gpsUnits == units)
     return;
   _gpsUnits = units;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::keepLastCallerEnabled() const {
+  return _keepLastCaller;
+}
+void
+AnytoneSettingsExtension::enableKeepLastCaller(bool enable) {
+  if (_keepLastCaller == enable)
+    return;
+  _keepLastCaller = enable;
+  emit modified(this);
+}
+
+double
+AnytoneSettingsExtension::vfoStep() const {
+  return _vfoStep;
+}
+void
+AnytoneSettingsExtension::setVFOStep(double step) {
+  if (_vfoStep == step)
+    return;
+  _vfoStep = step;
   emit modified(this);
 }
 
@@ -1027,7 +1079,7 @@ AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent
   : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10),
     _volumeChangePrompt(true), _callEndPrompt(true),
     _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
-    _callColor(Color::Red), _showZoneAndContact(true)
+    _callColor(Color::Red), _showZoneAndContact(true), _language(Language::English)
 {
   // pass...
 }
@@ -1159,6 +1211,18 @@ AnytoneDisplaySettingsExtension::enableShowZoneAndContact(bool enable) {
   if (_showZoneAndContact == enable)
     return;
   _showZoneAndContact = enable;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Language
+AnytoneDisplaySettingsExtension::language() const {
+  return _language;
+}
+void
+AnytoneDisplaySettingsExtension::setLanguage(Language lang) {
+  if (_language == lang)
+    return;
+  _language = lang;
   emit modified(this);
 }
 
