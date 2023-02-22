@@ -485,12 +485,12 @@ D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
   setUInt8(0x0004, tot/30);
 }
 
-D878UVCodeplug::GeneralSettingsElement::Language
+AnytoneDisplaySettingsExtension::Language
 D878UVCodeplug::GeneralSettingsElement::language() const {
-  return (Language)getUInt8(0x0005);
+  return (AnytoneDisplaySettingsExtension::Language)getUInt8(0x0005);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setLanguage(Language lang) {
+D878UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtension::Language lang) {
   setUInt8(0x0005, (unsigned)lang);
 }
 
@@ -752,7 +752,7 @@ D878UVCodeplug::GeneralSettingsElement::maintainCallChannel() const {
   return getUInt8(0x006e);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::enableMaintainCalLChannel(bool enable) {
+D878UVCodeplug::GeneralSettingsElement::enableMaintainCallChannel(bool enable) {
   setUInt8(0x0063, (enable ? 0x01 : 0x00));
 }
 
@@ -1090,11 +1090,11 @@ D878UVCodeplug::GeneralSettingsElement::enableSeparateDisplay(bool enable) {
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::keepCaller() const {
+D878UVCodeplug::GeneralSettingsElement::keepLastCaller() const {
   return getUInt8(0x00e3);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::enableKeepCaller(bool enable) {
+D878UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
   setUInt8(0x00e3, (enable ? 0x01 : 0x00));
 }
 
@@ -1182,6 +1182,61 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
+  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Encode boot settings
+    enableDefaultChannel(
+          ext->bootSettings()->defaultChannelEnabled() &&
+          (! ext->bootSettings()->zoneA()->isNull()) &&
+          (! ext->bootSettings()->zoneB()->isNull()));
+
+    if (defaultChannel()) {
+      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelA()->isNull() ||
+          (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelA()->as<Channel>())))
+        setDefaultChannelAToVFO();
+      else
+        setDefaultChannelAIndex(
+              ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
+                ext->bootSettings()->channelA()->as<Channel>()));
+
+      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelB()->isNull() ||
+          (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelB()->as<Channel>())))
+        setDefaultChannelBToVFO();
+      else
+        setDefaultChannelBIndex(
+              ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
+                ext->bootSettings()->channelB()->as<Channel>()));
+    }
+
+    // Encode key settings
+    enableKnobLock(ext->keySettings()->knobLockEnabled());
+    enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+    enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+    enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
+    // Encode tone settings
+    setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+    // Encode display settings
+    setCallDisplayColor(ext->displaySettings()->callColor());
+    setLanguage(ext->displaySettings()->language());
+
+    // Encode auto-repeater settings
+    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+    // Encode other settings
+    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
+    enableKeepLastCaller(ext->keepLastCallerEnabled());
+    setVFOFrequencyStep(ext->vfoStep());
+  }
+
   return true;
 }
 
@@ -1201,8 +1256,34 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Decode boot settings
+  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
+
+  // Decode key settings
+  ext->keySettings()->enableKnobLock(this->knobLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
+  ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
+
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Decode display settings
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+  ext->displaySettings()->setLanguage(this->language());
+
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
+
+  // Decode other settings
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
+                                           AnytoneSettingsExtension::Units::Metric);
+  ext->enableKeepLastCaller(this->keepLastCaller());
+  ext->setVFOStep(this->vfoFrequencyStep());
 
   return true;
 }

@@ -666,6 +666,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
+    enableKeepLastCaller(ext->keepLastCallerEnabled());
   }
 
   return true;
@@ -711,6 +712,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
                                            AnytoneSettingsExtension::Units::Metric);
+  ext->enableKeepLastCaller(this->keepLastCaller());
 
   return true;
 }
