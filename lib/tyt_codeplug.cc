@@ -461,7 +461,6 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ex->enablePrivateCallConfirmed(privateCallConfirm());
     ex->enableDataCallConfirmed(dataCallConfirm());
     ex->enableEmergencyAlarmConfirmed(emergencyAlarmACK());
-
     // If encryption is enabled, Add commercial extension to channel if needed
     // the key will be linked later
     if ((PRIV_NONE != privacyType()) && (nullptr == dch->commercialExtension()))
