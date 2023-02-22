@@ -124,19 +124,19 @@ D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
 
 bool
 D878UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return 1 == getUInt2(0x0035, 0);
-}
-void
-D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setUInt2(0x0035, 0, (enable ? 0x01 : 0x00));
-}
-bool
-D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
   return 2 == getUInt2(0x0035, 0);
 }
 void
-D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
+D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
   setUInt2(0x0035, 0, (enable ? 0x02 : 0x00));
+}
+bool
+D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
+  return 1 == getUInt2(0x0035, 0);
+}
+void
+D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
+  setUInt2(0x0035, 0, (enable ? 0x01 : 0x00));
 }
 
 D878UVCodeplug::ChannelElement::APRSPTT
@@ -239,7 +239,6 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableTXDigitalAPRS(true);
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
     } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      enableRXAPRS(true);
       enableTXAnalogAPRS(true);
     }
     // Enable roaming
@@ -257,7 +256,9 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     enableRXAPRS(false);
     if (nullptr != ac->aprsSystem()) {
       enableTXAnalogAPRS(true);
-      enableRXAPRS(true);
+      if (ac == ac->aprsSystem()->revertChannel()) {
+        enableRXAPRS(true);
+      }
     }
     // Apply extension settings
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {

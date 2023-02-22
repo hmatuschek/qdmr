@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
@@ -995,7 +995,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>

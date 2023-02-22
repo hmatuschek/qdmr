@@ -31,7 +31,7 @@
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="76"/>
         <source>Supported Radios</source>
-        <translation type="unfinished"></translation>
+        <translation>Wspierane radia</translation>
     </message>
 </context>
 <context>
@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
@@ -80,7 +80,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Maks</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
@@ -100,7 +100,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
-        <translation type="unfinished">Minimum</translation>
+        <translation>Min</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
@@ -113,34 +113,34 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Limit czasu TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation type="unfinished">Wyłącz</translation>
+        <translation>Wyłącz</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="144"/>
         <source> s</source>
         <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation> s</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="163"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Poziom VOX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="191"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Tylko RX</translation>
+        <translation>Tylko RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="201"/>
         <source>Scan List</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj listę</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="215"/>
@@ -150,17 +150,17 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="223"/>
         <source>Always</source>
-        <translation type="unfinished">Zawsze</translation>
+        <translation>Zawsze</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Wolny kanał</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>Tone</source>
-        <translation type="unfinished">Ton</translation>
+        <translation>Ton</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="241"/>
@@ -170,17 +170,17 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Rx Tone</source>
-        <translation type="unfinished">Ton RX</translation>
+        <translation>Ton RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="258"/>
         <source>Tx Tone</source>
-        <translation type="unfinished">Ton TX</translation>
+        <translation>Ton TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="268"/>
         <source>Bandwidth</source>
-        <translation type="unfinished">Szerokość pasma</translation>
+        <translation>Szerokość pasma</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="276"/>
@@ -195,17 +195,17 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="289"/>
         <source>APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>Open</source>
-        <translation type="unfinished">Otwórz</translation>
+        <translation>Otwórz</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Rozszerzenia</translation>
     </message>
 </context>
 <context>
@@ -213,18 +213,18 @@
     <message>
         <location filename="../src/application.cc" line="238"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="252"/>
         <location filename="../src/application.cc" line="761"/>
         <source>Radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikatory radia</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="256"/>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontakty</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="260"/>
@@ -234,22 +234,22 @@
     <message>
         <location filename="../src/application.cc" line="264"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanały</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="268"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Strefy</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="272"/>
         <source>Scan Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj listy</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="276"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="280"/>
@@ -265,7 +265,7 @@
         <location filename="../src/application.cc" line="289"/>
         <location filename="../src/application.cc" line="775"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Rozszerzenia</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="308"/>
