@@ -10,7 +10,7 @@ TyTChannelExtension::TyTChannelExtension(QObject *parent)
     _displayPTTId(true), _rxRefFrequency(RefFrequency::Low), _txRefFrequency(RefFrequency::Low),
     _tightSquelch(false), _compressedUDPHeader(false), _reverseBurst(true),
     _killTone(KillTone::Off), _inCallCriterion(InCallCriterion::Always), _allowInterrupt(false),
-    _dcdm(false), _dcdmLeader(false)
+    _dcdm(false), _dcdmLeader(false), _dmrSquelch(1)
 {
   // pass...
 }
@@ -131,6 +131,18 @@ TyTChannelExtension::setTXRefFrequency(RefFrequency ref) {
   if (_txRefFrequency == ref)
     return;
   _txRefFrequency = ref;
+  emit modified(this);
+}
+
+unsigned int
+TyTChannelExtension::dmrSquelch() const {
+  return _dmrSquelch;
+}
+void
+TyTChannelExtension::setDMRSquelch(unsigned int sq) {
+  if (_dmrSquelch == sq)
+    return;
+  _dmrSquelch = sq;
   emit modified(this);
 }
 
