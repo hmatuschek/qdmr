@@ -14,7 +14,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
 {
   // Define limits for call-sign DB
   _hasCallSignDB          = true;
-  _callSignDBImplemented  = false;
+  _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 122197;
 
   add("settings", new RadioLimitItem {

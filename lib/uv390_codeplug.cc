@@ -189,6 +189,8 @@ UV390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ex->enableAllowInterrupt(allowInterrupt());
     ex->enableDCDM(dualCapacityDirectMode());
     ex->enableDCDMLeader(dcdmLeader());
+    if (ch->is<DMRChannel>())
+      ex->setDMRSquelch(squelch());
   }
 
   return ch;
@@ -219,6 +221,8 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
     enableAllowInterrupt(ex->allowInterrupt());
     enableDualCapacityDirectMode(ex->dcdm());
     enableDCDMLeader(ex->dcdmLeader());
+    if (chan->is<DMRChannel>())
+      setSquelch(ex->dmrSquelch());
   }
 }
 
