@@ -339,16 +339,6 @@ public:
       FREQ_STEP_50kHz = 7               ///< 50kHz
     };
 
-    /** All possible STE types. */
-    enum class STEType {
-      Off = 0, Silent = 1, Deg120 = 2, Deg180 = 3, Deg240 = 4
-    };
-
-    /** All possible STE frequencies. */
-    enum class STEFrequency {
-      Off     = 0, Hz55_2  = 1, Hz259_2 = 2
-    };
-
     /** DTMF signalling durations. */
     enum DTMFDuration {
       DTMF_DUR_50ms = 0, DTMF_DUR_100ms = 1, DTMF_DUR_200ms = 2, DTMF_DUR_300ms = 3, DTMF_DUR_500ms = 4
@@ -372,6 +362,11 @@ public:
     /** Possible roaming start conditions. */
     enum class RoamStart {
       Periodic=0, OutOfRange=1
+    };
+
+    /** All possible STE (squelch tail eliminate) frequencies. */
+    enum class STEFrequency {
+      Off = 0, Hz55_2  = 1, Hz259_2 = 2
     };
 
   protected:
@@ -400,14 +395,16 @@ public:
     /** Sets the VFO frequency step in kHz. */
     virtual void setVFOFrequencyStep(double kHz);
 
-    /** Returns the STE type. */
-    virtual STEType steType() const;
-    /** Sets the STE type. */
-    virtual void setSTEType(STEType type);
-    /** Returns the STE frequency setting. */
-    virtual STEFrequency steFrequency() const;
-    /** Sets the STE frequency setting. */
-    virtual void setSTEFrequency(STEFrequency freq);
+    /** Returns the STE (squelch tail eliminate) type. */
+    virtual AnytoneSettingsExtension::STEType steType() const;
+    /** Sets the STE (squelch tail eliminate) type. */
+    virtual void setSTEType(AnytoneSettingsExtension::STEType type);
+    /** Returns the STE (squelch tail eliminate) frequency setting in Hz.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual double steFrequency() const;
+    /** Sets the STE (squelch tail eliminate) frequency setting.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual void setSTEFrequency(double freq);
 
     /** Returns the group call hang time in seconds. */
     virtual unsigned groupCallHangTime() const;
@@ -452,9 +449,9 @@ public:
     virtual void enableWFMMonitor(bool enable);
 
     /** Returns the TBST frequency. */
-    virtual TBSTFrequency tbstFrequency() const;
+    virtual unsigned int tbstFrequency() const;
     /** Sets the TBST frequency. */
-    virtual void setTBSTFrequency(TBSTFrequency freq);
+    virtual void setTBSTFrequency(unsigned int freq);
 
     /** Returns @c true if the "pro mode" is enabled. */
     virtual bool proMode() const;

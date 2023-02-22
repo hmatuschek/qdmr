@@ -320,7 +320,7 @@ AnytoneContactExtension::setAlertType(AlertType type) {
  * Implementation of AnytoneDMRSettingsExtension
  * ********************************************************************************************* */
 AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
-  : ConfigItem(parent)
+  : ConfigItem(parent), _groupCallHangTime(3), _privateCallHangTime(5)
 {
   // pass...
 }
@@ -333,6 +333,54 @@ AnytoneDMRSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
+}
+
+unsigned int
+AnytoneDMRSettingsExtension::groupCallHangTime() const {
+  return _groupCallHangTime;
+}
+void
+AnytoneDMRSettingsExtension::setGroupCallHangTime(unsigned int sec) {
+  if (_groupCallHangTime == sec)
+    return;
+  _groupCallHangTime = sec;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneDMRSettingsExtension::privateCallHangTime() const {
+  return _privateCallHangTime;
+}
+void
+AnytoneDMRSettingsExtension::setPrivateCallHangTime(unsigned int sec) {
+  if (_privateCallHangTime == sec)
+    return;
+  _privateCallHangTime = sec;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneDMRSettingsExtension::preWaveDelay() const {
+  return _preWaveDelay;
+}
+void
+AnytoneDMRSettingsExtension::setPreWaveDelay(unsigned int ms) {
+  if (_preWaveDelay == ms)
+    return;
+  _preWaveDelay = ms;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneDMRSettingsExtension::wakeHeadPeriod() const {
+  return _wakeHeadPeriod;
+}
+void
+AnytoneDMRSettingsExtension::setWakeHeadPeriod(unsigned int ms) {
+  if (_wakeHeadPeriod == ms)
+    return;
+  _wakeHeadPeriod = ms;
+  emit modified(this);
 }
 
 
@@ -352,7 +400,8 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
     _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(430000000U),
     _maxVFOScanFrequencyUHF(440000000U), _minVFOScanFrequencyVHF(144000000U),
-    _maxVFOScanFrequencyVHF(146000000U), _keepLastCaller(false), _vfoStep(2.5)
+    _maxVFOScanFrequencyVHF(146000000U), _keepLastCaller(false), _vfoStep(2.5),
+    _steType(STEType::Off), _steFrequency(0), _tbstFrequency(1750), _proMode(false)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -623,6 +672,53 @@ AnytoneSettingsExtension::setVFOStep(double step) {
   if (_vfoStep == step)
     return;
   _vfoStep = step;
+  emit modified(this);
+}
+
+AnytoneSettingsExtension::STEType
+AnytoneSettingsExtension::steType() const {
+  return _steType;
+}
+void
+AnytoneSettingsExtension::setSTEType(STEType type) {
+  if (_steType == type)
+    return;
+  _steType = type;
+  emit modified(this);
+}
+double
+AnytoneSettingsExtension::steFrequency() const {
+  return _steFrequency;
+}
+void
+AnytoneSettingsExtension::setSTEFrequency(double freq) {
+  if (_steFrequency == freq)
+    return;
+  _steFrequency = freq;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneSettingsExtension::tbstFrequency() const {
+  return _tbstFrequency;
+}
+void
+AnytoneSettingsExtension::setTBSTFrequency(unsigned int Hz) {
+  if (_tbstFrequency == Hz)
+    return;
+  _tbstFrequency = Hz;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::proModeEnabled() const {
+  return _proMode;
+}
+void
+AnytoneSettingsExtension::enableProMode(bool enable) {
+  if (_proMode == enable)
+    return;
+  _proMode = enable;
   emit modified(this);
 }
 

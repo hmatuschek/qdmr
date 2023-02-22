@@ -1046,13 +1046,53 @@ class AnytoneDMRSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
+  Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.");
+  /** Group-call hang-time in seconds. */
+  Q_PROPERTY(unsigned int groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+
+  Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.");
+  /** Private-call hang-time in seconds. */
+  Q_PROPERTY(unsigned int privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+
+  Q_CLASSINFO("preWaveDelay", "Sets the pre-wave delay in ms. Should be set to 100ms.")
+  /** Pre-wave delay in ms. */
+  Q_PROPERTY(unsigned int preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
+
+  Q_CLASSINFO("wakeHeadPeriod", "Sets the wake head-period in ms. Should be set to 100ms.")
+  /** Wake head-period in ms. */
+  Q_PROPERTY(unsigned int wakeHeadPeriod READ wakeHeadPeriod WRITE setWakeHeadPeriod)
+
 public:
   /** Constructor. */
   explicit AnytoneDMRSettingsExtension(QObject *parent = nullptr);
 
   ConfigItem *clone() const;
 
+  /** Returns the group-call hang-time in seconds. */
+  unsigned int groupCallHangTime() const;
+  /** Sets the group-call hang-time in seconds. */
+  void setGroupCallHangTime(unsigned int sec);
+  /** Returns the private-call hang-time in seconds. */
+  unsigned int privateCallHangTime() const;
+  /** Sets the private-call hang-time in seconds. */
+  void setPrivateCallHangTime(unsigned int sec);
+
+  /** Returns the pre-wave delay in ms. */
+  unsigned int preWaveDelay() const;
+  /** Sets the pre-wave delay in ms. */
+  void setPreWaveDelay(unsigned int ms);
+  /** Returns the wake head-period in ms. */
+  unsigned int wakeHeadPeriod() const;
+  /** Sets the wake head-period in ms. */
+  void setWakeHeadPeriod(unsigned int ms);
+
+protected:
+  unsigned int _groupCallHangTime;      ///< Hang-time for group-calls in seconds.
+  unsigned int _privateCallHangTime;    ///< Hang-time for private-calls in seconds.
+  unsigned int _preWaveDelay;           ///< Pre-wave time in ms, should be 100ms.
+  unsigned int _wakeHeadPeriod;         ///< Wake head-period in ms, should be 100ms.
 };
+
 
 /** Implements the device specific extension for the gerneral settings of AnyTone devices.
  *
@@ -1118,6 +1158,21 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The VFO tuning step-size in kHz. */
   Q_PROPERTY(double vfoStep READ vfoStep WRITE setVFOStep)
 
+  Q_CLASSINFO("steTypeDescription", "Specifies the STE (squelch tail elimination) type.")
+  /** The STE type. */
+  Q_PROPERTY(STEType steType READ steType WRITE setSTEType)
+  Q_CLASSINFO("steFrequencyDescription", "Specifies the STE (squelch tail elimination) frequency in Hz.")
+  /** The STE frequency in Hz. */
+  Q_PROPERTY(double steFrequency READ steFrequency WRITE setSTEFrequency)
+
+  Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz. Should be one of "
+                                          "1000, 1450, 1750 and 2100 Hz.")
+  /** The TBST frequency in Hz. */
+  Q_PROPERTY(unsigned int tbstFrequency READ tbstFrequency WRITE setTBSTFrequency)
+
+  /** If @c true, the "pro mode" is enabled. */
+  Q_PROPERTY(bool proMode READ proModeEnabled WRITE enableProMode)
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The key settings. */
@@ -1165,6 +1220,13 @@ public:
     Metric = 0, Imperial = 1
   };
   Q_ENUM(Units)
+
+  /** All possible STE (squelch tail eliminate) types. */
+  enum class STEType {
+    Off = 0, Silent = 1, Deg120 = 2, Deg180 = 3, Deg240 = 4
+  };
+  Q_ENUM(STEType)
+
 
 public:
   /** Constructor. */
@@ -1274,6 +1336,27 @@ public:
   /** Sets the VFO tuning step in kHz. */
   void setVFOStep(double step);
 
+  /** Returns the STE (squelch tail elimination) type. */
+  STEType steType() const;
+  /** Sets the STE (squelch tail elimination) type. */
+  void setSTEType(STEType type);
+  /** Retruns the STE (squelch tail elimination) frequency in Hz.
+   * A frequency of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+  double steFrequency() const;
+  /** Sets the STE (squelch tail elimination) frequency in Hz.
+   * A frequency of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+  void setSTEFrequency(double freq);
+
+  /** Returns the TBST frequency in Hz. */
+  unsigned int tbstFrequency() const;
+  /** Sets the TBST frequency in Hz. Should be one of 1000, 1450, 1750 and 2100 Hz. */
+  void setTBSTFrequency(unsigned int Hz);
+
+  /** Returns @c true, if the "pro mode" is enabled. */
+  bool proModeEnabled() const;
+  /** Enables/disables the "pro mode". */
+  void enableProMode(bool enable);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
@@ -1309,6 +1392,10 @@ protected:
   Units _gpsUnits;                 ///< The GPS units.
   bool _keepLastCaller;            ///< If @c true, the last caller is kept on channel switch.
   double _vfoStep;                 ///< The VFO tuning step in kHz.
+  STEType _steType;                ///< The STE type.
+  double _steFrequency;            ///< STE Frequency in Hz.
+  unsigned int _tbstFrequency;     ///< The TBST frequency in Hz.
+  bool _proMode;                   ///< The "pro mode" flag.
 };
 
 #endif // ANYTONEEXTENSION_HH

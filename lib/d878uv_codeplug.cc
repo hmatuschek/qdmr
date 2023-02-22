@@ -528,21 +528,32 @@ D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(double kHz) {
     setUInt8(0x0008, FREQ_STEP_50kHz);
 }
 
-D878UVCodeplug::GeneralSettingsElement::STEType
+AnytoneSettingsExtension::STEType
 D878UVCodeplug::GeneralSettingsElement::steType() const {
-  return (STEType)getUInt8(0x0017);
+  return (AnytoneSettingsExtension::STEType)getUInt8(0x0017);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setSTEType(STEType type) {
+D878UVCodeplug::GeneralSettingsElement::setSTEType(AnytoneSettingsExtension::STEType type) {
   setUInt8(0x0017, (unsigned)type);
 }
-D878UVCodeplug::GeneralSettingsElement::STEFrequency
+double
 D878UVCodeplug::GeneralSettingsElement::steFrequency() const {
-  return (STEFrequency)getUInt8(0x0018);
+  switch ((STEFrequency)getUInt8(0x0018)) {
+  case STEFrequency::Off: return 0;
+  case STEFrequency::Hz55_2: return 55.2;
+  case STEFrequency::Hz259_2: return 259.2;
+  }
+  return 0;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setSTEFrequency(STEFrequency freq) {
-  setUInt8(0x0018, (unsigned)freq);
+D878UVCodeplug::GeneralSettingsElement::setSTEFrequency(double freq) {
+  if (0 >= freq) {
+    setUInt8(0x0018, (unsigned)STEFrequency::Off);
+  } else if (100 > freq) {
+    setUInt8(0x0018, (unsigned)STEFrequency::Hz55_2);
+  } else {
+    setUInt8(0x0018, (unsigned)STEFrequency::Hz259_2);
+  }
 }
 
 unsigned
@@ -639,13 +650,29 @@ D878UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
   setUInt8(0x002b, (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsElement::TBSTFrequency
+unsigned int
 D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
-  return (TBSTFrequency)getUInt8(0x002e);
+  switch ((TBSTFrequency)getUInt8(0x002e)) {
+  case TBSTFrequency::Hz1000: return 1000;
+  case TBSTFrequency::Hz1450: return 1450;
+  case TBSTFrequency::Hz1750: return 1750;
+  case TBSTFrequency::Hz2100: return 2100;
+  }
+  return 1750;
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(TBSTFrequency freq) {
-  setUInt8(0x002e, (unsigned)freq);
+D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(unsigned int freq) {
+  if (1000 == freq) {
+    setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1000);
+  } else if (1450 == freq) {
+    setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1450);
+  } else if (1750 == freq) {
+    setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1750);
+  } else if (2100 == freq) {
+    setUInt8(0x002e, (unsigned)TBSTFrequency::Hz2100);
+  } else {
+    setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1750);
+  }
 }
 
 bool
@@ -1231,10 +1258,20 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
     setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
+    // Encode DMR settings
+    setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
+    setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
+    setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
+    setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
+
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
     enableKeepLastCaller(ext->keepLastCallerEnabled());
     setVFOFrequencyStep(ext->vfoStep());
+    setSTEType(ext->steType());
+    setSTEFrequency(ext->steFrequency());
+    setTBSTFrequency(ext->tbstFrequency());
+    enableProMode(ext->proModeEnabled());
   }
 
   return true;
@@ -1279,12 +1316,21 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
+  // Encode dmr settings
+  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
+  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
+  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
+  ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
+
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
                                            AnytoneSettingsExtension::Units::Metric);
   ext->enableKeepLastCaller(this->keepLastCaller());
   ext->setVFOStep(this->vfoFrequencyStep());
-
+  ext->setSTEType(this->steType());
+  ext->setSTEFrequency(this->steFrequency());
+  ext->setTBSTFrequency(this->tbstFrequency());
+  ext->enableProMode(this->proMode());
   return true;
 }
 
