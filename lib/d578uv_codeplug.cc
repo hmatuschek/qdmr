@@ -228,7 +228,7 @@ D578UVCodeplug::allocateContacts() {
     contactCount++;
     uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
     uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, CONTACT_BANK_SIZE);
       memset(data(addr), 0x00, CONTACT_BANK_SIZE);
     }

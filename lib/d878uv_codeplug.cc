@@ -2485,10 +2485,10 @@ D878UVCodeplug::allocateChannels() {
     uint32_t addr = CHANNEL_BANK_0
         + bank*CHANNEL_BANK_OFFSET
         + idx*CHANNEL_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, CHANNEL_SIZE);
     }
-    if (nullptr == data(addr+0x2000, 0)) {
+    if (!isAllocated(addr+0x2000, 0)) {
       image(0).addElement(addr+0x2000, CHANNEL_SIZE);
       memset(data(addr+0x2000), 0x00, CHANNEL_SIZE);
     }
@@ -2725,7 +2725,7 @@ D878UVCodeplug::allocateRoaming() {
       continue;
     // Allocate roaming channel
     uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    if (nullptr == data(addr, 0))
+    if (!isAllocated(addr, 0))
       image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
   }
 
@@ -2739,7 +2739,7 @@ D878UVCodeplug::allocateRoaming() {
       continue;
     // Allocate roaming zone
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       logDebug() << "Allocate roaming zone at " << QString::number(addr, 16);
       image(0).addElement(addr, ROAMING_ZONE_SIZE);
     }

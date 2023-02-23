@@ -1056,7 +1056,7 @@ D868UVCodeplug::allocateChannels() {
     uint32_t addr = CHANNEL_BANK_0
         + bank*CHANNEL_BANK_OFFSET
         + idx*CHANNEL_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, CHANNEL_SIZE);
     }
   }
@@ -1134,7 +1134,7 @@ D868UVCodeplug::allocateContacts() {
     contactCount++;
     uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
     uint32_t addr = bank_addr + ((i%CONTACTS_PER_BANK)/CONTACTS_PER_BLOCK)*CONTACT_BLOCK_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, CONTACT_BLOCK_SIZE);
       memset(data(addr), 0x00, CONTACT_BLOCK_SIZE);
     }
@@ -1208,7 +1208,7 @@ D868UVCodeplug::allocateAnalogContacts() {
     if (0xff == analog_contact_bytemap[i])
       continue;
     uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
     }
   }
@@ -1264,7 +1264,7 @@ D868UVCodeplug::allocateRadioIDs() {
       continue;
     // Allocate radio IDs individually
     uint32_t addr = ADDR_RADIOIDS + i*RADIOID_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (! isAllocated(addr, 0)) {
       image(0).addElement(addr, RADIOID_SIZE);
     }
   }
@@ -1315,7 +1315,7 @@ D868UVCodeplug::allocateRXGroupLists() {
       continue;
     // Allocate RX group lists indivitually
     uint32_t addr = ADDR_RXGRP_0 + i*RXGRP_OFFSET;
-    if (nullptr == data(addr, 0)) {
+    if (! isAllocated(addr, 0)) {
       image(0).addElement(addr, RXGRP_SIZE);
       memset(data(addr), 0xff, RXGRP_SIZE);
     }
@@ -1566,7 +1566,7 @@ D868UVCodeplug::allocateScanLists() {
       continue;
     // Allocate scan lists indivitually
     uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, SCAN_LIST_SIZE);
       memset(data(addr), 0xff, SCAN_LIST_SIZE);
     }
@@ -1749,7 +1749,7 @@ D868UVCodeplug::allocateSMSMessages() {
       continue;
     message_count++;
     uint32_t addr = MESSAGE_BANK_0 + bank*MESSAGE_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
+    if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, MESSAGE_BANK_SIZE);
     }
   }

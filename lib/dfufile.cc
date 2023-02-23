@@ -248,6 +248,13 @@ DFUFile::write(QFile &file, const ErrorStack &err) {
   return true;
 }
 
+bool
+DFUFile::isAllocated(uint32_t offset, uint32_t img) const {
+  if (int(img) >= _images.size())
+    return false;
+  return image(img).isAllocated(offset);
+}
+
 unsigned char *
 DFUFile::data(uint32_t offset, uint32_t img) {
   if (int(img) >= _images.size())
@@ -644,6 +651,11 @@ DFUFile::Image::dump(QTextStream &stream) const {
   foreach (const Element &e, _elements) {
     e.dump(stream);
   }
+}
+
+bool
+DFUFile::Image::isAllocated(uint32_t offset) const {
+  return 0 <= _addressmap.find(offset);
 }
 
 unsigned char *
