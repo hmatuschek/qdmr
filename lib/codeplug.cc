@@ -584,16 +584,16 @@ QString
 Codeplug::Element::readGBK(unsigned offset, unsigned maxlen, uint8_t eos) const {
   QByteArray txt;
   uint8_t *ptr = (uint8_t *)(_data+offset);
-  for (unsigned i=0; (i<maxlen)&&(ptr[i])&&(eos!=ptr[i]); i++) {
+  for (unsigned i=0; (i<maxlen*2)&&(ptr[i])&&(eos!=ptr[i]); i++) {
     txt.append((ptr[i]));
   }
   return QTextCodec::codecForName("GBK")->toUnicode(txt);
 }
 void
 Codeplug::Element::writeGBK(unsigned offset, const QString &txt, unsigned maxlen, uint8_t eos) {
-  QByteArray enc = QTextCodec::codecForName("GBK")->fromUnicode(txt);
+  QByteArray enc = QTextCodec::codecForName("GBK")->fromUnicode(txt.left(maxlen));
   uint8_t *ptr = (uint8_t *)(_data+offset);
-  for (unsigned i=0; i<maxlen; i++) {
+  for (unsigned i=0; i<maxlen*2; i++) {
     if (i < unsigned(enc.length()))
       ptr[i] = enc.at(i);
     else
