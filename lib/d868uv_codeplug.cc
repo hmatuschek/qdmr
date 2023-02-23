@@ -404,6 +404,14 @@ D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
+  switch (color) {
+  case AnytoneDisplaySettingsExtension::Color::White:
+  case AnytoneDisplaySettingsExtension::Color::Black:
+    break;
+  default:
+    color = AnytoneDisplaySettingsExtension::Color::Black;
+    break;
+  }
   setUInt8(0x00b0, (unsigned)color);
 }
 

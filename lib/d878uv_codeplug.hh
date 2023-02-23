@@ -349,16 +349,6 @@ public:
       Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
     };
 
-    /** Possible monitor slot matches. */
-    enum class SlotMatch {
-      Off = 0, Single = 1, Both = 2
-    };
-
-    /** Possible SMS formats. */
-    enum class SMSFormat {
-      M = 0, H = 1, DMR = 2,
-    };
-
     /** Possible roaming start conditions. */
     enum class RoamStart {
       Periodic=0, OutOfRange=1
@@ -472,9 +462,9 @@ public:
     virtual void enableRemoteMonitor(bool enable);
 
     /** Returns the monitor slot match. */
-    virtual SlotMatch monitorSlotMatch() const;
+    virtual AnytoneDMRSettingsExtension::SlotMatch monitorSlotMatch() const;
     /** Sets the monitor slot match. */
-    virtual void setMonitorSlotMatch(SlotMatch match);
+    virtual void setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match);
     /** Returns @c true if the monitor matches color code. */
     virtual bool monitorColorCodeMatch() const;
     /** Enables/disables monitor color code match. */
@@ -498,7 +488,7 @@ public:
     virtual void setAnalogCallHold(unsigned sec);
 
     /** Returns @c true if the GPS range reporting is enabled. */
-    virtual bool gpsRangReporting() const;
+    virtual bool gpsRangeReporting() const;
     /** Enables/disables GPS range reporting. */
     virtual void enableGPSRangeReporting(bool enable);
 
@@ -591,9 +581,9 @@ public:
     virtual void enableShowLastHeard(bool enable);
 
     /** Returns the SMS format. */
-    virtual SMSFormat smsFormat() const;
+    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(SMSFormat fmt);
+    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
     virtual unsigned autoRepeaterMinFrequencyVHF() const;
@@ -728,6 +718,8 @@ public:
 
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
+
   };
 
   /** Implements the GPS message settings (part of general settings).

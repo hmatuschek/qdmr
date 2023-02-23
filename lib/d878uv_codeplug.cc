@@ -711,12 +711,12 @@ D878UVCodeplug::GeneralSettingsElement::enableRemoteMonitor(bool enable) {
   setUInt8(0x003e, (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsElement::SlotMatch
+AnytoneDMRSettingsExtension::SlotMatch
 D878UVCodeplug::GeneralSettingsElement::monitorSlotMatch() const {
-  return (SlotMatch)getUInt8(0x0049);
+  return (AnytoneDMRSettingsExtension::SlotMatch)getUInt8(0x0049);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(SlotMatch match) {
+D878UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match) {
   setUInt8(0x0049, (unsigned)match);
 }
 
@@ -766,7 +766,7 @@ D878UVCodeplug::GeneralSettingsElement::setAnalogCallHold(unsigned sec) {
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::gpsRangReporting() const {
+D878UVCodeplug::GeneralSettingsElement::gpsRangeReporting() const {
   return getUInt8(0x0053);
 }
 void
@@ -940,12 +940,12 @@ D878UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(0x00c2, (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsElement::SMSFormat
+AnytoneDMRSettingsExtension::SMSFormat
 D878UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (SMSFormat) getUInt8(0x00c3);
+  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(0x00c3);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat fmt) {
+D878UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt) {
   setUInt8(0x00c3, (unsigned)fmt);
 }
 
@@ -1237,6 +1237,16 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
               ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
                 ext->bootSettings()->channelB()->as<Channel>()));
     }
+    if (ext->bootSettings()->priorityZoneA()->isNull())
+      setPriorityZoneAIndex(0xff);
+    else
+      setPriorityZoneAIndex(ctx.index(ext->bootSettings()->priorityZoneA()->as<Zone>()));
+    if (ext->bootSettings()->priorityZoneB()->isNull())
+      setPriorityZoneBIndex(0xff);
+    else
+      setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
+    if (! ext->bootSettings()->defaultRoamingZone()->isNull())
+      setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
 
     // Encode key settings
     enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -1250,6 +1260,10 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode display settings
     setCallDisplayColor(ext->displaySettings()->callColor());
     setLanguage(ext->displaySettings()->language());
+    enableDisplayChannelNumber(ext->displaySettings()->showChannelNumberEnabled());
+    enableDisplayContact(ext->displaySettings()->showContactEnabled());
+    setStandbyTextColor(ext->displaySettings()->standbyTextColor());
+    enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
 
     // Encode auto-repeater settings
     setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
@@ -1263,6 +1277,18 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
     setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
     setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
+    enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
+    setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
+    enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
+    enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
+    enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
+    setSMSFormat(ext->dmrSettings()->smsFormat());
+
+    // Encode ranging/roaming settings.
+    enableGPSRangeReporting(ext->rangingSettings()->gpsRangeReportingEnabled());
+    setGPSRangingInterval(ext->rangingSettings()->gpsRangingInterval());
+    setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
+    setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
 
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
@@ -1272,6 +1298,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setSTEFrequency(ext->steFrequency());
     setTBSTFrequency(ext->tbstFrequency());
     enableProMode(ext->proModeEnabled());
+    enableMaintainCallChannel(ext->maintainCallChannelEnabled());
   }
 
   return true;
@@ -1308,6 +1335,10 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());
   ext->displaySettings()->setLanguage(this->language());
+  ext->displaySettings()->enableShowChannelNumber(this->displayChannelNumber());
+  ext->displaySettings()->enableShowContact(this->displayContact());
+  ext->displaySettings()->setStandbyTextColor(this->standbyTextColor());
+  ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
@@ -1321,6 +1352,18 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
   ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
+  ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
+  ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
+  ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
+  ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
+  ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
+  ext->dmrSettings()->setSMSFormat(this->smsFormat());
+
+  // Encode ranging/roaming settings
+  ext->rangingSettings()->enableGPSRangeReporting(this->gpsRangeReporting());
+  ext->rangingSettings()->setGPSRangingInterval(this->gpsRangingInterval());
+  ext->rangingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
+  ext->rangingSettings()->setAutoRoamDelay(this->autoRoamDelay());
 
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
@@ -1331,6 +1374,37 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->setSTEFrequency(this->steFrequency());
   ext->setTBSTFrequency(this->tbstFrequency());
   ext->enableProMode(this->proMode());
+  ext->enableMaintainCallChannel(this->maintainCallChannel());
+
+  return true;
+}
+
+bool
+D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+    return false;
+  AnytoneSettingsExtension *ext = settings->anytoneExtension();
+
+  if (0xff != priorityZoneAIndex()) {
+    if (! ctx.has<Zone>(priorityZoneAIndex())) {
+      errMsg(err) << "Cannot link priority zone A index " << priorityZoneAIndex()
+                  << ": Zone with that index not defined.";
+      return false;
+    }
+    ext->bootSettings()->priorityZoneA()->set(ctx.get<Zone>(priorityZoneAIndex()));
+  }
+  if (0xff != priorityZoneBIndex()) {
+    if (! ctx.has<Zone>(priorityZoneBIndex())) {
+      errMsg(err) << "Cannot link priority zone B index " << priorityZoneBIndex()
+                  << ": Zone with that index not defined.";
+      return false;
+    }
+    ext->bootSettings()->priorityZoneB()->set(ctx.get<Zone>(priorityZoneBIndex()));
+  }
+  if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
+    ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+  }
+
   return true;
 }
 

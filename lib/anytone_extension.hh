@@ -302,6 +302,12 @@ class AnytoneBootSettingsExtension: public ConfigItem
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
   /** The default channel for VFO B. */
   Q_PROPERTY(ChannelReference* channelB READ channelB)
+  /** The priority zone for VFO A. */
+  Q_PROPERTY(ZoneReference* priorityZoneA READ priorityZoneA)
+  /** The priority zone for VFO B. */
+  Q_PROPERTY(ZoneReference* priorityZoneB READ priorityZoneB)
+  /** The default roaming zone. */
+  Q_PROPERTY(RoamingZoneReference* defaultRoamingZone READ defaultRoamingZone)
 
 public:
   /** What to display during boot. */
@@ -341,6 +347,12 @@ public:
   ZoneReference *zoneB() const;
   /** Returns a reference to the default channel for VFO B. */
   ChannelReference *channelB() const;
+  /** Returns a reference to the priority zone for VFO A. */
+  ZoneReference *priorityZoneA() const;
+  /** Returns a reference to the priority zone for VFO B. */
+  ZoneReference *priorityZoneB() const;
+  /** Returns a reference to the default roaming zone. */
+  RoamingZoneReference *defaultRoamingZone() const;
 
 protected:
   BootDisplay _bootDisplay;        ///< The boot display property.
@@ -351,6 +363,9 @@ protected:
   ChannelReference *_channelA;     ///< Default channel for VFO A, must be member of zone for VFO A.
   ZoneReference *_zoneB;           ///< Default zone for VFO B.
   ChannelReference *_channelB;     ///< Default channel for VFO B, must be member of zone for VFO B.
+  ZoneReference *_priorityZoneA;   ///< Priority zone for VFO A.
+  ZoneReference *_priorityZoneB;   ///< Priority zone for VFO B.
+  RoamingZoneReference *_defaultRoamingZone; ///< The default roaming zone.
 };
 
 
@@ -633,6 +648,7 @@ protected:
   Melody *_idleMelody;             ///< Idle melody.
   Melody *_resetMelody;            ///< Reset melody.
   unsigned int _keyToneLevel;      ///< The level of key-tones, 0=user adjustable.
+
 };
 
 
@@ -666,6 +682,14 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(bool showZoneAndContact READ showZoneAndContactEnabled WRITE enableShowZoneAndContact)
   /** Specifies the UI language. */
   Q_PROPERTY(Language language READ language WRITE setLanguage)
+  /** Shows the channel number. */
+  Q_PROPERTY(bool showChannelNumber READ showChannelNumberEnabled WRITE enableShowChannelNumber)
+  /** Shows the contact. */
+  Q_PROPERTY(bool showContact READ showContactEnabled WRITE enableShowContact)
+  /** The standby text color. */
+  Q_PROPERTY(Color standbyTextColor READ standbyTextColor WRITE setStandbyTextColor)
+  /** Shows the last caller. */
+  Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
 
 public:
   /** What to show from the last caller. */
@@ -676,7 +700,7 @@ public:
 
   /** Possible display colors. */
   enum class Color {
-    White = 0, Red = 1
+    White = 0, Black = 1, Orange=2, Red=3, Yellow=4, Green=5, Turquoise=6, Blue=7
   };
   Q_ENUM(Color)
 
@@ -748,6 +772,26 @@ public:
   /** Sets the UI language. */
   void setLanguage(Language lang);
 
+  /** Returns @c true if the channel number is shown. */
+  bool showChannelNumberEnabled() const;
+  /** Enables/disables the display of the channel number. */
+  void enableShowChannelNumber(bool enable);
+
+  /** Returns @c true if the contact is shown. */
+  bool showContactEnabled() const;
+  /** Enables/disables the display of calling contact. */
+  void enableShowContact(bool enable);
+
+  /** Returns the standby text color. */
+  Color standbyTextColor() const;
+  /** Sets the standby text color. */
+  void setStandbyTextColor(Color color);
+
+  /** Shows the last caller. */
+  bool showLastHeardEnabled() const;
+  /** Enables/disables display of last caller. */
+  void enableShowLastHeard(bool enable);
+
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
   unsigned int _brightness;                 ///< The display brightness.
@@ -760,6 +804,10 @@ protected:
   Color _callColor;                         ///< Color of call.
   bool _showZoneAndContact;                 ///< Display zone and contact
   Language _language;                       ///< UI language.
+  bool _showChannelNumber;                  ///< Show channel number.
+  bool _showContact;                        ///< Enables showing the contact.
+  Color _standbyTextColor;                  ///< Standby text color.
+  bool _showLastHeard;                      ///< Shows the last caller.
 };
 
 
@@ -1062,6 +1110,44 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   /** Wake head-period in ms. */
   Q_PROPERTY(unsigned int wakeHeadPeriod READ wakeHeadPeriod WRITE setWakeHeadPeriod)
 
+  Q_CLASSINFO("filterOwnIDDescription", "If enabled, own ID is not shown in call lists.")
+  /** Filter own ID from call lists. */
+  Q_PROPERTY(bool filterOwnID READ filterOwnIDEnabled WRITE enableFilterOwnID)
+
+  Q_CLASSINFO("monitorSlotMatchDescription", "Time-slot match-mode for DMR monitor.")
+  /** Slot-match mode for DMR monitor. */
+  Q_PROPERTY(SlotMatch monitorSlotMatch READ monitorSlotMatch WRITE setMonitorSlotMatch)
+
+  Q_CLASSINFO("monitorColorCodeMatchDescription", "If enabled, the DMR monitor will only open for "
+              "matching color-codes.")
+  /** Color-code match for DMR monitor. */
+  Q_PROPERTY(bool monitorColorCodeMatch READ monitorColorCodeMatchEnabled WRITE enableMonitorColorCodeMatch)
+
+  Q_CLASSINFO("monitorIDMatchDescription", "If enabled, the DMR monitor will only open for matching IDs.")
+  /** ID match for DMR monitor. */
+  Q_PROPERTY(bool monitorIDMatch READ monitorIDMatchEnabled WRITE enableMonitorIDMatch)
+
+  Q_CLASSINFO("monitorTimeSlotHold", "Whether the DMR monitor holds the time-slot.")
+  /** The DMR monitor holds the time-slot. */
+  Q_PROPERTY(bool monitorTimeSlotHold READ monitorTimeSlotHoldEnabled WRITE enableMonitorTimeSlotHold)
+
+  Q_CLASSINFO("smsFormatDescription", "Specifies the SMS format, select Motorola here.")
+  /** The SMS format. */
+  Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
+
+public:
+  /** Possible monitor slot matches. */
+  enum class SlotMatch {
+    Off = 0, Single = 1, Both = 2
+  };
+  Q_ENUM(SlotMatch)
+
+  /** Possible SMS formats. */
+  enum class SMSFormat {
+    Motorola = 0, Hytera = 1, DMR = 2,
+  };
+  Q_ENUM(SMSFormat)
+
 public:
   /** Constructor. */
   explicit AnytoneDMRSettingsExtension(QObject *parent = nullptr);
@@ -1086,11 +1172,99 @@ public:
   /** Sets the wake head-period in ms. */
   void setWakeHeadPeriod(unsigned int ms);
 
+  /** If @c true, the own ID is not shown in call lists. */
+  bool filterOwnIDEnabled() const;
+  /** Enables/disables filtering of own ID. */
+  void enableFilterOwnID(bool enable);
+
+  /** Returns the slot-match mode for the DMR monitor. */
+  SlotMatch monitorSlotMatch() const;
+  /** Sets the slot-match mode for the DMR monitor. */
+  void setMonitorSlotMatch(SlotMatch match);
+  /** Returns @c true if the CC match is enabled for the DMR monitor. */
+  bool monitorColorCodeMatchEnabled() const;
+  /** Enables/disables the CC match for the DMR monitor. */
+  void enableMonitorColorCodeMatch(bool enable);
+  /** Returns @c true if the ID match is enabled for the DMR monitor. */
+  bool monitorIDMatchEnabled() const;
+  /** Enables/disables ID match for the DMR monitor. */
+  void enableMonitorIDMatch(bool enable);
+  /** Returns @c true if the time-slot is held by the DMR monitor. */
+  bool monitorTimeSlotHoldEnabled() const;
+  /** Enables/disables the time-slot hold for the DMR monitor. */
+  void enableMonitorTimeSlotHold(bool enable);
+
+  /** Returns the SMS format. */
+  SMSFormat smsFormat() const;
+  /** Sets the SMS format. */
+  void setSMSFormat(SMSFormat format);
+
 protected:
   unsigned int _groupCallHangTime;      ///< Hang-time for group-calls in seconds.
   unsigned int _privateCallHangTime;    ///< Hang-time for private-calls in seconds.
   unsigned int _preWaveDelay;           ///< Pre-wave time in ms, should be 100ms.
   unsigned int _wakeHeadPeriod;         ///< Wake head-period in ms, should be 100ms.
+  bool _filterOwnID;                    ///< If enabled, the own ID is not shown in call lists.
+  SlotMatch _monitorSlotMatch;          ///< Slot-match mode for DMR monitor.
+  bool _monitorColorCodeMatch;          ///< Enables CC match for DMR monitor.
+  bool _monitorIDMatch;                 ///< Enables ID match for DMR monitor.
+  bool _monitorTimeSlotHold;            ///< Enables the time-slot hold for the DMR monitor.
+  SMSFormat _smsFormat;                 ///< Sets the SMS format.
+};
+
+
+/** Implements the ranging/roaming settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneRangingSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("Description", "Collects all ranging/roaming settings for AnyTone devices.")
+
+  Q_CLASSINFO("gpsRangeReporing", "Enables GPS range reporting.")
+  /** Enables GPS range reporing. */
+  Q_PROPERTY(bool gpsRangeReporting READ gpsRangeReportingEnabled WRITE enableGPSRangeReporting)
+
+  Q_CLASSINFO("gpsRangingInterval", "Specifies the GPS ranging interval in seconds.")
+  /** GPS ranging interval in seconds. */
+  Q_PROPERTY(unsigned int gpsRangingInterval READ gpsRangingInterval WRITE setGPSRangingInterval)
+
+  Q_CLASSINFO("autoRoamPeriodDescription", "Specifies the auto-roaming period in minutes.")
+  /** The auto-roaming period in minutes. */
+  Q_PROPERTY(unsigned int autoRoamPeriod READ autoRoamPeriod WRITE setAutoRoamPeriod)
+
+public:
+  /** Constructor. */
+  explicit AnytoneRangingSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the GPS range reporing is enabled. */
+  bool gpsRangeReportingEnabled() const;
+  /** Enables/disables the GPS range reporting. */
+  void enableGPSRangeReporting(bool enable);
+
+  /** Returns the GPS ranging interval in seconds. */
+  unsigned int gpsRangingInterval() const;
+  /** Sets the GPS ranging interval in seconds. */
+  void setGPSRangingInterval(unsigned int sec);
+
+  /** Returns the auto-roaming period in minutes. */
+  unsigned int autoRoamPeriod() const;
+  /** Sets the auto-roam period in minutes. */
+  void setAutoRoamPeriod(unsigned int min);
+  /** Returns the auto-roam delay in seconds. */
+  unsigned int autoRoamDelay() const;
+  /** Sets the auto-roam delay in seconds. */
+  void setAutoRoamDelay(unsigned int sec);
+
+protected:
+  bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
+  unsigned int _gpsRangingInterval;            ///< The GPS ranging interval in seconds.
+  unsigned int _autoRoamPeriod;                ///< The auto-roam period in minutes.
+  unsigned int _autoRoamDelay;                 ///< The auto-roam delay in seconds.
 };
 
 
@@ -1173,6 +1347,9 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** If @c true, the "pro mode" is enabled. */
   Q_PROPERTY(bool proMode READ proModeEnabled WRITE enableProMode)
 
+  /** If @c true, the call-channel is maintained (whatever that means). */
+  Q_PROPERTY(bool maintainCallChannel READ maintainCallChannelEnabled WRITE enableMaintainCallChannel)
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The key settings. */
@@ -1189,6 +1366,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneAutoRepeaterSettingsExtension* autoRepeaterSettings READ autoRepeaterSettings)
   /** The DMR settings. */
   Q_PROPERTY(AnytoneDMRSettingsExtension* dmrSettings READ dmrSettings)
+  /** The Raging/Roaming settings. */
+  Q_PROPERTY(AnytoneRangingSettingsExtension* rangingSettings READ rangingSettings)
 
 public:
   /** Possible power save modes. */
@@ -1250,6 +1429,8 @@ public:
   AnytoneAutoRepeaterSettingsExtension *autoRepeaterSettings() const;
   /** A reference to the DMR settings. */
   AnytoneDMRSettingsExtension *dmrSettings() const;
+  /** A reference to the ranging settings. */
+  AnytoneRangingSettingsExtension *rangingSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   unsigned int autoShutDownDelay() const;
@@ -1357,6 +1538,11 @@ public:
   /** Enables/disables the "pro mode". */
   void enableProMode(bool enable);
 
+  /** Returns @c true if the call-channel is maintained. */
+  bool maintainCallChannelEnabled() const;
+  /** Enables/disables maintaining the call-channel. */
+  void enableMaintainCallChannel(bool enable);
+
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
@@ -1374,6 +1560,8 @@ protected:
   AnytoneAutoRepeaterSettingsExtension *_autoRepeaterSettings;
   /** The DMR settings. */
   AnytoneDMRSettingsExtension *_dmrSettings;
+  /** The ranging settings. */
+  AnytoneRangingSettingsExtension *_rangingSettings;
 
   bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
@@ -1396,6 +1584,7 @@ protected:
   double _steFrequency;            ///< STE Frequency in Hz.
   unsigned int _tbstFrequency;     ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
+  bool _maintainCallChannel;       ///< Maintains the call channel.
 };
 
 #endif // ANYTONEEXTENSION_HH
