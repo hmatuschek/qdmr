@@ -1,6 +1,7 @@
 #include "codeplug.hh"
 #include "config.hh"
 #include <QtEndian>
+#include <QTextCodec>
 #include "logger.hh"
 #include "roamingchannel.hh"
 
@@ -579,6 +580,26 @@ Codeplug::Element::writeUnicode(unsigned offset, const QString &txt, unsigned ma
   }
 }
 
+QString
+Codeplug::Element::readGBK(unsigned offset, unsigned maxlen, uint8_t eos) const {
+  QByteArray txt;
+  uint8_t *ptr = (uint8_t *)(_data+offset);
+  for (unsigned i=0; (i<maxlen)&&(ptr[i])&&(eos!=ptr[i]); i++) {
+    txt.append((ptr[i]));
+  }
+  return QTextCodec::codecForName("GBK")->toUnicode(txt);
+}
+void
+Codeplug::Element::writeGBK(unsigned offset, const QString &txt, unsigned maxlen, uint8_t eos) {
+  QByteArray enc = QTextCodec::codecForName("GBK")->fromUnicode(txt);
+  uint8_t *ptr = (uint8_t *)(_data+offset);
+  for (unsigned i=0; i<maxlen; i++) {
+    if (i < unsigned(enc.length()))
+      ptr[i] = enc.at(i);
+    else
+      ptr[i] = eos;
+  }
+}
 
 /* ********************************************************************************************* *
  * Implementation of CodePlug::Context

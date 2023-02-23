@@ -178,6 +178,12 @@ public:
      * The stored string gets padded with @c eos to @c maxlen. */
     void writeUnicode(unsigned offset, const QString &txt, unsigned maxlen, uint16_t eos=0x0000);
 
+    /** Reads up to @c maxlen GBK char bytes at the given byte-offset using @c eos as the string termination char. */
+    QString readGBK(unsigned offset, unsigned maxlen, uint8_t eos=0x0000) const;
+    /** Stores up to @c maxlen GBK char bytes at the given byte-offset using @c eos as the string termination char.
+     * The stored string gets padded with @c eos to @c maxlen. */
+    void writeGBK(unsigned offset, const QString &txt, unsigned maxlen, uint8_t eos=0x0000);
+
   protected:
     /** Holds the pointer to the element. */
     uint8_t *_data;
