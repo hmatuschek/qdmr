@@ -464,7 +464,8 @@ AnytoneDMRSettingsExtension::setSMSFormat(SMSFormat format) {
  * ********************************************************************************************* */
 AnytoneRangingSettingsExtension::AnytoneRangingSettingsExtension(QObject *parent)
   : ConfigItem(parent), _gpsRangeReporting(false), _gpsRangingInterval(300), _autoRoamPeriod(1),
-    _autoRoamDelay(0)
+    _autoRoamDelay(0), _repeaterRangeCheck(false), _repeaterCheckInterval(5),
+    _repeaterRangeCheckCount(3), _roamingStartCondition(RoamStart::Periodic)
 {
   // pass...
 }
@@ -524,6 +525,53 @@ AnytoneRangingSettingsExtension::setAutoRoamDelay(unsigned int min) {
   if (_autoRoamDelay == min)
     return;
   _autoRoamDelay = min;
+  emit modified(this);
+}
+
+bool
+AnytoneRangingSettingsExtension::repeaterRangeCheckEnabled() const {
+  return _repeaterRangeCheck;
+}
+void
+AnytoneRangingSettingsExtension::enableRepeaterRangeCheck(bool enable) {
+  if (_repeaterRangeCheck == enable)
+    return;
+  _repeaterRangeCheck = enable;
+  emit modified(this);
+}
+unsigned int
+AnytoneRangingSettingsExtension::repeaterCheckInterval() const {
+  return _repeaterCheckInterval;
+}
+void
+AnytoneRangingSettingsExtension::setRepeaterCheckInterval(unsigned int sec) {
+  if (_repeaterCheckInterval == sec)
+    return;
+  _repeaterCheckInterval = sec;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneRangingSettingsExtension::repeaterRangeCheckCount() const {
+  return _repeaterRangeCheckCount;
+}
+void
+AnytoneRangingSettingsExtension::setRepeaterRangeCheckCount(unsigned int sec) {
+  if (_repeaterRangeCheckCount == sec)
+    return;
+  _repeaterRangeCheckCount = sec;
+  emit modified(this);
+}
+
+AnytoneRangingSettingsExtension::RoamStart
+AnytoneRangingSettingsExtension::roamingStartCondition() const {
+  return _roamingStartCondition;
+}
+void
+AnytoneRangingSettingsExtension::setRoamingStartCondition(RoamStart start) {
+  if (_roamingStartCondition == start)
+    return;
+  _roamingStartCondition = start;
   emit modified(this);
 }
 

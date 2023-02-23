@@ -349,11 +349,6 @@ public:
       Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
     };
 
-    /** Possible roaming start conditions. */
-    enum class RoamStart {
-      Periodic=0, OutOfRange=1
-    };
-
     /** All possible STE (squelch tail eliminate) frequencies. */
     enum class STEFrequency {
       Off = 0, Hz55_2  = 1, Hz259_2 = 2
@@ -658,9 +653,9 @@ public:
     virtual void setRepeaterRangeCheckCount(unsigned n);
 
     /** Returns the roaming start condition. */
-    virtual RoamStart roamingStartCondition() const;
+    virtual AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
     /** Sets the roaming start condition. */
-    virtual void setRoamingStartCondition(RoamStart cond);
+    virtual void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
 
     /** Returns the backlight duration during TX in seconds. */
     virtual unsigned backlightTXDuration() const;

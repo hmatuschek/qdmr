@@ -1235,6 +1235,29 @@ class AnytoneRangingSettingsExtension: public ConfigItem
   /** The auto-roaming period in minutes. */
   Q_PROPERTY(unsigned int autoRoamPeriod READ autoRoamPeriod WRITE setAutoRoamPeriod)
 
+  Q_CLASSINFO("rangeCheckDescription", "Repeater range check.")
+  /** Repeater range check. */
+  Q_PROPERTY(bool rangeCheck READ repeaterRangeCheckEnabled WRITE enableRepeaterRangeCheck)
+
+  Q_CLASSINFO("checkIntervalDescription", "Repeater range check interval in seconds.")
+  /** Repeater range check intervall in seconds. */
+  Q_PROPERTY(bool checkInterval READ repeaterCheckInterval WRITE setRepeaterCheckInterval)
+
+  Q_CLASSINFO("retryCount", "Number of retries to connect to a repeater before giving up.")
+  /** Retry count. */
+  Q_PROPERTY(unsigned int retryCount READ repeaterRangeCheckCount WRITE setRepeaterRangeCheckCount)
+
+  Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
+  /** Auto-roaming start condition. */
+  Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
+
+public:
+  /** Possible roaming start conditions. */
+  enum class RoamStart {
+    Periodic=0, OutOfRange=1
+  };
+  Q_ENUM(RoamStart)
+
 public:
   /** Constructor. */
   explicit AnytoneRangingSettingsExtension(QObject *parent=nullptr);
@@ -1260,11 +1283,33 @@ public:
   /** Sets the auto-roam delay in seconds. */
   void setAutoRoamDelay(unsigned int sec);
 
+  /** Retruns @c true if the repeater range check is enabled. */
+  bool repeaterRangeCheckEnabled() const;
+  /** Enables/disables repeater range check. */
+  void enableRepeaterRangeCheck(bool enable);
+  /** Returns the repeater check interval in seconds. */
+  unsigned int repeaterCheckInterval() const;
+  /** Sets the repeater check interval in seconds. */
+  void setRepeaterCheckInterval(unsigned int sec);
+  /** Number of retries before givnig up. */
+  unsigned int repeaterRangeCheckCount() const;
+  /** Sets the number of retries before giving up. */
+  void setRepeaterRangeCheckCount(unsigned int count);
+
+  /** Returns the auto-roaming start condition. */
+  RoamStart roamingStartCondition() const;
+  /** Sets the auto-roaming start condition. */
+  void setRoamingStartCondition(RoamStart start);
+
 protected:
   bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
   unsigned int _gpsRangingInterval;            ///< The GPS ranging interval in seconds.
   unsigned int _autoRoamPeriod;                ///< The auto-roam period in minutes.
   unsigned int _autoRoamDelay;                 ///< The auto-roam delay in seconds.
+  bool _repeaterRangeCheck;                    ///< Enables the repeater range-check.
+  unsigned int _repeaterCheckInterval;         ///< The repeater check interval in seconds.
+  unsigned int _repeaterRangeCheckCount;       ///< Number of range checks before giving up.
+  RoamStart _roamingStartCondition;            ///< Auto-roaming start condition.
 };
 
 

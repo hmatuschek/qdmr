@@ -1089,12 +1089,12 @@ D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(unsigned n) {
   setUInt8(0x00df, n);
 }
 
-D878UVCodeplug::GeneralSettingsElement::RoamStart
+AnytoneRangingSettingsExtension::RoamStart
 D878UVCodeplug::GeneralSettingsElement::roamingStartCondition() const {
-  return (RoamStart)getUInt8(0x00e0);
+  return (AnytoneRangingSettingsExtension::RoamStart)getUInt8(0x00e0);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(RoamStart cond) {
+D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond) {
   setUInt8(0x00e0, (unsigned)cond);
 }
 
@@ -1289,6 +1289,10 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setGPSRangingInterval(ext->rangingSettings()->gpsRangingInterval());
     setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
     setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
+    enableRepeaterRangeCheck(ext->rangingSettings()->repeaterRangeCheckEnabled());
+    setRepeaterRangeCheckInterval(ext->rangingSettings()->repeaterCheckInterval());
+    setRepeaterRangeCheckCount(ext->rangingSettings()->repeaterRangeCheckCount());
+    setRoamingStartCondition(ext->rangingSettings()->roamingStartCondition());
 
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
@@ -1364,6 +1368,10 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->rangingSettings()->setGPSRangingInterval(this->gpsRangingInterval());
   ext->rangingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
   ext->rangingSettings()->setAutoRoamDelay(this->autoRoamDelay());
+  ext->rangingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheck());
+  ext->rangingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
+  ext->rangingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
+  ext->rangingSettings()->setRoamingStartCondition(this->roamingStartCondition());
 
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
