@@ -81,8 +81,8 @@ D868UVETest::testAutoRepeaterOffset() {
   AnytoneAutoRepeaterSettingsExtension *ext = comp_config.settings()->anytoneExtension()->autoRepeaterSettings();
 
   QCOMPARE(ext->offsets()->count(), 2);
-  QCOMPARE(ext->offsets()->get(0)->as<AnytoneAutoRepeaterOffset>()->offset(),  600000);
-  QCOMPARE(ext->offsets()->get(1)->as<AnytoneAutoRepeaterOffset>()->offset(), 7600000);
+  QCOMPARE(ext->offsets()->get(0)->as<AnytoneAutoRepeaterOffset>()->offset().inHz(),  600000);
+  QCOMPARE(ext->offsets()->get(1)->as<AnytoneAutoRepeaterOffset>()->offset().inHz(), 7600000);
 
   QVERIFY(! ext->vhfRef()->isNull()); QVERIFY(! ext->uhfRef()->isNull());
   QCOMPARE(ext->vhfRef()->as<AnytoneAutoRepeaterOffset>(), ext->offsets()->get(0)->as<AnytoneAutoRepeaterOffset>());

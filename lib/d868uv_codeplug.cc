@@ -501,38 +501,37 @@ D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(0x00b6, (enable ? 0x01 : 0x00));
 }
 
-unsigned
-D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return getBCD8_be(0x00b8)*10;
+Frequency D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return Frequency::fromHz(getBCD8_be(0x00b8)*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00b8, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x00b8, freq.inHz()/10);
 }
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return getBCD8_be(0x00bc)*10;
+  return Frequency::fromHz(getBCD8_be(0x00bc)*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00bc, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x00bc, freq.inHz()/10);
 }
 
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return getBCD8_be(0x00c0)*10;
+  return Frequency::fromHz(getBCD8_be(0x00c0)*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00c0, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x00c0, freq.inHz()/10);
 }
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return getBCD8_be(0x00c4)*10;
+  return Frequency::fromHz(getBCD8_be(0x00c4)*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00c4, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x00c4, freq.inHz()/10);
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -658,6 +657,9 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode tone settings
     setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
+    // Encode menu settings
+    setMenuExitTime(ext->menuSettings()->duration());
+
     // Encode display settings
     setCallDisplayColor(ext->displaySettings()->callColor());
     enableShowZoneAndContact(ext->displaySettings()->showZoneAndContactEnabled());
@@ -702,6 +704,9 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode tone settings
   ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Menu settings
+  ext->menuSettings()->setDuration(this->menuExitTime());
 
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());
@@ -1777,7 +1782,7 @@ D868UVCodeplug::encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx
   for (int i=0; i<NUM_OFFSET_FREQ; i++) {
     uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ+i*sizeof(uint32_t));
     if (i < (int)ctx.count<AnytoneAutoRepeaterOffset>()) {
-      *offsetFreqPtr = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset());
+      *offsetFreqPtr = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset().inHz());
     } else {
       *offsetFreqPtr = 0;
     }
@@ -1805,7 +1810,7 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
     if (0 == *offsetFreqPtr)
       continue;
     AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
-    offset->setOffset(qFromLittleEndian(*offsetFreqPtr));
+    offset->setOffset(Frequency::fromHz(qFromLittleEndian(*offsetFreqPtr)));
     ext->autoRepeaterSettings()->offsets()->add(offset);
     ctx.add(offset, i);
   }

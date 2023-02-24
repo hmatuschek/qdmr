@@ -4,6 +4,8 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "melody.hh"
+#include "frequency.hh"
+#include "interval.hh"
 
 #include <QTimeZone>
 
@@ -308,6 +310,8 @@ class AnytoneBootSettingsExtension: public ConfigItem
   Q_PROPERTY(ZoneReference* priorityZoneB READ priorityZoneB)
   /** The default roaming zone. */
   Q_PROPERTY(RoamingZoneReference* defaultRoamingZone READ defaultRoamingZone)
+  /** Enables the GPS check. */
+  Q_PROPERTY(bool gpsCheck READ gpsCheckEnabled WRITE enableGPSCheck)
 
 public:
   /** What to display during boot. */
@@ -354,6 +358,16 @@ public:
   /** Returns a reference to the default roaming zone. */
   RoamingZoneReference *defaultRoamingZone() const;
 
+  /** Returns @c true if the GPS check is enabled. */
+  bool gpsCheckEnabled() const;
+  /** Enables/disables the GPS check. */
+  void enableGPSCheck(bool enable);
+
+  /** Returns @c true if the MCU is reset on boot. */
+  bool resetEnabled() const;
+  /** Enables/disables MCU reset on boot. */
+  void enableReset(bool enable);
+
 protected:
   BootDisplay _bootDisplay;        ///< The boot display property.
   bool _bootPasswordEnabled;       ///< If true, the boot password is enabled.
@@ -366,6 +380,8 @@ protected:
   ZoneReference *_priorityZoneA;   ///< Priority zone for VFO A.
   ZoneReference *_priorityZoneB;   ///< Priority zone for VFO B.
   RoamingZoneReference *_defaultRoamingZone; ///< The default roaming zone.
+  bool _gpsCheck;                  ///< Enables GPS check.
+  bool _reset;                     ///< Enables MCU reset on boot.
 };
 
 
@@ -398,7 +414,7 @@ class AnytoneKeySettingsExtension: public ConfigItem
   /** Programmable function key 2, long press function. */
   Q_PROPERTY(KeyFunction funcKey2Long READ funcKey2Long WRITE setFuncKey2Long)
   /** The long press duration in ms. */
-  Q_PROPERTY(unsigned int longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  Q_PROPERTY(Interval longPressDuration READ longPressDuration WRITE setLongPressDuration)
   /** The auto key-lock property. */
   Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
 
@@ -488,9 +504,9 @@ public:
   void setFuncKey2Long(KeyFunction func);
 
   /** Returns the long-press duration in ms. */
-  unsigned int longPressDuration() const;
+  Interval longPressDuration() const;
   /** Sets the long-press duration in ms. */
-  void setLongPressDuration(unsigned int ms);
+  void setLongPressDuration(Interval ms);
 
   /** Retruns @c true, if the automatic key-lock feature is enabled. */
   bool autoKeyLockEnabled() const;
@@ -525,7 +541,7 @@ protected:
   KeyFunction _funcKey1Long;               ///< Function of the function key 1, long press.
   KeyFunction _funcKey2Short;              ///< Function of the function key 2, short press.
   KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
-  unsigned int _longPressDuration;         ///< The long-press duration in ms.
+  Interval _longPressDuration;             ///< The long-press duration in ms.
   bool _autoKeyLock;                       ///< Auto key-lock property.
   bool _knobLock;                          ///< Knob locked too.
   bool _keypadLock;                        ///< Key-pad is locked.
@@ -665,13 +681,25 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   /** The display brightness [1-10]. */
   Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
   /** The backlight duration in seconds. */
-  Q_PROPERTY(unsigned int backlightDuration READ backlightDuration WRITE setBacklightDuration)
+  Q_PROPERTY(Interval backlightDuration READ backlightDuration WRITE setBacklightDuration)
+
+  Q_CLASSINFO("backlightDurationTX", "The duration in seconds, the backlight is lit during TX. "
+                                     "A value of 0 means off.")
+  /** TX backlight duration. */
+  Q_PROPERTY(Interval backlightDurationTX READ backlightDurationTX WRITE setBacklightDurationTX)
+
+  Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
+                                     "A value of 0 means off.")
+  /** TR backlight duration. */
+  Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
+
   /** The volume-change prompt is shown. */
   Q_PROPERTY(bool volumeChangePrompt READ volumeChangePromptEnabled WRITE enableVolumeChangePrompt)
   /** The call-end prompt is shown. */
   Q_PROPERTY(bool callEndPrompt READ callEndPromptEnabled WRITE enableCallEndPrompt)
   /** The last-caller display mode. */
   Q_PROPERTY(LastCallerDisplayMode lastCallerDisplay READ lastCallerDisplay WRITE setLastCallerDisplay)
+
   /** If @c true, the clock is shown. */
   Q_PROPERTY(bool showClock READ showClockEnabled WRITE enableShowClock)
   /** If @c true, the call is shown. */
@@ -690,6 +718,10 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(Color standbyTextColor READ standbyTextColor WRITE setStandbyTextColor)
   /** Shows the last caller. */
   Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
+
+  Q_CLASSINFO("channelNameColor", "Specifies the color of the channel name.")
+  /** The channel name color. */
+  Q_PROPERTY(Color channelNameColor READ channelNameColor WRITE setChannelNameColor)
 
 public:
   /** What to show from the last caller. */
@@ -728,9 +760,9 @@ public:
   void setBrightness(unsigned int level);
 
   /** Returns the backlight duration in seconds, 0 means permanent. */
-  unsigned int backlightDuration() const;
+  Interval backlightDuration() const;
   /** Sets the backlight duration in seconds, 0 means permanent. */
-  void setBacklightDuration(unsigned int sec);
+  void setBacklightDuration(Interval sec);
 
   /** Returns @c true if the volume-change prompt is shown. */
   bool volumeChangePromptEnabled() const;
@@ -792,10 +824,25 @@ public:
   /** Enables/disables display of last caller. */
   void enableShowLastHeard(bool enable);
 
+  /** Retuns backlight duration during TX. */
+  Interval backlightDurationTX() const;
+  /** Sets the backlight duration during TX in seconds. */
+  void setBacklightDurationTX(Interval sec);
+
+  /** Returns the color of the channel name. */
+  Color channelNameColor() const;
+  /** Sets the color of the channel name. */
+  void setChannelNameColor(Color color);
+
+  /** Retuns backlight duration during RX. */
+  Interval backlightDurationRX() const;
+  /** Sets the backlight duration during RX in seconds. */
+  void setBacklightDurationRX(Interval sec);
+
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
   unsigned int _brightness;                 ///< The display brightness.
-  unsigned int _backlightDuration;          ///< Backlight duration in seconds, 0=permanent.
+  Interval _backlightDuration;              ///< Backlight duration in seconds, 0=permanent.
   bool _volumeChangePrompt;                 ///< Volume-change prompt enabled.
   bool _callEndPrompt;                      ///< Call-end prompt enabled.
   LastCallerDisplayMode _lastCallerDisplay; ///< Last-caller display mode.
@@ -808,6 +855,9 @@ protected:
   bool _showContact;                        ///< Enables showing the contact.
   Color _standbyTextColor;                  ///< Standby text color.
   bool _showLastHeard;                      ///< Shows the last caller.
+  Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
+  Color _channelNameColor;                  ///< Color of channel name.
+  Interval _backlightDurationRX;            ///< Backlight duration in seconds during RX.
 };
 
 
@@ -820,7 +870,7 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   Q_OBJECT
 
   /** The VOX delay in ms. */
-  Q_PROPERTY(unsigned int voxDelay READ voxDelay WRITE setVOXDelay)
+  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
   /** If @c true, recording is enabled. */
   Q_PROPERTY(bool recording READ recordingEnabled WRITE enableRecording)
   /** The VOX source. */
@@ -831,6 +881,8 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
   /** If @c true, the audio is "enhanced". */
   Q_PROPERTY(bool enhance READ enhanceAudioEnabled WRITE enableEnhanceAudio)
+  /** The mute delay in minutes. */
+  Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
 
 public:
   /** Source for the VOX. */
@@ -846,9 +898,9 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the VOX delay in ms. */
-  unsigned int voxDelay() const;
+  Interval voxDelay() const;
   /** Sets the VOX delay in ms. */
-  void setVOXDelay(unsigned int ms);
+  void setVOXDelay(Interval ms);
 
   /** Returns @c true if recording is enabled. */
   bool recordingEnabled() const;
@@ -874,13 +926,19 @@ public:
   /** Enables/disables enhanced audio. */
   void enableEnhanceAudio(bool enable);
 
+  /** Returns the mute delay. */
+  Interval muteDelay() const;
+  /** Sets the mute delay. */
+  void setMuteDelay(Interval intv);
+
 protected:
-  unsigned int _voxDelay;           ///< VOX delay in ms.
+  Interval _voxDelay;               ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
   VoxSource _voxSource;             ///< The VOX source.
   unsigned int _maxVolume;          ///< The maximum volume.
   unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
   bool _enhanceAudio;               ///< Enhance audio.
+  Interval _muteDelay;              ///< Mute delay in minutes.
 };
 
 
@@ -892,8 +950,13 @@ class AnytoneMenuSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
+  Q_CLASSINFO("durationDescription", "The time in seconds, the menu is shown.")
   /** Menu exit time in seconds. */
-  Q_PROPERTY(unsigned int duration READ duration WRITE setDuration)
+  Q_PROPERTY(Interval duration READ duration WRITE setDuration)
+
+  Q_CLASSINFO("separatorDescription", "If enabled, the menu items are separated by a line.")
+  /** Menu separator. */
+  Q_PROPERTY(bool separator READ separatorEnabled WRITE enableSeparator)
 
 public:
   /** Default constructor. */
@@ -902,12 +965,17 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the menu duration in seconds. */
-  unsigned int duration() const;
+  Interval duration() const;
   /** Sets the menu duration in seconds. */
-  void setDuration(unsigned int sec);
+  void setDuration(Interval sec);
+  /** Returns @c true, if the menu separator lines are shown. */
+  bool separatorEnabled() const;
+  /** Enables/disables the menu separator lines. */
+  void enableSeparator(bool enable);
 
 protected:
-  unsigned int _menuDuration;      ///< Menu display duration in seconds.
+  Interval _menuDuration;          ///< Menu display duration in seconds.
+  bool _showSeparator;             ///< Show menu separator lines.
 };
 
 
@@ -925,7 +993,7 @@ class AnytoneAutoRepeaterOffset: public ConfigObject
               "The transmit-frequency offset is specified as a positive integer in Hz. The offset "
               "direction is specified for each VFO separately.")
   /** The offset frequency. */
-  Q_PROPERTY(unsigned int offset READ offset WRITE setOffset)
+  Q_PROPERTY(Frequency offset READ offset WRITE setOffset)
 
 public:
   /** Default constructor. */
@@ -934,13 +1002,13 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the transmit frequency offset in Hz. */
-  unsigned int offset() const;
+  Frequency offset() const;
   /** Sets the transmit frequency offset in Hz. */
-  void setOffset(unsigned int offset);
+  void setOffset(Frequency offset);
 
 protected:
   /** The transmit frequency offset in Hz. */
-  unsigned int _offset;
+  Frequency _offset;
 };
 
 
@@ -989,19 +1057,19 @@ class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("vhfMin", "The minimum frequency in Hz of the VHF auto-repeater frequency range.")
   /** The minimum frequency in Hz of the VHF auto-repeater frequency range. */
-  Q_PROPERTY(unsigned int vhfMin READ vhfMin WRITE setVHFMin)
+  Q_PROPERTY(Frequency vhfMin READ vhfMin WRITE setVHFMin)
 
   Q_CLASSINFO("vhfMax", "The maximum frequency in Hz of the VHF auto-repeater frequency range.")
   /** The maximum frequency in Hz of the VHF auto-repeater frequency range. */
-  Q_PROPERTY(unsigned int vhfMax READ vhfMax WRITE setVHFMax)
+  Q_PROPERTY(Frequency vhfMax READ vhfMax WRITE setVHFMax)
 
   Q_CLASSINFO("uhfMin", "The minimum frequency in Hz of the UHF auto-repeater frequency range.")
   /** The minimum frequency in Hz of the UHF auto-repeater frequency range. */
-  Q_PROPERTY(unsigned int uhfMin READ uhfMin WRITE setUHFMin)
+  Q_PROPERTY(Frequency uhfMin READ uhfMin WRITE setUHFMin)
 
   Q_CLASSINFO("uhfMax", "The maximum frequency in Hz of the UHF auto-repeater frequency range.")
   /** The maximum frequency in Hz of the UHF auto-repeater frequency range. */
-  Q_PROPERTY(unsigned int uhfMax READ uhfMax WRITE setUHFMax)
+  Q_PROPERTY(Frequency uhfMax READ uhfMax WRITE setUHFMax)
 
   Q_CLASSINFO("vhfDescription", "A reference to an offset frequency for the VHF band.")
   /** A reference to the auto-repeater frequency for VHF. */
@@ -1040,21 +1108,21 @@ public:
   void setDirectionB(Direction dir);
 
   /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
-  unsigned int vhfMin() const;
+  Frequency vhfMin() const;
   /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
-  void setVHFMin(unsigned int Hz);
+  void setVHFMin(Frequency Hz);
   /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
-  unsigned int vhfMax() const;
+  Frequency vhfMax() const;
   /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the VHF band. */
-  void setVHFMax(unsigned int Hz);
+  void setVHFMax(Frequency Hz);
   /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
-  unsigned int uhfMin() const;
+  Frequency uhfMin() const;
   /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
-  void setUHFMin(unsigned int Hz);
+  void setUHFMin(Frequency Hz);
   /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
-  unsigned int uhfMax() const;
+  Frequency uhfMax() const;
   /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the UHF band. */
-  void setUHFMax(unsigned int Hz);
+  void setUHFMax(Frequency Hz);
 
   /** Returns the reference for the UHF offset freuqency. */
   AnytoneAutoRepeaterOffsetRef *uhfRef() const;
@@ -1070,13 +1138,13 @@ protected:
   /** The auto-repeater direction for VFO B. */
   Direction _directionB;
   /** Minimum frequency of the VHF auto-repeater range. */
-  unsigned int _minVHF;
+  Frequency _minVHF;
   /** Maximum frequency of the VHF auto-repeater range. */
-  unsigned int _maxVHF;
+  Frequency _maxVHF;
   /** Minimum frequency of the UHF auto-repeater range. */
-  unsigned int _minUHF;
+  Frequency _minUHF;
   /** Maximum frequency of the UHF auto-repeater range. */
-  unsigned int _maxUHF;
+  Frequency _maxUHF;
   /** A reference to the VHF offset frequency. */
   AnytoneAutoRepeaterOffsetRef *_vhfOffset;
   /** A reference to the UHF offset frequency. */
@@ -1096,19 +1164,19 @@ class AnytoneDMRSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.");
   /** Group-call hang-time in seconds. */
-  Q_PROPERTY(unsigned int groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
 
   Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.");
   /** Private-call hang-time in seconds. */
-  Q_PROPERTY(unsigned int privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
 
   Q_CLASSINFO("preWaveDelay", "Sets the pre-wave delay in ms. Should be set to 100ms.")
   /** Pre-wave delay in ms. */
-  Q_PROPERTY(unsigned int preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
+  Q_PROPERTY(Interval preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
 
   Q_CLASSINFO("wakeHeadPeriod", "Sets the wake head-period in ms. Should be set to 100ms.")
   /** Wake head-period in ms. */
-  Q_PROPERTY(unsigned int wakeHeadPeriod READ wakeHeadPeriod WRITE setWakeHeadPeriod)
+  Q_PROPERTY(Interval wakeHeadPeriod READ wakeHeadPeriod WRITE setWakeHeadPeriod)
 
   Q_CLASSINFO("filterOwnIDDescription", "If enabled, own ID is not shown in call lists.")
   /** Filter own ID from call lists. */
@@ -1155,22 +1223,22 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the group-call hang-time in seconds. */
-  unsigned int groupCallHangTime() const;
+  Interval groupCallHangTime() const;
   /** Sets the group-call hang-time in seconds. */
-  void setGroupCallHangTime(unsigned int sec);
+  void setGroupCallHangTime(Interval sec);
   /** Returns the private-call hang-time in seconds. */
-  unsigned int privateCallHangTime() const;
+  Interval privateCallHangTime() const;
   /** Sets the private-call hang-time in seconds. */
-  void setPrivateCallHangTime(unsigned int sec);
+  void setPrivateCallHangTime(Interval sec);
 
   /** Returns the pre-wave delay in ms. */
-  unsigned int preWaveDelay() const;
+  Interval preWaveDelay() const;
   /** Sets the pre-wave delay in ms. */
-  void setPreWaveDelay(unsigned int ms);
+  void setPreWaveDelay(Interval ms);
   /** Returns the wake head-period in ms. */
-  unsigned int wakeHeadPeriod() const;
+  Interval wakeHeadPeriod() const;
   /** Sets the wake head-period in ms. */
-  void setWakeHeadPeriod(unsigned int ms);
+  void setWakeHeadPeriod(Interval ms);
 
   /** If @c true, the own ID is not shown in call lists. */
   bool filterOwnIDEnabled() const;
@@ -1200,10 +1268,10 @@ public:
   void setSMSFormat(SMSFormat format);
 
 protected:
-  unsigned int _groupCallHangTime;      ///< Hang-time for group-calls in seconds.
-  unsigned int _privateCallHangTime;    ///< Hang-time for private-calls in seconds.
-  unsigned int _preWaveDelay;           ///< Pre-wave time in ms, should be 100ms.
-  unsigned int _wakeHeadPeriod;         ///< Wake head-period in ms, should be 100ms.
+  Interval _groupCallHangTime;          ///< Hang-time for group-calls in seconds.
+  Interval _privateCallHangTime;        ///< Hang-time for private-calls in seconds.
+  Interval _preWaveDelay;               ///< Pre-wave time in ms, should be 100ms.
+  Interval _wakeHeadPeriod;             ///< Wake head-period in ms, should be 100ms.
   bool _filterOwnID;                    ///< If enabled, the own ID is not shown in call lists.
   SlotMatch _monitorSlotMatch;          ///< Slot-match mode for DMR monitor.
   bool _monitorColorCodeMatch;          ///< Enables CC match for DMR monitor.
@@ -1229,11 +1297,16 @@ class AnytoneRangingSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("gpsRangingInterval", "Specifies the GPS ranging interval in seconds.")
   /** GPS ranging interval in seconds. */
-  Q_PROPERTY(unsigned int gpsRangingInterval READ gpsRangingInterval WRITE setGPSRangingInterval)
+  Q_PROPERTY(Interval gpsRangingInterval READ gpsRangingInterval WRITE setGPSRangingInterval)
+
 
   Q_CLASSINFO("autoRoamPeriodDescription", "Specifies the auto-roaming period in minutes.")
   /** The auto-roaming period in minutes. */
-  Q_PROPERTY(unsigned int autoRoamPeriod READ autoRoamPeriod WRITE setAutoRoamPeriod)
+  Q_PROPERTY(Interval autoRoamPeriod READ autoRoamPeriod WRITE setAutoRoamPeriod)
+
+  Q_CLASSINFO("autoRoamDelayDescription", "A delay in seconds before starting the auto-roaming.")
+  /** The auto-roam delay. */
+  Q_PROPERTY(Interval autoRoamDelay READ autoRoamDelay WRITE setAutoRoamDelay)
 
   Q_CLASSINFO("rangeCheckDescription", "Repeater range check.")
   /** Repeater range check. */
@@ -1241,7 +1314,7 @@ class AnytoneRangingSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("checkIntervalDescription", "Repeater range check interval in seconds.")
   /** Repeater range check intervall in seconds. */
-  Q_PROPERTY(bool checkInterval READ repeaterCheckInterval WRITE setRepeaterCheckInterval)
+  Q_PROPERTY(Interval checkInterval READ repeaterCheckInterval WRITE setRepeaterCheckInterval)
 
   Q_CLASSINFO("retryCount", "Number of retries to connect to a repeater before giving up.")
   /** Retry count. */
@@ -1250,6 +1323,14 @@ class AnytoneRangingSettingsExtension: public ConfigItem
   Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
   /** Auto-roaming start condition. */
   Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
+
+  Q_CLASSINFO("notificationDescription", "Enables the repeater-check notification.")
+  /** Repeater-check notification. */
+  Q_PROPERTY(bool notification READ notificationEnabled WRITE enableNotification)
+
+  Q_CLASSINFO("notificationCountDescription", "The number of repeater-check notifications.")
+  /** Repeater-check notification count. */
+  Q_PROPERTY(unsigned int notificationCount READ notificationCount WRITE setNotificationCount)
 
 public:
   /** Possible roaming start conditions. */
@@ -1270,27 +1351,27 @@ public:
   void enableGPSRangeReporting(bool enable);
 
   /** Returns the GPS ranging interval in seconds. */
-  unsigned int gpsRangingInterval() const;
+  Interval gpsRangingInterval() const;
   /** Sets the GPS ranging interval in seconds. */
-  void setGPSRangingInterval(unsigned int sec);
+  void setGPSRangingInterval(Interval sec);
 
   /** Returns the auto-roaming period in minutes. */
-  unsigned int autoRoamPeriod() const;
+  Interval autoRoamPeriod() const;
   /** Sets the auto-roam period in minutes. */
-  void setAutoRoamPeriod(unsigned int min);
+  void setAutoRoamPeriod(Interval min);
   /** Returns the auto-roam delay in seconds. */
-  unsigned int autoRoamDelay() const;
+  Interval autoRoamDelay() const;
   /** Sets the auto-roam delay in seconds. */
-  void setAutoRoamDelay(unsigned int sec);
+  void setAutoRoamDelay(Interval sec);
 
   /** Retruns @c true if the repeater range check is enabled. */
   bool repeaterRangeCheckEnabled() const;
   /** Enables/disables repeater range check. */
   void enableRepeaterRangeCheck(bool enable);
   /** Returns the repeater check interval in seconds. */
-  unsigned int repeaterCheckInterval() const;
+  Interval repeaterCheckInterval() const;
   /** Sets the repeater check interval in seconds. */
-  void setRepeaterCheckInterval(unsigned int sec);
+  void setRepeaterCheckInterval(Interval sec);
   /** Number of retries before givnig up. */
   unsigned int repeaterRangeCheckCount() const;
   /** Sets the number of retries before giving up. */
@@ -1301,15 +1382,26 @@ public:
   /** Sets the auto-roaming start condition. */
   void setRoamingStartCondition(RoamStart start);
 
+  /** Returns @c true, if the repeater check notification is enabled. */
+  bool notificationEnabled() const;
+  /** Enables/disables the repeater-check notification. */
+  void enableNotification(bool enable);
+  /** Returns the number of notifications. */
+  unsigned int notificationCount() const;
+  /** Sets the number of repeater-check notifications. */
+  void setNotificationCount(unsigned int n);
+
 protected:
   bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
-  unsigned int _gpsRangingInterval;            ///< The GPS ranging interval in seconds.
-  unsigned int _autoRoamPeriod;                ///< The auto-roam period in minutes.
-  unsigned int _autoRoamDelay;                 ///< The auto-roam delay in seconds.
+  Interval _gpsRangingInterval;                ///< The GPS ranging interval in seconds.
+  Interval _autoRoamPeriod;                    ///< The auto-roam period in minutes.
+  Interval _autoRoamDelay;                     ///< The auto-roam delay in seconds.
   bool _repeaterRangeCheck;                    ///< Enables the repeater range-check.
-  unsigned int _repeaterCheckInterval;         ///< The repeater check interval in seconds.
+  Interval _repeaterCheckInterval;             ///< The repeater check interval in seconds.
   unsigned int _repeaterRangeCheckCount;       ///< Number of range checks before giving up.
   RoamStart _roamingStartCondition;            ///< Auto-roaming start condition.
+  bool _notification;                          ///< Repeater check notification.
+  unsigned int _notificationCount;             ///< Number of notifications.
 };
 
 
@@ -1327,7 +1419,7 @@ class AnytoneSettingsExtension: public ConfigExtension
 
   Q_CLASSINFO("autoShutDownDelayDescription", "The auto shut-down delay in minutes.")
   /** The auto shut-down delay in minutes. */
-  Q_PROPERTY(unsigned int autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+  Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
 
   /** The power-save mode. */
   Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
@@ -1357,13 +1449,13 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The VFO scan type. */
   Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
   /** The minimum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
+  Q_PROPERTY(Frequency minVFOScanFrequencyUHF READ minVFOScanFrequencyUHF WRITE setMinVFOScanFrequencyUHF)
   /** The maximum UHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
+  Q_PROPERTY(Frequency maxVFOScanFrequencyUHF READ maxVFOScanFrequencyUHF WRITE setMaxVFOScanFrequencyUHF)
   /** The minimum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
+  Q_PROPERTY(Frequency minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
   /** The maximum VHF VFO-scan frequency in Hz. */
-  Q_PROPERTY(unsigned int maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
+  Q_PROPERTY(Frequency maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
 
   Q_CLASSINFO("unitsDescription", "Specifies the GPS units.")
   /** The GPS units used. */
@@ -1375,7 +1467,7 @@ class AnytoneSettingsExtension: public ConfigExtension
 
   Q_CLASSINFO("vfoStep", "Specifes the VFO tuning steps in kHz.")
   /** The VFO tuning step-size in kHz. */
-  Q_PROPERTY(double vfoStep READ vfoStep WRITE setVFOStep)
+  Q_PROPERTY(Frequency vfoStep READ vfoStep WRITE setVFOStep)
 
   Q_CLASSINFO("steTypeDescription", "Specifies the STE (squelch tail elimination) type.")
   /** The STE type. */
@@ -1387,7 +1479,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz. Should be one of "
                                           "1000, 1450, 1750 and 2100 Hz.")
   /** The TBST frequency in Hz. */
-  Q_PROPERTY(unsigned int tbstFrequency READ tbstFrequency WRITE setTBSTFrequency)
+  Q_PROPERTY(Frequency tbstFrequency READ tbstFrequency WRITE setTBSTFrequency)
 
   /** If @c true, the "pro mode" is enabled. */
   Q_PROPERTY(bool proMode READ proModeEnabled WRITE enableProMode)
@@ -1478,9 +1570,9 @@ public:
   AnytoneRangingSettingsExtension *rangingSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
-  unsigned int autoShutDownDelay() const;
+  Interval autoShutDownDelay() const;
   /** Sets the auto shut-down delay. */
-  void setAutoShutDownDelay(unsigned int min);
+  void setAutoShutDownDelay(Interval min);
 
   /** Returns the power-save mode. */
   PowerSave powerSave() const;
@@ -1530,22 +1622,22 @@ public:
   void setTimeZone(const QTimeZone &zone);
 
   /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
-  unsigned minVFOScanFrequencyUHF() const;
+  Frequency minVFOScanFrequencyUHF() const;
   /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
-  void setMinVFOScanFrequencyUHF(unsigned hz);
+  void setMinVFOScanFrequencyUHF(Frequency hz);
   /** Returns the maximum VFO scan frequency for the UHF band in Hz. */
-  unsigned maxVFOScanFrequencyUHF() const;
+  Frequency maxVFOScanFrequencyUHF() const;
   /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
-  void setMaxVFOScanFrequencyUHF(unsigned hz);
+  void setMaxVFOScanFrequencyUHF(Frequency hz);
 
   /** Returns the minimum VFO scan frequency for the VHF band in Hz. */
-  unsigned minVFOScanFrequencyVHF() const;
+  Frequency minVFOScanFrequencyVHF() const;
   /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
-  void setMinVFOScanFrequencyVHF(unsigned hz);
+  void setMinVFOScanFrequencyVHF(Frequency hz);
   /** Returns the maximum VFO scan frequency for the VHF band in Hz. */
-  unsigned maxVFOScanFrequencyVHF() const;
+  Frequency maxVFOScanFrequencyVHF() const;
   /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
-  void setMaxVFOScanFrequencyVHF(unsigned hz);
+  void setMaxVFOScanFrequencyVHF(Frequency hz);
 
   /** Returns the GPS units used. */
   Units units() const;
@@ -1558,9 +1650,9 @@ public:
   void enableKeepLastCaller(bool enable);
 
   /** Returns the VFO tuning step in kHz. */
-  double vfoStep() const;
+  Frequency vfoStep() const;
   /** Sets the VFO tuning step in kHz. */
-  void setVFOStep(double step);
+  void setVFOStep(Frequency step);
 
   /** Returns the STE (squelch tail elimination) type. */
   STEType steType() const;
@@ -1574,9 +1666,9 @@ public:
   void setSTEFrequency(double freq);
 
   /** Returns the TBST frequency in Hz. */
-  unsigned int tbstFrequency() const;
+  Frequency tbstFrequency() const;
   /** Sets the TBST frequency in Hz. Should be one of 1000, 1450, 1750 and 2100 Hz. */
-  void setTBSTFrequency(unsigned int Hz);
+  void setTBSTFrequency(Frequency Hz);
 
   /** Returns @c true, if the "pro mode" is enabled. */
   bool proModeEnabled() const;
@@ -1608,7 +1700,7 @@ protected:
   /** The ranging settings. */
   AnytoneRangingSettingsExtension *_rangingSettings;
 
-  bool _autoShutDownDelay;         ///< The auto shut-down delay in minutes.
+  Interval _autoShutDownDelay;     ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.
   VFOScanType _vfoScanType;        ///< The VFO scan-type property.
   VFOMode _modeA;                  ///< Mode of VFO A.
@@ -1618,16 +1710,16 @@ protected:
   VFO _selectedVFO;                ///< The current VFO.
   bool _subChannel;                ///< If @c true, the sub-channel is enabled.
   QTimeZone _timeZone;             ///< The time zone.
-  unsigned int _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
-  unsigned int _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
-  unsigned int _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
-  unsigned int _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
+  Frequency _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
+  Frequency _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
+  Frequency _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
+  Frequency _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
   Units _gpsUnits;                 ///< The GPS units.
   bool _keepLastCaller;            ///< If @c true, the last caller is kept on channel switch.
-  double _vfoStep;                 ///< The VFO tuning step in kHz.
+  Frequency _vfoStep;              ///< The VFO tuning step in kHz.
   STEType _steType;                ///< The STE type.
   double _steFrequency;            ///< STE Frequency in Hz.
-  unsigned int _tbstFrequency;     ///< The TBST frequency in Hz.
+  Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
 };

@@ -1,6 +1,8 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "logger.hh"
+#include "frequency.hh"
+#include "interval.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
@@ -393,6 +395,10 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).toDouble();
     } else if (QString("QString") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
+    } else if (QString("Frequency") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Frequency>();
+    } else if (QString("Interval") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Interval>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
@@ -582,6 +588,30 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
+    } else if (QString("Frequency") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected frequency.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<Frequency>()));
+    } else if (QString("Interval") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected interval.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;

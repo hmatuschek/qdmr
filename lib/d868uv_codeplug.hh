@@ -319,22 +319,22 @@ public:
     /** Enables/disables showing last heard. */
     virtual void enableShowLastHeard(bool enable);
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMinFrequencyVHF() const;
+    virtual Frequency autoRepeaterMinFrequencyVHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyVHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMinFrequencyUHF() const;
+    virtual Frequency autoRepeaterMinFrequencyUHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyUHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
     /** Returns the auto-repeater direction for VFO B. */
     virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */

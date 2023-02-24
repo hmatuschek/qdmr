@@ -494,35 +494,35 @@ D878UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtens
   setUInt8(0x0005, (unsigned)lang);
 }
 
-double
+Frequency
 D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
   switch (getUInt8(0x0008)) {
-  case FREQ_STEP_2_5kHz: return 2.5;
-  case FREQ_STEP_5kHz: return 5;
-  case FREQ_STEP_6_25kHz: return 6.25;
-  case FREQ_STEP_10kHz: return 10;
-  case FREQ_STEP_12_5kHz: return 12.5;
-  case FREQ_STEP_20kHz: return 20;
-  case FREQ_STEP_25kHz: return 25;
-  case FREQ_STEP_50kHz: return 50;
+  case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
+  case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
+  case FREQ_STEP_6_25kHz: return Frequency::fromkHz(6.25);
+  case FREQ_STEP_10kHz: return Frequency::fromkHz(10);
+  case FREQ_STEP_12_5kHz: return Frequency::fromkHz(12.5);
+  case FREQ_STEP_20kHz: return Frequency::fromkHz(20);
+  case FREQ_STEP_25kHz: return Frequency::fromkHz(25);
+  case FREQ_STEP_50kHz: return Frequency::fromkHz(50);
   }
-  return 2.5;
+  return Frequency::fromkHz(2.5);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(double kHz) {
-  if (kHz <= 2.5)
+D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
+  if (freq.inkHz() <= 2.5)
     setUInt8(0x0008, FREQ_STEP_2_5kHz);
-  else if (kHz <= 5)
+  else if (freq.inkHz() <= 5)
     setUInt8(0x0008, FREQ_STEP_5kHz);
-  else if (kHz <= 6.25)
+  else if (freq.inkHz() <= 6.25)
     setUInt8(0x0008, FREQ_STEP_6_25kHz);
-  else if (kHz <= 10)
+  else if (freq.inkHz() <= 10)
     setUInt8(0x0008, FREQ_STEP_10kHz);
-  else if (kHz <= 12.5)
+  else if (freq.inkHz() <= 12.5)
     setUInt8(0x0008, FREQ_STEP_12_5kHz);
-  else if (kHz <= 20)
+  else if (freq.inkHz() <= 20)
     setUInt8(0x0008, FREQ_STEP_20kHz);
-  else if (kHz <= 25)
+  else if (freq.inkHz() <= 25)
     setUInt8(0x0008, FREQ_STEP_25kHz);
   else
     setUInt8(0x0008, FREQ_STEP_50kHz);
@@ -556,37 +556,37 @@ D878UVCodeplug::GeneralSettingsElement::setSTEFrequency(double freq) {
   }
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return getUInt8(0x0019);
+  return Interval::fromSeconds(getUInt8(0x0019));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned sec) {
-  setUInt8(0x0019, sec);
+D878UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(Interval intv) {
+  setUInt8(0x0019, intv.seconds());
 }
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return getUInt8(0x001a);
+  return Interval::fromSeconds(getUInt8(0x001a));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned sec) {
-  setUInt8(0x001a, sec);
+D878UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(Interval intv) {
+  setUInt8(0x001a, intv.seconds());
 }
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
-  return ((unsigned)getUInt8(0x001b))*20;
+  return Interval::fromMilliseconds((unsigned)getUInt8(0x001b)*20);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setPreWaveDelay(unsigned ms) {
-  setUInt8(0x001b, ms/20);
+D878UVCodeplug::GeneralSettingsElement::setPreWaveDelay(Interval intv) {
+  setUInt8(0x001b, intv.milliseconds()/20);
 }
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
-  return ((unsigned)getUInt8(0x001c))*20;
+  return Interval::fromMilliseconds(((unsigned)getUInt8(0x001c))*20);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(unsigned ms) {
-  setUInt8(0x001c, ms/20);
+D878UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(Interval intv) {
+  setUInt8(0x001c, intv.milliseconds()/20);
 }
 
 unsigned
@@ -650,25 +650,24 @@ D878UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
   setUInt8(0x002b, (enable ? 0x01 : 0x00));
 }
 
-unsigned int
-D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+Frequency D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
   switch ((TBSTFrequency)getUInt8(0x002e)) {
-  case TBSTFrequency::Hz1000: return 1000;
-  case TBSTFrequency::Hz1450: return 1450;
-  case TBSTFrequency::Hz1750: return 1750;
-  case TBSTFrequency::Hz2100: return 2100;
+  case TBSTFrequency::Hz1000: return Frequency::fromHz(1000);
+  case TBSTFrequency::Hz1450: return Frequency::fromHz(1450);
+  case TBSTFrequency::Hz1750: return Frequency::fromHz(1750);
+  case TBSTFrequency::Hz2100: return Frequency::fromHz(2100);
   }
-  return 1750;
+  return Frequency::fromHz(1750);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(unsigned int freq) {
-  if (1000 == freq) {
+D878UVCodeplug::GeneralSettingsElement::setTBSTFrequency(Frequency freq) {
+  if (1000 == freq.inHz()) {
     setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1000);
-  } else if (1450 == freq) {
+  } else if (1450 == freq.inHz()) {
     setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1450);
-  } else if (1750 == freq) {
+  } else if (1750 == freq.inHz()) {
     setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1750);
-  } else if (2100 == freq) {
+  } else if (2100 == freq.inHz()) {
     setUInt8(0x002e, (unsigned)TBSTFrequency::Hz2100);
   } else {
     setUInt8(0x002e, (unsigned)TBSTFrequency::Hz1750);
@@ -800,13 +799,12 @@ D878UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(unsigned idx) {
   setUInt8(0x0070, idx);
 }
 
-unsigned
-D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
-  return getUInt8(0x00b5);
+Interval D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
+  return Interval::fromSeconds(getUInt8(0x00b5));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(unsigned sec) {
-  setUInt8(0x00b5, sec);
+D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(Interval intv) {
+  setUInt8(0x00b5, intv.seconds());
 }
 
 bool
@@ -827,13 +825,13 @@ D878UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
   setUInt8(0x00b8, (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::autoRoamPeriod() const {
-  return getUInt8(0x00ba);
+  return Interval::fromMinutes(getUInt8(0x00ba));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(unsigned min) {
-  setUInt8(0x00ba, min);
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(Interval intv) {
+  setUInt8(0x00ba, intv.minutes());
 }
 
 bool
@@ -904,13 +902,13 @@ D878UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
   setBit(0x00be, 4, enable);
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::autoRoamDelay() const {
-  return getUInt8(0x00bf);
+  return Interval::fromSeconds(getUInt8(0x00bf));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(unsigned sec) {
-  setUInt8(0x00bf, sec);
+D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(Interval intv) {
+  setUInt8(0x00bf, intv.seconds());
 }
 
 AnytoneDisplaySettingsExtension::Color
@@ -949,38 +947,38 @@ D878UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension
   setUInt8(0x00c3, (unsigned)fmt);
 }
 
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return getBCD8_be(0x00c4)*10;
+  return Frequency::fromHz(getBCD8_be(0x00c4)*10);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00c4, Hz/10);
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x00c4, freq.inHz()/10);
 }
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return getBCD8_be(0x00c8)*10;
+  return Frequency::fromHz(getBCD8_be(0x00c8)*10);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00c8, Hz/10);
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x00c8, freq.inHz()/10);
 }
 
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return getBCD8_be(0x00cc)*10;
+  return Frequency::fromHz(getBCD8_be(0x00cc)*10);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00cc, Hz/10);
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x00cc, freq.inHz()/10);
 }
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return getBCD8_be(0x00d0)*10;
+  return Frequency::fromHz(getBCD8_be(0x00d0)*10);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00d0, Hz/10);
+D878UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x00d0, freq.inHz()/10);
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -1071,13 +1069,13 @@ D878UVCodeplug::GeneralSettingsElement::enableRepeaterRangeCheck(bool enable) {
   setUInt8(0x00dd, (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::repeaterRangeCheckInterval() const {
-  return ((unsigned)getUInt8(0x00de))*5;
+  return Interval::fromSeconds(((unsigned)getUInt8(0x00de))*5);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(unsigned sec) {
-  setUInt8(0x00de, sec/5);
+D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(Interval intv) {
+  setUInt8(0x00de, intv.seconds()/5);
 }
 
 unsigned
@@ -1098,13 +1096,13 @@ D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRangingS
   setUInt8(0x00e0, (unsigned)cond);
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::backlightTXDuration() const {
-  return getUInt8(0x00e1);
+  return Interval::fromSeconds(getUInt8(0x00e1));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setBacklightTXDuration(unsigned sec) {
-  setUInt8(0x00e1, sec);
+D878UVCodeplug::GeneralSettingsElement::setBacklightTXDuration(Interval intv) {
+  setUInt8(0x00e1, intv.seconds());
 }
 
 bool
@@ -1144,13 +1142,13 @@ D878UVCodeplug::GeneralSettingsElement::enableRepeaterCheckNotification(bool ena
 }
 
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::backlightRXDuration() const {
-  return getUInt8(0x00e6);
+  return Interval::fromSeconds(getUInt8(0x00e6));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setBacklightRXDuration(unsigned sec) {
-  setUInt8(0x00e6, sec);
+D878UVCodeplug::GeneralSettingsElement::setBacklightRXDuration(Interval intv) {
+  setUInt8(0x00e6, intv.seconds());
 }
 
 bool
@@ -1162,14 +1160,13 @@ D878UVCodeplug::GeneralSettingsElement::enableRoaming(bool enable) {
   setUInt8(0x00e7, (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::muteDelay() const {
-  return getUInt8(0x00e9)+1;
+  return Interval::fromMinutes(getUInt8(0x00e9)+1);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setMuteDelay(unsigned min) {
-  if (1>min) min = 1;
-  setUInt8(0x00e9, min-1);
+D878UVCodeplug::GeneralSettingsElement::setMuteDelay(Interval min) {
+  setUInt8(0x00e9, std::max(1ULL, min.minutes())-1);
 }
 
 unsigned
@@ -1247,6 +1244,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
       setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
     if (! ext->bootSettings()->defaultRoamingZone()->isNull())
       setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
+    enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
+    enableBootReset(ext->bootSettings()->resetEnabled());
 
     // Encode key settings
     enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -1257,6 +1256,9 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode tone settings
     setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
+    // Encode audio settings
+    setMuteDelay(ext->audioSettings()->muteDelay());
+
     // Encode display settings
     setCallDisplayColor(ext->displaySettings()->callColor());
     setLanguage(ext->displaySettings()->language());
@@ -1264,6 +1266,12 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     enableDisplayContact(ext->displaySettings()->showContactEnabled());
     setStandbyTextColor(ext->displaySettings()->standbyTextColor());
     enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
+    setBacklightTXDuration(ext->displaySettings()->backlightDurationTX());
+    setChannelNameColor(ext->displaySettings()->callColor());
+    setBacklightRXDuration(ext->displaySettings()->backlightDurationRX());
+
+    // Encode menu settings
+    enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
 
     // Encode auto-repeater settings
     setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
@@ -1293,6 +1301,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setRepeaterRangeCheckInterval(ext->rangingSettings()->repeaterCheckInterval());
     setRepeaterRangeCheckCount(ext->rangingSettings()->repeaterRangeCheckCount());
     setRoamingStartCondition(ext->rangingSettings()->roamingStartCondition());
+    enableRepeaterCheckNotification(ext->rangingSettings()->notificationEnabled());
+    setRepeaterCheckNumNotifications(ext->rangingSettings()->notificationCount());
 
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
@@ -1326,6 +1336,8 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode boot settings
   ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
+  ext->bootSettings()->enableGPSCheck(this->bootGPSCheck());
+  ext->bootSettings()->enableReset(this->bootReset());
 
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
@@ -1336,6 +1348,9 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Decode tone settings
   ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
+  // Store audio settings
+  ext->audioSettings()->setMuteDelay(this->muteDelay());
+
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());
   ext->displaySettings()->setLanguage(this->language());
@@ -1343,6 +1358,12 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowContact(this->displayContact());
   ext->displaySettings()->setStandbyTextColor(this->standbyTextColor());
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
+  ext->displaySettings()->setBacklightDurationTX(this->backlightTXDuration());
+  ext->displaySettings()->setChannelNameColor(this->channelNameColor());
+  ext->displaySettings()->setBacklightDurationRX(this->backlightRXDuration());
+
+  // Decode menu settings
+  ext->menuSettings()->enableSeparator(this->separateDisplay());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
@@ -1372,6 +1393,8 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->rangingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
   ext->rangingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
   ext->rangingSettings()->setRoamingStartCondition(this->roamingStartCondition());
+  ext->rangingSettings()->enableNotification(this->repeaterCheckNotification());
+  ext->rangingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
 
   // Decode other settings
   ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :

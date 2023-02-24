@@ -9,7 +9,7 @@ ELSE (APPLE)
 ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
-    utils.cc crc32.cc signaling.cc addressmap.cc radiointerface.cc errorstack.cc
+    utils.cc crc32.cc signaling.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
     radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc usbdevice.cc radiolimits.cc
     csvreader.cc dfufile.cc userdatabase.cc logger.cc
     visitor.cc configlabelingvisitor.cc melody.cc
@@ -60,7 +60,7 @@ SET(libdmrconf_MOC_HEADERS
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh
     md390_filereader.hh
-    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh)
+    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh)
 
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)

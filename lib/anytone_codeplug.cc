@@ -1437,26 +1437,26 @@ AnytoneCodeplug::GeneralSettingsElement::enableAutoKeyLock(bool enable) {
   setUInt8(0x0002, (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 AnytoneCodeplug::GeneralSettingsElement::autoShutdownDelay() const {
   switch ((AutoShutdown) getUInt8(0x0003)) {
-  case AutoShutdown::Off: return 0;
-  case AutoShutdown::After10min: return 10;
-  case AutoShutdown::After30min: return 30;
-  case AutoShutdown::After60min: return 60;
-  case AutoShutdown::After120min: return 120;
+  case AutoShutdown::Off:         return Interval::fromMinutes(0);
+  case AutoShutdown::After10min:  return Interval::fromMinutes(10);
+  case AutoShutdown::After30min:  return Interval::fromMinutes(30);
+  case AutoShutdown::After60min:  return Interval::fromMinutes(60);
+  case AutoShutdown::After120min: return Interval::fromMinutes(120);
   }
-  return 0;
+  return Interval();
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(unsigned min) {
-  if (0 == min) {
+AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(Interval intv) {
+  if (0 == intv.minutes()) {
     setUInt8(0x0003, (unsigned)AutoShutdown::Off);
-  } else if (min <= 10) {
+  } else if (intv.minutes() <= 10) {
     setUInt8(0x0003, (unsigned)AutoShutdown::After10min);
-  } else if (min <= 30) {
+  } else if (intv.minutes() <= 30) {
     setUInt8(0x0003, (unsigned)AutoShutdown::After30min);
-  } else if (min <= 60) {
+  } else if (intv.minutes() <= 60) {
     setUInt8(0x0003, (unsigned)AutoShutdown::After60min);
   } else {
     setUInt8(0x0003, (unsigned)AutoShutdown::After120min);
@@ -1515,15 +1515,13 @@ AnytoneCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
   setUInt8(0x000c, level/3);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::GeneralSettingsElement::voxDelay() const {
-  return 100 + 500*((unsigned)getUInt8(0x000d));
+  return Interval::fromMilliseconds(100 + 500*((unsigned)getUInt8(0x000d)));
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setVOXDelay(unsigned ms) {
-  if (ms < 100)
-    ms = 100;
-  setUInt8(0x000d, (ms-100)/500);
+AnytoneCodeplug::GeneralSettingsElement::setVOXDelay(Interval intv) {
+  setUInt8(0x000d, (std::max(100ULL, intv.milliseconds())-100)/500);
 }
 
 AnytoneSettingsExtension::VFOScanType
@@ -1645,19 +1643,19 @@ AnytoneCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return 0 == backlightDuration();
+  return backlightDuration().isNull();
 }
-unsigned
+Interval
 AnytoneCodeplug::GeneralSettingsElement::backlightDuration() const {
-  return 5*((unsigned)getUInt8(0x0027));
+  return Interval::fromSeconds(5*((unsigned)getUInt8(0x0027)));
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setBacklightDuration(unsigned sec) {
-  setUInt8(0x0027, sec/5);
+AnytoneCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+  setUInt8(0x0027, intv.seconds()/5);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setBacklightDuration(0);
+  setBacklightDuration(Interval());
 }
 
 bool
@@ -1760,15 +1758,12 @@ AnytoneCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
   return setUInt8(0x0036, (enable ? 0x01 : 0x00));
 }
 
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::menuExitTime() const {
-  return 5 + 5*((unsigned) getUInt8(0x0037));
+Interval AnytoneCodeplug::GeneralSettingsElement::menuExitTime() const {
+  return Interval::fromSeconds(5 + 5*((unsigned) getUInt8(0x0037)));
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setMenuExitTime(unsigned sec) {
-  if (sec < 5)
-    sec = 5;
-  setUInt8(0x0037, (sec-5)/5);
+AnytoneCodeplug::GeneralSettingsElement::setMenuExitTime(Interval intv) {
+  setUInt8(0x0037, (std::max(5ULL, intv.seconds())-5)/5);
 }
 
 bool
@@ -1852,15 +1847,13 @@ AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExten
   setUInt8(0x0045, (unsigned)func);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::GeneralSettingsElement::longPressDuration() const {
-  return (((unsigned)getUInt8(0x0046))+1)*1000;
+  return Interval::fromSeconds(((unsigned)getUInt8(0x0046))+1);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setLongPressDuration(unsigned ms) {
-  if (ms < 1000)
-    ms = 1000;
-  setUInt8(0x0046, ms/1000-1);
+AnytoneCodeplug::GeneralSettingsElement::setLongPressDuration(Interval ms) {
+  setUInt8(0x0046, std::max(1ULL,ms.seconds())-1);
 }
 
 bool
@@ -1917,40 +1910,40 @@ AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
   setUInt8(0x0057, (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Frequency
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
-  return ((unsigned)getBCD8_be(0x0058))*10;
+  return Frequency::fromHz(((unsigned)getBCD8_be(0x0058))*10);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(unsigned hz) {
-  setBCD8_be(0x0058, hz/10);
+AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x0058, freq.inHz()/10);
 }
 
-unsigned
+Frequency
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
-  return ((unsigned)getBCD8_be(0x005c))*10;
+  return Frequency::fromHz(((unsigned)getBCD8_be(0x005c))*10);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(unsigned hz) {
-  setBCD8_be(0x005c, hz/10);
+AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(Frequency freq) {
+  setBCD8_be(0x005c, freq.inHz()/10);
 }
 
-unsigned
+Frequency
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
-  return ((unsigned)getBCD8_be(0x0060))*10;
+  return Frequency::fromHz(((unsigned)getBCD8_be(0x0060))*10);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(unsigned hz) {
-  setBCD8_be(0x0060, hz/10);
+AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x0060, freq.inHz()/10);
 }
 
-unsigned
+Frequency
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
-  return ((unsigned)getBCD8_be(0x0064))*10;
+  return Frequency::fromHz(((unsigned)getBCD8_be(0x0064))*10);
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(unsigned hz) {
-  setBCD8_be(0x0064, hz/10);
+AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(Frequency freq) {
+  setBCD8_be(0x0064, freq.inHz()/10);
 }
 
 bool

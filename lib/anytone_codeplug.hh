@@ -627,9 +627,9 @@ public:
     /** Enables/disables auto key-lock. */
     virtual void enableAutoKeyLock(bool enable);
     /** Returns the auto-shutdown delay in minutes. */
-    virtual unsigned autoShutdownDelay() const;
+    virtual Interval autoShutdownDelay() const;
     /** Sets the auto-shutdown delay in minutes. */
-    virtual void setAutoShutdownDelay(unsigned min);
+    virtual void setAutoShutdownDelay(Interval min);
     /** Returns the boot display mode. */
     virtual AnytoneBootSettingsExtension::BootDisplay bootDisplay() const;
     /** Sets the boot display mode. */
@@ -655,9 +655,9 @@ public:
     /** Sets the VOX level. */
     virtual void setVOXLevel(unsigned level);
     /** Returns the VOX delay in ms. */
-    virtual unsigned voxDelay() const;
+    virtual Interval voxDelay() const;
     /** Sets the VOX delay in ms. */
-    virtual void setVOXDelay(unsigned ms);
+    virtual void setVOXDelay(Interval ms);
     /** Returns the VFO scan type. */
     virtual AnytoneSettingsExtension::VFOScanType vfoScanType() const;
     /** Sets the VFO scan type. */
@@ -715,9 +715,9 @@ public:
     /** Returns @c true if the backlight is always on. */
     virtual bool backlightPermanent() const;
     /** Returns the backlight duration in seconds. */
-    virtual unsigned backlightDuration() const;
+    virtual Interval backlightDuration() const;
     /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(unsigned sec);
+    virtual void setBacklightDuration(Interval sec);
     /** Sets the backlight to permanent (always on). */
     virtual void enableBacklightPermanent();
     /** Returns @c true if GPS is enabled. */
@@ -766,9 +766,9 @@ public:
     /** Enables/disables the idle channel tone. */
     virtual void enableIdleChannelTone(bool enable);
     /** Returns the menu exit time in seconds. */
-    virtual unsigned menuExitTime() const;
+    virtual Interval menuExitTime() const;
     /** Sets the menu exit time in seconds. */
-    virtual void setMenuExitTime(unsigned sec);
+    virtual void setMenuExitTime(Interval intv);
     /** Returns @c true if the startup tone is enabled. */
     virtual bool startupTone() const;
     /** Enables/disables the startup tone. */
@@ -807,9 +807,9 @@ public:
     /** Sets the key function for a long press on the function key 2. */
     virtual void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the long-press duration in ms. */
-    virtual unsigned longPressDuration() const;
+    virtual Interval longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(unsigned ms);
+    virtual void setLongPressDuration(Interval ms);
     /** Returns @c true if the volume change prompt is enabled. */
     virtual bool volumeChangePrompt() const;
     /** Enables/disables the volume change prompt. */
@@ -836,22 +836,22 @@ public:
     /** Enables/disables "enhanced" audio. */
     virtual void enableEnhancedAudio(bool enable);
     /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual unsigned minVFOScanFrequencyUHF() const;
+    virtual Frequency minVFOScanFrequencyUHF() const;
     /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMinVFOScanFrequencyUHF(unsigned hz);
+    virtual void setMinVFOScanFrequencyUHF(Frequency hz);
     /** Returns the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual unsigned maxVFOScanFrequencyUHF() const;
+    virtual Frequency maxVFOScanFrequencyUHF() const;
     /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyUHF(unsigned hz);
+    virtual void setMaxVFOScanFrequencyUHF(Frequency hz);
 
     /** Returns the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual unsigned minVFOScanFrequencyVHF() const;
+    virtual Frequency minVFOScanFrequencyVHF() const;
     /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMinVFOScanFrequencyVHF(unsigned hz);
+    virtual void setMinVFOScanFrequencyVHF(Frequency hz);
     /** Returns the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual unsigned maxVFOScanFrequencyVHF() const;
+    virtual Frequency maxVFOScanFrequencyVHF() const;
     /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyVHF(unsigned hz);
+    virtual void setMaxVFOScanFrequencyVHF(Frequency hz);
     /** Returns @c true if the auto-repeater offset frequency for UHF is set. */
     virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
     /** Returns the auto-repeater offset frequency index for UHF. */

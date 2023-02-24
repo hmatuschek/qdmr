@@ -320,10 +320,11 @@ AnytoneContactExtension::setAlertType(AlertType type) {
  * Implementation of AnytoneDMRSettingsExtension
  * ********************************************************************************************* */
 AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _groupCallHangTime(3), _privateCallHangTime(5), _preWaveDelay(100),
-    _wakeHeadPeriod(100), _filterOwnID(true), _monitorSlotMatch(SlotMatch::Off),
-    _monitorColorCodeMatch(false), _monitorIDMatch(false), _monitorTimeSlotHold(true),
-    _smsFormat(SMSFormat::Motorola)
+  : ConfigItem(parent), _groupCallHangTime(Interval::fromSeconds(3)),
+    _privateCallHangTime(Interval::fromSeconds(5)), _preWaveDelay(Interval::fromMilliseconds(100)),
+    _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
+    _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
+    _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola)
 {
   // pass...
 }
@@ -338,48 +339,48 @@ AnytoneDMRSettingsExtension::clone() const {
   return ext;
 }
 
-unsigned int
+Interval
 AnytoneDMRSettingsExtension::groupCallHangTime() const {
   return _groupCallHangTime;
 }
 void
-AnytoneDMRSettingsExtension::setGroupCallHangTime(unsigned int sec) {
+AnytoneDMRSettingsExtension::setGroupCallHangTime(Interval sec) {
   if (_groupCallHangTime == sec)
     return;
   _groupCallHangTime = sec;
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneDMRSettingsExtension::privateCallHangTime() const {
   return _privateCallHangTime;
 }
 void
-AnytoneDMRSettingsExtension::setPrivateCallHangTime(unsigned int sec) {
+AnytoneDMRSettingsExtension::setPrivateCallHangTime(Interval sec) {
   if (_privateCallHangTime == sec)
     return;
   _privateCallHangTime = sec;
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneDMRSettingsExtension::preWaveDelay() const {
   return _preWaveDelay;
 }
 void
-AnytoneDMRSettingsExtension::setPreWaveDelay(unsigned int ms) {
+AnytoneDMRSettingsExtension::setPreWaveDelay(Interval ms) {
   if (_preWaveDelay == ms)
     return;
   _preWaveDelay = ms;
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneDMRSettingsExtension::wakeHeadPeriod() const {
   return _wakeHeadPeriod;
 }
 void
-AnytoneDMRSettingsExtension::setWakeHeadPeriod(unsigned int ms) {
+AnytoneDMRSettingsExtension::setWakeHeadPeriod(Interval ms) {
   if (_wakeHeadPeriod == ms)
     return;
   _wakeHeadPeriod = ms;
@@ -463,9 +464,10 @@ AnytoneDMRSettingsExtension::setSMSFormat(SMSFormat format) {
  * Implementation of AnytoneRangingSettingsExtension
  * ********************************************************************************************* */
 AnytoneRangingSettingsExtension::AnytoneRangingSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _gpsRangeReporting(false), _gpsRangingInterval(300), _autoRoamPeriod(1),
-    _autoRoamDelay(0), _repeaterRangeCheck(false), _repeaterCheckInterval(5),
-    _repeaterRangeCheckCount(3), _roamingStartCondition(RoamStart::Periodic)
+  : ConfigItem(parent), _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300)),
+    _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
+    _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
+    _roamingStartCondition(RoamStart::Periodic), _notificationCount(1)
 {
   // pass...
 }
@@ -492,36 +494,36 @@ AnytoneRangingSettingsExtension::enableGPSRangeReporting(bool enable) {
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneRangingSettingsExtension::gpsRangingInterval() const {
   return _gpsRangingInterval;
 }
 void
-AnytoneRangingSettingsExtension::setGPSRangingInterval(unsigned int sec) {
+AnytoneRangingSettingsExtension::setGPSRangingInterval(Interval sec) {
   if (_gpsRangingInterval == sec)
     return;
   _gpsRangingInterval = sec;
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneRangingSettingsExtension::autoRoamPeriod() const {
   return _autoRoamPeriod;
 }
 void
-AnytoneRangingSettingsExtension::setAutoRoamPeriod(unsigned int min) {
+AnytoneRangingSettingsExtension::setAutoRoamPeriod(Interval min) {
   if (_autoRoamPeriod == min)
     return;
   _autoRoamPeriod = min;
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneRangingSettingsExtension::autoRoamDelay() const {
   return _autoRoamDelay;
 }
 void
-AnytoneRangingSettingsExtension::setAutoRoamDelay(unsigned int min) {
+AnytoneRangingSettingsExtension::setAutoRoamDelay(Interval min) {
   if (_autoRoamDelay == min)
     return;
   _autoRoamDelay = min;
@@ -539,12 +541,12 @@ AnytoneRangingSettingsExtension::enableRepeaterRangeCheck(bool enable) {
   _repeaterRangeCheck = enable;
   emit modified(this);
 }
-unsigned int
+Interval
 AnytoneRangingSettingsExtension::repeaterCheckInterval() const {
   return _repeaterCheckInterval;
 }
 void
-AnytoneRangingSettingsExtension::setRepeaterCheckInterval(unsigned int sec) {
+AnytoneRangingSettingsExtension::setRepeaterCheckInterval(Interval sec) {
   if (_repeaterCheckInterval == sec)
     return;
   _repeaterCheckInterval = sec;
@@ -575,6 +577,29 @@ AnytoneRangingSettingsExtension::setRoamingStartCondition(RoamStart start) {
   emit modified(this);
 }
 
+bool
+AnytoneRangingSettingsExtension::notificationEnabled() const {
+  return _notification;
+}
+void
+AnytoneRangingSettingsExtension::enableNotification(bool enable) {
+  if (_notification == enable)
+    return;
+  _notification = enable;
+  emit modified(this);
+}
+unsigned int
+AnytoneRangingSettingsExtension::notificationCount() const {
+  return _notificationCount;
+}
+void
+AnytoneRangingSettingsExtension::setNotificationCount(unsigned int n) {
+  if (_notificationCount == n)
+    return;
+  _notificationCount = n;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneSettingsExtension
@@ -589,12 +614,13 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _autoRepeaterSettings(new AnytoneAutoRepeaterSettingsExtension(this)),
     _dmrSettings(new AnytoneDMRSettingsExtension(this)),
     _rangingSettings(new AnytoneRangingSettingsExtension(this)),
-    _autoShutDownDelay(0), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
+    _autoShutDownDelay(), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
-    _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(430000000U),
-    _maxVFOScanFrequencyUHF(440000000U), _minVFOScanFrequencyVHF(144000000U),
-    _maxVFOScanFrequencyVHF(146000000U), _keepLastCaller(false), _vfoStep(2.5),
-    _steType(STEType::Off), _steFrequency(0), _tbstFrequency(1750), _proMode(false),
+    _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(Frequency::fromMHz(430)),
+    _maxVFOScanFrequencyUHF(Frequency::fromMHz(440)), _minVFOScanFrequencyVHF(Frequency::fromMHz(144)),
+    _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)), _keepLastCaller(false),
+    _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
+    _tbstFrequency(Frequency::fromHz(1750)), _proMode(false),
     _maintainCallChannel(false)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
@@ -673,15 +699,15 @@ AnytoneSettingsExtension::rangingSettings() const {
   return _rangingSettings;
 }
 
-unsigned int
+Interval
 AnytoneSettingsExtension::autoShutDownDelay() const {
   return _autoShutDownDelay;
 }
 void
-AnytoneSettingsExtension::setAutoShutDownDelay(unsigned int min) {
-  if (_autoShutDownDelay == min)
+AnytoneSettingsExtension::setAutoShutDownDelay(Interval intv) {
+  if (_autoShutDownDelay == intv)
     return;
-  _autoShutDownDelay = min;
+  _autoShutDownDelay = intv;
   emit modified(this);
 }
 
@@ -794,46 +820,46 @@ AnytoneSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
-unsigned int
+Frequency
 AnytoneSettingsExtension::minVFOScanFrequencyUHF() const {
   return _minVFOScanFrequencyUHF;
 }
 void
-AnytoneSettingsExtension::setMinVFOScanFrequencyUHF(unsigned hz) {
+AnytoneSettingsExtension::setMinVFOScanFrequencyUHF(Frequency hz) {
   if (_minVFOScanFrequencyUHF == hz)
     return;
   _minVFOScanFrequencyUHF = hz;
   emit modified(this);
 }
-unsigned int
+Frequency
 AnytoneSettingsExtension::maxVFOScanFrequencyUHF() const {
   return _maxVFOScanFrequencyUHF;
 }
 void
-AnytoneSettingsExtension::setMaxVFOScanFrequencyUHF(unsigned hz) {
+AnytoneSettingsExtension::setMaxVFOScanFrequencyUHF(Frequency hz) {
   if (_maxVFOScanFrequencyUHF == hz)
     return;
   _maxVFOScanFrequencyUHF = hz;
   emit modified(this);
 }
 
-unsigned int
+Frequency
 AnytoneSettingsExtension::minVFOScanFrequencyVHF() const {
   return _minVFOScanFrequencyVHF;
 }
 void
-AnytoneSettingsExtension::setMinVFOScanFrequencyVHF(unsigned hz) {
+AnytoneSettingsExtension::setMinVFOScanFrequencyVHF(Frequency hz) {
   if (_minVFOScanFrequencyVHF == hz)
     return;
   _minVFOScanFrequencyVHF = hz;
   emit modified(this);
 }
-unsigned int
+Frequency
 AnytoneSettingsExtension::maxVFOScanFrequencyVHF() const {
   return _maxVFOScanFrequencyVHF;
 }
 void
-AnytoneSettingsExtension::setMaxVFOScanFrequencyVHF(unsigned hz) {
+AnytoneSettingsExtension::setMaxVFOScanFrequencyVHF(Frequency hz) {
   if (_maxVFOScanFrequencyVHF == hz)
     return;
   _maxVFOScanFrequencyVHF = hz;
@@ -864,12 +890,12 @@ AnytoneSettingsExtension::enableKeepLastCaller(bool enable) {
   emit modified(this);
 }
 
-double
+Frequency
 AnytoneSettingsExtension::vfoStep() const {
   return _vfoStep;
 }
 void
-AnytoneSettingsExtension::setVFOStep(double step) {
+AnytoneSettingsExtension::setVFOStep(Frequency step) {
   if (_vfoStep == step)
     return;
   _vfoStep = step;
@@ -899,12 +925,12 @@ AnytoneSettingsExtension::setSTEFrequency(double freq) {
   emit modified(this);
 }
 
-unsigned int
+Frequency
 AnytoneSettingsExtension::tbstFrequency() const {
   return _tbstFrequency;
 }
 void
-AnytoneSettingsExtension::setTBSTFrequency(unsigned int Hz) {
+AnytoneSettingsExtension::setTBSTFrequency(Frequency Hz) {
   if (_tbstFrequency == Hz)
     return;
   _tbstFrequency = Hz;
@@ -944,7 +970,7 @@ AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
     _defaultChannel(false), _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
     _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this)),
     _priorityZoneA(new ZoneReference(this)), _priorityZoneB(new ZoneReference(this)),
-    _defaultRoamingZone(new RoamingZoneReference(this))
+    _defaultRoamingZone(new RoamingZoneReference(this)), _gpsCheck(false), _reset(true)
 {
   // pass...
 }
@@ -1038,6 +1064,30 @@ AnytoneBootSettingsExtension::defaultRoamingZone() const {
   return _defaultRoamingZone;
 }
 
+bool
+AnytoneBootSettingsExtension::gpsCheckEnabled() const {
+  return _gpsCheck;
+}
+void
+AnytoneBootSettingsExtension::enableGPSCheck(bool enable) {
+  if (_gpsCheck == enable)
+    return;
+  _gpsCheck = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneBootSettingsExtension::resetEnabled() const {
+  return _reset;
+}
+void
+AnytoneBootSettingsExtension::enableReset(bool enable) {
+  if (_reset == enable)
+    return;
+  _reset = enable;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneKeySettingsExtension
@@ -1049,7 +1099,7 @@ AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
     _progFuncKey3Short(KeyFunction::Power), _progFuncKey3Long(KeyFunction::VOX),
     _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::VFOChannel),
     _funcKey2Short(KeyFunction::Reverse), _funcKey2Long(KeyFunction::Off),
-    _longPressDuration(1000), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
+    _longPressDuration(Interval::fromSeconds(1)), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
     _sideKeysLock(false), _forcedKeyLock(false)
 {
   // pass...
@@ -1180,12 +1230,12 @@ AnytoneKeySettingsExtension::setFuncKey2Long(KeyFunction func) {
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneKeySettingsExtension::longPressDuration() const {
   return _longPressDuration;
 }
 void
-AnytoneKeySettingsExtension::setLongPressDuration(unsigned int ms) {
+AnytoneKeySettingsExtension::setLongPressDuration(Interval ms) {
   if (_longPressDuration == ms)
     return;
   _longPressDuration = ms;
@@ -1401,12 +1451,13 @@ AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
  * Implementation of AnytoneDisplaySettingsExtension
  * ********************************************************************************************* */
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
-  : ConfigItem(parent), _displayFrequency(false), _brightness(5), _backlightDuration(10),
-    _volumeChangePrompt(true), _callEndPrompt(true),
+  : ConfigItem(parent), _displayFrequency(false), _brightness(5),
+    _backlightDuration(Interval::fromSeconds(10)), _volumeChangePrompt(true), _callEndPrompt(true),
     _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
     _callColor(Color::Orange), _showZoneAndContact(true), _language(Language::English),
     _showChannelNumber(true), _showContact(true), _standbyTextColor(Color::White),
-    _showLastHeard(false)
+    _showLastHeard(false), _backlightDurationTX(), _channelNameColor(Color::Orange),
+    _backlightDurationRX()
 {
   // pass...
 }
@@ -1445,12 +1496,12 @@ AnytoneDisplaySettingsExtension::enableDisplayFrequency(bool enable) {
   emit modified(this);
 }
 
-unsigned int
+Interval
 AnytoneDisplaySettingsExtension::backlightDuration() const {
   return _backlightDuration;
 }
 void
-AnytoneDisplaySettingsExtension::setBacklightDuration(unsigned int sec) {
+AnytoneDisplaySettingsExtension::setBacklightDuration(Interval sec) {
   if (_backlightDuration == sec)
     return;
   _backlightDuration = sec;
@@ -1601,13 +1652,49 @@ AnytoneDisplaySettingsExtension::setStandbyTextColor(Color color) {
   emit modified(this);
 }
 
+Interval
+AnytoneDisplaySettingsExtension::backlightDurationTX() const {
+  return _backlightDurationTX;
+}
+void
+AnytoneDisplaySettingsExtension::setBacklightDurationTX(Interval sec) {
+  if (_backlightDurationTX == sec)
+    return;
+  _backlightDurationTX = sec;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Color
+AnytoneDisplaySettingsExtension::channelNameColor() const {
+  return _channelNameColor;
+}
+void
+AnytoneDisplaySettingsExtension::setChannelNameColor(Color color) {
+  if (_channelNameColor == color)
+    return;
+  _channelNameColor = color;
+  emit modified(this);
+}
+
+Interval
+AnytoneDisplaySettingsExtension::backlightDurationRX() const {
+  return _backlightDurationRX;
+}
+void
+AnytoneDisplaySettingsExtension::setBacklightDurationRX(Interval sec) {
+  if (_backlightDurationRX == sec)
+    return;
+  _backlightDurationRX = sec;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAudioSettingsExtension
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
-  : ConfigItem(parent),  _voxDelay(0), _recording(false), _voxSource(VoxSource::Both),
-    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true)
+  : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
+    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1))
 {
   // pass...
 }
@@ -1622,12 +1709,12 @@ AnytoneAudioSettingsExtension::clone() const {
   return ext;
 }
 
-unsigned int
+Interval
 AnytoneAudioSettingsExtension::voxDelay() const {
   return _voxDelay;
 }
 void
-AnytoneAudioSettingsExtension::setVOXDelay(unsigned int ms) {
+AnytoneAudioSettingsExtension::setVOXDelay(Interval ms) {
   if (_voxDelay == ms)
     return;
   _voxDelay = ms;
@@ -1693,12 +1780,24 @@ AnytoneAudioSettingsExtension::enableEnhanceAudio(bool enable) {
   emit modified(this);
 }
 
+Interval
+AnytoneAudioSettingsExtension::muteDelay() const {
+  return _muteDelay;
+}
+void
+AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
+  if (_muteDelay == intv)
+    return;
+  _muteDelay = intv;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
- * Implementation of AnytoneAudioSettingsExtension
+ * Implementation of AnytoneMenuSettingsExtension
  * ********************************************************************************************* */
 AnytoneMenuSettingsExtension::AnytoneMenuSettingsExtension(QObject *parent)
-  : ConfigItem(parent),  _menuDuration(15)
+  : ConfigItem(parent),  _menuDuration(Interval::fromSeconds(15)), _showSeparator(false)
 {
   // pass...
 }
@@ -1713,15 +1812,27 @@ AnytoneMenuSettingsExtension::clone() const {
   return ext;
 }
 
-unsigned int
+Interval
 AnytoneMenuSettingsExtension::duration() const {
   return _menuDuration;
 }
 void
-AnytoneMenuSettingsExtension::setDuration(unsigned int sec) {
+AnytoneMenuSettingsExtension::setDuration(Interval sec) {
   if (_menuDuration == sec)
     return;
   _menuDuration = sec;
+  emit modified(this);
+}
+
+bool
+AnytoneMenuSettingsExtension::separatorEnabled() const {
+  return _showSeparator;
+}
+void
+AnytoneMenuSettingsExtension::enableSeparator(bool enable) {
+  if (_showSeparator == enable)
+    return;
+  _showSeparator = enable;
   emit modified(this);
 }
 
@@ -1731,7 +1842,8 @@ AnytoneMenuSettingsExtension::setDuration(unsigned int sec) {
  * ********************************************************************************************* */
 AnytoneAutoRepeaterSettingsExtension::AnytoneAutoRepeaterSettingsExtension(QObject *parent)
   : ConfigItem(parent), _directionA(Direction::Off), _directionB(Direction::Off),
-    _minVHF(136000000U), _maxVHF(174000000U), _minUHF(400000000U), _maxUHF(480000000U),
+    _minVHF(Frequency::fromMHz(136)), _maxVHF(Frequency::fromMHz(174)),
+    _minUHF(Frequency::fromMHz(400)), _maxUHF(Frequency::fromMHz(480)),
     _vhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
     _uhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
     _offsets(new AnytoneAutoRepeaterOffsetList(this))
@@ -1772,45 +1884,45 @@ AnytoneAutoRepeaterSettingsExtension::setDirectionB(Direction dir) {
   emit modified(this);
 }
 
-unsigned int
+Frequency
 AnytoneAutoRepeaterSettingsExtension::vhfMin() const {
   return _minVHF;
 }
 void
-AnytoneAutoRepeaterSettingsExtension::setVHFMin(unsigned int Hz) {
+AnytoneAutoRepeaterSettingsExtension::setVHFMin(Frequency Hz) {
   if (_minVHF == Hz)
     return;
   _minVHF = Hz;
   emit modified(this);
 }
-unsigned int
+Frequency
 AnytoneAutoRepeaterSettingsExtension::vhfMax() const {
   return _maxVHF;
 }
 void
-AnytoneAutoRepeaterSettingsExtension::setVHFMax(unsigned int Hz) {
+AnytoneAutoRepeaterSettingsExtension::setVHFMax(Frequency Hz) {
   if (_maxVHF == Hz)
     return;
   _maxVHF = Hz;
   emit modified(this);
 }
-unsigned int
+Frequency
 AnytoneAutoRepeaterSettingsExtension::uhfMin() const {
   return _minUHF;
 }
 void
-AnytoneAutoRepeaterSettingsExtension::setUHFMin(unsigned int Hz) {
+AnytoneAutoRepeaterSettingsExtension::setUHFMin(Frequency Hz) {
   if (_minUHF == Hz)
     return;
   _minUHF = Hz;
   emit modified(this);
 }
-unsigned int
+Frequency
 AnytoneAutoRepeaterSettingsExtension::uhfMax() const {
   return _maxUHF;
 }
 void
-AnytoneAutoRepeaterSettingsExtension::setUHFMax(unsigned int Hz) {
+AnytoneAutoRepeaterSettingsExtension::setUHFMax(Frequency Hz) {
   if (_maxUHF == Hz)
     return;
   _maxUHF = Hz;
@@ -1836,7 +1948,7 @@ AnytoneAutoRepeaterSettingsExtension::offsets() const {
  * Implementation of AnytoneAutoRepeaterOffset
  * ********************************************************************************************* */
 AnytoneAutoRepeaterOffset::AnytoneAutoRepeaterOffset(QObject *parent)
-  : ConfigObject(parent), _offset(0)
+  : ConfigObject(parent), _offset()
 {
   // pass...
 }
@@ -1851,12 +1963,12 @@ AnytoneAutoRepeaterOffset::clone() const {
   return off;
 }
 
-unsigned int
+Frequency
 AnytoneAutoRepeaterOffset::offset() const {
   return _offset;
 }
 void
-AnytoneAutoRepeaterOffset::setOffset(unsigned int offset) {
+AnytoneAutoRepeaterOffset::setOffset(Frequency offset) {
   if (_offset == offset)
     return;
   _offset = offset;

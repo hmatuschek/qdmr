@@ -376,9 +376,9 @@ public:
     virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
 
     /** Returns the VFO frequency step in kHz. */
-    virtual double vfoFrequencyStep() const;
+    virtual Frequency vfoFrequencyStep() const;
     /** Sets the VFO frequency step in kHz. */
-    virtual void setVFOFrequencyStep(double kHz);
+    virtual void setVFOFrequencyStep(Frequency kHz);
 
     /** Returns the STE (squelch tail eliminate) type. */
     virtual AnytoneSettingsExtension::STEType steType() const;
@@ -392,22 +392,22 @@ public:
     virtual void setSTEFrequency(double freq);
 
     /** Returns the group call hang time in seconds. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time in seconds. */
-    virtual void setGroupCallHangTime(unsigned sec);
+    virtual void setGroupCallHangTime(Interval sec);
     /** Returns the private call hang time in seconds. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time in seconds. */
-    virtual void setPrivateCallHangTime(unsigned sec);
+    virtual void setPrivateCallHangTime(Interval sec);
 
     /** Returns the pre-wave time in ms. */
-    virtual unsigned preWaveDelay() const;
+    virtual Interval preWaveDelay() const;
     /** Sets the pre-wave time in ms. */
-    virtual void setPreWaveDelay(unsigned ms);
+    virtual void setPreWaveDelay(Interval ms);
     /** Returns the wake head-period in ms. */
-    virtual unsigned wakeHeadPeriod() const;
+    virtual Interval wakeHeadPeriod() const;
     /** Sets the wake head-period in ms. */
-    virtual void setWakeHeadPeriod(unsigned ms);
+    virtual void setWakeHeadPeriod(Interval ms);
 
     /** Returns the wide-FM (broadcast) channel index. */
     virtual unsigned wfmChannelIndex() const;
@@ -434,9 +434,9 @@ public:
     virtual void enableWFMMonitor(bool enable);
 
     /** Returns the TBST frequency. */
-    virtual unsigned int tbstFrequency() const;
+    virtual Frequency tbstFrequency() const;
     /** Sets the TBST frequency. */
-    virtual void setTBSTFrequency(unsigned int freq);
+    virtual void setTBSTFrequency(Frequency freq);
 
     /** Returns @c true if the "pro mode" is enabled. */
     virtual bool proMode() const;
@@ -502,9 +502,9 @@ public:
     virtual void setPriorityZoneBIndex(unsigned idx);
 
     /** Returns the GPS ranging interval in seconds. */
-    virtual unsigned gpsRangingInterval() const;
+    virtual Interval gpsRangingInterval() const;
     /** Sets the GPS ranging interval in seconds. */
-    virtual void setGPSRangingInterval(unsigned sec);
+    virtual void setGPSRangingInterval(Interval sec);
 
     /** Returns @c true if the channel number is displayed. */
     virtual bool displayChannelNumber() const;
@@ -516,9 +516,9 @@ public:
     virtual void enableDisplayContact(bool enable);
 
     /** Returns the auto roaming period in minutes. */
-    virtual unsigned autoRoamPeriod() const;
+    virtual Interval autoRoamPeriod() const;
     /** Sets the auto roaming period in minutes. */
-    virtual void setAutoRoamPeriod(unsigned min);
+    virtual void setAutoRoamPeriod(Interval min);
 
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
@@ -557,9 +557,9 @@ public:
     virtual void enableKeyLockForced(bool enable);
 
     /** Returns the auto-roam delay in seconds. */
-    virtual unsigned autoRoamDelay() const;
+    virtual Interval autoRoamDelay() const;
     /** Sets the auto-roam delay in seconds. */
-    virtual void setAutoRoamDelay(unsigned sec);
+    virtual void setAutoRoamDelay(Interval sec);
 
     /** Returns the standby text color. */
     virtual AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
@@ -581,22 +581,22 @@ public:
     virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMinFrequencyVHF() const;
+    virtual Frequency autoRepeaterMinFrequencyVHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyVHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMinFrequencyUHF() const;
+    virtual Frequency autoRepeaterMinFrequencyUHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyUHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
     /** Returns the auto-repeater direction for VFO B. */
     virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
@@ -644,9 +644,9 @@ public:
     /** Enables/disables repeater range check. */
     virtual void enableRepeaterRangeCheck(bool enable);
     /** Returns the repeater range check period in seconds. */
-    virtual unsigned repeaterRangeCheckInterval() const;
+    virtual Interval repeaterRangeCheckInterval() const;
     /** Sets the repeater range check interval in seconds. */
-    virtual void setRepeaterRangeCheckInterval(unsigned sec);
+    virtual void setRepeaterRangeCheckInterval(Interval sec);
     /** Returns the number of repeater range checks. */
     virtual unsigned repeaterRangeCheckCount() const;
     /** Sets the number of repeater range checks. */
@@ -658,9 +658,9 @@ public:
     virtual void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
 
     /** Returns the backlight duration during TX in seconds. */
-    virtual unsigned backlightTXDuration() const;
+    virtual Interval backlightTXDuration() const;
     /** Sets the backlight duration during TX in seconds. */
-    virtual void setBacklightTXDuration(unsigned sec);
+    virtual void setBacklightTXDuration(Interval sec);
 
     /** Returns @c true if the "separate display" is enabled. */
     virtual bool separateDisplay() const;
@@ -683,9 +683,9 @@ public:
     virtual void enableRepeaterCheckNotification(bool enable);
 
     /** Returns the backlight duration during RX in seconds. */
-    virtual unsigned backlightRXDuration() const;
+    virtual Interval backlightRXDuration() const;
     /** Sets the backlight duration during RX in seconds. */
-    virtual void setBacklightRXDuration(unsigned sec);
+    virtual void setBacklightRXDuration(Interval sec);
 
     /** Returns @c true if roaming is enabled. */
     virtual bool roaming() const;
@@ -693,9 +693,9 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns the mute delay in minutes. */
-    virtual unsigned muteDelay() const;
+    virtual Interval muteDelay() const;
     /** Sets the mute delay in minutes. */
-    virtual void setMuteDelay(unsigned min);
+    virtual void setMuteDelay(Interval min);
 
     /** Returns the number of repeater check notifications. */
     virtual unsigned repeaterCheckNumNotifications() const;
