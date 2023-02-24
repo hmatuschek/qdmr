@@ -638,8 +638,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
         setDefaultChannelAToVFO();
       else
         setDefaultChannelAIndex(
-              ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
-                ext->bootSettings()->channelA()->as<Channel>()));
+              ctx.index(ext->bootSettings()->channelA()->as<Channel>()));
 
       setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
       if (ext->bootSettings()->channelB()->isNull() ||
@@ -647,9 +646,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
              ext->bootSettings()->channelB()->as<Channel>())))
         setDefaultChannelBToVFO();
       else
-        setDefaultChannelBIndex(
-              ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
-                ext->bootSettings()->channelB()->as<Channel>()));
+        setDefaultChannelBIndex(ctx.index(ext->bootSettings()->channelB()->as<Channel>()));
     }
 
     // Encode key settings
@@ -747,13 +744,12 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
     ext->bootSettings()->zoneA()->set(zone);
     if (this->defaultChannelAIsVFO()) {
       // pass...
-    } else if (this->defaultChannelAIndex() >= (unsigned int)zone->A()->count()) {
+    } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
       errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
-                  << " out of bounds.";
+                  << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelA()->set(
-            zone->A()->get(this->defaultChannelAIndex())->as<Channel>());
+      ext->bootSettings()->channelA()->set(ctx.get<Channel>(this->defaultChannelAIndex()));
     }
 
     if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
@@ -765,13 +761,12 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
     ext->bootSettings()->zoneB()->set(zone);
     if (this->defaultChannelBIsVFO()) {
       // pass...
-    } else if (this->defaultChannelBIndex() >= (unsigned int)zone->A()->count()) {
+    } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {
       errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
-                  << " out of bounds.";
+                  << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelB()->set(
-            zone->A()->get(this->defaultChannelBIndex())->as<Channel>());
+      ext->bootSettings()->channelB()->set(ctx.get<Channel>(this->defaultChannelBIndex()));
     }
   }
 
@@ -1473,6 +1468,7 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
         return false;
       }
       // add to config
+      logDebug() << "Store zone '" << zonename << "' at index " << i << ".";
       ctx.config()->zones()->add(last_zone); ctx.add(last_zone, i);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
@@ -1481,6 +1477,8 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
         last_zone->deleteLater();
         return false;
       }
+      logDebug() << "Store merged zone '" << last_zonebasename << "' at index " << i << ".";
+      ctx.add(last_zone, i);
     }
   }
   return true;

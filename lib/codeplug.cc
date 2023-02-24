@@ -650,12 +650,10 @@ bool
 Codeplug::Context::add(ConfigItem *obj, unsigned idx) {
   if (!hasTable(obj->metaObject()))
     return false;
-  if (getTable(obj->metaObject()).indices.contains(obj))
-    return false;
-  if (getTable(obj->metaObject()).objects.contains(idx))
-    return false;
-  getTable(obj->metaObject()).objects.insert(idx, obj);
-  getTable(obj->metaObject()).indices.insert(obj, idx);
+  if (! getTable(obj->metaObject()).indices.contains(obj))
+    getTable(obj->metaObject()).objects.insert(idx, obj);
+  if (! getTable(obj->metaObject()).objects.contains(idx))
+    getTable(obj->metaObject()).indices.insert(obj, idx);
   return true;
 }
 
