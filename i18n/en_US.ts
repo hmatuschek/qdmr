@@ -2740,23 +2740,19 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
-        <translation>Delete roaming zone?</translation>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
-        <translation>Delete roaming zone &apos;%1&apos;?</translation>
+        <source>Delete roaming channel %1?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation>Delete roaming zones?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
-        <translation>Delete %1 roaming zones?</translation>
+        <source>Delete %1 roaming channel?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
