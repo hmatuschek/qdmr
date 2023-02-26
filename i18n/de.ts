@@ -2714,21 +2714,6 @@
 <context>
     <name>RoamingChannelListView</name>
     <message>
-        <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
-        <translation>Roamingzone &apos;%1&apos; löschen?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation>Roamingzonen löschen?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
-        <translation>%1 Roamingzonen löschen?</translation>
-    </message>
-    <message>
         <location filename="../src/roamingchannellistview.ui" line="51"/>
         <source>Add Roaming Channel</source>
         <translation>Roamingkanal hinzufügen</translation>
@@ -2750,8 +2735,19 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
-        <translation>Roamingzone löschen?</translation>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="74"/>
+        <source>Delete roaming channel %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete %1 roaming channel?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
