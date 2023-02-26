@@ -566,7 +566,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maks</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
@@ -710,7 +710,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strefy</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
@@ -740,7 +740,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="458"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="459"/>
@@ -995,7 +995,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
@@ -1028,7 +1028,7 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
@@ -1061,7 +1061,7 @@
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
@@ -1126,7 +1126,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
@@ -1151,7 +1151,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="92"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limit czasu TX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="99"/>
@@ -1161,12 +1161,12 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="109"/>
         <source>Scan List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skanuj listę</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maks</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="127"/>
@@ -1209,12 +1209,12 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="167"/>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> s</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="186"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poziom VOX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="215"/>
@@ -1229,7 +1229,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wolny kanał</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="233"/>
@@ -1364,7 +1364,7 @@
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
@@ -1482,7 +1482,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="158"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maks</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="163"/>
@@ -1528,12 +1528,12 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="213"/>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> s</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Poziom VOX</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="247"/>
@@ -1767,7 +1767,7 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="289"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ustawienia</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="292"/>
@@ -1913,7 +1913,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="716"/>
         <source>APRS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="718"/>
@@ -2508,7 +2508,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
@@ -2737,22 +2737,18 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
+        <source>Delete roaming channel %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
+        <source>Delete %1 roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2836,7 +2832,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="32"/>
@@ -2958,7 +2954,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
@@ -3115,7 +3111,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ustawienia</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="20"/>
@@ -3267,7 +3263,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="33"/>
@@ -3395,7 +3391,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>

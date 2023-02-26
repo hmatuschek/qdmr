@@ -1275,7 +1275,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="319"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DMR ID</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="332"/>
@@ -1402,7 +1402,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="28"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DMR ID</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="35"/>
@@ -1533,7 +1533,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOX-nivå</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="247"/>
@@ -1585,7 +1585,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
@@ -1595,7 +1595,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1815,7 +1815,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="64"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Välj kanal:</translation>
     </message>
 </context>
 <context>
@@ -1890,7 +1890,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="88"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+A</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="95"/>
@@ -1900,7 +1900,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="98"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1964,7 +1964,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="763"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kanal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="764"/>
@@ -2523,7 +2523,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="62"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="69"/>
@@ -2533,7 +2533,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="72"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
@@ -2604,7 +2604,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="914"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nummer</translation>
     </message>
 </context>
 <context>
@@ -2679,7 +2679,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="50"/>
         <source>Color Code</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Färgkod</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="68"/>
@@ -2737,22 +2737,18 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
+        <source>Delete roaming channel %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
+        <source>Delete %1 roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2782,12 +2778,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>TS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CC</translation>
     </message>
 </context>
 <context>
@@ -2856,7 +2852,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="66"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="73"/>
@@ -2866,7 +2862,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="76"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="86"/>
@@ -2929,7 +2925,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="51"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="58"/>
@@ -2944,7 +2940,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="68"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -2988,7 +2984,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="89"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="96"/>
@@ -2998,7 +2994,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="99"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="109"/>
@@ -3069,7 +3065,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="38"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="45"/>
@@ -3079,7 +3075,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="48"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3364,7 +3360,7 @@
     <message>
         <location filename="../src/zonelistview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="42"/>
@@ -3374,7 +3370,7 @@
     <message>
         <location filename="../src/zonelistview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3405,7 +3401,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="46"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kanal</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="56"/>
@@ -3416,7 +3412,7 @@
         <location filename="../src/aprssystemdialog.ui" line="75"/>
         <location filename="../src/aprssystemdialog.ui" line="113"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">-</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="94"/>
