@@ -997,7 +997,7 @@ class AnytoneAutoRepeaterOffset: public ConfigObject
 
 public:
   /** Default constructor. */
-  Q_INVOKABLE AnytoneAutoRepeaterOffset(QObject *parent=nullptr);
+  explicit Q_INVOKABLE AnytoneAutoRepeaterOffset(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
 
@@ -1405,6 +1405,60 @@ protected:
 };
 
 
+/** Implements the simplex repeater settings for the BTECH DMR-6X2UV.
+ * This extension is part of the @c AnytonSettingsExtension
+ *
+ * @ingroup anytone */
+class AnytoneSimplexRepeaterSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("enabledDescription", "If true, the simplex-repeater feature is enabled.")
+  /** Enables/disables the simplex repeater. */
+  Q_PROPERTY(bool enabled READ enabled WRITE enable)
+
+  Q_CLASSINFO("monitorDescription", "If true, the repeater-monitoring is enabled.")
+  /** Enables/disables the repeater monitor. */
+  Q_PROPERTY(bool monitor READ monitorEnabled WRITE enableMonitor)
+
+  Q_CLASSINFO("timeSlotDescription", "Specifies the time-slot of the repeater.")
+  /** Time-slot of the repeater. */
+  Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
+
+public:
+  /** Possible simplex repeater time-slots. */
+  enum class TimeSlot {
+    TS1 = 0, TS2 = 1, Channel = 2
+  };
+
+public:
+  /** Default constructor. */
+  explicit AnytoneSimplexRepeaterSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** If @c true, the simplex-repeater is enabled. */
+  bool enabled() const;
+  /** Enables/disables the simplex repeater. */
+  void enable(bool enable);
+
+  /** If @c true, repeater monitoring is enabled. */
+  bool monitorEnabled() const;
+  /** Enables/disables repeater monitoring. */
+  void enableMonitor(bool enable);
+
+  /** Returns the repeater time-slot. */
+  TimeSlot timeSlot() const;
+  /** Sets the repeater time-slot. */
+  void setTimeSlot(TimeSlot ts);
+
+protected:
+  bool _enabled;                ///< If @c true, the simplex repeater is enabled.
+  bool _monitor;                ///< If enabled, the radio will monitor the channel.
+  TimeSlot _timeSlot;           ///< The repeater time-slot.
+};
+
+
 /** Implements the device specific extension for the gerneral settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
@@ -1506,6 +1560,11 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The Raging/Roaming settings. */
   Q_PROPERTY(AnytoneRangingSettingsExtension* rangingSettings READ rangingSettings)
 
+  Q_CLASSINFO("simplexRepeaterSettingsDescription",
+              "Configuration for the DMR-6X2UV simplex-repeater feature.")
+  /** The simplex-repeater settings. DMR-6X2UV only. */
+  Q_PROPERTY(AnytoneSimplexRepeaterSettingsExtension * simplexRepeaterSettings READ simplexRepeaterSettings)
+
 public:
   /** Possible power save modes. */
   enum class PowerSave {
@@ -1568,6 +1627,8 @@ public:
   AnytoneDMRSettingsExtension *dmrSettings() const;
   /** A reference to the ranging settings. */
   AnytoneRangingSettingsExtension *rangingSettings() const;
+  /** A reference to the simplex repeater settings. */
+  AnytoneSimplexRepeaterSettingsExtension *simplexRepeaterSettings() const;
 
   /** Returns the auto shut-down delay in minutes. */
   Interval autoShutDownDelay() const;
@@ -1699,6 +1760,8 @@ protected:
   AnytoneDMRSettingsExtension *_dmrSettings;
   /** The ranging settings. */
   AnytoneRangingSettingsExtension *_rangingSettings;
+  /** The simplex-repeater settings. */
+  AnytoneSimplexRepeaterSettingsExtension *_simplexRepeaterSettings;
 
   Interval _autoShutDownDelay;     ///< The auto shut-down delay in minutes.
   PowerSave _powerSave;            ///< Power save mode property.

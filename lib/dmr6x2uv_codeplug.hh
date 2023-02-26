@@ -204,11 +204,6 @@ public:
       Orange=0x00, Red=0x01, Yellow=0x02, Green=0x03, Turquoise=0x04, Blue=0x05, White=0x06, Black=0x07
     };
 
-    /** Possible GPS modes. */
-    enum class SimplexRepeaterSlot {
-      TS1 = 0, TS2 = 1, Channel = 2
-    };
-
     /** Possible SMS formats. */
     enum class SMSFormat {
       MFormat = 0x00,
@@ -237,9 +232,9 @@ public:
     explicit GeneralSettingsElement(uint8_t *ptr);
 
     /** Retunrs the color for call-signs. */
-    virtual DisplayColor callsignDisplayColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     /** Sets the color for call-signs. */
-    void setCallsignDisplayColor(DisplayColor color);
+    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the simplex repeater feature is enabled. */
     virtual bool simplexRepeaterEnabled() const;
@@ -251,9 +246,9 @@ public:
     /** Enables/disables the speaker during RX in simplex repeater mode. */
     virtual void enableMonitorSimplexRepeater(bool enable);
     /** Returns the time-slot in simplex repeater mode. */
-    virtual SimplexRepeaterSlot simplexRepeaterTimeslot() const;
+    virtual AnytoneSimplexRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
     /** Sets the time-slot in simplex repeater mode. */
-    virtual void setSimplexRepeaterTimeslot(SimplexRepeaterSlot slot);
+    virtual void setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot);
 
     /** Returns the GPS ranging intervall in seconds. */
     virtual unsigned int gpsRangingIntervall() const;

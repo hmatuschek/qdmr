@@ -58,9 +58,35 @@ DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
   // pass...
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::DisplayColor
-DMR6X2UVCodeplug::GeneralSettingsElement::callsignDisplayColor() const {
-  return (DisplayColor)getUInt8(0x00b0);
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
+  DisplayColor color = (DisplayColor)getUInt8(0x00b0);
+  switch (color) {
+  case DisplayColor::Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case DisplayColor::Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case DisplayColor::Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case DisplayColor::Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case DisplayColor::Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case DisplayColor::Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  case DisplayColor::White: return AnytoneDisplaySettingsExtension::Color::White;
+  case DisplayColor::Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  }
+
+  return AnytoneDisplaySettingsExtension::Color::Orange;
+}
+
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
+  switch (color) {
+  case AnytoneDisplaySettingsExtension::Color::Orange:    setUInt8(0x00b0, (unsigned int)DisplayColor::Orange); break;
+  case AnytoneDisplaySettingsExtension::Color::Red:       setUInt8(0x00b0, (unsigned int)DisplayColor::Red); break;
+  case AnytoneDisplaySettingsExtension::Color::Yellow:    setUInt8(0x00b0, (unsigned int)DisplayColor::Yellow); break;
+  case AnytoneDisplaySettingsExtension::Color::Green:     setUInt8(0x00b0, (unsigned int)DisplayColor::Green); break;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: setUInt8(0x00b0, (unsigned int)DisplayColor::Turquoise); break;
+  case AnytoneDisplaySettingsExtension::Color::Blue:      setUInt8(0x00b0, (unsigned int)DisplayColor::Blue); break;
+  case AnytoneDisplaySettingsExtension::Color::White:     setUInt8(0x00b0, (unsigned int)DisplayColor::White); break;
+  case AnytoneDisplaySettingsExtension::Color::Black:     setUInt8(0x00b0, (unsigned int)DisplayColor::Black); break;
+  }
 }
 
 bool
@@ -81,26 +107,14 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorSimplexRepeater(bool enab
   setUInt8(0x00b3, enable ? 0x01 : 0x00);
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::SimplexRepeaterSlot
+AnytoneSimplexRepeaterSettingsExtension::TimeSlot
 DMR6X2UVCodeplug::GeneralSettingsElement::simplexRepeaterTimeslot() const {
-  switch (getUInt8(0x00b7)) {
-  case 0x00:
-    return SimplexRepeaterSlot::TS1;
-  case 0x01:
-    return SimplexRepeaterSlot::TS2;
-  case 0x02:
-  default:
-    return SimplexRepeaterSlot::Channel;
-  }
+  return (AnytoneSimplexRepeaterSettingsExtension::TimeSlot)getUInt8(0x00b7);
 }
 
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(SimplexRepeaterSlot slot) {
-  switch (slot) {
-  case SimplexRepeaterSlot::TS1:     setUInt8(0x00b7, 0x00); break;
-  case SimplexRepeaterSlot::TS2:     setUInt8(0x00b7, 0x01); break;
-  case SimplexRepeaterSlot::Channel: setUInt8(0x00b7, 0x02); break;
-  }
+DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot) {
+  setUInt8(0x00b7, (unsigned int) slot);
 }
 
 unsigned int
@@ -351,7 +365,17 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
 {
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
+
   // apply DMR-6X2UV specific settings.
+  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Apply display settings
+    setCallDisplayColor(ext->displaySettings()->callColor());
+
+    // Apply simplex repeater settings
+    enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
+    enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
+    setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
+  }
   return true;
 }
 
@@ -369,8 +393,16 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Decode display settings
+  ext->displaySettings()->setCallColor(callDisplayColor());
+
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
+  // Decode simplex-repeater feature.
+  ext->simplexRepeaterSettings()->enable(this->simplexRepeaterEnabled());
+  ext->simplexRepeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());
+  ext->simplexRepeaterSettings()->setTimeSlot(this->simplexRepeaterTimeslot());
 
   return true;
 }

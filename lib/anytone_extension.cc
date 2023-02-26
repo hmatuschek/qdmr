@@ -614,6 +614,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _autoRepeaterSettings(new AnytoneAutoRepeaterSettingsExtension(this)),
     _dmrSettings(new AnytoneDMRSettingsExtension(this)),
     _rangingSettings(new AnytoneRangingSettingsExtension(this)),
+    _simplexRepeaterSettings(new AnytoneSimplexRepeaterSettingsExtension(this)),
     _autoShutDownDelay(), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::TO),
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
     _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(Frequency::fromMHz(430)),
@@ -640,6 +641,8 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
   connect(_dmrSettings, &AnytoneDMRSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
   connect(_rangingSettings, &AnytoneRangingSettingsExtension::modified,
+          this, &AnytoneSettingsExtension::modified);
+  connect(_simplexRepeaterSettings, &AnytoneSimplexRepeaterSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
 }
 
@@ -697,6 +700,11 @@ AnytoneSettingsExtension::dmrSettings() const {
 AnytoneRangingSettingsExtension *
 AnytoneSettingsExtension::rangingSettings() const {
   return _rangingSettings;
+}
+
+AnytoneSimplexRepeaterSettingsExtension *
+AnytoneSettingsExtension::simplexRepeaterSettings() const {
+  return _simplexRepeaterSettings;
 }
 
 Interval
@@ -1997,4 +2005,60 @@ AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
   : ConfigObjectList(AnytoneAutoRepeaterOffset::staticMetaObject, parent)
 {
   // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneSimplexRepeaterSettingsExtension
+ * ********************************************************************************************* */
+AnytoneSimplexRepeaterSettingsExtension::AnytoneSimplexRepeaterSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _enabled(false), _monitor(false), _timeSlot(TimeSlot::Channel)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneSimplexRepeaterSettingsExtension::clone() const {
+  AnytoneSimplexRepeaterSettingsExtension *ext = new AnytoneSimplexRepeaterSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+bool
+AnytoneSimplexRepeaterSettingsExtension::enabled() const {
+  return _enabled;
+}
+void
+AnytoneSimplexRepeaterSettingsExtension::enable(bool enable) {
+  if (_enabled == enable)
+    return;
+  _enabled = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneSimplexRepeaterSettingsExtension::monitorEnabled() const {
+  return _monitor;
+}
+void
+AnytoneSimplexRepeaterSettingsExtension::enableMonitor(bool enable) {
+  if (_monitor == enable)
+    return;
+  _monitor = enable;
+  emit modified(this);
+}
+
+AnytoneSimplexRepeaterSettingsExtension::TimeSlot
+AnytoneSimplexRepeaterSettingsExtension::timeSlot() const {
+  return _timeSlot;
+}
+void
+AnytoneSimplexRepeaterSettingsExtension::setTimeSlot(TimeSlot ts) {
+  if (_timeSlot == ts)
+    return;
+  _timeSlot = ts;
+  emit modified(this);
 }
