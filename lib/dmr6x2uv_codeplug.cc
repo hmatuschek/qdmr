@@ -117,13 +117,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(AnytoneSimp
   setUInt8(0x00b7, (unsigned int) slot);
 }
 
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::gpsRangingIntervall() const {
-  return getUInt8(0x00b1);
+Interval DMR6X2UVCodeplug::GeneralSettingsElement::gpsRangingIntervall() const {
+  return Interval::fromSeconds(getUInt8(0x00b1));
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setGPSRangingIntervall(unsigned int sec) {
-  setUInt8(0x00b1, sec);
+DMR6X2UVCodeplug::GeneralSettingsElement::setGPSRangingIntervall(Interval intv) {
+  setUInt8(0x00b1, intv.seconds());
 }
 
 bool
@@ -136,11 +135,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::showCurrentContact(bool show) {
 }
 
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::keySoundVolume() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
   return getUInt8(0x00b5);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setKeySoundVolume(unsigned int vol) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned int vol) {
   vol = std::min(15U, vol);
   setUInt8(0x00b5, vol);
 }
@@ -164,11 +163,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableSideKeyLock(bool enable) {
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::keyboadLock() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::keypadLock() const {
   return getBit(0x00b6, 2);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyboradLock(bool enable) {
+DMR6X2UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
   setBit(0x00b6, 2, enable);
 }
 
@@ -190,21 +189,21 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastCallOnStartup(bool enabl
   setUInt8(0x00b8, enable ? 0x01 : 0x00);
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::SMSFormat
+AnytoneDMRSettingsExtension::SMSFormat
 DMR6X2UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (SMSFormat) getUInt8(0x00b9);
+  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(0x00b9);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat format) {
-  setUInt8(0x00b8, (uint8_t)format);
+DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format) {
+  setUInt8(0x00b8, (unsigned int)format);
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::GPSUnits
+AnytoneSettingsExtension::Units
 DMR6X2UVCodeplug::GeneralSettingsElement::gpsUnits() const {
-  return (GPSUnits) getUInt8(0x00ba);
+  return (AnytoneSettingsExtension::Units) getUInt8(0x00ba);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setGPSUnits(GPSUnits units) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setGPSUnits(AnytoneSettingsExtension::Units units) {
   setUInt8(0x00ba, (uint8_t) units);
 }
 
@@ -368,13 +367,32 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
 
   // apply DMR-6X2UV specific settings.
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Apply key pad settings
+    enableSideKeyLock(ext->keySettings()->sideKeysLockEnabled());
+    enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+    enableKnobLock(ext->keySettings()->knobLockEnabled());
+
+    // Apply tone settings:
+    setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
     // Apply display settings
+    showCurrentContact(ext->displaySettings()->showContactEnabled());
     setCallDisplayColor(ext->displaySettings()->callColor());
+    enableShowLastCallOnStartup(ext->displaySettings()->showLastHeardEnabled());
+
+    // Apply DMR settings
+    setSMSFormat(ext->dmrSettings()->smsFormat());
+
+    // Apply ranging/roaming settings
+    setGPSRangingIntervall(ext->rangingSettings()->gpsRangingInterval());
 
     // Apply simplex repeater settings
     enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
     enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
     setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
+
+    // Apply other settings
+    setGPSUnits(ext->units());
   }
   return true;
 }
@@ -392,17 +410,35 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+  // Decode keypad settings
+  ext->keySettings()->enableSideKeysLock(this->sideKeyLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableKnobLock(this->knobLock());
+
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(this->keyToneLevel());
 
   // Decode display settings
+  ext->displaySettings()->enableShowContact(this->currentContactShown());
   ext->displaySettings()->setCallColor(callDisplayColor());
+  ext->displaySettings()->enableShowLastHeard(this->lastCallShownOnStartup());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+
+  // Decode DMR settings
+  ext->dmrSettings()->setSMSFormat(this->smsFormat());
+
+  // Decode ranging/roaming settings
+  ext->rangingSettings()->setGPSRangingInterval(this->gpsRangingIntervall());
 
   // Decode simplex-repeater feature.
   ext->simplexRepeaterSettings()->enable(this->simplexRepeaterEnabled());
   ext->simplexRepeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());
   ext->simplexRepeaterSettings()->setTimeSlot(this->simplexRepeaterTimeslot());
+
+  // Decode other settings
+  ext->setUnits(this->gpsUnits());
 
   return true;
 }

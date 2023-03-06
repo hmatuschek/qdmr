@@ -204,19 +204,6 @@ public:
       Orange=0x00, Red=0x01, Yellow=0x02, Green=0x03, Turquoise=0x04, Blue=0x05, White=0x06, Black=0x07
     };
 
-    /** Possible SMS formats. */
-    enum class SMSFormat {
-      MFormat = 0x00,
-      HFormat = 0x01,
-      DMRStandard = 0x02
-    };
-
-    /** Possible GPS units. */
-    enum class GPSUnits {
-      Metric = 0x00,
-      Imperial = 0x01
-    };
-
     /** Possible background colors. */
     enum class BackgroundColor {
       Black = 0x00,
@@ -251,17 +238,17 @@ public:
     virtual void setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot);
 
     /** Returns the GPS ranging intervall in seconds. */
-    virtual unsigned int gpsRangingIntervall() const;
+    virtual Interval gpsRangingIntervall() const;
     /** Sets the GPS ranging intervall in seconds. */
-    virtual void setGPSRangingIntervall(unsigned int sec);
+    virtual void setGPSRangingIntervall(Interval sec);
     /** Returns @c true if the current contact is shown. */
     virtual bool currentContactShown() const;
     /** Shows/hides the current contact. */
     virtual void showCurrentContact(bool show);
     /** Key sound volume. Any value from 1-15, 0 means adjustable. */
-    virtual unsigned int keySoundVolume() const;
+    virtual unsigned int keyToneLevel() const;
     /** Sets the key sound volume. Any value from 1-15, 0 means adjustable. */
-    virtual void setKeySoundVolume(unsigned int vol);
+    virtual void setKeyToneLevel(unsigned int vol);
 
     /** Returns @c true if the "professional key" gets locked too. */
     virtual bool professionalKeyLock() const;
@@ -272,9 +259,9 @@ public:
     /** Enables/disables side key lock. */
     virtual void enableSideKeyLock(bool enable);
     /** Returns @c true if the keyboard gets locked too. */
-    virtual bool keyboadLock() const;
+    virtual bool keypadLock() const;
     /** Enables/disables keyboard lock. */
-    virtual void enableKeyboradLock(bool enable);
+    virtual void enableKeypadLock(bool enable);
     /** Returns @c true if the knob gets locked too. */
     virtual bool knobLock() const;
     /** Enables/disables knob lock. */
@@ -286,14 +273,14 @@ public:
     virtual void enableShowLastCallOnStartup(bool enable);
 
     /** Returns the SMS format. */
-    virtual SMSFormat smsFormat() const;
+    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(SMSFormat format);
+    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format);
 
     /** Retuns the units used to display distances. */
-    virtual GPSUnits gpsUnits() const;
+    virtual AnytoneSettingsExtension::Units gpsUnits() const;
     /** Sets the GPS units. */
-    virtual void setGPSUnits(GPSUnits units);
+    virtual void setGPSUnits(AnytoneSettingsExtension::Units units);
 
     /** Returns the VHF frequency range in MHz for the auto-repeater feature.
      * If a frequency within this range is chosen, the radio will transmit at the specified
