@@ -53,4 +53,6 @@ private:
   static const char ESCAPED_DB = '\xDD';
 };
 
+
+
 #endif // PACKETSTREAM_HH

@@ -1,7 +1,7 @@
 #include "openrtx_interface.hh"
 
 OpenRTXInterface::OpenRTXInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : DFUDevice(descr, err, parent), RadioInterface()
+  : USBSerial(descr, err, parent)
 {
   // pass...
 }
@@ -9,12 +9,12 @@ OpenRTXInterface::OpenRTXInterface(const USBDeviceDescriptor &descr, const Error
 
 bool
 OpenRTXInterface::isOpen() const {
-  return DFUDevice::isOpen();
+  return USBSerial::isOpen();
 }
 
 void
 OpenRTXInterface::close() {
-  DFUDevice::close();
+  USBSerial::close();
 }
 
 
