@@ -952,7 +952,7 @@ RadioddityCodeplug::GroupListElement::setName(const QString &name) {
 
 bool
 RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
-  return 0!=member(n);
+  return 0 != member(n);
 }
 unsigned
 RadioddityCodeplug::GroupListElement::member(unsigned n) const {
@@ -960,7 +960,7 @@ RadioddityCodeplug::GroupListElement::member(unsigned n) const {
 }
 void
 RadioddityCodeplug::GroupListElement::setMember(unsigned n, unsigned idx) {
-  return setUInt16_le(0x0010+2*n, idx);
+  return setUInt16_le(0x0010 + 2*n, idx);
 }
 void
 RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
@@ -968,19 +968,19 @@ RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
 }
 
 RXGroupList *
-RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
-  Q_UNUSED(ctx)
+RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   return new RXGroupList(name());
 }
 
 bool
-RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
+RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack& err) const {
   for (int i=0; (i<16) && (i<ncnt); i++) {
     if (ctx.has<DMRContact>(member(i))) {
       lst->addContact(ctx.get<DMRContact>(member(i)));
     } else {
-      logError() << "Cannot link group list '" << lst->name()
-                << "': Member index " << member(i) << " does not refer to a digital contact.";
+      errMsg(err) << "Cannot link group list '" << lst->name()
+                  << "': Member index " << member(i) << " does not refer to a digital contact.";
       return false;
     }
   }
@@ -988,13 +988,14 @@ RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *
 }
 
 void
-RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(err)
   setName(lst->name());
   int j = 0;
   // Iterate over all 15 entries in the codeplug
   for (int i=0; i<15; i++) {
     if (lst->count() > j) {
-      // Skip non-private-call entries
+      // Skip non-group-call entries
       while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
         logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                   << "' is not a group call. Skip entry.";
@@ -2676,8 +2677,10 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack 
 
   // Create index<->object table.
   Context ctx(config);
-  if (! index(config, ctx, err))
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot index configuration objects.";
     return false;
+  }
 
   return this->encodeElements(flags, ctx);
 }

@@ -503,11 +503,11 @@ public:
     virtual void clearMember(unsigned n);
 
     /** Constructs a @c RXGroupList object from the codeplug representation. */
-    virtual RXGroupList *toRXGroupListObj(Context &ctx);
+    virtual RXGroupList *toRXGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const;
+    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
-    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Implements a base class of group list memory banks for all Radioddity codeplugs.
