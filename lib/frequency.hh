@@ -67,7 +67,7 @@ namespace YAML
 
     /** Parses the frequency. */
     static bool decode(const Node& node, Frequency& rhs) {
-      if (!node.IsScalar())
+      if (! node.IsScalar())
         return false;
       return rhs.parse(QString::fromStdString(node.as<std::string>()));
     }

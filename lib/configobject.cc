@@ -599,7 +599,8 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
                     << ": Expected frequency.";
         return false;
       }
-      prop.write(this, QVariant::fromValue(node[prop.name()].as<Frequency>()));
+      Frequency f = node[prop.name()].as<Frequency>();
+      prop.write(this, QVariant::fromValue(f));
     } else if (QString("Interval") == prop.typeName()) {
       // If property is not set -> skip
       if (! node[prop.name()])

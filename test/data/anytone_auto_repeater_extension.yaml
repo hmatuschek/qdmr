@@ -17,8 +17,8 @@ settings:
       vhf: off0
       uhf: off1
       offsets:
-        - {id: off0, name: VHF Offset, offset: 600000}
-        - {id: off1, name: UHF Offset, offset: 7600000}
+        - {id: off0, name: VHF Offset, offset: 600 kHz}
+        - {id: off1, name: UHF Offset, offset: 7.6 MHz}
 radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
 contacts:

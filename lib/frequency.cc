@@ -50,7 +50,7 @@ Frequency::format(Format f) const {
 
 bool
 Frequency::parse(const QString &value) {
-  QRegularExpression re("\\w*([0-9]*)(?:.([0-9]*))\\w*([kMG]?Hz)\\w*");
+  QRegularExpression re(R"(\s*([0-9]+)(?:.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
   if (! match.isValid())
     return false;
@@ -59,8 +59,8 @@ Frequency::parse(const QString &value) {
   bool hasUnit = match.capturedLength(3);
   QString unit = match.captured(3);
   QString decimals = match.captured(2);
-
-  _frequency = match.captured(1).toUInt();
+  QString leading = match.captured(1);
+  _frequency = leading.toUInt();
 
   if (("Hz" == unit) || (!isFloat && !hasUnit))
     return true;
