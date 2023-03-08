@@ -71,11 +71,11 @@ RoamingChannelListView::onRemChannel() {
   if (rows.first==rows.second) {
     QString name = _config->roamingChannels()->channel(rows.first)->name();
     if (QMessageBox::No == QMessageBox::question(
-          nullptr, tr("Delete roaming zone?"), tr("Delete roaming zone %1?").arg(name)))
+          nullptr, tr("Delete roaming channel?"), tr("Delete roaming channel %1?").arg(name)))
       return;
   } else {
     if (QMessageBox::No == QMessageBox::question(
-          nullptr, tr("Delete roaming zones?"), tr("Delete %1 roaming zones?").arg(rowcount)))
+          nullptr, tr("Delete roaming channel?"), tr("Delete %1 roaming channel?").arg(rowcount)))
       return;
   }
   // collect all selected channels
