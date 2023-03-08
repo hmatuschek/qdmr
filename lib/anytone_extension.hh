@@ -1430,6 +1430,7 @@ public:
   enum class TimeSlot {
     TS1 = 0, TS2 = 1, Channel = 2
   };
+  Q_ENUM(TimeSlot)
 
 public:
   /** Default constructor. */

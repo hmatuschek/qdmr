@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "configreference.hh"
 #include "configobjecttypeselectiondialog.hh"
+#include "frequency.hh"
 
 
 /* ******************************************************************************************** *
@@ -584,6 +585,11 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
                  (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
                 && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
       return value;
+    } else if (QString("Frequency") == prop.typeName()) {
+      if (Qt::DisplayRole == role)
+        return value.value<Frequency>().format();
+      else if (Qt::EditRole == role)
+        return value;
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
       ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
       ConfigObject *obj = ref->as<ConfigObject>();
@@ -604,6 +610,8 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
       ConfigObjectList *lst = value.value<ConfigObjectList*>();
       if (Qt::DisplayRole == role)
         return tr("List of %1 instances").arg(lst->classNames().join(", "));
+    } else if (Qt::DisplayRole == role) {
+      logWarn() << "Unhandled property '" << prop.name() << "' of type " << prop.typeName() << ".";
     }
   } else if (isListElement(index)) {
     ConfigObjectList *lst = parentList(index);

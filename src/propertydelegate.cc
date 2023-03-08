@@ -60,6 +60,8 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return edit;
   } else if (QVariant::String == prop.type()) {
     return new QLineEdit(parent);
+  } else if (QString("Frequency") == prop.typeName()) {
+    return new QLineEdit(parent);
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     return new QComboBox(parent);
   } else if (propIsInstance<ConfigItem>(prop)) {
@@ -100,6 +102,8 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
     dynamic_cast<QLineEdit *>(editor)->setText(QString::number(prop.read(obj).toDouble()));
   } else if (QVariant::String == prop.type()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).toString());
+  } else if (QString("Frequency") == prop.typeName()) {
+    dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).value<Frequency>().format());
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
     // Find all matching elements in config that can be referenced
@@ -137,6 +141,10 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text().toDouble());
   } else if (QVariant::String == prop.type()) {
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text());
+  } else if (QString("Frequency") == prop.typeName()) {
+    Frequency f;
+    if (f.parse(dynamic_cast<QLineEdit *>(editor)->text()))
+      prop.write(obj, QVariant::fromValue(f));
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
     ref->set(dynamic_cast<QComboBox *>(editor)->currentData().value<ConfigObject*>());
