@@ -17,5 +17,6 @@
 <xi:include href="contact.xml"/>
 <xi:include href="channel.xml"/>
 <xi:include href="zone.xml"/>
+<xi:include href="settings.xml"/>
 
 </section>

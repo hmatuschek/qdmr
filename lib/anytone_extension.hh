@@ -1593,7 +1593,7 @@ public:
 
   /** Possible unit systems. */
   enum class Units {
-    Metric = 0, Imperial = 1
+    Metric = 0, Archaic = 1
   };
   Q_ENUM(Units)
 

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Settings extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some device specific settings for
+   <trademark>AnyTone</trademark> devices. As there are a myriad of settings for these devices, the
+   settings extension is split into several sub-extensions, grouping the settings by domain.
+</para>
+
+<para>
+  The <trademark>AnyTone</trademark> settings extension is a mapping named <token>anytone</token>. 
+  It contains the device specific settings for AnyTone devices.
+</para>
+
+<section>
+<info>
+  <title>General settings attributes</title>
+</info>
+
+<para>
+  The following attributes are common across all AnyTone devices. 
+</para>
+
+<variablelist>
+  <title>General settings extension fields</title>
+  <varlistentry>
+    <term><token>autoShutDownDelay</token></term>
+    <listitem>
+      <para>
+        The auto shut-down delay. Any interval can be specified here, a unit is needed 
+        unless the interval is given in seconds. The interval is stored in minute resolution.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSave</token></term>
+    <listitem>
+      <para>
+        The power-save mode, must be one of <token>Off</token>, <token>Save50</token> or 
+        <token>Save66</token>. The first disables the power-save feature, while the latter two 
+        save 50% and 66% power, respectively. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>subChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the sub-channel is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>selectedVFO</token></term>
+    <listitem>
+      <para>
+        Specifies the currently selected VFO. Must be one of <token>A</token> or <token>B</token>,
+        selecting VFO A and B, respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>modeA</token>, <token>modeB</token></term>
+    <listitem>
+      <para>
+        Specifies the VFO mode for VFOs A and B. Must be one of <token>Memory</token> or 
+        <token>VFO</token>. The former selects the memory/channel mode while the latter selects the 
+        VFO mode.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>zoneA</token>, <token>zoneB</token></term>
+    <listitem>
+      <para>
+        Specifies the current zones for VFO A and B. Must be a reference to a zone.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>timeZone</token></term>
+    <listitem>
+      <para>
+        Specifies time-zone. Can by any IANA time-zone name as a string.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vfoScanType</token></term>
+    <listitem>
+      <para>
+        Specifies scan-type for the VFO mode. Must be one of <token>TO</token>, <token>CO</token> or 
+        <token>SE</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>minVFOScanFrequencyVHF</token>, <token>maxVFOScanFrequencyVHF</token>, 
+      <token>minVFOScanFrequencyUHF</token>, <token>maxVFOScanFrequencyUHF</token></term>
+    <listitem>
+      <para>
+        Specifies the frequency ranges for the VFO scan in the VHF and UHF bands. These frequency 
+        can be specified arbitrarily. If a unit less floating point value is given, it is 
+        interpreted as in MHz. If a unit less integer value is given, it is interpreted as in Hz.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>units</token></term>
+    <listitem>
+      <para>
+        Specifies the distance units used to display GPS information. This must be 
+        <token>Metric</token> or <token>Archaic</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keepLastCaller</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the last caller ID is kept even, when the channel is changed. 
+        Seriously, who needs that option? Just keep it or don't. Why is it so important? AnyTone
+        codeplugs are full of these unnecessary settings.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vfoStep</token></term>
+    <listitem>
+      <para>
+        Specifies the VFO tuning step-size.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>steType</token>, <token>steFrequency</token></term>
+    <listitem>
+      <para>
+        Specifies the squelch-tail elimination type and frequency. The type must be one of 
+        <token>Off</token>, <token>Silent</token>, <token>Deg120</token>, <token>Deg180</token> or 
+        <token>Deg240</token>. The frequency is specified as a floating point number in Hz. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>tbstFrequency</token></term>
+    <listitem>
+      <para>
+        Specifies TBST/pilot-tone frequency used to enable/open a repeater. This should be one of 
+        the common frequencies like 1000, 1450, 1750 and 2100 Hz.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>proMode</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, enables the professional mode.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>maintainCallChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, maintains the call-channel. Whatever that now means. If you find it
+        out, let it me know. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootSettings</token>, <token>keySettings</token>, <token>toneSettings</token>, 
+      <token>displaySettings</token>, <token>audioSettings</token>, <token>menuSettings</token>, 
+      <token>autoRepeaterSettings</token>, <token>dmrSettings</token>, 
+      <token>rangingSettings</token>, <token>simplexRepeaterSettings</token></term>
+    <listitem>
+      <para>
+        Many more funny settings, grouped by domain. For details, see the descriptions below.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Boot settings</title></info>
+<para>
+  Collects some settings, that control the startup of the radio.
+</para>
+
+<variablelist>
+  <title>Boot settings extension fields</title>
+  <varlistentry>
+    <term><token>bootDisplay</token></term>
+    <listitem>
+      <para>
+        Specifies what is seen on the display during boot. Must be one of <token>Default</token>, 
+        <token>CustomText</token> or <token>CustomImage</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootPasswordEnabled</token>, <token>bootPassword</token></term>
+    <listitem>
+      <para>
+        Enables/disables and specifies the boot password.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+</section>
