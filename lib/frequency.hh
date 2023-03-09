@@ -30,11 +30,16 @@ public:
   inline bool operator==  (const Frequency &other) const {   ///< Comparison.
     return _frequency == other._frequency;
   }
+  inline bool operator<   (const Frequency &other) const {   ///< Comparison.
+    return _frequency < other._frequency;
+  }
 
   /** Format the frequency. */
   QString format(Format f=Format::Automatic) const;
   /** Parses a frequency. */
   bool parse(const QString &value);
+  /** Pareses a frequency. */
+  static Frequency fromString(const QString &freq);
 
   inline unsigned long long inHz() const { return _frequency; }    ///< Unit conversion.
   inline double inkHz() const { return double(_frequency)/1e3; }   ///< Unit conversion.

@@ -619,7 +619,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
     _subChannel(true), _timeZone(QTimeZone::utc()), _minVFOScanFrequencyUHF(Frequency::fromMHz(430)),
     _maxVFOScanFrequencyUHF(Frequency::fromMHz(440)), _minVFOScanFrequencyVHF(Frequency::fromMHz(144)),
-    _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)), _keepLastCaller(false),
+    _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)), _gpsUnits(Units::Metric), _keepLastCaller(false),
     _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
     _tbstFrequency(Frequency::fromHz(1750)), _proMode(false),
     _maintainCallChannel(false)

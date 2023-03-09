@@ -4,6 +4,7 @@
 #include "configreference.hh"
 #include "configobjecttypeselectiondialog.hh"
 #include "frequency.hh"
+#include "interval.hh"
 
 
 /* ******************************************************************************************** *
@@ -588,6 +589,11 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
     } else if (QString("Frequency") == prop.typeName()) {
       if (Qt::DisplayRole == role)
         return value.value<Frequency>().format();
+      else if (Qt::EditRole == role)
+        return value;
+    } else if (QString("Interval") == prop.typeName()) {
+      if (Qt::DisplayRole == role)
+        return value.value<Interval>().format();
       else if (Qt::EditRole == role)
         return value;
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {

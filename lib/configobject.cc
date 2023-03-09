@@ -163,7 +163,9 @@ ConfigItem::copy(const ConfigItem &other) {
     // true if the property is a basic type
     bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
                          (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
-                         (QVariant::Double==prop.type()) ||(QVariant::String==prop.type()));
+                         (QVariant::Double==prop.type()) || (QVariant::String==prop.type()) ||
+                         (QString("Frequency")==prop.typeName()) ||
+                         (QString("Interval")==prop.typeName()) );
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
@@ -267,6 +269,20 @@ ConfigItem::compare(const ConfigItem &other) const {
     if (QVariant::String == prop.type()) {
       int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
       if (cmp) return cmp;
+      continue;
+    }
+
+    if (QString("Frequency") == prop.typeName()) {
+      Frequency a = prop.read(this).value<Frequency>(), b = oprop.read(&other).value<Frequency>();
+      if (a<b) return -1;
+      if (b<a) return 1;
+      continue;
+    }
+
+    if (QString("Interval") == prop.typeName()) {
+      Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
+      if (a<b) return -1;
+      if (b<a) return 1;
       continue;
     }
 

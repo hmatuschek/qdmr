@@ -1,4 +1,5 @@
 #include "frequency.hh"
+#include "logger.hh"
 #include <QRegularExpression>
 
 Frequency::Frequency(unsigned long long Hz)
@@ -50,7 +51,7 @@ Frequency::format(Format f) const {
 
 bool
 Frequency::parse(const QString &value) {
-  QRegularExpression re(R"(\s*([0-9]+)(?:.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
+  QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
   if (! match.isValid())
     return false;
@@ -89,4 +90,13 @@ Frequency::parse(const QString &value) {
   }
 
   return true;
+}
+
+Frequency
+Frequency::fromString(const QString &freq) {
+  Frequency f;
+  if (! f.parse(freq)) {
+    logWarn() << "Cannot parse frequency '" << freq << "'.";
+  }
+  return f;
 }
