@@ -44,13 +44,13 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 54 | Unknown settings                                                                              | Enable enhanced audio         |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-58 | VFO Scan UHF minimum frequency in 10Hz, 8-digit BCD, little endian                                                            |
+58 | VFO Scan UHF minimum frequency in 10Hz, 32bit uint, little endian                                                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-5c | VFO Scan UHF maximum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
+5c | VFO Scan UHF maximum frequency in 10Hz, 32bit uint, little endian                                                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-60 | VFO Scan VHF minimum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
+60 | VFO Scan VHF minimum frequency in 10Hz, 32bit uint, little endian                                                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-64 | VFO Scan VHF maximum frequency in 10Hz, 8-digit BCD,  little endian                                                           |
+64 | VFO Scan VHF maximum frequency in 10Hz, 32bit uint, little endian                                                             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 68 | Auto rep. offset index UHF    | Auto rep. offset index VHF    | Unknown                                                    ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -98,13 +98,13 @@ bc | Callsign color                | GPS unit                      | 0   0   0 |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 c0 | Standby text color            | Standby image color           | Show last heard               | SMS format                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c4 | Auto repeater VHF min frequency in 10Hz, 8-digit BCD, big endian                                                              |
+c4 | Auto repeater VHF min frequency in 10Hz, 32bit uint, little endian                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c8 | Auto repeater VHF max frequency in 10Hz, 8-digit BCD, big endian                                                              |
+c8 | Auto repeater VHF max frequency in 10Hz, 32bit uint, little endian                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-cc | Auto repeater UHF min frequency in 10Hz, 8-digit BCD, big endian                                                              |
+cc | Auto repeater UHF min frequency in 10Hz, 32bit uint, little endian                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d0 | Auto repeater UHF max frequency in 10Hz, 8-digit BCD, big endian                                                              |
+d0 | Auto repeater UHF max frequency in 10Hz, 32bit uint, little endian                                                            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d4 | Auto rep. VFO B direction     | Unknown                       | Unused set to 0x00            | Boot channel enable           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
