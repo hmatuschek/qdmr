@@ -437,7 +437,7 @@ class AnytoneKeySettingsExtension: public ConfigItem
 public:
   /** All possible key functions. */
   enum class KeyFunction {
-    Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+    Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03,  = 0x04,
     DigitalEncryption = 0x05, Call = 0x06, VOX = 0x07, VFOChannel = 0x08, SubPTT = 0x09,
     Scan = 0x0a, FM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
     Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, MainChannelSwitch = 0x13, HotKey1 = 0x14,

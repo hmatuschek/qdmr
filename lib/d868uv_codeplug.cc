@@ -632,7 +632,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     if (defaultChannel()) {
       setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
       if (ext->bootSettings()->channelA()->isNull() ||
-          (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
+          (! ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
              ext->bootSettings()->channelA()->as<Channel>())))
         setDefaultChannelAToVFO();
       else
@@ -641,7 +641,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
       setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
       if (ext->bootSettings()->channelB()->isNull() ||
-          (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
+          (! ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
              ext->bootSettings()->channelB()->as<Channel>())))
         setDefaultChannelBToVFO();
       else
@@ -672,7 +672,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
     // Encode other settings
-    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
+    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
     enableKeepLastCaller(ext->keepLastCallerEnabled());
   }
 
@@ -720,7 +720,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Decode other settings
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
                                            AnytoneSettingsExtension::Units::Metric);
   ext->enableKeepLastCaller(this->keepLastCaller());
 

@@ -212,7 +212,270 @@
     <term><token>bootPasswordEnabled</token>, <token>bootPassword</token></term>
     <listitem>
       <para>
-        Enables/disables and specifies the boot password.
+        Enables/disables and specifies the boot password. The boot password is a string of up to 8 
+        number chars.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultChannel</token>, <token>zoneA</token>, <token>channelA</token>, 
+      <token>zoneB</token>, <token>channelB</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, <token>defaultChannel</token> enables the specified zones and 
+        channels to be set on startup. <token>zoneA</token> and <token>zoneB</token> specify the 
+        startup zone for VFOs A and B, respectively, and must reference a defined zone. While
+        <token>channelA</token> and <token>channelB</token> specify the startup channels for each
+        VFO. If no channels are defined, the VFO is chosen.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>priorityZoneA</token>, <token>priorityZoneB</token></term>
+    <listitem>
+      <para>
+        Specifies the priority zones for each VFO. These must reference a defined zone. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultRoamingZone</token></term>
+    <listitem>
+      <para>
+        Specifies the startup roaming zone. Must refer to a defined roaming zone.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>gpsCheck</token></term>
+    <listitem>
+      <para>
+        Enables the GPS check on boot.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info><title>Keypad settings</title></info>
+<para>
+  Collects some settings, that configure the keypad, lock etc.
+</para>
+
+<para>
+  This extension also allows to assign specific functions to the programmable function keys on the 
+  radio. These are the side-keys, top-key and the front buttons labeled <keycap>P1</keycap> and 
+  <keycap>P2</keycap>. The following list shows all functions, that can be assigned to each of these 
+  buttons. Some function are not available on all devices.
+</para>
+
+<variablelist>
+  <title>Key functions</title>
+  <varlistentry>
+    <term><token>Off</token></term>
+    <listitem><para>No function at all.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Voltage</token></term>
+    <listitem><para>Shows the battery voltage.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Power</token></term>
+    <listitem><para>Toggles though the power settings.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Repeater</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>DigitalEncryption</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Call</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>VOX</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>VFOChannel</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SubPTT</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>FM</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Alarm</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>RecordSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Record</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SMS</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Dial</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPSInformation</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Monitor</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MainChannelSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>HotKey1</token>, <token>HotKey2</token>, <token>HotKey3</token>, 
+      <token>HotKey4</token>, <token>HotKey5</token>, <token>HotKey6</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>WorkAlone</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>NuisanceDelete</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>DigitalMonitor</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SubChannelSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>PriorityZone</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SubChannelSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>VFOScan</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MICSoundQuality</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>LastCallReply</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelTypeSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Ranging</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Roaming</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelRanging</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MaxVolume</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SlotSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSTypeSwitch</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>TimedRoamingSet</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSSet</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MuteTimeing</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>CtcssDcsSet</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>TBSTSend</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Bluetooth</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPS</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelName</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>CDTScan</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSSend</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSInfo</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPSRoaming</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+  The following list contains all keypad setting fields.
+</para>
+
+<variablelist>
+  <title>Keypad settings extension fields</title>
+  <varlistentry>
+    <term><token>progFuncKey1Short</token>, <token>progFuncKey1Long</token></term>
+    <listitem>
+      <para>
+        Specifies the functions associated with the programmable function key <keycap>P1</keycap> 
+        for a short and long press. Must be one of the items in the key function list above.
       </para>
     </listitem>
   </varlistentry>
