@@ -1805,7 +1805,7 @@ D868UVCodeplug::encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx
   for (int i=0; i<NUM_OFFSET_FREQ; i++) {
     uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ + i*sizeof(uint32_t));
     if (i < (int)ctx.count<AnytoneAutoRepeaterOffset>()) {
-      (*offsetFreqPtr) = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset().inHz());
+      (*offsetFreqPtr) = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset().inHz()/10);
     } else {
       *offsetFreqPtr = 0;
     }
@@ -1832,7 +1832,7 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
     if (0 == *offsetFreqPtr)
       continue;
     AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
-    offset->setOffset(Frequency::fromHz(qFromLittleEndian(*offsetFreqPtr)));
+    offset->setOffset(Frequency::fromHz(qFromLittleEndian(*offsetFreqPtr)*10ULL));
     ext->autoRepeaterSettings()->offsets()->add(offset);
     ctx.add(offset, i);
   }
