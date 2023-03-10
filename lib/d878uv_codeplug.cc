@@ -1305,7 +1305,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setRepeaterCheckNumNotifications(ext->rangingSettings()->notificationCount());
 
     // Encode other settings
-    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Imperial == ext->units());
+    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
     enableKeepLastCaller(ext->keepLastCallerEnabled());
     setVFOFrequencyStep(ext->vfoStep());
     setSTEType(ext->steType());
@@ -1397,7 +1397,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->rangingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
 
   // Decode other settings
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Imperial :
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
                                            AnytoneSettingsExtension::Units::Metric);
   ext->enableKeepLastCaller(this->keepLastCaller());
   ext->setVFOStep(this->vfoFrequencyStep());

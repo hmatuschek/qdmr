@@ -4,6 +4,7 @@
 #include "anytone_extension.hh"
 #include "melody.hh"
 #include <QTimeZone>
+#include <QRegularExpression>
 
 using namespace Signaling;
 
@@ -2404,11 +2405,13 @@ AnytoneCodeplug::BootSettingsElement::setIntroLine2(const QString &txt) {
 
 QString
 AnytoneCodeplug::BootSettingsElement::password() const {
-  return readASCII(0x0020, 16, 0x00);
+  return readASCII(0x0020, 8, 0x00);
 }
 void
 AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
-  writeASCII(0x0020, txt, 16, 0x00);
+  QRegularExpression pattern("[0-9]{0,8}");
+  if (pattern.match(txt).isValid())
+    writeASCII(0x0020, txt, 8, 0x00);
 }
 
 bool
