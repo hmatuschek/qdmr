@@ -502,36 +502,36 @@ D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
 }
 
 Frequency D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return Frequency::fromHz(getBCD8_be(0x00b8)*10);
+  return Frequency::fromHz(getUInt32_le(0x00b8)*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
-  setBCD8_be(0x00b8, freq.inHz()/10);
+  setUInt32_le(0x00b8, freq.inHz()/10);
 }
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return Frequency::fromHz(getBCD8_be(0x00bc)*10);
+  return Frequency::fromHz(getUInt32_le(0x00bc)*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
-  setBCD8_be(0x00bc, freq.inHz()/10);
+  setUInt32_le(0x00bc, freq.inHz()/10);
 }
 
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return Frequency::fromHz(getBCD8_be(0x00c0)*10);
+  return Frequency::fromHz(getUInt32_le(0x00c0)*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
-  setBCD8_be(0x00c0, freq.inHz()/10);
+  setUInt32_le(0x00c0, freq.inHz()/10);
 }
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return Frequency::fromHz(getBCD8_be(0x00c4)*10);
+  return Frequency::fromHz(getUInt32_le(0x00c4)*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
-  setBCD8_be(0x00c4, freq.inHz()/10);
+  setUInt32_le(0x00c4, freq.inHz()/10);
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction

@@ -1912,38 +1912,38 @@ AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
 
 Frequency
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
-  return Frequency::fromHz(((unsigned)getBCD8_be(0x0058))*10);
+  return Frequency::fromHz(((unsigned)getUInt32_le(0x0058))*10);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(Frequency freq) {
-  setBCD8_be(0x0058, freq.inHz()/10);
+  setUInt32_le(0x0058, freq.inHz()/10);
 }
 
 Frequency
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
-  return Frequency::fromHz(((unsigned)getBCD8_be(0x005c))*10);
+  return Frequency::fromHz(((unsigned)getUInt32_le(0x005c))*10);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(Frequency freq) {
-  setBCD8_be(0x005c, freq.inHz()/10);
+  setUInt32_le(0x005c, freq.inHz()/10);
 }
 
 Frequency
 AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
-  return Frequency::fromHz(((unsigned)getBCD8_be(0x0060))*10);
+  return Frequency::fromHz(((unsigned)getUInt32_le(0x0060))*10);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(Frequency freq) {
-  setBCD8_be(0x0060, freq.inHz()/10);
+  setUInt32_le(0x0060, freq.inHz()/10);
 }
 
 Frequency
 AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
-  return Frequency::fromHz(((unsigned)getBCD8_be(0x0064))*10);
+  return Frequency::fromHz(((unsigned)getUInt32_le(0x0064))*10);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(Frequency freq) {
-  setBCD8_be(0x0064, freq.inHz()/10);
+  setUInt32_le(0x0064, freq.inHz()/10);
 }
 
 bool
