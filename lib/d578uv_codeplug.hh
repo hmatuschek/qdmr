@@ -236,6 +236,43 @@ public:
     Channel *toChannelObj(Context &ctx) const;
   };
 
+  /** Represents the general config of the radio within the D578UV binary codeplug.
+   *
+   * This class implements only the differences to the D878UV general settings
+   * @c D878UVCodeplug::GeneralSettingsElement.
+   *
+   * Binary encoding of the general settings (size 0x0100 bytes):
+   * @verbinclude d578uv_generalsettings.txt */
+  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  {
+  protected:
+    /** Device specific key functions. */
+    enum class KeyFunction {
+      Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+      Encryption = 0x05, Call = 0x06, ToggleVFO = 0x07, Scan = 0x08, WFM = 0x09, Alarm = 0x0a,
+      RecordSwitch = 0x0b, Record = 0x0c, SMS = 0x0d, Dial = 0x0e, Monitor = 0x10,
+      ToggleMainChannel = 0x11, HotKey1 = 0x12, HotKey2 = 0x13, HotKey3 = 0x14, HotKey4 = 0x15,
+      HotKey5 = 0x16, HotKey6 = 0x17, WorkAlone = 0x18, SkipChannel = 0x19, DMRMonitor = 0x1a,
+      SubChannel = 0x1b, PriorityZone = 0x1c, VFOScan = 0x1d, MICSoundQuality = 0x1e,
+      LastCallReply = 0x1f, ChannelType = 0x20, Roaming = 0x22, MaxVolume = 0x24, Slot = 0x25,
+      Zone = 0x26, MuteA = 0x27, MuteB = 0x28, RoamingSet = 0x2a, APRSSet = 0x2b, ZoneUp = 0x2c,
+      ZoneDown = 0x2d, XBandRepeater = 0x30, Speaker = 0x31, ChannelName = 0x32, Bluetooth = 0x33,
+      GPS = 0x34, CDTScan = 0x35, TBSTSend = 0x36, APRSSend = 0x37, APRSInfo = 0x38,
+      GPSRoaming = 0x39
+    };
+
+    AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
+    uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
+
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
+};
+
 protected:
   /** Hidden constructor. */
   explicit D578UVCodeplug(const QString &label, QObject *parent = nullptr);
@@ -255,6 +292,22 @@ protected:
 
   void allocateContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  void allocateGeneralSettings();
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Internal used offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int settings()          { return 0x02500000; }
+    static constexpr unsigned int gpsMessages()       { return 0x02501280; }
+    static constexpr unsigned int settingsExtension() { return 0x02501400; }
+    /// @endcond
+  };
+
+
 };
 
 #endif // D578UV_CODEPLUG_HH

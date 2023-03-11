@@ -437,18 +437,13 @@ class AnytoneKeySettingsExtension: public ConfigItem
 public:
   /** All possible key functions. */
   enum class KeyFunction {
-    Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03,  = 0x04,
-    DigitalEncryption = 0x05, Call = 0x06, VOX = 0x07, VFOChannel = 0x08, SubPTT = 0x09,
-    Scan = 0x0a, FM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-    Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, MainChannelSwitch = 0x13, HotKey1 = 0x14,
-    HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
-    WorkAlone = 0x1a, NuisanceDelete = 0x1b, DigitalMonitor = 0x1c, SubChannelSwitch = 0x1d,
-    PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-    ChannelTypeSwitch = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
-    MaxVolume = 0x26, SlotSwitch = 0x27, APRSTypeSwitch = 0x28, ZoneSelect = 0x29,
-    TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
-    TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32,
-    APRSSend = 0x33, APRSInfo = 0x34, GPSRoaming = 0x35
+    Off, Voltage, Power, Repeater, Reverse, Encryption, Call, VOX, ToggleVFO, SubPTT,
+    Scan, WFM, Alarm, RecordSwitch, Record, SMS, Dial, GPSInformation, Monitor, ToggleMainChannel,
+    HotKey1, HotKey2, HotKey3, HotKey4, HotKey5, HotKey6, WorkAlone, SkipChannel, DMRMonitor,
+    SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
+    Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
+    APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
+    APRSSend, APRSInfo, Speaker, XBandRepeater, GPSRoaming
   };
   Q_ENUM(KeyFunction)
 

@@ -279,59 +279,98 @@
   </varlistentry>
   <varlistentry>
     <term><token>Voltage</token></term>
-    <listitem><para>Shows the battery voltage.</para></listitem>
+    <listitem><para>Shows the battery voltage. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Power</token></term>
-    <listitem><para>Toggles though the power settings.</para></listitem>
+    <listitem><para>Toggles though the power settings. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Repeater</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggles the talk-around feature. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>DigitalEncryption</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>Reverse</token></term>
+    <listitem><para>Swaps the RX and TX frequencies. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Encryption</token></term>
+    <listitem><para>Shows the encryption key selection. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Call</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Performs an FM call with the configured DMTF/two-tone/five-tone ID. Applicable 
+      to <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>VOX</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Shows the VOX level selection. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>VFOChannel</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>ToggleVFO</token></term>
+    <listitem><para>Toggles between VFO and memory/channel mode. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>SubPTT</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>PTT for the sub channel. Only applicable for <keycap>PF1</keycap>, 
+      <keycap>PF2</keycap> and <keycap>PF3</keycap> keys. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>FM</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>Scan</token></term>
+    <listitem><para>Starts/stops a scan. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>WFM</token></term>
+    <listitem><para>Toggles the WFM (or Air band) receiver. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Alarm</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Starts/stops an alarm call. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>RecordSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Enables/disables recoding function. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Record</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Start/stops a recoding. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>SMS</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Start writing an SMS. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Dial</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Start manual dial. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>GPSInformation</token></term>
@@ -339,56 +378,73 @@
   </varlistentry>
   <varlistentry>
     <term><token>Monitor</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Enables the (FM) monitor. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>MainChannelSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>ToggleMainChannel</token></term>
+    <listitem><para>Toggles betwen VFOs A and B for the main channel. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>HotKey1</token>, <token>HotKey2</token>, <token>HotKey3</token>, 
       <token>HotKey4</token>, <token>HotKey5</token>, <token>HotKey6</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Tiggers one of the programmed hot-key function. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>WorkAlone</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggles the lone-worker mode. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>NuisanceDelete</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>SkipChannel</token></term>
+    <listitem><para>During a scan, use this function to skip the current channel. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>DigitalMonitor</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggles the digital monitor. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>SubChannelSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>SubChannel</token></term>
+    <listitem><para>Enables/disables the sub-channel. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>PriorityZone</token></term>
-    <listitem><para>???</para></listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>SubChannelSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Change to the priority zone. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>VFOScan</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggles the VFO scan. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>MICSoundQuality</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggle <quote>enhanced</quote> sound mode in DMR mode. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>LastCallReply</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Allows to answer the last call, after the hang-time has passed. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>ChannelTypeSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>ChannelType</token></term>
+    <listitem><para>Change the channel type. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Ranging</token></term>
@@ -396,7 +452,8 @@
   </varlistentry>
   <varlistentry>
     <term><token>Roaming</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Manually starts roaming. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>. </para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>ChannelRanging</token></term>
@@ -404,59 +461,78 @@
   </varlistentry>
   <varlistentry>
     <term><token>MaxVolume</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Shows the maximum volume setting. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>SlotSwitch</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>Slot</token></term>
+    <listitem><para>Changes the time-slot, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>APRSTypeSwitch</token></term>
     <listitem><para>???</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>TimedRoamingSet</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>Zone</token></term>
+    <listitem><para>Shows the zone selection dialog. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>RoamingSet</token></term>
+    <listitem><para>Shows the roaming settings(?). Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>APRSSet</token></term>
     <listitem><para>???</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>MuteTimeing</token></term>
-    <listitem><para>???</para></listitem>
+    <term><token>Mute</token></term>
+    <listitem><para>Mutes the radio for a specified interval. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>CtcssDcsSet</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Shows the CTCSS/DCS settings for FM channels. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>TBSTSend</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Sends the TBST tone. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>. </para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Bluetooth</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Enables/disables bluetooth function. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>GPS</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Enables/disables GPS. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>ChannelName</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Toggle channel name and frequency display. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>CDTScan</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Starts CTCSS/DCS scan for FM channel. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>APRSSend</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Transmits the positioning information. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>APRSInfo</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Shows received APRS information. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>GPSRoaming</token></term>
@@ -474,8 +550,9 @@
     <term><token>progFuncKey1Short</token>, <token>progFuncKey1Long</token></term>
     <listitem>
       <para>
-        Specifies the functions associated with the programmable function key <keycap>P1</keycap> 
-        for a short and long press. Must be one of the items in the key function list above.
+        Specifies the functions associated with the programmable function key <keycap>PF1</keycap> 
+        for a short and long press. Must be one of the items in the key function list above. The 
+        programmable function key 1 is the one directly under the PTT.
       </para>
     </listitem>
   </varlistentry>

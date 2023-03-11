@@ -687,6 +687,14 @@ public:
     virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
     /** Sets the key function for a short press on the function key 2. */
     virtual void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+
+  protected:
+    /** Maps the key function to the device specific function code. */
+    virtual uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const = 0;
+    /** Maps the device specific function code to the key function. */
+    virtual AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const = 0;
+
+  public:
     /** Returns @c true if the VFO A is in VFO mode. */
     virtual bool vfoModeA() const;
     /** Enables/disables VFO mode for VFO A. */

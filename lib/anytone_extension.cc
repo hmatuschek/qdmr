@@ -1102,10 +1102,10 @@ AnytoneBootSettingsExtension::enableReset(bool enable) {
  * ********************************************************************************************* */
 AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
   : ConfigItem(parent),
-    _progFuncKey1Short(KeyFunction::Off), _progFuncKey1Long(KeyFunction::DigitalEncryption),
+    _progFuncKey1Short(KeyFunction::Off), _progFuncKey1Long(KeyFunction::Encryption),
     _progFuncKey2Short(KeyFunction::Voltage), _progFuncKey2Long(KeyFunction::Call),
     _progFuncKey3Short(KeyFunction::Power), _progFuncKey3Long(KeyFunction::VOX),
-    _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::VFOChannel),
+    _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::ToggleVFO),
     _funcKey2Short(KeyFunction::Reverse), _funcKey2Long(KeyFunction::Off),
     _longPressDuration(Interval::fromSeconds(1)), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
     _sideKeysLock(false), _forcedKeyLock(false)

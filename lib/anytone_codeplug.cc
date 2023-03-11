@@ -1545,47 +1545,47 @@ AnytoneCodeplug::GeneralSettingsElement::setMICGain(unsigned gain) {
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
-  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0010);
+  return this->mapCodeToKeyFunction(getUInt8(0x0010));
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(0x0010, (unsigned)func);
+  setUInt8(0x0010, this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
-  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0011);
+  return this->mapCodeToKeyFunction(getUInt8(0x0011));
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(0x0011, (unsigned)func);
+  setUInt8(0x0011, this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Short() const {
-  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0012);
+  return this->mapCodeToKeyFunction(getUInt8(0x0012));
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(0x0012, (unsigned)func);
+  setUInt8(0x0012, this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey1Short() const {
-  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0013);
+  return this->mapCodeToKeyFunction(getUInt8(0x0013));
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(0x0013, (unsigned)func);
+  setUInt8(0x0013, this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneCodeplug::GeneralSettingsElement::funcKey2Short() const {
-  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(0x0014);
+  return this->mapCodeToKeyFunction(getUInt8(0x0014));
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(0x0014, (unsigned)func);
+  setUInt8(0x0014, this->mapKeyFunctionToCode(func));
 }
 
 bool
