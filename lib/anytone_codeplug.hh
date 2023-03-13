@@ -16,6 +16,44 @@ class AnytoneCodeplug : public Codeplug
   Q_OBJECT
 
 public:
+  /** Represents the base class for bitmaps in all AnyTone codeplugs. */
+  class BitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+  /** Represents the base class for inverted bitmaps in all AnyTone codeplugs. */
+  class InvertedBitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
   /** Represents the base class for channel encodings in all AnyTone codeplugs.
    *
    * Memory layout of encoded channel (0x40 bytes):
@@ -81,6 +119,9 @@ public:
     ChannelElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
 
     /** Resets the channel. */
     void clear();
@@ -309,6 +350,21 @@ public:
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
+  /** Represents the channel bitmaps in all AnyTone codeplugs. */
+  class ChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ChannelBitmapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+  };
+
   /** Represents the base class for conacts in all AnyTone codeplugs.
    *
    * Memory layout of encoded contact (0x64 bytes):
@@ -325,6 +381,9 @@ public:
     explicit ContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ContactElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0064; }
 
     /** Resets the contact element. */
     void clear();
@@ -357,19 +416,26 @@ public:
     virtual bool fromContactObj(const DMRContact *contact, Context &ctx);
   };
 
+  /** Represents the contact bitmaps in all AnyTone codeplugs. */
+  class ContactBitmapElement: public InvertedBitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ContactBitmapElement(uint8_t *ptr);
+
+    static constexpr unsigned int size() { return 0x0500; }
+  };
+
   /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
    *
    * Encoding of the DTMF contact (0x30 bytes):
    * @verbinclude anytone_dtmfcontact.txt */
   class DTMFContactElement: public Element
   {
-    enum Offsets {
-      DIGITS = 0x0,
-      DIGIT_COUNT = 0x7,
-      NAME = DIGIT_COUNT + 1
-    };
-    static const unsigned NAME_LEN = 15;
-
   protected:
     /** Hidden constructor. */
     DTMFContactElement(uint8_t *ptr, unsigned size);
@@ -379,6 +445,9 @@ public:
     explicit DTMFContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~DTMFContactElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the contact element. */
     void clear();
@@ -397,6 +466,23 @@ public:
     virtual DTMFContact *toContact() const;
     /** Encodes an DTMF contact from the given one. */
     virtual bool fromContact(const DTMFContact *contact);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int digitCount() { return 14; }       ///< The max number of digits.
+      static constexpr unsigned int nameLength() { return 15; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Internal used offsets within the codeplug. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int digits()    { return 0x0000; }
+      static constexpr unsigned int numDigits() { return 0x0007; }
+      static constexpr unsigned int name()      { return 0x0008; }
+      /// @endcond
+    };
   };
 
   /** Represents the base class for group lists in all AnyTone codeplugs.
@@ -412,6 +498,9 @@ public:
   public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0120; }
 
     /** Clears the group list. */
     void clear();
@@ -477,6 +566,9 @@ public:
   public:
     /** Constructor. */
     ScanListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
 
     /** Resets the scan list. */
     void clear();
@@ -571,6 +663,9 @@ public:
     /** Constructor. */
     RadioIDElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Resets the radio ID. */
     void clear();
 
@@ -610,6 +705,9 @@ public:
   public:
     /** Constructor. */
     explicit GeneralSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00d0; }
 
     /** Resets the general settings. */
     void clear();
@@ -921,6 +1019,9 @@ public:
     /** Constructor. */
     ZoneChannelListElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0400; }
+
     /** Resets the zone channel list. */
     void clear();
 
@@ -956,6 +1057,9 @@ public:
   public:
     /** Constructor. */
     BootSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the boot settings. */
     void clear();
@@ -993,6 +1097,9 @@ public:
   public:
     /** Constructor. */
     explicit DMRAPRSSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the APRS settings. */
     void clear();
@@ -1089,6 +1196,9 @@ public:
     /** Constructor. */
     explicit MessageListElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
     /** Clears the message list item. */
     void clear();
 
@@ -1125,6 +1235,9 @@ public:
     /** Constructor. */
     MessageElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
     /** Resets the message. */
     void clear();
 
@@ -1156,6 +1269,9 @@ public:
   public:
     /** Constructor. */
     explicit AnalogQuickCallElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0002; }
 
     /** Resets the quick call entry. */
     void clear();
@@ -1224,6 +1340,9 @@ public:
   public:
     /** Constructor. */
     explicit HotKeyElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the hot-key entry. */
     void clear();
@@ -1312,6 +1431,9 @@ public:
       /** Constructor. */
       AnalogAlarm(uint8_t *ptr);
 
+      /** Returns the size of the element. */
+      static constexpr unsigned int size() { return 0x000a; }
+
       /** Resets the alarm. */
       void clear();
 
@@ -1385,6 +1507,9 @@ public:
       /** Constructor. */
       explicit DigitalAlarm(uint8_t *ptr);
 
+      /** Returns the size of the element. */
+      static constexpr unsigned int size() { return 0x000c; }
+
       /** Resets the digital alarm settings. */
       void clear();
 
@@ -1451,6 +1576,9 @@ public:
     /** Constructor. */
     AlarmSettingElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Clears the alarm settings. */
     void clear();
 
@@ -1473,6 +1601,9 @@ public:
   public:
     /** Constructor. */
     DigitalAlarmExtensionElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Clears the settings. */
     void clear();
@@ -1508,6 +1639,9 @@ public:
   public:
     /** Constructor. */
     FiveToneIDElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Clears the ID. */
     void clear();
@@ -1559,6 +1693,9 @@ public:
     /** Constructor. */
     explicit FiveToneFunctionElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Clears the function settings. */
     void clear();
 
@@ -1603,6 +1740,9 @@ public:
   public:
     /** Constructor. */
     FiveToneSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
 
     /** Resets the 5tone settings. */
     void clear();
@@ -1717,6 +1857,9 @@ public:
     /** Constructor. */
     TwoToneIDElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
     /** Resets the ID. */
     void clear();
 
@@ -1756,6 +1899,9 @@ public:
     /** Constructor. */
     TwoToneFunctionElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Resets the function. */
     void clear();
 
@@ -1793,6 +1939,9 @@ public:
   public:
     /** Constructor. */
     TwoToneSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
 
     /** Resets the settings. */
     void clear();
@@ -1847,6 +1996,9 @@ public:
   public:
     /** Constructor. */
     explicit DTMFSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0050; }
 
     /** Resets the settings. */
     void clear();
@@ -1946,6 +2098,9 @@ public:
     /** Constructor. */
     ContactMapElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0008; }
+
     /** Clears the entry. */
     void clear();
     /** Returns @c true if the contact map is valid. */
@@ -1961,10 +2116,6 @@ public:
     virtual unsigned index() const;
     /** Sets the index. */
     virtual void setIndex(unsigned idx);
-
-  public:
-    /** Returns the size of this entry. */
-    static unsigned size();
   };
 
 protected:

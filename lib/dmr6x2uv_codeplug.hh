@@ -208,7 +208,9 @@ public:
       HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
       WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
       PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-      ChannelType = 0x22, Ranging = 0x23, ChannelRanging = 0x24, MaxVolume = 0x25, Slot = 0x26
+      ChannelType = 0x22, SimplexRepeater = 0x23, Ranging = 0x24, ChannelRanging = 0x25,
+      MaxVolume = 0x26, Slot = 0x27, Squelch = 0x28, Roaming = 0x29, Zone = 0x2a, RoamingSet = 0x2b,
+      Mute = 0x02c, CtcssDcsSet=0x2d, APRSSet = 0x2e, APRSSend = 0x2f
     };
 
     AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
@@ -233,6 +235,9 @@ public:
   public:
     /** Constructor. */
     explicit GeneralSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00e0; }
 
     /** Retunrs the color for call-signs. */
     virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
@@ -433,6 +438,9 @@ public:
     /** Constructor. */
     explicit ExtendedSettingsElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
     /** Resets the general settings. */
     void clear();
 
@@ -624,6 +632,15 @@ protected:
   virtual bool createRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Some internal used offsets within the codeplug. */
+  struct Offset {
+    ///@cond DO_NOT_DOCUMENT
+    static constexpr unsigned int settings()          { return 0x02500000; }
+    static constexpr unsigned int settingsExtension() { return 0x02501400; }
+    /// @endcond
+  };
 };
 
 #endif // DMR6X2UVCODEPLUG_HH

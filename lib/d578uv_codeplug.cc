@@ -10,30 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define NUM_CHANNELS              4000
-#define NUM_CHANNEL_BANKS         32
-#define CHANNEL_BANK_0            0x00800000
-#define CHANNEL_BANK_SIZE         0x00002000
-#define CHANNEL_BANK_31           0x00fc0000
-#define CHANNEL_BANK_31_SIZE      0x00000800
-#define CHANNEL_BANK_OFFSET       0x00040000
-#define CHANNEL_BITMAP            0x024c1500
-#define CHANNEL_BITMAP_SIZE       0x00000200
-#define CHANNEL_SIZE              0x00000040
-
-#define NUM_CONTACTS              10000      // Total number of contacts
-#define CONTACTS_PER_BLOCK        4
-#define CONTACT_BLOCK_0           0x02680000 // First bank of 4 contacts
-#define CONTACT_BLOCK_SIZE        0x00000190 // Size of 4 contacts
-#define CONTACT_BANK_SIZE         0x00040000 // Size of one contact bank
-#define CONTACTS_PER_BANK         1000       // Number of contacts per bank
-#define CONTACT_INDEX_LIST        0x02600000 // Address of contact index list
-#define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
-#define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
-#define CONTACT_SIZE              0x00000064 // Size of contact element
-#define CONTACT_ID_MAP            0x04800000 // Address of ID->Contact index map
-#define CONTACT_ID_ENTRY_SIZE     0x00000008 // Size of each map entry
-
 #define ADDR_HOTKEY               0x025C0000 // Same address as D868UV::hotkey_settings_t
 #define HOTKEY_SIZE               0x00000970 // Different size.
 
@@ -306,8 +282,9 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
-    uint16_t bank = i/128, idx = i%128;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
@@ -317,14 +294,16 @@ bool
 D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+
   // Create channels
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
@@ -336,16 +315,20 @@ bool
 D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+
   // Link channel objects
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
+
   return true;
 }
 
@@ -353,25 +336,24 @@ D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 void
 D578UVCodeplug::allocateContacts() {
   /* Allocate contacts */
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
   unsigned contactCount=0;
-  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
-    // enabled if false (ass hole)
-    if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))
+  for (uint16_t i=0; i<Limit::numContacts(); i++) {
+    if (! contact_bitmap.isEncoded(i))
       continue;
     contactCount++;
-    uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
-    uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
+    uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
+    uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*Offset::betweenContactBlocks();
     if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, CONTACT_BANK_SIZE);
-      memset(data(addr), 0x00, CONTACT_BANK_SIZE);
+      image(0).addElement(addr, Offset::betweenContactBlocks());
+      memset(data(addr), 0x00, Offset::betweenContactBlocks());
     }
   }
   if (contactCount) {
-    image(0).addElement(CONTACT_INDEX_LIST, align_size(4*contactCount, 16));
-    memset(data(CONTACT_INDEX_LIST), 0xff, align_size(4*contactCount, 16));
-    image(0).addElement(CONTACT_ID_MAP, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
-    memset(data(CONTACT_ID_MAP), 0xff, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
+    image(0).addElement(Offset::contactIndex(), align_size(4*contactCount, 16));
+    memset(data(Offset::contactIndex()), 0xff, align_size(4*contactCount, 16));
+    image(0).addElement(Offset::contactIdTable(), align_size(ContactMapElement::size()*(1+contactCount), 16));
+    memset(data(Offset::contactIdTable()), 0xff, align_size(ContactMapElement::size()*(1+contactCount), 16));
   }
 }
 
@@ -383,13 +365,13 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
   for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
-    uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
-    uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
+    uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
+    uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));
     DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
-    ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
+    ((uint32_t *)data(Offset::contactIndex()))[i] = qToLittleEndian(i);
     contacts.append(contact);
   }
   // encode index map for contacts
@@ -398,7 +380,7 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
     return a->number() < b->number();
   });
   for (int i=0; i<contacts.size(); i++) {
-    ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
+    ContactMapElement el(data(Offset::contactIdTable() + i*ContactMapElement::size()));
     el.setID(contacts[i]->number(), (DMRContact::GroupCall==contacts[i]->type()));
     el.setIndex(ctx.index(contacts[i]));
   }

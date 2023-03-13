@@ -443,7 +443,7 @@ public:
     SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
     Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
     APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
-    APRSSend, APRSInfo, Speaker, XBandRepeater, GPSRoaming
+    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch
   };
   Q_ENUM(KeyFunction)
 

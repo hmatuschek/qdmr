@@ -299,15 +299,14 @@ protected:
 
 protected:
   /** Internal used offsets within the codeplug. */
-  struct Offset {
+  struct Offset: D878UVCodeplug::Offset {
     /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int contactIdTable()    { return 0x04800000; }
     static constexpr unsigned int settings()          { return 0x02500000; }
     static constexpr unsigned int gpsMessages()       { return 0x02501280; }
     static constexpr unsigned int settingsExtension() { return 0x02501400; }
     /// @endcond
   };
-
-
 };
 
 #endif // D578UV_CODEPLUG_HH

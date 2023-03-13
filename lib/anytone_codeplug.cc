@@ -61,6 +61,84 @@ QVector<char> _anytone_bin_dtmf_tab = {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::BitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::BitmapElement::BitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::BitmapElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+AnytoneCodeplug::BitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return (_data[byte] & (1 << bit));
+}
+
+void
+AnytoneCodeplug::BitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] |= (1 << bit);
+  else
+    _data[byte] &= ~(1 << bit);
+}
+
+void
+AnytoneCodeplug::BitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0xff, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] |= (1<<i);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::InvertedBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::InvertedBitmapElement::InvertedBitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::InvertedBitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return 0 == (_data[byte] & (1 << bit));
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] &= ~(1 << bit);
+  else
+    _data[byte] |= (1 << bit);
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0x00, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] &= ~(1<<i);
+  }
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
@@ -70,7 +148,7 @@ AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Element(ptr, 0x0040)
+  : Element(ptr, ChannelElement::size())
 {
   // pass...
 }
@@ -811,6 +889,22 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ChannelBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ChannelBitmapElement::ChannelBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ChannelBitmapElement::ChannelBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ChannelBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ContactElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
@@ -820,7 +914,7 @@ AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, 0x0064)
+  : Element(ptr, ContactElement::size())
 {
   // pass...
 }
@@ -937,6 +1031,22 @@ AnytoneCodeplug::ContactElement::fromContactObj(const DMRContact *contact, Conte
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ContactBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ContactBitmapElement::ContactBitmapElement(uint8_t *ptr, size_t size)
+  : InvertedBitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ContactBitmapElement::ContactBitmapElement(uint8_t *ptr)
+  : InvertedBitmapElement(ptr, ContactBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::DTMFContactElement
  * ********************************************************************************************* */
 AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigned size)
@@ -946,7 +1056,7 @@ AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigned s
 }
 
 AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
-  : Element(ptr, 0x30)
+  : Element(ptr, DTMFContactElement::size())
 {
   // pass...
 }
@@ -963,9 +1073,9 @@ AnytoneCodeplug::DTMFContactElement::clear() {
 QString
 AnytoneCodeplug::DTMFContactElement::number() const {
   QString number;
-  int n = getUInt8(Offsets::DIGIT_COUNT);
+  int n = getUInt8(Offset::numDigits());
   for (int i=0; i<n; i++) {
-    uint8_t byte = _data[i/2];
+    uint8_t byte = _data[Offset::digits() + i/2];
     if (0 == (i%2))
       number.append(_anytone_bin_dtmf_tab[(byte>>4)&0xf]);
     else
@@ -977,23 +1087,24 @@ void
 AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return;
-  memset(_data+Offsets::DIGITS, 0, Offsets::DIGIT_COUNT);
-  setUInt8(Offsets::DIGIT_COUNT, number.length());
-  for (int i=0; i<number.length(); i++) {
+  memset(_data+Offset::digits(), 0, Limit::digitCount()/2);
+  unsigned int n = std::min((unsigned int)number.length(), Limit::digitCount());
+  setUInt8(Offset::digits(), n);
+  for (unsigned int i=0; i<n; i++) {
     if (0 == (i%2))
-      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
+      _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
     else
-      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<0);
+      _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<0);
   }
 }
 
 QString
 AnytoneCodeplug::DTMFContactElement::name() const {
-  return readASCII(Offsets::NAME, NAME_LEN, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
-  writeASCII(Offsets::NAME, name, NAME_LEN, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 DTMFContact *
@@ -1019,7 +1130,7 @@ AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, 0x120)
+  : Element(ptr, GroupListElement::size())
 {
   // pass...
 }
@@ -1122,7 +1233,7 @@ AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
-  : Element(ptr, 0x0090)
+  : Element(ptr, ScanListElement::size())
 {
   // pass...
 }
@@ -1352,7 +1463,7 @@ AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, RadioIDElement::size())
 {
   // pass...
 }
@@ -1401,7 +1512,7 @@ AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x00d0)
+  : Element(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
@@ -2319,7 +2430,7 @@ AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr)
-  : Element(ptr, 0x0400)
+  : Element(ptr, ZoneChannelListElement::size())
 {
   // pass...
 }
@@ -2376,7 +2487,7 @@ AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, BootSettingsElement::size())
 {
   // pass...
 }
@@ -2456,7 +2567,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, DMRAPRSSettingsElement::size())
 {
   // pass...
 }
@@ -2709,7 +2820,7 @@ AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr, unsigned s
 }
 
 AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, MessageListElement::size())
 {
   // pass...
 }
@@ -2766,7 +2877,7 @@ AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr)
-  : Element(ptr, 0x0100)
+  : Element(ptr, MessageElement::size())
 {
   // pass...
 }
@@ -2796,7 +2907,7 @@ AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr)
-  : Element(ptr, 0x0002)
+  : Element(ptr, AnalogQuickCallElement::size())
 {
   // pass...
 }
@@ -2844,7 +2955,7 @@ AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, HotKeyElement::size())
 {
   // pass...
 }
@@ -2937,7 +3048,7 @@ AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr, uns
 }
 
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr)
-  : Element(ptr, 0x000a)
+  : Element(ptr, AlarmSettingElement::AnalogAlarm::size())
 {
   // pass...
 }
@@ -3047,7 +3158,7 @@ AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr, u
 }
 
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr)
-  : Element(ptr, 0x000c)
+  : Element(ptr, AlarmSettingElement::DigitalAlarm::size())
 {
   // pass...
 }
@@ -3178,7 +3289,7 @@ AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, AlarmSettingElement::size())
 {
   // pass...
 }
@@ -3209,7 +3320,7 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint
 }
 
 AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, DigitalAlarmExtensionElement::size())
 {
   // pass...
 }
@@ -3257,7 +3368,7 @@ AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr, unsigned siz
 }
 
 AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, FiveToneIDElement::size())
 {
   // pass...
 }
@@ -3333,7 +3444,7 @@ AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr, 
 }
 
 AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, FiveToneFunctionElement::size())
 {
   // pass...
 }
@@ -3409,7 +3520,7 @@ AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr, 
 }
 
 AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0080)
+  : Element(ptr, FiveToneSettingsElement::size())
 {
   // pass...
 }
@@ -3675,7 +3786,7 @@ AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, TwoToneIDElement::size())
 {
   // pass...
 }
@@ -3723,7 +3834,7 @@ AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, TwoToneFunctionElement::size())
 {
   // pass...
 }
@@ -3780,7 +3891,7 @@ AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, TwoToneSettingsElement::size())
 {
   // pass...
 }
@@ -3855,7 +3966,7 @@ AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0050)
+  : Element(ptr, DTMFSettingsElement::size())
 {
   // pass...
 }
@@ -4057,7 +4168,7 @@ AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr, unsigned siz
 }
 
 AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr)
-  : Element(ptr, 0x0008)
+  : Element(ptr, ContactMapElement::size())
 {
   // pass...
 }
@@ -4097,11 +4208,6 @@ AnytoneCodeplug::ContactMapElement::index() const {
 void
 AnytoneCodeplug::ContactMapElement::setIndex(unsigned idx) {
   setUInt32_le(0x0004, idx);
-}
-
-unsigned
-AnytoneCodeplug::ContactMapElement::size() {
-  return 0x0008;
 }
 
 

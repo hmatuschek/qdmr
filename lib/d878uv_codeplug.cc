@@ -10,17 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define NUM_CHANNELS              4000
-#define NUM_CHANNEL_BANKS         32
-#define CHANNEL_BANK_0            0x00800000
-#define CHANNEL_BANK_SIZE         0x00002000
-#define CHANNEL_BANK_31           0x00fc0000
-#define CHANNEL_BANK_31_SIZE      0x00000800
-#define CHANNEL_BANK_OFFSET       0x00040000
-#define CHANNEL_SIZE              0x00000040
-#define CHANNEL_BITMAP            0x024c1500
-#define CHANNEL_BITMAP_SIZE       0x00000200
-
 #define ADDR_HIDDEN_ZONE_MAP      0x024c1360
 #define HIDDEN_ZONE_MAP_SIZE      0x00000020
 
@@ -81,7 +70,7 @@ D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
 }
 
 D878UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : D868UVCodeplug::ChannelElement(ptr, 0x0040)
+  : D868UVCodeplug::ChannelElement(ptr, ChannelElement::size())
 {
   // pass...
 }
@@ -2606,23 +2595,21 @@ D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 void
 D878UVCodeplug::allocateChannels() {
   /* Allocate channels */
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
-    // Get byte and bit for channel, as well as bank of channel
-    uint16_t bit = i%8, byte = i/8, bank = i/128, idx=i%128;
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // if disabled -> skip
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    if (! channel_bitmap.isEncoded(i))
       continue;
     // compute address for channel
-    uint32_t addr = CHANNEL_BANK_0
-        + bank*CHANNEL_BANK_OFFSET
-        + idx*CHANNEL_SIZE;
+    uint16_t bank = i/Limit::channelsPerBank(), idx=i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx * ChannelElement::size();
     if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, CHANNEL_SIZE);
+      image(0).addElement(addr, ChannelElement::size());
     }
     if (!isAllocated(addr+0x2000, 0)) {
-      image(0).addElement(addr+0x2000, CHANNEL_SIZE);
-      memset(data(addr+0x2000), 0x00, CHANNEL_SIZE);
+      image(0).addElement(addr+0x2000, ChannelElement::size());
+      memset(data(addr+0x2000), 0x00, ChannelElement::size());
     }
   }
 }
@@ -2633,8 +2620,9 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
-    uint16_t bank = i/128, idx = i%128;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
@@ -2645,13 +2633,14 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create channels
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
@@ -2662,14 +2651,16 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 bool
 D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Link channel objects
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }

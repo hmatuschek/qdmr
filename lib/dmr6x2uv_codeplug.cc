@@ -13,11 +13,6 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
-#define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x000000e0
-#define ADDR_EXTENDED_SETTINGS    0x02501400
-#define EXTENDED_SETTINGS_SIZE    0x00000030
-
 #define ADDR_APRS_SETTINGS        0x02501000
 #define APRS_SETTINGS_SIZE        0x00000040
 #define NUM_DMRAPRS_SYSTEMS                8
@@ -53,7 +48,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, u
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, GENERAL_CONFIG_SIZE)
+  : AnytoneCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
@@ -479,12 +474,21 @@ DMR6X2UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySetting
   case AnytoneKeySettingsExtension::KeyFunction::PriorityZone:      return (uint8_t)KeyFunction::PriorityZone;
   case AnytoneKeySettingsExtension::KeyFunction::VFOScan:           return (uint8_t)KeyFunction::VFOScan;
   case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
-  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;
+  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;    
   case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater:   return (uint8_t)KeyFunction::SimplexRepeater;
   case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
   case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
   case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
+  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
+  case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
+  case AnytoneKeySettingsExtension::KeyFunction::Zone:              return (uint8_t)KeyFunction::Zone;
+  case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
+  case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
+  case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
   default:                                                          return (uint8_t)KeyFunction::Off;
   }
 }
@@ -527,10 +531,19 @@ DMR6X2UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) con
   case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
   case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
   case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::SimplexRepeater:   return AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater;
   case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
   case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
   case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
   case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
+  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
+  case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
+  case KeyFunction::Zone:              return AnytoneKeySettingsExtension::KeyFunction::Zone;
+  case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
+  case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
+  case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
+  case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
+  case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
   default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
   }
 }
@@ -546,7 +559,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr,
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, EXTENDED_SETTINGS_SIZE)
+  : Codeplug::Element(ptr, ExtendedSettingsElement::size())
 {
   // pass...
 }
@@ -940,18 +953,18 @@ DMR6X2UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 
 void
 DMR6X2UVCodeplug::allocateGeneralSettings() {
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
-  image(0).addElement(ADDR_EXTENDED_SETTINGS, EXTENDED_SETTINGS_SIZE);
+  image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
+  image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
 }
 
 bool
 DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx)) {
     errMsg(err) << "Cannot encode general settings element.";
     return false;
   }
 
-  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).fromConfig(flags, ctx)) {
+  if (! ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx)) {
     errMsg(err) << "Cannot encode extended settings element.";
     return false;
   }
@@ -961,12 +974,12 @@ DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const 
 
 bool
 DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx)) {
     errMsg(err) << "Cannot decode general settings element.";
     return false;
   }
 
-  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).updateConfig(ctx)) {
+  if (! ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx)) {
     errMsg(err) << "Cannot decode extended settings element.";
     return false;
   }

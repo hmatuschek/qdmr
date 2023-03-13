@@ -208,6 +208,14 @@ public:
 protected:
   void allocateContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Internal used offsets within the codeplug. */
+  struct Offset: public D878UVCodeplug::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int contactIdTable()       { return 0x04800000; }
+    /// @endcond
+  };
 };
 
 #endif // D878UVCODEPLUG_HH

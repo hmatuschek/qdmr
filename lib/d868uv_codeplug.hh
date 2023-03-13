@@ -287,6 +287,9 @@ public:
     /** Constructor. */
     GeneralSettingsElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00d0; }
+
     /** Resets the general settings. */
     void clear();
 
@@ -544,10 +547,38 @@ protected:
   /** Allocates DTMF settings. */
   virtual void allocateDTMFSettings();
 
+protected:
   /** Internal used function to encode CTCSS frequencies. */
   static uint8_t ctcss_code2num(Signaling::Code code);
   /** Internal used function to decode CTCSS frequencies. */
   static Signaling::Code ctcss_num2code(uint8_t num);
+
+public:
+  /** Some limits for the codeplug. */
+  struct Limit {
+    static constexpr unsigned int channelsPerBank() { return 128; }      ///< Max number of channels per bank.
+    static constexpr unsigned int numChannels()     { return 4000; }     ///< Max number of channels.
+    static constexpr unsigned int contactsPerBank() { return 1000; }     ///< Max number of contacts per bank.
+    static constexpr unsigned int contactsPerBlock(){ return 4; }        ///< Max number of contacts per block.
+    static constexpr unsigned int numContacts()     { return 10000; }    ///< Max number of contacts.
+  };
+
+protected:
+  /** Some internal used offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int channelBitmap()        { return 0x024c1500; }
+    static constexpr unsigned int channelBanks()         { return 0x00800000; }
+    static constexpr unsigned int betweenChannelBanks()  { return 0x00040000; }
+
+    static constexpr unsigned int contactBitmap()        { return 0x02640000; }
+    static constexpr unsigned int contactBanks()         { return 0x02680000; }
+    static constexpr unsigned int betweenContactBanks()  { return 0x00040000; }
+    static constexpr unsigned int betweenContactBlocks() { return 0x00000190; }
+    static constexpr unsigned int contactIndex()         { return 0x02600000; }
+    static constexpr unsigned int contactIdTable()       { return 0x04340000; }
+    /// @endcond
+  };
 };
 
 #endif // D868UVCODEPLUG_HH
