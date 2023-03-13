@@ -130,4 +130,5 @@ Field description:
  - LSK: Lock side key
  - LKB: Keyboard lock
  - LKN: Knob lock
-
+ - GPS time-zone: 00h=UTC-12:00, ..., 09h=UTC-3:30, 0Ah=UTC-3:00, ..., 0Dh=UTC, ..., 11h=UTC+3:30, 12h=UTC+4:00, 13h=UTC+4:30,
+                  14h=UTC+5:00, 15h=UTC+5:30, 16h=UTC+5:45, ..., 1Ah=UTC+8:30, ..., 1Fh=UTC+13:00

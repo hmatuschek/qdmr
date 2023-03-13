@@ -448,6 +448,17 @@ D878UVCodeplug::RoamingZoneElement::linkRoamingZone(RoamingZone *zone, Context &
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
+static QVector<QTimeZone> _indexToTZ = {
+  QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400),
+  QTimeZone(-28800), QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000),
+  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone(- 7200),
+  QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600), QTimeZone(  7200),
+  QTimeZone( 10800), QTimeZone( 12600), QTimeZone(-28800), QTimeZone( 14400),
+  QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700),
+  QTimeZone( 21600), QTimeZone( 25200), QTimeZone( 28600), QTimeZone( 30600),
+  QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600), QTimeZone( 43200),
+  QTimeZone( 46800) };
+
 D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
   : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
 {
@@ -463,6 +474,21 @@ D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
 void
 D878UVCodeplug::GeneralSettingsElement::clear() {
   AnytoneCodeplug::GeneralSettingsElement::clear();
+}
+
+QTimeZone
+D878UVCodeplug::GeneralSettingsElement::gpsTimeZone() const {
+  int index = getUInt8(Offset::gpsTimeZone());
+  if (index >= _indexToTZ.size())
+    return _indexToTZ.back();
+  return _indexToTZ.at(index);
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
+  if (! _indexToTZ.contains(zone))
+    setUInt8(Offset::gpsTimeZone(), 13); // <- Set to UTC
+  else
+    setUInt8(Offset::gpsTimeZone(), _indexToTZ.indexOf(zone));
 }
 
 unsigned

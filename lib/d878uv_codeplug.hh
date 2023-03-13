@@ -386,6 +386,9 @@ public:
     /** Resets the general settings. */
     void clear();
 
+    QTimeZone gpsTimeZone() const;
+    void setGPSTimeZone(const QTimeZone &zone);
+
     /** Returns the transmit timeout in seconds. */
     virtual unsigned transmitTimeout() const;
     /** Sets the transmit timeout in seconds. */

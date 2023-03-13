@@ -1002,6 +1002,14 @@ public:
     virtual bool updateConfig(Context &ctx);
     /** Links the general settings. */
     virtual bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int gpsTimeZone() { return 0x0030; }
+      /// @endcond
+    };
   };
 
   /** Represents the base class for zone channel list for all AnyTone codeplugs.

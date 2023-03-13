@@ -1817,12 +1817,12 @@ AnytoneCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
 
 QTimeZone
 AnytoneCodeplug::GeneralSettingsElement::gpsTimeZone() const {
-  return QTimeZone((((int)getUInt8(0x0030))-12)*3600);
+  return QTimeZone((((int)getUInt8(Offset::gpsTimeZone()))-12)*3600);
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
   int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
-  setUInt8(0x0030, (12 + offset/3600));
+  setUInt8(Offset::gpsTimeZone(), (12 + offset/3600));
 }
 
 bool
