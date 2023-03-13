@@ -720,8 +720,7 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
                   << " not defined.";
       return false;
     }
-    Zone *zone = ctx.get<Zone>(this->defaultZoneIndexA());
-    ext->bootSettings()->zoneA()->set(zone);
+    ext->bootSettings()->zoneA()->set(ctx.get<Zone>(this->defaultZoneIndexA()));
     if (this->defaultChannelAIsVFO()) {
       // pass...
     } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
@@ -737,8 +736,7 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
                   << " not defined.";
       return false;
     }
-    zone = ctx.get<Zone>(this->defaultZoneIndexB());
-    ext->bootSettings()->zoneB()->set(zone);
+    ext->bootSettings()->zoneB()->set(ctx.get<Zone>(this->defaultZoneIndexB()));
     if (this->defaultChannelBIsVFO()) {
       // pass...
     } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {

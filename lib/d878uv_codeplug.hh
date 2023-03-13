@@ -143,6 +143,7 @@ class GPSSystem;
  *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings,
  *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settigs.</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
  *
@@ -154,10 +155,8 @@ class GPSSystem;
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
  *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1,
- *    see @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</td></tr>
+ *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension,
+ *    see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
  *    Default 0x00000000, 0x00 padded.</td></tr>
@@ -628,35 +627,35 @@ public:
     virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
     /** Returns @c true if a boot channel is set. */
-    virtual bool defaultChannel() const;
+    bool defaultChannel() const;
     /** Enables/disables the boot channel. */
-    virtual void enableDefaultChannel(bool enable);
+    void enableDefaultChannel(bool enable);
     /** Returns the default zone index (0-based) for VFO A. */
-    virtual unsigned defaultZoneIndexA() const;
+    unsigned defaultZoneIndexA() const;
     /** Sets the default zone (0-based) for VFO A. */
-    virtual void setDefaultZoneIndexA(unsigned idx);
+    void setDefaultZoneIndexA(unsigned idx);
     /** Returns the default zone index (0-based) for VFO B. */
-    virtual unsigned defaultZoneIndexB() const;
+    unsigned defaultZoneIndexB() const;
     /** Sets the default zone (0-based) for VFO B. */
-    virtual void setDefaultZoneIndexB(unsigned idx);
+    void setDefaultZoneIndexB(unsigned idx);
     /** Returns @c true if the default channel for VFO A is VFO. */
-    virtual bool defaultChannelAIsVFO() const;
+    bool defaultChannelAIsVFO() const;
     /** Returns the default channel index for VFO A.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelAIndex() const;
+    unsigned defaultChannelAIndex() const;
     /** Sets the default channel index for VFO A. */
-    virtual void setDefaultChannelAIndex(unsigned idx);
+    void setDefaultChannelAIndex(unsigned idx);
     /** Sets the default channel for VFO A to be VFO. */
-    virtual void setDefaultChannelAToVFO();
+    void setDefaultChannelAToVFO();
     /** Returns @c true if the default channel for VFO B is VFO. */
-    virtual bool defaultChannelBIsVFO() const;
+    bool defaultChannelBIsVFO() const;
     /** Returns the default channel index for VFO B.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelBIndex() const;
+    unsigned defaultChannelBIndex() const;
     /** Sets the default channel index for VFO B. */
-    virtual void setDefaultChannelBIndex(unsigned idx);
+    void setDefaultChannelBIndex(unsigned idx);
     /** Sets the default channel for VFO B to be VFO. */
-    virtual void setDefaultChannelBToVFO();
+    void setDefaultChannelBToVFO();
 
     /** Returns the default roaming zone index. */
     virtual unsigned defaultRoamingZoneIndex() const;
@@ -774,7 +773,7 @@ public:
 
   /** General settings extension element for the D878UV.
    *
-   * Memory representation of the encoded settings element (size 0x100 bytes):
+   * Memory representation of the encoded settings element (size 0x200 bytes):
    * @verbinclude d878uv_generalsettingsextension.txt */
   class GeneralSettingsExtensionElement: public Element
   {
@@ -803,7 +802,7 @@ public:
     explicit GeneralSettingsExtensionElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
-    static constexpr unsigned int size() { return 0x00000100; }
+    static constexpr unsigned int size() { return 0x00000200; }
 
     /** Resets the settings. */
     void clear();
@@ -842,31 +841,55 @@ public:
     virtual void clearAutoRepeaterVHF2OffsetIndex();
 
     /** Returns the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual unsigned autoRepeaterVHF2MinFrequency() const;
+    virtual Frequency autoRepeaterVHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MinFrequency(unsigned hz);
+    virtual void setAutoRepeaterVHF2MinFrequency(Frequency hz);
     /** Returns the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual unsigned autoRepeaterVHF2MaxFrequency() const;
+    virtual Frequency autoRepeaterVHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MaxFrequency(unsigned hz);
+    virtual void setAutoRepeaterVHF2MaxFrequency(Frequency hz);
     /** Returns the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual unsigned autoRepeaterUHF2MinFrequency() const;
+    virtual Frequency autoRepeaterUHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MinFrequency(unsigned hz);
+    virtual void setAutoRepeaterUHF2MinFrequency(Frequency hz);
     /** Returns the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual unsigned autoRepeaterUHF2MaxFrequency() const;
+    virtual Frequency autoRepeaterUHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MaxFrequency(unsigned hz);
+    virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
     virtual GPSMode gpsMode() const;
     /** Sets the GPS mode. */
     virtual void setGPSMode(GPSMode mode);
 
+    /** Returns the FM Mic gain [1,10]. */
+    virtual unsigned int analogMicGain() const;
+    /** Sets the analog mic gain [1,10]. */
+    virtual void setAnalogMicGain(unsigned int gain);
+
     /** Encodes the settings from the config. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
     /** Update config from settings. */
     virtual bool updateConfig(Context &ctx);
+
+
+  protected:
+    /** Internal used offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
+      static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
+      static constexpr unsigned int talkerAliasEncoding()          { return 0x001f; }
+      static constexpr unsigned int autoRepeaterUHF2OffsetIndex()  { return 0x0022; }
+      static constexpr unsigned int autoRepeaterVHF2OffsetIndex()  { return 0x0023; }
+      static constexpr unsigned int autoRepeaterVHF2MinFrequency() { return 0x0024; }
+      static constexpr unsigned int autoRepeaterVHF2MaxFrequency() { return 0x0028; }
+      static constexpr unsigned int autoRepeaterUHF2MinFrequency() { return 0x002c; }
+      static constexpr unsigned int autoRepeaterUHF2MaxFrequency() { return 0x0030; }
+      static constexpr unsigned int gpsMode()                      { return 0x0035; }
+      static constexpr unsigned int analogMicGain()                { return 0x0043; }
+      /// @endcond
+    };
   };
 
   /** Represents the APRS settings within the binary D878UV codeplug.
@@ -1389,6 +1412,7 @@ protected:
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGPSSystems();
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());

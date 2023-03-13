@@ -878,6 +878,10 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   Q_PROPERTY(bool enhance READ enhanceAudioEnabled WRITE enableEnhanceAudio)
   /** The mute delay in minutes. */
   Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
+  /** Enables the separate FM mic gain. If disabled, the DMR mic gain setting is used for FM too. */
+  Q_PROPERTY(bool enableAnalogMicGain READ analogMicGainEnabled WRITE enableAnalogMicGain)
+  /** The FM mic gain [1,10]. */
+  Q_PROPERTY(unsigned int analogMicGain READ analogMicGain WRITE setAnalogMicGain)
 
 public:
   /** Source for the VOX. */
@@ -926,6 +930,15 @@ public:
   /** Sets the mute delay. */
   void setMuteDelay(Interval intv);
 
+  /** Returns @c true, if the FM mic gain is set independently. */
+  bool analogMicGainEnabled() const;
+  /** Enables/disables the FM mic gain. */
+  void enableAnalogMicGain(bool enable);
+  /** Returns the FM mic gain. */
+  unsigned int analogMicGain() const;
+  /** Sets the FM mic gain. */
+  void setAnalogMicGain(unsigned int gain);
+
 protected:
   Interval _voxDelay;               ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
@@ -934,6 +947,8 @@ protected:
   unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
   bool _enhanceAudio;               ///< Enhance audio.
   Interval _muteDelay;              ///< Mute delay in minutes.
+  bool _enableAnalogMicGain;        ///< Enables separate analog mic gain.
+  unsigned int _analogMicGain;      ///< The FM mic gain.
 };
 
 

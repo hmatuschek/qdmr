@@ -326,33 +326,33 @@ public:
     virtual void enableSendAddressbookWithOwnCode(bool enable);
 
     /** Returns @c true if a default boot channel is enabled. */
-    virtual bool defaultBootChannelEnabled() const;
+    bool defaultChannel() const;
     /** Enables/disables default boot channel. */
-    virtual void enableDefaultBootChannel(bool enable);
+    void enableDefaultChannel(bool enable);
     /** Returns the zone of the boot channel for VFO A. */
-    virtual unsigned int bootZoneAIndex() const;
+    unsigned int defaultZoneIndexA() const;
     /** Sets the index of the zone of the boot channel for VFO A. */
-    virtual void setBootZoneAIndex(unsigned int index);
+    void setDefaultZoneIndexA(unsigned int index);
     /** Returns @c true if the boot channel for VFO A is the VFO. */
-    virtual bool bootChannelAIsVFO() const;
+    bool defaultChannelAIsVFO() const;
     /** Returns the index of the boot channel for VFO A. */
-    virtual unsigned int bootChannelAIndex() const;
+    unsigned int defaultChannelAIndex() const;
     /** Sets the boot channel index for VFO A. */
-    virtual void setBootChannelAIndex(unsigned int index);
+    void setDefaultChannelAIndex(unsigned int index);
     /** Sets the boot channel for VFO A to VFO. */
-    virtual void setBootChannelAIsVFO();
+    void setDefaultChannelAToVFO();
     /** Returns the zone of the boot channel for VFO B. */
-    virtual unsigned int bootZoneBIndex() const;
+    unsigned int defaultZoneIndexB() const;
     /** Sets the index of the zone of the boot channel for VFO B. */
-    virtual void setBootZoneBIndex(unsigned int index);
+    void setDefaultZoneIndexB(unsigned int index);
     /** Returns @c true if the boot channel for VFO B is the VFO. */
-    virtual bool bootChannelBIsVFO() const;
+    bool defaultChannelBIsVFO() const;
     /** Returns the index of the boot channel for VFO B. */
-    virtual unsigned int bootChannelBIndex() const;
+    unsigned int defaultChannelBIndex() const;
     /** Sets the boot channel index for VFO B. */
-    virtual void setBootChannelBIndex(unsigned int index);
+    void setDefaultChannelBIndex(unsigned int index);
     /** Sets the boot channel for VFO B to VFO. */
-    virtual void setBootChannelBIsVFO();
+    void setDefaultChannelBToVFO();
 
     /** Returns @c true if the last caller is kept. */
     virtual bool lastCallerIsKept() const;
@@ -611,9 +611,10 @@ protected:
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
-  virtual void allocateGeneralSettings();
-  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  void allocateGeneralSettings();
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());

@@ -15,6 +15,7 @@ DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
 void
 DMR6X2UVTest::initTestCase() {
   ErrorStack err;
+
   if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());

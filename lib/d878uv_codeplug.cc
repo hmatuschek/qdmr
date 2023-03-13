@@ -1221,114 +1221,117 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
-  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
-    // Encode boot settings
-    enableDefaultChannel(
-          ext->bootSettings()->defaultChannelEnabled() &&
-          (! ext->bootSettings()->zoneA()->isNull()) &&
-          (! ext->bootSettings()->zoneB()->isNull()));
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
 
-    if (defaultChannel()) {
-      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-      if (ext->bootSettings()->channelA()->isNull() ||
-          (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelA()->as<Channel>())))
-        setDefaultChannelAToVFO();
-      else
-        setDefaultChannelAIndex(
-              ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
-                ext->bootSettings()->channelA()->as<Channel>()));
+  // Encode boot settings
+  enableDefaultChannel(
+        ext->bootSettings()->defaultChannelEnabled() &&
+        (! ext->bootSettings()->zoneA()->isNull()) &&
+        (! ext->bootSettings()->zoneB()->isNull()));
 
-      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-      if (ext->bootSettings()->channelB()->isNull() ||
-          (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelB()->as<Channel>())))
-        setDefaultChannelBToVFO();
-      else
-        setDefaultChannelBIndex(
-              ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
-                ext->bootSettings()->channelB()->as<Channel>()));
-    }
-    if (ext->bootSettings()->priorityZoneA()->isNull())
-      setPriorityZoneAIndex(0xff);
+  if (defaultChannel()) {
+    setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+    if (ext->bootSettings()->channelA()->isNull() ||
+        (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
+           ext->bootSettings()->channelA()->as<Channel>())))
+      setDefaultChannelAToVFO();
     else
-      setPriorityZoneAIndex(ctx.index(ext->bootSettings()->priorityZoneA()->as<Zone>()));
-    if (ext->bootSettings()->priorityZoneB()->isNull())
-      setPriorityZoneBIndex(0xff);
+      setDefaultChannelAIndex(
+            ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
+              ext->bootSettings()->channelA()->as<Channel>()));
+
+    setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+    if (ext->bootSettings()->channelB()->isNull() ||
+        (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
+           ext->bootSettings()->channelB()->as<Channel>())))
+      setDefaultChannelBToVFO();
     else
-      setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
-    if (! ext->bootSettings()->defaultRoamingZone()->isNull())
-      setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
-    enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
-    enableBootReset(ext->bootSettings()->resetEnabled());
-
-    // Encode key settings
-    enableKnobLock(ext->keySettings()->knobLockEnabled());
-    enableKeypadLock(ext->keySettings()->keypadLockEnabled());
-    enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
-    enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
-
-    // Encode tone settings
-    setKeyToneLevel(ext->toneSettings()->keyToneLevel());
-
-    // Encode audio settings
-    setMuteDelay(ext->audioSettings()->muteDelay());
-
-    // Encode display settings
-    setCallDisplayColor(ext->displaySettings()->callColor());
-    setLanguage(ext->displaySettings()->language());
-    enableDisplayChannelNumber(ext->displaySettings()->showChannelNumberEnabled());
-    enableDisplayContact(ext->displaySettings()->showContactEnabled());
-    setStandbyTextColor(ext->displaySettings()->standbyTextColor());
-    enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
-    setBacklightTXDuration(ext->displaySettings()->backlightDurationTX());
-    setChannelNameColor(ext->displaySettings()->callColor());
-    setBacklightRXDuration(ext->displaySettings()->backlightDurationRX());
-
-    // Encode menu settings
-    enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
-
-    // Encode auto-repeater settings
-    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
-    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
-    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
-    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
-    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
-
-    // Encode DMR settings
-    setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-    setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
-    setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
-    setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
-    enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
-    setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
-    enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
-    enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
-    enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-    setSMSFormat(ext->dmrSettings()->smsFormat());
-
-    // Encode ranging/roaming settings.
-    enableGPSRangeReporting(ext->rangingSettings()->gpsRangeReportingEnabled());
-    setGPSRangingInterval(ext->rangingSettings()->gpsRangingInterval());
-    setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
-    setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
-    enableRepeaterRangeCheck(ext->rangingSettings()->repeaterRangeCheckEnabled());
-    setRepeaterRangeCheckInterval(ext->rangingSettings()->repeaterCheckInterval());
-    setRepeaterRangeCheckCount(ext->rangingSettings()->repeaterRangeCheckCount());
-    setRoamingStartCondition(ext->rangingSettings()->roamingStartCondition());
-    enableRepeaterCheckNotification(ext->rangingSettings()->notificationEnabled());
-    setRepeaterCheckNumNotifications(ext->rangingSettings()->notificationCount());
-
-    // Encode other settings
-    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
-    enableKeepLastCaller(ext->keepLastCallerEnabled());
-    setVFOFrequencyStep(ext->vfoStep());
-    setSTEType(ext->steType());
-    setSTEFrequency(ext->steFrequency());
-    setTBSTFrequency(ext->tbstFrequency());
-    enableProMode(ext->proModeEnabled());
-    enableMaintainCallChannel(ext->maintainCallChannelEnabled());
+      setDefaultChannelBIndex(
+            ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
+              ext->bootSettings()->channelB()->as<Channel>()));
   }
+
+  if (ext->bootSettings()->priorityZoneA()->isNull())
+    setPriorityZoneAIndex(0xff);
+  else
+    setPriorityZoneAIndex(ctx.index(ext->bootSettings()->priorityZoneA()->as<Zone>()));
+  if (ext->bootSettings()->priorityZoneB()->isNull())
+    setPriorityZoneBIndex(0xff);
+  else
+    setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
+  if (! ext->bootSettings()->defaultRoamingZone()->isNull())
+    setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
+  enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
+  enableBootReset(ext->bootSettings()->resetEnabled());
+
+  // Encode key settings
+  enableKnobLock(ext->keySettings()->knobLockEnabled());
+  enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+  enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+  enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
+  // Encode tone settings
+  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+  // Encode audio settings
+  setMuteDelay(ext->audioSettings()->muteDelay());
+
+  // Encode display settings
+  setCallDisplayColor(ext->displaySettings()->callColor());
+  setLanguage(ext->displaySettings()->language());
+  enableDisplayChannelNumber(ext->displaySettings()->showChannelNumberEnabled());
+  enableDisplayContact(ext->displaySettings()->showContactEnabled());
+  setStandbyTextColor(ext->displaySettings()->standbyTextColor());
+  enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
+  setBacklightTXDuration(ext->displaySettings()->backlightDurationTX());
+  setChannelNameColor(ext->displaySettings()->callColor());
+  setBacklightRXDuration(ext->displaySettings()->backlightDurationRX());
+
+  // Encode menu settings
+  enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
+
+  // Encode auto-repeater settings
+  setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+  setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+  setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+  setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+  setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+  // Encode DMR settings
+  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
+  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
+  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
+  setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
+  enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
+  setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
+  enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
+  enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
+  enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
+  setSMSFormat(ext->dmrSettings()->smsFormat());
+
+  // Encode ranging/roaming settings.
+  enableGPSRangeReporting(ext->rangingSettings()->gpsRangeReportingEnabled());
+  setGPSRangingInterval(ext->rangingSettings()->gpsRangingInterval());
+  setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
+  setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
+  enableRepeaterRangeCheck(ext->rangingSettings()->repeaterRangeCheckEnabled());
+  setRepeaterRangeCheckInterval(ext->rangingSettings()->repeaterCheckInterval());
+  setRepeaterRangeCheckCount(ext->rangingSettings()->repeaterRangeCheckCount());
+  setRoamingStartCondition(ext->rangingSettings()->roamingStartCondition());
+  enableRepeaterCheckNotification(ext->rangingSettings()->notificationEnabled());
+  setRepeaterCheckNumNotifications(ext->rangingSettings()->notificationCount());
+
+  // Encode other settings
+  enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
+  enableKeepLastCaller(ext->keepLastCallerEnabled());
+  setVFOFrequencyStep(ext->vfoStep());
+  setSTEType(ext->steType());
+  setSTEFrequency(ext->steFrequency());
+  setTBSTFrequency(ext->tbstFrequency());
+  enableProMode(ext->proModeEnabled());
+  enableMaintainCallChannel(ext->maintainCallChannelEnabled());
 
   return true;
 }
@@ -1628,116 +1631,156 @@ D878UVCodeplug::GeneralSettingsExtensionElement::clear() {
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::sendTalkerAlias() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::sendTalkerAlias());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::enableSendTalkerAlias(bool enable) {
-  setUInt8(0x0000, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::sendTalkerAlias(), (enable ? 0x01 : 0x00));
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasDisplay
 D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasDisplay() const {
-  return (TalkerAliasDisplay)getUInt8(0x001e);
+  return (TalkerAliasDisplay)getUInt8(Offset::talkerAliasDisplay());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasDisplay(TalkerAliasDisplay mode) {
-  setUInt8(0x001e, (unsigned)mode);
+  setUInt8(Offset::talkerAliasDisplay(), (unsigned)mode);
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasEncoding
 D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasEncoding() const {
-  return (TalkerAliasEncoding)getUInt8(0x001f);
+  return (TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasEncoding(TalkerAliasEncoding enc) {
-  setUInt8(0x001f, (unsigned)enc);
+  setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterUHF2OffsetIndex() const {
-  return 0xff != autoRepeaterUHF2OffsetIndex();
+  return 0xff != getUInt8(Offset::autoRepeaterUHF2OffsetIndex());
 }
 unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2OffsetIndex() const {
-  return getUInt8(0x0022);
+  return getUInt8(Offset::autoRepeaterUHF2OffsetIndex());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2OffsetIndex(unsigned idx) {
-  setUInt8(0x0022, idx);
+  setUInt8(Offset::autoRepeaterUHF2OffsetIndex(), idx);
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterUHF2OffsetIndex() {
-  setAutoRepeaterUHF2OffsetIndex(0xff);
+  setUInt8(Offset::autoRepeaterUHF2OffsetIndex(), 0xff);
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::hasAutoRepeaterVHF2OffsetIndex() const {
-  return 0xff != autoRepeaterVHF2OffsetIndex();
+  return 0xff != getUInt8(Offset::autoRepeaterVHF2OffsetIndex());
 }
 unsigned
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2OffsetIndex() const {
-  return getUInt8(0x0023);
+  return getUInt8(Offset::autoRepeaterVHF2OffsetIndex());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2OffsetIndex(unsigned idx) {
-  setUInt8(0x0023, idx);
+  setUInt8(Offset::autoRepeaterVHF2OffsetIndex(), idx);
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::clearAutoRepeaterVHF2OffsetIndex() {
-  setAutoRepeaterVHF2OffsetIndex(0xff);
+  setUInt8(Offset::autoRepeaterVHF2OffsetIndex(), 0xff);
 }
 
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MinFrequency() const {
-  return ((unsigned)getBCD8_be(0x0024))*10;
+  return Frequency::fromHz(((unsigned long long)getUInt32_le(Offset::autoRepeaterVHF2MinFrequency()))*10);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(unsigned hz) {
-  setBCD8_be(0x0024, hz/10);
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MinFrequency(Frequency hz) {
+  setUInt32_le(Offset::autoRepeaterVHF2MinFrequency(), hz.inHz()/10);
 }
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterVHF2MaxFrequency() const {
-  return ((unsigned)getBCD8_be(0x0028))*10;
+  return Frequency::fromHz(((unsigned long long)getUInt32_le(Offset::autoRepeaterVHF2MaxFrequency()))*10);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(unsigned hz) {
-  setBCD8_be(0x0028, hz/10);
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency(Frequency hz) {
+  setBCD8_be(Offset::autoRepeaterVHF2MaxFrequency(), hz.inHz()/10);
 }
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MinFrequency() const {
-  return ((unsigned)getBCD8_be(0x002c))*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::autoRepeaterUHF2MinFrequency()))*10);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(unsigned hz) {
-  setBCD8_be(0x002c, hz/10);
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(Frequency hz) {
+  setBCD8_be(Offset::autoRepeaterUHF2MinFrequency(), hz.inHz()/10);
 }
-unsigned
+Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MaxFrequency() const {
-  return ((unsigned)getBCD8_be(0x0030))*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::autoRepeaterUHF2MaxFrequency()))*10);
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(unsigned hz) {
-  setBCD8_be(0x0030, hz/10);
+D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(Frequency hz) {
+  setBCD8_be(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::GPSMode
 D878UVCodeplug::GeneralSettingsExtensionElement::gpsMode() const {
-  return (GPSMode)getUInt8(0x0035);
+  return (GPSMode)getUInt8(Offset::gpsMode());
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
-  setUInt8(0x0035, (unsigned)mode);
+  setUInt8(Offset::gpsMode(), (unsigned)mode);
+}
+
+unsigned int
+D878UVCodeplug::GeneralSettingsExtensionElement::analogMicGain() const {
+  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setAnalogMicGain(unsigned int gain) {
+  gain = std::min(10U, std::max(1U, gain));
+  setUInt8(Offset::analogMicGain(), gain*4/10);
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags); Q_UNUSED(ctx)
+  Q_UNUSED(flags); Q_UNUSED(ctx);
+
+  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
+    // If there is no extension, reuse DMR mic gain setting
+    setAnalogMicGain(ctx.config()->settings()->micLevel());
+    return true;
+  }
+
+  // Get extension
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+
+  // Encode audio settings
+  if (ext->audioSettings()->analogMicGainEnabled())
+    setAnalogMicGain(ext->audioSettings()->analogMicGain());
+  else
+    setAnalogMicGain(ctx.config()->settings()->micLevel());
+
   return true;
 }
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
   Q_UNUSED(ctx)
+
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Store FM mic gain separately
+  ext->audioSettings()->setAnalogMicGain(analogMicGain());
+  // Enable separate mic gain, if it differs from the DMR mic gain:
+  ext->audioSettings()->enableAnalogMicGain(
+        ctx.config()->settings()->micLevel() != analogMicGain());
+
   return true;
 }
 
@@ -2765,6 +2808,10 @@ D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
   GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
   return true;
+}
+bool
+D878UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err);
 }
 
 void

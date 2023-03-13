@@ -1647,7 +1647,7 @@ AnytoneCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension
 
 unsigned
 AnytoneCodeplug::GeneralSettingsElement::micGain() const {
-  return (((unsigned)getUInt8(0x000f))*10)/4;
+  return (((unsigned)getUInt8(0x000f)+1)*10)/4;
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setMICGain(unsigned gain) {

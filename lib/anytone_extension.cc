@@ -1702,7 +1702,8 @@ AnytoneDisplaySettingsExtension::setBacklightDurationRX(Interval sec) {
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
-    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1))
+    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
+    _enableAnalogMicGain(false), _analogMicGain(1)
 {
   // pass...
 }
@@ -1797,6 +1798,29 @@ AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
   if (_muteDelay == intv)
     return;
   _muteDelay = intv;
+  emit modified(this);
+}
+
+bool
+AnytoneAudioSettingsExtension::analogMicGainEnabled() const {
+  return _enableAnalogMicGain;
+}
+void
+AnytoneAudioSettingsExtension::enableAnalogMicGain(bool enable) {
+  if (_enableAnalogMicGain == enable)
+    return;
+  _enableAnalogMicGain = enable;
+  emit modified(this);
+}
+unsigned int
+AnytoneAudioSettingsExtension::analogMicGain() const {
+  return _analogMicGain;
+}
+void
+AnytoneAudioSettingsExtension::setAnalogMicGain(unsigned int gain) {
+  if (_analogMicGain == gain)
+    return;
+  _analogMicGain = gain;
   emit modified(this);
 }
 

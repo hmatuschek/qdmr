@@ -358,36 +358,38 @@ public:
     virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
     virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+
     /** Returns @c true if the default boot channel is enabled. */
-    virtual bool defaultChannel() const;
+    bool defaultChannel() const;
     /** Enables/disables default boot channel. */
-    virtual void enableDefaultChannel(bool enable);
+    void enableDefaultChannel(bool enable);
     /** Returns the default zone index (0-based) for VFO A. */
-    virtual unsigned defaultZoneIndexA() const;
+    unsigned defaultZoneIndexA() const;
     /** Sets the default zone (0-based) for VFO A. */
-    virtual void setDefaultZoneIndexA(unsigned idx);
+    void setDefaultZoneIndexA(unsigned idx);
     /** Returns the default zone index (0-based) for VFO B. */
-    virtual unsigned defaultZoneIndexB() const;
+    unsigned defaultZoneIndexB() const;
     /** Sets the default zone (0-based) for VFO B. */
-    virtual void setDefaultZoneIndexB(unsigned idx);
+    void setDefaultZoneIndexB(unsigned idx);
     /** Returns @c true if the default channel for VFO A is VFO. */
-    virtual bool defaultChannelAIsVFO() const;
+    bool defaultChannelAIsVFO() const;
     /** Returns the default channel index for VFO A.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelAIndex() const;
+    unsigned defaultChannelAIndex() const;
     /** Sets the default channel index for VFO A. */
-    virtual void setDefaultChannelAIndex(unsigned idx);
+    void setDefaultChannelAIndex(unsigned idx);
     /** Sets the default channel for VFO A to be VFO. */
-    virtual void setDefaultChannelAToVFO();
+    void setDefaultChannelAToVFO();
     /** Returns @c true if the default channel for VFO B is VFO. */
-    virtual bool defaultChannelBIsVFO() const;
+    bool defaultChannelBIsVFO() const;
     /** Returns the default channel index for VFO B.
      * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelBIndex() const;
+    unsigned defaultChannelBIndex() const;
     /** Sets the default channel index for VFO B. */
-    virtual void setDefaultChannelBIndex(unsigned idx);
+    void setDefaultChannelBIndex(unsigned idx);
     /** Sets the default channel for VFO B to be VFO. */
-    virtual void setDefaultChannelBToVFO();
+    void setDefaultChannelBToVFO();
+
     /** Returns @c true if the last caller is kept when changing channel. */
     virtual bool keepLastCaller() const;
     /** Enables/disables keeping the last caller when changing the channel. */

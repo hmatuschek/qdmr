@@ -975,6 +975,37 @@ public:
     /** Clears the auto-repeater offset frequency index for VHF. */
     virtual void clearAutoRepeaterOffsetFrequencyIndexVHF();
 
+    /** Returns @c true if the default boot channel is enabled. */
+    virtual bool defaultChannel() const = 0;
+    /** Enables/disables default boot channel. */
+    virtual void enableDefaultChannel(bool enable) = 0;
+    /** Returns the default zone index (0-based) for VFO A. */
+    virtual unsigned defaultZoneIndexA() const = 0;
+    /** Sets the default zone (0-based) for VFO A. */
+    virtual void setDefaultZoneIndexA(unsigned idx) = 0;
+    /** Returns the default zone index (0-based) for VFO B. */
+    virtual unsigned defaultZoneIndexB() const = 0;
+    /** Sets the default zone (0-based) for VFO B. */
+    virtual void setDefaultZoneIndexB(unsigned idx) = 0;
+    /** Returns @c true if the default channel for VFO A is VFO. */
+    virtual bool defaultChannelAIsVFO() const = 0;
+    /** Returns the default channel index for VFO A.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual unsigned defaultChannelAIndex() const = 0;
+    /** Sets the default channel index for VFO A. */
+    virtual void setDefaultChannelAIndex(unsigned idx) = 0;
+    /** Sets the default channel for VFO A to be VFO. */
+    virtual void setDefaultChannelAToVFO() = 0;
+    /** Returns @c true if the default channel for VFO B is VFO. */
+    virtual bool defaultChannelBIsVFO() const = 0;
+    /** Returns the default channel index for VFO B.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual unsigned defaultChannelBIndex() const = 0;
+    /** Sets the default channel index for VFO B. */
+    virtual void setDefaultChannelBIndex(unsigned idx) = 0;
+    /** Sets the default channel for VFO B to be VFO. */
+    virtual void setDefaultChannelBToVFO() = 0;
+
     /** Returns the call-tone melody. */
     virtual void callToneMelody(Melody &melody) const;
     /** Sets the call-tone melody. */

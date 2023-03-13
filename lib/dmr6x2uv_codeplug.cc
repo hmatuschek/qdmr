@@ -243,62 +243,62 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableSendAddressbookWithOwnCode(bool 
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::defaultBootChannelEnabled() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannel() const {
   return 0x01 == getUInt8(0x00ce);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableDefaultBootChannel(bool enable) {
+DMR6X2UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
   setUInt8(0x00ce, enable ? 0x01 : 0x00);
 }
 
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootZoneAIndex() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
   return getUInt8(0x00cf);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootZoneAIndex(unsigned int index) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned int index) {
   setUInt8(0x00cf, index);
 }
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelAIsVFO() const {
-  return 0xff == bootChannelAIndex();
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
+  return 0xff == defaultChannelAIndex();
 }
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelAIndex() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
   return getUInt8(0x00d1);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelAIndex(unsigned int index) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned int index) {
   return setUInt8(0x00d1, index);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelAIsVFO() {
-  setBootChannelAIndex(0xff);
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
+  setDefaultChannelAIndex(0xff);
 }
 
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootZoneBIndex() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
   return getUInt8(0x00d0);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootZoneBIndex(unsigned int index) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned int index) {
   setUInt8(0x00d0, index);
 }
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelBIsVFO() const {
-  return 0xff == bootChannelBIndex();
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
+  return 0xff == defaultChannelBIndex();
 }
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelBIndex() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
   return getUInt8(0x00d2);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelBIndex(unsigned int index) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned int index) {
   return setUInt8(0x00d2, index);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelBIsVFO() {
-  setBootChannelBIndex(0xff);
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
+  setDefaultChannelBIndex(0xff);
 }
 
 bool
@@ -985,6 +985,10 @@ DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   }
 
   return true;
+}
+bool
+DMR6X2UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err);
 }
 
 

@@ -19,8 +19,12 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
 
+  void testAnalogMicGain();
+
 protected:
+  QTextStream _stderr;
   Config _basicConfig;
+  Config _micGainConfig;
 };
 
 #endif // D878UVTEST_HH
