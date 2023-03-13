@@ -598,31 +598,6 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
 
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
-    // Encode boot settings
-    enableDefaultChannel(
-          ext->bootSettings()->defaultChannelEnabled() &&
-          (! ext->bootSettings()->zoneA()->isNull()) &&
-          (! ext->bootSettings()->zoneB()->isNull()));
-
-    if (defaultChannel()) {
-      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-      if (ext->bootSettings()->channelA()->isNull() ||
-          (! ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelA()->as<Channel>())))
-        setDefaultChannelAToVFO();
-      else
-        setDefaultChannelAIndex(
-              ctx.index(ext->bootSettings()->channelA()->as<Channel>()));
-
-      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-      if (ext->bootSettings()->channelB()->isNull() ||
-          (! ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelB()->as<Channel>())))
-        setDefaultChannelBToVFO();
-      else
-        setDefaultChannelBIndex(ctx.index(ext->bootSettings()->channelB()->as<Channel>()));
-    }
-
     // Encode key settings
     enableKnobLock(ext->keySettings()->knobLockEnabled());
     enableKeypadLock(ext->keySettings()->keypadLockEnabled());
@@ -668,9 +643,6 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
-  // Decode boot settings
-  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
-
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
   ext->keySettings()->enableKeypadLock(this->keypadLock());
@@ -711,41 +683,6 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
   } else {
     ext = new AnytoneSettingsExtension();
     settings->setAnytoneExtension(ext);
-  }
-
-  // Link boot settings
-  if (this->defaultChannel()) {
-    if (! ctx.has<Zone>(this->defaultZoneIndexA())) {
-      errMsg(err) << "Cannot link default zone A. Zone index " << this->defaultZoneIndexA()
-                  << " not defined.";
-      return false;
-    }
-    ext->bootSettings()->zoneA()->set(ctx.get<Zone>(this->defaultZoneIndexA()));
-    if (this->defaultChannelAIsVFO()) {
-      // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
-      errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
-                  << " not defined.";
-      return false;
-    } else {
-      ext->bootSettings()->channelA()->set(ctx.get<Channel>(this->defaultChannelAIndex()));
-    }
-
-    if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
-      errMsg(err) << "Cannot link default zone B. Zone index " << this->defaultZoneIndexB()
-                  << " not defined.";
-      return false;
-    }
-    ext->bootSettings()->zoneB()->set(ctx.get<Zone>(this->defaultZoneIndexB()));
-    if (this->defaultChannelBIsVFO()) {
-      // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {
-      errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
-                  << " not defined.";
-      return false;
-    } else {
-      ext->bootSettings()->channelB()->set(ctx.get<Channel>(this->defaultChannelBIndex()));
-    }
   }
 
   // Link auto-repeater

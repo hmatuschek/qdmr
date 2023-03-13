@@ -958,6 +958,7 @@ public:
     virtual Frequency maxVFOScanFrequencyVHF() const;
     /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
     virtual void setMaxVFOScanFrequencyVHF(Frequency hz);
+
     /** Returns @c true if the auto-repeater offset frequency for UHF is set. */
     virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
     /** Returns the auto-repeater offset frequency index for UHF. */

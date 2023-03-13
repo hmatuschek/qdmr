@@ -1226,33 +1226,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     return true;
 
   // Encode boot settings
-  enableDefaultChannel(
-        ext->bootSettings()->defaultChannelEnabled() &&
-        (! ext->bootSettings()->zoneA()->isNull()) &&
-        (! ext->bootSettings()->zoneB()->isNull()));
-
-  if (defaultChannel()) {
-    setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-    if (ext->bootSettings()->channelA()->isNull() ||
-        (ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
-           ext->bootSettings()->channelA()->as<Channel>())))
-      setDefaultChannelAToVFO();
-    else
-      setDefaultChannelAIndex(
-            ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
-              ext->bootSettings()->channelA()->as<Channel>()));
-
-    setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-    if (ext->bootSettings()->channelB()->isNull() ||
-        (ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
-           ext->bootSettings()->channelB()->as<Channel>())))
-      setDefaultChannelBToVFO();
-    else
-      setDefaultChannelBIndex(
-            ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
-              ext->bootSettings()->channelB()->as<Channel>()));
-  }
-
   if (ext->bootSettings()->priorityZoneA()->isNull())
     setPriorityZoneAIndex(0xff);
   else
@@ -1353,7 +1326,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   }
 
   // Decode boot settings
-  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
   ext->bootSettings()->enableGPSCheck(this->bootGPSCheck());
   ext->bootSettings()->enableReset(this->bootReset());
 
@@ -1432,6 +1404,7 @@ bool
 D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
   if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
     return false;
+
   AnytoneSettingsExtension *ext = settings->anytoneExtension();
 
   if (0xff != priorityZoneAIndex()) {
