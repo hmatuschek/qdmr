@@ -1271,6 +1271,7 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   /** The SMS format. */
   Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
 
+
 public:
   /** Possible monitor slot matches. */
   enum class SlotMatch {

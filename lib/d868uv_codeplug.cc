@@ -14,81 +14,9 @@
 #include <QSet>
 
 
-#define VFO_A_ADDR                0x00fc0800 // Address of VFO A settings (channel_t)
-#define VFO_B_ADDR                0x00fc0840 // Address of VFO B settings (channel_t)
-#define VFO_SIZE                  0x00000040 // Size of each VFO settings.
-
-#define NUM_ANALOGCONTACTS        128
-#define NUM_ANALOGCONTACT_BANKS   64
-#define ANALOGCONTACTS_PER_BANK   2
-#define ANALOGCONTACT_BANK_0      0x02940000
-#define ANALOGCONTACT_BANK_SIZE   0x00000030
-#define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Size of analog contact index list
-#define ANALOGCONTACT_BYTEMAP     0x02900100 // Address of contact bytemap
-#define ANALOGCONTACT_BYTEMAP_SIZE 0x00000080 // Size of contact bytemap
-#define ANALOGCONTACT_SIZE        0x00000018 // Size of analog contact
-
-#define NUM_RXGRP                 250        // Total number of RX group lists
-#define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
-#define RXGRP_SIZE                0x00000120 // Size of each RX group list.
-#define RXGRP_OFFSET              0x00000200 // Offset between group lists.
-#define RXGRP_BITMAP              0x025C0B10 // Address of RX group list bitmap.
-#define RXGRP_BITMAP_SIZE         0x00000020 // Storage size of RX group list bitmap.
-
-#define NUM_ZONES                 250        // Maximum number of zones
-#define NUM_CH_PER_ZONE           250        // Maximum number of channels per zone
-#define ADDR_ZONE                 0x01000000 // Address of zone-channel lists, see zone_t
-#define ZONE_SIZE                 0x00000200 // Size of each zone-channel list
-#define ZONE_OFFSET               0x00000200 // Offset between zone-channel lists
-#define ADDR_ZONE_NAME            0x02540000 // Address of zone names.
-#define ZONE_NAME_SIZE            0x00000010 // Size of zone names
-#define ZONE_NAME_OFFSET          0x00000020 // Offset between zone names.
-#define ZONE_BITMAPS              0x024c1300 // Bitmap of all enabled zones
-#define ZONE_BITMAPS_SIZE         0x00000020 // Size of the zone bitmap
-
-#define NUM_RADIOIDS              250
-#define ADDR_RADIOIDS             0x02580000
-#define RADIOID_SIZE              0x00000020
-#define RADIOID_BITMAP            0x024c1320
-#define RADIOID_BITMAP_SIZE       0x00000020
-
-#define NUM_SCAN_LISTS            250
-#define NUM_SCANLISTS_PER_BANK    16
-#define SCAN_LIST_BANK_0          0x01080000 // First scanlist bank
-#define SCAN_LIST_OFFSET          0x00000200 // Offset to next list.
-#define SCAN_LIST_SIZE            0x00000090 // Size of scan-list.
-#define SCAN_LIST_BANK_OFFSET     0x00040000 // Offset to next bank
-#define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
-#define SCAN_BITMAP_SIZE          0x00000020 // Size of scan-list bitmap.
-
-#define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x000000d0
-
-#define ADDR_ZONE_CHANNELS        0x02500100
-#define ZONE_CHANNELS_SIZE        0x00000400
 
 #define ADDR_DTMF_NUMBERS         0x02500500
 #define DTMF_NUMBERS_SIZE         0x00000100
-
-#define ADDR_BOOT_SETTINGS        0x02500600
-#define BOOT_SETTINGS_SIZE        0x00000030
-
-#define ADDR_GPS_SETTINGS         0x02501000
-#define GPS_SETTINGS_SIZE         0x00000030
-
-#define ADDR_GPS_MESSAGE          0x02501100
-#define GPS_MESSAGE_SIZE          0x00000030
-
-#define NUM_MESSAGES              100
-#define NUM_MESSAGES_PER_BANK     8
-#define MESSAGE_SIZE              0x00000100
-#define MESSAGE_BANK_0            0x02140000
-#define MESSAGE_BANK_SIZE         0x00000800
-#define MESSAGE_BANK_OFFSET       0x00040000
-#define MESSAGE_INDEX_LIST        0x01640000
-#define MESSAGE_BYTEMAP           0x01640800
-#define MESSAGE_BYTEMAP_SIZE      0x00000090
 
 #define ADDR_HOTKEY               0x025C0000
 #define HOTKEY_SIZE               0x00000860
@@ -885,19 +813,19 @@ D868UVCodeplug::allocateBitmaps() {
   // Channel bitmap
   image(0).addElement(Offset::channelBitmap(), ChannelBitmapElement::size());
   // Zone bitmap
-  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
+  image(0).addElement(Offset::zoneBitmap(), ZoneBitmapElement::size());
   // Contacts bitmap
   image(0).addElement(Offset::contactBitmap(), ContactBitmapElement::size());
   // Analog contacts bytemap
-  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
+  image(0).addElement(Offset::dtmfContactBytemap(), DTMFContactBytemapElement::size());
   // RX group list bitmaps
-  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
+  image(0).addElement(Offset::groupListBitmap(), GroupListBitmapElement::size());
   // Scan list bitmaps
-  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
+  image(0).addElement(Offset::scanListBitmap(), ScanListBitmapElement::size());
   // Radio IDs bitmaps
-  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
+  image(0).addElement(Offset::radioIDBitmap(), RadioIDBitmapElement::size());
   // Message bitmaps
-  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
+  image(0).addElement(Offset::messageBytemap(), MessageBytemapElement::size());
   // Status messages
   image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
   // FM Broadcast bitmaps
@@ -913,53 +841,45 @@ D868UVCodeplug::allocateBitmaps() {
 
 
 void
-D868UVCodeplug::setBitmaps(Config *config)
+D868UVCodeplug::setBitmaps(Context& ctx)
 {
   // Mark first radio ID as valid
-  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  memset(radioid_bitmap, 0, RADIOID_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_RADIOIDS, config->radioIDs()->count()); i++)
-    radioid_bitmap[i/8] |= (1 << (i%8));
+  RadioIDBitmapElement radioid_bitmap(data(Offset::radioIDBitmap()));
+  unsigned int num_radio_ids = std::min(Limit::numRadioIDs(), ctx.count<DMRRadioID>());
+  radioid_bitmap.clear(); radioid_bitmap.enableFirst(num_radio_ids);
 
   // Mark valid channels (set bit)
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
-  unsigned int num_channels = std::min(Limit::numChannels(), (unsigned int)config->channelList()->count());
+  unsigned int num_channels = std::min(Limit::numChannels(), ctx.count<Channel>());
   channel_bitmap.clear(); channel_bitmap.enableFirst(num_channels);
 
   // Mark valid contacts (clear bit)
   ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
-  unsigned int num_contacts = std::min(Limit::numContacts(), (unsigned int)config->contacts()->digitalCount());
+  unsigned int num_contacts = std::min(Limit::numContacts(), ctx.count<DMRContact>());
   contact_bitmap.clear(); contact_bitmap.enableFirst(num_contacts);
 
   // Mark valid analog contacts (clear bytes)
-  uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
-  memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
-  for (int i=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->dtmfCount()); i++) {
-    analog_contact_bitmap[i] = 0x00;
-  }
+  DTMFContactBytemapElement analog_contact_bitmap(data(Offset::dtmfContactBytemap()));
+  unsigned int num_dtmf_contacts = std::min(Limit::numDTMFContacts(), ctx.count<DTMFContact>());
+  analog_contact_bitmap.clear(); analog_contact_bitmap.enableFirst(num_dtmf_contacts);
 
   // Mark valid zones (set bits)
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
-  memset(zone_bitmap, 0x00, ZONE_BITMAPS_SIZE);
-  for (int i=0,z=0; i<std::min(NUM_ZONES, config->zones()->count()); i++) {
-    zone_bitmap[z/8] |= (1 << (z%8)); z++;
-    if (config->zones()->zone(i)->B()->count()) {
-      zone_bitmap[z/8] |= (1 << (z%8)); z++;
-    }
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
+  unsigned int num_zones = std::min(Limit::numZones(), ctx.count<Zone>());
+  zone_bitmap.clear();
+  for (unsigned int i=0,z=0; i<num_zones; i++) {
+    zone_bitmap.setEncoded(z, true);
   }
 
   // Mark group lists
-  uint8_t *group_bitmap = data(RXGRP_BITMAP);
-  memset(group_bitmap, 0x00, RXGRP_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_RXGRP, config->rxGroupLists()->count()); i++)
-    group_bitmap[i/8] |= (1 << (i%8));
+  GroupListBitmapElement group_bitmap(data(Offset::groupListBitmap()));
+  unsigned int num_group_lists = std::min(Limit::numGroupLists(), ctx.count<RXGroupList>());
+  group_bitmap.clear(); group_bitmap.enableFirst(num_group_lists);
 
   // Mark scan lists
-  uint8_t *scan_bitmap = data(SCAN_BITMAP);
-  memset(scan_bitmap, 0x00, SCAN_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_SCAN_LISTS, config->scanlists()->count()); i++) {
-    scan_bitmap[i/8] |= (1<<(i%8));
-  }
+  ScanListBitmapElement scan_bitmap(data(Offset::scanListBitmap()));
+  unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
+  scan_bitmap.clear(); scan_bitmap.enableFirst(num_scan_lists);
 }
 
 
@@ -1138,10 +1058,10 @@ D868UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateVFOSettings() {
   // Allocate VFO channels
-  image(0).addElement(VFO_A_ADDR, ChannelElement::size());
-  image(0).addElement(VFO_A_ADDR+0x2000, ChannelElement::size());
-  image(0).addElement(VFO_B_ADDR, ChannelElement::size());
-  image(0).addElement(VFO_B_ADDR+0x2000, ChannelElement::size());
+  image(0).addElement(Offset::vfoA(), ChannelElement::size());
+  image(0).addElement(Offset::vfoA()+0x2000, ChannelElement::size());
+  image(0).addElement(Offset::vfoB(), ChannelElement::size());
+  image(0).addElement(Offset::vfoB()+0x2000, ChannelElement::size());
 }
 
 void
@@ -1223,29 +1143,27 @@ D868UVCodeplug::createContacts(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateAnalogContacts() {
   /* Allocate analog contacts */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i+=2) {
+  DTMFContactBytemapElement analog_contact_bytemap(data(Offset::dtmfContactBytemap()));
+  for (uint8_t i=0; i<Limit::numDTMFContacts(); i++) {
     // if disabled -> skip
-    if (0xff == analog_contact_bytemap[i])
+    if (! analog_contact_bytemap.isEncoded(i))
       continue;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
-    if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
+    uint32_t bank_addr = Offset::dtmfContacts() + (i/2)*(2*DTMFContactElement::size());
+    if (! isAllocated(bank_addr, 0)) {
+      image(0).addElement(bank_addr, 2*DTMFContactElement::size());
     }
   }
-  image(0).addElement(ANALOGCONTACT_INDEX_LIST, ANALOGCONTACT_LIST_SIZE);
+  image(0).addElement(Offset::dtmfIndex(), 1*Limit::numDTMFContacts());
 }
 
 bool
 D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
-  memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
-  for (int i=0; i<ctx.config()->contacts()->dtmfCount(); i++) {
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
-        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    DTMFContactElement cont(data(addr));
+  uint8_t *idxlst = data(Offset::dtmfIndex());
+  memset(idxlst, 0xff, 1*Limit::numDTMFContacts());
+  for (unsigned int i=0; i<ctx.count<DTMFContact>(); i++) {
+    DTMFContactElement cont(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
     cont.fromContact(ctx.config()->contacts()->dtmfContact(i));
     idxlst[i] = i;
   }
@@ -1256,19 +1174,18 @@ bool
 D868UVCodeplug::createAnalogContacts(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+  DTMFContactBytemapElement analog_contact_bytemap(data(Offset::dtmfContactBytemap()));
+  for (unsigned int i=0; i<Limit::numDTMFContacts(); i++) {
     // if disabled -> skip
-    if (0xff == analog_contact_bytemap[i])
+    if (! analog_contact_bytemap.isEncoded(i))
       continue;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
-        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    DTMFContactElement cont(data(addr));
+    DTMFContactElement cont(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
     if (DTMFContact *dtmf = cont.toContact()) {
       ctx.config()->contacts()->add(dtmf);
       ctx.add(dtmf, i);
     }
   }
+
   return true;
 }
 
@@ -1276,17 +1193,15 @@ D868UVCodeplug::createAnalogContacts(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateRadioIDs() {
   /* Allocate radio IDs */
-  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  for (uint8_t i=0; i<NUM_RADIOIDS; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
+  RadioIDBitmapElement radioid_bitmap(data(Offset::radioIDBitmap()));
+  for (uint8_t i=0; i<Limit::numRadioIDs(); i++) {
     // if disabled -> skip
-    if (0 == ((radioid_bitmap[byte]>>bit) & 0x01))
+    if (! radioid_bitmap.isEncoded(i))
       continue;
     // Allocate radio IDs individually
-    uint32_t addr = ADDR_RADIOIDS + i*RADIOID_SIZE;
+    uint32_t addr = Offset::radioIDs() + i*RadioIDElement::size();
     if (! isAllocated(addr, 0)) {
-      image(0).addElement(addr, RADIOID_SIZE);
+      image(0).addElement(addr, RadioIDElement::size());
     }
   }
 }
@@ -1296,8 +1211,8 @@ D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
-    RadioIDElement(data(ADDR_RADIOIDS + i*RADIOID_SIZE)).fromRadioID(
+  for (unsigned int i=0; i<ctx.count<DMRRadioID>(); i++) {
+    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size())).fromRadioID(
           ctx.config()->radioIDs()->getId(i));
   }
   return true;
@@ -1308,12 +1223,11 @@ D868UVCodeplug::setRadioID(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Find a valid RadioID
-  uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
-  for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
-    if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
+  RadioIDBitmapElement radio_id_bitmap(data(Offset::radioIDBitmap()));
+  for (uint16_t i=0; i<Limit::numRadioIDs(); i++) {
+    if (! radio_id_bitmap.isEncoded(i))
       continue;
-    RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
-    logDebug() << "Store id " << id.number() << " at idx " << i << ".";
+    RadioIDElement id(data(Offset::radioIDs() + i*RadioIDElement::size()));
     if (DMRRadioID *rid = id.toRadioID()) {
       ctx.config()->radioIDs()->add(rid);  ctx.add(rid, i);
     }
@@ -1327,18 +1241,16 @@ D868UVCodeplug::allocateRXGroupLists() {
   /*
    * Allocate group lists
    */
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
-    // Get byte and bit for group list
-    uint16_t bit = i%8, byte = i/8;
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // if disabled -> skip
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
     // Allocate RX group lists indivitually
-    uint32_t addr = ADDR_RXGRP_0 + i*RXGRP_OFFSET;
+    uint32_t addr = Offset::groupLists() + i*Offset::betweenGroupLists();
     if (! isAllocated(addr, 0)) {
-      image(0).addElement(addr, RXGRP_SIZE);
-      memset(data(addr), 0xff, RXGRP_SIZE);
+      image(0).addElement(addr, GroupListElement::size());
+      GroupListElement(data(addr)).clear();
     }
   }
 
@@ -1350,9 +1262,10 @@ D868UVCodeplug::encodeRXGroupLists(const Flags &flags, Context &ctx, const Error
 
   // Encode RX group-lists
   for (int i=0; i<ctx.config()->rxGroupLists()->count(); i++) {
-    GroupListElement grp(data(ADDR_RXGRP_0 + i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     grp.fromGroupListObj(ctx.config()->rxGroupLists()->list(i), ctx);
   }
+
   return true;
 }
 
@@ -1361,14 +1274,13 @@ D868UVCodeplug::createRXGroupLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create RX group lists
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // check if group list is enabled
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
     // construct RXGroupList from definition
-    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     if (RXGroupList *obj = grp.toGroupListObj()) {
       ctx.config()->rxGroupLists()->add(obj); ctx.add(obj, i);
     }
@@ -1380,35 +1292,34 @@ bool
 D868UVCodeplug::linkRXGroupLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // check if group list is enabled
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
+
     // link group list
-    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     if (! grp.linkGroupList(ctx.get<RXGroupList>(i), ctx)) {
       logError() << "Cannot link RX group list idx=" << i;
       return false;
     }
   }
+
   return true;
 }
 
 
 void
 D868UVCodeplug::allocateZones() {
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
-    // Get byte and bit for zone
-    uint16_t bit = i%8, byte = i/8;
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // if invalid -> skip
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Allocate zone itself
-    image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
-    image(0).addElement(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET, ZONE_NAME_SIZE);
+    image(0).addElement(Offset::zoneChannels()+i*Offset::betweenZoneChannels(), Offset::betweenZoneChannels());
+    image(0).addElement(Offset::zoneNames()+i*Offset::betweenZoneNames(), Limit::zoneNameLength());
   }
 }
 
@@ -1420,10 +1331,10 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
   unsigned zidx = 0;
   for (int i=0; i<ctx.config()->zones()->count(); i++) {
     // Clear name and channel list
-    uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE + zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_SIZE);
-    memset(channels, 0xff, ZONE_SIZE);
+    uint8_t  *name     = (uint8_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    uint16_t *channels = (uint16_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    memset(name, 0, Limit::zoneNameLength());
+    memset(channels, 0xff, Offset::betweenZoneChannels());
     if (ctx.config()->zones()->zone(i)->B()->count())
       encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" A", 16, 0);
     else
@@ -1441,10 +1352,10 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
       continue;
 
     // Process list B if present
-    name     = (uint8_t *)data(ADDR_ZONE_NAME+zidx*ZONE_NAME_OFFSET);
-    channels = (uint16_t *)data(ADDR_ZONE+zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_SIZE);
-    memset(channels, 0xff, ZONE_SIZE);
+    name     = (uint8_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    channels = (uint16_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    memset(name, 0, Offset::betweenZoneChannels());
+    memset(channels, 0xff, Limit::zoneNameLength());
     encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" B", 16, 0);
     // Handle list B
     for (int j=0; j<ctx.config()->zones()->zone(i)->B()->count(); j++) {
@@ -1469,16 +1380,16 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create zones
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
-    uint16_t bit = i%8, byte = i/8;
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    QString zonename = decode_ascii(data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+                                    Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1521,16 +1432,16 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create zones
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
-    uint16_t bit = i%8, byte = i/8;
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    QString zonename = decode_ascii(data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+                                    Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1547,8 +1458,8 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
     }
 
     // link zone
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
-    for (uint8_t j=0; j<NUM_CH_PER_ZONE; j++, channels++) {
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels()+i*Offset::betweenZoneChannels());
+    for (uint8_t j=0; j<Limit::numChannelsPerZone(); j++, channels++) {
       // If not enabled -> continue
       if (0xffff == *channels)
         continue;
@@ -1577,34 +1488,32 @@ D868UVCodeplug::linkZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorS
 
 void
 D868UVCodeplug::allocateScanLists() {
-  /*
-   * Allocate scan lists
-   */
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (uint8_t i=0; i<NUM_SCAN_LISTS; i++) {
-    // Get byte and bit for scan list, bank and bank_idx
-    uint16_t bit = i%8, byte = i/8;
-    uint8_t bank = (i/NUM_SCANLISTS_PER_BANK), bank_idx = (i%NUM_SCANLISTS_PER_BANK);
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (uint8_t i=0; i<Limit::numScanLists(); i++) {
     // if disabled -> skip
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
     // Allocate scan lists indivitually
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    uint8_t bank = (i/Limit::numScanListsPerBank()), bank_idx = (i%Limit::numScanListsPerBank());
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
     if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, SCAN_LIST_SIZE);
-      memset(data(addr), 0xff, SCAN_LIST_SIZE);
+      image(0).addElement(addr, ScanListElement::size());
+      ScanListElement(data(addr)).clear();
     }
   }
 }
 
 bool
 D868UVCodeplug::encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode scan lists
-  for (int i=0; i<ctx.config()->scanlists()->count(); i++) {
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, idx = i%NUM_SCANLISTS_PER_BANK;
-    ScanListElement scan(data(SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + idx*SCAN_LIST_OFFSET));
+  unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
+  for (unsigned int i=0; i<num_scan_lists; i++) {
+    uint8_t bank = i/Limit::numScanListsPerBank(), idx = i%Limit::numScanListsPerBank();
+    ScanListElement scan(data(Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+                              + idx*Offset::betweenScanLists()));
     scan.fromScanListObj(ctx.config()->scanlists()->scanlist(i), ctx);
   }
   return true;
@@ -1615,13 +1524,13 @@ D868UVCodeplug::createScanLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create scan lists
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (unsigned int i=0; i<Limit::numScanLists(); i++) {
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    uint8_t bank = i/Limit::numScanListsPerBank(), bank_idx = i%Limit::numScanListsPerBank();
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
     ScanListElement scanl(data(addr));
     // Create scanlist
     ScanList *obj = scanl.toScanListObj();
@@ -1634,13 +1543,13 @@ bool
 D868UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (unsigned i=0; i<Limit::numScanLists(); i++) {
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    uint8_t bank = i/Limit::numScanListsPerBank(), bank_idx = i%Limit::numScanListsPerBank();
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
     ScanListElement scanl(data(addr));
     // Create scanlist
     ScanList *obj = ctx.get<ScanList>(i);
@@ -1653,31 +1562,31 @@ D868UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
 
 void
 D868UVCodeplug::allocateGeneralSettings() {
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
 }
 
 bool
 D868UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
+  return GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
 }
 
 bool
 D868UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
+  return GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
 }
 
 bool
 D868UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err);
+  return GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err);
 }
 
 void
 D868UVCodeplug::allocateZoneChannelList() {
-  image(0).addElement(ADDR_ZONE_CHANNELS, ZONE_CHANNELS_SIZE);
+  image(0).addElement(Offset::zoneChannels(), Offset::betweenZoneChannels());
 }
 
 
@@ -1689,35 +1598,35 @@ D868UVCodeplug::allocateDTMFNumbers() {
 
 void
 D868UVCodeplug::allocateBootSettings() {
-  image(0).addElement(ADDR_BOOT_SETTINGS, BOOT_SETTINGS_SIZE);
+  image(0).addElement(Offset::bootSettings(), BootSettingsElement::size());
 }
 
 bool
 D868UVCodeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).fromConfig(flags, ctx);
+  return BootSettingsElement(data(Offset::bootSettings())).fromConfig(flags, ctx);
 }
 
 bool
 D868UVCodeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).updateConfig(ctx);
+  return BootSettingsElement(data(Offset::bootSettings())).updateConfig(ctx);
 }
 
 
 void
 D868UVCodeplug::allocateGPSSystems() {
-  image(0).addElement(ADDR_GPS_SETTINGS, GPS_SETTINGS_SIZE);
-  image(0).addElement(ADDR_GPS_MESSAGE, GPS_MESSAGE_SIZE);
+  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
+  image(0).addElement(Offset::dmrAPRSMessage(), DMRAPRSMessageElement::size());
 }
 
 bool
 D868UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   return gps.fromConfig(flags, ctx);
 }
 
@@ -1742,7 +1651,7 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       systems.insert(ch.digitalAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
     gps.createGPSSystem(*idx, ctx);
   return true;
@@ -1752,9 +1661,9 @@ bool
 D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   // Then link all referenced GPS systems
-  for (uint8_t i=0; i<8; i++) {
+  for (uint8_t i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (! ctx.has<GPSSystem>(i))
       continue;
     gps.linkGPSSystem(i, ctx);
@@ -1766,20 +1675,20 @@ D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateSMSMessages() {
   // Prefab. SMS messages
-  uint8_t *messages_bytemap = data(MESSAGE_BYTEMAP);
+  MessageBytemapElement messages_bytemap(data(Offset::messageBytemap()));
   unsigned message_count = 0;
-  for (uint8_t i=0; i<NUM_MESSAGES; i++) {
-    uint8_t bank = i/NUM_MESSAGES_PER_BANK;
-    if (0xff == messages_bytemap[i])
+  for (uint8_t i=0; i<Limit::numMessages(); i++) {
+    uint8_t bank = i/Limit::numMessagePerBank();
+    if (! messages_bytemap.isEncoded(i))
       continue;
     message_count++;
-    uint32_t addr = MESSAGE_BANK_0 + bank*MESSAGE_BANK_SIZE;
+    uint32_t addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks();
     if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, MESSAGE_BANK_SIZE);
+      image(0).addElement(addr, Limit::numMessagePerBank()*MessageElement::size());
     }
   }
   if (message_count) {
-    image(0).addElement(MESSAGE_INDEX_LIST, 0x10*message_count);
+    image(0).addElement(Offset::messageIndex(), 0x10*message_count);
   }
 }
 

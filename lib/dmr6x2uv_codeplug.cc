@@ -881,22 +881,24 @@ DMR6X2UVCodeplug::allocateBitmaps() {
 }
 
 void
-DMR6X2UVCodeplug::setBitmaps(Config *config)
+DMR6X2UVCodeplug::setBitmaps(Context& ctx)
 {
   // First set everything common between D868UV and D878UV codeplugs.
-  D868UVCodeplug::setBitmaps(config);
+  D868UVCodeplug::setBitmaps(ctx);
 
   // Mark roaming zones
   uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
   memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  for (int i=0; i<config->roamingZones()->count(); i++)
+  unsigned int num_roaming_zones = std::min((unsigned int) NUM_ROAMING_ZONES, ctx.count<RoamingZone>());
+  for (unsigned int i=0; i<num_roaming_zones; i++)
     roaming_zone_bitmap[i/8] |= (1<<(i%8));
 
   // Mark roaming channels
   uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
+  unsigned int num_roaming_channels = std::min((unsigned int)NUM_ROAMING_CHANNEL,ctx.count<RoamingChannel>());
   // Get all (unique) channels used in roaming
-  for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,config->roamingChannels()->count()); i++)
+  for (unsigned int i=0; i<num_roaming_channels; i++)
     roaming_ch_bitmap[i/8] |= (1<<(i%8));
 }
 

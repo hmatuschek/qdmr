@@ -54,6 +54,30 @@ public:
     virtual void enableFirst(unsigned int n);
   };
 
+  /** Represents the base class for inverted bytemaps in all AnyTone codeplugs.
+   * This is obviously a result of a lazy firmware developer. There is already some code in the
+   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewere. It is
+   * inverted, because reased flash memory is usually initialized with 0xff. However, the AnyTone
+   * memory gets erased to 0x00. So the inversion is not necessary. Someone really took pride in
+   * his/her work and consequently, I need to implement some BS elements more. */
+  class InvertedBytemapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
   /** Represents the base class for channel encodings in all AnyTone codeplugs.
    *
    * Memory layout of encoded channel (0x40 bytes):
@@ -427,6 +451,7 @@ public:
     /** Constructor. */
     ContactBitmapElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0500; }
   };
 
@@ -447,7 +472,7 @@ public:
     virtual ~DTMFContactElement();
 
     /** Returns the size of the element. */
-    static constexpr unsigned int size() { return 0x0030; }
+    static constexpr unsigned int size() { return 0x0018; }
 
     /** Resets the contact element. */
     void clear();
@@ -483,6 +508,21 @@ public:
       static constexpr unsigned int name()      { return 0x0008; }
       /// @endcond
     };
+  };
+
+  /** Represents the DTMF contact byte map, indicating which contacts are valid. */
+  class DTMFContactBytemapElement: public InvertedBytemapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFContactBytemapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
   };
 
   /** Represents the base class for group lists in all AnyTone codeplugs.
@@ -530,6 +570,21 @@ public:
     virtual bool linkGroupList(RXGroupList *lst, Context &ctx) const;
     /** Constructs this group list from the given @c RXGroupList. */
     virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
+  };
+
+  /** Represents the bitmap indicating which group list element is valid. */
+  class GroupListBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit GroupListBitmapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
   /** Represents the base class for scan lists in all AnyTone codeplugs.
@@ -649,6 +704,21 @@ public:
     virtual bool fromScanListObj(ScanList *lst, Context &ctx);
   };
 
+  /** Represents the bitmap indicating which scanlist elements are valid. */
+  class ScanListBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00000020; }
+  };
+
   /** Represents the base class for radio IDs in all AnyTone codeplugs.
    *
    * Memory layout of encoded scanlist (0x20 bytes):
@@ -683,6 +753,21 @@ public:
     virtual bool fromRadioID(DMRRadioID *id);
     /** Constructs a new radio id. */
     virtual DMRRadioID *toRadioID() const;
+  };
+
+  /** Represents the bitmap indicating which radio IDs are valid. */
+  class RadioIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RadioIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RadioIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
   /** Represents the base class for the settings element in all AnyTone codeplugs.
@@ -1084,6 +1169,21 @@ public:
     virtual void clearChannelIndexB(unsigned n);
   };
 
+  /** Represents the bitmap indcating which zones are valid. */
+  class ZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
   /** Represents the base class of the boot settings for all AnyTone codeplug.
    *
    * Memory layout of encoded boot settings (size 0x0030):
@@ -1220,6 +1320,42 @@ public:
     virtual bool linkGPSSystem(uint8_t i, Context &ctx);
   };
 
+  /** Represents the base class of a DMR APRS message for all AnyTone codeplugs. */
+  class DMRAPRSMessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMRAPRSMessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMRAPRSMessageElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
+    void clear();
+
+    /** Returns the message. */
+    virtual QString message() const;
+    /** Sets the message. */
+    void setMessage(const QString &message);
+
+  public:
+    /** Some limits for the message. */
+    struct Limit {
+      static constexpr unsigned int length() { return 32; }      ///< Maximum message length.
+    };
+
+  protected:
+    /** Some internal used offset. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int message() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class of prefabricated message linked list for all AnyTone codeplugs.
    * This element is some weird linked list that determines some order for the prefabricated
    * SMS messages.
@@ -1285,6 +1421,21 @@ public:
     virtual QString message() const;
     /** Sets the message text. */
     virtual void setMessage(const QString &msg);
+  };
+
+  /** Represents the bytemap indicating which message is valid. */
+  class MessageBytemapElement: public InvertedBytemapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageBytemapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
   };
 
   /** Represents base class of a analog quick call entry for all AnyTone codeplugs.
@@ -2178,7 +2329,7 @@ protected:
   /** Allocates the bitmaps. This is also performed during a clear. */
   virtual bool allocateBitmaps() = 0;
   /** Sets all bitmaps for the given config. */
-  virtual void setBitmaps(Config *config) = 0;
+  virtual void setBitmaps(Context &ctx) = 0;
 
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */

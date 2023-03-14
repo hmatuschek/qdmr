@@ -139,6 +139,40 @@ AnytoneCodeplug::InvertedBitmapElement::enableFirst(unsigned int n) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::InvertedBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::InvertedBytemapElement::InvertedBytemapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::InvertedBytemapElement::isEncoded(unsigned int idx) const {
+  if (idx >= _size)
+    return false;
+  return 0 == _data[idx];
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::setEncoded(unsigned int idx, bool enable) {
+  if (idx >= _size)
+    return;
+  _data[idx] = enable ? 0x00 : 0xff;
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::enableFirst(unsigned int n) {
+  memset(_data, 0x00, n);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
@@ -1121,6 +1155,22 @@ AnytoneCodeplug::DTMFContactElement::fromContact(const DTMFContact *contact) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFContactBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFContactBytemapElement::DTMFContactBytemapElement(uint8_t *ptr, size_t size)
+  : InvertedBytemapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFContactBytemapElement::DTMFContactBytemapElement(uint8_t *ptr)
+  : InvertedBytemapElement(ptr, DTMFContactBytemapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GroupListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
@@ -1220,6 +1270,22 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   }
 
   return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::GroupListBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::GroupListBitmapElement::GroupListBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::GroupListBitmapElement::GroupListBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, GroupListBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -1454,6 +1520,22 @@ AnytoneCodeplug::ScanListElement::fromScanListObj(ScanList *lst, Context &ctx) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ScanListBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ScanListBitmapElement::ScanListBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ScanListBitmapElement::ScanListBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ScanListBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::RadioIDElement
  * ********************************************************************************************* */
 AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr, unsigned size)
@@ -1499,6 +1581,22 @@ AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
   setName(id->name());
   setNumber(id->number());
   return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::RadioIDBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+   // pass...
+}
+
+AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, RadioIDBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -2538,6 +2636,22 @@ AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexB(unsigned n) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ZoneBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ZoneBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::BootSettingsElement
  * ********************************************************************************************* */
 AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned size)
@@ -2871,6 +2985,37 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMRAPRSMessageElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMRAPRSMessageElement::DMRAPRSMessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMRAPRSMessageElement::DMRAPRSMessageElement(uint8_t *ptr)
+  : Element(ptr, DMRAPRSMessageElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMRAPRSMessageElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::DMRAPRSMessageElement::message() const {
+  return readASCII(Offset::message(), Limit::length(), 0x00);
+}
+
+void
+AnytoneCodeplug::DMRAPRSMessageElement::setMessage(const QString &message) {
+  writeASCII(Offset::message(), message, Limit::length(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::MessageListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr, unsigned size)
@@ -2954,6 +3099,22 @@ AnytoneCodeplug::MessageElement::message() const {
 void
 AnytoneCodeplug::MessageElement::setMessage(const QString &msg) {
   writeASCII(0x0000, msg, 99, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::MessageBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::MessageBytemapElement::MessageBytemapElement(uint8_t *ptr, size_t size)
+  : InvertedBytemapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::MessageBytemapElement::MessageBytemapElement(uint8_t *ptr)
+  : InvertedBytemapElement(ptr, MessageBytemapElement::size())
+{
+  // pass...
 }
 
 
@@ -4368,12 +4529,14 @@ AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
   if (! flags.updateCodePlug) {
     // Clear codeplug
     this->clear();
-    // First set bitmaps
-    this->setBitmaps(config);
     // Then allocate elements
     this->allocateUpdated();
-    this->allocateForEncoding();
   }
+
+  // First set bitmaps
+  this->setBitmaps(ctx);
+  // Allocate all memory elements representing the common config
+  this->allocateForEncoding();
 
   // Then encode everything.
   return this->encodeElements(flags, ctx, err);

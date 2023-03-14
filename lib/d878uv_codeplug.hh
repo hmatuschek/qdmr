@@ -1393,7 +1393,7 @@ public:
 
 protected:
   bool allocateBitmaps();
-  void setBitmaps(Config *config);
+  void setBitmaps(Context &ctx);
   void allocateForDecoding();
   void allocateUpdated();
   void allocateForEncoding();

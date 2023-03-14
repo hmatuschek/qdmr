@@ -410,7 +410,7 @@ public:
 
 protected:
   bool allocateBitmaps();
-  virtual void setBitmaps(Config *config);
+  virtual void setBitmaps(Context &ctx);
   virtual void allocateUpdated();
   virtual void allocateForDecoding();
   virtual void allocateForEncoding();
@@ -558,11 +558,23 @@ protected:
 public:
   /** Some limits for the codeplug. */
   struct Limit {
-    static constexpr unsigned int channelsPerBank() { return 128; }      ///< Max number of channels per bank.
-    static constexpr unsigned int numChannels()     { return 4000; }     ///< Max number of channels.
-    static constexpr unsigned int contactsPerBank() { return 1000; }     ///< Max number of contacts per bank.
-    static constexpr unsigned int contactsPerBlock(){ return 4; }        ///< Max number of contacts per block.
-    static constexpr unsigned int numContacts()     { return 10000; }    ///< Max number of contacts.
+    static constexpr unsigned int channelsPerBank()     { return 128; }   ///< Max number of channels per bank.
+    static constexpr unsigned int numChannels()         { return 4000; }  ///< Max number of channels.
+    static constexpr unsigned int contactsPerBank()     { return 1000; }  ///< Max number of contacts per bank.
+    static constexpr unsigned int contactsPerBlock()    { return 4; }     ///< Max number of contacts per block.
+    static constexpr unsigned int numContacts()         { return 10000; } ///< Max number of contacts.
+    static constexpr unsigned int numDTMFContacts()     { return 128; }   ///< Max number of DTMF contacts.
+    static constexpr unsigned int numGroupLists()       { return 250; }   ///< Max number of group lists.
+    static constexpr unsigned int numScanLists()        { return 250; }   ///< Max number of scan lists.
+    static constexpr unsigned int numScanListsPerBank() { return 16; }    ///< Max number of scan lists per bank.
+    static constexpr unsigned int numRadioIDs()         { return 250; }   ///< Max number of radio IDs.
+    // There is no zone element -> hence all attributes must be defied within the codeplug.
+    static constexpr unsigned int numZones()            { return 250; }   ///< Max number of zones.
+    static constexpr unsigned int numChannelsPerZone()  { return 250; }   ///< Max number of channels per zone.
+    static constexpr unsigned int zoneNameLength()      { return 16; }    ///< Max zone name length.
+    static constexpr unsigned int dmrAPRSSystems()      { return 8; }     ///< Max number of DMR APRS systems.
+    static constexpr unsigned int numMessages()         { return 100; }   ///< Max number of preset SMS.
+    static constexpr unsigned int numMessagePerBank()   { return 8; }     ///< Max number of SMS per bank.
   };
 
 protected:
@@ -572,6 +584,8 @@ protected:
     static constexpr unsigned int channelBitmap()        { return 0x024c1500; }
     static constexpr unsigned int channelBanks()         { return 0x00800000; }
     static constexpr unsigned int betweenChannelBanks()  { return 0x00040000; }
+    static constexpr unsigned int vfoA()                 { return 0x00fc0800; }
+    static constexpr unsigned int vfoB()                 { return 0x00fc0840; }
 
     static constexpr unsigned int contactBitmap()        { return 0x02640000; }
     static constexpr unsigned int contactBanks()         { return 0x02680000; }
@@ -579,6 +593,37 @@ protected:
     static constexpr unsigned int betweenContactBlocks() { return 0x00000190; }
     static constexpr unsigned int contactIndex()         { return 0x02600000; }
     static constexpr unsigned int contactIdTable()       { return 0x04340000; }
+
+    static constexpr unsigned int dtmfContactBytemap()   { return 0x02900100; }
+    static constexpr unsigned int dtmfContacts()         { return 0x02940000; }
+    static constexpr unsigned int dtmfIndex()            { return 0x02900000; }
+
+    static constexpr unsigned int groupListBitmap()      { return 0x025C0B10; }
+    static constexpr unsigned int groupLists()           { return 0x02980000; }
+    static constexpr unsigned int betweenGroupLists()    { return 0x00000200; }
+
+    static constexpr unsigned int scanListBitmap()       { return 0x024c1340; }
+    static constexpr unsigned int scanListBanks()        { return 0x01080000; }
+    static constexpr unsigned int betweenScanLists()     { return 0x00000200; }
+    static constexpr unsigned int betweenScanListBanks() { return 0x00040000; }
+
+    static constexpr unsigned int radioIDBitmap()        { return 0x024c1320; }
+    static constexpr unsigned int radioIDs()             { return 0x02580000; }
+
+    static constexpr unsigned int settings()             { return 0x02500000; }
+    static constexpr unsigned int bootSettings()         { return 0x02500600; }
+    static constexpr unsigned int dmrAPRSSettings()      { return 0x02501000; }
+    static constexpr unsigned int dmrAPRSMessage()       { return 0x02501100; }
+    static constexpr unsigned int zoneBitmap()           { return 0x024c1300; }
+    static constexpr unsigned int zoneChannels()         { return 0x01000000; }
+    static constexpr unsigned int betweenZoneChannels()  { return 0x00000200; }
+    static constexpr unsigned int zoneNames()            { return 0x02540000; }
+    static constexpr unsigned int betweenZoneNames()     { return 0x00000020; }
+
+    static constexpr unsigned int messageBytemap()       { return 0x01640800; }
+    static constexpr unsigned int messageBanks()         { return 0x02140000; }
+    static constexpr unsigned int betweenMessageBanks()  { return 0x00040000; }
+    static constexpr unsigned int messageIndex()         { return 0x01640000; }
     /// @endcond
   };
 };
