@@ -868,10 +868,11 @@ public:
     virtual void setAnalogMicGain(unsigned int gain);
 
     /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx);
-
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Link config from settings extension. */
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Internal used offset within the element. */

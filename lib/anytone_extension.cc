@@ -1878,6 +1878,10 @@ AnytoneAutoRepeaterSettingsExtension::AnytoneAutoRepeaterSettingsExtension(QObje
     _minUHF(Frequency::fromMHz(400)), _maxUHF(Frequency::fromMHz(480)),
     _vhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
     _uhfOffset(new AnytoneAutoRepeaterOffsetRef(this)),
+    _minVHF2(Frequency::fromMHz(136)), _maxVHF2(Frequency::fromMHz(174)),
+    _minUHF2(Frequency::fromMHz(400)), _maxUHF2(Frequency::fromMHz(480)),
+    _vhf2Offset(new AnytoneAutoRepeaterOffsetRef(this)),
+    _uhf2Offset(new AnytoneAutoRepeaterOffsetRef(this)),
     _offsets(new AnytoneAutoRepeaterOffsetList(this))
 {
   // pass...
@@ -1971,10 +1975,66 @@ AnytoneAutoRepeaterSettingsExtension::uhfRef() const {
   return _uhfOffset;
 }
 
+Frequency
+AnytoneAutoRepeaterSettingsExtension::vhf2Min() const {
+  return _minVHF2;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setVHF2Min(Frequency Hz) {
+  if (_minVHF2 == Hz)
+    return;
+  _minVHF2 = Hz;
+  emit modified(this);
+}
+Frequency
+AnytoneAutoRepeaterSettingsExtension::vhf2Max() const {
+  return _maxVHF2;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setVHF2Max(Frequency Hz) {
+  if (_maxVHF2 == Hz)
+    return;
+  _maxVHF2 = Hz;
+  emit modified(this);
+}
+Frequency
+AnytoneAutoRepeaterSettingsExtension::uhf2Min() const {
+  return _minUHF2;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setUHF2Min(Frequency Hz) {
+  if (_minUHF2 == Hz)
+    return;
+  _minUHF2 = Hz;
+  emit modified(this);
+}
+Frequency
+AnytoneAutoRepeaterSettingsExtension::uhf2Max() const {
+  return _maxUHF2;
+}
+void
+AnytoneAutoRepeaterSettingsExtension::setUHF2Max(Frequency Hz) {
+  if (_maxUHF2 == Hz)
+    return;
+  _maxUHF2 = Hz;
+  emit modified(this);
+}
+
+AnytoneAutoRepeaterOffsetRef *
+AnytoneAutoRepeaterSettingsExtension::vhf2Ref() const {
+  return _vhf2Offset;
+}
+
+AnytoneAutoRepeaterOffsetRef *
+AnytoneAutoRepeaterSettingsExtension::uhf2Ref() const {
+  return _uhf2Offset;
+}
+
 AnytoneAutoRepeaterOffsetList *
 AnytoneAutoRepeaterSettingsExtension::offsets() const {
   return _offsets;
 }
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAutoRepeaterOffset

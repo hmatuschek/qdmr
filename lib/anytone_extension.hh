@@ -1089,6 +1089,30 @@ class AnytoneAutoRepeaterSettingsExtension: public ConfigItem
   /** A reference to the auto-repeater frequency for UHF. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* uhf READ uhfRef)
 
+  Q_CLASSINFO("vhf2Min", "The minimum frequency in Hz of the second VHF auto-repeater frequency range.")
+  /** The minimum frequency in Hz of the second VHF auto-repeater frequency range. */
+  Q_PROPERTY(Frequency vhf2Min READ vhf2Min WRITE setVHF2Min)
+
+  Q_CLASSINFO("vhf2Max", "The maximum frequency in Hz of the second VHF auto-repeater frequency range.")
+  /** The maximum frequency in Hz of the second VHF auto-repeater frequency range. */
+  Q_PROPERTY(Frequency vhf2Max READ vhf2Max WRITE setVHF2Max)
+
+  Q_CLASSINFO("uhf2Min", "The minimum frequency in Hz of the second UHF auto-repeater frequency range.")
+  /** The minimum frequency in Hz of the second UHF auto-repeater frequency range. */
+  Q_PROPERTY(Frequency uhf2Min READ uhf2Min WRITE setUHF2Min)
+
+  Q_CLASSINFO("uhf2Max", "The maximum frequency in Hz of the second UHF auto-repeater frequency range.")
+  /** The maximum frequency in Hz of the second UHF auto-repeater frequency range. */
+  Q_PROPERTY(Frequency uhf2Max READ uhf2Max WRITE setUHF2Max)
+
+  Q_CLASSINFO("vhf2Description", "A reference to an offset frequency for the second VHF band.")
+  /** A reference to the auto-repeater frequency for the second VHF band. */
+  Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* vhf2 READ vhf2Ref)
+
+  Q_CLASSINFO("uhf2Description", "A reference to an offset frequency for the second UHF band.")
+  /** A reference to the auto-repeater frequency for the second UHF band. */
+  Q_PROPERTY(AnytoneAutoRepeaterOffsetRef* uhf2 READ uhf2Ref)
+
   Q_CLASSINFO("offsetDescription", "The lists of offset frequencies.")
   /** The repeater transmit offset frequencies. */
   Q_PROPERTY(AnytoneAutoRepeaterOffsetList* offsets READ offsets)
@@ -1139,6 +1163,28 @@ public:
   /** Returns the reference for the VHF offset freuqency. */
   AnytoneAutoRepeaterOffsetRef *vhfRef() const;
 
+  /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the second VHF band. */
+  Frequency vhf2Min() const;
+  /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the second VHF band. */
+  void setVHF2Min(Frequency Hz);
+  /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the second VHF band. */
+  Frequency vhf2Max() const;
+  /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the second VHF band. */
+  void setVHF2Max(Frequency Hz);
+  /** Returns the minimum frequency (in Hz) of the auto-repeater frequency range in the second UHF band. */
+  Frequency uhf2Min() const;
+  /** Sets the minimum frequency (in Hz) of the auto-repeater frequency range in the second UHF band. */
+  void setUHF2Min(Frequency Hz);
+  /** Returns the maximum frequency (in Hz) of the auto-repeater frequency range in the second UHF band. */
+  Frequency uhf2Max() const;
+  /** Sets the maximum frequency (in Hz) of the auto-repeater frequency range in the second UHF band. */
+  void setUHF2Max(Frequency Hz);
+
+  /** Returns the reference for the second UHF offset freuqency. */
+  AnytoneAutoRepeaterOffsetRef *uhf2Ref() const;
+  /** Returns the reference for the second VHF offset freuqency. */
+  AnytoneAutoRepeaterOffsetRef *vhf2Ref() const;
+
   /** Returns a weak reference to the offset list. */
   AnytoneAutoRepeaterOffsetList *offsets() const;
 
@@ -1159,6 +1205,18 @@ protected:
   AnytoneAutoRepeaterOffsetRef *_vhfOffset;
   /** A reference to the UHF offset frequency. */
   AnytoneAutoRepeaterOffsetRef *_uhfOffset;
+  /** Minimum frequency of the second VHF auto-repeater range. */
+  Frequency _minVHF2;
+  /** Maximum frequency of the second VHF auto-repeater range. */
+  Frequency _maxVHF2;
+  /** Minimum frequency of the second UHF auto-repeater range. */
+  Frequency _minUHF2;
+  /** Maximum frequency of the second UHF auto-repeater range. */
+  Frequency _maxUHF2;
+  /** A reference to the second VHF offset frequency. */
+  AnytoneAutoRepeaterOffsetRef *_vhf2Offset;
+  /** A reference to the second UHF offset frequency. */
+  AnytoneAutoRepeaterOffsetRef *_uhf2Offset;
   /** The list of repeater offsets. */
   AnytoneAutoRepeaterOffsetList *_offsets;
 };

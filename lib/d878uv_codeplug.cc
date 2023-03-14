@@ -20,7 +20,6 @@
 #define GENERAL_CONFIG_EXT1_SIZE  0x00000030
 
 #define ADDR_GENERAL_CONFIG_EXT2  0x02501400
-#define GENERAL_CONFIG_EXT2_SIZE  0x00000100
 
 #define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
 #define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
@@ -1600,6 +1599,8 @@ D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::clear() {
   memset(_data, 0x00, _size);
+  clearAutoRepeaterVHF2OffsetIndex();
+  clearAutoRepeaterUHF2OffsetIndex();
 }
 
 bool
@@ -1681,19 +1682,19 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterVHF2MaxFrequency
 }
 Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MinFrequency() const {
-  return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::autoRepeaterUHF2MinFrequency()))*10);
+  return Frequency::fromHz(((unsigned long long)getUInt32_le(Offset::autoRepeaterUHF2MinFrequency()))*10);
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MinFrequency(Frequency hz) {
-  setBCD8_be(Offset::autoRepeaterUHF2MinFrequency(), hz.inHz()/10);
+  setUInt32_le(Offset::autoRepeaterUHF2MinFrequency(), hz.inHz()/10);
 }
 Frequency
 D878UVCodeplug::GeneralSettingsExtensionElement::autoRepeaterUHF2MaxFrequency() const {
-  return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::autoRepeaterUHF2MaxFrequency()))*10);
+  return Frequency::fromHz(((unsigned long long)getUInt32_le(Offset::autoRepeaterUHF2MaxFrequency()))*10);
 }
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setAutoRepeaterUHF2MaxFrequency(Frequency hz) {
-  setBCD8_be(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
+  setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::GPSMode
@@ -1716,8 +1717,11 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setAnalogMicGain(unsigned int g
 }
 
 bool
-D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags); Q_UNUSED(ctx);
+D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  if (! flags.updateCodePlug)
+    this->clear();
 
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
@@ -1727,6 +1731,25 @@ D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, 
 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+
+  // Encode auto-repeater frequency ranges
+  setAutoRepeaterVHF2MinFrequency(ext->autoRepeaterSettings()->vhf2Min());
+  setAutoRepeaterVHF2MaxFrequency(ext->autoRepeaterSettings()->vhf2Max());
+  setAutoRepeaterUHF2MinFrequency(ext->autoRepeaterSettings()->uhf2Min());
+  setAutoRepeaterUHF2MaxFrequency(ext->autoRepeaterSettings()->uhf2Max());
+  // Encode auto-repeater offset indices
+  clearAutoRepeaterVHF2OffsetIndex();
+  if (! ext->autoRepeaterSettings()->vhf2Ref()->isNull()) {
+    setAutoRepeaterVHF2OffsetIndex(
+          ctx.index(
+            ext->autoRepeaterSettings()->vhf2Ref()->as<AnytoneAutoRepeaterOffset>()));
+  }
+  clearAutoRepeaterUHF2OffsetIndex();
+  if (! ext->autoRepeaterSettings()->uhf2Ref()->isNull()) {
+    setAutoRepeaterUHF2OffsetIndex(
+          ctx.index(
+            ext->autoRepeaterSettings()->uhf2Ref()->as<AnytoneAutoRepeaterOffset>()));
+  }
 
   // Encode audio settings
   if (ext->audioSettings()->analogMicGainEnabled())
@@ -1738,7 +1761,7 @@ D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, 
 }
 
 bool
-D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
+D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
   // Get or add extension if not present
@@ -1748,11 +1771,53 @@ D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx) {
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Store auto-repeater frequency ranges
+  ext->autoRepeaterSettings()->setVHF2Min(this->autoRepeaterVHF2MinFrequency());
+  ext->autoRepeaterSettings()->setVHF2Max(this->autoRepeaterVHF2MaxFrequency());
+  ext->autoRepeaterSettings()->setUHF2Min(this->autoRepeaterUHF2MinFrequency());
+  ext->autoRepeaterSettings()->setUHF2Max(this->autoRepeaterUHF2MaxFrequency());
+
   // Store FM mic gain separately
   ext->audioSettings()->setAnalogMicGain(analogMicGain());
   // Enable separate mic gain, if it differs from the DMR mic gain:
   ext->audioSettings()->enableAnalogMicGain(
         ctx.config()->settings()->micLevel() != analogMicGain());
+
+  return true;
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    errMsg(err) << "Cannot link config extension: not set.";
+    return false;
+  }
+
+  if (hasAutoRepeaterVHF2OffsetIndex()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterVHF2OffsetIndex())) {
+      errMsg(err) << "Cannot link AnyTone settings extension: "
+                     "second auto-repeater VHF offset index "
+                  << this->autoRepeaterVHF2OffsetIndex() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->vhf2Ref()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(
+            this->autoRepeaterVHF2OffsetIndex()));
+  }
+
+  if (hasAutoRepeaterUHF2OffsetIndex()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterUHF2OffsetIndex())) {
+      errMsg(err) << "Cannot link AnyTone settings extension: "
+                     "second auto-repeater UHF offset index "
+                  << this->autoRepeaterUHF2OffsetIndex() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->uhf2Ref()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(
+            this->autoRepeaterUHF2OffsetIndex()));
+  }
 
   return true;
 }
@@ -2761,7 +2826,7 @@ D878UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
   image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
   image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
-  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GENERAL_CONFIG_EXT2_SIZE);
+  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GeneralSettingsExtensionElement::size());
 
 }
 bool
@@ -2784,7 +2849,17 @@ D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 }
 bool
 D878UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err);
+  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err)) {
+    errMsg(err) << "Cannot link general settings extension.";
+    return false;
+  }
+
+  if (! GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).linkConfig(ctx, err)) {
+    errMsg(err) << "Cannot link general settings extension.";
+    return false;
+  }
+
+  return true;
 }
 
 void
