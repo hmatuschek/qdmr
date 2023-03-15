@@ -1452,7 +1452,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="94"/>
         <source>Intro line 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intro rad 2</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="104"/>
@@ -1810,7 +1810,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="43"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Vald]</translation>
     </message>
     <message>
         <location filename="../src/channelselectiondialog.cc" line="64"/>
@@ -1908,7 +1908,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="714"/>
         <source>DMR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="716"/>
@@ -1934,7 +1934,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="735"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Vald]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="739"/>
@@ -1954,7 +1954,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="761"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destination</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="762"/>
@@ -2674,7 +2674,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="43"/>
         <source>Time Slot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Time Slot</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="50"/>
@@ -2700,12 +2700,12 @@
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="44"/>
         <source>TS 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS 1</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="45"/>
         <source>TS 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS 2</translation>
     </message>
 </context>
 <context>
@@ -2758,7 +2758,7 @@
         <location filename="../src/configitemwrapper.cc" line="528"/>
         <location filename="../src/configitemwrapper.cc" line="536"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Vald]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="548"/>
@@ -2776,12 +2776,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="551"/>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>TS</source>
         <translation type="unfinished">TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>CC</source>
         <translation type="unfinished">CC</translation>
     </message>
@@ -3017,7 +3017,7 @@
         <location filename="../src/scanlistdialog.cc" line="37"/>
         <location filename="../src/scanlistdialog.cc" line="39"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Vald]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="38"/>
@@ -3417,7 +3417,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="94"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destination</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="103"/>
@@ -3437,7 +3437,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="146"/>
         <source>Update period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uppdateringsperiod [s]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="153"/>
