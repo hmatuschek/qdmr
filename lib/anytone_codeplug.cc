@@ -3059,8 +3059,14 @@ AnytoneCodeplug::RepeaterOffsetListElement::setOffset(unsigned int n, Frequency 
   if (n >= Limit::numEntries())
     return;
 
-  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(),
-               freq.inHz()/10);
+  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(), freq.inHz()/10);
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::clearOffset(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(), 0);
 }
 
 
