@@ -1125,16 +1125,6 @@ public:
     RoamingChannelElement(uint8_t *ptr, unsigned size);
 
   protected:
-    /** Address offsets within the element. */
-    enum Offsets {
-      RXFrequency = 0x0000,
-      TXFrequency = 0x0004,
-      ColorCode   = 0x0008,
-      TimeSlot    = 0x0009,
-      Name        = 0x000a,
-      NameLength  = 16
-    };
-
     /** Special values for the color code. */
     enum ColorCodeValue {
       Disabled = 16
@@ -1149,6 +1139,9 @@ public:
   public:
     /** Constructor. */
     RoamingChannelElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Resets the roaming channel. */
     void clear();
@@ -1185,6 +1178,24 @@ public:
     virtual bool fromChannel(const RoamingChannel *ch);
     /** Constructs a @c RoamingChannel instance for this roaming channel. */
     virtual RoamingChannel *toChannel(Context &ctx);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int rxFrequency() { return 0x0000; }
+      static constexpr unsigned int txFrequency() { return 0x0004; }
+      static constexpr unsigned int colorCode()   { return 0x0008; }
+      static constexpr unsigned int timeSlot()    { return 0x0009; }
+      static constexpr unsigned int name()        { return 0x000a; }
+      /// @endcond
+    };
   };
 
   /** Represents a roaming zone within the binary codeplug.
@@ -1200,6 +1211,9 @@ public:
   public:
     /** Constructor. */
     RoamingZoneElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
 
     /** Clears the roaming zone. */
     void clear();
@@ -1219,11 +1233,28 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, Context& ctx);
+    virtual bool fromRoamingZone(RoamingZone *zone, Context& ctx, const ErrorStack &err=ErrorStack());
     /** Constructs a @c RoamingZone instance from this configuration. */
-    virtual RoamingZone *toRoamingZone() const;
+    virtual RoamingZone *toRoamingZone(Context& ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, Context& ctx);
+    virtual bool linkRoamingZone(RoamingZone *zone, Context& ctx, const ErrorStack& err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }          ///< Maximum name length.
+      static constexpr unsigned int numMembers() { return 64; }          ///< Maximum number of roaming channel in zone.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()        { return 0x0000; }
+      static constexpr unsigned int betweenMembers() { return 0x0001; }
+      static constexpr unsigned int name()           { return 0x0040; }
+      /// @endcond
+    };
   };
 
   /** Represents an AES encryption key.
