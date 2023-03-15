@@ -1223,9 +1223,9 @@ DMR6X2UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
       continue;
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
     D878UVCodeplug::RoamingZoneElement z(data(addr));
-    RoamingZone *zone = z.toRoamingZone();
+    RoamingZone *zone = z.toRoamingZone(ctx, err);
     ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);
-    z.linkRoamingZone(zone, ctx);
+    z.linkRoamingZone(zone, ctx, err);
   }
 
   return true;

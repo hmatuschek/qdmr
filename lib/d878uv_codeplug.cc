@@ -268,7 +268,7 @@ D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, unsig
 }
 
 D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, RoamingChannelElement::size())
 {
   // pass...
 }
@@ -280,41 +280,41 @@ D878UVCodeplug::RoamingChannelElement::clear() {
 
 unsigned
 D878UVCodeplug::RoamingChannelElement::rxFrequency() const {
-  return getBCD8_be(Offsets::RXFrequency)*10;
+  return getBCD8_be(Offset::rxFrequency())*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setRXFrequency(unsigned hz) {
-  setBCD8_be(Offsets::RXFrequency, hz/10);
+  setBCD8_be(Offset::rxFrequency(), hz/10);
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::txFrequency() const {
-  return getBCD8_be(Offsets::TXFrequency)*10;
+  return getBCD8_be(Offset::txFrequency())*10;
 }
 void
 D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
-  setBCD8_be(Offsets::TXFrequency, hz/10);
+  setBCD8_be(Offset::txFrequency(), hz/10);
 }
 
 bool
 D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
-  return ColorCodeValue::Disabled == getUInt8(Offsets::ColorCode);
+  return ColorCodeValue::Disabled == getUInt8(Offset::colorCode());
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
-  return std::min(15u, (unsigned)getUInt8(Offsets::ColorCode));
+  return std::min(15u, (unsigned)getUInt8(Offset::colorCode()));
 }
 void
 D878UVCodeplug::RoamingChannelElement::setColorCode(unsigned cc) {
-  setUInt8(Offsets::ColorCode, cc);
+  setUInt8(Offset::colorCode(), cc);
 }
 void
 D878UVCodeplug::RoamingChannelElement::disableColorCode() {
-  setUInt8(Offsets::ColorCode, ColorCodeValue::Disabled);
+  setUInt8(Offset::colorCode(), ColorCodeValue::Disabled);
 }
 
 DMRChannel::TimeSlot
 D878UVCodeplug::RoamingChannelElement::timeSlot() const {
-  switch (getUInt8(Offsets::TimeSlot)) {
+  switch (getUInt8(Offset::timeSlot())) {
   case TimeSlotValue::TS1: return DMRChannel::TimeSlot::TS1;
   case TimeSlotValue::TS2: return DMRChannel::TimeSlot::TS2;
   }
@@ -323,18 +323,18 @@ D878UVCodeplug::RoamingChannelElement::timeSlot() const {
 void
 D878UVCodeplug::RoamingChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   switch (ts) {
-  case DMRChannel::TimeSlot::TS1: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS1); break;
-  case DMRChannel::TimeSlot::TS2: setUInt8(Offsets::TimeSlot, TimeSlotValue::TS2); break;
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::timeSlot(), TimeSlotValue::TS1); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::timeSlot(), TimeSlotValue::TS2); break;
   }
 }
 
 QString
 D878UVCodeplug::RoamingChannelElement::name() const {
-  return readASCII(Offsets::Name, Offsets::NameLength, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(Offsets::Name, name, Offsets::NameLength, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 bool
@@ -379,7 +379,7 @@ D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr, unsigned si
 }
 
 D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr)
-  : Element(ptr, 0x0080)
+  : Element(ptr, RoamingZoneElement::size())
 {
   // pass...
 }
@@ -387,7 +387,7 @@ D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr)
 void
 D878UVCodeplug::RoamingZoneElement::clear() {
   memset(_data, 0x00, _size);
-  memset(_data+0x000, 0xff, NUM_CH_PER_ROAMINGZONE);
+  memset(_data+Offset::members(), 0xff, Limit::numMembers());
 }
 
 bool
@@ -396,49 +396,60 @@ D878UVCodeplug::RoamingZoneElement::hasMember(unsigned n) const {
 }
 unsigned
 D878UVCodeplug::RoamingZoneElement::member(unsigned n) const {
-  return getUInt8(0x0000 + n);
+  return getUInt8(Offset::members() + n*Offset::betweenMembers());
 }
 void
 D878UVCodeplug::RoamingZoneElement::setMember(unsigned n, unsigned idx) {
-  setUInt8(0x0000 + n, idx);
+  if (n >= Limit::numMembers())
+    return;
+  setUInt8(Offset::members() + n*Offset::betweenMembers(), idx);
 }
 void
 D878UVCodeplug::RoamingZoneElement::clearMember(unsigned n) {
-  setMember(n, 0xff);
+  if (n >= Limit::numMembers())
+    return;
+  setMember(Offset::members() + n*Offset::betweenMembers(), 0xff);
 }
 
 QString
 D878UVCodeplug::RoamingZoneElement::name() const {
-  return readASCII(0x0040, 16, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 D878UVCodeplug::RoamingZoneElement::setName(const QString &name) {
-  writeASCII(0x0040, name, 16, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 bool
-D878UVCodeplug::RoamingZoneElement::fromRoamingZone(
-    RoamingZone *zone, Context &ctx)
+D878UVCodeplug::RoamingZoneElement::fromRoamingZone(RoamingZone *zone, Context &ctx, const ErrorStack& err)
 {
+  Q_UNUSED(err)
+
   clear();
   setName(zone->name());
-  for (int i=0; i<std::min(NUM_CH_PER_ROAMINGZONE, zone->count()); i++) {
+  for (unsigned int i=0; i<std::min(Limit::numMembers(), (unsigned int)zone->count()); i++) {
     setMember(i, ctx.index(zone->channel(i)));
   }
   return true;
 }
 
 RoamingZone *
-D878UVCodeplug::RoamingZoneElement::toRoamingZone() const {
+D878UVCodeplug::RoamingZoneElement::toRoamingZone(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   return new RoamingZone(name());
 }
 
 bool
-D878UVCodeplug::RoamingZoneElement::linkRoamingZone(RoamingZone *zone, Context &ctx)
+D878UVCodeplug::RoamingZoneElement::linkRoamingZone(RoamingZone *zone, Context &ctx, const ErrorStack &err)
 {
-  for (uint8_t i=0; (i<NUM_CH_PER_ROAMINGZONE)&&hasMember(i); i++) {
-    if (ctx.has<RoamingChannel>(i))
-      zone->addChannel(ctx.get<RoamingChannel>(i));
+  for (uint8_t i=0; (i<Limit::numMembers())&&hasMember(i); i++) {
+    if (ctx.has<RoamingChannel>(member(i))) {
+      zone->addChannel(ctx.get<RoamingChannel>(member(i)));
+    } else {
+      errMsg(err) << "Cannot link roaming zone '" << zone->name()
+                  << "': Roaming channel index " << member(i) << " is not defined.";
+      return false;
+    }
   }
   return true;
 }
@@ -2994,10 +3005,12 @@ D878UVCodeplug::allocateRoaming() {
 
 bool
 D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode roaming channels
-  for (uint8_t i=0; i<std::min(NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count()); i++) {
+  unsigned int num_roaming_channel = std::min(
+        NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count());
+  for (uint8_t i=0; i<num_roaming_channel; i++) {
     // Encode roaming channel
     uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
     RoamingChannelElement rch_elm(data(addr));
@@ -3048,9 +3061,9 @@ D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
       continue;
     uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
     RoamingZoneElement z(data(addr));
-    RoamingZone *zone = z.toRoamingZone();
+    RoamingZone *zone = z.toRoamingZone(ctx, err);
     ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);
-    z.linkRoamingZone(zone, ctx);
+    z.linkRoamingZone(zone, ctx, err);
   }
 
   return true;

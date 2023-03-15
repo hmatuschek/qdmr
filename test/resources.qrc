@@ -4,5 +4,6 @@
         <file>data/channel_frequency_test.yaml</file>
         <file>data/anytone_auto_repeater_extension.yaml</file>
         <file>data/anytone_audio_settings_extension.yaml</file>
+        <file>data/roaming_channel_test.yaml</file>
     </qresource>
 </RCC>

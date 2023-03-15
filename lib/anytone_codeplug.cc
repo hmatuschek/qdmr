@@ -4738,6 +4738,8 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // Map roaming
   for (int i=0; i<config->roamingZones()->count(); i++)
     ctx.add(config->roamingZones()->zone(i), i);
+  for (int i=0; i<config->roamingChannels()->count(); i++)
+    ctx.add(config->roamingChannels()->channel(i), i);
 
   // Map auto-repeater offsets
   if (config->settings()->anytoneExtension()) {
