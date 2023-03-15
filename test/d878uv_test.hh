@@ -19,8 +19,11 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
 
+  void testRoaming();
+
 protected:
   Config _basicConfig;
+  Config _roamingConfig;
 };
 
 #endif // D878UVTEST_HH
