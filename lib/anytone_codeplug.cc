@@ -3016,6 +3016,55 @@ AnytoneCodeplug::DMRAPRSMessageElement::setMessage(const QString &message) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::RepeaterOffsetListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::RepeaterOffsetListElement::RepeaterOffsetListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::RepeaterOffsetListElement::RepeaterOffsetListElement(uint8_t *ptr)
+  : Element(ptr, RepeaterOffsetListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    clearOffset(i);
+}
+
+bool
+AnytoneCodeplug::RepeaterOffsetListElement::isSet(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0 != getUInt32_le(Offset::frequencies() + n * Offset::betweenFrequencies());
+}
+
+Frequency
+AnytoneCodeplug::RepeaterOffsetListElement::offset(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return Frequency::fromHz(0);
+
+  return Frequency::fromHz(
+        ((unsigned long long)getUInt32_le(Offset::frequencies()
+                                          + n * Offset::betweenFrequencies()))*10);
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::setOffset(unsigned int n, Frequency freq) {
+  if (n >= Limit::numEntries())
+    return;
+
+  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(),
+               freq.inHz()/10);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::MessageListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr, unsigned size)
@@ -3167,6 +3216,85 @@ AnytoneCodeplug::AnalogQuickCallElement::clearContactIndex() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AnalogQuickCallsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::AnalogQuickCallsElement::AnalogQuickCallsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AnalogQuickCallsElement::AnalogQuickCallsElement(uint8_t *ptr)
+  : Element(ptr, AnalogQuickCallsElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AnalogQuickCallsElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    AnalogQuickCallElement(quickCall(i)).clear();
+}
+
+uint8_t *
+AnytoneCodeplug::AnalogQuickCallsElement::quickCall(unsigned int n) const {
+  n = std::min(Limit::numEntries(), n);
+  return _data + n*AnalogQuickCallElement::size();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::StatusMessagesElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::StatusMessagesElement::StatusMessagesElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::StatusMessagesElement::StatusMessagesElement(uint8_t *ptr)
+  : Element(ptr, StatusMessagesElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::StatusMessagesElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::StatusMessagesElement::message(unsigned int n) const {
+  n = std::min(Limit::numMessages(), n);
+  return readASCII(Offset::messages()+n*Offset::betweenMessages(), Limit::messageLength(), 0x00);
+}
+
+void
+AnytoneCodeplug::StatusMessagesElement::setMessage(unsigned int n, const QString &msg) {
+  if (n >= Limit::numMessages())
+    return;
+  writeASCII(Offset::messages()+n*Offset::betweenMessages(), msg, Limit::messageLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::StatusMessageBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::StatusMessageBitmapElement::StatusMessageBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::StatusMessageBitmapElement::StatusMessageBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, StatusMessageBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::HotKeyElement
  * ********************************************************************************************* */
 AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr, unsigned size)
@@ -3256,6 +3384,35 @@ AnytoneCodeplug::HotKeyElement::setMessageIndex(unsigned idx) {
 void
 AnytoneCodeplug::HotKeyElement::clearMessageIndex() {
   setMessageIndex(0xff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::HotKeySettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr)
+  : Element(ptr, HotKeySettingsElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::HotKeySettingsElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    HotKeyElement(hotKeySetting(i)).clear();
+}
+
+uint8_t *
+AnytoneCodeplug::HotKeySettingsElement::hotKeySetting(unsigned int n) const {
+  n = std::min(Limit::numEntries(), n);
+  return _data + Offset::hotKeySettings() + n*Offset::betweenHotKeySettings();
 }
 
 
@@ -4551,7 +4708,3 @@ AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
 
   return this->decodeElements(ctx, err);
 }
-
-
-
-

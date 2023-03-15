@@ -18,14 +18,9 @@
 #define ADDR_DTMF_NUMBERS         0x02500500
 #define DTMF_NUMBERS_SIZE         0x00000100
 
-#define ADDR_HOTKEY               0x025C0000
-#define HOTKEY_SIZE               0x00000860
-#define STATUSMESSAGE_BITMAP      0x025C0B00
-#define STATUSMESSAGE_BITMAP_SIZE 0x00000010
-
-#define ADDR_OFFSET_FREQ          0x024C2000
+/*#define ADDR_OFFSET_FREQ          0x024C2000
 #define NUM_OFFSET_FREQ                  250
-#define OFFSET_FREQ_SIZE          0x000003F0
+#define OFFSET_FREQ_SIZE          0x000003F0*/
 
 #define ADDR_ALARM_SETTING        0x024C1400
 #define ALARM_SETTING_SIZE        0x00000020
@@ -827,7 +822,7 @@ D868UVCodeplug::allocateBitmaps() {
   // Message bitmaps
   image(0).addElement(Offset::messageBytemap(), MessageBytemapElement::size());
   // Status messages
-  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
+  image(0).addElement(Offset::statusMessageBitmap(), StatusMessageBitmapElement::size());
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
   // 5-Tone function bitmaps
@@ -868,7 +863,10 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   unsigned int num_zones = std::min(Limit::numZones(), ctx.count<Zone>());
   zone_bitmap.clear();
   for (unsigned int i=0,z=0; i<num_zones; i++) {
-    zone_bitmap.setEncoded(z, true);
+    zone_bitmap.setEncoded(z, true); z++;
+    if (0 != ctx.get<Zone>(i)->B()->count()) {
+      zone_bitmap.setEncoded(z, true); z++;
+    }
   }
 
   // Mark group lists
@@ -1318,51 +1316,52 @@ D868UVCodeplug::allocateZones() {
     if (! zone_bitmap.isEncoded(i))
       continue;
     // Allocate zone itself
-    image(0).addElement(Offset::zoneChannels()+i*Offset::betweenZoneChannels(), Offset::betweenZoneChannels());
-    image(0).addElement(Offset::zoneNames()+i*Offset::betweenZoneNames(), Limit::zoneNameLength());
+    image(0).addElement(Offset::zoneChannels()+i*Offset::betweenZoneChannels(), Size::zoneChannels());
+    image(0).addElement(Offset::zoneNames()+i*Offset::betweenZoneNames(), Size::zoneName());
   }
 }
 
 bool
 D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode zones
   unsigned zidx = 0;
-  for (int i=0; i<ctx.config()->zones()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Zone>(); i++) {
+    Zone *zone = ctx.get<Zone>(i);
     // Clear name and channel list
-    uint8_t  *name     = (uint8_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
-    uint16_t *channels = (uint16_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
-    memset(name, 0, Limit::zoneNameLength());
-    memset(channels, 0xff, Offset::betweenZoneChannels());
-    if (ctx.config()->zones()->zone(i)->B()->count())
-      encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" A", 16, 0);
+    uint8_t  *name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    memset(name, 0, Size::zoneName());
+    memset(channels, 0xff, Size::zoneChannels());
+    if (zone->B()->count())
+      encode_ascii(name, zone->name()+" A", Limit::zoneNameLength(), 0);
     else
-      encode_ascii(name, ctx.config()->zones()->zone(i)->name(), 16, 0);
+      encode_ascii(name, zone->name(), Limit::zoneNameLength(), 0);
     // Handle list A
-    for (int j=0; j<ctx.config()->zones()->zone(i)->A()->count(); j++) {
-      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->A()->get(j)));
+    for (int j=0; j<zone->A()->count(); j++) {
+      //channels[j] = qToLittleEndian(ctx.index(zone->A()->get(j)->as<Channel>()));
     }
 
-    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), false, flags, ctx, err))
+    if (! encodeZone(zidx, zone, false, flags, ctx, err))
       return false;
     zidx++;
 
-    if (! ctx.config()->zones()->zone(i)->B()->count())
+    if (0 == zone->B()->count())
       continue;
 
     // Process list B if present
-    name     = (uint8_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
-    channels = (uint16_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
-    memset(name, 0, Offset::betweenZoneChannels());
-    memset(channels, 0xff, Limit::zoneNameLength());
-    encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" B", 16, 0);
+    name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    memset(name, 0, Size::zoneName());
+    memset(channels, 0xff, Size::zoneChannels());
+    encode_ascii(name, zone->name()+" B", Limit::zoneNameLength(), 0);
     // Handle list B
-    for (int j=0; j<ctx.config()->zones()->zone(i)->B()->count(); j++) {
-      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->B()->get(j)));
+    for (int j=0; j<zone->B()->count(); j++) {
+      channels[j] = qToLittleEndian(ctx.index(zone->B()->get(j)->as<Channel>()));
     }
 
-    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), true, flags, ctx, err))
+    if (! encodeZone(zidx, zone, true, flags, ctx, err))
       return false;
     zidx++;
   }
@@ -1388,8 +1387,9 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
     if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
-                                    Limit::zoneNameLength(), 0);
+    QString zonename = decode_ascii(
+          data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+          Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1440,8 +1440,9 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
     if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
-                                    Limit::zoneNameLength(), 0);
+    QString zonename = decode_ascii(
+          data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+          Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1586,7 +1587,7 @@ D868UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
 
 void
 D868UVCodeplug::allocateZoneChannelList() {
-  image(0).addElement(Offset::zoneChannels(), Offset::betweenZoneChannels());
+  image(0).addElement(Offset::zoneChannelList(), ZoneChannelListElement::size());
 }
 
 
@@ -1678,30 +1679,31 @@ D868UVCodeplug::allocateSMSMessages() {
   MessageBytemapElement messages_bytemap(data(Offset::messageBytemap()));
   unsigned message_count = 0;
   for (uint8_t i=0; i<Limit::numMessages(); i++) {
-    uint8_t bank = i/Limit::numMessagePerBank();
     if (! messages_bytemap.isEncoded(i))
       continue;
     message_count++;
-    uint32_t addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks();
+    uint32_t addr = Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks();
     if (!isAllocated(addr, 0)) {
-      image(0).addElement(addr, Limit::numMessagePerBank()*MessageElement::size());
+      image(0).addElement(addr, Size::messageBank());
     }
   }
   if (message_count) {
-    image(0).addElement(Offset::messageIndex(), 0x10*message_count);
+    image(0).addElement(Offset::messageIndex(), Size::messageIndex()*message_count);
   }
 }
 
 void
 D868UVCodeplug::allocateHotKeySettings() {
   // Allocate Hot Keys
-  image(0).addElement(ADDR_HOTKEY, HOTKEY_SIZE);
+  image(0).addElement(Offset::analogQuickCall(), AnalogQuickCallsElement::size());
+  image(0).addElement(Offset::statusMessages(), StatusMessagesElement::size());
+  image(0).addElement(Offset::hotKeySettings(), HotKeySettingsElement::size());
 }
 
 void
 D868UVCodeplug::allocateRepeaterOffsetFrequencies() {
   // Offset frequencies
-  image(0).addElement(ADDR_OFFSET_FREQ, OFFSET_FREQ_SIZE);
+  image(0).addElement(Offset::offsetFrequencies(), RepeaterOffsetListElement::size());
 }
 
 bool
@@ -1712,13 +1714,10 @@ D868UVCodeplug::encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx
   if (! ctx.config()->settings()->anytoneExtension())
     return true;
 
-  for (int i=0; i<NUM_OFFSET_FREQ; i++) {
-    uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ + i*sizeof(uint32_t));
-    if (i < (int)ctx.count<AnytoneAutoRepeaterOffset>()) {
-      (*offsetFreqPtr) = qToLittleEndian(ctx.get<AnytoneAutoRepeaterOffset>(i)->offset().inHz()/10);
-    } else {
-      *offsetFreqPtr = 0;
-    }
+  RepeaterOffsetListElement offsets(data(Offset::offsetFrequencies()));
+  offsets.clear();
+  for (unsigned int i=0; i<ctx.count<AnytoneAutoRepeaterOffset>(); i++) {
+    offsets.setOffset(i, ctx.get<AnytoneAutoRepeaterOffset>(i)->offset());
   }
   return true;
 }
@@ -1737,14 +1736,14 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
   }
 
   // Decode offsets.
-  for (int i=0; i<NUM_OFFSET_FREQ; i++) {
-    uint32_t *offsetFreqPtr = (uint32_t *)data(ADDR_OFFSET_FREQ + i*sizeof(uint32_t));
-    if (0 == *offsetFreqPtr)
-      continue;
-    AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
-    offset->setOffset(Frequency::fromHz(qFromLittleEndian(*offsetFreqPtr)*10ULL));
-    ext->autoRepeaterSettings()->offsets()->add(offset);
-    ctx.add(offset, i);
+  RepeaterOffsetListElement offsets(data(Offset::offsetFrequencies()));
+  for (unsigned int i=0; i<RepeaterOffsetListElement::Limit::numEntries(); i++) {
+    if (offsets.isSet(i)) {
+      AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
+      offset->setOffset(offsets.offset(i));
+      ext->autoRepeaterSettings()->offsets()->add(offset);
+      ctx.add(offset, i);
+    }
   }
 
   return true;

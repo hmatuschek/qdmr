@@ -614,6 +614,9 @@ protected:
     static constexpr unsigned int bootSettings()         { return 0x02500600; }
     static constexpr unsigned int dmrAPRSSettings()      { return 0x02501000; }
     static constexpr unsigned int dmrAPRSMessage()       { return 0x02501100; }
+    static constexpr unsigned int zoneChannelList()      { return 0x02500100; }
+    static constexpr unsigned int offsetFrequencies()    { return 0x024C2000; }
+
     static constexpr unsigned int zoneBitmap()           { return 0x024c1300; }
     static constexpr unsigned int zoneChannels()         { return 0x01000000; }
     static constexpr unsigned int betweenZoneChannels()  { return 0x00000200; }
@@ -624,6 +627,22 @@ protected:
     static constexpr unsigned int messageBanks()         { return 0x02140000; }
     static constexpr unsigned int betweenMessageBanks()  { return 0x00040000; }
     static constexpr unsigned int messageIndex()         { return 0x01640000; }
+
+    static constexpr unsigned int analogQuickCall()      { return 0x025C0000; }
+    static constexpr unsigned int statusMessageBitmap()  { return 0x025C0B00; }
+    static constexpr unsigned int statusMessages()       { return 0x025C0100; }
+    static constexpr unsigned int hotKeySettings()       { return 0x025C0500; }
+    /// @endcond
+  };
+
+  /** Internal used sizes. Usually sizes are specified by static methods of the element, however,
+   * some stuff is not represented by Elements in the AnyTone codeplug, hence this table is needed. */
+  struct Size {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int zoneName()             { return 0x0020; }
+    static constexpr unsigned int zoneChannels()         { return 0x0200; }
+    static constexpr unsigned int messageBank()          { return 0x0800; }
+    static constexpr unsigned int messageIndex()         { return 0x0010; }
     /// @endcond
   };
 };

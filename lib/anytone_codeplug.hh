@@ -1356,6 +1356,50 @@ public:
     };
   };
 
+  /** Represents the table of repeater offset frequencies.
+   *
+   * Memory representation of the offset frequency table (size 0x03F0 bytes):
+   * @verbinclude anytone_repeater_offset_frequencies.txt */
+  class RepeaterOffsetListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    RepeaterOffsetListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit RepeaterOffsetListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x03f0; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th offset frequency is set. */
+    virtual bool isSet(unsigned int n) const;
+    /** Returns the n-th offset frequency. */
+    virtual Frequency offset(unsigned int n) const;
+    /** Sets the n-th offset frequency. */
+    virtual void setOffset(unsigned int n, Frequency freq);
+    /** Clears the n-th offset frequency. */
+    virtual void clearOffset(unsigned int n);
+
+  public:
+    /** Some limts for the offset frequency table. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 250; }      ///< Max number of entries in the table.
+    };
+
+  protected:
+    /** Some internal used offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int frequencies() { return 0x0000; }
+      static constexpr unsigned int betweenFrequencies() { return sizeof(uint32_t); }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class of prefabricated message linked list for all AnyTone codeplugs.
    * This element is some weird linked list that determines some order for the prefabricated
    * SMS messages.
@@ -1482,6 +1526,100 @@ public:
     virtual void clearContactIndex();
   };
 
+  /** Implements the list of analog quick-call settings for all AnyTone codeplugs.
+   *
+   * Memory reresentation of the quick-call settings (size 0x0100 bytes):
+   * @verbinclude anytone_analogquickcalls.txt */
+  class AnalogQuickCallsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogQuickCallsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AnalogQuickCallsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    /** Clears the quick calls. */
+    void clear();
+
+    /** Returns a pointer to the n-th entry. */
+    uint8_t *quickCall(unsigned int n) const;
+
+  public:
+    /** Some limits for the quick calls. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 4; }   ///< The maximum number of quick-call entries.
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int quickCalls() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the list of status messages for all AnyTone codeplugs.
+   *
+   * Memory reresentation of the status messages (size 0x0400 bytes):
+   * @verbinclude anytone_statusmessages.txt */
+  class StatusMessagesElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    StatusMessagesElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    StatusMessagesElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0400; }
+
+    void clear();
+
+    /** Retunrs the n-th status message. */
+    virtual QString message(unsigned int n) const;
+    /** Sets the n-th status message. */
+    virtual void setMessage(unsigned int n, const QString &msg);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int numMessages()   { return 32; }    ///< Maximum number of messages.
+      static constexpr unsigned int messageLength() { return 32; }    ///< Maximum length of the messages.
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messages()        { return 0x0000; }
+      static constexpr unsigned int betweenMessages() { return 0x0020; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which status messages are valid. */
+  class StatusMessageBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    StatusMessageBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    StatusMessageBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+  };
+
   /** Represents the base class of a hot-key setting entry for all AnyTone codeplugs.
    *
    * Memory encoding of a hot-key setting (size 0x0030 bytes):
@@ -1583,6 +1721,44 @@ public:
     virtual void setMessageIndex(unsigned idx);
     /** Clears the message index. */
     virtual void clearMessageIndex();
+  };
+
+  /** Represents the list of hot-key settings for all AnyTone codeplugs.
+   *
+   *  Memory encoding of the hot-key settings (size 0x0360 bytes):
+   * @verbinclude anytone_hotkey_settings.txt */
+  class HotKeySettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    HotKeySettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HotKeySettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0360; }
+
+    void clear();
+
+    /** Returns a pointer to the n-th hot key setting. */
+    uint8_t *hotKeySetting(unsigned int n) const;
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 18; }   ///< Maximum number of hot-key entries.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int hotKeySettings()        { return 0x0000; }
+      static constexpr unsigned int betweenHotKeySettings() { return HotKeySettingsElement::size(); }
+      /// @endcond
+    };
   };
 
   /** Represents the base class of alarm setting entry for all AnyTone codeplugs.
