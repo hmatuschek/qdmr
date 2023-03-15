@@ -3686,11 +3686,11 @@ AnytoneCodeplug::AlarmSettingElement::clear() {
 
 uint8_t *
 AnytoneCodeplug::AlarmSettingElement::analog() const {
-  return _data + 0x0000;
+  return _data + Offset::analog();
 }
 uint8_t *
 AnytoneCodeplug::AlarmSettingElement::digital() const {
-  return _data + 0x000a;
+  return _data + Offset::digital();
 }
 
 
@@ -3716,7 +3716,7 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::clear() {
 
 DMRContact::Type
 AnytoneCodeplug::DigitalAlarmExtensionElement::callType() const {
-  switch (getUInt8(0x0000)) {
+  switch (getUInt8(Offset::callType())) {
   case 0x00: return DMRContact::PrivateCall;
   case 0x01: return DMRContact::GroupCall;
   case 0x02: return DMRContact::AllCall;
@@ -3726,19 +3726,19 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::callType() const {
 void
 AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DMRContact::PrivateCall: setUInt8(0x0000, 0x00); break;
-  case DMRContact::GroupCall: setUInt8(0x0000, 0x01); break;
-  case DMRContact::AllCall: setUInt8(0x0000, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::callType(), 0x00); break;
+  case DMRContact::GroupCall: setUInt8(Offset::callType(), 0x01); break;
+  case DMRContact::AllCall: setUInt8(Offset::callType(), 0x02); break;
   }
 }
 
 unsigned
 AnytoneCodeplug::DigitalAlarmExtensionElement::destination() const {
-  return getBCD8_be(0x0023);
+  return getBCD8_be(Offset::destination());
 }
 void
 AnytoneCodeplug::DigitalAlarmExtensionElement::setDestination(unsigned number) {
-  setBCD8_be(0x0023, number);
+  setBCD8_be(Offset::destination(), number);
 }
 
 
@@ -3819,6 +3819,50 @@ AnytoneCodeplug::FiveToneIDElement::setName(const QString &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneIDBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneIDBitmapElement::FiveToneIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneIDBitmapElement::FiveToneIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, FiveToneIDBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneIDListElement::FiveToneIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneIDListElement::FiveToneIDListElement(uint8_t *ptr)
+  : Element(ptr, FiveToneIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneIDListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+uint8_t *
+AnytoneCodeplug::FiveToneIDListElement::member(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return nullptr;
+  return _data + n*FiveToneIDElement::size();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::FiveToneFunctionElement
  * ********************************************************************************************* */
 AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr, unsigned size)
@@ -3891,6 +3935,34 @@ AnytoneCodeplug::FiveToneFunctionElement::name() const {
 void
 AnytoneCodeplug::FiveToneFunctionElement::setName(const QString &name) {
   writeASCII(0x000f, name, 7, 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneFunctionListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneFunctionListElement::FiveToneFunctionListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneFunctionListElement::FiveToneFunctionListElement(uint8_t *ptr)
+  : Element(ptr, FiveToneFunctionListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneFunctionListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+uint8_t *
+AnytoneCodeplug::FiveToneFunctionListElement::function(unsigned int n) const {
+  if (n >= Limit::numFunctions())
+    return nullptr;
+  return _data + n*FiveToneFunctionElement::size();
 }
 
 

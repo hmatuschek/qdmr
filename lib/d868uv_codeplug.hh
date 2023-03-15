@@ -632,6 +632,15 @@ protected:
     static constexpr unsigned int statusMessageBitmap()  { return 0x025C0B00; }
     static constexpr unsigned int statusMessages()       { return 0x025C0100; }
     static constexpr unsigned int hotKeySettings()       { return 0x025C0500; }
+
+    static constexpr unsigned int alarmSettings()        { return 0x024C1400; }
+    static constexpr unsigned int alarmSettingsExtension() { return 0x024c1440; }
+
+    static constexpr unsigned int fiveToneIdBitmap()     { return 0x024C0C80; }
+    static constexpr unsigned int fiveToneIdList()       { return 0x024C0000; }
+    static constexpr unsigned int fiveToneFunctions()    { return 0x024C0D00; }
+    static constexpr unsigned int fiveToneSettings()     { return 0x024C1000; }
+
     /// @endcond
   };
 

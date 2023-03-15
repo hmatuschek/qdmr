@@ -18,35 +18,12 @@
 #define ADDR_DTMF_NUMBERS         0x02500500
 #define DTMF_NUMBERS_SIZE         0x00000100
 
-/*#define ADDR_OFFSET_FREQ          0x024C2000
-#define NUM_OFFSET_FREQ                  250
-#define OFFSET_FREQ_SIZE          0x000003F0*/
-
-#define ADDR_ALARM_SETTING        0x024C1400
-#define ALARM_SETTING_SIZE        0x00000020
-
-#define ADDR_ALARM_SETTING_EXT    0x024c1440
-#define ALARM_SETTING_EXT_SIZE    0x00000030
-
 #define FMBC_BITMAP               0x02480210
 #define FMBC_BITMAP_SIZE          0x00000020
 #define ADDR_FMBC                 0x02480000
 #define FMBC_SIZE                 0x00000200
 #define ADDR_FMBC_VFO             0x02480200
 #define FMBC_VFO_SIZE             0x00000010
-
-#define FIVE_TONE_ID_BITMAP       0x024C0C80
-#define FIVE_TONE_ID_BITMAP_SIZE  0x00000010
-#define NUM_FIVE_TONE_IDS         100
-#define ADDR_FIVE_TONE_ID_LIST    0x024C0000
-#define FIVE_TONE_ID_SIZE         0x00000020
-#define FIVE_TONE_ID_LIST_SIZE    0x00000c80
-#define NUM_FIVE_TONE_FUNCTIONS   16
-#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0D00
-#define FIVE_TONE_FUNCTION_SIZE   0x00000020
-#define FIVE_TONE_FUNCTIONS_SIZE  0x00000200
-#define ADDR_FIVE_TONE_SETTINGS   0x024C1000
-#define FIVE_TONE_SETTINGS_SIZE   0x00000080
 
 #define ADDR_DTMF_SETTINGS        0x024C1080
 #define DTMF_SETTINGS_SIZE        0x00000050
@@ -826,7 +803,7 @@ D868UVCodeplug::allocateBitmaps() {
   // FM Broadcast bitmaps
   image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
   // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
+  image(0).addElement(Offset::fiveToneIdBitmap(), FiveToneIDBitmapElement::size());
   // 2-Tone function bitmaps
   image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
   image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
@@ -1753,8 +1730,8 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
 void
 D868UVCodeplug::allocateAlarmSettings() {
   // Alarm settings
-  image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
-  image(0).addElement(ADDR_ALARM_SETTING_EXT, ALARM_SETTING_EXT_SIZE);
+  image(0).addElement(Offset::alarmSettings(), AlarmSettingElement::size());
+  image(0).addElement(Offset::alarmSettingsExtension(), DigitalAlarmExtensionElement::size());
 }
 
 void
@@ -1766,23 +1743,22 @@ D868UVCodeplug::allocateFMBroadcastSettings() {
 void
 D868UVCodeplug::allocate5ToneIDs() {
   // Allocate 5-tone functions
-  uint8_t *bitmap = data(FIVE_TONE_ID_BITMAP);
-  for (uint8_t i=0; i<NUM_FIVE_TONE_IDS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (bitmap[byte] & (1<<bit)))
+  FiveToneIDBitmapElement bitmap(data(Offset::fiveToneIdBitmap()));
+  for (uint8_t i=0; i<FiveToneIDListElement::Limit::numEntries(); i++) {
+    if (! bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_FIVE_TONE_ID_LIST + i*FIVE_TONE_ID_SIZE, FIVE_TONE_ID_SIZE);
+    image(0).addElement(Offset::fiveToneIdList() + i*FiveToneIDElement::size(), FiveToneIDElement::size());
   }
 }
 
 void
 D868UVCodeplug::allocate5ToneFunctions() {
-  image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS, FIVE_TONE_FUNCTIONS_SIZE);
+  image(0).addElement(Offset::fiveToneFunctions(), FiveToneFunctionListElement::size());
 }
 
 void
 D868UVCodeplug::allocate5ToneSettings() {
-  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
+  image(0).addElement(Offset::fiveToneSettings(), FiveToneSettingsElement::size());
 }
 
 void

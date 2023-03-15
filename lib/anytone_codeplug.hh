@@ -1953,6 +1953,15 @@ public:
     virtual uint8_t *analog() const;
     /** Returns a pointer to the digital alarm settings. */
     virtual uint8_t *digital() const;
+
+  protected:
+    /** Internal offsets within the element */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int analog()  { return 0x0000; }
+      static constexpr unsigned int digital() { return 0x000a; }
+      /// @endcond
+    };
   };
 
   /** Represents the base class of digital alarm setting extension for all AnyTone codeplugs.
@@ -1984,6 +1993,15 @@ public:
     virtual unsigned destination() const;
     /** Sets the destination DMR number. */
     virtual void setDestination(unsigned number);
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int callType()    { return 0x0000; }
+      static constexpr unsigned int destination() { return 0x0023; }
+      /// @endcond
+    };
   };
 
   /** Represents the base-class for 5Tone IDs for all AnyTone codeplugs.
@@ -2032,6 +2050,49 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+  };
+
+  /** Represents the bitmap indicating which five-tone IDs are valid. */
+  class FiveToneIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+  };
+
+  /** Represents the list of five-tone IDs.
+   *
+   * Memory encoding of the ID list (size 0x0c80 bytes):
+   * @verbinclude anytone_fivetone_id_list.txt */
+  class FiveToneIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0c80; }
+
+    void clear();
+
+    virtual uint8_t *member(unsigned int n) const;
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 100; }   ///< Maximum number of entries.
+    };
   };
 
   /** Represents the base-class for 5Tone function for all AnyTone codeplugs.
@@ -2084,6 +2145,35 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+  };
+
+  /** Represents the list of five-tone functions for all AnyTone codeplugs.
+   *
+   * Memory representation of the function list (size 0x0200 bytes):
+   * @verbinclude anytone_5tone_function_list.txt */
+  class FiveToneFunctionListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneFunctionListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneFunctionListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+
+    void clear();
+
+    /** Returns the pointer to the n-th function setting. */
+    virtual uint8_t *function(unsigned int n) const;
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numFunctions() { return 16; }     ///< The max number of functions.
+    };
   };
 
   /** Represents the base-class for 5Tone settings for all AnyTone codeplugs.
