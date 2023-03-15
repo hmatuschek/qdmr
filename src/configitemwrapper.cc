@@ -544,8 +544,8 @@ RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, 
   case 0: return tr("Name");
   case 1: return tr("RX Frequency");
   case 2: return tr("TX Frequency");
-  case 3: return tr("TS");
-  case 4: return tr("CC");
+  case 3: return tr("CC");
+  case 4: return tr("TS");
   default: break;
   }
   return QVariant();
