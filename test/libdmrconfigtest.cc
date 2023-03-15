@@ -17,6 +17,11 @@ UnitTestBase::initTestCase() {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
+  if (! _roamingConfig.readYAML(":/data/roaming_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
 }
 
 void

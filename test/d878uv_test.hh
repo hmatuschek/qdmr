@@ -15,6 +15,8 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+
+  void testRoaming();
 };
 
 #endif // D878UVTEST_HH
