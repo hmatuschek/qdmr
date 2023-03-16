@@ -7,6 +7,7 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "config.hh"
+#include "commercial_extension.hh"
 
 
 /* ********************************************************************************************* *

@@ -2086,6 +2086,7 @@ public:
 
     void clear();
 
+    /** Returns a pointer to the n-th five-tone ID. */
     virtual uint8_t *member(unsigned int n) const;
 
   public:

@@ -2,7 +2,6 @@
 #define RXGROUPLIST_HH
 
 #include <QObject>
-#include <QAbstractListModel>
 #include "configreference.hh"
 
 class Config;

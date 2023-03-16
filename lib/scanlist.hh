@@ -2,11 +2,10 @@
 #define SCANLIST_HH
 
 #include "configobject.hh"
-#include <QAbstractListModel>
-
-class Channel;
 #include "configreference.hh"
-#include "tyt_extensions.hh"
+
+class TyTScanListExtension;
+class Channel;
 
 
 /** Generic representation of a scan list.

@@ -1,4 +1,7 @@
 #include "radiosettings.hh"
+#include "tyt_extensions.hh"
+#include "radioddity_extensions.hh"
+#include "anytone_extension.hh"
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),

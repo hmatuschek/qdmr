@@ -2,13 +2,13 @@
 #define CONTACT_HH
 
 #include "configobject.hh"
-#include "anytone_extension.hh"
-#include "opengd77_extension.hh"
 #include <QVector>
 #include <QAbstractTableModel>
 
 
 class Config;
+class AnytoneContactExtension;
+class OpenGD77ContactExtension;
 
 
 /** Represents the base-class for all contact types, analog (DTMF) or digital (DMR, M17).

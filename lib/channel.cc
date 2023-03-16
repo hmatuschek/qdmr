@@ -20,6 +20,10 @@
 #include <QMetaEnum>
 
 #include "opengd77_extension.hh"
+#include "tyt_extensions.hh"
+#include "opengd77_extension.hh"
+#include "anytone_extension.hh"
+#include "commercial_extension.hh"
 
 
 /* ********************************************************************************************* *

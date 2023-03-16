@@ -7,10 +7,6 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
-#include "tyt_extensions.hh"
-#include "opengd77_extension.hh"
-#include "anytone_extension.hh"
-#include "commercial_extension.hh"
 
 class Config;
 class RXGroupList;
@@ -21,6 +17,11 @@ class PositioningSystem;
 class RoamingZone;
 class DMRRadioID;
 
+class OpenGD77ChannelExtension;
+class TyTChannelExtension;
+class AnytoneFMChannelExtension;
+class CommercialChannelExtension;
+class AnytoneDMRChannelExtension;
 
 /** The base class of all channels (analog and digital) of a codeplug configuration.
  *
