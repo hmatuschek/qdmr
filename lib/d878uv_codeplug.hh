@@ -740,37 +740,6 @@ public:
 
   };
 
-  /** Implements the GPS message settings (part of general settings).
-   *
-   * Memory layout of the encoded GPS message (size 0x0030 bytes):
-   * @verbinclude d878uv_gpsmessage.txt */
-  class GPSMessageElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    GPSMessageElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    GPSMessageElement(uint8_t *ptr);
-
-    /** Returns the size of the element. */
-    static constexpr unsigned int size() { return 0x0030; }
-
-    /** Resets the message. */
-    void clear();
-
-    /** Returns the GPS message. */
-    virtual QString message() const;
-    /** Sets the message. */
-    virtual void setMessage(const QString &message);
-
-    /** Encodes GPS message from config object. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
-    /** Updates config. */
-    virtual bool updateConfig(Context &ctx) const;
-  };
-
   /** General settings extension element for the D878UV.
    *
    * Memory representation of the encoded settings element (size 0x200 bytes):
@@ -908,6 +877,9 @@ public:
     /** Constructor. */
     explicit AnalogAPRSSettingsElement(uint8_t *ptr);
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
     /** Resets the settings. */
     void clear();
     bool isValid() const;
@@ -1008,6 +980,9 @@ public:
     /** Constructor. */
     AnalogAPRSSettingsExtensionElement(uint8_t *ptr);
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0060; }
+
     /** Resets the settings. */
     void clear();
 
@@ -1054,6 +1029,34 @@ public:
     virtual void enableReportOther(bool enable);
   };
 
+  /** Represents an (analog/FM) APRS message. */
+  class AnalogAPRSMessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogAPRSMessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AnalogAPRSMessageElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    /** Returns the message. */
+    virtual QString message() const;
+    /** Sets the message. */
+    virtual void setMessage(const QString &msg);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int length() { return 60; }    ///< Maximum message length.
+    };
+  };
+
   /** Represents an analog APRS RX entry.
    *
    * Memory layout of analog APRS RX entry (size 0x0008 bytes):
@@ -1067,6 +1070,9 @@ public:
   public:
     /** Constructor. */
     AnalogAPRSRXEntryElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0008; }
 
     /** Resets the entry. */
     void clear();
@@ -1094,6 +1100,9 @@ public:
   public:
     /** Constructor. */
     DMRAPRSSystemsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0060; }
 
     /** Resets the systems. */
     void clear();
@@ -1320,6 +1329,21 @@ public:
     virtual void setKey(const QByteArray &key);
   };
 
+  /** Encodes the bitmap, indicating which zone is hidden. */
+  class HiddenZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
   /** Encodes some information about the radio and firmware.
    *
    * Binary encoding of the info, size 0x0100 bytes:
@@ -1459,6 +1483,33 @@ protected:
   virtual bool createRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some limits. */
+  struct Limit: public D868UVCodeplug::Limit {
+    static constexpr unsigned int analogAPRSRXEntries() { return 32; }   ///< Maximum number of analog APRS RX entries.
+    static constexpr unsigned int roamingChannels()     { return 250; }  ///< Maximum number of roaming channels.
+    static constexpr unsigned int roamingZones()        { return 64; }   ///< Maximum number of roaming zones.
+  };
+
+protected:
+  /** Internal offsets within the codeplug. */
+  struct Offset: public D868UVCodeplug::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int settingsExtension()           { return 0x02501400; }
+    static constexpr unsigned int analogAPRSSettings()          { return 0x02501000; }
+    static constexpr unsigned int analogAPRSSettingsExtension() { return 0x025010A0; }
+    static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
+    static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
+    static constexpr unsigned int dmrAPRSSettings()             { return 0x02501040; }
+    static constexpr unsigned int dmrAPRSMessage()              { return 0x02501280; }
+    static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
+    static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
+    static constexpr unsigned int roamingChannels()             { return 0x01040000; }
+    static constexpr unsigned int roamingZoneBitmap()           { return 0x01042080; }
+    static constexpr unsigned int roamingZones()                { return 0x01043000; }
+    /// @endcond
+  };
 };
 
 #endif // D878UVCODEPLUG_HH

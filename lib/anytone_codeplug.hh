@@ -1341,6 +1341,11 @@ public:
     /** Sets the message. */
     void setMessage(const QString &message);
 
+    /** Encodes the message. */
+    virtual bool fromConfig(Codeplug::Flags flags, Context &ctx);
+    /** Decodes the message. */
+    virtual bool updateConfig(Context &ctx) const;
+
   public:
     /** Some limits for the message. */
     struct Limit {
@@ -2749,7 +2754,7 @@ public:
   public:
     /** Some limits for the list. */
     struct Limit {
-      static constexpr unsigned int numEntries() { return 32; }
+      static constexpr unsigned int numEntries() { return 32; }      ///< Maximum number of DMR encryption key IDs.
     };
 
   protected:

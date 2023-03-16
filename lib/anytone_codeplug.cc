@@ -3014,6 +3014,18 @@ AnytoneCodeplug::DMRAPRSMessageElement::setMessage(const QString &message) {
   writeASCII(Offset::message(), message, Limit::length(), 0x00);
 }
 
+bool
+AnytoneCodeplug::DMRAPRSMessageElement::fromConfig(Codeplug::Flags flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
+  return true;
+}
+
+bool
+AnytoneCodeplug::DMRAPRSMessageElement::updateConfig(Context &ctx) const {
+  Q_UNUSED(ctx)
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::RepeaterOffsetListElement

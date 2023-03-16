@@ -10,34 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define ADDR_HIDDEN_ZONE_MAP      0x024c1360
-#define HIDDEN_ZONE_MAP_SIZE      0x00000020
-
-#define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x00000100
-
-#define ADDR_GENERAL_CONFIG_EXT1  0x02501280
-#define GENERAL_CONFIG_EXT1_SIZE  0x00000030
-
-#define ADDR_GENERAL_CONFIG_EXT2  0x02501400
-
-#define ADDR_APRS_SETTING         0x02501000 // Address of APRS settings
-#define APRS_SETTING_SIZE         0x00000040 // Size of the APRS settings
-
-#define ADDR_APRS_SET_EXT         0x025010A0 // Address of APRS settings extension
-#define APRS_SET_EXT_SIZE         0x00000060 // Size of APRS settings extension
-
-#define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
-#define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
-
-#define NUM_APRS_RX_ENTRY         32
-#define ADDR_APRS_RX_ENTRY        0x02501800 // Address of APRS RX list
-#define APRS_RX_ENTRY_SIZE        0x00000008 // Size of each APRS RX entry
-
-#define NUM_GPS_SYSTEMS           8
-#define ADDR_GPS_SETTING          0x02501040 // Address of GPS settings
-#define GPS_SETTING_SIZE          0x00000060 // Size of the GPS settings
-
 #define NUM_ROAMING_CHANNEL         250
 #define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
 #define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
@@ -1551,48 +1523,6 @@ D878UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::GPSMessageElement
- * ******************************************************************************************** */
-D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::GPSMessageElement::GPSMessageElement(uint8_t *ptr)
-  : Element(ptr, GPSMessageElement::size())
-{
-  // pass...
-}
-
-void
-D878UVCodeplug::GPSMessageElement::clear() {
-  memset(_data, 0x00, _size);
-}
-
-QString
-D878UVCodeplug::GPSMessageElement::message() const {
-  return readASCII(0x0000, 32, 0x00);
-}
-void
-D878UVCodeplug::GPSMessageElement::setMessage(const QString &message) {
-  writeASCII(0x0000, message, 32, 0x00);
-}
-
-bool
-D878UVCodeplug::GPSMessageElement::fromConfig(const Flags &flags, Context &ctx) {
-  Q_UNUSED(flags); Q_UNUSED(ctx)
-  return true;
-}
-
-bool
-D878UVCodeplug::GPSMessageElement::updateConfig(Context &ctx) const {
-  Q_UNUSED(ctx)
-  return true;
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::GeneralSettingsExtensionElement
  * ******************************************************************************************** */
 D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size)
@@ -1844,7 +1774,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *pt
 }
 
 D878UVCodeplug::AnalogAPRSSettingsElement::AnalogAPRSSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0040)
+  : Element(ptr, AnalogAPRSSettingsElement::size())
 {
   // pass...
 }
@@ -2116,7 +2046,7 @@ D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionE
 }
 
 D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr)
-  : Element(ptr, 0x0060)
+  : Element(ptr, AnalogAPRSSettingsExtensionElement::size())
 {
   // pass...
 }
@@ -2218,6 +2148,37 @@ D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportOther(bool enabl
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AnalogAPRSMessageElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AnalogAPRSMessageElement::AnalogAPRSMessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AnalogAPRSMessageElement::AnalogAPRSMessageElement(uint8_t *ptr)
+  : Element(ptr, AnalogAPRSMessageElement::size())
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::AnalogAPRSMessageElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+D878UVCodeplug::AnalogAPRSMessageElement::message() const {
+  return readASCII(0, Limit::length(), 0x00);
+}
+
+void
+D878UVCodeplug::AnalogAPRSMessageElement::setMessage(const QString &msg) {
+  writeASCII(0, msg, Limit::length(), 0x00);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AnalogAPRSRXEntryElement
  * ******************************************************************************************** */
 D878UVCodeplug::AnalogAPRSRXEntryElement::AnalogAPRSRXEntryElement(uint8_t *ptr, unsigned size)
@@ -2268,7 +2229,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr, unsig
 }
 
 D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr)
-  : Element(ptr, 0x0060)
+  : Element(ptr, DMRAPRSSystemsElement::size())
 {
   // pass...
 }
@@ -2475,6 +2436,22 @@ D878UVCodeplug::AESEncryptionKeyElement::setKey(const QByteArray &key) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::HiddenZoneBitmapElement
+ * ******************************************************************************************** */
+D878UVCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, HiddenZoneBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RadioInfoElement
  * ******************************************************************************************** */
 D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr, unsigned size)
@@ -2638,10 +2615,12 @@ D878UVCodeplug::allocateUpdated() {
   image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
 
   // allocate APRS settings extension
-  image(0).addElement(ADDR_APRS_SET_EXT, APRS_SET_EXT_SIZE);
+  image(0).addElement(Offset::analogAPRSSettingsExtension(),
+                      AnalogAPRSSettingsExtensionElement::size());
 
   // allocate APRS RX list
-  image(0).addElement(ADDR_APRS_RX_ENTRY, NUM_APRS_RX_ENTRY*APRS_RX_ENTRY_SIZE);
+  image(0).addElement(Offset::analogAPRSRXEntries(),
+                      Limit::analogAPRSRXEntries()*AnalogAPRSRXEntryElement::size());
 }
 
 void
@@ -2792,7 +2771,7 @@ void
 D878UVCodeplug::allocateZones() {
   D868UVCodeplug::allocateZones();
   // Hidden zone map
-  image(0).addElement(ADDR_HIDDEN_ZONE_MAP, HIDDEN_ZONE_MAP_SIZE);
+  image(0).addElement(Offset::hiddenZoneBitmap(), HiddenZoneBitmapElement::size());
 }
 
 bool
@@ -2804,13 +2783,7 @@ D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Cont
   if (nullptr == ext)
       return true;
 
-  if (ext->hidden()) {
-    // set bit
-    data(ADDR_HIDDEN_ZONE_MAP)[i/8] |= (1<<(i%8));
-  } else {
-    // clear bit
-    data(ADDR_HIDDEN_ZONE_MAP)[i/8] &= ~(1<<(i%8));
-  }
+  HiddenZoneBitmapElement(data(Offset::hiddenZoneBitmap())).setEncoded(i, ext->hidden());
 
   return true;
 }
@@ -2825,10 +2798,8 @@ D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const Erro
     zone->setAnytoneExtension(ext);
   }
 
-  if ((! isB) && (data(ADDR_HIDDEN_ZONE_MAP)[i/8] & (1<<(i%8))))
-    ext->enableHidden(true);
-  else
-    ext->enableHidden(false);
+  HiddenZoneBitmapElement bitmap(data(Offset::hiddenZoneBitmap()));
+  ext->enableHidden(bitmap.isEncoded(i) && (!isB));
 
   return true;
 }
@@ -2837,37 +2808,37 @@ D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const Erro
 void
 D878UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
-  image(0).addElement(ADDR_GENERAL_CONFIG_EXT1, GENERAL_CONFIG_EXT1_SIZE);
-  image(0).addElement(ADDR_GENERAL_CONFIG_EXT2, GeneralSettingsExtensionElement::size());
+  image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
+  image(0).addElement(Offset::dmrAPRSMessage(), DMRAPRSMessageElement::size());
+  image(0).addElement(Offset::settingsExtension(), GeneralSettingsExtensionElement::size());
 
 }
 bool
 D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
-  GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).fromConfig(flags, ctx);
-  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).fromConfig(flags, ctx);
+  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).fromConfig(flags, ctx);
+  GeneralSettingsExtensionElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
 }
 bool
 D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
-  GPSMessageElement(data(ADDR_GENERAL_CONFIG_EXT1)).updateConfig(ctx);
-  GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).updateConfig(ctx);
+  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).updateConfig(ctx);
+  GeneralSettingsExtensionElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;
 }
 bool
 D878UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).linkSettings(ctx.config()->settings(), ctx, err)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err)) {
     errMsg(err) << "Cannot link general settings extension.";
     return false;
   }
 
-  if (! GeneralSettingsExtensionElement(data(ADDR_GENERAL_CONFIG_EXT2)).linkConfig(ctx, err)) {
+  if (! GeneralSettingsExtensionElement(data(Offset::settingsExtension())).linkConfig(ctx, err)) {
     errMsg(err) << "Cannot link general settings extension.";
     return false;
   }
@@ -2880,9 +2851,9 @@ D878UVCodeplug::allocateGPSSystems() {
   // replaces D868UVCodeplug::allocateGPSSystems
 
   // APRS settings
-  image(0).addElement(ADDR_APRS_SETTING, APRS_SETTING_SIZE);
-  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
-  image(0).addElement(ADDR_GPS_SETTING, GPS_SETTING_SIZE);
+  image(0).addElement(Offset::analogAPRSSettings(), AnalogAPRSSettingsElement::size());
+  image(0).addElement(Offset::analogAPRSMessage(), AnalogAPRSMessageElement::size());
+  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSystemsElement::size());
 }
 
 bool
@@ -2892,20 +2863,20 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    AnalogAPRSSettingsElement(data(ADDR_APRS_SETTING))
+    AnalogAPRSSettingsElement(data(Offset::analogAPRSSettings()))
         .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
-    uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-    encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+    AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
+        .setMessage(ctx.config()->posSystems()->aprsSystem(0)->message());
   }
 
   // Encode GPS systems
-  DMRAPRSSystemsElement gps(data(ADDR_GPS_SETTING));
+  DMRAPRSSystemsElement gps(data(Offset::dmrAPRSSettings()));
   if (! gps.fromGPSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+    AnalogAPRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
     aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
     aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
   }
@@ -2919,21 +2890,21 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX interval
-  AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+  AnalogAPRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
+  AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
   unsigned pos_intervall = aprs.autoTXInterval();
 
   // Create APRS system (if enabled)
-  uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
   if (aprs.isValid()) {
     APRSSystem *sys = aprs.toAPRSSystem();
     sys->setPeriod(pos_intervall);
-    sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
+    sys->setMessage(aprsMessage.message());
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
 
   // Create GPS systems
-  DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
-  for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
+  DMRAPRSSystemsElement gps_systems(data(Offset::dmrAPRSSettings()));
+  for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == gps_systems.destination(i))
       continue;
     if (GPSSystem *sys = gps_systems.toGPSSystemObj(i)) {
@@ -2953,14 +2924,14 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
-  AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTING));
+  AnalogAPRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
   if (aprs.isValid()) {
     aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
 
   // Link GPS systems
-  DMRAPRSSystemsElement gps_systems(data(ADDR_GPS_SETTING));
-  for (int i=0; i<NUM_GPS_SYSTEMS; i++) {
+  DMRAPRSSystemsElement gps_systems(data(Offset::dmrAPRSSettings()));
+  for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == gps_systems.destination(i))
       continue;
     gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
