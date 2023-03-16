@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "commercial_extension.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>

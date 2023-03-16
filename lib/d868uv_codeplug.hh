@@ -575,6 +575,8 @@ public:
     static constexpr unsigned int dmrAPRSSystems()      { return 8; }     ///< Max number of DMR APRS systems.
     static constexpr unsigned int numMessages()         { return 100; }   ///< Max number of preset SMS.
     static constexpr unsigned int numMessagePerBank()   { return 8; }     ///< Max number of SMS per bank.
+    static constexpr unsigned int numTwoToneIDs()       { return 24; }    ///< Max number of two-tone IDs.
+    static constexpr unsigned int numTwoToneFunctions() { return 16; }    ///< Max number of two-tone functions.
   };
 
 protected:
@@ -597,6 +599,8 @@ protected:
     static constexpr unsigned int dtmfContactBytemap()   { return 0x02900100; }
     static constexpr unsigned int dtmfContacts()         { return 0x02940000; }
     static constexpr unsigned int dtmfIndex()            { return 0x02900000; }
+    static constexpr unsigned int dtmfSettings()         { return 0x024C1080; }
+    static constexpr unsigned int dtmfIDList()           { return 0x02500500; }
 
     static constexpr unsigned int groupListBitmap()      { return 0x025C0B10; }
     static constexpr unsigned int groupLists()           { return 0x02980000; }
@@ -641,6 +645,18 @@ protected:
     static constexpr unsigned int fiveToneFunctions()    { return 0x024C0D00; }
     static constexpr unsigned int fiveToneSettings()     { return 0x024C1000; }
 
+    static constexpr unsigned int twoToneIdBitmap()      { return 0x024C1280; }
+    static constexpr unsigned int twoToneIdList()        { return 0x024C1100; }
+    static constexpr unsigned int twoToneFunctionBitmap(){ return 0x024c2600; }
+    static constexpr unsigned int twoToneFunctionList()  { return 0x024c2400; }
+    static constexpr unsigned int twoToneSettings()      { return 0x024C1290; }
+
+    static constexpr unsigned int wfmChannelBitmap()     { return 0x02480210; }
+    static constexpr unsigned int wfmChannels()          { return 0x02480000; }
+    static constexpr unsigned int wfmVFO()               { return 0x02480200; }
+
+    static constexpr unsigned int dmrEncryptionIDs()     { return 0x024C1700; }
+    static constexpr unsigned int dmrEncryptionKeys()    { return 0x024C1800; }
     /// @endcond
   };
 

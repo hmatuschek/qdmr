@@ -5,8 +5,9 @@
 #include "configobject.hh"
 #include "configreference.hh"
 
+#include "anytone_extension.hh"
+
 class Config;
-class AnytoneZoneExtension;
 
 /** Represents a zone within the generic configuration.
  * @ingroup conf */

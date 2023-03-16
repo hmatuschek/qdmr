@@ -3,8 +3,6 @@
 
 #include "rxgrouplist.hh"
 #include "channel.hh"
-#include "encryptionextension.hh"
-#include "commercial_extension.hh"
 #include "csvreader.hh"
 #include "userdatabase.hh"
 #include "logger.hh"

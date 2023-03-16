@@ -51,13 +51,12 @@
 #include "roamingzone.hh"
 #include "radioid.hh"
 #include "radiosettings.hh"
-//#include "encryptionextension.hh"
+
+#include "commercial_extension.hh"
+#include "tyt_extensions.hh"
 
 // Forward declaration
 class UserDatabase;
-class EncryptionExtension;
-class TyTConfigExtension;
-class CommercialExtension;
 
 
 /** The config class, representing the codeplug configuration.

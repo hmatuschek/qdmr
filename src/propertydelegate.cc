@@ -9,6 +9,8 @@
 #include "extensionwrapper.hh"
 #include "config.hh"
 #include "logger.hh"
+#include "frequency.hh"
+#include "interval.hh"
 
 
 PropertyDelegate::PropertyDelegate(QObject *parent)

@@ -9,7 +9,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QInputDialog>
-#include "tyt_extensions.hh"
 
 
 /* ********************************************************************************************* *

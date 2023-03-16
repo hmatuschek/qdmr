@@ -1726,7 +1726,7 @@ public:
   /** Represents the list of hot-key settings for all AnyTone codeplugs.
    *
    *  Memory encoding of the hot-key settings (size 0x0360 bytes):
-   * @verbinclude anytone_hotkey_settings.txt */
+   * @verbinclude anytone_hotkeysettings.txt */
   class HotKeySettingsElement: public Element
   {
   protected:
@@ -2070,7 +2070,7 @@ public:
   /** Represents the list of five-tone IDs.
    *
    * Memory encoding of the ID list (size 0x0c80 bytes):
-   * @verbinclude anytone_fivetone_id_list.txt */
+   * @verbinclude anytone_5toneidlist.txt */
   class FiveToneIDListElement: public Element
   {
   protected:
@@ -2151,7 +2151,7 @@ public:
   /** Represents the list of five-tone functions for all AnyTone codeplugs.
    *
    * Memory representation of the function list (size 0x0200 bytes):
-   * @verbinclude anytone_5tone_function_list.txt */
+   * @verbinclude anytone_5tonefunctionlist.txt */
   class FiveToneFunctionListElement: public Element
   {
   protected:
@@ -2335,6 +2335,37 @@ public:
     virtual QString name() const;
     /** Sets the name of the function. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 7; }          ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstTone()  { return 0x0000; }
+      static constexpr unsigned int secondTone() { return 0x0002; }
+      static constexpr unsigned int name()       { return 0x0008; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the two-tone ID bitmap, indicating the which two-tone IDs are valid. */
+  class TwoToneIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    TwoToneIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents the base-class for a 2-tone function for all AnyTone codeplugs.
@@ -2382,6 +2413,38 @@ public:
     virtual QString name() const;
     /** Sets the name of the function. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits of the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 7; }      ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstTone()  { return 0x0000; }
+      static constexpr unsigned int secondTone() { return 0x0002; }
+      static constexpr unsigned int response()   { return 0x0004; }
+      static constexpr unsigned int name()       { return 0x0005; }
+      /// @endcond
+    };
+  };
+
+  /** Rerpesents the two-tone function bitmap, indicating which two-tone functions are valid. */
+  class TwoToneFunctionBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneFunctionBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    TwoToneFunctionBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents the base class of 2-tone settings for all AnyTone codeplugs.
@@ -2540,6 +2603,199 @@ public:
     virtual QString remoteStunID() const;
     /** Sets the remote stun ID. */
     virtual void setRemoteStunID(const QString &id);
+  };
+
+  /** Represents a list of DTMF IDs to be send.
+   *
+   * Memory encoding of the DTMF IDs (size 0x0100 bytes):
+   * @verbinclude anytone_dtmfidlist.txt */
+  class DTMFIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th number is set. */
+    virtual bool hasNumber(unsigned int n) const;
+    /** Returns the n-th number. */
+    virtual QString number(unsigned int n) const;
+    /** Sets the n-th number. */
+    virtual void setNumber(unsigned int n, const QString &number);
+    /** Clears the n-th number. */
+    virtual void clearNumber(unsigned int n);
+
+  public:
+    /** Some limits of the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries()   { return 16; }      ///< The maximum number of entries in the list.
+      static constexpr unsigned int numberLength() { return 16; }      ///< The maximum length of the numbers.
+    };
+  };
+
+  /** Represents a list of 100 FM broad cast channels.
+   *
+   * Memory representation of the channel list (size 0x0200 bytes):
+   * @verbinclude anytone_wfmchannellist.txt */
+  class WFMChannelListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMChannelListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit WFMChannelListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th channel is set. */
+    virtual bool hasChannel(unsigned int n) const;
+    /** Returns the n-th channel frequency. */
+    virtual Frequency channel(unsigned int n) const;
+    /** Sets the n-th channel frequency. */
+    virtual void setChannel(unsigned int n, Frequency freq);
+    /** Clears the n-th channel frequency. */
+    virtual void clearChannel(unsigned int n);
+
+  public:
+    /** Some limits for the channel list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 100; }     ///< Maximum number of channels in the list.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenChannels() { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which WFM (FM broadcast) channels are valid. */
+  class WFMChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    WFMChannelBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+  /** Represents the WFM (FM broadcast) VFO frquency. */
+  class WFMVFOElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMVFOElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    WFMVFOElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    void clear();
+
+    /** Returns the VFO frequency. */
+    virtual Frequency frequency() const;
+    /** Sets the VFO frequency. */
+    virtual void setFrequency(Frequency freq);
+  };
+
+  /** Represents a list of DMR encryption key IDs. */
+  class DMREncryptionKeyIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMREncryptionKeyIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    /** Returns @c true if the n-th id is set. */
+    virtual bool hasID(unsigned int n) const;
+    /** Returns the ID of the encryption key. */
+    virtual uint16_t id(unsigned int n) const;
+    /** Sets the ID of the encryption key. */
+    virtual void setID(unsigned int n, uint16_t id);
+    /** Clears the n-th id. */
+    virtual void clearID(unsigned int n);
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 32; }
+    };
+
+  protected:
+    /** Some internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenIDs() { return 0x0002; }
+      /// @endcond
+    };
+  };
+
+  /** Represents a list of DMR encryption keys. */
+  class DMREncryptionKeyListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMREncryptionKeyListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMREncryptionKeyListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0500; }
+
+    void clear();
+
+    /** Returns the n-th key. */
+    QByteArray key(unsigned int n) const;
+    /** Sets the n-th key. */
+    void setKey(unsigned int n, const QByteArray &key);
+
+  public:
+    /** Some limits of the list. */
+    struct Limit {
+      static constexpr unsigned numEntries() { return DMREncryptionKeyIDListElement::Limit::numEntries(); } ///< Maximum number of keys.
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keys() { return 0x0010; }
+      static constexpr unsigned int betweenKeys() { return 0x0028; }
+      /// @endcond
+    };
   };
 
   /** Represents the base class for entries to the contact indices in all AnyTone codeplugs.

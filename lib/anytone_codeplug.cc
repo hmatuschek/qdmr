@@ -4254,29 +4254,45 @@ AnytoneCodeplug::TwoToneIDElement::clear() {
 
 double
 AnytoneCodeplug::TwoToneIDElement::firstTone() const {
-  return ((double)getUInt16_le(0x0000))/10;
+  return ((double)getUInt16_le(Offset::firstTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setFirstTone(double f) {
-  setUInt16_le(0x0000, f*10);
+  setUInt16_le(Offset::firstTone(), f*10);
 }
 
 double
 AnytoneCodeplug::TwoToneIDElement::secondTone() const {
-  return ((double)getUInt16_le(0x0002))/10;
+  return ((double)getUInt16_le(Offset::secondTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setSecondTone(double f) {
-  setUInt16_le(0x0002, f*10);
+  setUInt16_le(Offset::secondTone(), f*10);
 }
 
 QString
 AnytoneCodeplug::TwoToneIDElement::name() const {
-  return readASCII(0x0008, 7, 0x00);
+  return readASCII(Offset::name(), 7, 0x00);
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setName(const QString &name) {
-  writeASCII(0x0008, name, 7, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneIDBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneIDBitmapElement::TwoToneIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneIDBitmapElement::TwoToneIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, TwoToneIDBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -4302,38 +4318,54 @@ AnytoneCodeplug::TwoToneFunctionElement::clear() {
 
 double
 AnytoneCodeplug::TwoToneFunctionElement::firstTone() const {
-  return ((double)getUInt16_le(0x0000))/10;
+  return ((double)getUInt16_le(Offset::firstTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setFirstTone(double f) {
-  setUInt16_le(0x0000, f*10);
+  setUInt16_le(Offset::firstTone(), f*10);
 }
 
 double
 AnytoneCodeplug::TwoToneFunctionElement::secondTone() const {
-  return ((double)getUInt16_le(0x0002))/10;
+  return ((double)getUInt16_le(Offset::secondTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setSecondTone(double f) {
-  setUInt16_le(0x0002, f*10);
+  setUInt16_le(Offset::secondTone(), f*10);
 }
 
 AnytoneCodeplug::TwoToneFunctionElement::Response
 AnytoneCodeplug::TwoToneFunctionElement::response() const {
-  return (Response) getUInt8(0x0004);
+  return (Response) getUInt8(Offset::response());
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setResponse(Response resp) {
-  setUInt8(0x0004, (unsigned)resp);
+  setUInt8(Offset::response(), (unsigned)resp);
 }
 
 QString
 AnytoneCodeplug::TwoToneFunctionElement::name() const {
-  return readASCII(0x0005, 7, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setName(const QString &name) {
-  writeASCII(0x0005, name, 7, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneFunctionBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneFunctionBitmapElement::TwoToneFunctionBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneFunctionBitmapElement::TwoToneFunctionBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, TwoToneFunctionBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -4611,6 +4643,242 @@ AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0040+i, id.mid(i,1).toUInt(&ok, 16));
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFIDListElement::DTMFIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFIDListElement::DTMFIDListElement(uint8_t *ptr)
+  : Element(ptr, DTMFIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::DTMFIDListElement::hasNumber(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0xff != getUInt8(n*Limit::numberLength());
+}
+
+QString
+AnytoneCodeplug::DTMFIDListElement::number(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return "";
+  uint8_t *num = _data + n*Limit::numberLength();
+  return decode_dtmf_bin(num, Limit::numberLength(), 0xff);
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::setNumber(unsigned int n, const QString &number) {
+  if (n >= Limit::numEntries())
+    return;
+  uint8_t *num = _data + n*Limit::numberLength();
+  encode_dtmf_bin(number, num, Limit::numberLength(), 0xff);
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::clearNumber(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  uint8_t *num = _data + n*Limit::numberLength();
+  memset(num, 0xff, Limit::numberLength());
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMChannelListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMChannelListElement::WFMChannelListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMChannelListElement::WFMChannelListElement(uint8_t *ptr)
+  : Element(ptr, WFMChannelListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+bool
+AnytoneCodeplug::WFMChannelListElement::hasChannel(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0 != getBCD8_le(n*Offset::betweenChannels());
+}
+
+Frequency
+AnytoneCodeplug::WFMChannelListElement::channel(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return Frequency();
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(n*Offset::betweenChannels()))*100);
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::setChannel(unsigned int n, Frequency freq) {
+  if (n >= Limit::numEntries())
+    return;
+  setBCD8_le(n*Offset::betweenChannels(), freq.inHz()/100);
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::clearChannel(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setBCD8_le(n*Offset::betweenChannels(), 0);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMChannelBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMChannelBitmapElement::WFMChannelBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMChannelBitmapElement::WFMChannelBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, WFMChannelBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMVFOElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMVFOElement::WFMVFOElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMVFOElement::WFMVFOElement(uint8_t *ptr)
+  : Element(ptr, WFMVFOElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::WFMVFOElement::clear() {
+  memset(_data, 0x00, _size);
+  setFrequency(Frequency::fromMHz(88));
+}
+
+Frequency
+AnytoneCodeplug::WFMVFOElement::frequency() const {
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(0))*100);
+}
+
+void
+AnytoneCodeplug::WFMVFOElement::setFrequency(Frequency freq) {
+  setBCD8_le(0, freq.inHz()/100);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMREncryptionKeyIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr)
+  : Element(ptr, DMREncryptionKeyIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::DMREncryptionKeyIDListElement::hasID(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0xffff == getUInt16_be(n*Offset::betweenIDs());
+}
+
+uint16_t
+AnytoneCodeplug::DMREncryptionKeyIDListElement::id(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return 0xffff;
+  return getUInt16_be(n*Offset::betweenIDs());
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::setID(unsigned int n, uint16_t id) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt16_be(n*Offset::betweenIDs(), id);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::clearID(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt16_be(n*Offset::betweenIDs(), 0xffff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMREncryptionKeyListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMREncryptionKeyListElement::DMREncryptionKeyListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMREncryptionKeyListElement::DMREncryptionKeyListElement(uint8_t *ptr)
+  : Element(ptr, DMREncryptionKeyListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++) {
+    setKey(i, QByteArray::fromHex("FFFF"));
+  }
+}
+
+QByteArray
+AnytoneCodeplug::DMREncryptionKeyListElement::key(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return QByteArray();
+  return QByteArray::fromRawData((const char *)_data + Offset::keys() + n*Offset::betweenKeys(), 2);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::setKey(unsigned int n, const QByteArray &key) {
+  if ((n >= Limit::numEntries()) || (2 != key.size()))
+    return;
+  memcpy(_data + Offset::keys() + n*Offset::betweenKeys(), key.constData(), 2);
 }
 
 

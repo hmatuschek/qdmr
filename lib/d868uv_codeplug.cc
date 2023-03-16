@@ -13,41 +13,6 @@
 #include <QtEndian>
 #include <QSet>
 
-
-
-#define ADDR_DTMF_NUMBERS         0x02500500
-#define DTMF_NUMBERS_SIZE         0x00000100
-
-#define FMBC_BITMAP               0x02480210
-#define FMBC_BITMAP_SIZE          0x00000020
-#define ADDR_FMBC                 0x02480000
-#define FMBC_SIZE                 0x00000200
-#define ADDR_FMBC_VFO             0x02480200
-#define FMBC_VFO_SIZE             0x00000010
-
-#define ADDR_DTMF_SETTINGS        0x024C1080
-#define DTMF_SETTINGS_SIZE        0x00000050
-
-#define NUM_TWO_TONE_IDS          24
-#define TWO_TONE_IDS_BITMAP       0x024C1280
-#define TWO_TONE_IDS_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_IDS         0x024C1100
-#define TWO_TONE_ID_SIZE          0x00000010
-
-#define NUM_TWO_TONE_FUNCTIONS    16
-#define TWO_TONE_FUNCTIONS_BITMAP 0x024c2600
-#define TWO_TONE_FUNC_BITMAP_SIZE 0x00000010
-#define ADDR_TWO_TONE_FUNCTIONS   0x024c2400
-#define TWO_TONE_FUNCTION_SIZE    0x00000020
-
-#define ADDR_TWO_TONE_SETTINGS    0x024C1290
-#define TWO_TONE_SETTINGS_SIZE    0x00000010
-
-#define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
-#define DMR_ENCRYPTION_LIST_SIZE  0x00000040
-#define ADDR_DMR_ENCRYPTION_KEYS  0x024C1800
-#define DMR_ENCRYPTION_KEYS_SIZE  0x00000500
-
 using namespace Signaling;
 
 Code _ctcss_num2code[52] = {
@@ -744,8 +709,8 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateDTMFSettings();
 
-  image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
-  image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
+  image(0).addElement(Offset::dmrEncryptionIDs(), DMREncryptionKeyIDListElement::size());
+  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
 }
 
 void
@@ -801,12 +766,12 @@ D868UVCodeplug::allocateBitmaps() {
   // Status messages
   image(0).addElement(Offset::statusMessageBitmap(), StatusMessageBitmapElement::size());
   // FM Broadcast bitmaps
-  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  image(0).addElement(Offset::wfmChannelBitmap(), WFMChannelBitmapElement::size());
   // 5-Tone function bitmaps
   image(0).addElement(Offset::fiveToneIdBitmap(), FiveToneIDBitmapElement::size());
   // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+  image(0).addElement(Offset::twoToneIdBitmap(), TwoToneIDBitmapElement::size());
+  image(0).addElement(Offset::twoToneFunctionBitmap(), TwoToneFunctionBitmapElement::size());
 
   return true;
 }
@@ -1570,7 +1535,7 @@ D868UVCodeplug::allocateZoneChannelList() {
 
 void
 D868UVCodeplug::allocateDTMFNumbers() {
-  image(0).addElement(ADDR_DTMF_NUMBERS, DTMF_NUMBERS_SIZE);
+  image(0).addElement(Offset::dtmfIDList(), DTMFIDListElement::size());
 }
 
 
@@ -1737,7 +1702,8 @@ D868UVCodeplug::allocateAlarmSettings() {
 void
 D868UVCodeplug::allocateFMBroadcastSettings() {
   // FM broad-cast settings
-  image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
+  image(0).addElement(Offset::wfmChannels(), WFMChannelListElement::size());
+  image(0).addElement(Offset::wfmVFO(), WFMVFOElement::size());
 }
 
 void
@@ -1764,12 +1730,11 @@ D868UVCodeplug::allocate5ToneSettings() {
 void
 D868UVCodeplug::allocate2ToneIDs() {
   // Allocate 2-tone encoding
-  uint8_t *enc_bitmap = data(TWO_TONE_IDS_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_IDS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (enc_bitmap[byte] & (1<<bit)))
+  TwoToneIDBitmapElement enc_bitmap(data(Offset::twoToneIdBitmap()));
+  for (uint8_t i=0; i<Limit::numTwoToneIDs(); i++) {
+    if (! enc_bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_IDS + i*TWO_TONE_ID_SIZE, TWO_TONE_ID_SIZE);
+    image(0).addElement(Offset::twoToneIdList() + i*TwoToneIDElement::size(), TwoToneIDElement::size());
   }
 }
 
@@ -1777,22 +1742,22 @@ D868UVCodeplug::allocate2ToneIDs() {
 void
 D868UVCodeplug::allocate2ToneFunctions() {
   // Allocate 2-tone decoding
-  uint8_t *dec_bitmap = data(TWO_TONE_FUNCTIONS_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_FUNCTIONS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (dec_bitmap[byte] & (1<<bit)))
+  TwoToneFunctionBitmapElement dec_bitmap(data(Offset::twoToneFunctionBitmap()));
+  for (uint8_t i=0; i<Limit::numTwoToneFunctions(); i++) {
+    if (! dec_bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_FUNCTIONS + i*TWO_TONE_FUNCTION_SIZE, TWO_TONE_FUNCTION_SIZE);
+    image(0).addElement(Offset::twoToneFunctionList() + i*TwoToneFunctionElement::size(),
+                        TwoToneFunctionElement::size());
   }
 }
 
 void
 D868UVCodeplug::allocate2ToneSettings() {
-  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+  image(0).addElement(Offset::twoToneSettings(), TwoToneSettingsElement::size());
 }
 
 
 void
 D868UVCodeplug::allocateDTMFSettings() {
-  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
+  image(0).addElement(Offset::dtmfSettings(), DTMFSettingsElement::size());
 }

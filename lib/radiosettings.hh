@@ -4,10 +4,9 @@
 #include "configobject.hh"
 #include "channel.hh"
 
-// Forward declaration
-class RadiodditySettingsExtension;
-class AnytoneSettingsExtension;
-class TyTSettingsExtension;
+#include "radioddity_extensions.hh"
+#include "anytone_extension.hh"
+#include "tyt_extensions.hh"
 
 /** Represents the common radio-global settings.
  * @ingroup conf */

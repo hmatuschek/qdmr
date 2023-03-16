@@ -4,7 +4,8 @@
 #include "configobject.hh"
 #include "configreference.hh"
 
-class TyTScanListExtension;
+#include "tyt_extensions.hh"
+
 class Channel;
 
 

@@ -5,6 +5,7 @@
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
+#include "commercial_extension.hh"
 
 D578UVTest::D578UVTest(QObject *parent)
   : QObject(parent)
