@@ -1068,7 +1068,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   }
 
   // Encode GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps(data(ADDR_DMRAPRS_SETTINGS));
   if (! gps.fromGPSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
@@ -1101,7 +1101,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Create GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
     if (0 == gps_systems.destination(i))
       continue;
@@ -1127,7 +1127,7 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Link GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
     if (0 == gps_systems.destination(i))
       continue;

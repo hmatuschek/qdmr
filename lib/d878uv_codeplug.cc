@@ -10,26 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define NUM_ROAMING_CHANNEL         250
-#define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
-#define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
-#define ADDR_ROAMING_CHANNEL_0      0x01040000
-#define ROAMING_CHANNEL_SIZE        0x00000020
-#define ROAMING_CHANNEL_OFFSET      0x00000020
-
-#define NUM_ROAMING_ZONES           64
-#define NUM_CH_PER_ROAMINGZONE      64
-#define ADDR_ROAMING_ZONE_BITMAP    0x01042080
-#define ROAMING_ZONE_BITMAP_SIZE    0x00000010
-#define ADDR_ROAMING_ZONE_0         0x01043000
-#define ROAMING_ZONE_SIZE           0x00000080
-#define ROAMING_ZONE_OFFSET         0x00000080
-
-#define NUM_ENCRYPTION_KEYS       256
-#define ADDR_ENCRYPTION_KEYS      0x024C4000
-#define ENCRYPTION_KEY_SIZE       0x00000040
-#define ENCRYPTION_KEYS_SIZE      0x00004000
-
 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::ChannelElement
@@ -342,6 +322,22 @@ D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::RoamingChannelBitmapElement
+ * ******************************************************************************************** */
+D878UVCodeplug::RoamingChannelBitmapElement::RoamingChannelBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::RoamingChannelBitmapElement::RoamingChannelBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, RoamingChannelBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RoamingZoneElement
  * ******************************************************************************************** */
 D878UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr, unsigned size)
@@ -424,6 +420,22 @@ D878UVCodeplug::RoamingZoneElement::linkRoamingZone(RoamingZone *zone, Context &
     }
   }
   return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::RoamingZoneBitmapElement
+ * ******************************************************************************************** */
+D878UVCodeplug::RoamingZoneBitmapElement::RoamingZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::RoamingZoneBitmapElement::RoamingZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, RoamingZoneBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -2222,51 +2234,51 @@ D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, unsigned 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::DMRAPRSSystemsElement
  * ******************************************************************************************** */
-D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr, unsigned size)
+D878UVCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
   // pass...
 }
 
-D878UVCodeplug::DMRAPRSSystemsElement::DMRAPRSSystemsElement(uint8_t *ptr)
-  : Element(ptr, DMRAPRSSystemsElement::size())
+D878UVCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr)
+  : Element(ptr, DMRAPRSSettingsElement::size())
 {
   // pass...
 }
 
 void
-D878UVCodeplug::DMRAPRSSystemsElement::clear() {
+D878UVCodeplug::DMRAPRSSettingsElement::clear() {
   memset(_data, 0x00, _size);
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::channelIsSelected(unsigned n) const {
+D878UVCodeplug::DMRAPRSSettingsElement::channelIsSelected(unsigned n) const {
   return 0xfa2 == channelIndex(n);
 }
 unsigned
-D878UVCodeplug::DMRAPRSSystemsElement::channelIndex(unsigned n) const {
+D878UVCodeplug::DMRAPRSSettingsElement::channelIndex(unsigned n) const {
   return getUInt16_le(0x0000 + n*2);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setChannelIndex(unsigned n, unsigned idx) {
+D878UVCodeplug::DMRAPRSSettingsElement::setChannelIndex(unsigned n, unsigned idx) {
   setUInt16_le(0x0000 + 2*n, idx);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setChannelSelected(unsigned n) {
+D878UVCodeplug::DMRAPRSSettingsElement::setChannelSelected(unsigned n) {
   setChannelIndex(n, 0xfa2);
 }
 
 unsigned
-D878UVCodeplug::DMRAPRSSystemsElement::destination(unsigned n) const {
+D878UVCodeplug::DMRAPRSSettingsElement::destination(unsigned n) const {
   return getBCD8_be(0x0010 + 4*n);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setDestination(unsigned n, unsigned idx) {
+D878UVCodeplug::DMRAPRSSettingsElement::setDestination(unsigned n, unsigned idx) {
   setBCD8_be(0x0010 + 4*n, idx);
 }
 
 DMRContact::Type
-D878UVCodeplug::DMRAPRSSystemsElement::callType(unsigned n) const {
+D878UVCodeplug::DMRAPRSSettingsElement::callType(unsigned n) const {
   switch(getUInt8(0x0030 + n)) {
   case 0: return DMRContact::PrivateCall;
   case 1: return DMRContact::GroupCall;
@@ -2275,7 +2287,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::callType(unsigned n) const {
   return DMRContact::PrivateCall;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setCallType(unsigned n, DMRContact::Type type) {
+D878UVCodeplug::DMRAPRSSettingsElement::setCallType(unsigned n, DMRContact::Type type) {
   switch(type) {
   case DMRContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
   case DMRContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
@@ -2284,11 +2296,11 @@ D878UVCodeplug::DMRAPRSSystemsElement::setCallType(unsigned n, DMRContact::Type 
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::timeSlotOverride(unsigned n) {
+D878UVCodeplug::DMRAPRSSettingsElement::timeSlotOverride(unsigned n) {
   return 0x00 != getUInt8(0x0039 + n);
 }
 DMRChannel::TimeSlot
-D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(unsigned n) const {
+D878UVCodeplug::DMRAPRSSettingsElement::timeSlot(unsigned n) const {
   switch (getUInt8(0x0039 + n)) {
   case 1: return DMRChannel::TimeSlot::TS1;
   case 2: return DMRChannel::TimeSlot::TS2;
@@ -2296,37 +2308,37 @@ D878UVCodeplug::DMRAPRSSystemsElement::timeSlot(unsigned n) const {
   return DMRChannel::TimeSlot::TS1;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
+D878UVCodeplug::DMRAPRSSettingsElement::setTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
   switch (ts) {
   case DMRChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
   case DMRChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
   }
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::clearTimeSlotOverride(unsigned n) {
+D878UVCodeplug::DMRAPRSSettingsElement::clearTimeSlotOverride(unsigned n) {
   setUInt8(0x0039+n, 0);
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::roaming() const {
+D878UVCodeplug::DMRAPRSSettingsElement::roaming() const {
   return getUInt8(0x0038);
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::enableRoaming(bool enable) {
+D878UVCodeplug::DMRAPRSSettingsElement::enableRoaming(bool enable) {
   setUInt8(0x0038, (enable ? 0x01 : 0x00));
 }
 
 unsigned
-D878UVCodeplug::DMRAPRSSystemsElement::repeaterActivationDelay() const {
+D878UVCodeplug::DMRAPRSSettingsElement::repeaterActivationDelay() const {
   return ((unsigned)getUInt8(0x0041))*100;
 }
 void
-D878UVCodeplug::DMRAPRSSystemsElement::setRepeaterActivationDelay(unsigned ms) {
+D878UVCodeplug::DMRAPRSSettingsElement::setRepeaterActivationDelay(unsigned ms) {
   setUInt8(0x0041, ms/100);
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystems(Context &ctx) {
+D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystems(Context &ctx) {
   if (ctx.config()->posSystems()->gpsCount() > 8)
     return false;
   for (int i=0; i<ctx.config()->posSystems()->gpsCount(); i++)
@@ -2335,7 +2347,7 @@ D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystems(Context &ctx) {
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
+D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
   int idx = ctx.config()->posSystems()->indexOfGPSSys(sys);
   if ((idx < 0) || idx > 7)
     return false;
@@ -2353,14 +2365,14 @@ D878UVCodeplug::DMRAPRSSystemsElement::fromGPSSystemObj(GPSSystem *sys, Context 
 }
 
 GPSSystem *
-D878UVCodeplug::DMRAPRSSystemsElement::toGPSSystemObj(int idx) const {
+D878UVCodeplug::DMRAPRSSettingsElement::toGPSSystemObj(int idx) const {
   if (0 == destination(idx))
     return nullptr;
   return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
 }
 
 bool
-D878UVCodeplug::DMRAPRSSystemsElement::linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const {
+D878UVCodeplug::DMRAPRSSettingsElement::linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const {
   // Clear revert channel from GPS system
   sys->setRevertChannel(nullptr);
 
@@ -2395,7 +2407,7 @@ D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr, u
 }
 
 D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr)
-  : Element(ptr, 0x0040)
+  : Element(ptr, AESEncryptionKeyElement::size())
 {
   // pass...
 }
@@ -2599,9 +2611,9 @@ D878UVCodeplug::allocateBitmaps() {
     return false;
 
   // Roaming channel bitmaps
-  image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
+  image(0).addElement(Offset::roamingChannelBitmap(), RoamingChannelBitmapElement::size());
   // Roaming zone bitmaps
-  image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
+  image(0).addElement(Offset::roamingZoneBitmap(), RoamingZoneBitmapElement::size());
 
   return true;
 }
@@ -2612,7 +2624,7 @@ D878UVCodeplug::allocateUpdated() {
   D868UVCodeplug::allocateUpdated();
 
   // Encryption keys
-  image(0).addElement(ADDR_ENCRYPTION_KEYS, ENCRYPTION_KEYS_SIZE);
+  image(0).addElement(Offset::aesKeys(), Limit::aesKeys()*AESEncryptionKeyElement::size());
 
   // allocate APRS settings extension
   image(0).addElement(Offset::analogAPRSSettingsExtension(),
@@ -2645,19 +2657,14 @@ D878UVCodeplug::setBitmaps(Context& ctx)
   D868UVCodeplug::setBitmaps(ctx);
 
   // Mark roaming zones
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  unsigned int num_roaming_zones = std::min((unsigned int)NUM_ROAMING_ZONES, ctx.count<RoamingZone>());
-  for (unsigned int i=0; i<num_roaming_zones; i++)
-    roaming_zone_bitmap[i/8] |= (1<<(i%8));
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  unsigned int num_roaming_zones = std::min(Limit::roamingZones(), ctx.count<RoamingZone>());
+  roaming_zone_bitmap.clear(); roaming_zone_bitmap.enableFirst(num_roaming_zones);
 
   // Mark roaming channels
-  uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
-  unsigned int num_roaming_channel = std::min((unsigned int)NUM_ROAMING_CHANNEL, ctx.count<RoamingChannel>());
-  // Get all (unique) channels used in roaming
-  for (unsigned int i=0; i<num_roaming_channel; i++)
-    roaming_ch_bitmap[i/8] |= (1<<(i%8));
+  RoamingChannelBitmapElement roaming_ch_bitmap(data(Offset::roamingChannelBitmap()));
+  unsigned int num_roaming_channel = std::min(Limit::roamingChannels(), ctx.count<RoamingChannel>());
+  roaming_ch_bitmap.clear(); roaming_ch_bitmap.enableFirst(num_roaming_channel);
 }
 
 
@@ -2853,7 +2860,7 @@ D878UVCodeplug::allocateGPSSystems() {
   // APRS settings
   image(0).addElement(Offset::analogAPRSSettings(), AnalogAPRSSettingsElement::size());
   image(0).addElement(Offset::analogAPRSMessage(), AnalogAPRSMessageElement::size());
-  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSystemsElement::size());
+  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
 }
 
 bool
@@ -2870,7 +2877,7 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   }
 
   // Encode GPS systems
-  DMRAPRSSystemsElement gps(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   if (! gps.fromGPSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
@@ -2903,7 +2910,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Create GPS systems
-  DMRAPRSSystemsElement gps_systems(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps_systems(data(Offset::dmrAPRSSettings()));
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == gps_systems.destination(i))
       continue;
@@ -2930,7 +2937,7 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Link GPS systems
-  DMRAPRSSystemsElement gps_systems(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps_systems(data(Offset::dmrAPRSSettings()));
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == gps_systems.destination(i))
       continue;
@@ -2944,32 +2951,30 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
 void
 D878UVCodeplug::allocateRoaming() {
   /* Allocate roaming channels */
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+  RoamingChannelBitmapElement roaming_channel_bitmap(data(Offset::roamingChannelBitmap()));
+  for (uint8_t i=0; i<Limit::roamingChannels(); i++) {
     // Get byte and bit for roaming channel
-    uint16_t bit = i%8, byte = i/8;
     // if disabled -> skip
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+    if (! roaming_channel_bitmap.isEncoded(i))
       continue;
     // Allocate roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
     if (!isAllocated(addr, 0))
-      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+      image(0).addElement(addr, RoamingChannelElement::size());
   }
 
   /* Allocate roaming zones. */
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  for (uint8_t i=0; i<Limit::roamingZones(); i++) {
     // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
     // if disabled -> skip
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+    if (! roaming_zone_bitmap.isEncoded(i))
       continue;
     // Allocate roaming zone
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    uint32_t addr = Offset::roamingZones() + i*RoamingZoneElement::size();
     if (!isAllocated(addr, 0)) {
       logDebug() << "Allocate roaming zone at " << QString::number(addr, 16);
-      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+      image(0).addElement(addr, RoamingZoneElement::size());
     }
   }
 }
@@ -2980,10 +2985,10 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack
 
   // Encode roaming channels
   unsigned int num_roaming_channel = std::min(
-        NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count());
+        Limit::roamingChannels(), ctx.count<RoamingChannel>());
   for (uint8_t i=0; i<num_roaming_channel; i++) {
     // Encode roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
     RoamingChannelElement rch_elm(data(addr));
     RoamingChannel *rch = ctx.config()->roamingChannels()->get(i)->as<RoamingChannel>();
     rch_elm.clear();
@@ -2996,8 +3001,8 @@ D878UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack
   }
 
   // Encode roaming zones
-  for (int i=0; i<ctx.config()->roamingZones()->count(); i++){
-    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
+  for (unsigned int i=0; i<ctx.count<RoamingZone>(); i++){
+    uint32_t addr = Offset::roamingZones() + i*RoamingZoneElement::size();
     RoamingZoneElement zone(data(addr));
     logDebug() << "Encode roaming zone " << ctx.config()->roamingZones()->zone(i)->name()
                << " (" << (i+1) << ") at " << QString::number(addr, 16)
@@ -3013,24 +3018,22 @@ D878UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create or find roaming channels
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+  RoamingChannelBitmapElement roaming_channel_bitmap(data(Offset::roamingChannelBitmap()));
+  for (unsigned int i=0; i<Limit::roamingChannels(); i++) {
+    if (! roaming_channel_bitmap.isEncoded(i))
       continue;
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
+    uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
     RoamingChannelElement ch(data(addr));
     RoamingChannel *digi = ch.toChannel(ctx);
     ctx.add(digi, i);
   }
 
   // Create and link roaming zones
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  for (unsigned int i=0; i<Limit::roamingZones(); i++) {
+    if (! roaming_zone_bitmap.isEncoded(i))
       continue;
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
+    uint32_t addr = Offset::roamingZones() + i*RoamingZoneElement::size();
     RoamingZoneElement z(data(addr));
     RoamingZone *zone = z.toRoamingZone(ctx, err);
     ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);

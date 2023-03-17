@@ -1090,16 +1090,16 @@ public:
   /** Represents the 8 DMR-APRS systems within the binary codeplug.
    *
    * Memory layout of encoded DMR-APRS systems (size 0x0060 bytes):
-   * @verbinclude d878uv_dmraprssystems.txt */
-  class DMRAPRSSystemsElement: public Element
+   * @verbinclude d878uv_dmraprssettings.txt */
+  class DMRAPRSSettingsElement: public Element
   {
   protected:
     /** Hidden constructor. */
-    DMRAPRSSystemsElement(uint8_t *ptr, unsigned size);
+    DMRAPRSSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
-    DMRAPRSSystemsElement(uint8_t *ptr);
+    DMRAPRSSettingsElement(uint8_t *ptr);
 
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0060; }
@@ -1239,6 +1239,21 @@ public:
     };
   };
 
+  /** Represents the bitmap, indicating which roaming channel is valid. */
+  class RoamingChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RoamingChannelBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
   /** Represents a roaming zone within the binary codeplug.
    *
    * Memory layout of roaming zone (0x80byte):
@@ -1298,6 +1313,21 @@ public:
     };
   };
 
+  /** Represents the bitmap, indicating which roaming zone is valid. */
+  class RoamingZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RoamingZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+  };
+
   /** Represents an AES encryption key.
    *
    * Binary representation of the key (size 0x0040 bytes):
@@ -1311,6 +1341,9 @@ public:
   public:
     /** Constructor. */
     AESEncryptionKeyElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
 
     /** Resets the key. */
     void clear();
@@ -1490,6 +1523,7 @@ public:
     static constexpr unsigned int analogAPRSRXEntries() { return 32; }   ///< Maximum number of analog APRS RX entries.
     static constexpr unsigned int roamingChannels()     { return 250; }  ///< Maximum number of roaming channels.
     static constexpr unsigned int roamingZones()        { return 64; }   ///< Maximum number of roaming zones.
+    static constexpr unsigned int aesKeys()             { return 256; }  ///< Maximum number of AES keys.
   };
 
 protected:
@@ -1508,6 +1542,7 @@ protected:
     static constexpr unsigned int roamingChannels()             { return 0x01040000; }
     static constexpr unsigned int roamingZoneBitmap()           { return 0x01042080; }
     static constexpr unsigned int roamingZones()                { return 0x01043000; }
+    static constexpr unsigned int aesKeys()                     { return 0x024C4000; }
     /// @endcond
   };
 };
