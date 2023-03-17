@@ -1730,6 +1730,8 @@ public:
 
   /** Represents the list of hot-key settings for all AnyTone codeplugs.
    *
+   * See @c HotKeyElement for encoding of each element.
+   *
    *  Memory encoding of the hot-key settings (size 0x0360 bytes):
    * @verbinclude anytone_hotkeysettings.txt */
   class HotKeySettingsElement: public Element
@@ -1748,7 +1750,7 @@ public:
     void clear();
 
     /** Returns a pointer to the n-th hot key setting. */
-    uint8_t *hotKeySetting(unsigned int n) const;
+    virtual uint8_t *hotKeySetting(unsigned int n) const;
 
   public:
     /** Some limits for this element. */

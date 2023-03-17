@@ -10,9 +10,6 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define ADDR_HOTKEY               0x025C0000 // Same address as D868UV::hotkey_settings_t
-#define HOTKEY_SIZE               0x00000970 // Different size.
-
 #define ADDR_UNKNOWN_SETTING_1    0x02BC0000 // Address of unknown settings
 #define UNKNOWN_SETTING_1_SIZE    0x00000020 // Size of unknown settings.
 #define ADDR_UNKNOWN_SETTING_2    0x02BC0C60 // Address of unknown settings
@@ -247,6 +244,92 @@ D578UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
 
 
 /* ******************************************************************************************** *
+ * Implementation of D578UVCodeplug::HotKeySettingsElement
+ * ******************************************************************************************** */
+D578UVCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr, size_t size)
+  : AnytoneCodeplug::HotKeySettingsElement(ptr, size)
+{
+  // pass...
+}
+
+D578UVCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr)
+  : AnytoneCodeplug::HotKeySettingsElement(ptr, HotKeySettingsElement::size())
+{
+  // pass...
+}
+
+uint8_t *
+D578UVCodeplug::HotKeySettingsElement::hotKeySetting(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return nullptr;
+  return _data + Offset::hotKeySettings() + n*Offset::betweenHotKeySettings();
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D578UVCodeplug::AirBandChannelElement
+ * ******************************************************************************************** */
+D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr)
+  : Element(ptr, AirBandChannelElement::size())
+{
+  // pass...
+}
+
+void
+D578UVCodeplug::AirBandChannelElement::clear() {
+  memset(_data, 0, _size);
+}
+
+Frequency
+D578UVCodeplug::AirBandChannelElement::frequency() const {
+  return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::frequency()))*10);
+}
+void
+D578UVCodeplug::AirBandChannelElement::setFrequency(Frequency freq) {
+  setBCD8_be(Offset::frequency(), freq.inHz()/10);
+}
+
+QString
+D578UVCodeplug::AirBandChannelElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+void
+D578UVCodeplug::AirBandChannelElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D578UVCodeplug::AirBandChannelListElement
+ * ******************************************************************************************** */
+D578UVCodeplug::AirBandChannelListElement::AirBandChannelListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D578UVCodeplug::AirBandChannelListElement::AirBandChannelListElement(uint8_t *ptr)
+  : Element(ptr, AirBandChannelListElement::size())
+{
+  // pass...
+}
+
+uint8_t *
+D578UVCodeplug::AirBandChannelListElement::channel(unsigned int n) const {
+  if (n >= Limit::channels())
+    return nullptr;
+
+  return _data + n*AirBandChannelElement::size();
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of D578UVCodeplug
  * ******************************************************************************************** */
 D578UVCodeplug::D578UVCodeplug(const QString &label, QObject *parent)
@@ -272,7 +355,7 @@ D578UVCodeplug::allocateUpdated() {
 
 void
 D578UVCodeplug::allocateHotKeySettings() {
-  image(0).addElement(ADDR_HOTKEY, HOTKEY_SIZE);
+  image(0).addElement(Offset::hotKeySettings(), HotKeySettingsElement::size());
 }
 
 bool

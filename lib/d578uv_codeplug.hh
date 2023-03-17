@@ -273,6 +273,108 @@ public:
     GeneralSettingsElement(uint8_t *ptr);
 };
 
+  /** Represents the hot-key settings of the radio within the D578UV binary codeplug.
+   *
+   * This class extends the common @c AnytoneCodeplug::HotKeySettings element, encoding 24 instead
+   * of 17 @c HotKeySettingsElement.
+   *
+   * Memory layout of the hot-key settings (size 0x0370 bytes):
+   * @verbinclude d578uv_hotkeysettings.txt */
+  class HotKeySettingsElement: public AnytoneCodeplug::HotKeySettingsElement
+  {
+  protected:
+    /** Hidden constructor. */
+    HotKeySettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HotKeySettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0970; }
+
+    uint8_t *hotKeySetting(unsigned int n) const;
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 24; }   ///< Maximum number of hot-key entries.
+    };
+
+  };
+
+  /** Implements the air-band receiver channel.
+   *
+   * Memory layout of the air-band channel list (size 0x0020 bytes):
+   * @verbinclude d578uv_airbandchannel.txt */
+  class AirBandChannelElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AirBandChannelElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AirBandChannelElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
+    void clear();
+
+    /** The channel frequency. */
+    virtual Frequency frequency() const;
+    /** Sets the channel frequency. */
+    virtual void setFrequency(Frequency freq);
+
+    /** The name of the channel. */
+    virtual QString name() const;
+    /** Sets the name of the channel. */
+    virtual void setName(const QString &name);
+
+  public:
+    /** Some limits of the channel. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }     ///< Maximum name length.
+    };
+
+  public:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int frequency() { return 0x0000; }
+      static constexpr unsigned int name()      { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the air-band receiver channel list.
+   *
+   * Memory layout of the air-band channel list (size 0x0c80 bytes):
+   * @verbinclude d578uv_airbandchannellist.txt */
+  class AirBandChannelListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AirBandChannelListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AirBandChannelListElement(uint8_t *ptr);
+
+    /** Element size. */
+    static constexpr unsigned int size() { return 0x0c80; }
+
+    /** Returns a pointer to the n-th channel element. */
+    virtual uint8_t *channel(unsigned int n) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int channels() { return 100; }
+    };
+  };
+
 protected:
   /** Hidden constructor. */
   explicit D578UVCodeplug(const QString &label, QObject *parent = nullptr);
