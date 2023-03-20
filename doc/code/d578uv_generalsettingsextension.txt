@@ -14,31 +14,31 @@
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0018  | Unknown                                                                                                                       |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-001c  | Unknown                                                                                                                       |
+001c  | Unknown                                                       | Alias priority                | Alias encoding                |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0020  | Waether alarm enable          | Unknown                                                       | Speaker mode                  |
+0020  | Weather alarm enable          | Cross-band repeater enable    | Unknown                       | Speaker mode                  |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0024  | Unknown                       | Mic-speaker path              |                               | BT PTT hold enable            |
+0024  | Unknown                       | Mic-speaker path              | GPS mode                      | BT PTT hold enable            |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0028  | PTT sleep time                | Fan control                   | Weather channel index         | Man dial group call hang time |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 002c  | Man dial priv call hang time  | Knob short press              | Knob long press               | Channel B name color          |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0030  | Encryption mode               | Pro-mode enable               | Unknown                       | HandOpMode                    |
+0030  | Encryption mode               | Pro-mode enable               | STE duration                  | HandOpMode                    |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0034  | Zone name A color             | Zone name B color             | Auto shut-down mode           | Air band mode                 |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0038  | Air band channel index        | Air band TX offset direction  | Air band squelch              |                   |SCC|STS|SCT|
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-003c  | FM channel idle tone enable   | Date format                   | Unknown                                                       |
+003c  | FM channel idle tone enable   | Date format                   | Unknown                       | FM mic gain                   |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0040  | Unknown                                                                                                                       |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0044  | Unknown                                                                                                                       |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0048  | Unknown                       | Transmit timeout predict      |                                                               |
+0048  | Unknown                       | Transmit timeout predict      | GPS roaming enable            | Cross band rep. CC match mode |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-004c  | Unknown                                                                                                                       |
+004c  | Cross band rep. Ch A TS       | Cross band rep. Ch B TS       | Unknown                                                       |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 0050  | Unknown                                                                                                                       |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -84,7 +84,7 @@
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00a4  | Unknown                                                                                                                    ...
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-00fc   ...                                                                                                                            |
+01fc   ...                                                                                                                            |
       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Where:
@@ -92,6 +92,7 @@ Where:
   - BT handset VOX level [0,8], default=0
   - BT handset VOX delay in 0.5s. 0=0.5s, 1=1.0s, ..., 9=5.0s
   - BT handset vol A/B [0,31]
+  - STE duration in ms. 0=10ms (default), 1=20ms, ..., 99=1000ms.
   - Auto shut-down mode: 0=Reset timer on call, 1=no reset.
   - Mic-speaker path: 0=Master, 1=Slave
   - Fan control: 0=PTT, 1=Temperature, 2=Both
@@ -105,3 +106,9 @@ Where:
   - STS: Show time slot enable
   - SCC: Show color code enable
   - Date format: 0=yyyy/mm/dd, 1=dd/mm/yyyy
+  - GPS mode: 0=GPS, 1=Baidu, 2=Both
+  - Cross band rep. CC match mode: 0 = None, 1 = Match channel A CC, 2 = Match channel B CC
+  - Cross band rep. Ch A/B TS: 0=Off, 1=TS1, 2=TS2
+  - FM mic gain: 0=1, ..., 4=5.
+  - Alias priority: 0=Off, 1=contact, 2=over-the-air
+  - Alias encoding: 0=ISO8, 1=ISO7, 2=Unicode

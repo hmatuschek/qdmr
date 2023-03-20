@@ -102,7 +102,7 @@ class GPSSystem;
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
+ *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D578UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
@@ -114,7 +114,7 @@ class GPSSystem;
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>DMR ARPS (GPS) messages, see @c D878UVCodeplug::GPSMessageElement.</td></tr>
- *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension 2, see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
+ *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension 2, see @c D578UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *
