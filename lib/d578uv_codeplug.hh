@@ -114,7 +114,7 @@ class GPSSystem;
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
  *  <tr><td>02501280</td> <td>000030</td> <td>DMR ARPS (GPS) messages, see @c D878UVCodeplug::GPSMessageElement.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2, see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
+ *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension 2, see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000. Default 0x00000000, 0x00 padded.</td></tr>
  *

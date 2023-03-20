@@ -1,133 +1,176 @@
      7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-00 | Enable key tone               | Display mode                  | Enable automatic key lock     | Automatic shutdown time       |
+00 | Key tones                     | Display mode                  | Auto key-lock enable          | Auto shut-down delay          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04 | Transmit timeout in 30s       | Language                      | Boot display                  | Enable boot password          |
+04 | Transmit timeout              | Language                      | Boot display mode             | Boot password enable          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-08 | VFO frequency step            | Squelch level VFO A           | Squelch level VFO B           | Power save mode               |
+08 | VFO Frequency step            | Squelch level A               | Squelch level B               | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-0c | VOX sensitivity               | VOX delay in 100+500*n ms     | VFO scan type                 | MIC gain                      |
+0c | Unknown                       | Work mode A                   | Work mode B                   | STE Type                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-10 | PF1 short press function      | PF2 short press function      | PF3 short press function      | P1 short press function       |
+10 | STE when no signal            | Group call hang time          | Private call hang time        | Pre-wave delay                |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-14 | P2 short press function       | Work mode A                   | Work mode B                   | STE Type                      |
+14 | Wake head period              | WFM channel index             | WFM Mode                      | Work mode MEM zone idx A      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-18 | STE freq. no signal           | Group call hang time in sec   | Private call hang time in sec | Prewave time in 20ms          |
+18 | Work mode MEM zone idx B      | Airband/WFM enable            | Unknown                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-1c | Wake head period in 20ms      | WFM channel index             | WFM VFO Mode enable           | Work mode MEM zone A          |
+1c | Unknown                       | Display brightness            | Unknown                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-20 | Work mode MEM zone B          | Unused set to 0x00            | Enable recording              | DTMF duration                 |
+20 | SMS alert tone enable         | WFM monitor enable            | Unknown                       | Main channel B                |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-24 | Man down enable               | Unused set to 0x00            | Display brightness            | Backlight duration            |
+24 | Sub channel enable            | TBST frequency                | Call alert tone enable        | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-28 | Enable GPS                    | Enable SMS alert              | Unused set to 0x00            | WFM monitor enable            |
+28 | Talk permit tones             | DMR call reset tone enable    | DMR idle channel tone         | Menu exit time                |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c | Work mode main channel set    | Enable sub channel            | TBST frquency                 | Enable call alert             |
+2c | Filter own ID in missed calls | Boot tone enable              | Show call end prompt          | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30 | GPS Time zone                 | Talk permit tone              | Digital call reset tone       | VOX source                    |
+30 | Remote stun & kill enable     | Remote monitor enable         | STE duration                  | Long key-press duration       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34 | Enable pro mode               | Unused set to 0x00            | Idle channel tone             | Menu exit time                |
+34 | Show volume bar               | Unknown                       | DMR monitor mode              | DMR monitor match CC          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-38 | Filter own ID enable          | Startup tone                  | Enable call end prompt        | Max speaker volume            |
+38 | DMR monitor match ID          | DMR monitor slot hold         | Last caller display mode      | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Remote stun/kill enable       | Unused set to 0x00            | Remote monitor enable         | GPS RX positions              |
+3c | Analog call hang time         | Show clock                    | Unknown                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-40 | Unknown                       | PF1 long press function       | PF2 long press function       | PF3 long press function       |
+40 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-44 | P1 long press function        | P2 long press function        | Long press duration           | Enable Volume change prompt   |
+44 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-48 | Auto repeater A direction     | Digital monitor slot          | Digital monitor color code    | Digital monitor match ID      |
+48 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-4c | Digital monitor hold slot     | Display later caller          | Unknown                       | Man down delay in sec         |
+4c | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-50 | Analog call hold in seconds   | Display clock                 | Max head phone volume         | Enable GPS range message      |
+50 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-54 | Unknown settings                                                                              | Enable enhanced audio         |
+54 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-58 | VFO Scan UHF minimum frequency in 10Hz, 32bit uint, little endian                                                             |
+58 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-5c | VFO Scan UHF maximum frequency in 10Hz, 32bit uint, little endian                                                             |
+5c | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-60 | VFO Scan VHF minimum frequency in 10Hz, 32bit uint, little endian                                                             |
+60 | Talk permit tone 1 frequency                                  | Talk permit tone 2 frequency                                  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-64 | VFO Scan VHF maximum frequency in 10Hz, 32bit uint, little endian                                                             |
+64 | Talk permit tone 3 frequency                                  | Talk permit tone 4 frequency                                  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-68 | Auto rep. offset index UHF    | Auto rep. offset index VHF    | Unknown                                                    ...
+68 | Talk permit tone 5 frequency                                  | Talk permit tone 1 duration in 10ms, 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-6c |                                                               | Maintain call channel         | Priority zone A index         |
+6c | Talk permit tone 2 duration in 10ms, 16bit uint little endian | Talk permit tone 3 duration in 10ms, 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-70 | Priority zone B index         | Unused set to 0x00            | Call tone frequency 1 in Hz, little endian                    |
+70 | Talk permit tone 4 duration in 10ms, 16bit uint little endian | Talk permit tone 5 duration in 10ms, 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-74 | Call tone frequency 2 in Hz, little endian                    | Call tone frequency 3 in Hz, little endian                    |
+74 | Idle channel tone 1 freuency in Hz, 16bit uint little endian  | Idle channel tone 2 freuency in Hz, 16bit uint little endian  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-78 | Call tone frequency 4 in Hz, little endian                    | Call tone frequency 5 in Hz, little endian                    |
+78 | Idle channel tone 3 freuency in Hz, 16bit uint little endian  | Idle channel tone 4 freuency in Hz, 16bit uint little endian  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-7c | Call tone duration 1 in ms, little endian                     | Call tone duration 2 in ms, little endian                     |
+7c | Idle channel tone 5 freuency in Hz, 16bit uint little endian  | Idle channel tone 1 duration in 10ms 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-80 | Call tone duration 3 in ms, little endian                     | Call tone duration 4 in ms, little endian                     |
+80 | Idle channel tone 2 duration in 10ms 16bit uint little endian | Idle channel tone 3 duration in 10ms 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-84 | Call tone duration 5 in ms, little endian                     | Idle tone frequency 1 in Hz, little endian                    |
+84 | Idle channel tone 4 duration in 10ms 16bit uint little endian | Idle channel tone 5 duration in 10ms 16bit uint little endian |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-88 | Idle tone frequency 2 in Hz, little endian                    | Idle tone frequency 3 in Hz, little endian                    |
+88 | Call reset tone 1 freuency in Hz, 16bit uint little endian    | Call reset tone 2 freuency in Hz, 16bit uint little endian    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-8c | Idle tone frequency 4 in Hz, little endian                    | Idle tone frequency 5 in Hz, little endian                    |
+8c | Call reset tone 3 freuency in Hz, 16bit uint little endian    | Call reset tone 4 freuency in Hz, 16bit uint little endian    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-90 | Idle tone duration 1 in ms, little endian                     | Idle tone duration 2 in ms, little endian                     |
+90 | Call reset tone 5 freuency in Hz, 16bit uint little endian    | Call reset tone 1 duration in 10ms, 16bit uint little endian  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-94 | Idle tone duration 3 in ms, little endian                     | Idle tone duration 4 in ms, little endian                     |
+94 | Call reset tone 2 duration in 10ms, 16bit uint little endian  | Call reset tone 3 duration in 10ms, 16bit uint little endian  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-98 | Idle tone duration 5 in ms, little endian                     | Reset tone frequency 1 in Hz, little endian                   |
+98 | Call reset tone 4 duration in 10ms, 16bit uint little endian  | Call reset tone 5 duration in 10ms, 16bit uint little endian  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-9c | Reset tone frequency 2 in Hz, little endian                   | Reset tone frequency 3 in Hz, little endian                   |
+9c | Unknown                                                                                       | Priority zone A index         |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-a0 | Reset tone frequency 4 in Hz, little endian                   | Reset tone frequency 5 in Hz, little endian                   |
+a0 | Priority zone B index         | Unknown                       | Caller display mode           | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-a4 | Reset tone duration 1 in ms, little endian                    | Reset tone duration 2 in ms, little endian                    |
+a4 | Bluetooth enable              | BT + int microphone           | BT + int. speaker             | Plug-in recoding tone enable  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-a8 | Reset tone duration 3 in ms, little endian                    | Reset tone duration 4 in ms, little endian                    |
+a8 | Unknown, 0x05                 | BT mic gain [0,4]             | BT speaker gain [0,4]         | Channel number mode           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-ac | Reset tone duration 5 in ms, little endian                    | Record delay in 200ms         | Call display mode             |
+ac | Show current contact          | Unknown                       | Call sign color               | Unknown                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-b0 | Unknown settings                                                                                                           ...
+b0 |           |FKL|SkL| 0 |KbL|KnL| Unknown                       | Standby text color            | Standby background image      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-b4  ...                            | GPS ranging interval in sec   | Unknown settings                                              |
+b4 | Show last call on boot        | SMS format                                                    | Send addr book with own code  |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-b8 | Display channel number        | Display contact               | Auto roaming period in min    | Key tone level                |
+b8 | Boot channel enable           | Boot zone A index             | Boot zone B index             | Boot channel index A          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-bc | Callsign color                | GPS unit                      | 0   0   0 |KLF|LSK| 0 |LKB|LKN| Auto roam delay in seconds    |
+bc | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c0 | Standby text color            | Standby image color           | Show last heard               | SMS format                    |
+c0 | Unknown                                                                                       | Show display separator        |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c4 | Auto repeater VHF min frequency in 10Hz, 32bit uint, little endian                                                            |
+c4 | Channel switch keep last call | Channel A name color          | Unknown                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-c8 | Auto repeater VHF max frequency in 10Hz, 32bit uint, little endian                                                            |
+c8 | Unknown                       | P1 key short press            | P2 key short press            | P3 key short press            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-cc | Auto repeater UHF min frequency in 10Hz, 32bit uint, little endian                                                            |
+cc | P4 key short press            | P5 key short press            | P6 key short press            | PA key short press            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d0 | Auto repeater UHF max frequency in 10Hz, 32bit uint, little endian                                                            |
+d0 | PB key short press            | PC key short press            | PD key short press            | P1 key long press             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d4 | Auto rep. VFO B direction     | Unknown                       | Unused set to 0x00            | Boot channel enable           |
+d4 | P2 key long press             | P3 key long press             | P4 key long                   | P5 key long press             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d8 | VFO A default zone index      | VFO B default zone index      | VFO A default channel index   | VFO B default channel index   |
+d8 | P6 key long press             | PA key long press             | PB key long press             | PC key long press             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-dc | Default roaming zone index    | Repeater range check enable   | Repeater check interval in 5s | RepCheck reconnect count      |
+dc | PD key long press             | Unknown                                                       | Transmit timeout rekey        |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-e0 | Roam start condition          | Backlight duration TX in sec  | Separate display              | Keep last caller              |
+e0 | Unknown                                                       | BT hold time                  | BT RX delay                   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-e4 | Channel name color            | RepCheck notification         | Backlight duration RX in sec  | Roaming enable                |
+e4 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-e8 | Unused set to 0x00            | Mute delay in minutes-1       | RepCheck num notification     | Startup GPS test enable       |
+e8 | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-ec | Startup reset enable          | Unused set to 0x00                                                                            |
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-f0 | Unknown settings                                                                                                           ...
-   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-fc  ...                                                                                                                            |
+ec | Unknown                                                                                                                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Field description:
- - KLF: Key lock forced enable
- - LSK: Lock side key
- - LKB: Keyboard lock
- - LKN: Knob lock
-
+Where:
+  Bluethooth settings:
+    - BT hold time in seconds, 0=off (default), [off, 1, ..., 30, infinity].
+    - BT RX delay stored in multiples of 0.5s, 0=0.5, 1=1.0s, 2=1.5s (default), ..., 10=5.5s.
+  STE (squelch tail):
+    - STE Type: 0=Off (default), 1=Silent, 2=120deg, 3=180deg, 4=240deg, 5=55Hz
+    - STE when no signal: 0=Off (default), 1=55.2Hz, 2=259.2Hz
+    - STE duration in ms. 0=10ms (default), 1=20ms, ..., 99=1000ms.
+  WFM/Air band:
+    - Air band/WFM enable: 0=Off (both, default), 1=WFM, 2=Air-band A, 3=Air-band B
+    - WFM mode: 0=Channel (default), 1=VFO
+    - Air band mode: 0=Channel (default), 1=VFO
+    - Air band TX offset direction: 0=positive (default), 1=negative
+    - Air band squelch: 0=Off (default), [1,5]
+  Power save:
+    - Auto shut-down delay: 0=off, 1=10m, 2=30min, 3=60min, 4=120min
+  Key settings:
+    - KnL: Knob lock enable.
+    - KbL: Key-board lock enable.
+    - SkL: Side-key lock enable.
+    - FKL: Forced key lock enable.
+    - Long key-press duration: 0=1s, 1=2s, ..., 4=5s
+  Other:
+    - Send addr book with own code: Sends ANI analog ID together with selected addr book ID.
+    - Transmit timeout in multiples of 30s. 0=Off, 1=30s, ..., 8=240s
+    - Transmit timeout rekey in seconds. 0=Off, 1=1s, ..., 255=255s.
+    - VFO Frequency step: 0=2.5k, 1=5k, 2=6.25k, 3=8.33l, 4=10k, 5=12.5k, 6=20k, 7=25k, 8=30k, 9=50k.
+    - Squelch level A/B: 0=Off, 1=1, ..., 5=5.
+    - TBST frequency: 0=1000kHz, 1=1450kHz, 2=1750kHz, 3=2100kHz.
+    - Analog call hang time in seconds, [0,30]
+    - Priority zone A/B index 0xff=Off.
+  DMR settings:
+    - Group/private call hang time in seconds 1=1s, 2=2s, ..., 30=30s, 31=30min, 32=infinity.
+    - Pre-wave delay in multiples of 20ms 0=0ms (default), 1=20ms, ..., 50=1000ms
+    - Wake head period in muliples of 20ms 0=0ms (default), 1=20ms, ..., 60=1200ms
+    - DMR monitor mode 0=Off, 1=Single slot, 2=Dual-slot.
+    - SMS format: 0=Motorola (default), 1=Hytera, 2=DMR Standard
+  Boot settings:
+    - Boot display mode: 0=Default, 1=Custom text, 2=Custom image
+    - Boot channel index A/B: Index within zone, 0xff = VFO
+  Tone settings:
+    - Talk permit tones: 0=None, 1=DMR, 2=FM, 3=Both
+    - Key tones: 0=Off, 1=1, ..., 8=8, 9=With RX tone A, 10=With RX tone B
+    - DMR idle channel tone: 0=Off, 1=Type 1, 2=Type 2, 3=Type 3.
+  Display settings:
+    - Display brightness 0=1, ..., 4=5
+    - Menu exit time in multiples of 5s: 0=5s, 1=10s, ..., 11=60s
+    - Last caller display mode: 0=Off, 1=Show ID, 2=Show Call, 3=Show both
+    - Caller display mode: 0=Show name, 1=Show call
+    - Callsign/Channel A/B name/ color: 0=Orange (default), 1=Red, 2=Yellow, 3=Green, 4=Turquoise, 5=Blue, 6=White
+    - Standby text color: 0=White, 1=Black, 2=Orange, 3=Red, 4=Yellow, 5=Green, 6=Turquoise, 7=Blue
+    - Channel number mode: 0=Channel number, 1=Channel index within zone.
+    - Standby background image: 0=Default, 1=Custom image 1, 2=Custom image 2
