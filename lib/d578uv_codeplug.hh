@@ -109,7 +109,7 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000100</td> <td>General settings, see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
+ *  <tr><td>02500000</td> <td>0000f0</td> <td>General settings, see @c D578UVCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings, see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
@@ -177,13 +177,20 @@ class GPSSystem;
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
+ *  <tr><th colspan="3">Air-band settings</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
+ *  <tr><td>02BC0000</td> <td>000c80</td> <td>Up to 100 air band channels, 0x20 bytes each. See
+ *      @c AirBandChannelElement.</td></tr>
+ *  <tr><td>02BC1000</td> <td>000020</td> <td>Air band VFO channel, see
+ *      @c AirBandChannelElement.</td></tr>
+ *  <tr><td>02BC1020</td> <td>000020</td> <td>Air band channel bitmap</td></tr>
+ *  <tr><td>02BC1040</td> <td>000020</td> <td>Air band scan enable bitmap</td></tr>
+ *
  *  <tr><th colspan="3">Still unknown</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
  *  <tr><td>024C1090</td> <td>000040</td> <td>Unknown, set to 0xff</td></tr>
  *  <tr><td>024C1440</td> <td>000030</td> <td>Unknown data.</td></tr>
- *  <tr><td>02BC0000</td> <td>000020</td> <td>Unknown, set to 0x00.</td></tr>
- *  <tr><td>02BC0C60</td> <td>000020</td> <td>Unknown, set to 0x00.</td></tr>
- *  <tr><td>02BC1000</td> <td>000060</td> <td>Unknown, set to 0x00.</td></tr>
+ *  <tr><td>02504000</td> <td>000400</td> <td>Unknown data.</td></tr>
  * </table>
  *
  * @ingroup d578uv */
@@ -241,7 +248,7 @@ public:
    * This class implements only the differences to the D878UV general settings
    * @c D878UVCodeplug::GeneralSettingsElement.
    *
-   * Binary encoding of the general settings (size 0x0100 bytes):
+   * Binary encoding of the general settings (size 0x00f0 bytes):
    * @verbinclude d578uv_generalsettings.txt */
   class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
   {
@@ -348,31 +355,20 @@ public:
     };
   };
 
-  /** Implements the air-band receiver channel list.
-   *
-   * Memory layout of the air-band channel list (size 0x0c80 bytes):
-   * @verbinclude d578uv_airbandchannellist.txt */
-  class AirBandChannelListElement: public Element
+  /** Represents the bitmap indicating which channels are valid and which are included in the
+   *  air-band scan. */
+  class AirBandBitmapElement: public BitmapElement
   {
   protected:
     /** Hidden constructor. */
-    AirBandChannelListElement(uint8_t *ptr, size_t size);
+    AirBandBitmapElement(uint8_t *ptr, size_t size);
 
   public:
     /** Constructor. */
-    AirBandChannelListElement(uint8_t *ptr);
+    AirBandBitmapElement(uint8_t *ptr);
 
-    /** Element size. */
-    static constexpr unsigned int size() { return 0x0c80; }
-
-    /** Returns a pointer to the n-th channel element. */
-    virtual uint8_t *channel(unsigned int n) const;
-
-  public:
-    /** Some limits. */
-    struct Limit {
-      static constexpr unsigned int channels() { return 100; }
-    };
+    /** The element size. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
 protected:
@@ -384,6 +380,8 @@ public:
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
 protected:
+  bool allocateBitmaps();
+
   void allocateUpdated();
 
   void allocateHotKeySettings();
@@ -399,14 +397,27 @@ protected:
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates the air-band channels und VFO settings. */
+  virtual void allocateAirBand();
+
+public:
+  /** Some limtis for the codeplug. */
+  struct Limit: D878UVCodeplug::Limit {
+    static constexpr unsigned int airBandChannels() { return 100; }     ///< Maximum number of air-band channels.
+  };
+
 protected:
   /** Internal used offsets within the codeplug. */
   struct Offset: D878UVCodeplug::Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int contactIdTable()    { return 0x04800000; }
-    static constexpr unsigned int settings()          { return 0x02500000; }
-    static constexpr unsigned int gpsMessages()       { return 0x02501280; }
-    static constexpr unsigned int settingsExtension() { return 0x02501400; }
+    static constexpr unsigned int contactIdTable()       { return 0x04800000; }
+    static constexpr unsigned int settings()             { return 0x02500000; }
+    static constexpr unsigned int gpsMessages()          { return 0x02501280; }
+    static constexpr unsigned int settingsExtension()    { return 0x02501400; }
+    static constexpr unsigned int airBandChannels()      { return 0x02BC0000; }
+    static constexpr unsigned int airBandVFO()           { return 0x02BC1000; }
+    static constexpr unsigned int airBandChannelBitmap() { return 0x02BC1020; }
+    static constexpr unsigned int airBandScanBitmap()    { return 0x02BC1040; }
     /// @endcond
   };
 };

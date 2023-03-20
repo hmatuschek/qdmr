@@ -10,12 +10,12 @@
 #include <QTimeZone>
 #include <QtEndian>
 
-#define ADDR_UNKNOWN_SETTING_1    0x02BC0000 // Address of unknown settings
+/*#define ADDR_UNKNOWN_SETTING_1    0x02BC0000 // Address of unknown settings
 #define UNKNOWN_SETTING_1_SIZE    0x00000020 // Size of unknown settings.
 #define ADDR_UNKNOWN_SETTING_2    0x02BC0C60 // Address of unknown settings
 #define UNKNOWN_SETTING_2_SIZE    0x00000020 // Size of unknown settings.
 #define ADDR_UNKNOWN_SETTING_3    0x02BC1000 // Address of unknown settings
-#define UNKNOWN_SETTING_3_SIZE    0x00000060 // Size of unknown settings.
+#define UNKNOWN_SETTING_3_SIZE    0x00000060 // Size of unknown settings.*/
 
 
 /* ******************************************************************************************** *
@@ -306,26 +306,18 @@ D578UVCodeplug::AirBandChannelElement::setName(const QString &name) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D578UVCodeplug::AirBandChannelListElement
+ * Implementation of D578UVCodeplug::AirBandBitmapElement
  * ******************************************************************************************** */
-D578UVCodeplug::AirBandChannelListElement::AirBandChannelListElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
+D578UVCodeplug::AirBandBitmapElement::AirBandBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
 {
   // pass...
 }
 
-D578UVCodeplug::AirBandChannelListElement::AirBandChannelListElement(uint8_t *ptr)
-  : Element(ptr, AirBandChannelListElement::size())
+D578UVCodeplug::AirBandBitmapElement::AirBandBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, AirBandBitmapElement::size())
 {
   // pass...
-}
-
-uint8_t *
-D578UVCodeplug::AirBandChannelListElement::channel(unsigned int n) const {
-  if (n >= Limit::channels())
-    return nullptr;
-
-  return _data + n*AirBandChannelElement::size();
 }
 
 
@@ -344,13 +336,21 @@ D578UVCodeplug::D578UVCodeplug(QObject *parent)
   // pass...
 }
 
+bool D578UVCodeplug::allocateBitmaps() {
+  if (! D878UVCodeplug::allocateBitmaps())
+    return false;
+
+  image(0).addElement(Offset::airBandChannelBitmap(), AirBandBitmapElement::size());
+  image(0).addElement(Offset::airBandScanBitmap(), AirBandBitmapElement::size());
+
+  return true;
+}
+
 void
 D578UVCodeplug::allocateUpdated() {
   D878UVCodeplug::allocateUpdated();
 
-  image(0).addElement(ADDR_UNKNOWN_SETTING_1, UNKNOWN_SETTING_1_SIZE);
-  image(0).addElement(ADDR_UNKNOWN_SETTING_2, UNKNOWN_SETTING_2_SIZE);
-  image(0).addElement(ADDR_UNKNOWN_SETTING_3, UNKNOWN_SETTING_3_SIZE);
+  this->allocateAirBand();
 }
 
 void
@@ -415,7 +415,6 @@ D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-
 void
 D578UVCodeplug::allocateContacts() {
   /* Allocate contacts */
@@ -439,7 +438,6 @@ D578UVCodeplug::allocateContacts() {
     memset(data(Offset::contactIdTable()), 0xff, align_size(ContactMapElement::size()*(1+contactCount), 16));
   }
 }
-
 
 bool
 D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
@@ -470,7 +468,6 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   return true;
 }
 
-
 void
 D578UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
@@ -498,5 +495,18 @@ D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
+void
+D578UVCodeplug::allocateAirBand() {
+  // Allocate valid air-band channels
+  AirBandBitmapElement bitmap(data(Offset::airBandChannelBitmap()));
+  for (unsigned int i=0; i<Limit::airBandChannels(); i++)  {
+    if (! bitmap.isEncoded(i))
+      return;
+    image(0).addElement(Offset::airBandChannels() + i*AirBandChannelElement::size(),
+                        AirBandChannelElement::size());
+  }
+  // allocate air-band VFO channel
+  image(0).addElement(Offset::airBandVFO(), AirBandChannelElement::size());
+}
 
 
