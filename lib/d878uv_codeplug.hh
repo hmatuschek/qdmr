@@ -136,7 +136,7 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings,
+ *  <tr><td>02501000</td> <td>0000f0</td> <td>APRS settings,
  *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
  *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
  *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
@@ -149,7 +149,7 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000100</td> <td>General settings,
+ *  <tr><td>02500000</td> <td>0000f0</td> <td>General settings,
  *    see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
@@ -220,6 +220,10 @@ class GPSSystem;
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
+ *  <tr><th colspan="3">Unknown settings.</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C1090</td> <td>000040</td> <td>Uknown, filled with 0xff.</td></tr>
+ *  <tr><td>02504000</td> <td>000400</td> <td>Uknown, filled with 0xff.</td></tr>
  * </table>
  *
  * @ingroup d878uv */
@@ -321,7 +325,7 @@ public:
    * This class implements only the differences to the generic
    * @c AnytonCodeplug::GeneralSettingsElement.
    *
-   * Binary encoding of the general settings (size 0x0100 bytes):
+   * Binary encoding of the general settings (size 0x00f0 bytes):
    * @verbinclude d878uv_generalsettings.txt */
   class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
   {
@@ -380,7 +384,7 @@ public:
     GeneralSettingsElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
-    static constexpr unsigned int size() { return 0x00000100; }
+    static constexpr unsigned int size() { return 0x00f0; }
 
     /** Resets the general settings. */
     void clear();
@@ -864,7 +868,7 @@ public:
 
   /** Represents the APRS settings within the binary D878UV codeplug.
    *
-   * Memory layout of APRS settings (size 0x0040 bytes):
+   * Memory layout of APRS settings (size 0x00f0 bytes):
    * @verbinclude d878uv_aprssetting.txt
    */
   class AnalogAPRSSettingsElement: public Element
@@ -878,7 +882,7 @@ public:
     explicit AnalogAPRSSettingsElement(uint8_t *ptr);
 
     /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0040; }
+    static constexpr unsigned int size() { return 0x00f0; }
 
     /** Resets the settings. */
     void clear();
