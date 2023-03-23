@@ -42,13 +42,13 @@
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
+  : D868UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }

@@ -293,6 +293,85 @@ public:
     /** Resets the general settings. */
     void clear();
 
+    bool keyToneEnabled() const;
+    void enableKeyTone(bool enable);
+
+    /** Returns the power-save mode. */
+    virtual AnytoneSettingsExtension::PowerSave powerSave() const;
+    /** Sets the power-save mode. */
+    virtual void setPowerSave(AnytoneSettingsExtension::PowerSave mode);
+
+    /** Returns the VOX level. */
+    virtual unsigned voxLevel() const;
+    /** Sets the VOX level. */
+    virtual void setVOXLevel(unsigned level);
+    /** Returns the VOX delay in ms. */
+    virtual Interval voxDelay() const;
+    /** Sets the VOX delay in ms. */
+    virtual void setVOXDelay(Interval ms);
+    /** Returns the VOX source. */
+    virtual AnytoneAudioSettingsExtension::VoxSource voxSource() const;
+    /** Sets the VOX source. */
+    virtual void setVOXSource(AnytoneAudioSettingsExtension::VoxSource source);
+
+    AnytoneSettingsExtension::VFOScanType vfoScanType() const;
+    void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
+
+    unsigned int dmrMicGain() const;
+    void setDMRMicGain(unsigned int gain);
+
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyAShort() const;
+    void setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBShort() const;
+    void setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCShort() const;
+    void setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Short() const;
+    void setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Short() const;
+    void setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyALong() const;
+    void setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBLong() const;
+    void setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCLong() const;
+    void setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Long() const;
+    void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const;
+    void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual Interval longPressDuration() const;
+    void setLongPressDuration(Interval ms);
+
+    bool vfoModeA() const;
+    void enableVFOModeA(bool enable);
+    bool vfoModeB() const;
+    void enableVFOModeB(bool enable);
+
+    unsigned memoryZoneA() const;
+    void setMemoryZoneA(unsigned zone);
+    unsigned memoryZoneB() const;
+    void setMemoryZoneB(unsigned zone);
+
+    /** Returns the maximum headphone volume. */
+    virtual unsigned maxHeadPhoneVolume() const;
+    /** Sets the maximum headphone volume. */
+    virtual void setMaxHeadPhoneVolume(unsigned max);
+
+    /** Returns the recording delay in ms. */
+    virtual unsigned recordingDelay() const;
+    /** Sets the recording delay in ms. */
+    virtual void setRecodringDelay(unsigned ms);
+
+    /** Returns @c true if the backlight is always on. */
+    virtual bool backlightPermanent() const;
+    /** Returns the backlight duration in seconds. */
+    virtual Interval backlightDuration() const;
+    /** Sets the backlight duration in seconds. */
+    virtual void setBacklightDuration(Interval sec);
+    /** Sets the backlight to permanent (always on). */
+    virtual void enableBacklightPermanent();
+
     /** Returns the display color for callsigns. */
     virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     /** Sets the display color for callsigns. */
@@ -398,6 +477,36 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some internal used offsets within the element. */
+    struct Offset: public AnytoneCodeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keyToneLevel()      { return 0x0000; }
+      static constexpr unsigned int powerSaveMode()     { return 0x000b; }
+      static constexpr unsigned int voxLevel()          { return 0x000c; }
+      static constexpr unsigned int voxDelay()          { return 0x000d; }
+      static constexpr unsigned int vfoScanType()       { return 0x000e; }
+      static constexpr unsigned int dmrMicGain()        { return 0x000f; }
+      static constexpr unsigned int progFuncKeyAShort() { return 0x0010; }
+      static constexpr unsigned int progFuncKeyBShort() { return 0x0011; }
+      static constexpr unsigned int progFuncKeyCShort() { return 0x0012; }
+      static constexpr unsigned int progFuncKey1Short() { return 0x0013; }
+      static constexpr unsigned int progFuncKey2Short() { return 0x0014; }
+      static constexpr unsigned int vfoModeA()          { return 0x0015; }
+      static constexpr unsigned int vfoModeB()          { return 0x0016; }
+      static constexpr unsigned int memZoneA()          { return 0x001f; }
+      static constexpr unsigned int memZoneB()          { return 0x0020; }
+
+      static constexpr unsigned int progFuncKeyALong()  { return 0x0041; }
+      static constexpr unsigned int progFuncKeyBLong()  { return 0x0042; }
+      static constexpr unsigned int progFuncKeyCLong()  { return 0x0043; }
+      static constexpr unsigned int progFuncKey1Long()  { return 0x0044; }
+      static constexpr unsigned int progFuncKey2Long()  { return 0x0045; }
+
+      static constexpr unsigned int longPressDuration() { return 0x0046; }
+      /// @endcond
+    };
   };
 
 protected:

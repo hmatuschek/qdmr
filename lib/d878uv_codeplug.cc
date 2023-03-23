@@ -32,6 +32,61 @@ D878UVCodeplug::ChannelElement::clear() {
   setPTTIDSetting(PTTId::Off);
 }
 
+bool
+D878UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
+  return 0x00 != getUInt8(Offset::keyToneLevel());
+}
+void
+D878UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setUInt8(Offset::keyToneLevel(), enable ? 0x01 : 0x00);
+}
+
+AnytoneSettingsExtension::PowerSave
+D878UVCodeplug::GeneralSettingsElement::powerSave() const {
+  return (AnytoneSettingsExtension::PowerSave) getUInt8(Offset::powerSaveMode());
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setPowerSave(AnytoneSettingsExtension::PowerSave mode) {
+  setUInt8(Offset::powerSaveMode(), (unsigned)mode);
+}
+
+unsigned
+D878UVCodeplug::GeneralSettingsElement::voxLevel() const {
+  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
+  setUInt8(Offset::voxLevel(), level/3);
+}
+
+Interval
+D878UVCodeplug::GeneralSettingsElement::voxDelay() const {
+  return Interval::fromMilliseconds(100 + 500*((unsigned)getUInt8(Offset::voxDelay())));
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setVOXDelay(Interval intv) {
+  setUInt8(Offset::voxDelay(), (std::max(100ULL, intv.milliseconds())-100)/500);
+}
+
+AnytoneSettingsExtension::VFOScanType
+D878UVCodeplug::GeneralSettingsElement::vfoScanType() const {
+  return (AnytoneSettingsExtension::VFOScanType) getUInt8(Offset::vfoScanType());
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension::VFOScanType type) {
+  setUInt8(Offset::vfoScanType(), (unsigned)type);
+}
+
+unsigned
+D878UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
+  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
+  gain = std::min(1U, std::min(10U, gain));
+  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+}
+
 D878UVCodeplug::ChannelElement::PTTId
 D878UVCodeplug::ChannelElement::pttIDSetting() const {
   return (PTTId)getUInt2(0x0019, 0);
@@ -454,13 +509,13 @@ static QVector<QTimeZone> _indexToTZ = {
   QTimeZone( 46800) };
 
 D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, 0x0100)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }

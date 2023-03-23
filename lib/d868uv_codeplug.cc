@@ -238,6 +238,189 @@ D868UVCodeplug::GeneralSettingsElement::clear() {
   AnytoneCodeplug::GeneralSettingsElement::clear();
 }
 
+bool
+D868UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
+  return 0x00 != getUInt8(Offset::keyToneLevel());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setUInt8(Offset::keyToneLevel(), enable ? 0x01 : 0x00);
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
+  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
+  setUInt8(Offset::voxLevel(), level/3);
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::voxDelay() const {
+  return Interval::fromMilliseconds(100 + 500*((unsigned)getUInt8(Offset::voxDelay())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVOXDelay(Interval intv) {
+  setUInt8(Offset::voxDelay(), (std::max(100ULL, intv.milliseconds())-100)/500);
+}
+
+AnytoneSettingsExtension::VFOScanType
+D868UVCodeplug::GeneralSettingsElement::vfoScanType() const {
+  return (AnytoneSettingsExtension::VFOScanType) getUInt8(Offset::vfoScanType());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension::VFOScanType type) {
+  setUInt8(Offset::vfoScanType(), (unsigned)type);
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
+  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
+  gain = std::min(1U, std::min(10U, gain));
+  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyAShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyAShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyAShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyBShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyBShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyCShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyCShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey1Short()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Short(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey2Short()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Short(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyALong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyALong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyALong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyBLong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyBLong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBLong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKeyCLong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyCLong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCLong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKey1Long() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey1Long());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Long(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::progFuncKey2Long() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey2Long());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Long(), (unsigned)func);
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::longPressDuration() const {
+  return Interval::fromSeconds(((unsigned)getUInt8(Offset::longPressDuration()))+1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setLongPressDuration(Interval ms) {
+  setUInt8(Offset::longPressDuration(), std::max(1ULL,ms.seconds())-1);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::vfoModeA() const {
+  return getUInt8(Offset::vfoModeA());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
+  setUInt8(Offset::vfoModeA(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::vfoModeB() const {
+  return getUInt8(Offset::vfoModeB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
+  setUInt8(Offset::vfoModeB(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::memoryZoneA() const {
+  return getUInt8(Offset::memZoneA());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMemoryZoneA(unsigned zone) {
+  setUInt8(Offset::memZoneA(), zone);
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::memoryZoneB() const {
+  return getUInt8(Offset::memZoneB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMemoryZoneB(unsigned zone) {
+  setUInt8(Offset::memZoneB(), zone);
+}
+
+
+
 AnytoneDisplaySettingsExtension::Color
 D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
   return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00b0);
