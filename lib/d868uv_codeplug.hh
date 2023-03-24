@@ -293,9 +293,6 @@ public:
     /** Resets the general settings. */
     void clear();
 
-    bool keyToneEnabled() const;
-    void enableKeyTone(bool enable);
-
     /** Returns the power-save mode. */
     virtual AnytoneSettingsExtension::PowerSave powerSave() const;
     /** Sets the power-save mode. */
@@ -313,12 +310,27 @@ public:
     virtual AnytoneAudioSettingsExtension::VoxSource voxSource() const;
     /** Sets the VOX source. */
     virtual void setVOXSource(AnytoneAudioSettingsExtension::VoxSource source);
+    unsigned int dmrMicGain() const;
+    void setDMRMicGain(unsigned int gain);
+    unsigned maxSpeakerVolume() const;
+    void setMaxSpeakerVolume(unsigned level);
+    /** Returns the maximum headphone volume. */
+    virtual unsigned maxHeadPhoneVolume() const;
+    /** Sets the maximum headphone volume. */
+    virtual void setMaxHeadPhoneVolume(unsigned max);
+    bool enhanceAudio() const;
+    void enableEnhancedAudio(bool enable);
 
     AnytoneSettingsExtension::VFOScanType vfoScanType() const;
     void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
-
-    unsigned int dmrMicGain() const;
-    void setDMRMicGain(unsigned int gain);
+    Frequency minVFOScanFrequencyUHF() const;
+    void setMinVFOScanFrequencyUHF(Frequency hz);
+    Frequency maxVFOScanFrequencyUHF() const;
+    void setMaxVFOScanFrequencyUHF(Frequency hz);
+    Frequency minVFOScanFrequencyVHF() const;
+    void setMinVFOScanFrequencyVHF(Frequency hz);
+    Frequency maxVFOScanFrequencyVHF() const;
+    void setMaxVFOScanFrequencyVHF(Frequency hz);
 
     AnytoneKeySettingsExtension::KeyFunction progFuncKeyAShort() const;
     void setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
@@ -353,16 +365,11 @@ public:
     unsigned memoryZoneB() const;
     void setMemoryZoneB(unsigned zone);
 
-    /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadPhoneVolume() const;
-    /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(unsigned max);
+    bool recording() const;
+    void enableRecording(bool enable);
 
-    /** Returns the recording delay in ms. */
-    virtual unsigned recordingDelay() const;
-    /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(unsigned ms);
-
+    unsigned brightness() const;
+    void setBrightness(unsigned level);
     /** Returns @c true if the backlight is always on. */
     virtual bool backlightPermanent() const;
     /** Returns the backlight duration in seconds. */
@@ -371,6 +378,72 @@ public:
     virtual void setBacklightDuration(Interval sec);
     /** Sets the backlight to permanent (always on). */
     virtual void enableBacklightPermanent();
+
+    bool gps() const;
+    void enableGPS(bool enable);
+    QTimeZone gpsTimeZone() const;
+    void setGPSTimeZone(const QTimeZone &zone);
+    bool getGPSPosition() const;
+    void enableGetGPSPosition(bool enable);
+
+    bool keyToneEnabled() const;
+    void enableKeyTone(bool enable);
+    bool smsAlert() const;
+    void enableSMSAlert(bool enable);
+    bool callAlert() const;
+    void enableCallAlert(bool enable);
+    bool dmrTalkPermit() const;
+    bool fmTalkPermit() const;
+    void enableDMRTalkPermit(bool enable);
+    void enableFMTalkPermit(bool enable);
+    bool dmrResetTone() const;
+    void enableDMRResetTone(bool enable);
+    bool idleChannelTone() const;
+    void enableIdleChannelTone(bool enable);
+    bool startupTone() const;
+    void enableStartupTone(bool enable);
+    void callToneMelody(Melody &melody) const;
+    void setCallToneMelody(const Melody &melody);
+    void idleToneMelody(Melody &melody) const;
+    void setIdleToneMelody(const Melody &melody);
+    void resetToneMelody(Melody &melody) const;
+    void setResetToneMelody(const Melody &melody);
+
+    bool activeChannelB() const;
+    void enableActiveChannelB(bool enable);
+
+    bool subChannel() const;
+    void enableSubChannel(bool enable);
+
+    Interval menuExitTime() const;
+    void setMenuExitTime(Interval intv);
+
+    bool callEndPrompt() const;
+    void enableCallEndPrompt(bool enable);
+    bool volumeChangePrompt() const;
+    void enableVolumeChangePrompt(bool enable);
+    AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const;
+    void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode);
+    bool displayClock() const;
+    void enableDisplayClock(bool enable);
+    bool displayCall() const;
+    void enableDisplayCall(bool enable);
+
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
+    void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
+    unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
+    void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
+    void clearAutoRepeaterOffsetFrequencyIndexUHF();
+    bool hasAutoRepeaterOffsetFrequencyIndexVHF() const;
+    unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
+    void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
+    void clearAutoRepeaterOffsetFrequencyIndexVHF();
+
+    /** Returns the recording delay in ms. */
+    virtual unsigned recordingDelay() const;
+    /** Sets the recording delay in ms. */
+    virtual void setRecodringDelay(unsigned ms);
 
     /** Returns the display color for callsigns. */
     virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
@@ -497,14 +570,50 @@ public:
       static constexpr unsigned int vfoModeB()          { return 0x0016; }
       static constexpr unsigned int memZoneA()          { return 0x001f; }
       static constexpr unsigned int memZoneB()          { return 0x0020; }
-
+      static constexpr unsigned int enableRecoding()    { return 0x0022; }
+      static constexpr unsigned int displayBrightness() { return 0x0026; }
+      static constexpr unsigned int backlightDuration() { return 0x0027; }
+      static constexpr unsigned int gpsEnable()         { return 0x0028; }
+      static constexpr unsigned int smsAlert()          { return 0x0029; }
+      static constexpr unsigned int activeChannelB()    { return 0x002c; }
+      static constexpr unsigned int subChannel()        { return 0x002d; }
+      static constexpr unsigned int callAlert()         { return 0x002f; }
+      static constexpr unsigned int gpsTimeZone()       { return 0x0030; }
+      static constexpr unsigned int talkPermit()        { return 0x0031; }
+      static constexpr unsigned int dmrResetTone()      { return 0x0032; }
+      static constexpr unsigned int voxSource()         { return 0x0033; }
+      static constexpr unsigned int idleChannelTone()   { return 0x0036; }
+      static constexpr unsigned int menuExitTime()      { return 0x0037; }
+      static constexpr unsigned int startupTone()       { return 0x0039; }
+      static constexpr unsigned int callEndPrompt()     { return 0x003a; }
+      static constexpr unsigned int maxSpeakerVolume()  { return 0x003b; }
+      static constexpr unsigned int getGPSPosition()    { return 0x003f; }
       static constexpr unsigned int progFuncKeyALong()  { return 0x0041; }
       static constexpr unsigned int progFuncKeyBLong()  { return 0x0042; }
       static constexpr unsigned int progFuncKeyCLong()  { return 0x0043; }
       static constexpr unsigned int progFuncKey1Long()  { return 0x0044; }
       static constexpr unsigned int progFuncKey2Long()  { return 0x0045; }
-
       static constexpr unsigned int longPressDuration() { return 0x0046; }
+      static constexpr unsigned int volumeChangePrompt(){ return 0x0047; }
+      static constexpr unsigned int autoRepeaterDirA()  { return 0x0048; }
+      static constexpr unsigned int lastCallerDisplay() { return 0x004d; }
+      static constexpr unsigned int showClock()         { return 0x0051; }
+      static constexpr unsigned int maxHeadPhoneVolume(){ return 0x0052; }
+      static constexpr unsigned int enhanceAudio()      { return 0x0057; }
+      static constexpr unsigned int minVFOScanUHF()     { return 0x0058; }
+      static constexpr unsigned int maxVFOScanUHF()     { return 0x005c; }
+      static constexpr unsigned int minVFOScanVHF()     { return 0x0060; }
+      static constexpr unsigned int maxVFOScanVHF()     { return 0x0064; }
+      static constexpr unsigned int autoRepOffsetUHF()  { return 0x0068; }
+      static constexpr unsigned int autoRepOffsetVHF()  { return 0x0069; }
+      static constexpr unsigned int callToneTones()     { return 0x0072; }
+      static constexpr unsigned int callToneDurations() { return 0x007c; }
+      static constexpr unsigned int idleToneTones()     { return 0x0086; }
+      static constexpr unsigned int idleToneDurations() { return 0x0090; }
+      static constexpr unsigned int resetToneTones()    { return 0x009a; }
+      static constexpr unsigned int resetToneDurations(){ return 0x00a4; }
+      static constexpr unsigned int recordingDelay()    { return 0x00ae; }
+      static constexpr unsigned int callDisplayMode()   { return 0x00af; }
       /// @endcond
     };
   };

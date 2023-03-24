@@ -419,6 +419,387 @@ D868UVCodeplug::GeneralSettingsElement::setMemoryZoneB(unsigned zone) {
   setUInt8(Offset::memZoneB(), zone);
 }
 
+bool
+D868UVCodeplug::GeneralSettingsElement::recording() const {
+  return getUInt8(Offset::enableRecoding());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
+  setUInt8(Offset::enableRecoding(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::brightness() const {
+  return (getUInt8(Offset::displayBrightness())*10)/4;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
+  setUInt8(Offset::displayBrightness(), (level*4)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::backlightPermanent() const {
+  return backlightDuration().isNull();
+}
+Interval
+D868UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+  return Interval::fromSeconds(5*((unsigned)getUInt8(Offset::backlightDuration())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+  setUInt8(Offset::backlightDuration(), intv.seconds()/5);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
+  setBacklightDuration(Interval());
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::gps() const {
+  return getUInt8(Offset::gpsEnable());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableGPS(bool enable) {
+  setUInt8(Offset::gpsEnable(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::smsAlert() const {
+  return getUInt8(Offset::smsAlert());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableSMSAlert(bool enable) {
+  setUInt8(Offset::smsAlert(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::activeChannelB() const {
+  return getUInt8(Offset::activeChannelB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableActiveChannelB(bool enable) {
+  setUInt8(Offset::activeChannelB(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::subChannel() const {
+  return getUInt8(Offset::subChannel());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableSubChannel(bool enable) {
+  setUInt8(Offset::subChannel(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::callAlert() const {
+  return getUInt8(Offset::callAlert());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
+  setUInt8(Offset::callAlert(), (enable ? 0x01 : 0x00));
+}
+
+QTimeZone
+D868UVCodeplug::GeneralSettingsElement::gpsTimeZone() const {
+  return QTimeZone((((int)getUInt8(Offset::gpsTimeZone()))-12)*3600);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
+  int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
+  setUInt8(Offset::gpsTimeZone(), (12 + offset/3600));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::dmrTalkPermit() const {
+  return getBit(Offset::talkPermit(), 0);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDMRTalkPermit(bool enable) {
+  return setBit(Offset::talkPermit(), 0, enable);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::fmTalkPermit() const {
+  return getBit(Offset::talkPermit(), 1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableFMTalkPermit(bool enable) {
+  return setBit(Offset::talkPermit(), 1, enable);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::dmrResetTone() const {
+  return getUInt8(Offset::dmrResetTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDMRResetTone(bool enable) {
+  return setUInt8(Offset::dmrResetTone(), (enable ? 0x01 : 0x00));
+}
+
+AnytoneAudioSettingsExtension::VoxSource
+D868UVCodeplug::GeneralSettingsElement::voxSource() const {
+  return (AnytoneAudioSettingsExtension::VoxSource)getUInt8(Offset::voxSource());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVOXSource(AnytoneAudioSettingsExtension::VoxSource source) {
+  setUInt8(Offset::voxSource(), (unsigned)source);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::idleChannelTone() const {
+  return getUInt8(Offset::idleChannelTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
+  return setUInt8(Offset::idleChannelTone(), (enable ? 0x01 : 0x00));
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::menuExitTime() const {
+  return Interval::fromSeconds(5 + 5*((unsigned) getUInt8(Offset::menuExitTime())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMenuExitTime(Interval intv) {
+  setUInt8(Offset::menuExitTime(), (std::max(5ULL, intv.seconds())-5)/5);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::startupTone() const {
+  return getUInt8(Offset::startupTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableStartupTone(bool enable) {
+  return setUInt8(Offset::startupTone(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::callEndPrompt() const {
+  return getUInt8(Offset::callEndPrompt());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
+  return setUInt8(Offset::callEndPrompt(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::maxSpeakerVolume() const {
+  return (((unsigned)getUInt8(Offset::maxSpeakerVolume()))*10)/8;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(unsigned level) {
+  setUInt8(Offset::maxSpeakerVolume(), (level*8)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::getGPSPosition() const {
+  return getUInt8(Offset::getGPSPosition());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
+  return setUInt8(Offset::getGPSPosition(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
+  return getUInt8(Offset::volumeChangePrompt());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+}
+
+AnytoneAutoRepeaterSettingsExtension::Direction
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
+  return (AnytoneAutoRepeaterSettingsExtension::Direction) getUInt8(Offset::autoRepeaterDirA());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
+  setUInt8(Offset::autoRepeaterDirA(), (unsigned)dir);
+}
+
+AnytoneDisplaySettingsExtension::LastCallerDisplayMode
+D868UVCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
+  return (AnytoneDisplaySettingsExtension::LastCallerDisplayMode)getUInt8(Offset::lastCallerDisplay());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) {
+  setUInt8(Offset::lastCallerDisplay(), (unsigned)mode);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::displayClock() const {
+  return getUInt8(Offset::showClock());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
+  setUInt8(Offset::showClock(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::maxHeadPhoneVolume() const {
+  return (((unsigned)getUInt8(Offset::maxHeadPhoneVolume()))*10)/8;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(unsigned max) {
+  setUInt8(Offset::maxHeadPhoneVolume(), (max*8)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::enhanceAudio() const {
+  return getUInt8(Offset::enhanceAudio());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
+  setUInt8(Offset::enhanceAudio(), (enable ? 0x01 : 0x00));
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::minVFOScanUHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::minVFOScanUHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::maxVFOScanUHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::maxVFOScanUHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::minVFOScanVHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::minVFOScanVHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::maxVFOScanVHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::maxVFOScanVHF(), freq.inHz()/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexUHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexUHF();
+}
+unsigned
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexUHF() const {
+  return getUInt8(Offset::autoRepOffsetUHF());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) {
+  setUInt8(Offset::autoRepOffsetUHF(), idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexUHF() {
+  setAutoRepeaterOffsetFrequenyIndexUHF(0xff);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexVHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexVHF();
+}
+unsigned
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexVHF() const {
+  return getUInt8(Offset::autoRepOffsetVHF());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) {
+  setUInt8(Offset::autoRepOffsetVHF(), idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVHF() {
+  setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::callToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double freq = getUInt16_le(Offset::callToneTones()+2*i);
+    unsigned int duration = getUInt16_le(Offset::callToneDurations()+2*i);
+    if (duration) tones.append({freq, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::callToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::callToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::idleToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double frequency = getUInt16_le(Offset::idleToneTones()+2*i);
+    unsigned int duration  = getUInt16_le(Offset::idleToneDurations()+2*i);
+    if (duration) tones.append({frequency, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::idleToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::idleToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::resetToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double frequency = getUInt16_le(Offset::resetToneTones()+2*i);
+    unsigned int duration  = getUInt16_le(Offset::resetToneDurations()+2*i);
+    if (duration) tones.append({frequency, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::resetToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::resetToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::recordingDelay() const {
+  return ((unsigned)getUInt8(Offset::recordingDelay()))*200;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setRecodringDelay(unsigned ms) {
+  setUInt8(Offset::recordingDelay(), ms/200);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::displayCall() const {
+  return getUInt8(Offset::callDisplayMode());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
+  setUInt8(Offset::callDisplayMode(), (enable ? 0x01 : 0x00));
+}
 
 
 AnytoneDisplaySettingsExtension::Color
@@ -644,8 +1025,13 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setGPSUpdatePeriod(0x05);
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+  // Set default VOX sensitivity
+  setVOXLevel(ctx.config()->settings()->vox());
 
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    // Power save settings
+    setPowerSave(ext->powerSave());
+
     // Encode key settings
     enableKnobLock(ext->keySettings()->knobLockEnabled());
     enableKeypadLock(ext->keySettings()->keypadLockEnabled());
@@ -655,11 +1041,20 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode tone settings
     setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
+    // Encode audio settings
+    setVOXDelay(ext->audioSettings()->voxDelay());
+    setVOXSource(ext->audioSettings()->voxSource());
+    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
+    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
+    setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
+
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
 
     // Encode display settings
+    setBacklightDuration(ext->displaySettings()->backlightDuration());
     setCallDisplayColor(ext->displaySettings()->callColor());
+    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
     enableShowZoneAndContact(ext->displaySettings()->showZoneAndContactEnabled());
 
     // Encode auto-repeater settings
@@ -672,6 +1067,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode other settings
     enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
     enableKeepLastCaller(ext->keepLastCallerEnabled());
+
   }
 
   return true;
@@ -682,6 +1078,8 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
 
+  ctx.config()->settings()->setVOX(voxLevel());
+
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
   if (ctx.config()->settings()->anytoneExtension()) {
@@ -690,6 +1088,9 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Decode power save settings:
+  ext->setPowerSave(powerSave());
 
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
@@ -700,12 +1101,18 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Decode tone settings
   ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
+  // Decode audio settings
+  ext->audioSettings()->setVOXDelay(voxDelay());
+  ext->audioSettings()->setVOXSource(voxSource());
+  ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
+
   // Menu settings
   ext->menuSettings()->setDuration(this->menuExitTime());
 
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());
   ext->displaySettings()->enableShowZoneAndContact(this->showZoneAndContact());
+  ext->displaySettings()->setBacklightDuration(backlightDuration());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());

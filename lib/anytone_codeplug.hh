@@ -908,133 +908,146 @@ public:
     virtual void setMemoryZoneB(unsigned zone) = 0;
 
     /** Returns @c true if recording is enabled. */
-    virtual bool recording() const;
+    virtual bool recording() const = 0;
     /** Enables/disables recording. */
-    virtual void enableRecording(bool enable);
+    virtual void enableRecording(bool enable) = 0;
 
     /** Returns the display brightness. */
-    virtual unsigned brightness() const;
+    virtual unsigned brightness() const = 0;
     /** Sets the display brightness. */
-    virtual void setBrightness(unsigned level);
+    virtual void setBrightness(unsigned level) = 0;
 
     /** Returns @c true if GPS is enabled. */
-    virtual bool gps() const;
+    virtual bool gps() const = 0;
     /** Enables/disables recording. */
-    virtual void enableGPS(bool enable);
+    virtual void enableGPS(bool enable) = 0;
     /** Returns @c true if SMS alert is enabled. */
-    virtual bool smsAlert() const;
+    virtual bool smsAlert() const = 0;
     /** Enables/disables SMS alert. */
-    virtual void enableSMSAlert(bool enable);
+    virtual void enableSMSAlert(bool enable) = 0;
     /** Returns @c true if the active channel is VFO B. */
-    virtual bool activeChannelB() const;
+    virtual bool activeChannelB() const = 0;
     /** Enables/disables VFO B as the active channel. */
-    virtual void enableActiveChannelB(bool enable);
+    virtual void enableActiveChannelB(bool enable) = 0;
     /** Returns @c true if sub channel is enabled. */
-    virtual bool subChannel() const;
+    virtual bool subChannel() const = 0;
     /** Enables/disables sub channel. */
-    virtual void enableSubChannel(bool enable);
+    virtual void enableSubChannel(bool enable) = 0;
     /** Returns @c true if call alert is enabled. */
-    virtual bool callAlert() const;
+    virtual bool callAlert() const = 0;
     /** Enables/disables call alert. */
-    virtual void enableCallAlert(bool enable);
+    virtual void enableCallAlert(bool enable) = 0;
 
     /** Returns the GPS time zone. */
-    virtual QTimeZone gpsTimeZone() const;
+    virtual QTimeZone gpsTimeZone() const = 0;
     /** Sets the GPS time zone. */
-    virtual void setGPSTimeZone(const QTimeZone &zone);
+    virtual void setGPSTimeZone(const QTimeZone &zone) = 0;
     /** Returns @c true if the talk permit tone is enabled for digital channels. */
-    virtual bool talkPermitDigital() const;
+    virtual bool dmrTalkPermit() const = 0;
     /** Returns @c true if the talk permit tone is enabled for digital channels. */
-    virtual bool talkPermitAnalog() const;
+    virtual bool fmTalkPermit() const = 0;
     /** Enables/disables the talk permit tone for digital channels. */
-    virtual void enableTalkPermitDigital(bool enable);
+    virtual void enableDMRTalkPermit(bool enable) = 0;
     /** Enables/disables the talk permit tone for analog channels. */
-    virtual void enableTalkPermitAnalog(bool enable);
+    virtual void enableFMTalkPermit(bool enable) = 0;
     /** Returns @c true if the reset tone is enabled for digital calls. */
-    virtual bool digitalResetTone() const;
+    virtual bool dmrResetTone() const = 0;
     /** Enables/disables the reset tone for digital calls. */
-    virtual void enableDigitalResetTone(bool enable);
+    virtual void enableDMRResetTone(bool enable) = 0;
 
     /** Returns @c true if the idle channel tone is enabled. */
-    virtual bool idleChannelTone() const;
+    virtual bool idleChannelTone() const = 0;
     /** Enables/disables the idle channel tone. */
-    virtual void enableIdleChannelTone(bool enable);
+    virtual void enableIdleChannelTone(bool enable) = 0;
     /** Returns the menu exit time in seconds. */
-    virtual Interval menuExitTime() const;
+    virtual Interval menuExitTime() const = 0;
     /** Sets the menu exit time in seconds. */
-    virtual void setMenuExitTime(Interval intv);
+    virtual void setMenuExitTime(Interval intv) = 0;
     /** Returns @c true if the startup tone is enabled. */
-    virtual bool startupTone() const;
+    virtual bool startupTone() const = 0;
     /** Enables/disables the startup tone. */
-    virtual void enableStartupTone(bool enable);
+    virtual void enableStartupTone(bool enable) = 0;
     /** Returns @c true if the call-end prompt is enabled. */
-    virtual bool callEndPrompt() const;
+    virtual bool callEndPrompt() const = 0;
     /** Enables/disables the call-end prompt. */
-    virtual void enableCallEndPrompt(bool enable);
+    virtual void enableCallEndPrompt(bool enable) = 0;
     /** Returns the maximum volume. */
-    virtual unsigned maxVolume() const;
+    virtual unsigned maxSpeakerVolume() const = 0;
     /** Sets the maximum volume. */
-    virtual void setMaxVolume(unsigned level);
+    virtual void setMaxSpeakerVolume(unsigned level) = 0;
     /** Returns @c true if get GPS position is enabled. */
-    virtual bool getGPSPosition() const;
+    virtual bool getGPSPosition() const = 0;
     /** Enables/disables get GPS position. */
-    virtual void enableGetGPSPosition(bool enable);
+    virtual void enableGetGPSPosition(bool enable) = 0;
 
     /** Returns @c true if the volume change prompt is enabled. */
-    virtual bool volumeChangePrompt() const;
+    virtual bool volumeChangePrompt() const = 0;
     /** Enables/disables the volume change prompt. */
-    virtual void enableVolumeChangePrompt(bool enable);
+    virtual void enableVolumeChangePrompt(bool enable) = 0;
     /** Returns the auto repeater offset direction for VFO A. */
-    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const = 0;
     /** Sets the auto-repeater offset direction for VFO A. */
-    virtual void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    virtual void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) = 0;
     /** Returns the last-caller display mode. */
-    virtual AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const;
+    virtual AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const = 0;
     /** Sets the last-caller display mode. */
-    virtual void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode);
+    virtual void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) = 0;
 
     /** Returns @c true if the clock is shown. */
-    virtual bool displayClock() const;
+    virtual bool displayClock() const = 0;
     /** Enables/disables clock display. */
-    virtual void enableDisplayClock(bool enable);
+    virtual void enableDisplayClock(bool enable) = 0;
     /** Returns @c true if the audio is "enhanced". */
-    virtual bool enhanceAudio() const;
+    virtual bool enhanceAudio() const = 0;
     /** Enables/disables "enhanced" audio. */
-    virtual void enableEnhancedAudio(bool enable);
+    virtual void enableEnhancedAudio(bool enable) = 0;
     /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual Frequency minVFOScanFrequencyUHF() const;
+    virtual Frequency minVFOScanFrequencyUHF() const = 0;
     /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMinVFOScanFrequencyUHF(Frequency hz);
+    virtual void setMinVFOScanFrequencyUHF(Frequency hz) = 0;
     /** Returns the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual Frequency maxVFOScanFrequencyUHF() const;
+    virtual Frequency maxVFOScanFrequencyUHF() const = 0;
     /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyUHF(Frequency hz);
+    virtual void setMaxVFOScanFrequencyUHF(Frequency hz) = 0;
 
     /** Returns the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual Frequency minVFOScanFrequencyVHF() const;
+    virtual Frequency minVFOScanFrequencyVHF() const = 0;
     /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMinVFOScanFrequencyVHF(Frequency hz);
+    virtual void setMinVFOScanFrequencyVHF(Frequency hz) = 0;
     /** Returns the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual Frequency maxVFOScanFrequencyVHF() const;
+    virtual Frequency maxVFOScanFrequencyVHF() const = 0;
     /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyVHF(Frequency hz);
+    virtual void setMaxVFOScanFrequencyVHF(Frequency hz) = 0;
 
     /** Returns @c true if the auto-repeater offset frequency for UHF is set. */
-    virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
+    virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const = 0;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexUHF() const = 0;
     /** Sets the auto-repeater offset frequency index for UHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) = 0;
     /** Clears the auto-repeater offset frequency index for UHF. */
-    virtual void clearAutoRepeaterOffsetFrequencyIndexUHF();
+    virtual void clearAutoRepeaterOffsetFrequencyIndexUHF() = 0;
     /** Returns @c true if the auto-repeater offset frequency for VHF is set. */
-    virtual bool hasAutoRepeaterOffsetFrequencyIndexVHF() const;
+    virtual bool hasAutoRepeaterOffsetFrequencyIndexVHF() const = 0;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexVHF() const = 0;
     /** Sets the auto-repeater offset frequency index for VHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) = 0;
     /** Clears the auto-repeater offset frequency index for VHF. */
-    virtual void clearAutoRepeaterOffsetFrequencyIndexVHF();
+    virtual void clearAutoRepeaterOffsetFrequencyIndexVHF() = 0;
+
+    /** Returns the call-tone melody. */
+    virtual void callToneMelody(Melody &melody) const = 0;
+    /** Sets the call-tone melody. */
+    virtual void setCallToneMelody(const Melody &melody) = 0;
+    /** Returns the idle-tone melody. */
+    virtual void idleToneMelody(Melody &melody) const = 0;
+    /** Sets the idle-tone melody. */
+    virtual void setIdleToneMelody(const Melody &melody) = 0;
+    /** Returns the reset-tone melody. */
+    virtual void resetToneMelody(Melody &melody) const = 0;
+    /** Sets the reset-tone melody. */
+    virtual void setResetToneMelody(const Melody &melody) = 0;
 
     /** Returns @c true if the default boot channel is enabled. */
     virtual bool defaultChannel() const = 0;
@@ -1067,23 +1080,10 @@ public:
     /** Sets the default channel for VFO B to be VFO. */
     virtual void setDefaultChannelBToVFO() = 0;
 
-    /** Returns the call-tone melody. */
-    virtual void callToneMelody(Melody &melody) const;
-    /** Sets the call-tone melody. */
-    virtual void setCallToneMelody(const Melody &melody);
-    /** Returns the idle-tone melody. */
-    virtual void idleToneMelody(Melody &melody) const;
-    /** Sets the idle-tone melody. */
-    virtual void setIdleToneMelody(const Melody &melody);
-    /** Returns the reset-tone melody. */
-    virtual void resetToneMelody(Melody &melody) const;
-    /** Sets the reset-tone melody. */
-    virtual void setResetToneMelody(const Melody &melody);
-
     /** Returns @c true if the call is displayed instead of the name. */
-    virtual bool displayCall() const;
+    virtual bool displayCall() const = 0;
     /** Enables/disables call display. */
-    virtual void enableDisplayCall(bool enable);
+    virtual void enableDisplayCall(bool enable) = 0;
 
     /** Encodes the general settings. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
@@ -1103,7 +1103,6 @@ public:
       static constexpr unsigned int bootPassword()    { return 0x0007; }
       static constexpr unsigned int squelchLevelA()   { return 0x0009; }
       static constexpr unsigned int squelchLevelB()   { return 0x000a; }
-      static constexpr unsigned int gpsTimeZone()     { return 0x0030; }
       /// @endcond
     };
   };

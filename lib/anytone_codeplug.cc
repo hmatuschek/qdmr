@@ -1692,389 +1692,6 @@ AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
   setUInt8(Offset::squelchLevelB(), level);
 }
 
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::recording() const {
-  return getUInt8(0x0022);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
-  setUInt8(0x0022, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::brightness() const {
-  return (getUInt8(0x0026)*10)/4;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
-  setUInt8(0x0026, (level*4)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return backlightDuration().isNull();
-}
-Interval
-AnytoneCodeplug::GeneralSettingsElement::backlightDuration() const {
-  return Interval::fromSeconds(5*((unsigned)getUInt8(0x0027)));
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
-  setUInt8(0x0027, intv.seconds()/5);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setBacklightDuration(Interval());
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::gps() const {
-  return getUInt8(0x0028);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableGPS(bool enable) {
-  setUInt8(0x0028, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::smsAlert() const {
-  return getUInt8(0x0029);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableSMSAlert(bool enable) {
-  setUInt8(0x0029, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::activeChannelB() const {
-  return getUInt8(0x002c);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableActiveChannelB(bool enable) {
-  setUInt8(0x002c, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::subChannel() const {
-  return getUInt8(0x002d);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableSubChannel(bool enable) {
-  setUInt8(0x002d, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::callAlert() const {
-  return getUInt8(0x002f);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
-  setUInt8(0x002f, (enable ? 0x01 : 0x00));
-}
-
-QTimeZone
-AnytoneCodeplug::GeneralSettingsElement::gpsTimeZone() const {
-  return QTimeZone((((int)getUInt8(Offset::gpsTimeZone()))-12)*3600);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
-  int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
-  setUInt8(Offset::gpsTimeZone(), (12 + offset/3600));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::talkPermitDigital() const {
-  return getBit(0x0031, 0);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitDigital(bool enable) {
-  return setBit(0x0031, 0, enable);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::talkPermitAnalog() const {
-  return getBit(0x0031, 1);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitAnalog(bool enable) {
-  return setBit(0x0031, 1, enable);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::digitalResetTone() const {
-  return getUInt8(0x0032);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDigitalResetTone(bool enable) {
-  return setUInt8(0x0032, (enable ? 0x01 : 0x00));
-}
-
-AnytoneAudioSettingsExtension::VoxSource
-AnytoneCodeplug::GeneralSettingsElement::voxSource() const {
-  return (AnytoneAudioSettingsExtension::VoxSource)getUInt8(0x0033);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setVOXSource(AnytoneAudioSettingsExtension::VoxSource source) {
-  setUInt8(0x0033, (unsigned)source);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::idleChannelTone() const {
-  return getUInt8(0x0036);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
-  return setUInt8(0x0036, (enable ? 0x01 : 0x00));
-}
-
-Interval AnytoneCodeplug::GeneralSettingsElement::menuExitTime() const {
-  return Interval::fromSeconds(5 + 5*((unsigned) getUInt8(0x0037)));
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMenuExitTime(Interval intv) {
-  setUInt8(0x0037, (std::max(5ULL, intv.seconds())-5)/5);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::startupTone() const {
-  return getUInt8(0x0039);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableStartupTone(bool enable) {
-  return setUInt8(0x0039, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::callEndPrompt() const {
-  return getUInt8(0x003a);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
-  return setUInt8(0x003a, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxVolume() const {
-  return (((unsigned)getUInt8(0x003b))*10)/8;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVolume(unsigned level) {
-  setUInt8(0x003b, (level*8)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::getGPSPosition() const {
-  return getUInt8(0x003f);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
-  return setUInt8(0x003f, (enable ? 0x01 : 0x00));
-}
-
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
-  return getUInt8(0x0047);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(0x0047, (enable ? 0x01 : 0x01));
-}
-
-AnytoneAutoRepeaterSettingsExtension::Direction
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
-  return (AnytoneAutoRepeaterSettingsExtension::Direction) getUInt8(0x0048);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
-  setUInt8(0x0048, (unsigned)dir);
-}
-
-AnytoneDisplaySettingsExtension::LastCallerDisplayMode
-AnytoneCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
-  return (AnytoneDisplaySettingsExtension::LastCallerDisplayMode)getUInt8(0x004d);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) {
-  setUInt8(0x004d, (unsigned)mode);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::displayClock() const {
-  return getUInt8(0x0051);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
-  setUInt8(0x0051, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxHeadPhoneVolume() const {
-  return (((unsigned)getUInt8(0x0052))*10)/8;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(unsigned max) {
-  setUInt8(0x0052, (max*8)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::enhanceAudio() const {
-  return getUInt8(0x0057);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
-  setUInt8(0x0057, (enable ? 0x01 : 0x00));
-}
-
-Frequency
-AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
-  return Frequency::fromHz(((unsigned)getUInt32_le(0x0058))*10);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(Frequency freq) {
-  setUInt32_le(0x0058, freq.inHz()/10);
-}
-
-Frequency
-AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
-  return Frequency::fromHz(((unsigned)getUInt32_le(0x005c))*10);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(Frequency freq) {
-  setUInt32_le(0x005c, freq.inHz()/10);
-}
-
-Frequency
-AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
-  return Frequency::fromHz(((unsigned)getUInt32_le(0x0060))*10);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(Frequency freq) {
-  setUInt32_le(0x0060, freq.inHz()/10);
-}
-
-Frequency
-AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
-  return Frequency::fromHz(((unsigned)getUInt32_le(0x0064))*10);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(Frequency freq) {
-  setUInt32_le(0x0064, freq.inHz()/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexUHF() const {
-  return 0xff != autoRepeaterOffsetFrequencyIndexUHF();
-}
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexUHF() const {
-  return getUInt8(0x0068);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) {
-  setUInt8(0x0068, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexUHF() {
-  setAutoRepeaterOffsetFrequenyIndexUHF(0xff);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexVHF() const {
-  return 0xff != autoRepeaterOffsetFrequencyIndexVHF();
-}
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexVHF() const {
-  return getUInt8(0x0069);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) {
-  setUInt8(0x0069, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVHF() {
-  setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
-}
-
-void
-AnytoneCodeplug::GeneralSettingsElement::callToneMelody(Melody &melody) const {
-  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
-  for (int i=0; i<5; i++) {
-    double freq = getUInt16_le(0x0072+2*i);
-    unsigned int duration = getUInt16_le(0x007c+2*i);
-    if (duration) tones.append({freq, duration});
-  }
-  melody.infer(tones);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
-  unsigned int n=std::min(5U, (unsigned int)melody.count());
-  QVector<QPair<double, unsigned int>> tones = melody.toTones();
-  for (unsigned int i=0; i<n; i++) {
-    setUInt16_le(0x0072+2*i, tones.at(i).first);
-    setUInt16_le(0x007c+2*i, tones.at(i).second);
-  }
-}
-
-void
-AnytoneCodeplug::GeneralSettingsElement::idleToneMelody(Melody &melody) const {
-  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
-  for (int i=0; i<5; i++) {
-    double frequency = getUInt16_le(0x0086+2*i);
-    unsigned int duration  = getUInt16_le(0x0090+2*i);
-    if (duration) tones.append({frequency, duration});
-  }
-  melody.infer(tones);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
-  unsigned int n=std::min(5U, (unsigned int)melody.count());
-  QVector<QPair<double, unsigned int>> tones = melody.toTones();
-  for (unsigned int i=0; i<n; i++) {
-    setUInt16_le(0x0086+2*i, tones.at(i).first);
-    setUInt16_le(0x0090+2*i, tones.at(i).second);
-  }
-}
-
-void
-AnytoneCodeplug::GeneralSettingsElement::resetToneMelody(Melody &melody) const {
-  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
-  for (int i=0; i<5; i++) {
-    double frequency = getUInt16_le(0x009a+2*i);
-    unsigned int duration  = getUInt16_le(0x00a4+2*i);
-    if (duration) tones.append({frequency, duration});
-  }
-  melody.infer(tones);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
-  unsigned int n=std::min(5U, (unsigned int)melody.count());
-  QVector<QPair<double, unsigned int>> tones = melody.toTones();
-  for (unsigned int i=0; i<n; i++) {
-    setUInt16_le(0x009a+2*i, tones.at(i).first);
-    setUInt16_le(0x00a4+2*i, tones.at(i).second);
-  }
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::recordingDelay() const {
-  return ((unsigned)getUInt8(0x00ae))*200;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setRecodringDelay(unsigned ms) {
-  setUInt8(0x00ae, ms/200);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::displayCall() const {
-  return getUInt8(0x00af);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
-  setUInt8(0x00af, (enable ? 0x01 : 0x00));
-}
-
 bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   // Set microphone gain
@@ -2091,8 +1708,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       enableGPS(false);
     }
   }
-  // Set default VOX sensitivity
-  setVOXLevel(ctx.config()->settings()->vox());
   // Set default squelch level
   if (0 == ctx.config()->settings()->squelch()) {
     setSquelchLevelA(0);
@@ -2108,7 +1723,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   // Handle extensions
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
     setAutoShutdownDelay(ext->autoShutDownDelay());
-    setPowerSave(ext->powerSave());
     setVFOScanType(ext->vfoScanType());
     enableVFOModeA(AnytoneSettingsExtension::VFOMode::VFO == ext->modeA());
     enableVFOModeB(AnytoneSettingsExtension::VFOMode::VFO == ext->modeB());
@@ -2173,9 +1787,9 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableKeyTone(ext->toneSettings()->keyToneEnabled());
     enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
     enableCallAlert(ext->toneSettings()->callAlertEnabled());
-    enableTalkPermitDigital(ext->toneSettings()->talkPermitDigitalEnabled());
-    enableTalkPermitAnalog(ext->toneSettings()->talkPermitAnalogEnabled());
-    enableDigitalResetTone(ext->toneSettings()->digitalResetToneEnabled());
+    enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
+    enableFMTalkPermit(ext->toneSettings()->talkPermitAnalogEnabled());
+    enableDMRResetTone(ext->toneSettings()->digitalResetToneEnabled());
     enableIdleChannelTone(ext->toneSettings()->idleChannelToneEnabled());
     enableStartupTone(ext->toneSettings()->startupToneEnabled());
     setCallToneMelody(*(ext->toneSettings()->callMelody()));
@@ -2185,20 +1799,13 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     // Encode display settings
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
     setBrightness(ext->displaySettings()->brightness());
-    setBacklightDuration(ext->displaySettings()->backlightDuration());
-    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
     enableCallEndPrompt(ext->displaySettings()->callEndPromptEnabled());
     setLastCallerDisplayMode(ext->displaySettings()->lastCallerDisplay());
     enableDisplayClock(ext->displaySettings()->showClockEnabled());
     enableDisplayCall(ext->displaySettings()->showCallEnabled());
 
     // Encode audio settings
-    setVOXDelay(ext->audioSettings()->voxDelay());
     enableRecording(ext->audioSettings()->recordingEnabled());
-    setVOXSource(ext->audioSettings()->voxSource());
-    setMaxVolume(ext->audioSettings()->maxVolume());
-    setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
-    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
 
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
@@ -2229,7 +1836,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setVOX(voxLevel());
   ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
 
   // Set extension
@@ -2240,7 +1846,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
 
   ext->setAutoShutDownDelay(autoShutdownDelay());
-  ext->setPowerSave(powerSave());
   ext->setVFOScanType(vfoScanType());
   ext->setModeA(vfoModeA() ? AnytoneSettingsExtension::VFOMode::VFO
                            : AnytoneSettingsExtension::VFOMode::Memory);
@@ -2279,12 +1884,12 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->keySettings()->enableAutoKeyLock(autoKeyLock());
 
   // Store tone settings
-  ext->toneSettings()->enableKeyTone(keyTone());
+  ext->toneSettings()->enableKeyTone(this->keyToneEnabled());
   ext->toneSettings()->enableSMSAlert(smsAlert());
   ext->toneSettings()->enableCallAlert(callAlert());
-  ext->toneSettings()->enableTalkPermitDigital(this->talkPermitDigital());
-  ext->toneSettings()->enableTalkPermitAnalog(this->talkPermitAnalog());
-  ext->toneSettings()->enableDigitalResetTone(this->digitalResetTone());
+  ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
+  ext->toneSettings()->enableTalkPermitAnalog(this->fmTalkPermit());
+  ext->toneSettings()->enableDigitalResetTone(this->dmrResetTone());
   ext->toneSettings()->enableIdleChannelTone(this->idleChannelTone());
   ext->toneSettings()->enableStartupTone(this->startupTone());
   this->callToneMelody(*(ext->toneSettings()->callMelody()));
@@ -2294,7 +1899,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Store display settings
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());
   ext->displaySettings()->setBrightness(brightness());
-  ext->displaySettings()->setBacklightDuration(backlightDuration());
   ext->displaySettings()->enableVolumeChangePrompt(this->volumeChangePrompt());
   ext->displaySettings()->enableCallEndPrompt(this->callEndPrompt());
   ext->displaySettings()->setLastCallerDisplay(this->lastCallerDisplayMode());
@@ -2302,11 +1906,8 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowCall(displayCall());
 
   // Store audio settings
-  ext->audioSettings()->setVOXDelay(voxDelay());
   ext->audioSettings()->enableRecording(recording());
-  ext->audioSettings()->setVOXSource(voxSource());
-  ext->audioSettings()->setMaxVolume(this->maxVolume());
-  ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
+  ext->audioSettings()->setMaxVolume(this->maxSpeakerVolume());
   ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
 
   // Store menu settings
