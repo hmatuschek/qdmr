@@ -247,6 +247,15 @@ D868UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::keyToneLevel(), enable ? 0x01 : 0x00);
 }
 
+AnytoneSettingsExtension::PowerSave
+D868UVCodeplug::GeneralSettingsElement::powerSave() const {
+  return (AnytoneSettingsExtension::PowerSave)getUInt8(Offset::powerSaveMode());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytoneSettingsExtension::PowerSave mode) {
+  setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
+}
+
 unsigned
 D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
   return ((unsigned)getUInt8(Offset::voxLevel()))*3;

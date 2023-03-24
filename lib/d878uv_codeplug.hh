@@ -389,25 +389,6 @@ public:
     /** Resets the general settings. */
     void clear();
 
-    /** Returns @c true if the backlight is always on. */
-    virtual bool backlightPermanent() const;
-    /** Returns the backlight duration in seconds. */
-    virtual Interval backlightDuration() const;
-    /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(Interval sec);
-    /** Sets the backlight to permanent (always on). */
-    virtual void enableBacklightPermanent();
-
-    /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadPhoneVolume() const;
-    /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(unsigned max);
-
-    /** Returns the recording delay in ms. */
-    virtual unsigned recordingDelay() const;
-    /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(unsigned ms);
-
     QTimeZone gpsTimeZone() const;
     void setGPSTimeZone(const QTimeZone &zone);
 

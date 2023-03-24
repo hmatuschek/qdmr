@@ -239,29 +239,10 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x00e0; }
 
-    /** Returns @c true if the backlight is always on. */
-    virtual bool backlightPermanent() const;
-    /** Returns the backlight duration in seconds. */
-    virtual Interval backlightDuration() const;
-    /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(Interval sec);
-    /** Sets the backlight to permanent (always on). */
-    virtual void enableBacklightPermanent();
-
-    /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadPhoneVolume() const;
-    /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(unsigned max);
-
-    /** Returns the recording delay in ms. */
-    virtual unsigned recordingDelay() const;
-    /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(unsigned ms);
-
     /** Retunrs the color for call-signs. */
-    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
+    AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     /** Sets the color for call-signs. */
-    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
+    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the simplex repeater feature is enabled. */
     virtual bool simplexRepeaterEnabled() const;
