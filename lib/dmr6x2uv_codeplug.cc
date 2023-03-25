@@ -312,20 +312,20 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightIsAlwaysOn() const {
-  return 0x00 == rxBacklightDuration();
+  return 0x00 == getUInt8(0x00d4);
 }
-unsigned int
+Interval
 DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return getUInt8(0x00d4);
+  return Interval::fromSeconds(getUInt8(0x00d4));
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(unsigned int dur) {
-  dur = std::max(30U, dur);
-  setUInt8(0x00d4, dur);
+DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
+  unsigned int secs = std::max(30ULL, dur.seconds());
+  setUInt8(0x00d4, secs);
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightAlwaysOn() {
-  setRXBacklightDuration(0);
+  setUInt8(0x00d4, 0);
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::BackgroundColor

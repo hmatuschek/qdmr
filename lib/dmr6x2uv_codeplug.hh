@@ -362,9 +362,9 @@ public:
     /** Returns true if the RX backlight stays on infinitely. */
     virtual bool rxBacklightIsAlwaysOn() const;
     /** Returns the duration of the RX backlight in seconds (max 30s). */
-    virtual unsigned int rxBacklightDuration() const;
+    virtual Interval rxBacklightDuration() const;
     /** Sets the RX backlight duration in seconds (max 30s). */
-    virtual void setRXBacklightDuration(unsigned int dur);
+    virtual void setRXBacklightDuration(Interval dur);
     /** Enables the RX backlight to stay on infinitely. */
     virtual void setRXBacklightAlwaysOn();
 

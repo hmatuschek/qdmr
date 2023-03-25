@@ -1803,15 +1803,20 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setLastCallerDisplayMode(ext->displaySettings()->lastCallerDisplay());
     enableDisplayClock(ext->displaySettings()->showClockEnabled());
     enableDisplayCall(ext->displaySettings()->showCallEnabled());
+    setCallDisplayColor(ext->displaySettings()->callColor());
+    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
 
     // Encode audio settings
     enableRecording(ext->audioSettings()->recordingEnabled());
+    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
+    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
 
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
 
     // Encode auto-repeater settings
     setAutoRepeaterDirectionA(ext->autoRepeaterSettings()->directionA());
+    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
     if (ext->autoRepeaterSettings()->vhfRef()->isNull())
       clearAutoRepeaterOffsetFrequencyIndexVHF();
     else
@@ -1822,6 +1827,14 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     else
       setAutoRepeaterOffsetFrequenyIndexUHF(
             ctx.index(ext->autoRepeaterSettings()->uhfRef()->as<AnytoneAutoRepeaterOffset>()));
+    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+    // Encode other settings
+    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
+    enableKeepLastCaller(ext->keepLastCallerEnabled());
   } else if (! flags.updateCodePlug) {
     clearAutoRepeaterOffsetFrequencyIndexVHF();
     clearAutoRepeaterOffsetFrequencyIndexUHF();
@@ -1904,17 +1917,28 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->setLastCallerDisplay(this->lastCallerDisplayMode());
   ext->displaySettings()->enableShowClock(displayClock());
   ext->displaySettings()->enableShowCall(displayCall());
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+
+  // Menu settings
+  ext->menuSettings()->setDuration(this->menuExitTime());
 
   // Store audio settings
   ext->audioSettings()->enableRecording(recording());
   ext->audioSettings()->setMaxVolume(this->maxSpeakerVolume());
   ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
 
-  // Store menu settings
-  ext->menuSettings()->setDuration(menuExitTime());
-
   // Store auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionA(this->autoRepeaterDirectionA());
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
+
+  // Other settings
+  ext->enableKeepLastCaller(this->keepLastCaller());
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
+                                           AnytoneSettingsExtension::Units::Metric);
 
   return true;
 }
@@ -1981,6 +2005,27 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
     ext->autoRepeaterSettings()->uhfRef()->set(
           ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
   }
+
+  // Link auto-repeater
+  if (hasAutoRepeaterOffsetFrequencyIndexVHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset frequency for VHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->vhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
+  }
+  if (hasAutoRepeaterOffsetFrequencyIndexUHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset frequency for UHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->uhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
+  }
+
 
   return true;
 }

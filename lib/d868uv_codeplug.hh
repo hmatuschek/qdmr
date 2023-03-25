@@ -320,6 +320,13 @@ public:
     virtual void setMaxHeadPhoneVolume(unsigned max);
     bool enhanceAudio() const;
     void enableEnhancedAudio(bool enable);
+    bool recording() const;
+    void enableRecording(bool enable);
+    /** Returns the recording delay in ms. */
+    virtual unsigned recordingDelay() const;
+    /** Sets the recording delay in ms. */
+    virtual void setRecodringDelay(unsigned ms);
+
 
     AnytoneSettingsExtension::VFOScanType vfoScanType() const;
     void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
@@ -365,26 +372,18 @@ public:
     unsigned memoryZoneB() const;
     void setMemoryZoneB(unsigned zone);
 
-    bool recording() const;
-    void enableRecording(bool enable);
-
-    unsigned brightness() const;
-    void setBrightness(unsigned level);
-    /** Returns @c true if the backlight is always on. */
-    virtual bool backlightPermanent() const;
-    /** Returns the backlight duration in seconds. */
-    virtual Interval backlightDuration() const;
-    /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(Interval sec);
-    /** Sets the backlight to permanent (always on). */
-    virtual void enableBacklightPermanent();
-
     bool gps() const;
     void enableGPS(bool enable);
     QTimeZone gpsTimeZone() const;
     void setGPSTimeZone(const QTimeZone &zone);
     bool getGPSPosition() const;
     void enableGetGPSPosition(bool enable);
+    bool gpsUnitsImperial() const ;
+    void enableGPSUnitsImperial(bool enable);
+    /** Returns the GPS update period in seconds. */
+    virtual Interval gpsUpdatePeriod() const;
+    /** Sets the GPS update period in seconds. */
+    virtual void setGPSUpdatePeriod(Interval sec);
 
     bool keyToneEnabled() const;
     void enableKeyTone(bool enable);
@@ -428,9 +427,25 @@ public:
     void enableDisplayClock(bool enable);
     bool displayCall() const;
     void enableDisplayCall(bool enable);
+    AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
+    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
+    bool showLastHeard() const;
+    void enableShowLastHeard(bool enable);
+    unsigned brightness() const;
+    void setBrightness(unsigned level);
+    /** Returns @c true if the backlight is always on. */
+    virtual bool backlightPermanent() const;
+    /** Returns the backlight duration in seconds. */
+    virtual Interval rxBacklightDuration() const;
+    /** Sets the backlight duration in seconds. */
+    virtual void setRXBacklightDuration(Interval sec);
+    /** Sets the backlight to permanent (always on). */
+    virtual void enableBacklightPermanent();
 
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
     void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
+    void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
     bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
     unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
     void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
@@ -439,20 +454,15 @@ public:
     unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
     void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
     void clearAutoRepeaterOffsetFrequencyIndexVHF();
+    Frequency autoRepeaterMinFrequencyVHF() const;
+    void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyVHF() const;
+    void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMinFrequencyUHF() const;
+    void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyUHF() const;
+    void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
-    /** Returns the recording delay in ms. */
-    virtual unsigned recordingDelay() const;
-    /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(unsigned ms);
-
-    /** Returns the display color for callsigns. */
-    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
-    /** Sets the display color for callsigns. */
-    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
-    /** Returns the GPS update period in seconds. */
-    virtual unsigned gpsUpdatePeriod() const;
-    /** Sets the GPS update period in seconds. */
-    virtual void setGPSUpdatePeriod(unsigned sec);
     /** Returns @c true if the zone and contact are shown. */
     virtual bool showZoneAndContact() const;
     /** Enables/disables @c true the zone and contact display. */
@@ -465,10 +475,7 @@ public:
     virtual void setKeyToneLevel(unsigned level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
-    /** Returns @c true if the GPS units are imperial. */
-    virtual bool gpsUnitsImperial() const;
-    /** Enables/disables imperial GPS units. */
-    virtual void enableGPSUnitsImperial(bool enable);
+
     /** Returns @c true if the knob is locked. */
     virtual bool knobLock() const;
     /** Enables/disables the knob lock. */
@@ -485,67 +492,24 @@ public:
     virtual bool keyLockForced() const;
     /** Enables/disables the "professional" key lock. */
     virtual void enableKeyLockForced(bool enable);
-    /** Returns @c true if the last heard is shown while pressing PTT. */
-    virtual bool showLastHeard() const;
-    /** Enables/disables showing last heard. */
-    virtual void enableShowLastHeard(bool enable);
-    /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual Frequency autoRepeaterMinFrequencyVHF() const;
-    /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
-    /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual Frequency autoRepeaterMaxFrequencyVHF() const;
-    /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
 
-    /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual Frequency autoRepeaterMinFrequencyUHF() const;
-    /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
-    /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual Frequency autoRepeaterMaxFrequencyUHF() const;
-    /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
-    /** Returns the auto-repeater direction for VFO B. */
-    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
-    /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
-
-    /** Returns @c true if the default boot channel is enabled. */
     bool defaultChannel() const;
-    /** Enables/disables default boot channel. */
     void enableDefaultChannel(bool enable);
-    /** Returns the default zone index (0-based) for VFO A. */
     unsigned defaultZoneIndexA() const;
-    /** Sets the default zone (0-based) for VFO A. */
     void setDefaultZoneIndexA(unsigned idx);
-    /** Returns the default zone index (0-based) for VFO B. */
     unsigned defaultZoneIndexB() const;
-    /** Sets the default zone (0-based) for VFO B. */
     void setDefaultZoneIndexB(unsigned idx);
-    /** Returns @c true if the default channel for VFO A is VFO. */
     bool defaultChannelAIsVFO() const;
-    /** Returns the default channel index for VFO A.
-     * Must be within default zone. If 0xff, default channel is VFO. */
     unsigned defaultChannelAIndex() const;
-    /** Sets the default channel index for VFO A. */
     void setDefaultChannelAIndex(unsigned idx);
-    /** Sets the default channel for VFO A to be VFO. */
     void setDefaultChannelAToVFO();
-    /** Returns @c true if the default channel for VFO B is VFO. */
     bool defaultChannelBIsVFO() const;
-    /** Returns the default channel index for VFO B.
-     * Must be within default zone. If 0xff, default channel is VFO. */
     unsigned defaultChannelBIndex() const;
-    /** Sets the default channel index for VFO B. */
     void setDefaultChannelBIndex(unsigned idx);
-    /** Sets the default channel for VFO B to be VFO. */
     void setDefaultChannelBToVFO();
 
-    /** Returns @c true if the last caller is kept when changing channel. */
-    virtual bool keepLastCaller() const;
-    /** Enables/disables keeping the last caller when changing the channel. */
-    virtual void enableKeepLastCaller(bool enable);
+    bool keepLastCaller() const;
+    void enableKeepLastCaller(bool enable);
 
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
@@ -555,7 +519,7 @@ public:
     /** Some internal used offsets within the element. */
     struct Offset: public AnytoneCodeplug::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int keyToneLevel()      { return 0x0000; }
+      static constexpr unsigned int enableKeyTone()     { return 0x0000; }
       static constexpr unsigned int powerSaveMode()     { return 0x000b; }
       static constexpr unsigned int voxLevel()          { return 0x000c; }
       static constexpr unsigned int voxDelay()          { return 0x000d; }
@@ -614,6 +578,27 @@ public:
       static constexpr unsigned int resetToneDurations(){ return 0x00a4; }
       static constexpr unsigned int recordingDelay()    { return 0x00ae; }
       static constexpr unsigned int callDisplayMode()   { return 0x00af; }
+      static constexpr unsigned int callColor()         { return 0x00b0; }
+      static constexpr unsigned int gpsPeriod()         { return 0x00b1; }
+      static constexpr unsigned int showZoneAndContact(){ return 0x00b2; }
+      static constexpr unsigned int keyToneLevel()      { return 0x00b3; }
+      static constexpr unsigned int gpsUnits()          { return 0x00b4; }
+      static constexpr unsigned int knobLock()          { return 0x00b5; }
+      static constexpr unsigned int keypadLock()        { return 0x00b5; }
+      static constexpr unsigned int sideKeyLock()       { return 0x00b5; }
+      static constexpr unsigned int forceKeyLock()      { return 0x00b5; }
+      static constexpr unsigned int showLastHeard()     { return 0x00b6; }
+      static constexpr unsigned int autoRepMinVHF()     { return 0x00b8; }
+      static constexpr unsigned int autoRepMaxVHF()     { return 0x00bc; }
+      static constexpr unsigned int autoRepMinUHF()     { return 0x00c0; }
+      static constexpr unsigned int autoRepMaxUHF()     { return 0x00c4; }
+      static constexpr unsigned int autoRepeaterDirB()  { return 0x00c8; }
+      static constexpr unsigned int defaultChannels()   { return 0x00ca; }
+      static constexpr unsigned int defaultZoneA()      { return 0x00cb; }
+      static constexpr unsigned int defaultZoneB()      { return 0x00cc; }
+      static constexpr unsigned int defaultChannelA()   { return 0x00cd; }
+      static constexpr unsigned int defaultChannelB()   { return 0x00ce; }
+      static constexpr unsigned int keepLastCaller()    { return 0x00cf; }
       /// @endcond
     };
   };

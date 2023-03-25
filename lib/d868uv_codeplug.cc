@@ -240,11 +240,11 @@ D868UVCodeplug::GeneralSettingsElement::clear() {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
-  return 0x00 != getUInt8(Offset::keyToneLevel());
+  return 0x00 != getUInt8(Offset::enableKeyTone());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
-  setUInt8(Offset::keyToneLevel(), enable ? 0x01 : 0x00);
+  setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
 }
 
 AnytoneSettingsExtension::PowerSave
@@ -448,19 +448,19 @@ D868UVCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return backlightDuration().isNull();
+  return rxBacklightDuration().isNull();
 }
 Interval
-D868UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+D868UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
   return Interval::fromSeconds(5*((unsigned)getUInt8(Offset::backlightDuration())));
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+D868UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
   setUInt8(Offset::backlightDuration(), intv.seconds()/5);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setBacklightDuration(Interval());
+  setRXBacklightDuration(Interval());
 }
 
 bool
@@ -813,7 +813,7 @@ D868UVCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
 
 AnytoneDisplaySettingsExtension::Color
 D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(0x00b0);
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::callColor());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
@@ -825,25 +825,25 @@ D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettin
     color = AnytoneDisplaySettingsExtension::Color::Black;
     break;
   }
-  setUInt8(0x00b0, (unsigned)color);
+  setUInt8(Offset::callColor(), (unsigned)color);
 }
 
-unsigned
+Interval
 D868UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
-  return getUInt8(0x00b1);
+  return Interval::fromSeconds(getUInt8(Offset::gpsPeriod()));
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(unsigned sec) {
-  setUInt8(0x00b1, sec);
+D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval sec) {
+  setUInt8(Offset::gpsPeriod(), sec.seconds());
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::showZoneAndContact() const {
-  return getUInt8(0x00b2);
+  return getUInt8(Offset::showZoneAndContact());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
-  setUInt8(0x00b2, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::showZoneAndContact(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -852,135 +852,136 @@ D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(0x00b3))*10/15;
+  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(0x00b3, level*10/15);
+  setUInt8(Offset::keyToneLevel(), level*10/15);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
-  setUInt8(0x00b3, 0);
+  setUInt8(Offset::keyToneLevel(), 0);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
-  return getUInt8(0x00b4);
+  return getUInt8(Offset::gpsUnits());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
-  setUInt8(0x00b4, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::gpsUnits(), (enable ? 0x01 : 0x00));
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(0x00b5, 0);
+  return getBit(Offset::knobLock(), 0);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(0x00b5, 0, enable);
+  setBit(Offset::knobLock(), 0, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(0x00b5, 1);
+  return getBit(Offset::keypadLock(), 1);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(0x00b5, 1, enable);
+  setBit(Offset::keypadLock(), 1, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(0x00b5, 3);
+  return getBit(Offset::sideKeyLock(), 3);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(0x00b5, 3, enable);
+  setBit(Offset::sideKeyLock(), 3, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::keyLockForced() const {
-  return getBit(0x00b5, 4);
+  return getBit(Offset::forceKeyLock(), 4);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
-  setBit(0x00b5, 4, enable);
+  setBit(Offset::forceKeyLock(), 4, enable);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::showLastHeard() const {
-  return getUInt8(0x00b6);
+  return getUInt8(Offset::showLastHeard());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
-  setUInt8(0x00b6, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-Frequency D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return Frequency::fromHz(getUInt32_le(0x00b8)*10);
+Frequency
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinVHF())*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
-  setUInt32_le(0x00b8, freq.inHz()/10);
+  setUInt32_le(Offset::autoRepMinVHF(), freq.inHz()/10);
 }
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return Frequency::fromHz(getUInt32_le(0x00bc)*10);
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxVHF())*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
-  setUInt32_le(0x00bc, freq.inHz()/10);
+  setUInt32_le(Offset::autoRepMaxVHF(), freq.inHz()/10);
 }
 
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return Frequency::fromHz(getUInt32_le(0x00c0)*10);
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinUHF())*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
-  setUInt32_le(0x00c0, freq.inHz()/10);
+  setUInt32_le(Offset::autoRepMinUHF(), freq.inHz()/10);
 }
 Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return Frequency::fromHz(getUInt32_le(0x00c4)*10);
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxUHF())*10);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
-  setUInt32_le(0x00c4, freq.inHz()/10);
+  setUInt32_le(Offset::autoRepMaxUHF(), freq.inHz()/10);
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(0x00c8);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(Offset::autoRepeaterDirB());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
-  setUInt8(0x00c8, (unsigned)dir);
+  setUInt8(Offset::autoRepeaterDirB(), (unsigned)dir);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::defaultChannel() const {
-  return getUInt8(0x00ca);
+  return getUInt8(Offset::defaultChannels());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
-  setUInt8(0x00ca, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::defaultChannels(), (enable ? 0x01 : 0x00));
 }
 
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
-  return getUInt8(0x00cb);
+  return getUInt8(Offset::defaultZoneA());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned idx) {
-  setUInt8(0x00cb, idx);
+  setUInt8(Offset::defaultZoneA(), idx);
 }
 
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
-  return getUInt8(0x00cc);
+  return getUInt8(Offset::defaultZoneB());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned idx) {
-  setUInt8(0x00cc, idx);
+  setUInt8(Offset::defaultZoneB(), idx);
 }
 
 bool
@@ -989,11 +990,11 @@ D868UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
-  return getUInt8(0x00cd);
+  return getUInt8(Offset::defaultChannelA());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned idx) {
-  setUInt8(0x00cd, idx);
+  setUInt8(Offset::defaultChannelA(), idx);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
@@ -1006,11 +1007,11 @@ D868UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
-  return getUInt8(0x00ce);
+  return getUInt8(Offset::defaultChannelB());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned idx) {
-  setUInt8(0x00ce, idx);
+  setUInt8(Offset::defaultChannelB(), idx);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
@@ -1019,11 +1020,11 @@ D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::keepLastCaller() const {
-  return getUInt8(0x00cf);
+  return getUInt8(Offset::keepLastCaller());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
-  setUInt8(0x00cf, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::keepLastCaller(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -1031,7 +1032,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  setGPSUpdatePeriod(0x05);
+  setGPSUpdatePeriod(Interval::fromSeconds(5));
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set default VOX sensitivity
@@ -1053,30 +1054,11 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     // Encode audio settings
     setVOXDelay(ext->audioSettings()->voxDelay());
     setVOXSource(ext->audioSettings()->voxSource());
-    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
-    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
     setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
-    // Encode menu settings
-    setMenuExitTime(ext->menuSettings()->duration());
-
     // Encode display settings
-    setBacklightDuration(ext->displaySettings()->backlightDuration());
-    setCallDisplayColor(ext->displaySettings()->callColor());
-    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
+    setRXBacklightDuration(ext->displaySettings()->backlightDuration());
     enableShowZoneAndContact(ext->displaySettings()->showZoneAndContactEnabled());
-
-    // Encode auto-repeater settings
-    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
-    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
-    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
-    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
-    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
-
-    // Encode other settings
-    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
-    enableKeepLastCaller(ext->keepLastCallerEnabled());
-
   }
 
   return true;
@@ -1115,31 +1097,18 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->audioSettings()->setVOXSource(voxSource());
   ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 
-  // Menu settings
-  ext->menuSettings()->setDuration(this->menuExitTime());
-
   // Decode display settings
-  ext->displaySettings()->setCallColor(this->callDisplayColor());
   ext->displaySettings()->enableShowZoneAndContact(this->showZoneAndContact());
-  ext->displaySettings()->setBacklightDuration(backlightDuration());
-
-  // Decode auto-repeater settings
-  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
-  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
-  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
-  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
-  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
-
-  // Decode other settings
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
-                                           AnytoneSettingsExtension::Units::Metric);
-  ext->enableKeepLastCaller(this->keepLastCaller());
+  ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
 
   return true;
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+    return false;
+
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
   if (settings->anytoneExtension()) {
@@ -1147,26 +1116,6 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
   } else {
     ext = new AnytoneSettingsExtension();
     settings->setAnytoneExtension(ext);
-  }
-
-  // Link auto-repeater
-  if (hasAutoRepeaterOffsetFrequencyIndexVHF()) {
-    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset frequency for VHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
-      return false;
-    }
-    ext->autoRepeaterSettings()->vhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
-  }
-  if (hasAutoRepeaterOffsetFrequencyIndexUHF()) {
-    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset frequency for UHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
-      return false;
-    }
-    ext->autoRepeaterSettings()->uhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
   }
 
   return true;

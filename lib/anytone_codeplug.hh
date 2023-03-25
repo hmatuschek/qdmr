@@ -1085,6 +1085,48 @@ public:
     /** Enables/disables call display. */
     virtual void enableDisplayCall(bool enable) = 0;
 
+    /** Returns the display color for callsigns. */
+    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const = 0;
+    /** Sets the display color for callsigns. */
+    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) = 0;
+
+    /** Returns @c true if the GPS units are imperial. */
+    virtual bool gpsUnitsImperial() const = 0;
+    /** Enables/disables imperial GPS units. */
+    virtual void enableGPSUnitsImperial(bool enable) = 0;
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual Frequency autoRepeaterMinFrequencyVHF() const = 0;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz) = 0;
+    /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const = 0;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz) = 0;
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual Frequency autoRepeaterMinFrequencyUHF() const = 0;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz) = 0;
+    /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const = 0;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz) = 0;
+    /** Returns the auto-repeater direction for VFO B. */
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const = 0;
+    /** Sets the auto-repeater direction for VFO B. */
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) = 0;
+
+    /** Returns @c true if the last heard is shown while pressing PTT. */
+    virtual bool showLastHeard() const = 0;
+    /** Enables/disables showing last heard. */
+    virtual void enableShowLastHeard(bool enable) = 0;
+
+    /** Returns @c true if the last caller is kept when changing channel. */
+    virtual bool keepLastCaller() const = 0;
+    /** Enables/disables keeping the last caller when changing the channel. */
+    virtual void enableKeepLastCaller(bool enable) = 0;
+
     /** Encodes the general settings. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
     /** Updates the abstract config from general settings. */
