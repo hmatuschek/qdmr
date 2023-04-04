@@ -7,6 +7,8 @@
 \usepackage{standalone}
 \usepackage[ngerman]{babel}
 \usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{shapes.geometric}
 \usepackage{listings}
 \usepackage[utf8]{inputenc}
 \usepackage{tikzsymbols}
@@ -144,22 +146,174 @@ Gleichzeitig ist so ein Flughafen ein riesiges Gelände. Das heißt, nicht alle 
 
 
 \section{Technischer Hintergrund}
-\begin{frame}
+\begin{frame}{Technischer Hintergrund}
+DMR ist ein digitaler Funkstandard. D.h., die Sprache wird abgetastet, verlustbehaftet komprimiert (Codec) und digital übertragen (4-MFSK).\\[0.5cm]
 
+Da digitaler Mode, können Metadaten (Quelle, Ziel, weitere Daten) parallel mit der Sprache übertragen werden.\\[0.5cm]
+
+Moderne Codecs erlauben Sprachübertragung mit geringer Bandbreite (Datenübertragungsrate). DMR verwendet AMBE+2 (ebenso wie System Fusion).\\[0.5cm]
+\end{frame}
+
+\begin{frame}{Technischer Hintergrund}
+DMR verwendet lediglich 2.45kbit/s (3.6kbit/2 mit Fehlerkorrektur)\footnote{Quelle: Vortrag DJ3EI, \url{https://www.delta25.de/dmr/dmr-einf\%C3\%BChrung.pdf}}, bei 12.5kHz Kanalbreite, ist reichlich Platz.\\[0.5cm]
+
+Wir könnten Kanalbreite halbieren (6.25kHz) oder aber zwei QSOs gleichzeitig auf einem Kanal per TDMA (time-division multiple access) ermöglichen.\\[0.5cm]
+\end{frame}
+
+\begin{frame}{TDMA - 2 QSOs auf einer Frequenz}
+\begin{center}
+ \includegraphics[width=0.7\linewidth]{../fig/timeslot.tex}
+\end{center}
+ Mit AMBE+2, können 60ms Audio in weniger als 30ms übertragen werden. D.h., wir können die Zeit in zwei Zeitschlitze aufteilen. Jeder 30ms lang.\\[0.5cm]
+ 
+ Was/Wann Zeitschlitz 1/2 ist, bestimmt der Repeater. Er gibt den Takt vor. \\[0.5cm]
+ 
+ Somit sind auf einem 12.5kHz Kanal zwei parallele unabhängige QSOs möglich.
+\end{frame}
+
+\begin{frame}{Qualität und Reichweite}
+ Technisches Limit 150km, für Relaisbetrieb ausreichend.\\[0.5cm]
+ 
+ Hörbare Kompressionsartefakte durch AMBE+2. Auch bei idealer Verbindung. Dennoch sehr gute Verständlichkeit, vglb. 12.5kHz FM. \\[0.5cm]
+ 
+ Qualität beleibt auch bei schlechtem SNR erhalten. Dann aber schnelle Degradierung.
 \end{frame}
 
 \section{Konfiguration}
-\begin{frame}
+\begin{frame}{Konfiguration (Brandmeister)}
+Die Konfiguration (sog. Codeplug erstellen) von DMR Funkgeräten ist recht komplex. \\[0.5cm]
 
+In FM ist ein Kanal ein Relais. In DMR sind Relais nicht wichtig, sondern Sprechgruppen. Wie programmieren daher logische Kanäle:
+\begin{center}
+\begin{tabular}{|c|c|} \hline
+FM & DMR \\ \hline \hline
+RX Frequenz & RX Frequenz \\
+TX Ablage & TX Ablage \\
+ --- & Zeitschlitz \\
+(CTCSS/DCS) & Color Code \\
+--- & TX Kontakt \\
+--- & Empfangsgruppen \\\hline
+\end{tabular}
+\end{center}
 \end{frame}
 
-\section{Demo (Vielleicht)}
-\begin{frame}
-
+\begin{frame}{Konfiguration (Brandmeister)}
+\begin{description}
+ \item[RX/TX Frequenz] Klar.
+ \item[Zeitschlitz] Hatten wir schon. Konvention: 
+ \begin{itemize}
+  \item TS1 überregionaler Funkverkehr
+  \item TS2 regionaler/lokaler Funkverkehr
+ \end{itemize}
+ \item[Color Code] Meist fix 1. Vergleichbar mit CTCSS/DSC Tönen in FM. Vermeidet Probleme bei Überreichweiten.
+ \item[TX Kontakt] Standard Sprechgruppe für den Kanal. Wird angerufen, wenn PTT gedrückt wird. Man kann aber auf einen empfangenden Ruf direkt antworten. 
+ \item[Empfangsgruppen] Sprechgruppen, die auf einem Kanal empfangen werden sollen.
+\end{description}
 \end{frame}
 
-\section{QDMR}
-\begin{frame}
+\begin{frame}{Konfiguration -- DMR-ID}
+ \begin{itemize}
+  \item Jeder Teilnehmer, Sprechgruppe und Dienst benötigt eine eindeutige DMR ID. 
+  \item Eine ID pro Teilnehmer, nicht Gerät! Zu bekommen bei \url{https://radioid.net}.
+  \item Funktioniert wie eine Telefonnummer, incl. Prefix. Z.B., 262/263 ... Deutschland.
+  \item Datenbank ID$\leftrightarrow$Call frei verfügbar. Kann auch aufs Gerät gespielt werden um ID aufzulösen.
+ \end{itemize}
+\end{frame}
 
+
+\begin{frame}{Konfiguration -- Sprechgruppen}
+\begin{description}
+ \item[TG8] Regionaler Verbund von Repeatern. Nicht festgelegt.
+ \item[TG9] Nur dieser Repeater. Verhält sich wie FM Repeater.
+ \item[TG91] Welt weit, ist viel los dort.
+ \item[TG92] Europa
+ \item[TG2621] Berlin/Brandenburg
+ \item[TG2629] Sachsen/Thüringen
+\end{description}
+\end{frame}
+
+
+\begin{frame}{Konfiguration -- Kanäle}
+In DMR werden pro Repeater mind. zwei Kanäle programmiert. Einen für jeden Zeitschlitz. Meist aber eher mehr. \\[0.5cm]
+
+Ziel: Kontakt zu Sprechgruppen. 
+\begin{enumerate}
+ \item Liste der Sprechgruppen zusammenstellen, die uns interessieren.
+ \begin{itemize}
+  \item TG9, TG2621, TG2629, TG26223 (Chaosrunde CCC), ...
+ \end{itemize}
+ \item Liste der Repeater raus suchen.
+ \begin{itemize}
+  \item DB0LDS, DB0PDM, DM0LEI, ...
+ \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Konfiguration -- Empfangsgruppen}
+Überbleibsel des kommerziellen Ursprungs. Wir gruppieren alle Sprechgruppen, die uns gleichzeitig interessieren. Es macht wenig Sinn, Sprechgruppen zusammenzufassen, die nie gleichzeitig empfangen werden können. Am besten, per Region:\\[0.5cm]
+
+\begin{description}
+ \item[B/B] TG8, TG9, TG2621
+ \item[Sa/Th] TG8, TG9, TG2629
+ \item[CCC] TG26223
+\end{description}
+\end{frame}
+
+\begin{frame}{Konfiguration -- Kanäle}
+ Jetzt sind wir so weit, die Kanäle anlegen zu können:
+ \begin{center}
+ \begin{tabular}{|l|llllll|}\hline
+ Name & RX Freq & Ablage & CC & TS & Kontakt & RX Gr. \\ \hline \hline
+ DB0LDS BB  & 439.5625 & -7.6 & 1 & 2 & Berlin/Brandenburg & B/B  \\
+ DB0LDS ST  & 439.5625 & -7.6 & 1 & 1 & Sachsen/Thüringen  & Sa/Th  \\
+ DB0LDS CCC & 439.5625 & -7.6 & 1 & 1 & Chaosrunde         & CCC  \\
+ DB0PDM BB  & 438.4000 & -7.6 & 1 & 2 & Berlin/Brandenburg & B/B  \\
+ DM0LEI BB  & 439.1500 & -7.6 & 1 & 1 & Berlin/Brandenburg & B/B  \\
+ DM0LEI ST  & 439.1500 & -7.6 & 1 & 2 & Sachsen/Thüringen  & Sa/Th \\ \hline
+ \end{tabular}
+ \end{center}
+\end{frame}
+
+\begin{frame}{Konfiguration -- Zonen}
+ Da so sehr viele Kanäle entstehen, werden diese in Zonen zusammengefasst (meist nach Regionen):\\[0.5cm]
+ \begin{description}
+  \item[Berlin/Brandenburg] DB0LDS BB, DB0PDM BB, DB0LDS ST, DB0LDS CCC
+  \item[Sachsen/Thüringen] DM0LEI BB, DM0LEI ST
+ \end{description}\vspace{0.5cm}
+ 
+ \pause Einige Geräte unterstützen auch sog. Roaming. Dabei wird einem Kanal eine Liste von alternativen Frequenzen, CCs, und TSs zugewiesen. Diese ermöglichen es, mit einer Sprechgruppe in Verbindung zu bleiben, wenn der aktuell eingestellte Kanal den Kontakt zum Repeater verliert.
+\end{frame}
+
+\section{Demo}
+\begin{frame}
+\begin{block}{}
+ Demo...
+\end{block}
+\end{frame}
+
+\section*{QDMR}
+\begin{frame}{QDMR}
+Da Konfiguration recht kompliziert sein kann, wird eine Software vom Hersteller verwendet (CPS, Codeplug Programming Software).
+\begin{itemize}
+ \item CPS vom Hersteller nur für Windows
+ \item Bedienkonzept aus den 90ern. 
+ \item Miese Übersetzung aus dem Chinesischen. 
+ \item Sehr auf kommerzielle Anwender ausgerichtet.
+ \item Keine Anbindung an User und Repeater Datenbanken.
+ \item Kein Austausch von Konfigurationen zwischen Geräten oder gar Herstellern.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{QDMR}
+ Da ich kein Windows habe, brauchte ich eine Lösung um meine DMR Geräte zu programmieren: Also eigene Software schreiben. 
+ \begin{itemize}
+  \item basiert auf Tool \texttt{dmrconfig} von Serge, KK6ABQ
+  \item läuft auf Linux und Mac OS X
+  \item verwendet gemeinsame Konfiguration für 20 verschiedene Geräte von verschiedenen Herstellern
+  \item Einbindung der User DB (DMR ID $\leftrightarrow$ Calls)
+  \item Einbindung der Sprechgruppen DB von Brandmeister
+  \item Einbindung von Repeater Book
+  \item nur 100k Zeilen C++ Code.
+ \end{itemize}
 \end{frame}
 \end{document}
