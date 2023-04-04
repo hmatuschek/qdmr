@@ -1,0 +1,165 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Boadilla}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{standalone}
+\usepackage[ngerman]{babel}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage{tikzsymbols}
+\usepackage{standalone}
+
+\title[DMR]{Kurze einführung in Digital Mobile Radio (DMR)}
+\subtitle{Ein Mobilfunknetz für den Amateurfunk}
+
+\author{Hannes, DM3MAT}
+\institute{\texttt{dm3mat [at] darc [dot] de}}
+\date{5. April 2023}
+
+\lstset{ %
+basicstyle=\tiny    % the size of the fonts that are used for the line-numbers
+}
+
+
+\input{../fig/repeater}
+
+\begin{document}
+\begin{frame}
+ \titlepage
+\end{frame}
+
+\begin{frame} \frametitle{Übersicht}
+ \tableofcontents
+\end{frame}
+
+
+\section{Motivation}
+\begin{frame}{Motivation}
+Schnatterfunk:
+\begin{itemize}
+ \item Ziel: Ich möchte mit bestimmten Leuten oder auch mit Irgendjemanden reden.
+ \pause\item Auf UKW: Reichweite begrenzt. Gerade mit Handfunke.
+ \pause\item Lösung: Repeater.
+ \pause\item Nächstes Problem: Reichweite immer noch begrenzt.
+ \pause\item Lösung: Repeater vernetzen! (Echolink)
+ \pause\item Immer noch Probleme: 
+ \begin{itemize}
+  \pause\item Wo sitzen die Leute, mit denen ich reden Will?
+  \pause\item Welche Repeater sind dort in der Nähe?
+  \pause\item Welche EL-Nummer haben die? 
+ \end{itemize}
+ \pause\item Eigentliches Problem: Was interessieren mich Repeater? Mich interessieren die Leute!
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Repeatertransparenz}
+Eigentlich sollten FM-Relais 4 verschiedene Anwendungsfälle abdecken:
+\begin{enumerate}
+ \pause\item Direktes QSO mit einer bestimmten Person, egal wo diese sitzt. \pause\Sadey
+ \pause\item Teilnahme an themenspezifischer Runde, egal wo die Teilnehmer sitzen. \pause\Neutrey
+ \pause\item Teilnahme an regionaler Runde. \pause\Neutrey
+ \pause\item QSO zum nächsten Dorf. \pause\Smiley
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Repeatertransparenz}
+Es wäre also schön, wenn der einzelne Repeater nicht mehr so im Zentrum stehen würde. 
+
+\pause Wir vernetzen also die Repeater und packen wir was anderes in die Mitte:
+\begin{block}{Sprechgruppe/Talkgroup}
+ Eine Sprechgruppe/Talkgroup ist ein virtueller Raum/Repeater. Er existiert nicht physisch durch einen Zusammenschluss bestimmter Repeater, sondern im Netz aller Repeater. 
+ 
+ Habe ich eine Sprechgruppe (TG) abonniert, höre ich alles, was in dieser TG gesagt wird. Sende ich dort hin, hören alle Teilnehmer meine Aussendung, egal über welchen Repeater. Sprechgruppen sind also repeatertransparent.
+\end{block}
+\end{frame}
+
+
+\section{Ursprung}
+\begin{frame}
+Digital Mobile Radio (DMR) hat seinen Ursprung als digitalisierter Bündelfunk/Betriebsfunk. Daher sind einige Techniken und Begriffe an diesen angelehnt. Einige dieser Techniken werden im AFu nicht verwendet (Alarm, Verschlüsselung) oder zweckentfremdet (all call). 
+
+Beispiel Flughafen (Gebäude): Es gibt eine Vielzahl an Gruppen:
+\begin{itemize}
+ \item Die Reinigungskolonne,
+ \item die Sicherheitsleute wie Gepäckkontrolle oder Wachschutz,
+ \item die Techniker,
+ \item die Betriebsfeuerwehr und
+ \item die Zentrale.
+\end{itemize}
+Gleichzeitig ist so ein Flughafen ein riesiges Gelände. Das heißt, nicht alle Mitarbeiter können alle anderen Mitarbeiter direkt erreichen. Es müssen also Repeater aufgestellt werden, damit das gesamte Gelände und alle Innenräume per Funk abgedeckt sind. Daher wird häufig in jedem Gebäude mindestens ein Repeater aufgestellt. 
+\end{frame}
+
+\begin{frame}{Beispiel: Flughafen}
+\centering
+\includegraphics[width=\linewidth]{../fig/trunk_net_ex1.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/trunk_net_ex2.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/trunk_net_ex3.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/trunk_net_ex4a.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/trunk_net_ex4b.tex}
+\end{frame}
+
+\section{Sprechgruppen}
+\begin{frame}{Nachmittagsschnatterrunde}
+\begin{block}{Anwendungsbeispiel im Amateurfunk: die Nachmittagsrunde}
+\begin{itemize}
+ \item Eine Nachmittagsrunde findet in der regionalen Sprechgruppe statt. Z.B., in der TG 2621 \emph{Berlin/Brandenburg} kurz BB.
+ \item Alle Teilnehmer befinden sich in der Region BB, außer DL3XYZ, der ist im Urlaub.
+\end{itemize} 
+\end{block}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/talkgroup_ex1a.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/talkgroup_ex1b.tex}
+\end{frame}
+
+\begin{frame}
+\centering
+\includegraphics[width=\linewidth]{../fig/talkgroup_ex1c.tex}
+\end{frame}
+
+
+\section{Technischer Hintergrund}
+\begin{frame}
+
+\end{frame}
+
+\section{Konfiguration}
+\begin{frame}
+
+\end{frame}
+
+\section{Demo (Vielleicht)}
+\begin{frame}
+
+\end{frame}
+
+\section{QDMR}
+\begin{frame}
+
+\end{frame}
+\end{document}
