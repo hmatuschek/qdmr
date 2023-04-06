@@ -42,7 +42,7 @@ Interval::format(Format f) const {
 
 bool
 Interval::parse(const QString &value) {
-  QRegularExpression ex("\\w*([0-9])+\\w*(|min|s|ms)\\w*");
+  QRegularExpression ex(R"(\s*([0-9]+)\s*(min|s|ms|)\s*)");
   QRegularExpressionMatch match = ex.match(value);
   if (! match.isValid())
     return false;
@@ -53,7 +53,7 @@ Interval::parse(const QString &value) {
 
   if (hasUnit && ("s"==unit))
     _duration = dur.toULongLong()*1000ULL;
-  else if (hasUnit && ("s"==unit))
+  else if (hasUnit && ("min"==unit))
     _duration = dur.toULongLong()*60000ULL;
   else
     _duration = dur.toULongLong();

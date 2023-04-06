@@ -108,5 +108,47 @@ D868UVETest::testAutoRepeaterOffset() {
   QCOMPARE(ext->uhfRef()->as<AnytoneAutoRepeaterOffset>(), ext->offsets()->get(1)->as<AnytoneAutoRepeaterOffset>());
 }
 
+void
+D868UVETest::testHangTime() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/anytone_call_hangtime.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check config
+  QVERIFY2(config.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
+  AnytoneDMRSettingsExtension *ext = config.settings()->anytoneExtension()->dmrSettings();
+
+  QCOMPARE(ext->privateCallHangTime().seconds(), 4ULL);
+  QCOMPARE(ext->groupCallHangTime().seconds(), 5ULL);
+
+  // Encode
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Decode
+  Config comp_config;
+  if (! codeplug.decode(&comp_config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UVII: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check config
+  QVERIFY2(comp_config.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
+  ext = comp_config.settings()->anytoneExtension()->dmrSettings();
+
+  QCOMPARE(ext->privateCallHangTime().seconds(), 4ULL);
+  QCOMPARE(ext->groupCallHangTime().seconds(), 5ULL);
+
+}
+
 QTEST_GUILESS_MAIN(D868UVETest)
 
