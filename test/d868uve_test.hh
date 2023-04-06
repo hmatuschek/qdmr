@@ -20,7 +20,6 @@ private slots:
   void testBasicConfigDecoding();
 
   void testAutoRepeaterOffset();
-  void testHangTime();
 
 protected:
   Config _basicConfig;

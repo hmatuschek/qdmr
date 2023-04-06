@@ -21,6 +21,7 @@ private slots:
 
   void testAnalogMicGain();
   void testRoaming();
+  void testHangTime();
 
 protected:
   QTextStream _stderr;
