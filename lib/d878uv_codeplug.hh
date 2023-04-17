@@ -1254,18 +1254,42 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns the the repeater activation delay in ms. */
-    virtual unsigned repeaterActivationDelay() const;
+    virtual Interval repeaterActivationDelay() const;
     /** Sets the repeater activation delay in ms. */
-    virtual void setRepeaterActivationDelay(unsigned ms);
+    virtual void setRepeaterActivationDelay(Interval ms);
 
     /** Constructs all GPS system from the generic configuration. */
     virtual bool fromGPSSystems(Context &ctx);
     /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
+    virtual bool fromGPSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
     /** Constructs a generic GPS system from the idx-th encoded GPS system. */
     virtual GPSSystem *toGPSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
     virtual bool linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /// Maximum number of channels, destinations, call types and time slots.
+      static constexpr unsigned int systemCount() { return 8; }
+    };
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channels()                { return 0x0000; }
+      static constexpr unsigned int betweenChannels()         { return 0x0002; }
+      static constexpr unsigned int destinations()            { return 0x0010; }
+      static constexpr unsigned int betweenDestinations()     { return 0x0004; }
+      static constexpr unsigned int callTypes()               { return 0x0030; }
+      static constexpr unsigned int betweenCallTypes()        { return 0x0001; }
+      static constexpr unsigned int timeSlots()               { return 0x0039; }
+      static constexpr unsigned int betweenTimeSlots()        { return 0x0001; }
+      static constexpr unsigned int roaming()                 { return 0x0038; }
+      static constexpr unsigned int repeaterActivationDelay() { return 0x0041; }
+      /// @endcond
+    };
   };
 
   /** Implements the binary representation of a roaming channel within the codeplug.

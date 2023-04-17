@@ -659,7 +659,8 @@ D878UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
   setUInt8(Offset::wfmMonitor(), (enable ? 0x01 : 0x00));
 }
 
-Frequency D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+Frequency
+D878UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
   switch ((TBSTFrequency)getUInt8(Offset::tbstFrequency())) {
   case TBSTFrequency::Hz1000: return Frequency::fromHz(1000);
   case TBSTFrequency::Hz1450: return Frequency::fromHz(1450);
@@ -866,7 +867,8 @@ D878UVCodeplug::GeneralSettingsElement::enablePluginRecTone(bool enable) {
   setUInt8(Offset::pluginRecTone(), enable ? 0x01 : 0x00);
 }
 
-Interval D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
+Interval
+D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
   return Interval::fromSeconds(getUInt8(Offset::gpsRangingInterval()));
 }
 void
@@ -2386,11 +2388,11 @@ D878UVCodeplug::DMRAPRSSettingsElement::channelIsSelected(unsigned n) const {
 }
 unsigned
 D878UVCodeplug::DMRAPRSSettingsElement::channelIndex(unsigned n) const {
-  return getUInt16_le(0x0000 + n*2);
+  return getUInt16_le(Offset::channels() + n*Offset::betweenChannels());
 }
 void
 D878UVCodeplug::DMRAPRSSettingsElement::setChannelIndex(unsigned n, unsigned idx) {
-  setUInt16_le(0x0000 + 2*n, idx);
+  setUInt16_le(Offset::channels() + n*Offset::betweenChannels(), idx);
 }
 void
 D878UVCodeplug::DMRAPRSSettingsElement::setChannelSelected(unsigned n) {
@@ -2399,16 +2401,16 @@ D878UVCodeplug::DMRAPRSSettingsElement::setChannelSelected(unsigned n) {
 
 unsigned
 D878UVCodeplug::DMRAPRSSettingsElement::destination(unsigned n) const {
-  return getBCD8_be(0x0010 + 4*n);
+  return getBCD8_be(Offset::destinations() + n*Offset::betweenDestinations());
 }
 void
 D878UVCodeplug::DMRAPRSSettingsElement::setDestination(unsigned n, unsigned idx) {
-  setBCD8_be(0x0010 + 4*n, idx);
+  setBCD8_be(Offset::destinations() + n*Offset::betweenDestinations(), idx);
 }
 
 DMRContact::Type
 D878UVCodeplug::DMRAPRSSettingsElement::callType(unsigned n) const {
-  switch(getUInt8(0x0030 + n)) {
+  switch(getUInt8(Offset::callTypes() + n*Offset::betweenCallTypes())) {
   case 0: return DMRContact::PrivateCall;
   case 1: return DMRContact::GroupCall;
   case 2: return DMRContact::AllCall;
@@ -2418,19 +2420,19 @@ D878UVCodeplug::DMRAPRSSettingsElement::callType(unsigned n) const {
 void
 D878UVCodeplug::DMRAPRSSettingsElement::setCallType(unsigned n, DMRContact::Type type) {
   switch(type) {
-  case DMRContact::PrivateCall: setUInt8(0x0030+n, 0x00); break;
-  case DMRContact::GroupCall: setUInt8(0x0030+n, 0x01); break;
-  case DMRContact::AllCall: setUInt8(0x0030+n, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x00); break;
+  case DMRContact::GroupCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x01); break;
+  case DMRContact::AllCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x02); break;
   }
 }
 
 bool
 D878UVCodeplug::DMRAPRSSettingsElement::timeSlotOverride(unsigned n) {
-  return 0x00 != getUInt8(0x0039 + n);
+  return 0x00 != getUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots());
 }
 DMRChannel::TimeSlot
 D878UVCodeplug::DMRAPRSSettingsElement::timeSlot(unsigned n) const {
-  switch (getUInt8(0x0039 + n)) {
+  switch (getUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots())) {
   case 1: return DMRChannel::TimeSlot::TS1;
   case 2: return DMRChannel::TimeSlot::TS2;
   }
@@ -2439,47 +2441,43 @@ D878UVCodeplug::DMRAPRSSettingsElement::timeSlot(unsigned n) const {
 void
 D878UVCodeplug::DMRAPRSSettingsElement::setTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
   switch (ts) {
-  case DMRChannel::TimeSlot::TS1: setUInt8(0x0039+n, 0x01); break;
-  case DMRChannel::TimeSlot::TS2: setUInt8(0x0039+n, 0x02); break;
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0x01); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0x02); break;
   }
 }
 void
 D878UVCodeplug::DMRAPRSSettingsElement::clearTimeSlotOverride(unsigned n) {
-  setUInt8(0x0039+n, 0);
+  setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0);
 }
 
 bool
 D878UVCodeplug::DMRAPRSSettingsElement::roaming() const {
-  return getUInt8(0x0038);
+  return getUInt8(Offset::roaming());
 }
 void
 D878UVCodeplug::DMRAPRSSettingsElement::enableRoaming(bool enable) {
-  setUInt8(0x0038, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::roaming(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 D878UVCodeplug::DMRAPRSSettingsElement::repeaterActivationDelay() const {
-  return ((unsigned)getUInt8(0x0041))*100;
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::repeaterActivationDelay()))*100);
 }
 void
-D878UVCodeplug::DMRAPRSSettingsElement::setRepeaterActivationDelay(unsigned ms) {
-  setUInt8(0x0041, ms/100);
+D878UVCodeplug::DMRAPRSSettingsElement::setRepeaterActivationDelay(Interval ms) {
+  setUInt8(Offset::repeaterActivationDelay(), ms.milliseconds()/100);
 }
 
 bool
 D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystems(Context &ctx) {
-  if (ctx.config()->posSystems()->gpsCount() > 8)
-    return false;
-  for (int i=0; i<ctx.config()->posSystems()->gpsCount(); i++)
-    fromGPSSystemObj(ctx.config()->posSystems()->gpsSystem(i), ctx);
+  unsigned int n = std::min(ctx.count<GPSSystem>(), Limit::systemCount());
+  for (unsigned int idx=0; idx<n; idx++)
+    fromGPSSystemObj(idx, ctx.get<GPSSystem>(idx), ctx);
   return true;
 }
 
 bool
-D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
-  int idx = ctx.config()->posSystems()->indexOfGPSSys(sys);
-  if ((idx < 0) || idx > 7)
-    return false;
+D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx) {
   if (sys->hasContact()) {
     setDestination(idx, sys->contactObj()->number());
     setCallType(idx, sys->contactObj()->type());

@@ -359,7 +359,7 @@ public:
     void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
     AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const;
     void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
-    virtual Interval longPressDuration() const;
+    Interval longPressDuration() const;
     void setLongPressDuration(Interval ms);
 
     bool vfoModeA() const;

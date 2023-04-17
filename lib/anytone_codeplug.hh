@@ -1384,7 +1384,7 @@ public:
   /** Represents the table of repeater offset frequencies.
    *
    * Memory representation of the offset frequency table (size 0x03F0 bytes):
-   * @verbinclude anytone_repeater_offset_frequencies.txt */
+   * @verbinclude anytone_repeateroffsetfrequencies.txt */
   class RepeaterOffsetListElement: public Element
   {
   protected:

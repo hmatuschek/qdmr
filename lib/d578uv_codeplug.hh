@@ -229,8 +229,7 @@ public:
     void enableDataACK(bool enable);
 
     // Replaced by analog scrambler settings
-    /** The D578UV does not support the weak DMR encryption, hence this function returns always
-     * 0. */
+    /** The D578UV does not support the weak DMR encryption, hence this function returns always 0. */
     unsigned dmrEncryptionKeyIndex() const;
     /** The D578UV does not support the weak DMR encryption, hence this function has not effect. */
     void setDMREncryptionKeyIndex(unsigned idx);
@@ -278,6 +277,513 @@ public:
   public:
     /** Constructor. */
     GeneralSettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00f0; }
+
+    /** This feature is not present in D578UV and D578UV II devices. */
+    AnytoneSettingsExtension::PowerSave powerSave() const;
+    /** This feature is not present in D578UV and D578UV II devices. */
+    void setPowerSave(AnytoneSettingsExtension::PowerSave mode);
+    /** This feature is not present in D578UV and D578UV II devices. */
+    unsigned int voxLevel() const;
+    /** This feature is not present in D578UV and D578UV II devices. */
+    void setVOXLevel(unsigned int level);
+    /** This feature is not present in D578UV and D578UV II devices. */
+    Interval voxDelay() const;
+    /** This feature is not present in D578UV and D578UV II devices. */
+    void setVOXDelay(Interval intv);
+
+    AnytoneSettingsExtension::VFOScanType vfoScanType() const;
+    void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
+    unsigned int dmrMicGain() const;
+    void setDMRMicGain(unsigned int gain);
+
+    bool vfoModeA() const;
+    void enableVFOModeA(bool enable);
+    bool vfoModeB() const;
+    void enableVFOModeB(bool enable);
+
+    AnytoneSettingsExtension::STEType steType() const;
+    void setSTEType(AnytoneSettingsExtension::STEType type);
+    double steFrequency() const;
+    void setSTEFrequency(double freq);
+
+    Interval groupCallHangTime() const;
+    void setGroupCallHangTime(Interval sec);
+    Interval privateCallHangTime() const;
+    void setPrivateCallHangTime(Interval sec);
+    Interval preWaveDelay() const;
+    void setPreWaveDelay(Interval ms);
+    Interval wakeHeadPeriod() const;
+    void setWakeHeadPeriod(Interval ms);
+
+    unsigned wfmChannelIndex() const;
+    void setWFMChannelIndex(unsigned idx);
+    bool wfmVFOEnabled() const;
+    void enableWFMVFO(bool enable);
+
+    unsigned memoryZoneA() const;
+    void setMemoryZoneA(unsigned zone);
+    unsigned memoryZoneB() const;
+    void setMemoryZoneB(unsigned zone);
+
+    /** Returns @c true, if the WFM/Airband receiver is enabled. */
+    virtual bool wfmEnabled() const;
+    /** Enables/disables WFM/Airband receiver. */
+    virtual void enableWFM(bool enable);
+
+    bool recording() const;
+    void enableRecording(bool enable);
+
+    unsigned dtmfToneDuration() const;
+    void setDTMFToneDuration(unsigned ms);
+
+    bool manDown() const;
+    void enableManDown(bool enable);
+
+    unsigned brightness() const;
+    void setBrightness(unsigned level);
+    bool backlightPermanent() const;
+    Interval rxBacklightDuration() const;
+    void setRXBacklightDuration(Interval sec);
+    void enableBacklightPermanent();
+
+    bool gps() const;
+    void enableGPS(bool enable);
+
+    bool smsAlert() const;
+    void enableSMSAlert(bool enable);
+
+    bool wfmMonitor() const;
+    void enableWFMMonitor(bool enable);
+
+    bool activeChannelB() const;
+    void enableActiveChannelB(bool enable);
+
+    bool subChannel() const;
+    void enableSubChannel(bool enable);
+
+    Frequency tbstFrequency() const;
+    void setTBSTFrequency(Frequency freq);
+
+    bool callAlert() const;
+    void enableCallAlert(bool enable);
+
+    QTimeZone gpsTimeZone() const;
+    void setGPSTimeZone(const QTimeZone &zone);
+
+    bool dmrTalkPermit() const;
+    void enableDMRTalkPermit(bool enable);
+    bool dmrResetTone() const;
+    void enableDMRResetTone(bool enable);
+    bool idleChannelTone() const;
+    void enableIdleChannelTone(bool enable);
+
+    Interval menuExitTime() const;
+    void setMenuExitTime(Interval intv);
+
+    bool filterOwnID() const;
+    void enableFilterOwnID(bool enable);
+
+    bool startupTone() const;
+    void enableStartupTone(bool enable);
+
+    bool callEndPrompt() const;
+    void enableCallEndPrompt(bool enable);
+
+    unsigned maxSpeakerVolume() const;
+    void setMaxSpeakerVolume(unsigned level);
+
+    bool remoteStunKill() const;
+    void enableRemoteStunKill(bool enable);
+
+    bool remoteMonitor() const;
+    void enableRemoteMonitor(bool enable);
+
+    bool getGPSPosition() const;
+    void enableGetGPSPosition(bool enable);
+
+    Interval longPressDuration() const;
+    void setLongPressDuration(Interval ms);
+
+    bool volumeChangePrompt() const;
+    void enableVolumeChangePrompt(bool enable);
+
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
+    void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+
+    AnytoneDMRSettingsExtension::SlotMatch monitorSlotMatch() const;
+    void setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match);
+    bool monitorColorCodeMatch() const;
+    void enableMonitorColorCodeMatch(bool enable);
+    bool monitorIDMatch() const;
+    void enableMonitorIDMatch(bool enable);
+    bool monitorTimeSlotHold() const;
+    void enableMonitorTimeSlotHold(bool enable);
+
+    AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const;
+    void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode);
+
+    unsigned fmCallHold() const;
+    void setFMCallHold(unsigned sec);
+
+    bool displayClock() const;
+    void enableDisplayClock(bool enable);
+
+    bool gpsMessageEnabled() const;
+    void enableGPSMessage(bool enable);
+
+    bool enhanceAudio() const;
+    void enableEnhancedAudio(bool enable);
+
+    Frequency minVFOScanFrequencyUHF() const;
+    void setMinVFOScanFrequencyUHF(Frequency hz);
+    Frequency maxVFOScanFrequencyUHF() const;
+    void setMaxVFOScanFrequencyUHF(Frequency hz);
+    Frequency minVFOScanFrequencyVHF() const;
+    void setMinVFOScanFrequencyVHF(Frequency hz);
+    Frequency maxVFOScanFrequencyVHF() const;
+    void setMaxVFOScanFrequencyVHF(Frequency hz);
+
+    void callToneMelody(Melody &melody) const;
+    void setCallToneMelody(const Melody &melody);
+    void idleToneMelody(Melody &melody) const;
+    void setIdleToneMelody(const Melody &melody);
+    void resetToneMelody(Melody &melody) const;
+    void setResetToneMelody(const Melody &melody);
+
+    bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
+    unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
+    void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
+    void clearAutoRepeaterOffsetFrequencyIndexUHF();
+    bool hasAutoRepeaterOffsetFrequencyIndexVHF() const;
+    unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
+    void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
+    void clearAutoRepeaterOffsetFrequencyIndexVHF();
+
+    unsigned priorityZoneAIndex() const;
+    void setPriorityZoneAIndex(unsigned idx);
+    unsigned priorityZoneBIndex() const;
+    void setPriorityZoneBIndex(unsigned idx);
+
+    bool displayCall() const;
+    void enableDisplayCall(bool enable);
+
+    bool bluetooth() const;
+    void enableBluetooth(bool enable);
+    bool btAndInternalMic() const;
+    void enableBTAndInternalMic(bool enable);
+    bool btAndInternalSpeaker() const;
+    void enableBTAndInternalSpeaker(bool enable);
+    bool pluginRecTone() const;
+    void enablePluginRecTone(bool enable);
+
+    Interval gpsRangingInterval() const;
+    void setGPSRangingInterval(Interval sec);
+
+    unsigned int btMicGain() const;
+    void setBTMicGain(unsigned int gain);
+    unsigned int btSpeakerGain() const;
+    void setBTSpeakerGain(unsigned int gain);
+
+    bool displayChannelNumber() const;
+    void enableDisplayChannelNumber(bool enable);
+
+    bool displayContact() const;
+    void enableDisplayContact(bool enable);
+
+    Interval autoRoamPeriod() const;
+    void setAutoRoamPeriod(Interval min);
+
+    AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
+    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
+
+    bool gpsUnitsImperial() const;
+    void enableGPSUnitsImperial(bool enable);
+
+    bool knobLock() const;
+    void enableKnobLock(bool enable);
+    bool keypadLock() const;
+    void enableKeypadLock(bool enable);
+    bool sidekeysLock() const;
+    void enableSidekeysLock(bool enable);
+    bool keyLockForced() const;
+    void enableKeyLockForced(bool enable);
+
+    Interval autoRoamDelay() const;
+    void setAutoRoamDelay(Interval sec);
+
+    AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
+    void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
+    void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
+
+    bool showLastHeard() const;
+    void enableShowLastHeard(bool enable);
+
+    AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
+    void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+
+    bool fmSendIDAndContact() const;
+    void enableFMSendIDAndContact(bool enable);
+
+    bool defaultChannel() const;
+    void enableDefaultChannel(bool enable);
+    unsigned defaultZoneIndexA() const;
+    void setDefaultZoneIndexA(unsigned idx);
+    unsigned defaultZoneIndexB() const;
+    void setDefaultZoneIndexB(unsigned idx);
+    bool defaultChannelAIsVFO() const;
+    unsigned defaultChannelAIndex() const;
+    void setDefaultChannelAIndex(unsigned idx);
+    void setDefaultChannelAToVFO();
+    bool defaultChannelBIsVFO() const;
+    unsigned defaultChannelBIndex() const;
+    void setDefaultChannelBIndex(unsigned idx);
+    void setDefaultChannelBToVFO();
+
+    unsigned defaultRoamingZoneIndex() const;
+    void setDefaultRoamingZoneIndex(unsigned idx);
+
+    bool repeaterRangeCheck() const;
+    void enableRepeaterRangeCheck(bool enable);
+
+    Interval repeaterRangeCheckInterval() const;
+    void setRepeaterRangeCheckInterval(Interval sec);
+    unsigned repeaterRangeCheckCount() const;
+    void setRepeaterRangeCheckCount(unsigned n);
+    AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
+    void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
+
+    bool separateDisplay() const;
+    void enableSeparateDisplay(bool enable);
+
+    bool keepLastCaller() const;
+    void enableKeepLastCaller(bool enable);
+
+    AnytoneDisplaySettingsExtension::Color channelNameColor() const;
+    void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
+
+    bool repeaterCheckNotification() const;
+    void enableRepeaterCheckNotification(bool enable);
+
+    bool roaming() const;
+    void enableRoaming(bool enable);
+
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Short() const;
+    void setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Short() const;
+    void setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 3 short press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Short() const;
+    /** Sets the function for programmable function key 3 short press. */
+    virtual void setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 4 short press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey4Short() const;
+    /** Sets the function for programmable function key 4 short press. */
+    virtual void setProgFuncKey4Short(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 5 short press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey5Short() const;
+    /** Sets the function for programmable function key 5 short press. */
+    virtual void setProgFuncKey5Short(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 6 short press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey6Short() const;
+    /** Sets the function for programmable function key 6 short press. */
+    virtual void setProgFuncKey6Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyAShort() const;
+    void setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBShort() const;
+    void setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCShort() const;
+    void setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key D short press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyDShort() const;
+    /** Sets the function for programmable function key D short press. */
+    virtual void setProgFuncKeyDShort(AnytoneKeySettingsExtension::KeyFunction func);
+
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Long() const;
+    void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const;
+    void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 3 long press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Long() const;
+    /** Sets the function for programmable function key 3 long press. */
+    virtual void setProgFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 4 long press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey4Long() const;
+    /** Sets the function for programmable function key 4 long press. */
+    virtual void setProgFuncKey4Long(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 5 long press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey5Long() const;
+    /** Sets the function for programmable function key 5 long press. */
+    virtual void setProgFuncKey5Long(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key 6 long press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey6Long() const;
+    /** Sets the function for programmable function key 6 long press. */
+    virtual void setProgFuncKey6Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyALong() const;
+    void setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBLong() const;
+    void setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCLong() const;
+    void setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for programmable function key D long press. */
+    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyDLong() const;
+    /** Sets the function for programmable function key D long press. */
+    virtual void setProgFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func);
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: D878UVCodeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int vfoScanType()         { return 0x000b; }
+      static constexpr unsigned int dmrMicGain()          { return 0x000c; }
+      static constexpr unsigned int vfoModeA()            { return 0x000d; }
+      static constexpr unsigned int vfoModeB()            { return 0x000e; }
+      static constexpr unsigned int steType()             { return 0x000f; }
+
+      static constexpr unsigned int steFrequency()        { return 0x0010; }
+      static constexpr unsigned int groupCallHangTime()   { return 0x0011; }
+      static constexpr unsigned int privateCallHangTime() { return 0x0012; }
+      static constexpr unsigned int preWaveDelay()        { return 0x0013; }
+      static constexpr unsigned int wakeHeadPeriod()      { return 0x0014; }
+      static constexpr unsigned int wfmChannelIndex()     { return 0x0015; }
+      static constexpr unsigned int wfmVFOEnabled()       { return 0x0016; }
+      static constexpr unsigned int memZoneA()            { return 0x0017; }
+      static constexpr unsigned int memZoneB()            { return 0x0018; }
+      static constexpr unsigned int wfmEnable()           { return 0x0019; } // new
+      static constexpr unsigned int enableRecoding()      { return 0x001a; }
+      static constexpr unsigned int displayBrightness()   { return 0x001d; }
+      static constexpr unsigned int gpsEnable()           { return 0x001f; }
+
+      static constexpr unsigned int smsAlert()            { return 0x0020; }
+      static constexpr unsigned int activeChannelB()      { return 0x0023; }
+      static constexpr unsigned int subChannel()          { return 0x0024; }
+      static constexpr unsigned int tbstFrequency()       { return 0x0025; }
+      static constexpr unsigned int callAlert()           { return 0x0026; }
+      static constexpr unsigned int gpsTimeZone()         { return 0x0027; }
+      static constexpr unsigned int talkPermit()          { return 0x0028; }
+      static constexpr unsigned int dmrResetTone()        { return 0x0029; }
+      static constexpr unsigned int idleChannelTone()     { return 0x002a; }
+      static constexpr unsigned int menuExitTime()        { return 0x002b; }
+      static constexpr unsigned int filterOwnID()         { return 0x002c; }
+      static constexpr unsigned int startupTone()         { return 0x002d; }
+      static constexpr unsigned int callEndPrompt()       { return 0x002e; }
+      static constexpr unsigned int maxSpeakerVolume()    { return 0x002f; }
+
+      static constexpr unsigned int remoteStunKill()      { return 0x0030; }
+      static constexpr unsigned int remoteMonitor()       { return 0x0031; }
+      static constexpr unsigned int getGPSPosition()      { return 0x0032; }
+      static constexpr unsigned int longPressDuration()   { return 0x0033; }
+      static constexpr unsigned int volumeChangePrompt()  { return 0x0034; }
+      static constexpr unsigned int autoRepeaterDirA()    { return 0x0035; }
+      static constexpr unsigned int monSlotMatch()        { return 0x0036; }
+      static constexpr unsigned int monColorCodeMatch()   { return 0x0037; }
+      static constexpr unsigned int monIDMatch()          { return 0x0038; }
+      static constexpr unsigned int monTimeSlotHold()     { return 0x0039; }
+      static constexpr unsigned int lastCallerDisplay()   { return 0x003a; }
+      static constexpr unsigned int fmCallHold()          { return 0x003c; }
+      static constexpr unsigned int showClock()           { return 0x003d; }
+      static constexpr unsigned int enableGPSMessage()    { return 0x003e; }
+      static constexpr unsigned int enhanceAudio()        { return 0x003f; }
+
+      static constexpr unsigned int minVFOScanUHF()       { return 0x0040; }
+      static constexpr unsigned int maxVFOScanUHF()       { return 0x0044; }
+      static constexpr unsigned int minVFOScanVHF()       { return 0x0048; }
+      static constexpr unsigned int maxVFOScanVHF()       { return 0x004c; }
+
+      static constexpr unsigned int autoRepMinVHF()       { return 0x0050; }
+      static constexpr unsigned int autoRepMaxVHF()       { return 0x0054; }
+      static constexpr unsigned int autoRepMinUHF()       { return 0x0058; }
+      static constexpr unsigned int autoRepMaxUHF()       { return 0x005c; }
+
+      static constexpr unsigned int callToneTones()       { return 0x0060; }
+      static constexpr unsigned int callToneDurations()   { return 0x006a; }
+      static constexpr unsigned int idleToneTones()       { return 0x0074; }
+      static constexpr unsigned int idleToneDurations()   { return 0x007e; }
+      static constexpr unsigned int resetToneTones()      { return 0x0088; }
+      static constexpr unsigned int resetToneDurations()  { return 0x0092; }
+
+      static constexpr unsigned int autoRepOffsetUHF()    { return 0x009c; }
+      static constexpr unsigned int autoRepOffsetVHF()    { return 0x009d; }
+      static constexpr unsigned int priorityZoneA()       { return 0x009f; }
+
+      static constexpr unsigned int priorityZoneB()       { return 0x00a0; }
+      static constexpr unsigned int callDisplayMode()     { return 0x00a2; }
+      static constexpr unsigned int bluetooth()           { return 0x00a4; }
+      static constexpr unsigned int btAndInternalMic()    { return 0x00a5; }
+      static constexpr unsigned int btAndInternalSpeaker(){ return 0x00a6; }
+      static constexpr unsigned int pluginRecTone()       { return 0x00a7; }
+      static constexpr unsigned int gpsRangingInterval()  { return 0x00a8; }
+      static constexpr unsigned int btMicGain()           { return 0x00a9; }
+      static constexpr unsigned int btSpeakerGain()       { return 0x00aa; }
+      static constexpr unsigned int showChannelNumber()   { return 0x00ab; }
+      static constexpr unsigned int showContact()         { return 0x00ac; }
+      static constexpr unsigned int autoRoamPeriod()      { return 0x00ad; }
+      static constexpr unsigned int callColor()           { return 0x00ae; }
+      static constexpr unsigned int gpsUnits()            { return 0x00af; }
+
+      static constexpr unsigned int knobLock()            { return 0x00b0; }
+      static constexpr unsigned int keypadLock()          { return 0x00b0; }
+      static constexpr unsigned int sideKeyLock()         { return 0x00b0; }
+      static constexpr unsigned int forceKeyLock()        { return 0x00b0; }
+      static constexpr unsigned int autoRoamDelay()       { return 0x00b1; }
+      static constexpr unsigned int standbyTextColor()    { return 0x00b2; }
+      static constexpr unsigned int standbyBackground()   { return 0x00b3; }
+      static constexpr unsigned int showLastHeard()       { return 0x00b4; }
+      static constexpr unsigned int smsFormat()           { return 0x00b5; }
+      static constexpr unsigned int autoRepeaterDirB()    { return 0x00b6; }
+      static constexpr unsigned int fmSendIDAndContact()  { return 0x00b7; }
+      static constexpr unsigned int defaultChannels()     { return 0x00b8; }
+      static constexpr unsigned int defaultZoneA()        { return 0x00b9; }
+      static constexpr unsigned int defaultZoneB()        { return 0x00ba; }
+      static constexpr unsigned int defaultChannelA()     { return 0x00bb; }
+      static constexpr unsigned int defaultChannelB()     { return 0x00bc; }
+      static constexpr unsigned int defaultRoamingZone()  { return 0x00bd; }
+      static constexpr unsigned int repRangeCheck()       { return 0x00be; }
+      static constexpr unsigned int rangeCheckInterval()  { return 0x00bf; }
+
+      static constexpr unsigned int rangeCheckCount()     { return 0x00c0; }
+      static constexpr unsigned int roamStartCondition()  { return 0x00c1; }
+      static constexpr unsigned int txBacklightDuration() { return 0x00c2; }
+      static constexpr unsigned int displaySeparator()    { return 0x00c3; }
+      static constexpr unsigned int keepLastCaller()      { return 0x00c4; }
+      static constexpr unsigned int channelNameColor()    { return 0x00c5; }
+      static constexpr unsigned int repCheckNotify()      { return 0x00c6; }
+      static constexpr unsigned int rxBacklightDuration() { return 0x00c7; }
+      static constexpr unsigned int roaming()             { return 0x00c8; }
+      static constexpr unsigned int progFuncKey1Short()   { return 0x00c9; }
+      static constexpr unsigned int progFuncKey2Short()   { return 0x00ca; }
+      static constexpr unsigned int progFuncKey3Short()   { return 0x00cb; }
+      static constexpr unsigned int progFuncKey4Short()   { return 0x00cc; }
+      static constexpr unsigned int progFuncKey5Short()   { return 0x00cd; }
+      static constexpr unsigned int progFuncKey6Short()   { return 0x00ce; }
+      static constexpr unsigned int progFuncKeyAShort()   { return 0x00cf; }
+
+      static constexpr unsigned int progFuncKeyBShort()   { return 0x00d0; }
+      static constexpr unsigned int progFuncKeyCShort()   { return 0x00d1; }
+      static constexpr unsigned int progFuncKeyDShort()   { return 0x00d2; }
+      static constexpr unsigned int progFuncKey1Long()    { return 0x00d3; }
+      static constexpr unsigned int progFuncKey2Long()    { return 0x00d4; }
+      static constexpr unsigned int progFuncKey3Long()    { return 0x00d5; }
+      static constexpr unsigned int progFuncKey4Long()    { return 0x00d6; }
+      static constexpr unsigned int progFuncKey5Long()    { return 0x00d7; }
+      static constexpr unsigned int progFuncKey6Long()    { return 0x00d8; }
+      static constexpr unsigned int progFuncKeyALong()    { return 0x00d9; }
+      static constexpr unsigned int progFuncKeyBLong()    { return 0x00da; }
+      static constexpr unsigned int progFuncKeyCLong()    { return 0x00db; }
+      static constexpr unsigned int progFuncKeyDLong()    { return 0x00dc; }
+      static constexpr unsigned int repCheckNumNotify()   { return 0x00de; }
+      static constexpr unsigned int totRekey()            { return 0x00df; }
+
+      static constexpr unsigned int btHoldTime()          { return 0x00e1; }
+      static constexpr unsigned int btRXDelay()           { return 0x00e2; }
+      /// @endcond
+    };
 };
 
   /** Represents the hot-key settings of the radio within the D578UV binary codeplug.
