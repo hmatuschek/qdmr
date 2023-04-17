@@ -61,7 +61,7 @@ D868UVCallsignDB::EntryElement::setContent(
 {
   unsigned addr = 0x0006;
   writeASCII(addr, name, 16, 0x00); addr += std::min(16, name.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, city, 16, 0x00); addr += std::min(16, city.size()); setUInt8(addr, 0); addr++;
+  writeASCII(addr, city, 15, 0x00); addr += std::min(15, city.size()); setUInt8(addr, 0); addr++;
   writeASCII(addr, call, 8, 0x00); addr += std::min(8, call.size()); setUInt8(addr, 0); addr++;
   writeASCII(addr, state, 16, 0x00); addr += std::min(16, state.size()); setUInt8(addr, 0); addr++;
   writeASCII(addr, country, 16, 0x00); addr += std::min(16, country.size()); setUInt8(addr, 0); addr++;
@@ -81,7 +81,7 @@ unsigned
 D868UVCallsignDB::EntryElement::size(const UserDatabase::User &user) {
   return 6 // header
       + std::min(16, user.name.size())+1 // name
-      + std::min(16, user.city.size())+1 // city
+      + std::min(15, user.city.size())+1 // city
       + std::min( 8, user.call.size())+1 // call
       + std::min(16, user.state.size())+1 // state
       + std::min(16, user.country.size())+1 // country
