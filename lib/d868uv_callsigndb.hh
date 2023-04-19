@@ -30,7 +30,7 @@ public:
    * number, call-type etc. All strings, that is contact name, city, callsign, state, country and
    * comment are 0x00 terminated strings in a lists.
    *
-   * Max length for name is 16, city is 16, callsign is 8, state is 16, country is 16 and
+   * Max length for name is 16, city is 15, callsign is 8, state is 16, country is 16 and
    * comment is 16, excluding terminating 0x00.
    *
    * Memory layout of encoded Callsign/User database entry (variable size, min 0x000c-0x0064):
@@ -74,9 +74,47 @@ public:
     static unsigned size(const UserDatabase::User &user);
   };
 
+  class EntryBankElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EntryBankElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit EntryBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x000186a0; }
+
+    void clear();
+
+    /** Returns the i-th element of the bank. */
+    uint8_t *entry(unsigned int i) const;
+  };
+
   /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
    * it maps to the byte offset within the database entries. */
   typedef D868UVCodeplug::ContactMapElement IndexEntryElement;
+
+  class IndexBankElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    IndexBankElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit IndexBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0001f400; }
+
+    void clear();
+
+    /** Returns the i-th element of the bank. */
+    uint8_t *entry(unsigned int i) const;
+  };
 
   /** Stores some basic limits of the callsign db.
    *
@@ -120,6 +158,24 @@ public:
   /** Tries to encode as many entries of the given user-database. */
   bool encode(UserDatabase *db, const Selection &selection=Selection(),
               const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some limits for the call-sign DB. */
+  struct Limit {
+    static constexpr unsigned int entries() { return 200000; }
+  };
+
+protected:
+  /** Some internal used offsets within the DB. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int index()                { return 0x04000000; }
+    static constexpr unsigned int betweenIndexBanks()    { return 0x00040000; }
+    static constexpr unsigned int callsigns()            { return 0x04500000; }
+    static constexpr unsigned int betweenCallsignBanks() { return 0x00040000; }
+    static constexpr unsigned int limits()               { return 0x044C0000; }
+    /// @endcond
+  };
 };
 
 #endif // D868UVCALLSIGNDB_HH
