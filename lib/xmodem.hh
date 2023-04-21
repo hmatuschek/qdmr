@@ -1,14 +1,14 @@
 #ifndef XMODEM_HH
 #define XMODEM_HH
 
-#include "usbserial.hh"
+#include "openrtx_link.hh"
 
-/** Implements the XMODEM protocol (1k + crc16 variant) for USB-Serial devices.
+/** Implements the XMODEM protocol (1k + crc16 variant) for a packet stream.
  *
  * Provides two methods to send and receive an entire "file".
  *
  * @ingroup rif */
-class XModem : public USBSerial
+class XModem : public QObject
 {
   Q_OBJECT
 
@@ -25,7 +25,7 @@ protected:
 
 public:
   /** Constructs a xmodem connection via the USB device specified by @c descriptor. */
-  explicit XModem(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  explicit XModem(OpenRTXLinkStream *transferLayer, QObject *parent=nullptr);
 
   /** Receives an entire file from the device.
    * @param buffer The buffer to store the data in. The contents of the buffer will be cleared.
@@ -54,6 +54,8 @@ protected:
   static uint16_t crc_ccitt(const QByteArray &data);
 
 private:
+  /// A weak reference to the transfer layer.
+  OpenRTXLinkStream *_link;
   /// State of the state machine.
   State _state;
   /// Maximum number of retires.

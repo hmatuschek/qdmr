@@ -2,8 +2,8 @@
 #include "logger.hh"
 
 
-XModem::XModem(const USBDeviceDescriptor& descriptor, const ErrorStack& err, QObject *parent)
-  : USBSerial(descriptor, err, parent), _state(State::Init), _maxRetry(10)
+XModem::XModem(OpenRTXLinkStream *link, QObject *parent)
+  : QObject(parent), _link(link), _state(State::Init), _maxRetry(10)
 {
   // pass...
 }
@@ -219,12 +219,9 @@ XModem::send(const QByteArray &buffer, int timeout, const ErrorStack &err) {
 
 bool
 XModem::txByte(uint8_t byte, int timeout, const ErrorStack &err) {
-  if (! putChar((char)byte)) {
-    errMsg(err) << "Cannot send byte: " << this->errorString();
-    return false;
-  }
-  if (! waitForBytesWritten(timeout)) {
-    errMsg(err) << "Write time-out.";
+  Q_UNUSED(timeout)
+  if (1 != _link->write((const char *)&byte, 1)) {
+    errMsg(err) << "Cannot send byte: " << _link->errorString();
     return false;
   }
   return true;
@@ -232,12 +229,12 @@ XModem::txByte(uint8_t byte, int timeout, const ErrorStack &err) {
 
 bool
 XModem::rxByte(uint8_t &byte, int timeout, const ErrorStack &err) {
-  if ((! bytesAvailable()) && (!waitForReadyRead(timeout))) {
+  if ((! _link->bytesAvailable()) && (!_link->waitForReadyRead(timeout))) {
     errMsg(err) << "Read time-out.";
     return false;
   }
-  if (! getChar((char *)&byte)) {
-    errMsg(err) << "Cannot receive byte: " << this->errorString();
+  if (! _link->getChar((char *)&byte)) {
+    errMsg(err) << "Cannot receive byte: " << _link->errorString();
     return false;
   }
   return true;
@@ -246,13 +243,13 @@ XModem::rxByte(uint8_t &byte, int timeout, const ErrorStack &err) {
 bool
 XModem::txBytes(const uint8_t *buffer, unsigned int length, int timeout, const ErrorStack &err) {
   while (length) {
-    qint64 nb_written = QSerialPort::write((const char *)buffer, length);
+    qint64 nb_written = _link->write((const char *)buffer, length);
     if (0 > nb_written) {
-      errMsg(err) << "Cannot write to interface: " << this->errorString();
+      errMsg(err) << "Cannot write to interface: " << _link->errorString();
       return false;
     }
     length -= nb_written;
-    if (! waitForBytesWritten(timeout)) {
+    if (! _link->waitForBytesWritten(timeout)) {
       errMsg(err) << "Read time-out.";
       return false;
     }
@@ -264,13 +261,13 @@ XModem::txBytes(const uint8_t *buffer, unsigned int length, int timeout, const E
 bool
 XModem::rxBytes(uint8_t *buffer, unsigned int length, int timeout, const ErrorStack &err) {
   while (length) {
-    if ((! bytesAvailable()) && (!waitForReadyRead(timeout))) {
+    if ((! _link->bytesAvailable()) && (!_link->waitForReadyRead(timeout))) {
       errMsg(err) << "Read time-out.";
       return false;
     }
-    qint64 nb_read = QSerialPort::read((char *)buffer, length);
+    qint64 nb_read = _link->read((char *)buffer, length);
     if (0 > nb_read) {
-      errMsg(err) << "Cannot read from interface: " << this->errorString();
+      errMsg(err) << "Cannot read from interface: " << _link->errorString();
       return false;
     }
     length -= nb_read;

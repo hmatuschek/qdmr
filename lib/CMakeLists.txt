@@ -26,7 +26,7 @@ SET(libdmrconf_SOURCES
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc gd77_limits.cc
     opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc
     opengd77_callsigndb.cc opengd77_limits.cc
-    openrtx.cc openrtx_interface.cc openrtx_codeplug.cc
+    openrtx.cc openrtx_link.cc openrtx_interface.cc openrtx_codeplug.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc anytone_limits.cc
     d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_limits.cc
     d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
@@ -50,7 +50,7 @@ SET(libdmrconf_MOC_HEADERS
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_limits.hh
     opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh
     opengd77_callsigndb.hh opengd77_limits.hh
-    openrtx.hh openrtx_interface.hh openrtx_codeplug.hh
+    openrtx.hh openrtx_link.hh openrtx_interface.hh openrtx_codeplug.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh anytone_limits.hh
     d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d868uv_limits.hh
     d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
