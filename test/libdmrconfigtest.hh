@@ -19,6 +19,7 @@ protected slots:
 protected:
   Config _basicConfig;
   Config _channelFrequencyConfig;
+  Config _roamingConfig;
 };
 
 #endif // LIBDMRCONFIGTEST_HH

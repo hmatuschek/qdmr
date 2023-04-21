@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundläggande Inställningar</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
@@ -547,13 +547,13 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="259"/>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>DMR</source>
-        <translation type="unfinished"></translation>
-   </message>
+        <translation>DMR</translation>
+    </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
         <location filename="../src/configitemwrapper.cc" line="284"/>
@@ -700,7 +700,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåta</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
@@ -710,7 +710,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Zones</source>
-        <translation type="unfinished">Zoner</translation>
+        <translation>Zoner</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
@@ -796,7 +796,7 @@
         <location filename="../src/configobjectlistview.cc" line="64"/>
         <location filename="../src/configobjectlistview.cc" line="85"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt: Du måste välja minst ett objekt först.</translation>
     </message>
 </context>
 <context>
@@ -805,13 +805,13 @@
         <location filename="../src/configobjecttableview.cc" line="70"/>
         <location filename="../src/configobjecttableview.cc" line="94"/>
         <source>Cannot move items.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="71"/>
         <location filename="../src/configobjecttableview.cc" line="95"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte flytta objekt: Du måste välja minst ett objekt först.</translation>
     </message>
 </context>
 <context>
@@ -819,22 +819,22 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="44"/>
         <source>An instance of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>En förekomst av &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="55"/>
         <source>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
         <source>Create extension object</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa extension object</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj objektklassen som ska skapas</translation>
     </message>
 </context>
 <context>
@@ -842,72 +842,72 @@
     <message>
         <location filename="../src/contactlistview.cc" line="63"/>
         <source>Cannot delete contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="64"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte ta bort kontakt: Du måste först välja en kontakt.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakten &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakter?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort %1 kontakter?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>
         <source>Adds a contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägger till en kontakt i listan.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till kontakt-knappen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
         <source>Add Digital Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till digital kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="41"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="48"/>
         <source>Add DTMF Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till DTMF-kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="55"/>
         <source>Delete contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt-knappen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="58"/>
         <source>Delete Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort kontakt</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="61"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -915,54 +915,54 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="609"/>
         <source>DTMF</source>
-        <translation type="unfinished"></translation>
+        <translation>DTMF</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="615"/>
         <location filename="../src/configitemwrapper.cc" line="634"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Påslagen</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="615"/>
         <location filename="../src/configitemwrapper.cc" line="634"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Avstängd</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat samtal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="625"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppsamtal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="626"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>All Call</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="650"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="652"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="654"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="656"/>
         <source>RX Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>RX-ton</translation>
     </message>
 </context>
 <context>
@@ -970,57 +970,57 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="23"/>
         <source>Create DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa DMR-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="48"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera DMR-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="79"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Privat samtal</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="80"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppsamtal</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="81"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>All Call</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grund inställningar</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="40"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="50"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="60"/>
         <source>Ring</source>
-        <translation type="unfinished"></translation>
+        <translation>Ringa</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="71"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1028,22 +1028,22 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grund inställningar</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="40"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR ID</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="51"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1051,37 +1051,37 @@
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="12"/>
         <source>Create DTMF Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa DTMF-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera DMR-kontakt</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grund inställningar</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="40"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="50"/>
         <source>Ring</source>
-        <translation type="unfinished"></translation>
+        <translation>Ringa</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="61"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1089,12 +1089,12 @@
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="14"/>
         <source>Select a device</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en enhet</translation>
     </message>
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="20"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There is either more than one device detected or the one found is not considered save to access. Either way, select the device to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Antingen har mer än en enhet upptäckts eller så anses den hittade inte vara säkert för åtkomst. Hur som helst, välj vilken enhet du vill använda.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1105,187 +1105,187 @@
         <location filename="../src/digitalchanneldialog.cc" line="82"/>
         <location filename="../src/digitalchanneldialog.cc" line="89"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Ingen]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="90"/>
         <location filename="../src/digitalchanneldialog.cc" line="99"/>
         <source>[Default]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Standard]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="14"/>
         <source>Edit Digital Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera digital kanal</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is send to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Obs!&lt;/span&gt; qdmr tillhandahåller viss autokomplettering för kanaler. Det vill säga, börja skriva anropssignalen för en repeater. Efter att tre tecken har angetts skickas en begäran till repeaterbook.com för att hämta matchande repeatrar. Dessa förfrågningar kan ta lite tid. Resultaten lagras lokalt i en cache.&lt;/p&gt;&lt;p&gt;En rullgardinslista visas där du kan välja en repeater. När en repeater har valts fylls RX/TX-frekvenserna och färgkoden i.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;dölj&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grund inställningar</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">RX-frekvens</translation>
+        <translation>RX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">TX-frekvens</translation>
+        <translation>TX-frekvens</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished">Effekt</translation>
+        <translation>Effekt</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="92"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Timeout</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="99"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Bara RX</translation>
+        <translation>Bara RX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="109"/>
         <source>Scan List</source>
-        <translation type="unfinished">Scan List</translation>
+        <translation>Scan List</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
-        <translation type="unfinished">max.</translation>
+        <translation>max.</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="127"/>
         <source>High</source>
-        <translation type="unfinished">Hög</translation>
+        <translation>Hög</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="132"/>
         <source>Mid</source>
-        <translation type="unfinished">Mitten</translation>
+        <translation>Mitten</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="137"/>
         <source>Low</source>
-        <translation type="unfinished">Lågt</translation>
+        <translation>Lågt</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="142"/>
         <source>Min</source>
-        <translation type="unfinished">Minimalt</translation>
+        <translation>Minimalt</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="150"/>
         <location filename="../src/digitalchanneldialog.ui" line="177"/>
         <location filename="../src/digitalchanneldialog.ui" line="202"/>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="161"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anger sändningstidsgränsen i sekunder. Ett värde på 0 betyder att sändningstidsgränsen är inaktiverad.</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="164"/>
         <location filename="../src/digitalchanneldialog.ui" line="195"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="167"/>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation> sekunder</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="186"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX-nivå</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
-        <translation type="unfinished">TX Admit</translation>
+        <translation>TX Admit</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="223"/>
         <source>Always</source>
-        <translation type="unfinished">Alltid</translation>
+        <translation>Alltid</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Kanal Tillgänglig</translation>
+        <translation>Kanal Tillgänglig</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="233"/>
         <location filename="../src/digitalchanneldialog.ui" line="241"/>
         <source>Color Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Färgkod</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="258"/>
         <source>Time Slot</source>
-        <translation type="unfinished"></translation>
+        <translation>Time Slot</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="266"/>
         <source>TS 1</source>
-        <translation type="unfinished"></translation>
+        <translation>TS 1</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="271"/>
         <source>TS 2</source>
-        <translation type="unfinished"></translation>
+        <translation>TS 2</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="279"/>
         <source>Rx Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupplista</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="289"/>
         <source>Tx Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>TX kontakt</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="299"/>
         <source>Positioning System</source>
-        <translation type="unfinished"></translation>
+        <translation>Positioneringssystem</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="309"/>
         <source>Roaming Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Roamingzon</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="319"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR ID</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="332"/>
         <source>Extended</source>
-        <translation type="unfinished"></translation>
+        <translation>Förlängd</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="335"/>
         <source>Device specific settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhetens specifika inställningar</translation>
     </message>
 </context>
 <context>
@@ -1293,17 +1293,17 @@
     <message>
         <location filename="../src/errormessageview.cc" line="12"/>
         <source>Error: Unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel: Okänt.</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.cc" line="18"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel: %1</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.ui" line="30"/>
         <source>Traceback:</source>
-        <translation type="unfinished"></translation>
+        <translation>Traceback:</translation>
     </message>
 </context>
 <context>
@@ -1311,32 +1311,32 @@
     <message>
         <location filename="../src/extensionview.cc" line="109"/>
         <source>Cannot create extension.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det går inte att skapa tillägg.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="110"/>
         <source>Cannot create extension, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte skapa tillägg, överväg att rapportera ett fel.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="113"/>
         <source>Cannot create list element.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte skapa listelement.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte skapa listelement, överväg att rapportera ett fel.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="32"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bort</translation>
     </message>
 </context>
 <context>
@@ -1344,52 +1344,52 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
         <source>Create DMR APRS Sysmtem</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa ett DMR APRS-system</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
         <source>Edit DMR APRS Sysmtem</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera DMR APRS-system</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Vald]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="14"/>
         <source>Edit GPS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera GPS-system</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Grundläggande</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Namn</translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="43"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Destination</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="50"/>
         <source>Update period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdateringsperiod [s]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="67"/>
         <source>Revert Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Återställ kanal</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="78"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1397,57 +1397,57 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
         <source>DMR Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR-Radio-ID</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="28"/>
         <source>DMR ID</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR ID</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="35"/>
         <source>Radio Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Radions namn</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="42"/>
         <source>Enter your name or callsign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange ditt namn eller anropssignal.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="45"/>
         <source>Name/Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Namn/Anropssignal</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Boot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Startinställningar</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="64"/>
         <source>Intro Line 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro rad 1</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="71"/>
         <source>First greeting line (if supported by the radio).</source>
-        <translation type="unfinished"></translation>
+        <translation>Första hälsningsraden (om det stöds av radion).</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="74"/>
         <source>Intro line 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro rad 1</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="81"/>
         <source>Intro Line 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro rad 2</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="88"/>
         <source>Second greeting line (if supported by the radio).</source>
-        <translation type="unfinished"></translation>
+        <translation>Andra hälsningsraden (om den stöds av radion).</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="94"/>
@@ -1533,7 +1533,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VOX-nivå</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="247"/>
@@ -1585,7 +1585,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
@@ -1595,7 +1595,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1815,7 +1815,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="64"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Välj kanal:</translation>
     </message>
 </context>
 <context>
@@ -1890,7 +1890,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="88"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+A</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="95"/>
@@ -1900,7 +1900,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="98"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1964,7 +1964,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="763"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kanal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="764"/>
@@ -2523,7 +2523,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="62"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="69"/>
@@ -2533,7 +2533,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="72"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
@@ -2604,7 +2604,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="914"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nummer</translation>
     </message>
 </context>
 <context>
@@ -2679,7 +2679,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="50"/>
         <source>Color Code</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Färgkod</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="68"/>
@@ -2737,22 +2737,18 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
+        <source>Delete roaming channel %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
+        <source>Delete %1 roaming channel?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2782,12 +2778,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>TS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CC</translation>
     </message>
 </context>
 <context>
@@ -2856,7 +2852,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="66"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="73"/>
@@ -2866,7 +2862,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="76"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="86"/>
@@ -2929,7 +2925,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="51"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="58"/>
@@ -2944,7 +2940,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="68"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -2988,7 +2984,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="89"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="96"/>
@@ -2998,7 +2994,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="99"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="109"/>
@@ -3069,7 +3065,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="38"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="45"/>
@@ -3079,7 +3075,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="48"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3364,7 +3360,7 @@
     <message>
         <location filename="../src/zonelistview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="42"/>
@@ -3374,7 +3370,7 @@
     <message>
         <location filename="../src/zonelistview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3405,7 +3401,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="46"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kanal</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="56"/>
@@ -3416,7 +3412,7 @@
         <location filename="../src/aprssystemdialog.ui" line="75"/>
         <location filename="../src/aprssystemdialog.ui" line="113"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">-</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="94"/>

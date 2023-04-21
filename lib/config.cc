@@ -111,7 +111,7 @@ Config::toYAML(QTextStream &stream, const ErrorStack &err) {
   // Print YAML
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc << doc << YAML::EndDoc;
-  stream << emitter.c_str();
+  stream << QString(emitter.c_str());
   return true;
 }
 

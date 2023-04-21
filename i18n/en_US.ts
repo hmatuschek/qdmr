@@ -547,12 +547,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="259"/>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>DMR</source>
-        <translation type="unfinished">DMR</translation>
+        <translation>DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
@@ -710,7 +710,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Zones</source>
-        <translation type="unfinished">Zones</translation>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
@@ -2740,23 +2740,19 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
-        <translation>Delete roaming zone?</translation>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
-        <translation>Delete roaming zone &apos;%1&apos;?</translation>
+        <source>Delete roaming channel %1?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation>Delete roaming zones?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
-        <translation>Delete %1 roaming zones?</translation>
+        <source>Delete %1 roaming channel?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
