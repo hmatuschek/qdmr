@@ -3312,7 +3312,7 @@ Dvs en samling kanaler för repeatrar inom en viss region. &lt;/p&gt;
     <message>
         <location filename="../src/zonedialog.ui" line="142"/>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Förlängning</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="28"/>

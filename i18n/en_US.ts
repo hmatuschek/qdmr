@@ -209,46 +209,7 @@
     </message>
 </context>
 <context>
-    <name>AnytoneLimits</name>
-    <message>
-        <location filename="../lib/anytone_limits.cc" line="18"/>
-        <source>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</source>
-        <translation>You are likely using a newer radio reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible. Notify the developers of qdmr about the new reversion.</translation>
-    </message>
-    <message>
-        <location filename="../lib/anytone_limits.cc" line="23"/>
-        <source>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</source>
-        <translation>You are likely using an older hardware reversion (%1) than supported (%2) by qdmr. The codeplug might be incompatible.</translation>
-    </message>
-</context>
-<context>
     <name>Application</name>
-    <message>
-        <location filename="../src/application.cc" line="208"/>
-        <source>Settings</source>
-        <translation>Settings</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="222"/>
-        <location filename="../src/application.cc" line="710"/>
-        <source>Radio IDs</source>
-        <translation>Radio IDs</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="226"/>
-        <source>Contacts</source>
-        <translation>Contacts</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="230"/>
-        <source>Group Lists</source>
-        <translation>Group Lists</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="234"/>
-        <source>Channels</source>
-        <translation>Channels</translation>
-    </message>
     <message>
         <location filename="../src/application.cc" line="238"/>
         <source>Settings</source>
@@ -307,36 +268,12 @@
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="274"/>
-        <location filename="../src/application.cc" line="291"/>
-        <location filename="../src/application.cc" line="392"/>
-        <location filename="../src/application.cc" line="498"/>
+        <location filename="../src/application.cc" line="308"/>
+        <location filename="../src/application.cc" line="325"/>
+        <location filename="../src/application.cc" line="426"/>
+        <location filename="../src/application.cc" line="540"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="275"/>
-        <location filename="../src/application.cc" line="292"/>
-        <location filename="../src/application.cc" line="393"/>
-        <location filename="../src/application.cc" line="499"/>
-        <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="300"/>
-        <source>Open codeplug</source>
-        <translation>Open codeplug</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="302"/>
-        <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="308"/>
-        <location filename="../src/application.cc" line="368"/>
-        <source>Cannot open file</source>
-        <translation>Cannot open file</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="309"/>
@@ -368,22 +305,6 @@
         <location filename="../src/application.cc" line="368"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Cannot read codeplug from file &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="322"/>
-        <location filename="../src/application.cc" line="333"/>
-        <source>Cannot read codeplug.</source>
-        <translation>Cannot read codeplug.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="349"/>
-        <source>Save codeplug</source>
-        <translation>Save codeplug</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="350"/>
-        <source>Codeplug Files (*.yaml *.yml)</source>
-        <translation>Codeplug Files (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="356"/>
@@ -461,57 +382,6 @@
         <translation>No radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="480"/>
-        <source>Verification success</source>
-        <translation>Verification success</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="481"/>
-        <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="517"/>
-        <source>Read ...</source>
-        <translation>Read …</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="527"/>
-        <source>Read error</source>
-        <translation>Read error</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="545"/>
-        <source>Read complete</source>
-        <translation>Read complete</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="582"/>
-        <source>Upload ...</source>
-        <translation>Upload …</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="599"/>
-        <location filename="../src/application.cc" line="609"/>
-        <location filename="../src/application.cc" line="621"/>
-        <source>Cannot write call-sign DB.</source>
-        <translation>Cannot write call-sign DB.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="600"/>
-        <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
-        <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="491"/>
-        <location filename="../src/application.cc" line="507"/>
-        <location filename="../src/application.cc" line="550"/>
-        <location filename="../src/application.cc" line="610"/>
-        <location filename="../src/application.cc" line="644"/>
-        <source>No matching device was found.</source>
-        <translation>No matching device was found.</translation>
-    </message>
-    <message>
         <location filename="../src/application.cc" line="522"/>
         <source>Verification success</source>
         <translation>Verification success</translation>
@@ -519,7 +389,7 @@
     <message>
         <location filename="../src/application.cc" line="523"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
+        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="562"/>
@@ -539,7 +409,7 @@
     <message>
         <location filename="../src/application.cc" line="630"/>
         <source>Upload ...</source>
-        <translation>Write …</translation>
+        <translation>Upload …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="650"/>
@@ -552,6 +422,15 @@
         <location filename="../src/application.cc" line="651"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="491"/>
+        <location filename="../src/application.cc" line="507"/>
+        <location filename="../src/application.cc" line="550"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="644"/>
+        <source>No matching device was found.</source>
+        <translation>No matching device was found.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="661"/>
@@ -582,26 +461,6 @@
         <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias for %2 %3)</translation>
-    </message>
-</context>
-<context>
-    <name>CSVLexer</name>
-    <message>
-        <location filename="../lib/csvreader.cc" line="72"/>
-        <source>Lexer error %1,%2: Unexpected char &apos;%3&apos;.</source>
-        <translation>Lexer error %1,%2: Unexpected char &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
-    <name>CSVReader</name>
-    <message>
-        <location filename="../lib/csvreader.cc" line="1730"/>
-        <source>
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</source>
-        <translation>
-The generic code-plug format might be changed with a new release of qdmr.
-Visit https://github.com/hmatuschek/qdmr/releases for further information.</translation>
     </message>
 </context>
 <context>
@@ -743,12 +602,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>On</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="292"/>
-        <location filename="../src/configitemwrapper.cc" line="298"/>
-        <source>Always</source>
-        <translation>Always</translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
         <location filename="../src/configitemwrapper.cc" line="299"/>
         <source>Always</source>
@@ -756,15 +609,6 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="294"/>
-        <source>Free</source>
-        <translation>Free</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="294"/>
-        <source>Color</source>
-        <translation>Color</translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="300"/>
         <source>Free</source>
         <translation>Free</translation>
@@ -819,104 +663,49 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <translation>Narrow</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="433"/>
+        <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="434"/>
+        <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="435"/>
+        <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="436"/>
+        <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="437"/>
+        <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="438"/>
+        <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>Timeout</source>
         <translation>Timeout</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="439"/>
+        <location filename="../src/configitemwrapper.cc" line="449"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="440"/>
+        <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Admit</source>
         <translation>Admit</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="441"/>
+        <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Scanlist</source>
         <translation>Scanlist</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="442"/>
-        <source>CC</source>
-        <translation>CC</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="443"/>
-        <source>TS</source>
-        <translation>TS</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="444"/>
-        <source>RX Group List</source>
-        <translation>RX Group List</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="445"/>
-        <source>TX Contact</source>
-        <translation>TX Contact</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="446"/>
-        <source>DMR ID</source>
-        <translation>DMR ID</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="447"/>
-        <source>GPS/APRS</source>
-        <translation>GPS/APRS</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="448"/>
-        <source>Roaming</source>
-        <translation>Roaming</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="449"/>
-        <source>Squelch</source>
-        <translation>Squelch</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="450"/>
-        <source>Rx Tone</source>
-        <translation>RX Tone</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="451"/>
-        <source>Tx Tone</source>
-        <translation>TX Tone</translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="452"/>
-        <source>Zones</source>
-        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
@@ -931,7 +720,7 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
     <message>
         <location filename="../src/configitemwrapper.cc" line="455"/>
         <source>RX Group List</source>
-        <translation>Group List</translation>
+        <translation>RX Group List</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="456"/>
@@ -967,6 +756,11 @@ Visit https://github.com/hmatuschek/qdmr/releases for further information.</tran
         <location filename="../src/configitemwrapper.cc" line="462"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="452"/>
+        <source>Zones</source>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="463"/>
