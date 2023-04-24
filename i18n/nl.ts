@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr">
+<TS version="2.1" language="nl">
 <context>
     <name>APRSSystemDialog</name>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
         <source>Create APRS system</source>
-        <translation>Créer un système APRS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="110"/>
         <source>Edit APRS system</source>
-        <translation>Modifier le système APRS</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -20,18 +20,18 @@
         <location filename="../src/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
-        <translation>À propos de qdrm</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
-        <translation>À propos de qdrm</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="76"/>
         <source>Supported Radios</source>
-        <translation>Radios prises en charge</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -40,12 +40,12 @@
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation>[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
         <source>Edit Analog Channel</source>
-        <translation>Modifier le canal analogique</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="23"/>
@@ -60,47 +60,47 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation>Fréquence RX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation>Fréquence TX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation>Énergie</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
-        <translation>Max</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
-        <translation>Haute</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
-        <translation>Moyenne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
-        <translation>Basse</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
-        <translation>Min</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
@@ -108,7 +108,7 @@
         <location filename="../src/analogchanneldialog.ui" line="182"/>
         <location filename="../src/analogchanneldialog.ui" line="311"/>
         <source>Default</source>
-        <translation>Défaut</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
@@ -566,27 +566,27 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="275"/>
         <source>Max</source>
-        <translation type="unfinished">Max</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
         <source>High</source>
-        <translation type="unfinished">Haute</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="277"/>
         <source>Mid</source>
-        <translation type="unfinished">Moyenne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="278"/>
         <source>Low</source>
-        <translation type="unfinished">Basse</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>Min</source>
-        <translation type="unfinished">Min</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="286"/>
@@ -645,7 +645,7 @@
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <location filename="../src/configitemwrapper.cc" line="422"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="395"/>
@@ -670,22 +670,22 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">Fréquence RX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">Fréquence TX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>Power</source>
-        <translation type="unfinished">Énergie</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="448"/>
@@ -952,7 +952,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="652"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="654"/>
@@ -1005,7 +1005,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="40"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="50"/>
@@ -1033,7 +1033,7 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="40"/>
@@ -1066,7 +1066,7 @@
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="40"/>
@@ -1105,7 +1105,7 @@
         <location filename="../src/digitalchanneldialog.cc" line="82"/>
         <location filename="../src/digitalchanneldialog.cc" line="89"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="90"/>
@@ -1131,22 +1131,22 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">Fréquence RX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">Fréquence TX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished">Énergie</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="92"/>
@@ -1166,34 +1166,34 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
-        <translation type="unfinished">Max</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="127"/>
         <source>High</source>
-        <translation type="unfinished">Haute</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="132"/>
         <source>Mid</source>
-        <translation type="unfinished">Moyenne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="137"/>
         <source>Low</source>
-        <translation type="unfinished">Basse</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="142"/>
         <source>Min</source>
-        <translation type="unfinished">Min</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="150"/>
         <location filename="../src/digitalchanneldialog.ui" line="177"/>
         <location filename="../src/digitalchanneldialog.ui" line="202"/>
         <source>Default</source>
-        <translation type="unfinished">Défaut</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="161"/>
@@ -1369,7 +1369,7 @@
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="43"/>
@@ -1477,32 +1477,32 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="150"/>
         <source>Power</source>
-        <translation type="unfinished">Énergie</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="158"/>
         <source>Max</source>
-        <translation type="unfinished">Max</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="163"/>
         <source>High</source>
-        <translation type="unfinished">Haute</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="168"/>
         <source>Mid</source>
-        <translation type="unfinished">Moyenne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="173"/>
         <source>Low</source>
-        <translation type="unfinished">Basse</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="178"/>
         <source>Min</source>
-        <translation type="unfinished">Min</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="186"/>
@@ -1752,7 +1752,7 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="265"/>
         <source>About qdmr</source>
-        <translation type="unfinished">À propos de qdrm</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="277"/>
@@ -1924,7 +1924,7 @@
         <location filename="../src/configitemwrapper.cc" line="724"/>
         <location filename="../src/configitemwrapper.cc" line="743"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="727"/>
@@ -1949,7 +1949,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="760"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="761"/>
@@ -1987,7 +1987,7 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2026,7 +2026,7 @@
         <location filename="../src/extensionwrapper.cc" line="586"/>
         <location filename="../src/extensionwrapper.cc" line="594"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="596"/>
@@ -2045,7 +2045,7 @@
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -2513,7 +2513,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="59"/>
@@ -2599,7 +2599,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="913"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="914"/>
@@ -2659,7 +2659,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="22"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="29"/>
@@ -2763,7 +2763,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="548"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="549"/>
@@ -2776,13 +2776,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
-        <source>TS</source>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
+        <source>CC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="551"/>
-        <source>CC</source>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <source>TS</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2959,7 +2959,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="42"/>
@@ -3010,7 +3010,7 @@
         <location filename="../src/scanlistdialog.cc" line="34"/>
         <location filename="../src/scanlistdialog.cc" line="36"/>
         <source>[None]</source>
-        <translation type="unfinished">[Aucun]</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="35"/>
@@ -3273,7 +3273,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="65"/>
@@ -3396,7 +3396,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="46"/>

@@ -2774,7 +2774,7 @@
         <translation>RX Frequenz</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
@@ -2784,7 +2784,7 @@
         <translation>TX Frequenz</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="551"/>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
