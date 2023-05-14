@@ -1830,7 +1830,7 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
       encode_ascii(name, zone->name(), Limit::zoneNameLength(), 0);
     // Handle list A
     for (int j=0; j<zone->A()->count(); j++) {
-      //channels[j] = qToLittleEndian(ctx.index(zone->A()->get(j)->as<Channel>()));
+      channels[j] = qToLittleEndian(ctx.index(zone->A()->get(j)->as<Channel>()));
     }
 
     if (! encodeZone(zidx, zone, false, flags, ctx, err))
