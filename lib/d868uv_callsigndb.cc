@@ -31,6 +31,12 @@ D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr)
 }
 
 void
+D868UVCallsignDB::EntryElement::clear() {
+  // Clear header and all strings.
+  memset(_data, 0x00, 12);
+}
+
+void
 D868UVCallsignDB::EntryElement::setCallType(DMRContact::Type type) {
   switch (type) {
   case DMRContact::PrivateCall: setUInt8(0x0000, 0); break;
@@ -46,7 +52,7 @@ D868UVCallsignDB::EntryElement::setNumber(unsigned num) {
 
 void
 D868UVCallsignDB::EntryElement::setFriendFlag(bool set) {
-  setBit(0x0005, 3, set);
+  setBit(0x0005, 4, set);
 }
 
 void
@@ -70,6 +76,7 @@ D868UVCallsignDB::EntryElement::setContent(
 
 unsigned
 D868UVCallsignDB::EntryElement::fromUser(const UserDatabase::User &user) {
+  clear();
   setCallType(DMRContact::PrivateCall);
   setNumber(user.id);
   setRingTone(RingTone::Off);
@@ -182,7 +189,7 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, cons
 
   // Allocate index banks
   for (int i=0; 0<indexSize; i++, indexSize-=std::min(indexSize, size_t(IndexBankElement::size()))) {
-    size_t addr = Offset::index() + i*IndexBankElement::size();
+    size_t addr = Offset::index() + i*Offset::betweenIndexBanks();
     size_t size = align_size(std::min(indexSize, size_t(IndexBankElement::size())), 16);
     image(0).addElement(addr, size);
     memset(data(addr), 0xff, size);
@@ -205,7 +212,7 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, cons
     if (IndexBankElement::size() <= index_offset) {
       index_offset = 0; index_bank += 1;
     }
-    IndexEntryElement index(data(Offset::index()+index_bank*IndexBankElement::size()+index_offset));
+    IndexEntryElement index(data(Offset::index()+index_bank*Offset::betweenIndexBanks()+index_offset));
     index.setID(users[i].id, false);
     index.setIndex(entry_offset);
     entry_offset += EntryElement::size(users[i]);

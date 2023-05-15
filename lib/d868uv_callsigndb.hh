@@ -54,6 +54,8 @@ public:
     /** Constructor. */
     explicit EntryElement(uint8_t *ptr);
 
+    void clear();
+
     /** Sets the call type. */
     virtual void setCallType(DMRContact::Type type);
     /** Sets the DMR ID number. */
@@ -162,6 +164,7 @@ public:
 public:
   /** Some limits for the call-sign DB. */
   struct Limit {
+    /// Specifies the max number of entries in the DB.
     static constexpr unsigned int entries() { return 200000; }
   };
 
