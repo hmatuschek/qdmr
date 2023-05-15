@@ -76,6 +76,7 @@ public:
     static unsigned size(const UserDatabase::User &user);
   };
 
+  /** Represents a bank of call-sign DB entries. */
   class EntryBankElement: public Codeplug::Element
   {
   protected:
@@ -99,6 +100,7 @@ public:
    * it maps to the byte offset within the database entries. */
   typedef D868UVCodeplug::ContactMapElement IndexEntryElement;
 
+  /** Represents a bank of index entries. */
   class IndexBankElement: public Codeplug::Element
   {
   protected:

@@ -2,18 +2,6 @@
 #include "utils.hh"
 #include <QtEndian>
 
-/*#define MAX_CALLSIGNS               0x00030d40  // Maximum number of callsings in DB (200k)
-
-#define CALLSIGN_INDEX_BANK0        0x04000000  // Start address of the callsign index table
-#define CALLSIGN_INDEX_BANK_OFFSET  0x00040000  // Offset between index banks
-#define CALLSIGN_INDEX_BANK_SIZE    0x0001f400  // Size of each callsign index bank
-
-#define CALLSIGN_BANK0              0x04500000  // Start address of the actual call sign entries
-#define CALLSIGN_BANK_OFFSET        0x00040000  // Offset between callsign entry bank
-#define CALLSIGN_BANK_SIZE          0x000186a0  // Size of each callsign entry bank
-
-#define CALLSIGN_LIMITS             0x044C0000  // Start address of callsign db limits*/
-
 
 /* ********************************************************************************************* *
  * Implementation of D868UVCallsignDB::EntryElement

@@ -636,6 +636,24 @@ public:
     /** Sets the function for programmable function key D long press. */
     virtual void setProgFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func);
 
+    unsigned int repeaterCheckNumNotifications() const;
+    void setRepeaterCheckNumNotifications(unsigned int num);
+
+    /** Returns the transmit timeout rekey interval in seconds [0,255], 0=Off. */
+    virtual Interval transmitTimeoutRekey() const;
+    /** Sets the transmit timeout rekey interval in seconds [0,255], 0=Off. */
+    virtual void setTransmitTimeoutRekey(Interval dt);
+
+    bool btHoldTimeEnabled() const;
+    bool btHoldTimeInfinite() const;
+    Interval btHoldTime() const;
+    void setBTHoldTime(Interval dt);
+    void setBTHoldTimeInfinite();
+    void disableBTHoldTime();
+
+    Interval btRXDelay() const;
+    void setBTRXDelay(Interval delay);
+
   protected:
     /** Some internal offsets. */
     struct Offset: D878UVCodeplug::GeneralSettingsElement::Offset {
@@ -909,7 +927,8 @@ protected:
 public:
   /** Some limtis for the codeplug. */
   struct Limit: D878UVCodeplug::Limit {
-    static constexpr unsigned int airBandChannels() { return 100; }     ///< Maximum number of air-band channels.
+    /// Maximum number of air-band channels.
+    static constexpr unsigned int airBandChannels() { return 100; }
   };
 
 protected:

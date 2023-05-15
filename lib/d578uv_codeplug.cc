@@ -1463,6 +1463,67 @@ D578UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
   }
 }
 
+unsigned int
+D578UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
+  return getUInt8(Offset::repCheckNumNotify())+1;
+}
+void
+D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
+  n = std::max(1U, std::min(10U, n));
+  setUInt8(Offset::repCheckNumNotify(), n);
+}
+
+Interval
+D578UVCodeplug::GeneralSettingsElement::transmitTimeoutRekey() const {
+  return Interval::fromSeconds(getUInt8(Offset::totRekey()));
+}
+void
+D578UVCodeplug::GeneralSettingsElement::setTransmitTimeoutRekey(Interval dt) {
+  setUInt8(Offset::totRekey(), dt.seconds());
+}
+
+bool
+D578UVCodeplug::GeneralSettingsElement::btHoldTimeEnabled() const {
+  return 0x00 != getUInt8(Offset::btHoldTime());
+}
+bool
+D578UVCodeplug::GeneralSettingsElement::btHoldTimeInfinite() const {
+  return 121U == getUInt8(Offset::btHoldTime());
+}
+Interval
+D578UVCodeplug::GeneralSettingsElement::btHoldTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::btHoldTime()));
+}
+void
+D578UVCodeplug::GeneralSettingsElement::setBTHoldTime(Interval interval) {
+  unsigned int seconds = std::min(120ULL, std::max(1ULL, interval.seconds()));
+  setUInt8(Offset::btHoldTime(), seconds);
+}
+void
+D578UVCodeplug::GeneralSettingsElement::setBTHoldTimeInfinite() {
+  setUInt8(Offset::btHoldTime(), 121);
+}
+void
+D578UVCodeplug::GeneralSettingsElement::disableBTHoldTime() {
+  setUInt8(Offset::btHoldTime(), 0);
+}
+
+Interval
+D578UVCodeplug::GeneralSettingsElement::btRXDelay() const {
+  if (0 == getUInt8(Offset::btRXDelay()))
+    return Interval::fromMilliseconds(30);
+  return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::btRXDelay())+1)*500);
+}
+void
+D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
+  if (500 >= delay.milliseconds()) {
+    setUInt8(Offset::btRXDelay(), 0);
+  } else {
+    unsigned int millis = std::min(5500ULL, std::max(500ULL, delay.milliseconds()));
+    setUInt8(Offset::btRXDelay(), (millis-500)/500);
+  }
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of D578UVCodeplug::HotKeySettingsElement
