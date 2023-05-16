@@ -196,7 +196,7 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_generalsettings.txt */
-  class GeneralSettingsElement: public D868UVCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
   {
   protected:
     /** Device specific key functions. */
@@ -239,139 +239,113 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x00e0; }
 
-    /** Retunrs the color for call-signs. */
+    bool idleChannelTone() const;
+    void enableIdleChannelTone(bool enable);
+
+    bool vfoModeA() const;
+    void enableVFOModeA(bool enable);
+    bool vfoModeB() const;
+    void enableVFOModeB(bool enable);
+
+    bool keyToneEnabled() const;
+    void enableKeyTone(bool enable);
+
+    /** Retunrs @c true, if the selection of a TX contact is enabled. */
+    virtual bool selectTXContactEnabled() const;
+    /** Enables/disables selection of the TX contact. */
+    virtual void enableSelectTXContact(bool enable);
+
+    /** Returns @c true, if a SMS confirmation is send. */
+    virtual bool smsConfirmEnabled() const;
+    /** Enables/disables SMS confirmation. */
+    virtual void enableSMSConfirm(bool enable);
+
     AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
-    /** Sets the color for call-signs. */
     void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the simplex repeater feature is enabled. */
     virtual bool simplexRepeaterEnabled() const;
     /** Enables disables the simplex repeater feature. */
     virtual void enableSimplexRepeater(bool enable);
+
+    Interval gpsRangingInterval() const;
+    void setGPSRangingInterval(Interval sec);
+
     /** Returns @c true if the speaker is switched on during RX in simplex repeater mode,
      * see @c simplexRepeaterEnabled. */
     virtual bool monitorSimplexRepeaterEnabled() const;
     /** Enables/disables the speaker during RX in simplex repeater mode. */
     virtual void enableMonitorSimplexRepeater(bool enable);
+
+    bool displayContact() const;
+    void enableDisplayContact(bool enable);
+
+    bool keyToneLevelAdjustable() const;
+    unsigned keyToneLevel() const;
+    void setKeyToneLevel(unsigned level);
+    void setKeyToneLevelAdjustable();
+
+    bool knobLock() const;
+    void enableKnobLock(bool enable);
+    bool keypadLock() const;
+    void enableKeypadLock(bool enable);
+    bool sidekeysLock() const;
+    void enableSidekeysLock(bool enable);
+    bool keyLockForced() const;
+    void enableKeyLockForced(bool enable);
+
     /** Returns the time-slot in simplex repeater mode. */
     virtual AnytoneSimplexRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
     /** Sets the time-slot in simplex repeater mode. */
     virtual void setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot);
 
-    /** Returns the GPS ranging intervall in seconds. */
-    virtual Interval gpsRangingIntervall() const;
-    /** Sets the GPS ranging intervall in seconds. */
-    virtual void setGPSRangingIntervall(Interval sec);
-    /** Returns @c true if the current contact is shown. */
-    virtual bool currentContactShown() const;
-    /** Shows/hides the current contact. */
-    virtual void showCurrentContact(bool show);
-    /** Key sound volume. Any value from 1-15, 0 means adjustable. */
-    virtual unsigned int keyToneLevel() const;
-    /** Sets the key sound volume. Any value from 1-15, 0 means adjustable. */
-    virtual void setKeyToneLevel(unsigned int vol);
+    bool showLastHeard() const;
+    void enableShowLastHeard(bool enable);
 
-    /** Returns @c true if the "professional key" gets locked too. */
-    virtual bool professionalKeyLock() const;
-    /** Enables/disables professional key lock. */
-    virtual void enableProfessionalKeyLock(bool enable);
-    /** Returns @c true if the side keys gets locked too. */
-    virtual bool sideKeyLock() const;
-    /** Enables/disables side key lock. */
-    virtual void enableSideKeyLock(bool enable);
-    /** Returns @c true if the keyboard gets locked too. */
-    virtual bool keypadLock() const;
-    /** Enables/disables keyboard lock. */
-    virtual void enableKeypadLock(bool enable);
-    /** Returns @c true if the knob gets locked too. */
-    virtual bool knobLock() const;
-    /** Enables/disables knob lock. */
-    virtual void enableKnobLock(bool enable);
+    AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
-    /** Returns @c true if the last call is shown on startup. */
-    virtual bool lastCallShownOnStartup() const;
-    /** Enables/disables showing last call on startup. */
-    virtual void enableShowLastCallOnStartup(bool enable);
+    bool gpsUnitsImperial() const;
+    void enableGPSUnitsImperial(bool enable);
 
-    /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
-    /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format);
+    Frequency autoRepeaterMinFrequencyVHF() const;
+    void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyVHF() const;
+    void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMinFrequencyUHF() const;
+    void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyUHF() const;
+    void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
-    /** Retuns the units used to display distances. */
-    virtual AnytoneSettingsExtension::Units gpsUnits() const;
-    /** Sets the GPS units. */
-    virtual void setGPSUnits(AnytoneSettingsExtension::Units units);
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
+    void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** Returns the VHF frequency range in MHz for the auto-repeater feature.
-     * If a frequency within this range is chosen, the radio will transmit at the specified
-     * offset. */
-    virtual QPair<double,double> vhfAutoRepeaterFrequencyRange() const;
-    /** Sets the VHF auto-repeater frequency range in MHz. */
-    virtual void setVHFAutoRepeaterFrequencyRange(double lower, double upper);
-    /** Returns the UHF frequency range in MHz for the auto-repeater feature.
-     * If a frequency within this range is chosen, the radio will transmit at the specified
-     * offset. */
-    virtual QPair<double,double> uhfAutoRepeaterFrequencyRange() const;
-    /** Sets the UHF auto-repeater frequency range in MHz. */
-    virtual void setUHFAutoRepeaterFrequencyRange(double lower, double upper);
-    /** Returns auto-repeater direction for VFO B. */
-    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
-    /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    bool fmSendIDAndContact() const;
+    void enableFMSendIDAndContact(bool enable);
 
-    /** Returns @c true if the address book is send with its own code (WTF?). */
-    virtual bool addressBookIsSendWithOwnCode() const;
-    /** Enables/disables sending address book with own code. */
-    virtual void enableSendAddressbookWithOwnCode(bool enable);
-
-    /** Returns @c true if a default boot channel is enabled. */
     bool defaultChannel() const;
-    /** Enables/disables default boot channel. */
     void enableDefaultChannel(bool enable);
-    /** Returns the zone of the boot channel for VFO A. */
-    unsigned int defaultZoneIndexA() const;
-    /** Sets the index of the zone of the boot channel for VFO A. */
-    void setDefaultZoneIndexA(unsigned int index);
-    /** Returns @c true if the boot channel for VFO A is the VFO. */
+    unsigned defaultZoneIndexA() const;
+    void setDefaultZoneIndexA(unsigned idx);
+    unsigned defaultZoneIndexB() const;
+    void setDefaultZoneIndexB(unsigned idx);
     bool defaultChannelAIsVFO() const;
-    /** Returns the index of the boot channel for VFO A. */
-    unsigned int defaultChannelAIndex() const;
-    /** Sets the boot channel index for VFO A. */
-    void setDefaultChannelAIndex(unsigned int index);
-    /** Sets the boot channel for VFO A to VFO. */
+    unsigned defaultChannelAIndex() const;
+    void setDefaultChannelAIndex(unsigned idx);
     void setDefaultChannelAToVFO();
-    /** Returns the zone of the boot channel for VFO B. */
-    unsigned int defaultZoneIndexB() const;
-    /** Sets the index of the zone of the boot channel for VFO B. */
-    void setDefaultZoneIndexB(unsigned int index);
-    /** Returns @c true if the boot channel for VFO B is the VFO. */
     bool defaultChannelBIsVFO() const;
-    /** Returns the index of the boot channel for VFO B. */
-    unsigned int defaultChannelBIndex() const;
-    /** Sets the boot channel index for VFO B. */
-    void setDefaultChannelBIndex(unsigned int index);
-    /** Sets the boot channel for VFO B to VFO. */
+    unsigned defaultChannelBIndex() const;
+    void setDefaultChannelBIndex(unsigned idx);
     void setDefaultChannelBToVFO();
 
-    /** Returns @c true if the last caller is kept. */
-    virtual bool lastCallerIsKept() const;
-    /** Enables/disables if last caller is kept. */
-    virtual void enableKeepLastCaller(bool enable);
+    bool keepLastCaller() const;
+    void enableKeepLastCaller(bool enable);
 
-    /** Returns true if the RX backlight stays on infinitely. */
-    virtual bool rxBacklightIsAlwaysOn() const;
-    /** Returns the duration of the RX backlight in seconds (max 30s). */
-    virtual Interval rxBacklightDuration() const;
-    /** Sets the RX backlight duration in seconds (max 30s). */
-    virtual void setRXBacklightDuration(Interval dur);
-    /** Enables the RX backlight to stay on infinitely. */
-    virtual void setRXBacklightAlwaysOn();
+    Interval rxBacklightDuration() const;
+    void setRXBacklightDuration(Interval sec);
 
-    /** Returns the background color. */
-    virtual BackgroundColor backgroundColor() const;
-    /** Sets the background color. */
-    virtual void setBackgroundColor(BackgroundColor color);
+    AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
+    void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns the group-call hang time, if group call was dialed manually. */
     virtual unsigned int manualDialedGroupCallHangTime() const;
@@ -382,16 +356,105 @@ public:
     /** Sets the private-call hang time, if the private call was dialed maually. */
     virtual void setManualDialedPrivateCallHangTime(unsigned int dur);
 
-    /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
-    /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx);
+    // The following elements are not present in the DMR-6X2UV codeplug.
+    bool bluetooth() const;
+    void enableBluetooth(bool enable);
+    bool btAndInternalMic() const;
+    void enableBTAndInternalMic(bool enable);
+    bool btAndInternalSpeaker() const;
+    void enableBTAndInternalSpeaker(bool enable);
+    bool pluginRecTone() const;
+    void enablePluginRecTone(bool enable);
+    unsigned int btMicGain() const;
+    void setBTMicGain(unsigned int gain);
+    unsigned int btSpeakerGain() const;
+    void setBTSpeakerGain(unsigned int gain);
+    Interval autoRoamPeriod() const;
+    void setAutoRoamPeriod(Interval min);
+    Interval autoRoamDelay() const;
+    void setAutoRoamDelay(Interval sec);
+    AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
+    void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
+    unsigned defaultRoamingZoneIndex() const;
+    void setDefaultRoamingZoneIndex(unsigned idx);
+    bool repeaterRangeCheck() const;
+    void enableRepeaterRangeCheck(bool enable);
+    Interval repeaterRangeCheckInterval() const;
+    void setRepeaterRangeCheckInterval(Interval sec);
+    unsigned repeaterRangeCheckCount() const;
+    void setRepeaterRangeCheckCount(unsigned n);
+    AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
+    void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
+    Interval txBacklightDuration() const;
+    void setTXBacklightDuration(Interval sec);
+    bool separateDisplay() const;
+    void enableSeparateDisplay(bool enable);
+    AnytoneDisplaySettingsExtension::Color channelNameColor() const;
+    void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
+    bool repeaterCheckNotification() const;
+    void enableRepeaterCheckNotification(bool enable);
+    virtual bool roaming() const;
+    virtual void enableRoaming(bool enable);
+    virtual Interval muteDelay() const;
+    virtual void setMuteDelay(Interval min);
+    virtual unsigned repeaterCheckNumNotifications() const;
+    virtual void setRepeaterCheckNumNotifications(unsigned num);
+    virtual bool bootGPSCheck() const;
+    virtual void enableBootGPSCheck(bool enable);
+    virtual bool bootReset() const;
+    virtual void enableBootReset(bool enable);
+    virtual bool btHoldTimeEnabled() const;
+    virtual bool btHoldTimeInfinite() const;
+    virtual Interval btHoldTime() const;
+    virtual void setBTHoldTime(Interval interval);
+    virtual void setBTHoldTimeInfinite();
+    virtual void disableBTHoldTime();
+    virtual Interval btRXDelay() const;
+    virtual void setBTRXDelay(Interval delay);
+
+    bool fromConfig(const Flags &flags, Context &ctx);
+    bool updateConfig(Context &ctx);
 
   protected:
     /** Some internal used offsets within the element. */
     struct Offset: public D868UVCodeplug::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int keyToneLevel() { return 0x0036; }   ///< Swapped w.r.t. D868?!?
+      static constexpr unsigned int idleChannelTone()     { return 0x0000; }
+      static constexpr unsigned int vfoModeB()            { return 0x0015; }
+      static constexpr unsigned int vfoModeA()            { return 0x0016; }
+      static constexpr unsigned int enableKeyTone()       { return 0x0036; }
+      static constexpr unsigned int selectTXContact()     { return 0x0040; }
+      static constexpr unsigned int smsConfirm()          { return 0x0071; }
+      static constexpr unsigned int callColor()           { return 0x00b0; }
+      static constexpr unsigned int simplexRepEnable()    { return 0x00b1; }
+      static constexpr unsigned int gpsRangingInterval()  { return 0x00b2; }
+      static constexpr unsigned int simplxRepSpeaker()    { return 0x00b3; }
+      static constexpr unsigned int showContact()         { return 0x00b4; }
+      static constexpr unsigned int keyToneLevel()        { return 0x00b5; }
+      static constexpr unsigned int knobLock()            { return 0x00b6; }
+      static constexpr unsigned int keypadLock()          { return 0x00b6; }
+      static constexpr unsigned int sideKeyLock()         { return 0x00b6; }
+      static constexpr unsigned int forceKeyLock()        { return 0x00b6; }
+      static constexpr unsigned int simplxRepSlot()       { return 0x00b7; }
+      static constexpr unsigned int showLastHeard()       { return 0x00b8; }
+      static constexpr unsigned int smsFormat()           { return 0x00b9; }
+      static constexpr unsigned int gpsUnits()            { return 0x00ba; }
+      static constexpr unsigned int autoRepMinVHF()       { return 0x00bc; }
+      static constexpr unsigned int autoRepMaxVHF()       { return 0x00c0; }
+      static constexpr unsigned int autoRepMinUHF()       { return 0x00c4; }
+      static constexpr unsigned int autoRepMaxUHF()       { return 0x00c8; }
+      static constexpr unsigned int autoRepeaterDirB()    { return 0x00cc; }
+      static constexpr unsigned int fmSendIDAndContact()  { return 0x00cd; }
+      static constexpr unsigned int defaultChannels()     { return 0x00ce; }
+      static constexpr unsigned int defaultZoneA()        { return 0x00cf; }
+      static constexpr unsigned int defaultZoneB()        { return 0x00d0; }
+      static constexpr unsigned int defaultChannelA()     { return 0x00d1; }
+      static constexpr unsigned int defaultChannelB()     { return 0x00d2; }
+      static constexpr unsigned int keepLastCaller()      { return 0x00d3; }
+      static constexpr unsigned int rxBacklightDuration() { return 0x00d4; }
+      static constexpr unsigned int standbyBackground()   { return 0x00d5; }
+      static constexpr unsigned int manGrpCallHangTime()  { return 0x00d6; }
+      static constexpr unsigned int manPrvCallHangTime()  { return 0x00d7; }
       /// @endcond
     };
 
