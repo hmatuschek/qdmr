@@ -1036,6 +1036,11 @@ public:
     /** Clears the auto-repeater offset frequency index for VHF. */
     virtual void clearAutoRepeaterOffsetFrequencyIndexVHF() = 0;
 
+    /** Returns @c true if the current contact is shown. */
+    virtual bool showCurrentContact() const = 0;
+    /** Enables/disables display of current contact. */
+    virtual void enableShowCurrentContact(bool enable) = 0;
+
     /** Returns the call-tone melody. */
     virtual void callToneMelody(Melody &melody) const = 0;
     /** Sets the call-tone melody. */

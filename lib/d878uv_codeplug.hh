@@ -536,9 +536,6 @@ public:
     /** Enables/disables bluetooth. */
     virtual void enableBluetooth(bool enable);
 
-    bool showZoneAndContact() const;
-    void enableShowZoneAndContact(bool enable);
-
     /** Returns @c true if the internal mic is addionally active when BT is active. */
     virtual bool btAndInternalMic() const;
     /** Enables/disables the internal mic when BT is active. */
@@ -573,10 +570,8 @@ public:
     /** Enables/disables display of channel number. */
     virtual void enableDisplayChannelNumber(bool enable);
 
-    /** Returns @c true if the contact is displayed. */
-    virtual bool displayContact() const;
-    /** Enables/disables display of contact. */
-    virtual void enableDisplayContact(bool enable);
+    bool showCurrentContact() const;
+    void enableShowCurrentContact(bool enable);
 
     /** Returns the auto roaming period in minutes. */
     virtual Interval autoRoamPeriod() const;
@@ -806,7 +801,7 @@ public:
       static constexpr unsigned int btMicGain()           { return 0x00b6; }
       static constexpr unsigned int btSpeakerGain()       { return 0x00b7; }
       static constexpr unsigned int showChannelNumber()   { return 0x00b8; }
-      static constexpr unsigned int showContact()         { return 0x00b9; }
+      static constexpr unsigned int showCurrentContact()  { return 0x00b9; }
       static constexpr unsigned int autoRoamPeriod()      { return 0x00ba; }
       static constexpr unsigned int keyToneLevel()        { return 0x00bb; }
       static constexpr unsigned int callColor()           { return 0x00bc; }

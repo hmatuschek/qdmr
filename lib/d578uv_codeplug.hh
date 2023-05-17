@@ -490,8 +490,8 @@ public:
     bool displayChannelNumber() const;
     void enableDisplayChannelNumber(bool enable);
 
-    bool displayContact() const;
-    void enableDisplayContact(bool enable);
+    bool showCurrentContact() const;
+    void enableShowCurrentContact(bool enable);
 
     Interval autoRoamPeriod() const;
     void setAutoRoamPeriod(Interval min);
@@ -740,7 +740,7 @@ public:
       static constexpr unsigned int btMicGain()           { return 0x00a9; }
       static constexpr unsigned int btSpeakerGain()       { return 0x00aa; }
       static constexpr unsigned int showChannelNumber()   { return 0x00ab; }
-      static constexpr unsigned int showContact()         { return 0x00ac; }
+      static constexpr unsigned int showCurrentContact()         { return 0x00ac; }
       static constexpr unsigned int autoRoamPeriod()      { return 0x00ad; }
       static constexpr unsigned int callColor()           { return 0x00ae; }
       static constexpr unsigned int gpsUnits()            { return 0x00af; }

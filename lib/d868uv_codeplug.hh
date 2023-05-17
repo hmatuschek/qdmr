@@ -463,10 +463,9 @@ public:
     Frequency autoRepeaterMaxFrequencyUHF() const;
     void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
-    /** Returns @c true if the zone and contact are shown. */
-    virtual bool showZoneAndContact() const;
-    /** Enables/disables @c true the zone and contact display. */
-    virtual void enableShowZoneAndContact(bool enable);
+    bool showCurrentContact() const;
+    void enableShowCurrentContact(bool enable);
+
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
     /** Returns the key-tone level (0=adjustable). */
@@ -580,7 +579,7 @@ public:
       static constexpr unsigned int callDisplayMode()   { return 0x00af; }
       static constexpr unsigned int callColor()         { return 0x00b0; }
       static constexpr unsigned int gpsPeriod()         { return 0x00b1; }
-      static constexpr unsigned int showZoneAndContact(){ return 0x00b2; }
+      static constexpr unsigned int showCurrentContact(){ return 0x00b2; }
       static constexpr unsigned int keyToneLevel()      { return 0x00b3; }
       static constexpr unsigned int gpsUnits()          { return 0x00b4; }
       static constexpr unsigned int knobLock()          { return 0x00b5; }

@@ -883,12 +883,12 @@ D578UVCodeplug::GeneralSettingsElement::enableDisplayChannelNumber(bool enable) 
 }
 
 bool
-D578UVCodeplug::GeneralSettingsElement::displayContact() const {
-  return getUInt8(Offset::showContact());
+D578UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
+  return getUInt8(Offset::showCurrentContact());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
-  setUInt8(Offset::showContact(), (enable ? 0x01 : 0x00));
+D578UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
+  setUInt8(Offset::showCurrentContact(), (enable ? 0x01 : 0x00));
 }
 
 Interval

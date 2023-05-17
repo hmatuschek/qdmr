@@ -182,11 +182,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorSimplexRepeater(bool enab
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::displayContact() const {
+DMR6X2UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
   return getUInt8(Offset::showContact());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
+DMR6X2UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
   setUInt8(Offset::showContact(), (enable ? 0x01 : 0x00));
 }
 

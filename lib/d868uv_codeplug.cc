@@ -838,12 +838,12 @@ D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval sec) {
 }
 
 bool
-D868UVCodeplug::GeneralSettingsElement::showZoneAndContact() const {
-  return getUInt8(Offset::showZoneAndContact());
+D868UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
+  return getUInt8(Offset::showCurrentContact());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
-  setUInt8(Offset::showZoneAndContact(), (enable ? 0x01 : 0x00));
+D868UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
+  setUInt8(Offset::showCurrentContact(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -1058,7 +1058,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
     // Encode display settings
     setRXBacklightDuration(ext->displaySettings()->backlightDuration());
-    enableShowZoneAndContact(ext->displaySettings()->showZoneAndContactEnabled());
+    enableShowCurrentContact(ext->displaySettings()->showZoneAndContactEnabled());
   }
 
   return true;
@@ -1098,7 +1098,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 
   // Decode display settings
-  ext->displaySettings()->enableShowZoneAndContact(this->showZoneAndContact());
+  ext->displaySettings()->enableShowZoneAndContact(this->showCurrentContact());
   ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
 
   return true;

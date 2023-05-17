@@ -277,8 +277,8 @@ public:
     /** Enables/disables the speaker during RX in simplex repeater mode. */
     virtual void enableMonitorSimplexRepeater(bool enable);
 
-    bool displayContact() const;
-    void enableDisplayContact(bool enable);
+    bool showCurrentContact() const;
+    void enableShowCurrentContact(bool enable);
 
     bool keyToneLevelAdjustable() const;
     unsigned keyToneLevel() const;

@@ -830,17 +830,6 @@ D878UVCodeplug::GeneralSettingsElement::enableBluetooth(bool enable) {
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::showZoneAndContact() const {
-  // Not used.
-  return false;
-}
-void
-D878UVCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
-  Q_UNUSED(enable);
-  // Not used.
-}
-
-bool
 D878UVCodeplug::GeneralSettingsElement::btAndInternalMic() const {
   return 0 != getUInt8(Offset::btAndInternalMic());
 }
@@ -906,12 +895,12 @@ D878UVCodeplug::GeneralSettingsElement::enableDisplayChannelNumber(bool enable) 
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::displayContact() const {
-  return getUInt8(Offset::showContact());
+D878UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
+  return getUInt8(Offset::showCurrentContact());
 }
 void
-D878UVCodeplug::GeneralSettingsElement::enableDisplayContact(bool enable) {
-  setUInt8(Offset::showContact(), (enable ? 0x01 : 0x00));
+D878UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
+  setUInt8(Offset::showCurrentContact(), (enable ? 0x01 : 0x00));
 }
 
 Interval
@@ -1380,7 +1369,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setCallDisplayColor(ext->displaySettings()->callColor());
   setLanguage(ext->displaySettings()->language());
   enableDisplayChannelNumber(ext->displaySettings()->showChannelNumberEnabled());
-  enableDisplayContact(ext->displaySettings()->showContactEnabled());
+  enableShowCurrentContact(ext->displaySettings()->showContactEnabled());
   setStandbyTextColor(ext->displaySettings()->standbyTextColor());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
   setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
@@ -1470,7 +1459,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->setCallColor(this->callDisplayColor());
   ext->displaySettings()->setLanguage(this->language());
   ext->displaySettings()->enableShowChannelNumber(this->displayChannelNumber());
-  ext->displaySettings()->enableShowContact(this->displayContact());
+  ext->displaySettings()->enableShowContact(this->showCurrentContact());
   ext->displaySettings()->setStandbyTextColor(this->standbyTextColor());
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
