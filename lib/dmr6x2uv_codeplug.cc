@@ -42,13 +42,13 @@
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : D878UVCodeplug::GeneralSettingsElement(ptr, size)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : D878UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
+  : D868UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
@@ -715,22 +715,84 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedPrivateCallHangTime(uns
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx)
 {
-  if (! D878UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
   // apply DMR-6X2UV specific settings.
-  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
-    // Apply simplex repeater settings
-    enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
-    enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
-    setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
-  }
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  // Encode boot settings
+  if (ext->bootSettings()->priorityZoneA()->isNull())
+    setPriorityZoneAIndex(0xff);
+  else
+    setPriorityZoneAIndex(ctx.index(ext->bootSettings()->priorityZoneA()->as<Zone>()));
+  if (ext->bootSettings()->priorityZoneB()->isNull())
+    setPriorityZoneBIndex(0xff);
+  else
+    setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
+
+  // Encode key settings
+  enableKnobLock(ext->keySettings()->knobLockEnabled());
+  enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+  enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+  enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
+  // Encode tone settings
+  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+  // Encode display settings
+  setCallDisplayColor(ext->displaySettings()->callColor());
+  setLanguage(ext->displaySettings()->language());
+  enableShowCurrentContact(ext->displaySettings()->showContactEnabled());
+  enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
+  setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
+
+  // Encode auto-repeater settings
+  setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+  setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+  setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+  setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+  setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+  // Encode DMR settings
+  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
+  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
+  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
+  setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
+  enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
+  setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
+  enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
+  enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
+  enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
+  setSMSFormat(ext->dmrSettings()->smsFormat());
+
+  // Encode ranging/roaming settings.
+  enableGPSMessage(ext->rangingSettings()->gpsRangeReportingEnabled());
+  setGPSUpdatePeriod(ext->rangingSettings()->gpsRangingInterval());
+
+  // Encode other settings
+  enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
+  enableKeepLastCaller(ext->keepLastCallerEnabled());
+  setVFOFrequencyStep(ext->vfoStep());
+  setSTEType(ext->steType());
+  setSTEFrequency(ext->steFrequency());
+  setTBSTFrequency(ext->tbstFrequency());
+  enableProMode(ext->proModeEnabled());
+  enableMaintainCallChannel(ext->maintainCallChannelEnabled());
+
+  // Apply simplex repeater settings
+  enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
+  enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
+  setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
+
   return true;
 }
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! D878UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
 
   // Get or add settings extension
@@ -741,6 +803,57 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Decode key settings
+  ext->keySettings()->enableKnobLock(this->knobLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
+  ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
+
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Decode display settings
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+  ext->displaySettings()->setLanguage(this->language());
+  ext->displaySettings()->enableShowContact(this->showCurrentContact());
+  ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
+  ext->displaySettings()->setBacklightDurationRX(this->rxBacklightDuration());
+
+  // Decode auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
+
+  // Encode dmr settings
+  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
+  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
+  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
+  ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
+  ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
+  ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
+  ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
+  ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
+  ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
+  ext->dmrSettings()->setSMSFormat(this->smsFormat());
+
+  // Encode ranging/roaming settings
+  ext->rangingSettings()->enableGPSRangeReporting(this->gpsMessageEnabled());
+  ext->rangingSettings()->setGPSRangingInterval(this->gpsUpdatePeriod());
+
+  // Decode other settings
+  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
+                                           AnytoneSettingsExtension::Units::Metric);
+  ext->enableKeepLastCaller(this->keepLastCaller());
+  ext->setVFOStep(this->vfoFrequencyStep());
+  ext->setSTEType(this->steType());
+  ext->setSTEFrequency(this->steFrequency());
+  ext->setTBSTFrequency(this->tbstFrequency());
+  ext->enableProMode(this->proMode());
+  ext->enableMaintainCallChannel(this->maintainCallChannel());
+
   // Decode simplex-repeater feature.
   ext->simplexRepeaterSettings()->enable(this->simplexRepeaterEnabled());
   ext->simplexRepeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());

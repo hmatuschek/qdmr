@@ -196,7 +196,7 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_generalsettings.txt */
-  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public D868UVCodeplug::GeneralSettingsElement
   {
   protected:
     /** Device specific key functions. */
@@ -215,6 +215,33 @@ public:
 
     AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
     uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
+
+    /** Possible VFO frequency steps. */
+    enum FreqStep {
+      FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
+      FREQ_STEP_5kHz = 1,               ///< 5kHz
+      FREQ_STEP_6_25kHz = 2,            ///< 6.25kHz
+      FREQ_STEP_10kHz = 3,              ///< 10kHz
+      FREQ_STEP_12_5kHz = 4,            ///< 12.5kHz
+      FREQ_STEP_20kHz = 5,              ///< 20kHz
+      FREQ_STEP_25kHz = 6,              ///< 25kHz
+      FREQ_STEP_50kHz = 7               ///< 50kHz
+    };
+
+    /** DTMF signalling durations. */
+    enum DTMFDuration {
+      DTMF_DUR_50ms = 0, DTMF_DUR_100ms = 1, DTMF_DUR_200ms = 2, DTMF_DUR_300ms = 3, DTMF_DUR_500ms = 4
+    };
+
+    /** TBST (open repeater) frequencies. */
+    enum class TBSTFrequency {
+      Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
+    };
+
+    /** All possible STE (squelch tail eliminate) frequencies. */
+    enum class STEFrequency {
+      Off = 0, Hz55_2  = 1, Hz259_2 = 2
+    };
 
   public:
     /** Possible colors for the callsign etc. */
