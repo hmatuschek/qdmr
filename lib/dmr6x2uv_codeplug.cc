@@ -62,6 +62,59 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
   return setUInt8(Offset::idleChannelTone(), (enable ? 0x01 : 0x00));
 }
 
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
+  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
+  setUInt8(Offset::transmitTimeout(), tot/30);
+}
+
+AnytoneDisplaySettingsExtension::Language
+DMR6X2UVCodeplug::GeneralSettingsElement::language() const {
+  return (AnytoneDisplaySettingsExtension::Language)getUInt8(Offset::language());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtension::Language lang) {
+  setUInt8(Offset::language(), (unsigned)lang);
+}
+
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
+  switch (getUInt8(Offset::vfoFrequencyStep())) {
+  case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
+  case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
+  case FREQ_STEP_6_25kHz: return Frequency::fromkHz(6.25);
+  case FREQ_STEP_10kHz: return Frequency::fromkHz(10);
+  case FREQ_STEP_12_5kHz: return Frequency::fromkHz(12.5);
+  case FREQ_STEP_20kHz: return Frequency::fromkHz(20);
+  case FREQ_STEP_25kHz: return Frequency::fromkHz(25);
+  case FREQ_STEP_50kHz: return Frequency::fromkHz(50);
+  }
+  return Frequency::fromkHz(2.5);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
+  if (freq.inkHz() <= 2.5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_2_5kHz);
+  else if (freq.inkHz() <= 5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_5kHz);
+  else if (freq.inkHz() <= 6.25)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_6_25kHz);
+  else if (freq.inkHz() <= 10)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_10kHz);
+  else if (freq.inkHz() <= 12.5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_12_5kHz);
+  else if (freq.inkHz() <= 20)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_20kHz);
+  else if (freq.inkHz() <= 25)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_25kHz);
+  else
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_50kHz);
+}
+
+
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::vfoModeA() const {
   return getUInt8(Offset::vfoModeA());
@@ -80,6 +133,171 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
   setUInt8(Offset::vfoModeB(), (enable ? 0x01 : 0x00));
 }
 
+AnytoneSettingsExtension::STEType
+DMR6X2UVCodeplug::GeneralSettingsElement::steType() const {
+  return (AnytoneSettingsExtension::STEType)getUInt8(Offset::steType());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setSTEType(AnytoneSettingsExtension::STEType type) {
+  setUInt8(Offset::steType(), (unsigned)type);
+}
+double
+DMR6X2UVCodeplug::GeneralSettingsElement::steFrequency() const {
+  switch ((STEFrequency)getUInt8(Offset::steFrequency())) {
+  case STEFrequency::Off: return 0;
+  case STEFrequency::Hz55_2: return 55.2;
+  case STEFrequency::Hz259_2: return 259.2;
+  }
+  return 0;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setSTEFrequency(double freq) {
+  if (0 >= freq) {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Off);
+  } else if (100 > freq) {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Hz55_2);
+  } else {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Hz259_2);
+  }
+}
+
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::groupCallHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::groupCallHangTime()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(Interval intv) {
+  setUInt8(Offset::groupCallHangTime(), intv.seconds());
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::privateCallHangTime()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(Interval intv) {
+  setUInt8(Offset::privateCallHangTime(), intv.seconds());
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
+  return Interval::fromMilliseconds((unsigned)getUInt8(Offset::preWaveDelay())*20);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPreWaveDelay(Interval intv) {
+  setUInt8(Offset::preWaveDelay(), intv.milliseconds()/20);
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::wakeHeadPeriod()))*20);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(Interval intv) {
+  setUInt8(Offset::wakeHeadPeriod(), intv.milliseconds()/20);
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmChannelIndex() const {
+  return getUInt8(Offset::wfmChannelIndex());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(unsigned idx) {
+  setUInt8(Offset::wfmChannelIndex(), idx);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmVFOEnabled() const {
+  return getUInt8(Offset::wfmVFOEnabled());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableWFMVFO(bool enable) {
+  setUInt8(Offset::wfmVFOEnabled(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
+  switch (getUInt8(Offset::dtmfToneDuration())) {
+  case DTMF_DUR_50ms:  return 50;
+  case DTMF_DUR_100ms: return 100;
+  case DTMF_DUR_200ms: return 200;
+  case DTMF_DUR_300ms: return 300;
+  case DTMF_DUR_500ms: return 500;
+  }
+  return 50;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setDTMFToneDuration(unsigned ms) {
+  if (ms<=50) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_50ms);
+  } else if (ms<=100) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_100ms);
+  } else if (ms<=200) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_200ms);
+  } else if (ms<=300) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_300ms);
+  } else {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_500ms);
+  }
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::manDown() const {
+  return getUInt8(Offset::manDown());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableManDown(bool enable) {
+  setUInt8(Offset::manDown(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmMonitor() const {
+  return getUInt8(Offset::wfmMonitor());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
+  setUInt8(Offset::wfmMonitor(), (enable ? 0x01 : 0x00));
+}
+
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+  switch ((TBSTFrequency)getUInt8(Offset::tbstFrequency())) {
+  case TBSTFrequency::Hz1000: return Frequency::fromHz(1000);
+  case TBSTFrequency::Hz1450: return Frequency::fromHz(1450);
+  case TBSTFrequency::Hz1750: return Frequency::fromHz(1750);
+  case TBSTFrequency::Hz2100: return Frequency::fromHz(2100);
+  }
+  return Frequency::fromHz(1750);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setTBSTFrequency(Frequency freq) {
+  if (1000 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1000);
+  } else if (1450 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1450);
+  } else if (1750 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1750);
+  } else if (2100 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz2100);
+  } else {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1750);
+  }
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::proMode() const {
+  return getUInt8(Offset::proMode());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableProMode(bool enable) {
+  setUInt8(Offset::proMode(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::filterOwnID() const {
+  return getUInt8(Offset::filterOwnID());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableFilterOwnID(bool enable) {
+  setUInt8(Offset::filterOwnID(), (enable ? 0x01 : 0x00));
+}
+
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
   return 0x00 != getUInt8(Offset::enableKeyTone());
@@ -87,6 +305,24 @@ DMR6X2UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::remoteStunKill() const {
+  return getUInt8(Offset::remoteStunKill());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableRemoteStunKill(bool enable) {
+  setUInt8(Offset::remoteStunKill(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::remoteMonitor() const {
+  return getUInt8(Offset::remoteMonitor());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableRemoteMonitor(bool enable) {
+  setUInt8(Offset::remoteMonitor(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -98,6 +334,95 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableSelectTXContact(bool enable) {
   setUInt8(Offset::selectTXContact(), enable ? 0x01 : 0x00);
 }
 
+AnytoneDMRSettingsExtension::SlotMatch
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorSlotMatch() const {
+  return (AnytoneDMRSettingsExtension::SlotMatch)getUInt8(Offset::monSlotMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match) {
+  setUInt8(Offset::monSlotMatch(), (unsigned)match);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorColorCodeMatch() const {
+  return getUInt8(Offset::monColorCodeMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorColorCodeMatch(bool enable) {
+  setUInt8(Offset::monColorCodeMatch(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorIDMatch() const {
+  return getUInt8(Offset::monIDMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorIDMatch(bool enable) {
+  setUInt8(Offset::monIDMatch(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorTimeSlotHold() const {
+  return getUInt8(Offset::monTimeSlotHold());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorTimeSlotHold(bool enable) {
+  setUInt8(Offset::monTimeSlotHold(), (enable ? 0x01 : 0x00));
+}
+
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::manDownDelay() const {
+  return Interval::fromSeconds(getUInt8(Offset::manDownDelay()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setManDownDelay(Interval sec) {
+  setUInt8(Offset::manDownDelay(), sec.seconds());
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::fmCallHold() const {
+  return getUInt8(Offset::fmCallHold());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFMCallHold(unsigned sec) {
+  setUInt8(Offset::fmCallHold(), sec);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::gpsMessageEnabled() const {
+  return getUInt8(Offset::enableGPSMessage());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableGPSMessage(bool enable) {
+  setUInt8(Offset::enableGPSMessage(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::maintainCallChannel() const {
+  return getUInt8(Offset::maintainCallChannel());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMaintainCallChannel(bool enable) {
+  setUInt8(Offset::maintainCallChannel(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::priorityZoneAIndex() const {
+  return getUInt8(Offset::priorityZoneA());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPriorityZoneAIndex(unsigned idx) {
+  setUInt8(Offset::priorityZoneA(), idx);
+}
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::priorityZoneBIndex() const {
+  return getUInt8(Offset::priorityZoneB());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(unsigned idx) {
+  setUInt8(Offset::priorityZoneB(), idx);
+}
+
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::smsConfirmEnabled() const {
   return 0x01 == getUInt8(Offset::smsConfirm());
@@ -105,53 +430,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::smsConfirmEnabled() const {
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableSMSConfirm(bool enable) {
   setUInt8(Offset::smsConfirm(), enable ? 0x01 : 0x00);
-}
-
-AnytoneDisplaySettingsExtension::Color
-DMR6X2UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  DisplayColor color = (DisplayColor)getUInt8(Offset::callColor());
-  switch (color) {
-  case DisplayColor::Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
-  case DisplayColor::Red: return AnytoneDisplaySettingsExtension::Color::Red;
-  case DisplayColor::Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
-  case DisplayColor::Green: return AnytoneDisplaySettingsExtension::Color::Green;
-  case DisplayColor::Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
-  case DisplayColor::Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
-  case DisplayColor::White: return AnytoneDisplaySettingsExtension::Color::White;
-  case DisplayColor::Black: return AnytoneDisplaySettingsExtension::Color::Black;
-  }
-
-  return AnytoneDisplaySettingsExtension::Color::Orange;
-}
-
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
-  switch (color) {
-  case AnytoneDisplaySettingsExtension::Color::Orange:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Orange);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Red:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Red);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Yellow:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Yellow);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Green:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Green);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Turquoise:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Turquoise);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Blue:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Blue);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::White:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::White);
-    break;
-  case AnytoneDisplaySettingsExtension::Color::Black:
-    setUInt8(Offset::callColor(), (unsigned int)DisplayColor::Black);
-    break;
-  }
 }
 
 bool
@@ -164,12 +442,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableSimplexRepeater(bool enable) {
 }
 
 Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
-  return Interval::fromSeconds(getUInt8(Offset::gpsRangingInterval()));
+DMR6X2UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
+  return Interval::fromSeconds(getUInt8(Offset::gpsUpdatePeriod()));
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(Interval intv) {
-  setUInt8(Offset::gpsRangingInterval(), intv.seconds());
+DMR6X2UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval intv) {
+  setUInt8(Offset::gpsUpdatePeriod(), intv.seconds());
 }
 
 bool
@@ -431,247 +709,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::manualDialedPrivateCallHangTime() cons
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedPrivateCallHangTime(unsigned int dur) {
   setUInt8(Offset::manPrvCallHangTime(), dur);
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bluetooth() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableBluetooth(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::btAndInternalMic() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableBTAndInternalMic(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::btAndInternalSpeaker() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableBTAndInternalSpeaker(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::pluginRecTone() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enablePluginRecTone(bool enable) {
-  Q_UNUSED(enable)
-}
-
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::btMicGain() const {
-  return 0;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBTMicGain(unsigned int gain) {
-  Q_UNUSED(gain)
-}
-
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::btSpeakerGain() const {
-  return 0;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBTSpeakerGain(unsigned int gain) {
-  Q_UNUSED(gain)
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::autoRoamPeriod() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(Interval intv) {
-  Q_UNUSED(intv)
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::autoRoamDelay() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(Interval intv) {
-  Q_UNUSED(intv)
-}
-
-AnytoneDisplaySettingsExtension::Color
-DMR6X2UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
-  return AnytoneDisplaySettingsExtension::Color::White;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color) {
-  Q_UNUSED(color)
-}
-
-unsigned
-DMR6X2UVCodeplug::GeneralSettingsElement::defaultRoamingZoneIndex() const {
-  return 0;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultRoamingZoneIndex(unsigned idx) {
-  Q_UNUSED(idx)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::repeaterRangeCheck() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableRepeaterRangeCheck(bool enable) {
-  Q_UNUSED(enable)
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::repeaterRangeCheckInterval() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckInterval(Interval intv) {
-  Q_UNUSED(intv)
-}
-
-unsigned
-DMR6X2UVCodeplug::GeneralSettingsElement::repeaterRangeCheckCount() const {
-  return 0;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(unsigned n) {
-  Q_UNUSED(n)
-}
-
-AnytoneRangingSettingsExtension::RoamStart
-DMR6X2UVCodeplug::GeneralSettingsElement::roamingStartCondition() const {
-  return AnytoneRangingSettingsExtension::RoamStart::OutOfRange;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond) {
-  Q_UNUSED(cond)
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::txBacklightDuration() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setTXBacklightDuration(Interval intv) {
-  Q_UNUSED(intv)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::separateDisplay() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableSeparateDisplay(bool enable) {
-  Q_UNUSED(enable)
-}
-
-AnytoneDisplaySettingsExtension::Color
-DMR6X2UVCodeplug::GeneralSettingsElement::channelNameColor() const {
-  return AnytoneDisplaySettingsExtension::Color::White;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setChannelNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  Q_UNUSED(color)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::repeaterCheckNotification() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableRepeaterCheckNotification(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::roaming() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableRoaming(bool enable) {
-  Q_UNUSED(enable)
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::muteDelay() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setMuteDelay(Interval min) {
-  Q_UNUSED(min)
-}
-
-unsigned
-DMR6X2UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
-  return 0;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned num) {
-  Q_UNUSED(num)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootGPSCheck() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableBootGPSCheck(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootReset() const {
-  return false;
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableBootReset(bool enable) {
-  Q_UNUSED(enable)
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::btHoldTimeEnabled() const {
-  return false;
-}
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::btHoldTimeInfinite() const {
-  return false;
-}
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::btHoldTime() const {
-  return Interval::fromSeconds(0);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBTHoldTime(Interval interval) {
-  Q_UNUSED(interval)
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBTHoldTimeInfinite() {
-  // pass...
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::disableBTHoldTime() {
-  // pass...
-}
-
-Interval
-DMR6X2UVCodeplug::GeneralSettingsElement::btRXDelay() const {
-  return Interval::fromMilliseconds(30);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
-  Q_UNUSED(delay)
 }
 
 

@@ -528,9 +528,6 @@ public:
     /** Sets the priority zone B index. */
     virtual void setPriorityZoneBIndex(unsigned idx);
 
-    Interval gpsUpdatePeriod() const;
-    void setGPSUpdatePeriod(Interval intv);
-
     /** Returns @c true if bluetooth is enabled. */
     virtual bool bluetooth() const;
     /** Enables/disables bluetooth. */
@@ -552,9 +549,9 @@ public:
     virtual void enablePluginRecTone(bool enable);
 
     /** Returns the GPS ranging interval in seconds. */
-    virtual Interval gpsRangingInterval() const;
+    virtual Interval gpsUpdatePeriod() const;
     /** Sets the GPS ranging interval in seconds. */
-    virtual void setGPSRangingInterval(Interval sec);
+    virtual void setGPSUpdatePeriod(Interval sec);
 
     /** Retunrs the bluetooth microphone gain [1,10]. */
     virtual unsigned int btMicGain() const;

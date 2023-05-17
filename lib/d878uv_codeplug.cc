@@ -809,17 +809,6 @@ D878UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(unsigned idx) {
   setUInt8(Offset::priorityZoneB(), idx);
 }
 
-Interval
-D878UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
-  // Not used
-  return Interval::fromSeconds(0);
-}
-void
-D878UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval intv) {
-  Q_UNUSED(intv);
-  // Not used
-}
-
 bool
 D878UVCodeplug::GeneralSettingsElement::bluetooth() const {
   return 0 != getUInt8(Offset::bluetooth());
@@ -857,11 +846,11 @@ D878UVCodeplug::GeneralSettingsElement::enablePluginRecTone(bool enable) {
 }
 
 Interval
-D878UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
+D878UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
   return Interval::fromSeconds(getUInt8(Offset::gpsRangingInterval()));
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(Interval intv) {
+D878UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval intv) {
   setUInt8(Offset::gpsRangingInterval(), intv.seconds());
 }
 
@@ -1400,7 +1389,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   // Encode ranging/roaming settings.
   enableGPSMessage(ext->rangingSettings()->gpsRangeReportingEnabled());
-  setGPSRangingInterval(ext->rangingSettings()->gpsRangingInterval());
+  setGPSUpdatePeriod(ext->rangingSettings()->gpsRangingInterval());
   setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
   setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
   enableRepeaterRangeCheck(ext->rangingSettings()->repeaterRangeCheckEnabled());
@@ -1490,7 +1479,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Encode ranging/roaming settings
   ext->rangingSettings()->enableGPSRangeReporting(this->gpsMessageEnabled());
-  ext->rangingSettings()->setGPSRangingInterval(this->gpsRangingInterval());
+  ext->rangingSettings()->setGPSRangingInterval(this->gpsUpdatePeriod());
   ext->rangingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
   ext->rangingSettings()->setAutoRoamDelay(this->autoRoamDelay());
   ext->rangingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheck());

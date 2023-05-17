@@ -845,11 +845,11 @@ D578UVCodeplug::GeneralSettingsElement::enablePluginRecTone(bool enable) {
 }
 
 Interval
-D578UVCodeplug::GeneralSettingsElement::gpsRangingInterval() const {
+D578UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
   return Interval::fromSeconds(getUInt8(Offset::gpsRangingInterval()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setGPSRangingInterval(Interval intv) {
+D578UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval intv) {
   setUInt8(Offset::gpsRangingInterval(), intv.seconds());
 }
 

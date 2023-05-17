@@ -479,8 +479,8 @@ public:
     bool pluginRecTone() const;
     void enablePluginRecTone(bool enable);
 
-    Interval gpsRangingInterval() const;
-    void setGPSRangingInterval(Interval sec);
+    Interval gpsUpdatePeriod() const;
+    void setGPSUpdatePeriod(Interval sec);
 
     unsigned int btMicGain() const;
     void setBTMicGain(unsigned int gain);
