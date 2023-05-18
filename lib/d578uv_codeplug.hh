@@ -16,6 +16,8 @@ class GPSSystem;
 
 /** Represents the device specific binary codeplug for Anytone AT-D578UV radios.
  *
+ * Fits firmware/CPS version 1.17.
+ *
  * @section d578uvcpl Codeplug structure within radio
  * <table>
  *  <tr><th colspan="3">Channels</th></tr>
@@ -245,7 +247,7 @@ public:
   /** Represents the general config of the radio within the D578UV binary codeplug.
    *
    * This class implements only the differences to the D878UV general settings
-   * @c D878UVCodeplug::GeneralSettingsElement.
+   * @c D878UVCodeplug::GeneralSettingsElement
    *
    * Binary encoding of the general settings (size 0x00f0 bytes):
    * @verbinclude d578uv_generalsettings.txt */
@@ -256,15 +258,16 @@ public:
     enum class KeyFunction {
       Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
       Encryption = 0x05, Call = 0x06, ToggleVFO = 0x07, Scan = 0x08, WFM = 0x09, Alarm = 0x0a,
-      RecordSwitch = 0x0b, Record = 0x0c, SMS = 0x0d, Dial = 0x0e, Monitor = 0x10,
+      RecordSwitch = 0x0b, Record = 0x0c, SMS = 0x0d, Dial = 0x0e, GPSInformation=0x0f, Monitor = 0x10,
       ToggleMainChannel = 0x11, HotKey1 = 0x12, HotKey2 = 0x13, HotKey3 = 0x14, HotKey4 = 0x15,
       HotKey5 = 0x16, HotKey6 = 0x17, WorkAlone = 0x18, SkipChannel = 0x19, DMRMonitor = 0x1a,
       SubChannel = 0x1b, PriorityZone = 0x1c, VFOScan = 0x1d, MICSoundQuality = 0x1e,
-      LastCallReply = 0x1f, ChannelType = 0x20, Roaming = 0x22, MaxVolume = 0x24, Slot = 0x25,
-      Zone = 0x26, MuteA = 0x27, MuteB = 0x28, RoamingSet = 0x2a, APRSSet = 0x2b, ZoneUp = 0x2c,
-      ZoneDown = 0x2d, XBandRepeater = 0x30, Speaker = 0x31, ChannelName = 0x32, Bluetooth = 0x33,
+      LastCallReply = 0x1f, ChannelType = 0x20, Ranging=0x21, Roaming = 0x22, ChannelRanging = 0x23,
+      MaxVolume = 0x24, Slot = 0x25, APRSTypeSwitch=0x26, Zone = 0x27, MuteA = 0x28, MuteB = 0x29,
+      RoamingSet = 0x2a, APRSSet = 0x2b, ZoneUp = 0x2c, ZoneDown = 0x2d,
+      XBandRepeater = 0x30, Speaker = 0x31, ChannelName = 0x32, Bluetooth = 0x33,
       GPS = 0x34, CDTScan = 0x35, TBSTSend = 0x36, APRSSend = 0x37, APRSInfo = 0x38,
-      GPSRoaming = 0x39
+      GPSRoaming = 0x39, Squelch=0x3a, NoiseReductionTX=0x3b
     };
 
     AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
@@ -574,67 +577,67 @@ public:
     bool roaming() const;
     void enableRoaming(bool enable);
 
-    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Short() const;
-    void setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Short() const;
-    void setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 3 short press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey3Short() const;
     /** Sets the function for programmable function key 3 short press. */
-    virtual void setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 4 short press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey4Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey4Short() const;
     /** Sets the function for programmable function key 4 short press. */
-    virtual void setProgFuncKey4Short(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey4Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 5 short press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey5Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey5Short() const;
     /** Sets the function for programmable function key 5 short press. */
-    virtual void setProgFuncKey5Short(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey5Short(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 6 short press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey6Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey6Short() const;
     /** Sets the function for programmable function key 6 short press. */
-    virtual void setProgFuncKey6Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyAShort() const;
-    void setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBShort() const;
-    void setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCShort() const;
-    void setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey6Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key D short press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyDShort() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyDShort() const;
     /** Sets the function for programmable function key D short press. */
-    virtual void setProgFuncKeyDShort(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKeyDShort(AnytoneKeySettingsExtension::KeyFunction func);
 
-    AnytoneKeySettingsExtension::KeyFunction progFuncKey1Long() const;
-    void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const;
-    void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 3 long press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey3Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey3Long() const;
     /** Sets the function for programmable function key 3 long press. */
-    virtual void setProgFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 4 long press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey4Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey4Long() const;
     /** Sets the function for programmable function key 4 long press. */
-    virtual void setProgFuncKey4Long(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey4Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 5 long press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey5Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey5Long() const;
     /** Sets the function for programmable function key 5 long press. */
-    virtual void setProgFuncKey5Long(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey5Long(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key 6 long press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey6Long() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey6Long() const;
     /** Sets the function for programmable function key 6 long press. */
-    virtual void setProgFuncKey6Long(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyALong() const;
-    void setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyBLong() const;
-    void setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction progFuncKeyCLong() const;
-    void setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKey6Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
     /** Returns the function for programmable function key D long press. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyDLong() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyDLong() const;
     /** Sets the function for programmable function key D long press. */
-    virtual void setProgFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func);
+    virtual void setFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func);
 
     unsigned int repeaterCheckNumNotifications() const;
     void setRepeaterCheckNumNotifications(unsigned int num);
@@ -653,6 +656,9 @@ public:
 
     Interval btRXDelay() const;
     void setBTRXDelay(Interval delay);
+
+    bool fromConfig(const Flags &flags, Context &ctx);
+    bool updateConfig(Context &ctx);
 
   protected:
     /** Some internal offsets. */
@@ -851,6 +857,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0020; }
 
+    /** Resets the element. */
     void clear();
 
     /** The channel frequency. */

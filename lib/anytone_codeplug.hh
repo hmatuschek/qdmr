@@ -836,47 +836,48 @@ public:
     /** Sets the microphone gain. */
     virtual void setDMRMicGain(unsigned int gain) = 0;
 
-    /** Returns the key function for a short press on the programmable function key 1/A. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyAShort() const = 0;
-    /** Sets the key function for a short press on the programmable function key 1/A. */
-    virtual void setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
-    /** Returns the key function for a short press on the programmable function key 2/B. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyBShort() const = 0;
-    /** Sets the key function for a short press on the programmable function key 2/B. */
-    virtual void setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
-    /** Returns the key function for a short press on the programmable function key 3/C. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyCShort() const = 0;
-    /** Sets the key function for a short press on the programmable function key 3/C. */
-    virtual void setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a short press on the function key 1/A. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const = 0;
+    /** Sets the key function for a short press on the function key 1/A. */
+    virtual void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a short press on the function key 2/B. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const = 0;
+    /** Sets the key function for a short press on the function key 2/B. */
+    virtual void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a short press on the function key 3/C. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const = 0;
+    /** Sets the key function for a short press on the function key 3/C. */
+    virtual void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a short press on the function key 1. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey1Short() const = 0;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const = 0;
     /** Sets the key function for a short press on the function key 1. */
-    virtual void setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    virtual void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a short press on the function key 2. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey2Short() const = 0;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const = 0;
     /** Sets the key function for a short press on the function key 2. */
-    virtual void setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    virtual void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
 
-    /** Returns the key function for a long press on the programmable function key 1. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyALong() const = 0;
-    /** Sets the key function for a long press on the programmable function key 1. */
-    virtual void setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
-    /** Returns the key function for a long press on the programmable function key 2. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyBLong() const = 0;
-    /** Sets the key function for a long press on the programmable function key 2. */
-    virtual void setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
-    /** Returns the key function for a long press on the programmable function key 3. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKeyCLong() const = 0;
-    /** Sets the key function for a long press on the programmable function key 3. */
-    virtual void setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a long press on the function key 1. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey1Long() const = 0;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const = 0;
     /** Sets the key function for a long press on the function key 1. */
-    virtual void setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    virtual void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a long press on the function key 2. */
-    virtual AnytoneKeySettingsExtension::KeyFunction progFuncKey2Long() const = 0;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const = 0;
     /** Sets the key function for a long press on the function key 2. */
-    virtual void setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    virtual void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 3. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const = 0;
+    /** Sets the key function for a long press on the function key 3. */
+    virtual void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 1. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const = 0;
+    /** Sets the key function for a long press on the function key 1. */
+    virtual void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 2. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const = 0;
+    /** Sets the key function for a long press on the function key 2. */
+    virtual void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+
     /** Returns the long-press duration in ms. */
     virtual Interval longPressDuration() const = 0;
     /** Sets the long-press duration in ms. */

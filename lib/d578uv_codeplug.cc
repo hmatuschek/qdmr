@@ -1166,182 +1166,182 @@ D578UVCodeplug::GeneralSettingsElement::enableRoaming(bool enable) {
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey1Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey1Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey1Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey2Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey2Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey2Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey3Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey3Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey3Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey3Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey3Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey4Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey4Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey4Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey4Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey4Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey4Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey5Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey5Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey5Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey5Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey5Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey5Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey6Short() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey6Short() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey6Short()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey6Short(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey6Short(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey6Short(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyAShort() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyAShort() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyAShort()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyAShort(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyBShort() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyBShort() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyBShort()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyBShort(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyCShort() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyCShort() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyCShort()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyCShort(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyDShort() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyDShort() const {
   return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyDShort()));
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyDShort(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyDShort(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyDShort(), this->mapKeyFunctionToCode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey1Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey1Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey1Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey1Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey2Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey2Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey2Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey2Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey3Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey3Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey3Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey3Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey3Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey4Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey4Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey4Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey4Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey4Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey4Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey5Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey5Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey5Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey5Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey5Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey5Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKey6Long() const {
+D578UVCodeplug::GeneralSettingsElement::funcKey6Long() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey6Long());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKey6Long(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKey6Long(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKey6Long(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyALong() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyALong() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyALong());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyALong(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyBLong() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyBLong() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyBLong());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyBLong(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyCLong() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyCLong() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyCLong());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyCLong(), (unsigned)func);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::progFuncKeyDLong() const {
+D578UVCodeplug::GeneralSettingsElement::funcKeyDLong() const {
   return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyDLong());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setProgFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::GeneralSettingsElement::setFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func) {
   setUInt8(Offset::progFuncKeyDLong(), (unsigned)func);
 }
 
@@ -1363,6 +1363,7 @@ D578UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsE
   case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
   case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
   case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
   case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
   case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
   case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
@@ -1380,9 +1381,12 @@ D578UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsE
   case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
   case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
   case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
   case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
   case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch:    return (uint8_t)KeyFunction::APRSTypeSwitch;
   case AnytoneKeySettingsExtension::KeyFunction::Zone:              return (uint8_t)KeyFunction::Zone;
   case AnytoneKeySettingsExtension::KeyFunction::MuteA:             return (uint8_t)KeyFunction::MuteA;
   case AnytoneKeySettingsExtension::KeyFunction::MuteB:             return (uint8_t)KeyFunction::MuteB;
@@ -1400,6 +1404,8 @@ D578UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsE
   case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
   case AnytoneKeySettingsExtension::KeyFunction::APRSInfo:          return (uint8_t)KeyFunction::APRSInfo;
   case AnytoneKeySettingsExtension::KeyFunction::GPSRoaming:        return (uint8_t)KeyFunction::GPSRoaming;
+  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
+  case AnytoneKeySettingsExtension::KeyFunction::NoiseReductionTX:  return (uint8_t)KeyFunction::NoiseReductionTX;
   default:                                                          return (uint8_t)KeyFunction::Off;
   }
 }
@@ -1422,6 +1428,7 @@ D578UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
   case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
   case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
   case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
+  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
   case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
   case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
   case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
@@ -1439,9 +1446,12 @@ D578UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
   case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
   case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
   case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
   case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
+  case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
   case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
   case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
+  case KeyFunction::APRSTypeSwitch:    return AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch;
   case KeyFunction::Zone:              return AnytoneKeySettingsExtension::KeyFunction::Zone;
   case KeyFunction::MuteA:             return AnytoneKeySettingsExtension::KeyFunction::MuteA;
   case KeyFunction::MuteB:             return AnytoneKeySettingsExtension::KeyFunction::MuteB;
@@ -1459,6 +1469,8 @@ D578UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
   case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
   case KeyFunction::APRSInfo:          return AnytoneKeySettingsExtension::KeyFunction::APRSInfo;
   case KeyFunction::GPSRoaming:        return AnytoneKeySettingsExtension::KeyFunction::GPSRoaming;
+  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
+  case KeyFunction::NoiseReductionTX:  return AnytoneKeySettingsExtension::KeyFunction::NoiseReductionTX;
   default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
   }
 }
@@ -1522,6 +1534,58 @@ D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
     unsigned int millis = std::min(5500ULL, std::max(500ULL, delay.milliseconds()));
     setUInt8(Offset::btRXDelay(), (millis-500)/500);
   }
+}
+
+bool
+D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+  if (! D878UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+    return false;
+
+  // Handle D578UV specific settings
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) // <- if extension is not set
+    return true;
+
+  // Apply key-settings
+  setFuncKey3Short(ext->keySettings()->funcKey3Short());
+  setFuncKey3Long(ext->keySettings()->funcKey3Long());
+  setFuncKey4Short(ext->keySettings()->funcKey4Short());
+  setFuncKey4Long(ext->keySettings()->funcKey4Long());
+  setFuncKey5Short(ext->keySettings()->funcKey5Short());
+  setFuncKey5Long(ext->keySettings()->funcKey5Long());
+  setFuncKey6Short(ext->keySettings()->funcKey6Short());
+  setFuncKey6Long(ext->keySettings()->funcKey6Long());
+  setFuncKeyDShort(ext->keySettings()->funcKeyDShort());
+  setFuncKeyDLong(ext->keySettings()->funcKeyDLong());
+
+  return true;
+}
+
+bool
+D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+  if (! D878UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
+    return false;
+
+  // Handle D578UV specific extension
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Store key-settings
+  ext->keySettings()->setFuncKey3Short(funcKey3Short());
+  ext->keySettings()->setFuncKey3Long(funcKey3Long());
+  ext->keySettings()->setFuncKey4Short(funcKey4Short());
+  ext->keySettings()->setFuncKey4Long(funcKey4Long());
+  ext->keySettings()->setFuncKey5Short(funcKey5Short());
+  ext->keySettings()->setFuncKey5Long(funcKey5Long());
+  ext->keySettings()->setFuncKey6Short(funcKey6Short());
+  ext->keySettings()->setFuncKey6Long(funcKey6Long());
+  ext->keySettings()->setFuncKeyDShort(funcKeyDShort());
+  ext->keySettings()->setFuncKeyDLong(funcKeyDLong());
+
+  return true;
 }
 
 

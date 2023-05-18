@@ -393,26 +393,46 @@ class AnytoneKeySettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** Programmable function key 1, short press function. */
-  Q_PROPERTY(KeyFunction progFuncKey1Short READ progFuncKey1Short WRITE setProgFuncKey1Short)
-  /** Programmable function key 1, long press function. */
-  Q_PROPERTY(KeyFunction progFuncKey1Long READ progFuncKey1Long WRITE setProgFuncKey1Long)
-  /** Programmable function key 2, short press function. */
-  Q_PROPERTY(KeyFunction progFuncKey2Short READ progFuncKey2Short WRITE setProgFuncKey2Short)
-  /** Programmable function key 2, long press function. */
-  Q_PROPERTY(KeyFunction progFuncKey2Long READ progFuncKey2Long WRITE setProgFuncKey2Long)
-  /** Programmable function key 3, short press function. */
-  Q_PROPERTY(KeyFunction progFuncKey3Short READ progFuncKey3Short WRITE setProgFuncKey3Short)
-  /** Programmable function key 3, long press function. */
-  Q_PROPERTY(KeyFunction progFuncKey3Long READ progFuncKey3Long WRITE setProgFuncKey3Long)
-  /** Function key 1, short press function. */
+  /** Function key 1 (P1 below or next to screen), short press function. */
   Q_PROPERTY(KeyFunction funcKey1Short READ funcKey1Short WRITE setFuncKey1Short)
-  /** Programmable function key 1, long press function. */
+  /** Function key 1 (P1 below or next to screen), long press function. */
   Q_PROPERTY(KeyFunction funcKey1Long READ funcKey1Long WRITE setFuncKey1Long)
-  /** Function key 2, short press function. */
+  /** Function key 2 (P2 below or next to screen), short press function. */
   Q_PROPERTY(KeyFunction funcKey2Short READ funcKey2Short WRITE setFuncKey2Short)
-  /** Programmable function key 2, long press function. */
+  /** Function key 2 (P2 below or next to screen), long press function. */
   Q_PROPERTY(KeyFunction funcKey2Long READ funcKey2Long WRITE setFuncKey2Long)
+  /** Function key 3 (P3 next to screen, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKey3Short READ funcKey3Short WRITE setFuncKey3Short)
+  /** Function key 3 (P3 next to screen, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKey3Long READ funcKey3Long WRITE setFuncKey3Long)
+  /** Function key 4 (P4 next to screen, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKey4Short READ funcKey4Short WRITE setFuncKey4Short)
+  /** Function key 4 (P4 next to screen, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKey4Long READ funcKey4Long WRITE setFuncKey4Long)
+  /** Function key 5 (P5 next to screen, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKey5Short READ funcKey5Short WRITE setFuncKey5Short)
+  /** Function key 5 (P5 next to screen, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKey5Long READ funcKey5Long WRITE setFuncKey5Long)
+  /** Function key 6 (P6 next to screen, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKey6Short READ funcKey6Short WRITE setFuncKey6Short)
+  /** Function key 6 (P6 next to screen, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKey6Long READ funcKey6Long WRITE setFuncKey6Long)
+  /** Function key A (PF1 below PTT or A on mic), short press function. */
+  Q_PROPERTY(KeyFunction funcKeyAShort READ funcKeyAShort WRITE setFuncKeyAShort)
+  /** Function key A (PF1 below PTT or A on mic), long press function. */
+  Q_PROPERTY(KeyFunction funcKeyALong READ funcKeyALong WRITE setFuncKeyALong)
+  /** Function key B (PF2 second below PTT or B on mic), short press function. */
+  Q_PROPERTY(KeyFunction funcKeyBShort READ funcKeyBShort WRITE setFuncKeyBShort)
+  /** Function key B (PF2 second below PTT or B on mic), long press function. */
+  Q_PROPERTY(KeyFunction funcKeyBLong READ funcKeyBLong WRITE setFuncKeyBLong)
+  /** Function key C (PF3 on top or C on mic), short press function. */
+  Q_PROPERTY(KeyFunction funcKeyCShort READ funcKeyCShort WRITE setFuncKeyCShort)
+  /** Function key C (PF3 on top or B on mic), long press function. */
+  Q_PROPERTY(KeyFunction funcKeyCLong READ funcKeyCLong WRITE setFuncKeyCLong)
+  /** Function key D (D on mic, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKeyDShort READ funcKeyDShort WRITE setFuncKeyDShort)
+  /** Function key D (D on mic, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKeyDLong READ funcKeyDLong WRITE setFuncKeyDLong)
   /** The long press duration in ms. */
   Q_PROPERTY(Interval longPressDuration READ longPressDuration WRITE setLongPressDuration)
   /** The auto key-lock property. */
@@ -443,7 +463,7 @@ public:
     SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
     Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
     APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
-    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch
+    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch, NoiseReductionTX
   };
   Q_ENUM(KeyFunction)
 
@@ -452,33 +472,6 @@ public:
   explicit AnytoneKeySettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns the key function for a short press on the programmable function key 1. */
-  KeyFunction progFuncKey1Short() const;
-  /** Sets the key function for a short press on the programmable function key 1. */
-  void setProgFuncKey1Short(KeyFunction func);
-  /** Returns the key function for a long press on the programmable function key 1. */
-  KeyFunction progFuncKey1Long() const;
-  /** Sets the key function for a long press on the programmable function key 1. */
-  void setProgFuncKey1Long(KeyFunction func);
-
-  /** Returns the key function for a short press on the programmable function key 2. */
-  KeyFunction progFuncKey2Short() const;
-  /** Sets the key function for a short press on the programmable function key 2. */
-  void setProgFuncKey2Short(KeyFunction func);
-  /** Returns the key function for a long press on the programmable function key 2. */
-  KeyFunction progFuncKey2Long() const;
-  /** Sets the key function for a long press on the programmable function key 2. */
-  void setProgFuncKey2Long(KeyFunction func);
-
-  /** Returns the key function for a short press on the programmable function key 3. */
-  KeyFunction progFuncKey3Short() const;
-  /** Sets the key function for a short press on the programmable function key 3. */
-  void setProgFuncKey3Short(KeyFunction func);
-  /** Returns the key function for a long press on the programmable function key 3. */
-  KeyFunction progFuncKey3Long() const;
-  /** Sets the key function for a long press on the programmable function key 3. */
-  void setProgFuncKey3Long(KeyFunction func);
 
   /** Returns the key function for a short press on the function key 1. */
   KeyFunction funcKey1Short() const;
@@ -489,14 +482,86 @@ public:
   /** Sets the key function for a long press on the function key 1. */
   void setFuncKey1Long(KeyFunction func);
 
-  /** Returns the key function for a short press on the function key 2. */
+  /** Returns the key function for a short press on the programmable function key 2. */
   KeyFunction funcKey2Short() const;
-  /** Sets the key function for a short press on the function key 2. */
+  /** Sets the key function for a short press on the programmable function key 2. */
   void setFuncKey2Short(KeyFunction func);
-  /** Returns the key function for a long press on the function key 2. */
+  /** Returns the key function for a long press on the programmable function key 2. */
   KeyFunction funcKey2Long() const;
-  /** Sets the key function for a long press on the function key 2. */
+  /** Sets the key function for a long press on the programmable function key 2. */
   void setFuncKey2Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 3. */
+  KeyFunction funcKey3Short() const;
+  /** Sets the key function for a short press on the programmable function key 3. */
+  void setFuncKey3Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 3. */
+  KeyFunction funcKey3Long() const;
+  /** Sets the key function for a long press on the programmable function key 3. */
+  void setFuncKey3Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 4. */
+  KeyFunction funcKey4Short() const;
+  /** Sets the key function for a short press on the programmable function key 4. */
+  void setFuncKey4Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 4. */
+  KeyFunction funcKey4Long() const;
+  /** Sets the key function for a long press on the programmable function key 4. */
+  void setFuncKey4Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 5. */
+  KeyFunction funcKey5Short() const;
+  /** Sets the key function for a short press on the programmable function key 5. */
+  void setFuncKey5Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 5. */
+  KeyFunction funcKey5Long() const;
+  /** Sets the key function for a long press on the programmable function key 5. */
+  void setFuncKey5Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the programmable function key 6. */
+  KeyFunction funcKey6Short() const;
+  /** Sets the key function for a short press on the programmable function key 6. */
+  void setFuncKey6Short(KeyFunction func);
+  /** Returns the key function for a long press on the programmable function key 6. */
+  KeyFunction funcKey6Long() const;
+  /** Sets the key function for a long press on the programmable function key 6. */
+  void setFuncKey6Long(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key A. */
+  KeyFunction funcKeyAShort() const;
+  /** Sets the key function for a short press on the function key A. */
+  void setFuncKeyAShort(KeyFunction func);
+  /** Returns the key function for a long press on the function key A. */
+  KeyFunction funcKeyALong() const;
+  /** Sets the key function for a long press on the function key A. */
+  void setFuncKeyALong(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key B. */
+  KeyFunction funcKeyBShort() const;
+  /** Sets the key function for a short press on the function key B. */
+  void setFuncKeyBShort(KeyFunction func);
+  /** Returns the key function for a long press on the function key B. */
+  KeyFunction funcKeyBLong() const;
+  /** Sets the key function for a long press on the function key B. */
+  void setFuncKeyBLong(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key C. */
+  KeyFunction funcKeyCShort() const;
+  /** Sets the key function for a short press on the function key C. */
+  void setFuncKeyCShort(KeyFunction func);
+  /** Returns the key function for a long press on the function key C. */
+  KeyFunction funcKeyCLong() const;
+  /** Sets the key function for a long press on the function key C. */
+  void setFuncKeyCLong(KeyFunction func);
+
+  /** Returns the key function for a short press on the function key D. */
+  KeyFunction funcKeyDShort() const;
+  /** Sets the key function for a short press on the function key D. */
+  void setFuncKeyDShort(KeyFunction func);
+  /** Returns the key function for a long press on the function key D. */
+  KeyFunction funcKeyDLong() const;
+  /** Sets the key function for a long press on the function key D. */
+  void setFuncKeyDLong(KeyFunction func);
 
   /** Returns the long-press duration in ms. */
   Interval longPressDuration() const;
@@ -526,22 +591,32 @@ public:
   void enableForcedKeyLock(bool enable);
 
 protected:
-  KeyFunction _progFuncKey1Short;          ///< Function of the programmable key 1, short press.
-  KeyFunction _progFuncKey1Long;           ///< Function of the programmable key 1, long press.
-  KeyFunction _progFuncKey2Short;          ///< Function of the programmable key 2, short press.
-  KeyFunction _progFuncKey2Long;           ///< Function of the programmable key 2, long press.
-  KeyFunction _progFuncKey3Short;          ///< Function of the programmable key 3, short press.
-  KeyFunction _progFuncKey3Long;           ///< Function of the programmable key 3, long press.
-  KeyFunction _funcKey1Short;              ///< Function of the function key 1, short press.
-  KeyFunction _funcKey1Long;               ///< Function of the function key 1, long press.
-  KeyFunction _funcKey2Short;              ///< Function of the function key 2, short press.
-  KeyFunction _funcKey2Long;               ///< Function of the function key 2, long press.
-  Interval _longPressDuration;             ///< The long-press duration in ms.
-  bool _autoKeyLock;                       ///< Auto key-lock property.
-  bool _knobLock;                          ///< Knob locked too.
-  bool _keypadLock;                        ///< Key-pad is locked.
-  bool _sideKeysLock;                      ///< Side-keys are locked.
-  bool _forcedKeyLock;                     ///< Forced key-lock.
+  KeyFunction _funcKey1Short;          ///< Function of the function key 1, short press.
+  KeyFunction _funcKey1Long;           ///< Function of the function key 1, long press.
+  KeyFunction _funcKey2Short;          ///< Function of the function key 2, short press.
+  KeyFunction _funcKey2Long;           ///< Function of the function key 2, long press.
+  KeyFunction _funcKey3Short;          ///< Function of the function key 3, short press.
+  KeyFunction _funcKey3Long;           ///< Function of the function key 3, long press.
+  KeyFunction _funcKey4Short;          ///< Function of the function key 4, short press.
+  KeyFunction _funcKey4Long;           ///< Function of the function key 4, long press.
+  KeyFunction _funcKey5Short;          ///< Function of the function key 5, short press.
+  KeyFunction _funcKey5Long;           ///< Function of the function key 5, long press.
+  KeyFunction _funcKey6Short;          ///< Function of the function key 6, short press.
+  KeyFunction _funcKey6Long;           ///< Function of the function key 6, long press.
+  KeyFunction _funcKeyAShort;          ///< Function of the function key A, short press.
+  KeyFunction _funcKeyALong;           ///< Function of the function key A, long press.
+  KeyFunction _funcKeyBShort;          ///< Function of the function key B, short press.
+  KeyFunction _funcKeyBLong;           ///< Function of the function key B, long press.
+  KeyFunction _funcKeyCShort;          ///< Function of the function key C, short press.
+  KeyFunction _funcKeyCLong;           ///< Function of the function key C, long press.
+  KeyFunction _funcKeyDShort;          ///< Function of the function key D, short press.
+  KeyFunction _funcKeyDLong;           ///< Function of the function key D, long press.
+  Interval _longPressDuration;         ///< The long-press duration in ms.
+  bool _autoKeyLock;                   ///< Auto key-lock property.
+  bool _knobLock;                      ///< Knob locked too.
+  bool _keypadLock;                    ///< Key-pad is locked.
+  bool _sideKeysLock;                  ///< Side-keys are locked.
+  bool _forcedKeyLock;                 ///< Forced key-lock.
 };
 
 

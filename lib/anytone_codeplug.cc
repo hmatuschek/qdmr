@@ -1770,16 +1770,16 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     }
 
     // Encode key settings
-    setProgFuncKeyAShort(ext->keySettings()->progFuncKey1Short());
-    setProgFuncKeyALong(ext->keySettings()->progFuncKey1Long());
-    setProgFuncKeyBShort(ext->keySettings()->progFuncKey2Short());
-    setProgFuncKeyBLong(ext->keySettings()->progFuncKey2Long());
-    setProgFuncKeyCShort(ext->keySettings()->progFuncKey3Short());
-    setProgFuncKeyCLong(ext->keySettings()->progFuncKey3Long());
-    setProgFuncKey1Short(ext->keySettings()->funcKey1Short());
-    setProgFuncKey1Long(ext->keySettings()->funcKey1Long());
-    setProgFuncKey2Short(ext->keySettings()->funcKey2Short());
-    setProgFuncKey2Long(ext->keySettings()->funcKey2Long());
+    setFuncKeyAShort(ext->keySettings()->funcKeyAShort());
+    setFuncKeyALong(ext->keySettings()->funcKeyALong());
+    setFuncKeyBShort(ext->keySettings()->funcKeyBShort());
+    setFuncKeyBLong(ext->keySettings()->funcKeyBLong());
+    setFuncKeyCShort(ext->keySettings()->funcKeyCShort());
+    setFuncKeyCLong(ext->keySettings()->funcKeyCLong());
+    setFuncKey1Short(ext->keySettings()->funcKey1Short());
+    setFuncKey1Long(ext->keySettings()->funcKey1Long());
+    setFuncKey2Short(ext->keySettings()->funcKey2Short());
+    setFuncKey2Long(ext->keySettings()->funcKey2Long());
     setLongPressDuration(ext->keySettings()->longPressDuration());
     enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
 
@@ -1883,16 +1883,16 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
 
   // Store key settings
-  ext->keySettings()->setProgFuncKey1Short(progFuncKeyAShort());
-  ext->keySettings()->setProgFuncKey1Long(progFuncKeyALong());
-  ext->keySettings()->setProgFuncKey2Short(progFuncKeyBShort());
-  ext->keySettings()->setProgFuncKey2Long(progFuncKeyBLong());
-  ext->keySettings()->setProgFuncKey3Short(progFuncKeyCShort());
-  ext->keySettings()->setProgFuncKey3Long(progFuncKeyCLong());
-  ext->keySettings()->setFuncKey1Short(progFuncKey1Short());
-  ext->keySettings()->setFuncKey1Long(progFuncKey1Long());
-  ext->keySettings()->setFuncKey2Short(progFuncKey2Short());
-  ext->keySettings()->setFuncKey2Long(progFuncKey2Long());
+  ext->keySettings()->setFuncKey1Short(funcKeyAShort());
+  ext->keySettings()->setFuncKey1Long(funcKeyALong());
+  ext->keySettings()->setFuncKey2Short(funcKeyBShort());
+  ext->keySettings()->setFuncKey2Long(funcKeyBLong());
+  ext->keySettings()->setFuncKey3Short(funcKeyCShort());
+  ext->keySettings()->setFuncKey3Long(funcKeyCLong());
+  ext->keySettings()->setFuncKey1Short(funcKey1Short());
+  ext->keySettings()->setFuncKey1Long(funcKey1Long());
+  ext->keySettings()->setFuncKey2Short(funcKey2Short());
+  ext->keySettings()->setFuncKey2Long(funcKey2Long());
   ext->keySettings()->setLongPressDuration(longPressDuration());
   ext->keySettings()->enableAutoKeyLock(autoKeyLock());
 

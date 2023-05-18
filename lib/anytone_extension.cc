@@ -1102,11 +1102,15 @@ AnytoneBootSettingsExtension::enableReset(bool enable) {
  * ********************************************************************************************* */
 AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
   : ConfigItem(parent),
-    _progFuncKey1Short(KeyFunction::Off), _progFuncKey1Long(KeyFunction::Encryption),
-    _progFuncKey2Short(KeyFunction::Voltage), _progFuncKey2Long(KeyFunction::Call),
-    _progFuncKey3Short(KeyFunction::Power), _progFuncKey3Long(KeyFunction::VOX),
     _funcKey1Short(KeyFunction::VOX), _funcKey1Long(KeyFunction::ToggleVFO),
     _funcKey2Short(KeyFunction::Reverse), _funcKey2Long(KeyFunction::Off),
+    _funcKey3Short(KeyFunction::Power), _funcKey3Long(KeyFunction::Record),
+    _funcKey4Short(KeyFunction::Repeater), _funcKey4Long(KeyFunction::SMS),
+    _funcKey5Short(KeyFunction::Reverse), _funcKey5Long(KeyFunction::Dial),
+    _funcKey6Short(KeyFunction::Encryption), _funcKey6Long(KeyFunction::Off),
+    _funcKeyAShort(KeyFunction::Off), _funcKeyALong(KeyFunction::Encryption),
+    _funcKeyBShort(KeyFunction::Voltage), _funcKeyBLong(KeyFunction::Call),
+    _funcKeyCShort(KeyFunction::Power), _funcKeyCLong(KeyFunction::VOX),
     _longPressDuration(Interval::fromSeconds(1)), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
     _sideKeysLock(false), _forcedKeyLock(false)
 {
@@ -1121,75 +1125,6 @@ AnytoneKeySettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
-}
-
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey1Short() const {
-  return _progFuncKey1Short;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey1Short(KeyFunction func) {
-  if (_progFuncKey1Short == func)
-    return;
-  _progFuncKey1Short = func;
-  emit modified(this);
-}
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey1Long() const {
-  return _progFuncKey1Long;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey1Long(KeyFunction func) {
-  if (_progFuncKey1Long == func)
-    return;
-  _progFuncKey1Long = func;
-  emit modified(this);
-}
-
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey2Short() const {
-  return _progFuncKey2Short;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey2Short(KeyFunction func) {
-  if (_progFuncKey2Short == func)
-    return;
-  _progFuncKey2Short = func;
-  emit modified(this);
-}
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey2Long() const {
-  return _progFuncKey2Long;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey2Long(KeyFunction func) {
-  if (_progFuncKey2Long == func)
-    return;
-  _progFuncKey2Long = func;
-  emit modified(this);
-}
-
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey3Short() const {
-  return _progFuncKey3Short;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey3Short(KeyFunction func) {
-  if (_progFuncKey3Short == func)
-    return;
-  _progFuncKey3Short = func;
-  emit modified(this);
-}
-AnytoneKeySettingsExtension::KeyFunction
-AnytoneKeySettingsExtension::progFuncKey3Long() const {
-  return _progFuncKey3Long;
-}
-void
-AnytoneKeySettingsExtension::setProgFuncKey3Long(KeyFunction func) {
-  if (_progFuncKey3Long == func)
-    return;
-  _progFuncKey3Long = func;
-  emit modified(this);
 }
 
 AnytoneKeySettingsExtension::KeyFunction
@@ -1235,6 +1170,190 @@ AnytoneKeySettingsExtension::setFuncKey2Long(KeyFunction func) {
   if (_funcKey2Long == func)
     return;
   _funcKey2Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey3Short() const {
+  return _funcKey3Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey3Short(KeyFunction func) {
+  if (_funcKey3Short == func)
+    return;
+  _funcKey3Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey3Long() const {
+  return _funcKey3Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey3Long(KeyFunction func) {
+  if (_funcKey3Long == func)
+    return;
+  _funcKey3Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey4Short() const {
+  return _funcKey4Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey4Short(KeyFunction func) {
+  if (_funcKey4Short == func)
+    return;
+  _funcKey4Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey4Long() const {
+  return _funcKey4Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey4Long(KeyFunction func) {
+  if (_funcKey4Long == func)
+    return;
+  _funcKey4Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey5Short() const {
+  return _funcKey5Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey5Short(KeyFunction func) {
+  if (_funcKey5Short == func)
+    return;
+  _funcKey5Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey5Long() const {
+  return _funcKey5Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey5Long(KeyFunction func) {
+  if (_funcKey5Long == func)
+    return;
+  _funcKey5Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey6Short() const {
+  return _funcKey6Short;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey6Short(KeyFunction func) {
+  if (_funcKey6Short == func)
+    return;
+  _funcKey6Short = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKey6Long() const {
+  return _funcKey6Long;
+}
+void
+AnytoneKeySettingsExtension::setFuncKey6Long(KeyFunction func) {
+  if (_funcKey6Long == func)
+    return;
+  _funcKey6Long = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyAShort() const {
+  return _funcKeyAShort;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyAShort(KeyFunction func) {
+  if (_funcKeyAShort == func)
+    return;
+  _funcKeyAShort = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyALong() const {
+  return _funcKeyALong;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyALong(KeyFunction func) {
+  if (_funcKeyALong == func)
+    return;
+  _funcKeyALong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyBShort() const {
+  return _funcKeyBShort;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyBShort(KeyFunction func) {
+  if (_funcKeyBShort == func)
+    return;
+  _funcKeyBShort = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyBLong() const {
+  return _funcKeyBLong;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyBLong(KeyFunction func) {
+  if (_funcKeyBLong == func)
+    return;
+  _funcKeyBLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyCShort() const {
+  return _funcKeyCShort;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyCShort(KeyFunction func) {
+  if (_funcKeyCShort == func)
+    return;
+  _funcKeyCShort = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyCLong() const {
+  return _funcKeyCLong;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyCLong(KeyFunction func) {
+  if (_funcKeyCLong == func)
+    return;
+  _funcKeyCLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyDShort() const {
+  return _funcKeyDShort;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyDShort(KeyFunction func) {
+  if (_funcKeyDShort == func)
+    return;
+  _funcKeyDShort = func;
+  emit modified(this);
+}
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyDLong() const {
+  return _funcKeyDLong;
+}
+void
+AnytoneKeySettingsExtension::setFuncKeyDLong(KeyFunction func) {
+  if (_funcKeyDLong == func)
+    return;
+  _funcKeyDLong = func;
   emit modified(this);
 }
 

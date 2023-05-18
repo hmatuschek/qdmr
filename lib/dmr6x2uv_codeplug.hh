@@ -459,8 +459,10 @@ public:
     bool showLastHeard() const;
     void enableShowLastHeard(bool enable);
 
-    AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
-    void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    /** Returns the SMS format. */
+    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    /** Sets the SMS format. */
+    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     bool gpsUnitsImperial() const;
     void enableGPSUnitsImperial(bool enable);
@@ -477,8 +479,10 @@ public:
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    bool fmSendIDAndContact() const;
-    void enableFMSendIDAndContact(bool enable);
+    /** If enabled, the FM ID is send together with selected contact. */
+    virtual bool fmSendIDAndContact() const;
+    /** Enables/disables sending contact with FM ID. */
+    virtual void enableFMSendIDAndContact(bool enable);
 
     bool defaultChannel() const;
     void enableDefaultChannel(bool enable);
@@ -501,8 +505,10 @@ public:
     Interval rxBacklightDuration() const;
     void setRXBacklightDuration(Interval sec);
 
-    AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
-    void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the stand-by background color. */
+    virtual AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
+    /** Sets the stand-by background color. */
+    virtual void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns the group-call hang time, if group call was dialed manually. */
     virtual unsigned int manualDialedGroupCallHangTime() const;
