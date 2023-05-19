@@ -776,8 +776,8 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(bool showCall READ showCallEnabled WRITE enableShowCall)
   /** The color of the call. */
   Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
-  /** If @c true, the zone and contact names is shown. */
-  Q_PROPERTY(bool showZoneAndContact READ showZoneAndContactEnabled WRITE enableShowZoneAndContact)
+  /** If @c true, the contact name is shown. */
+  Q_PROPERTY(bool showCurrentContact READ showCurrentContact WRITE enableShowCurrentContact)
   /** Specifies the UI language. */
   Q_PROPERTY(Language language READ language WRITE setLanguage)
   /** Shows the channel number. */
@@ -865,9 +865,9 @@ public:
   void setCallColor(Color color);
 
   /** Returns @c true if the zone and contact names are shown. */
-  bool showZoneAndContactEnabled() const;
+  bool showCurrentContact() const;
   /** Enables/disables showing the zone and contact names. */
-  void enableShowZoneAndContact(bool enable);
+  void enableShowCurrentContact(bool enable);
 
   /** Returns the UI language. */
   Language language() const;
@@ -1620,6 +1620,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The auto shut-down delay in minutes. */
   Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
 
+  Q_CLASSINFO("powerSaveDescription", "Specifies the power save mode. "
+                                      "D686UV, D878UV(2) and DMR-6X2UV only.")
   /** The power-save mode. */
   Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
 
@@ -1642,6 +1644,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
 
+  Q_CLASSINFO("timeZoneDescription", "Specifies the GPS time-zone (IANA name).")
   /** The time-zone IANA Id. */
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
 
@@ -1664,7 +1667,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The keep-last-caller setting. */
   Q_PROPERTY(bool keepLastCaller READ keepLastCallerEnabled WRITE enableKeepLastCaller)
 
-  Q_CLASSINFO("vfoStep", "Specifes the VFO tuning steps in kHz.")
+  Q_CLASSINFO("vfoStepDescription", "Specifes the VFO tuning steps in kHz.")
   /** The VFO tuning step-size in kHz. */
   Q_PROPERTY(Frequency vfoStep READ vfoStep WRITE setVFOStep)
 
@@ -1676,10 +1679,12 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(double steFrequency READ steFrequency WRITE setSTEFrequency)
 
   Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz. Should be one of "
-                                          "1000, 1450, 1750 and 2100 Hz.")
+                                          "1000, 1450, 1750 and 2100 Hz. "
+                                          "D878UV(2), D578UV and DMR-6X2UV only.")
   /** The TBST frequency in Hz. */
   Q_PROPERTY(Frequency tbstFrequency READ tbstFrequency WRITE setTBSTFrequency)
 
+  Q_CLASSINFO("proModeDescription", "Enables 'professional' mode. This limits the option reachable via the menu.")
   /** If @c true, the "pro mode" is enabled. */
   Q_PROPERTY(bool proMode READ proModeEnabled WRITE enableProMode)
 

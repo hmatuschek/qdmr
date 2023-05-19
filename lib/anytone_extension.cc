@@ -1708,11 +1708,11 @@ AnytoneDisplaySettingsExtension::setCallColor(Color color) {
 }
 
 bool
-AnytoneDisplaySettingsExtension::showZoneAndContactEnabled() const {
+AnytoneDisplaySettingsExtension::showCurrentContact() const {
   return _showZoneAndContact;
 }
 void
-AnytoneDisplaySettingsExtension::enableShowZoneAndContact(bool enable) {
+AnytoneDisplaySettingsExtension::enableShowCurrentContact(bool enable) {
   if (_showZoneAndContact == enable)
     return;
   _showZoneAndContact = enable;

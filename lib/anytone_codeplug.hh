@@ -883,6 +883,23 @@ public:
     /** Sets the long-press duration in ms. */
     virtual void setLongPressDuration(Interval ms) = 0;
 
+    /** Returns @c true if the knob is locked. */
+    virtual bool knobLock() const = 0;
+    /** Enables/disables the knob lock. */
+    virtual void enableKnobLock(bool enable) = 0;
+    /** Returns @c true if the keypad is locked. */
+    virtual bool keypadLock() const = 0;
+    /** Enables/disables the keypad lock. */
+    virtual void enableKeypadLock(bool enable) = 0;
+    /** Returns @c true if the sidekeys are locked. */
+    virtual bool sidekeysLock() const = 0;
+    /** Enables/disables the sidekeys lock. */
+    virtual void enableSidekeysLock(bool enable) = 0;
+    /** Returns @c true if the "professional" key is locked. */
+    virtual bool keyLockForced() const = 0;
+    /** Enables/disables the "professional" key lock. */
+    virtual void enableKeyLockForced(bool enable) = 0;
+
   protected:
     /** Maps the key function to the device specific function code. */
     virtual uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const = 0;

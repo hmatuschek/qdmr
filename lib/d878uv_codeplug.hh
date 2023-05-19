@@ -347,7 +347,7 @@ public:
     AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
     uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
 
-  public:
+  protected:
     /** Possible VFO frequency steps. */
     enum FreqStep {
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
@@ -394,13 +394,13 @@ public:
     /** Sets the transmit timeout in seconds. */
     virtual void setTransmitTimeout(unsigned tot);
 
-    QTimeZone gpsTimeZone() const;
-    void setGPSTimeZone(const QTimeZone &zone);
-
     /** Returns the UI language. */
     virtual AnytoneDisplaySettingsExtension::Language language() const;
     /** Sets the UI language. */
     virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
+
+    QTimeZone gpsTimeZone() const;
+    void setGPSTimeZone(const QTimeZone &zone);
 
     /** Returns the VFO frequency step in kHz. */
     virtual Frequency vfoFrequencyStep() const;

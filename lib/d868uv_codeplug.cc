@@ -1038,28 +1038,30 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set default VOX sensitivity
   setVOXLevel(ctx.config()->settings()->vox());
 
-  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
-    // Power save settings
-    setPowerSave(ext->powerSave());
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
 
-    // Encode key settings
-    enableKnobLock(ext->keySettings()->knobLockEnabled());
-    enableKeypadLock(ext->keySettings()->keypadLockEnabled());
-    enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
-    enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+  // Power save settings
+  setPowerSave(ext->powerSave());
 
-    // Encode tone settings
-    setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+  // Encode key settings
+  enableKnobLock(ext->keySettings()->knobLockEnabled());
+  enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+  enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+  enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
 
-    // Encode audio settings
-    setVOXDelay(ext->audioSettings()->voxDelay());
-    setVOXSource(ext->audioSettings()->voxSource());
-    setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
+  // Encode tone settings
+  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
-    // Encode display settings
-    setRXBacklightDuration(ext->displaySettings()->backlightDuration());
-    enableShowCurrentContact(ext->displaySettings()->showZoneAndContactEnabled());
-  }
+  // Encode audio settings
+  setVOXDelay(ext->audioSettings()->voxDelay());
+  setVOXSource(ext->audioSettings()->voxSource());
+  setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
+
+  // Encode display settings
+  setRXBacklightDuration(ext->displaySettings()->backlightDuration());
+  enableShowCurrentContact(ext->displaySettings()->showCurrentContact());
 
   return true;
 }
@@ -1098,11 +1100,12 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 
   // Decode display settings
-  ext->displaySettings()->enableShowZoneAndContact(this->showCurrentContact());
+  ext->displaySettings()->enableShowCurrentContact(this->showCurrentContact());
   ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
 
   return true;
 }
+
 
 bool
 D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
@@ -1110,13 +1113,13 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
     return false;
 
   // Get or add settings extension
-  AnytoneSettingsExtension *ext = nullptr;
-  if (settings->anytoneExtension()) {
-    ext = settings->anytoneExtension();
-  } else {
+  AnytoneSettingsExtension *ext = settings->anytoneExtension();
+  if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
     settings->setAnytoneExtension(ext);
   }
+
+  // Nothing to link
 
   return true;
 }

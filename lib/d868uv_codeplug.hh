@@ -392,8 +392,8 @@ public:
     bool callAlert() const;
     void enableCallAlert(bool enable);
     bool dmrTalkPermit() const;
-    bool fmTalkPermit() const;
     void enableDMRTalkPermit(bool enable);
+    bool fmTalkPermit() const;
     void enableFMTalkPermit(bool enable);
     bool dmrResetTone() const;
     void enableDMRResetTone(bool enable);
@@ -475,22 +475,14 @@ public:
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
 
-    /** Returns @c true if the knob is locked. */
-    virtual bool knobLock() const;
-    /** Enables/disables the knob lock. */
-    virtual void enableKnobLock(bool enable);
-    /** Returns @c true if the keypad is locked. */
-    virtual bool keypadLock() const;
-    /** Enables/disables the keypad lock. */
-    virtual void enableKeypadLock(bool enable);
-    /** Returns @c true if the sidekeys are locked. */
-    virtual bool sidekeysLock() const;
-    /** Enables/disables the sidekeys lock. */
-    virtual void enableSidekeysLock(bool enable);
-    /** Returns @c true if the "professional" key is locked. */
-    virtual bool keyLockForced() const;
-    /** Enables/disables the "professional" key lock. */
-    virtual void enableKeyLockForced(bool enable);
+    bool knobLock() const;
+    void enableKnobLock(bool enable);
+    bool keypadLock() const;
+    void enableKeypadLock(bool enable);
+    bool sidekeysLock() const;
+    void enableSidekeysLock(bool enable);
+    bool keyLockForced() const;
+    void enableKeyLockForced(bool enable);
 
     bool defaultChannel() const;
     void enableDefaultChannel(bool enable);

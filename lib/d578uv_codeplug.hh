@@ -251,7 +251,7 @@ public:
    *
    * Binary encoding of the general settings (size 0x00f0 bytes):
    * @verbinclude d578uv_generalsettings.txt */
-  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
   {
   protected:
     /** Device specific key functions. */
@@ -273,6 +273,16 @@ public:
     AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
     uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
 
+    /** TBST (open repeater) frequencies. */
+    enum class TBSTFrequency {
+      Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
+    };
+
+    /** All possible STE (squelch tail eliminate) frequencies. */
+    enum class STEFrequency {
+      Off = 0, Hz55_2  = 1, Hz259_2 = 2
+    };
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -284,21 +294,22 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x00f0; }
 
-    /** This feature is not present in D578UV and D578UV II devices. */
-    AnytoneSettingsExtension::PowerSave powerSave() const;
-    /** This feature is not present in D578UV and D578UV II devices. */
-    void setPowerSave(AnytoneSettingsExtension::PowerSave mode);
-    /** This feature is not present in D578UV and D578UV II devices. */
-    unsigned int voxLevel() const;
-    /** This feature is not present in D578UV and D578UV II devices. */
-    void setVOXLevel(unsigned int level);
-    /** This feature is not present in D578UV and D578UV II devices. */
-    Interval voxDelay() const;
-    /** This feature is not present in D578UV and D578UV II devices. */
-    void setVOXDelay(Interval intv);
+    bool keyToneEnabled() const;
+    void enableKeyTone(bool enable);
+
+    /** Returns the transmit timeout in seconds. */
+    virtual unsigned transmitTimeout() const;
+    /** Sets the transmit timeout in seconds. */
+    virtual void setTransmitTimeout(unsigned tot);
+
+    /** Returns the UI language. */
+    virtual AnytoneDisplaySettingsExtension::Language language() const;
+    /** Sets the UI language. */
+    virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
 
     AnytoneSettingsExtension::VFOScanType vfoScanType() const;
     void setVFOScanType(AnytoneSettingsExtension::VFOScanType type);
+
     unsigned int dmrMicGain() const;
     void setDMRMicGain(unsigned int gain);
 
@@ -307,24 +318,43 @@ public:
     bool vfoModeB() const;
     void enableVFOModeB(bool enable);
 
-    AnytoneSettingsExtension::STEType steType() const;
-    void setSTEType(AnytoneSettingsExtension::STEType type);
-    double steFrequency() const;
-    void setSTEFrequency(double freq);
+    /** Returns the STE (squelch tail eliminate) type. */
+    virtual AnytoneSettingsExtension::STEType steType() const;
+    /** Sets the STE (squelch tail eliminate) type. */
+    virtual void setSTEType(AnytoneSettingsExtension::STEType type);
+    /** Returns the STE (squelch tail eliminate) frequency setting in Hz.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual double steFrequency() const;
+    /** Sets the STE (squelch tail eliminate) frequency setting.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual void setSTEFrequency(double freq);
 
-    Interval groupCallHangTime() const;
-    void setGroupCallHangTime(Interval sec);
-    Interval privateCallHangTime() const;
-    void setPrivateCallHangTime(Interval sec);
-    Interval preWaveDelay() const;
-    void setPreWaveDelay(Interval ms);
-    Interval wakeHeadPeriod() const;
-    void setWakeHeadPeriod(Interval ms);
+    /** Returns the group call hang time in seconds. */
+    virtual Interval groupCallHangTime() const;
+    /** Sets the group call hang time in seconds. */
+    virtual void setGroupCallHangTime(Interval sec);
+    /** Returns the private call hang time in seconds. */
+    virtual Interval privateCallHangTime() const;
+    /** Sets the private call hang time in seconds. */
+    virtual void setPrivateCallHangTime(Interval sec);
 
-    unsigned wfmChannelIndex() const;
-    void setWFMChannelIndex(unsigned idx);
-    bool wfmVFOEnabled() const;
-    void enableWFMVFO(bool enable);
+    /** Returns the pre-wave time in ms. */
+    virtual Interval preWaveDelay() const;
+    /** Sets the pre-wave time in ms. */
+    virtual void setPreWaveDelay(Interval ms);
+    /** Returns the wake head-period in ms. */
+    virtual Interval wakeHeadPeriod() const;
+    /** Sets the wake head-period in ms. */
+    virtual void setWakeHeadPeriod(Interval ms);
+
+    /** Returns the wide-FM (broadcast) channel index. */
+    virtual unsigned wfmChannelIndex() const;
+    /** Sets the wide-FM (broadcast) channel index. */
+    virtual void setWFMChannelIndex(unsigned idx);
+    /** Returns @c true if the WFM RX is in VFO mode. */
+    virtual bool wfmVFOEnabled() const;
+    /** Enables/disables VFO mode for WFM RX. */
+    virtual void enableWFMVFO(bool enable);
 
     unsigned memoryZoneA() const;
     void setMemoryZoneA(unsigned zone);
@@ -339,18 +369,8 @@ public:
     bool recording() const;
     void enableRecording(bool enable);
 
-    unsigned dtmfToneDuration() const;
-    void setDTMFToneDuration(unsigned ms);
-
-    bool manDown() const;
-    void enableManDown(bool enable);
-
     unsigned brightness() const;
     void setBrightness(unsigned level);
-    bool backlightPermanent() const;
-    Interval rxBacklightDuration() const;
-    void setRXBacklightDuration(Interval sec);
-    void enableBacklightPermanent();
 
     bool gps() const;
     void enableGPS(bool enable);
@@ -358,8 +378,10 @@ public:
     bool smsAlert() const;
     void enableSMSAlert(bool enable);
 
-    bool wfmMonitor() const;
-    void enableWFMMonitor(bool enable);
+    /** Returns @c true if WFM monitor is enabled. */
+    virtual bool wfmMonitor() const;
+    /** Enables/disables WFM monitor. */
+    virtual void enableWFMMonitor(bool enable);
 
     bool activeChannelB() const;
     void enableActiveChannelB(bool enable);
@@ -367,8 +389,10 @@ public:
     bool subChannel() const;
     void enableSubChannel(bool enable);
 
-    Frequency tbstFrequency() const;
-    void setTBSTFrequency(Frequency freq);
+    /** Returns the TBST frequency. */
+    virtual Frequency tbstFrequency() const;
+    /** Sets the TBST frequency. */
+    virtual void setTBSTFrequency(Frequency freq);
 
     bool callAlert() const;
     void enableCallAlert(bool enable);
@@ -378,6 +402,8 @@ public:
 
     bool dmrTalkPermit() const;
     void enableDMRTalkPermit(bool enable);
+    bool fmTalkPermit() const;
+    void enableFMTalkPermit(bool enable);
     bool dmrResetTone() const;
     void enableDMRResetTone(bool enable);
     bool idleChannelTone() const;
@@ -386,8 +412,10 @@ public:
     Interval menuExitTime() const;
     void setMenuExitTime(Interval intv);
 
-    bool filterOwnID() const;
-    void enableFilterOwnID(bool enable);
+    /** Returns @c true if the own ID is filtered in call lists. */
+    virtual bool filterOwnID() const;
+    /** Enables/disables filter of own ID in call lists. */
+    virtual void enableFilterOwnID(bool enable);
 
     bool startupTone() const;
     void enableStartupTone(bool enable);
@@ -398,11 +426,15 @@ public:
     unsigned maxSpeakerVolume() const;
     void setMaxSpeakerVolume(unsigned level);
 
-    bool remoteStunKill() const;
-    void enableRemoteStunKill(bool enable);
+    /** Returns @c true remote stun/kill is enabled. */
+    virtual bool remoteStunKill() const;
+    /** Enables/disables remote stun/kill. */
+    virtual void enableRemoteStunKill(bool enable);
 
-    bool remoteMonitor() const;
-    void enableRemoteMonitor(bool enable);
+    /** Returns @c true remote monitor is enabled. */
+    virtual bool remoteMonitor() const;
+    /** Enables/disables remote monitor. */
+    virtual void enableRemoteMonitor(bool enable);
 
     bool getGPSPosition() const;
     void enableGetGPSPosition(bool enable);
@@ -416,26 +448,38 @@ public:
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const;
     void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    AnytoneDMRSettingsExtension::SlotMatch monitorSlotMatch() const;
-    void setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match);
-    bool monitorColorCodeMatch() const;
-    void enableMonitorColorCodeMatch(bool enable);
-    bool monitorIDMatch() const;
-    void enableMonitorIDMatch(bool enable);
-    bool monitorTimeSlotHold() const;
-    void enableMonitorTimeSlotHold(bool enable);
+    /** Returns the monitor slot match. */
+    virtual AnytoneDMRSettingsExtension::SlotMatch monitorSlotMatch() const;
+    /** Sets the monitor slot match. */
+    virtual void setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match);
+    /** Returns @c true if the monitor matches color code. */
+    virtual bool monitorColorCodeMatch() const;
+    /** Enables/disables monitor color code match. */
+    virtual void enableMonitorColorCodeMatch(bool enable);
+    /** Returns @c true if the monitor matches ID. */
+    virtual bool monitorIDMatch() const;
+    /** Enables/disables monitor ID match. */
+    virtual void enableMonitorIDMatch(bool enable);
+    /** Returns @c true if the monitor holds the time slot. */
+    virtual bool monitorTimeSlotHold() const;
+    /** Enables/disables monitor time slot hold. */
+    virtual void enableMonitorTimeSlotHold(bool enable);
 
     AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const;
     void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode);
 
-    unsigned fmCallHold() const;
-    void setFMCallHold(unsigned sec);
+    /** Returns the analog call hold in seconds. */
+    virtual unsigned fmCallHold() const;
+    /** Sets the analog call hold in seconds. */
+    virtual void setFMCallHold(unsigned sec);
 
     bool displayClock() const;
     void enableDisplayClock(bool enable);
 
-    bool gpsMessageEnabled() const;
-    void enableGPSMessage(bool enable);
+    /** Returns @c true if the GPS range reporting is enabled. */
+    virtual bool gpsMessageEnabled() const;
+    /** Enables/disables GPS range reporting. */
+    virtual void enableGPSMessage(bool enable);
 
     bool enhanceAudio() const;
     void enableEnhancedAudio(bool enable);
@@ -449,13 +493,6 @@ public:
     Frequency maxVFOScanFrequencyVHF() const;
     void setMaxVFOScanFrequencyVHF(Frequency hz);
 
-    void callToneMelody(Melody &melody) const;
-    void setCallToneMelody(const Melody &melody);
-    void idleToneMelody(Melody &melody) const;
-    void setIdleToneMelody(const Melody &melody);
-    void resetToneMelody(Melody &melody) const;
-    void setResetToneMelody(const Melody &melody);
-
     bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
     unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
     void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
@@ -464,40 +501,80 @@ public:
     unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
     void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
     void clearAutoRepeaterOffsetFrequencyIndexVHF();
+    Frequency autoRepeaterMinFrequencyVHF() const;
+    void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyVHF() const;
+    void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
+    Frequency autoRepeaterMinFrequencyUHF() const;
+    void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
+    Frequency autoRepeaterMaxFrequencyUHF() const;
+    void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
-    unsigned priorityZoneAIndex() const;
-    void setPriorityZoneAIndex(unsigned idx);
-    unsigned priorityZoneBIndex() const;
-    void setPriorityZoneBIndex(unsigned idx);
+    void callToneMelody(Melody &melody) const;
+    void setCallToneMelody(const Melody &melody);
+    void idleToneMelody(Melody &melody) const;
+    void setIdleToneMelody(const Melody &melody);
+    void resetToneMelody(Melody &melody) const;
+    void setResetToneMelody(const Melody &melody);
+
+    /** Returns the priority Zone A index. */
+    virtual unsigned priorityZoneAIndex() const;
+    /** Sets the priority zone A index. */
+    virtual void setPriorityZoneAIndex(unsigned idx);
+    /** Returns the priority Zone B index. */
+    virtual unsigned priorityZoneBIndex() const;
+    /** Sets the priority zone B index. */
+    virtual void setPriorityZoneBIndex(unsigned idx);
 
     bool displayCall() const;
     void enableDisplayCall(bool enable);
 
-    bool bluetooth() const;
-    void enableBluetooth(bool enable);
-    bool btAndInternalMic() const;
-    void enableBTAndInternalMic(bool enable);
-    bool btAndInternalSpeaker() const;
-    void enableBTAndInternalSpeaker(bool enable);
-    bool pluginRecTone() const;
-    void enablePluginRecTone(bool enable);
+    /** Returns @c true if bluetooth is enabled. */
+    virtual bool bluetooth() const;
+    /** Enables/disables bluetooth. */
+    virtual void enableBluetooth(bool enable);
 
-    Interval gpsUpdatePeriod() const;
-    void setGPSUpdatePeriod(Interval sec);
+    /** Returns @c true if the internal mic is addionally active when BT is active. */
+    virtual bool btAndInternalMic() const;
+    /** Enables/disables the internal mic when BT is active. */
+    virtual void enableBTAndInternalMic(bool enable);
 
-    unsigned int btMicGain() const;
-    void setBTMicGain(unsigned int gain);
-    unsigned int btSpeakerGain() const;
-    void setBTSpeakerGain(unsigned int gain);
+    /** Returns @c true if the internal speaker is addionally active when BT is active. */
+    virtual bool btAndInternalSpeaker() const;
+    /** Enables/disables the internal speaker when BT is active. */
+    virtual void enableBTAndInternalSpeaker(bool enable);
 
-    bool displayChannelNumber() const;
-    void enableDisplayChannelNumber(bool enable);
+    /** Returns @c true if the plug-in record tone is enabled. */
+    virtual bool pluginRecTone() const;
+    /** Enables/disables the plug-in record tone. */
+    virtual void enablePluginRecTone(bool enable);
+
+    /** Returns the GPS ranging interval in seconds. */
+    virtual Interval gpsUpdatePeriod() const;
+    /** Sets the GPS ranging interval in seconds. */
+    virtual void setGPSUpdatePeriod(Interval sec);
+
+    /** Retunrs the bluetooth microphone gain [1,10]. */
+    virtual unsigned int btMicGain() const;
+    /** Sets the bluetooth microphone gain [1,10]. */
+    virtual void setBTMicGain(unsigned int gain);
+    /** Retunrs the bluetooth speaker gain [1,10]. */
+    virtual unsigned int btSpeakerGain() const;
+    /** Sets the bluetooth speaker gain [1,10]. */
+    virtual void setBTSpeakerGain(unsigned int gain);
+
+    /** Returns @c true if the channel number is displayed. */
+    virtual bool displayChannelNumber() const;
+    /** Enables/disables display of channel number. */
+    virtual void enableDisplayChannelNumber(bool enable);
 
     bool showCurrentContact() const;
     void enableShowCurrentContact(bool enable);
 
-    Interval autoRoamPeriod() const;
-    void setAutoRoamPeriod(Interval min);
+    /** Returns the auto roaming period in minutes. */
+    virtual Interval autoRoamPeriod() const;
+    /** Sets the auto roaming period in minutes. */
+    virtual void setAutoRoamPeriod(Interval min);
 
     AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
     void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
@@ -514,25 +591,35 @@ public:
     bool keyLockForced() const;
     void enableKeyLockForced(bool enable);
 
-    Interval autoRoamDelay() const;
-    void setAutoRoamDelay(Interval sec);
+    /** Returns the auto-roam delay in seconds. */
+    virtual Interval autoRoamDelay() const;
+    /** Sets the auto-roam delay in seconds. */
+    virtual void setAutoRoamDelay(Interval sec);
 
-    AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
-    void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
-    AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
-    void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the standby text color. */
+    virtual AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
+    /** Sets the standby text color. */
+    virtual void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the standby image color. */
+    virtual AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
+    /** Sets the standby image color. */
+    virtual void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
 
     bool showLastHeard() const;
     void enableShowLastHeard(bool enable);
 
-    AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
-    void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    /** Returns the SMS format. */
+    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    /** Sets the SMS format. */
+    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    bool fmSendIDAndContact() const;
-    void enableFMSendIDAndContact(bool enable);
+    /** If enabled, the FM ID is send together with selected contact. */
+    virtual bool fmSendIDAndContact() const;
+    /** Enables/disables sending contact with FM ID. */
+    virtual void enableFMSendIDAndContact(bool enable);
 
     bool defaultChannel() const;
     void enableDefaultChannel(bool enable);
@@ -549,33 +636,50 @@ public:
     void setDefaultChannelBIndex(unsigned idx);
     void setDefaultChannelBToVFO();
 
-    unsigned defaultRoamingZoneIndex() const;
-    void setDefaultRoamingZoneIndex(unsigned idx);
+    /** Returns the default roaming zone index. */
+    virtual unsigned defaultRoamingZoneIndex() const;
+    /** Sets the default roaming zone index. */
+    virtual void setDefaultRoamingZoneIndex(unsigned idx);
 
-    bool repeaterRangeCheck() const;
-    void enableRepeaterRangeCheck(bool enable);
+    /** Returns @c true if repeater range check is enabled. */
+    virtual bool repeaterRangeCheck() const;
+    /** Enables/disables repeater range check. */
+    virtual void enableRepeaterRangeCheck(bool enable);
+    /** Returns the repeater range check period in seconds. */
+    virtual Interval repeaterRangeCheckInterval() const;
+    /** Sets the repeater range check interval in seconds. */
+    virtual void setRepeaterRangeCheckInterval(Interval sec);
+    /** Returns the number of repeater range checks. */
+    virtual unsigned repeaterRangeCheckCount() const;
+    /** Sets the number of repeater range checks. */
+    virtual void setRepeaterRangeCheckCount(unsigned n);
+    /** Returns the roaming start condition. */
+    virtual AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
+    /** Sets the roaming start condition. */
+    virtual void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
 
-    Interval repeaterRangeCheckInterval() const;
-    void setRepeaterRangeCheckInterval(Interval sec);
-    unsigned repeaterRangeCheckCount() const;
-    void setRepeaterRangeCheckCount(unsigned n);
-    AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
-    void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
-
-    bool separateDisplay() const;
-    void enableSeparateDisplay(bool enable);
+    /** Returns @c true if the "separate display" is enabled. */
+    virtual bool separateDisplay() const;
+    /** Enables/disables "separate display. */
+    virtual void enableSeparateDisplay(bool enable);
 
     bool keepLastCaller() const;
     void enableKeepLastCaller(bool enable);
 
-    AnytoneDisplaySettingsExtension::Color channelNameColor() const;
-    void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the channel name color. */
+    virtual AnytoneDisplaySettingsExtension::Color channelNameColor() const;
+    /** Sets the channel name color. */
+    virtual void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
 
-    bool repeaterCheckNotification() const;
-    void enableRepeaterCheckNotification(bool enable);
+    /** Returns @c true if repeater check notification is enabled. */
+    virtual bool repeaterCheckNotification() const;
+    /** Enables/disables repeater check notification. */
+    virtual void enableRepeaterCheckNotification(bool enable);
 
-    bool roaming() const;
-    void enableRoaming(bool enable);
+    /** Returns @c true if roaming is enabled. */
+    virtual bool roaming() const;
+    /** Enables/disables repeater check notification. */
+    virtual void enableRoaming(bool enable);
 
     AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
     void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
@@ -639,31 +743,45 @@ public:
     /** Sets the function for programmable function key D long press. */
     virtual void setFuncKeyDLong(AnytoneKeySettingsExtension::KeyFunction func);
 
-    unsigned int repeaterCheckNumNotifications() const;
-    void setRepeaterCheckNumNotifications(unsigned int num);
+    /** Returns the number of repeater check notifications. */
+    virtual unsigned repeaterCheckNumNotifications() const;
+    /** Sets the number of repeater check notifications. */
+    virtual void setRepeaterCheckNumNotifications(unsigned num);
 
     /** Returns the transmit timeout rekey interval in seconds [0,255], 0=Off. */
     virtual Interval transmitTimeoutRekey() const;
     /** Sets the transmit timeout rekey interval in seconds [0,255], 0=Off. */
     virtual void setTransmitTimeoutRekey(Interval dt);
 
-    bool btHoldTimeEnabled() const;
-    bool btHoldTimeInfinite() const;
-    Interval btHoldTime() const;
-    void setBTHoldTime(Interval dt);
-    void setBTHoldTimeInfinite();
-    void disableBTHoldTime();
+    /** Returns @c true, if the bluetooth hold time is enabled. */
+    virtual bool btHoldTimeEnabled() const;
+    /** Returns @c true, if the bluetooth hold time is infinite. */
+    virtual bool btHoldTimeInfinite() const;
+    /** Returns the bluetooth hold time. */
+    virtual Interval btHoldTime() const;
+    /** Sets the bluethooth hold time (1-120s). */
+    virtual void setBTHoldTime(Interval interval);
+    /** Sets the bluethooth hold time to infinite. */
+    virtual void setBTHoldTimeInfinite();
+    /** Sets the bluethooth hold time to infinite. */
+    virtual void disableBTHoldTime();
 
-    Interval btRXDelay() const;
-    void setBTRXDelay(Interval delay);
+    /** Returns the bluetooth RX delay in ms. */
+    virtual Interval btRXDelay() const;
+    /** Sets the bluetooth RX delay in ms. */
+    virtual void setBTRXDelay(Interval delay);
 
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
 
   protected:
     /** Some internal offsets. */
-    struct Offset: D878UVCodeplug::GeneralSettingsElement::Offset {
+    struct Offset: AnytoneCodeplug::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int enableKeyTone()       { return 0x0000; }
+      static constexpr unsigned int transmitTimeout()     { return 0x0004; }
+      static constexpr unsigned int language()            { return 0x0005; }
       static constexpr unsigned int vfoScanType()         { return 0x000b; }
       static constexpr unsigned int dmrMicGain()          { return 0x000c; }
       static constexpr unsigned int vfoModeA()            { return 0x000d; }
@@ -685,6 +803,7 @@ public:
       static constexpr unsigned int gpsEnable()           { return 0x001f; }
 
       static constexpr unsigned int smsAlert()            { return 0x0020; }
+      static constexpr unsigned int wfmMonitor()          { return 0x0021;}
       static constexpr unsigned int activeChannelB()      { return 0x0023; }
       static constexpr unsigned int subChannel()          { return 0x0024; }
       static constexpr unsigned int tbstFrequency()       { return 0x0025; }
