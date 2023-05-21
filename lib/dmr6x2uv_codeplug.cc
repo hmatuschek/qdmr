@@ -744,8 +744,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
 
   // Encode display settings
   setCallDisplayColor(ext->displaySettings()->callColor());
+  setStandbyBackgroundColor(ext->displaySettings()->standbyBackgroundColor());
   setLanguage(ext->displaySettings()->language());
-  enableShowCurrentContact(ext->displaySettings()->showContactEnabled());
+  enableShowCurrentContact(ext->displaySettings()->showContact());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
   setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
 
@@ -768,12 +769,13 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
   setSMSFormat(ext->dmrSettings()->smsFormat());
 
-  // Encode ranging/roaming settings.
-  enableGPSMessage(ext->rangingSettings()->gpsRangeReportingEnabled());
-  setGPSUpdatePeriod(ext->rangingSettings()->gpsRangingInterval());
+  // Encode GPS settings.
+  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
+  setGPSTimeZone(ext->gpsSettings()->timeZone());
+  enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
+  setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
 
   // Encode other settings
-  enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
   enableKeepLastCaller(ext->keepLastCallerEnabled());
   setVFOFrequencyStep(ext->vfoStep());
   setSTEType(ext->steType());
@@ -819,6 +821,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setBacklightDurationRX(this->rxBacklightDuration());
+  ext->displaySettings()->setStandbyBackgroundColor(this->standbyBackgroundColor());
 
   // Decode auto-repeater settings
   ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
@@ -839,13 +842,14 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
   ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
-  // Encode ranging/roaming settings
-  ext->rangingSettings()->enableGPSRangeReporting(this->gpsMessageEnabled());
-  ext->rangingSettings()->setGPSRangingInterval(this->gpsUpdatePeriod());
+  // Encode GPS settings
+  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
+                                                          AnytoneGPSSettingsExtension::Units::Metric);
+  ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
+  ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
+  ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
 
   // Decode other settings
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
-                                           AnytoneSettingsExtension::Units::Metric);
   ext->enableKeepLastCaller(this->keepLastCaller());
   ext->setVFOStep(this->vfoFrequencyStep());
   ext->setSTEType(this->steType());

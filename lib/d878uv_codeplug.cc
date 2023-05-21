@@ -1163,12 +1163,12 @@ D878UVCodeplug::GeneralSettingsElement::setRepeaterRangeCheckCount(unsigned n) {
   setUInt8(Offset::rangeCheckCount(), n);
 }
 
-AnytoneRangingSettingsExtension::RoamStart
+AnytoneRoamingSettingsExtension::RoamStart
 D878UVCodeplug::GeneralSettingsElement::roamingStartCondition() const {
-  return (AnytoneRangingSettingsExtension::RoamStart)getUInt8(Offset::roamStartCondition());
+  return (AnytoneRoamingSettingsExtension::RoamStart)getUInt8(Offset::roamStartCondition());
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond) {
+D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond) {
   setUInt8(Offset::roamStartCondition(), (unsigned)cond);
 }
 
@@ -1358,12 +1358,13 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setCallDisplayColor(ext->displaySettings()->callColor());
   setLanguage(ext->displaySettings()->language());
   enableDisplayChannelNumber(ext->displaySettings()->showChannelNumberEnabled());
-  enableShowCurrentContact(ext->displaySettings()->showContactEnabled());
+  enableShowCurrentContact(ext->displaySettings()->showContact());
   setStandbyTextColor(ext->displaySettings()->standbyTextColor());
+  setStandbyBackgroundColor(ext->displaySettings()->standbyBackgroundColor());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
-  setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
   setChannelNameColor(ext->displaySettings()->callColor());
   setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
+  setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
 
   // Encode menu settings
   enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
@@ -1387,20 +1388,23 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
   setSMSFormat(ext->dmrSettings()->smsFormat());
 
+  // Encode GPS settings
+  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
+  setGPSTimeZone(ext->gpsSettings()->timeZone());
+  enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
+  setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
+
   // Encode ranging/roaming settings.
-  enableGPSMessage(ext->rangingSettings()->gpsRangeReportingEnabled());
-  setGPSUpdatePeriod(ext->rangingSettings()->gpsRangingInterval());
-  setAutoRoamPeriod(ext->rangingSettings()->autoRoamPeriod());
-  setAutoRoamDelay(ext->rangingSettings()->autoRoamDelay());
-  enableRepeaterRangeCheck(ext->rangingSettings()->repeaterRangeCheckEnabled());
-  setRepeaterRangeCheckInterval(ext->rangingSettings()->repeaterCheckInterval());
-  setRepeaterRangeCheckCount(ext->rangingSettings()->repeaterRangeCheckCount());
-  setRoamingStartCondition(ext->rangingSettings()->roamingStartCondition());
-  enableRepeaterCheckNotification(ext->rangingSettings()->notificationEnabled());
-  setRepeaterCheckNumNotifications(ext->rangingSettings()->notificationCount());
+  setAutoRoamPeriod(ext->roamingSettings()->autoRoamPeriod());
+  setAutoRoamDelay(ext->roamingSettings()->autoRoamDelay());
+  enableRepeaterRangeCheck(ext->roamingSettings()->repeaterRangeCheckEnabled());
+  setRepeaterRangeCheckInterval(ext->roamingSettings()->repeaterCheckInterval());
+  setRepeaterRangeCheckCount(ext->roamingSettings()->repeaterRangeCheckCount());
+  setRoamingStartCondition(ext->roamingSettings()->roamingStartCondition());
+  enableRepeaterCheckNotification(ext->roamingSettings()->notificationEnabled());
+  setRepeaterCheckNumNotifications(ext->roamingSettings()->notificationCount());
 
   // Encode other settings
-  enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
   enableKeepLastCaller(ext->keepLastCallerEnabled());
   setVFOFrequencyStep(ext->vfoStep());
   setSTEType(ext->steType());
@@ -1450,6 +1454,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowChannelNumber(this->displayChannelNumber());
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
   ext->displaySettings()->setStandbyTextColor(this->standbyTextColor());
+  ext->displaySettings()->setStandbyBackgroundColor(this->standbyBackgroundColor());
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
   ext->displaySettings()->setChannelNameColor(this->channelNameColor());
@@ -1477,21 +1482,24 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
   ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
+  // Encode GPS settings
+  ext->gpsSettings()->setUnits(
+        this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
+                                   AnytoneGPSSettingsExtension::Units::Metric);
+  ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
+  ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
+
   // Encode ranging/roaming settings
-  ext->rangingSettings()->enableGPSRangeReporting(this->gpsMessageEnabled());
-  ext->rangingSettings()->setGPSRangingInterval(this->gpsUpdatePeriod());
-  ext->rangingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
-  ext->rangingSettings()->setAutoRoamDelay(this->autoRoamDelay());
-  ext->rangingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheck());
-  ext->rangingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
-  ext->rangingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
-  ext->rangingSettings()->setRoamingStartCondition(this->roamingStartCondition());
-  ext->rangingSettings()->enableNotification(this->repeaterCheckNotification());
-  ext->rangingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
+  ext->roamingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
+  ext->roamingSettings()->setAutoRoamDelay(this->autoRoamDelay());
+  ext->roamingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheck());
+  ext->roamingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
+  ext->roamingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
+  ext->roamingSettings()->setRoamingStartCondition(this->roamingStartCondition());
+  ext->roamingSettings()->enableNotification(this->repeaterCheckNotification());
+  ext->roamingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
 
   // Decode other settings
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
-                                           AnytoneSettingsExtension::Units::Metric);
   ext->enableKeepLastCaller(this->keepLastCaller());
   ext->setVFOStep(this->vfoFrequencyStep());
   ext->setSTEType(this->steType());
@@ -1814,8 +1822,8 @@ D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, 
   }
 
   // Encode audio settings
-  if (ext->audioSettings()->analogMicGainEnabled())
-    setAnalogMicGain(ext->audioSettings()->analogMicGain());
+  if (ext->audioSettings()->fmMicGainEnabled())
+    setAnalogMicGain(ext->audioSettings()->fmMicGain());
   else
     setAnalogMicGain(ctx.config()->settings()->micLevel());
 
@@ -1840,9 +1848,9 @@ D878UVCodeplug::GeneralSettingsExtensionElement::updateConfig(Context &ctx, cons
   ext->autoRepeaterSettings()->setUHF2Max(this->autoRepeaterUHF2MaxFrequency());
 
   // Store FM mic gain separately
-  ext->audioSettings()->setAnalogMicGain(analogMicGain());
+  ext->audioSettings()->setFMMicGain(analogMicGain());
   // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableAnalogMicGain(
+  ext->audioSettings()->enableFMMicGain(
         ctx.config()->settings()->micLevel() != analogMicGain());
 
   return true;

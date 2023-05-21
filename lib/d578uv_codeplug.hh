@@ -654,9 +654,9 @@ public:
     /** Sets the number of repeater range checks. */
     virtual void setRepeaterRangeCheckCount(unsigned n);
     /** Returns the roaming start condition. */
-    virtual AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
+    virtual AnytoneRoamingSettingsExtension::RoamStart roamingStartCondition() const;
     /** Sets the roaming start condition. */
-    virtual void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
+    virtual void setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond);
 
     /** Returns @c true if the "separate display" is enabled. */
     virtual bool separateDisplay() const;

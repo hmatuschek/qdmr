@@ -1736,7 +1736,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       setMemoryZoneB(ctx.index(ext->zoneB()->as<Zone>()));
     enableActiveChannelB(AnytoneSettingsExtension::VFO::B == ext->selectedVFO());
     enableSubChannel(ext->subChannelEnabled());
-    setGPSTimeZone(ext->timeZone());
     setMinVFOScanFrequencyUHF(ext->minVFOScanFrequencyUHF());
     setMaxVFOScanFrequencyUHF(ext->maxVFOScanFrequencyUHF());
     setMinVFOScanFrequencyVHF(ext->minVFOScanFrequencyVHF());
@@ -1832,8 +1831,11 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
     setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
+    // Encode GPS Settings
+    setGPSTimeZone(ext->gpsSettings()->timeZone());
+    enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
+
     // Encode other settings
-    enableGPSUnitsImperial(AnytoneSettingsExtension::Units::Archaic == ext->units());
     enableKeepLastCaller(ext->keepLastCallerEnabled());
   } else if (! flags.updateCodePlug) {
     clearAutoRepeaterOffsetFrequencyIndexVHF();
@@ -1871,7 +1873,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->setSelectedVFO(activeChannelB() ? AnytoneSettingsExtension::VFO::B
                                        : AnytoneSettingsExtension::VFO::A);
   ext->enableSubChannel(subChannel());
-  ext->setTimeZone(gpsTimeZone());
   ext->setMinVFOScanFrequencyUHF(this->minVFOScanFrequencyUHF());
   ext->setMaxVFOScanFrequencyUHF(this->maxVFOScanFrequencyUHF());
   ext->setMinVFOScanFrequencyVHF(this->minVFOScanFrequencyVHF());
@@ -1935,10 +1936,13 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
+  // Store GPS settings
+  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
+                                                          AnytoneGPSSettingsExtension::Units::Metric);
+  ext->gpsSettings()->setTimeZone(gpsTimeZone());
+
   // Other settings
   ext->enableKeepLastCaller(this->keepLastCaller());
-  ext->setUnits(this->gpsUnitsImperial() ? AnytoneSettingsExtension::Units::Archaic :
-                                           AnytoneSettingsExtension::Units::Metric);
 
   return true;
 }

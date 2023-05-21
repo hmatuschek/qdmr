@@ -750,6 +750,7 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(bool displayFrequency READ displayFrequencyEnabled WRITE enableDisplayFrequency)
   /** The display brightness [1-10]. */
   Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
+
   /** The backlight duration in seconds. */
   Q_PROPERTY(Interval backlightDuration READ backlightDuration WRITE setBacklightDuration)
 
@@ -776,16 +777,16 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(bool showCall READ showCallEnabled WRITE enableShowCall)
   /** The color of the call. */
   Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
-  /** If @c true, the contact name is shown. */
-  Q_PROPERTY(bool showCurrentContact READ showCurrentContact WRITE enableShowCurrentContact)
   /** Specifies the UI language. */
   Q_PROPERTY(Language language READ language WRITE setLanguage)
   /** Shows the channel number. */
   Q_PROPERTY(bool showChannelNumber READ showChannelNumberEnabled WRITE enableShowChannelNumber)
   /** Shows the contact. */
-  Q_PROPERTY(bool showContact READ showContactEnabled WRITE enableShowContact)
+  Q_PROPERTY(bool showContact READ showContact WRITE enableShowContact)
   /** The standby text color. */
   Q_PROPERTY(Color standbyTextColor READ standbyTextColor WRITE setStandbyTextColor)
+  /** The standby background color. */
+  Q_PROPERTY(Color standbyBackgroundColor READ standbyBackgroundColor WRITE setStandbyBackgroundColor)
   /** Shows the last caller. */
   Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
 
@@ -864,11 +865,6 @@ public:
   /** Sets the color of the call. */
   void setCallColor(Color color);
 
-  /** Returns @c true if the zone and contact names are shown. */
-  bool showCurrentContact() const;
-  /** Enables/disables showing the zone and contact names. */
-  void enableShowCurrentContact(bool enable);
-
   /** Returns the UI language. */
   Language language() const;
   /** Sets the UI language. */
@@ -880,7 +876,7 @@ public:
   void enableShowChannelNumber(bool enable);
 
   /** Returns @c true if the contact is shown. */
-  bool showContactEnabled() const;
+  bool showContact() const;
   /** Enables/disables the display of calling contact. */
   void enableShowContact(bool enable);
 
@@ -888,6 +884,10 @@ public:
   Color standbyTextColor() const;
   /** Sets the standby text color. */
   void setStandbyTextColor(Color color);
+  /** Returns the standby background color. */
+  Color standbyBackgroundColor() const;
+  /** Sets the standby background color. */
+  void setStandbyBackgroundColor(Color color);
 
   /** Shows the last caller. */
   bool showLastHeardEnabled() const;
@@ -919,11 +919,11 @@ protected:
   bool _showClock;                          ///< Display clock.
   bool _showCall;                           ///< Display call.
   Color _callColor;                         ///< Color of call.
-  bool _showZoneAndContact;                 ///< Display zone and contact
   Language _language;                       ///< UI language.
   bool _showChannelNumber;                  ///< Show channel number.
   bool _showContact;                        ///< Enables showing the contact.
   Color _standbyTextColor;                  ///< Standby text color.
+  Color _standbyBackgroundColor;            ///< Standby background color.
   bool _showLastHeard;                      ///< Shows the last caller.
   Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
   Color _channelNameColor;                  ///< Color of channel name.
@@ -954,9 +954,9 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   /** The mute delay in minutes. */
   Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
   /** Enables the separate FM mic gain. If disabled, the DMR mic gain setting is used for FM too. */
-  Q_PROPERTY(bool enableAnalogMicGain READ analogMicGainEnabled WRITE enableAnalogMicGain)
+  Q_PROPERTY(bool enableFMMicGain READ fmMicGainEnabled WRITE enableFMMicGain)
   /** The FM mic gain [1,10]. */
-  Q_PROPERTY(unsigned int analogMicGain READ analogMicGain WRITE setAnalogMicGain)
+  Q_PROPERTY(unsigned int fmMicGain READ fmMicGain WRITE setFMMicGain)
 
 public:
   /** Source for the VOX. */
@@ -1006,13 +1006,13 @@ public:
   void setMuteDelay(Interval intv);
 
   /** Returns @c true, if the FM mic gain is set independently. */
-  bool analogMicGainEnabled() const;
+  bool fmMicGainEnabled() const;
   /** Enables/disables the FM mic gain. */
-  void enableAnalogMicGain(bool enable);
+  void enableFMMicGain(bool enable);
   /** Returns the FM mic gain. */
-  unsigned int analogMicGain() const;
+  unsigned int fmMicGain() const;
   /** Sets the FM mic gain. */
-  void setAnalogMicGain(unsigned int gain);
+  void setFMMicGain(unsigned int gain);
 
 protected:
   Interval _voxDelay;               ///< VOX delay in ms.
@@ -1350,13 +1350,13 @@ class AnytoneDMRSettingsExtension: public ConfigItem
 public:
   /** Possible monitor slot matches. */
   enum class SlotMatch {
-    Off = 0, Single = 1, Both = 2
+    Off = 0, Single = 1, Both = 2,
   };
   Q_ENUM(SlotMatch)
 
   /** Possible SMS formats. */
   enum class SMSFormat {
-    Motorola = 0, Hytera = 1, DMR = 2,
+    Motorola = 0, Hytera = 1, DMR = 2
   };
   Q_ENUM(SMSFormat)
 
@@ -1425,24 +1425,84 @@ protected:
 };
 
 
+/** Implements the GPS settings extension of AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneGPSSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("unitsDescription", "Specifies the GPS units.")
+  /** The GPS units used. */
+  Q_PROPERTY(Units units READ units WRITE setUnits)
+
+  Q_CLASSINFO("timeZoneDescription", "Specifies the GPS time-zone (IANA name).")
+  /** The time-zone IANA Id. */
+  Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
+
+  Q_CLASSINFO("positionReportingDescription", "Enables GPS range reporting.")
+  /** Enables GPS range reporing. */
+  Q_PROPERTY(bool reportPosition READ positionReportingEnabled WRITE enablePositionReporting)
+
+  Q_CLASSINFO("updatePeriodDescription", "Specifies the GPS reporting interval in seconds.")
+  /** GPS ranging interval in seconds. */
+  Q_PROPERTY(Interval updatePeriod READ updatePeriod WRITE setUpdatePeriod)
+
+public:
+  /** Possible unit systems. */
+  enum class Units {
+    Metric = 0, Archaic = 1
+  };
+  Q_ENUM(Units)
+
+public:
+  /** Constructor. */
+  explicit AnytoneGPSSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the GPS units used. */
+  Units units() const;
+  /** Sets the GPS units. */
+  void setUnits(Units units);
+
+  /** Returns the IANA ID of the time zone. */
+  QString ianaTimeZone() const;
+  /** Returns the time-zone. */
+  QTimeZone timeZone() const;
+  /** Sets the time zone by IANA ID. */
+  void setIANATimeZone(const QString &id);
+  /** Sets the time zone. */
+  void setTimeZone(const QTimeZone &zone);
+
+  /** Returns @c true if the GPS range reporing is enabled. */
+  bool positionReportingEnabled() const;
+  /** Enables/disables the GPS range reporting. */
+  void enablePositionReporting(bool enable);
+
+  /** Returns the GPS ranging interval in seconds. */
+  Interval updatePeriod() const;
+  /** Sets the GPS ranging interval in seconds. */
+  void setUpdatePeriod(Interval sec);
+
+protected:
+  Units _gpsUnits;                             ///< The GPS units.
+  QTimeZone _timeZone;                         ///< The time zone.
+  bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
+  Interval _gpsRangingInterval;                ///< The GPS ranging interval in seconds.
+};
+
+
 /** Implements the ranging/roaming settings extension of AnyTone devices.
  * This extension is part of the @c AnytoneSettingsExtension.
  *
  * @ingroup anytone */
-class AnytoneRangingSettingsExtension: public ConfigItem
+class AnytoneRoamingSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
   Q_CLASSINFO("Description", "Collects all ranging/roaming settings for AnyTone devices.")
-
-  Q_CLASSINFO("gpsRangeReporing", "Enables GPS range reporting.")
-  /** Enables GPS range reporing. */
-  Q_PROPERTY(bool gpsRangeReporting READ gpsRangeReportingEnabled WRITE enableGPSRangeReporting)
-
-  Q_CLASSINFO("gpsRangingInterval", "Specifies the GPS ranging interval in seconds.")
-  /** GPS ranging interval in seconds. */
-  Q_PROPERTY(Interval gpsRangingInterval READ gpsRangingInterval WRITE setGPSRangingInterval)
-
 
   Q_CLASSINFO("autoRoamPeriodDescription", "Specifies the auto-roaming period in minutes.")
   /** The auto-roaming period in minutes. */
@@ -1485,19 +1545,9 @@ public:
 
 public:
   /** Constructor. */
-  explicit AnytoneRangingSettingsExtension(QObject *parent=nullptr);
+  explicit AnytoneRoamingSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns @c true if the GPS range reporing is enabled. */
-  bool gpsRangeReportingEnabled() const;
-  /** Enables/disables the GPS range reporting. */
-  void enableGPSRangeReporting(bool enable);
-
-  /** Returns the GPS ranging interval in seconds. */
-  Interval gpsRangingInterval() const;
-  /** Sets the GPS ranging interval in seconds. */
-  void setGPSRangingInterval(Interval sec);
 
   /** Returns the auto-roaming period in minutes. */
   Interval autoRoamPeriod() const;
@@ -1536,8 +1586,6 @@ public:
   void setNotificationCount(unsigned int n);
 
 protected:
-  bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
-  Interval _gpsRangingInterval;                ///< The GPS ranging interval in seconds.
   Interval _autoRoamPeriod;                    ///< The auto-roam period in minutes.
   Interval _autoRoamDelay;                     ///< The auto-roam delay in seconds.
   bool _repeaterRangeCheck;                    ///< Enables the repeater range-check.
@@ -1644,10 +1692,6 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
 
-  Q_CLASSINFO("timeZoneDescription", "Specifies the GPS time-zone (IANA name).")
-  /** The time-zone IANA Id. */
-  Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
-
   /** The VFO scan type. */
   Q_PROPERTY(VFOScanType vfoScanType READ vfoScanType WRITE setVFOScanType)
   /** The minimum UHF VFO-scan frequency in Hz. */
@@ -1658,10 +1702,6 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(Frequency minVFOScanFrequencyVHF READ minVFOScanFrequencyVHF WRITE setMinVFOScanFrequencyVHF)
   /** The maximum VHF VFO-scan frequency in Hz. */
   Q_PROPERTY(Frequency maxVFOScanFrequencyVHF READ maxVFOScanFrequencyVHF WRITE setMaxVFOScanFrequencyVHF)
-
-  Q_CLASSINFO("unitsDescription", "Specifies the GPS units.")
-  /** The GPS units used. */
-  Q_PROPERTY(Units units READ units WRITE setUnits)
 
   Q_CLASSINFO("keepLastCallerDescription", "Keeps the last caller on channel switch")
   /** The keep-last-caller setting. */
@@ -1707,8 +1747,10 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneAutoRepeaterSettingsExtension* autoRepeaterSettings READ autoRepeaterSettings)
   /** The DMR settings. */
   Q_PROPERTY(AnytoneDMRSettingsExtension* dmrSettings READ dmrSettings)
-  /** The Raging/Roaming settings. */
-  Q_PROPERTY(AnytoneRangingSettingsExtension* rangingSettings READ rangingSettings)
+  /** The GPS settings. */
+  Q_PROPERTY(AnytoneGPSSettingsExtension* gpsSettings READ gpsSettings)
+  /** The Roaming settings. */
+  Q_PROPERTY(AnytoneRoamingSettingsExtension* roamingSettings READ roamingSettings)
 
   Q_CLASSINFO("simplexRepeaterSettingsDescription",
               "Configuration for the DMR-6X2UV simplex-repeater feature.")
@@ -1724,7 +1766,7 @@ public:
 
   /** Encodes the possible VFO scan types. */
   enum class VFOScanType {
-    TO = 0, CO = 1, SE = 2
+    Time = 0, Carrier = 1, Stop = 2
   };
   Q_ENUM(VFOScanType)
 
@@ -1739,12 +1781,6 @@ public:
     A = 0, B = 1
   };
   Q_ENUM(VFO)
-
-  /** Possible unit systems. */
-  enum class Units {
-    Metric = 0, Archaic = 1
-  };
-  Q_ENUM(Units)
 
   /** All possible STE (squelch tail eliminate) types. */
   enum class STEType {
@@ -1775,8 +1811,10 @@ public:
   AnytoneAutoRepeaterSettingsExtension *autoRepeaterSettings() const;
   /** A reference to the DMR settings. */
   AnytoneDMRSettingsExtension *dmrSettings() const;
-  /** A reference to the ranging settings. */
-  AnytoneRangingSettingsExtension *rangingSettings() const;
+  /** A reference to the GPS settings. */
+  AnytoneGPSSettingsExtension *gpsSettings() const;
+  /** A reference to the roaming settings. */
+  AnytoneRoamingSettingsExtension *roamingSettings() const;
   /** A reference to the simplex repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *simplexRepeaterSettings() const;
 
@@ -1823,15 +1861,6 @@ public:
   /** Enables/disables the sub-channel. */
   void enableSubChannel(bool enable);
 
-  /** Returns the IANA ID of the time zone. */
-  QString ianaTimeZone() const;
-  /** Returns the time-zone. */
-  QTimeZone timeZone() const;
-  /** Sets the time zone by IANA ID. */
-  void setIANATimeZone(const QString &id);
-  /** Sets the time zone. */
-  void setTimeZone(const QTimeZone &zone);
-
   /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
   Frequency minVFOScanFrequencyUHF() const;
   /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
@@ -1849,11 +1878,6 @@ public:
   Frequency maxVFOScanFrequencyVHF() const;
   /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
   void setMaxVFOScanFrequencyVHF(Frequency hz);
-
-  /** Returns the GPS units used. */
-  Units units() const;
-  /** Sets the GPS units. */
-  void setUnits(Units units);
 
   /** Returns @c true if the last caller is kept on channel switch. */
   bool keepLastCallerEnabled() const;
@@ -1908,8 +1932,10 @@ protected:
   AnytoneAutoRepeaterSettingsExtension *_autoRepeaterSettings;
   /** The DMR settings. */
   AnytoneDMRSettingsExtension *_dmrSettings;
+  /** The GSP settings. */
+  AnytoneGPSSettingsExtension *_gpsSettings;
   /** The ranging settings. */
-  AnytoneRangingSettingsExtension *_rangingSettings;
+  AnytoneRoamingSettingsExtension *_roaminSettings;
   /** The simplex-repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *_simplexRepeaterSettings;
 
@@ -1922,12 +1948,10 @@ protected:
   ZoneReference _zoneB;            ///< The current zone for VFO B.
   VFO _selectedVFO;                ///< The current VFO.
   bool _subChannel;                ///< If @c true, the sub-channel is enabled.
-  QTimeZone _timeZone;             ///< The time zone.
   Frequency _minVFOScanFrequencyUHF; ///< The minimum UHF VFO-scan frequency in Hz.
   Frequency _maxVFOScanFrequencyUHF; ///< The maximum UHF VFO-scan frequency in Hz.
   Frequency _minVFOScanFrequencyVHF; ///< The minimum VHF VFO-scan frequency in Hz.
   Frequency _maxVFOScanFrequencyVHF; ///< The maximum VHF VFO-scan frequency in Hz.
-  Units _gpsUnits;                 ///< The GPS units.
   bool _keepLastCaller;            ///< If @c true, the last caller is kept on channel switch.
   Frequency _vfoStep;              ///< The VFO tuning step in kHz.
   STEType _steType;                ///< The STE type.

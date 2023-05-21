@@ -1061,7 +1061,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   // Encode display settings
   setRXBacklightDuration(ext->displaySettings()->backlightDuration());
-  enableShowCurrentContact(ext->displaySettings()->showCurrentContact());
+  enableShowCurrentContact(ext->displaySettings()->showContact());
 
   return true;
 }
@@ -1100,7 +1100,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 
   // Decode display settings
-  ext->displaySettings()->enableShowCurrentContact(this->showCurrentContact());
+  ext->displaySettings()->enableShowContact(this->showCurrentContact());
   ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
 
   return true;

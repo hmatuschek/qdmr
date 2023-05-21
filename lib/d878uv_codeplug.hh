@@ -679,9 +679,9 @@ public:
     virtual void setRepeaterRangeCheckCount(unsigned n);
 
     /** Returns the roaming start condition. */
-    virtual AnytoneRangingSettingsExtension::RoamStart roamingStartCondition() const;
+    virtual AnytoneRoamingSettingsExtension::RoamStart roamingStartCondition() const;
     /** Sets the roaming start condition. */
-    virtual void setRoamingStartCondition(AnytoneRangingSettingsExtension::RoamStart cond);
+    virtual void setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond);
 
     /** Returns the backlight duration during TX in seconds. */
     virtual Interval txBacklightDuration() const;
