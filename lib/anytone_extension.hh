@@ -790,9 +790,19 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   /** Shows the last caller. */
   Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
 
-  Q_CLASSINFO("channelNameColor", "Specifies the color of the channel name.")
+  Q_CLASSINFO("channelNameColorDescription", "Specifies the color of the channel name.")
   /** The channel name color. */
   Q_PROPERTY(Color channelNameColor READ channelNameColor WRITE setChannelNameColor)
+  Q_CLASSINFO("channelBNameColorDescription", "Specifies the color of the channel name for VFO B.")
+  /** The channel name color for VFO B. */
+  Q_PROPERTY(Color channelBNameColor READ channelBNameColor WRITE setChannelBNameColor)
+
+  Q_CLASSINFO("zoneNameColorDescription", "Specifies the color of the zone name.")
+  /** The zone name color. */
+  Q_PROPERTY(Color zoneNameColor READ zoneNameColor WRITE setZoneNameColor)
+  Q_CLASSINFO("zoneBNameColorDescription", "Specifies the color of the zone name for VFO B.")
+  /** The zone name color for VFO B. */
+  Q_PROPERTY(Color zoneBNameColor READ zoneBNameColor WRITE setZoneBNameColor)
 
 public:
   /** What to show from the last caller. */
@@ -903,6 +913,19 @@ public:
   Color channelNameColor() const;
   /** Sets the color of the channel name. */
   void setChannelNameColor(Color color);
+  /** Returns the color of the channel name for VFO B. */
+  Color channelBNameColor() const;
+  /** Sets the channel name color for VFO B. */
+  void setChannelBNameColor(Color color);
+
+  /** Returns the color of the zone name. */
+  Color zoneNameColor() const;
+  /** Sets the color of the zone name. */
+  void setZoneNameColor(Color color);
+  /** Returns the color of the zone name for VFO B. */
+  Color zoneBNameColor() const;
+  /** Sets the zone name color for VFO B. */
+  void setZoneBNameColor(Color color);
 
   /** Retuns backlight duration during RX. */
   Interval backlightDurationRX() const;
@@ -926,8 +949,11 @@ protected:
   Color _standbyBackgroundColor;            ///< Standby background color.
   bool _showLastHeard;                      ///< Shows the last caller.
   Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
-  Color _channelNameColor;                  ///< Color of channel name.
   Interval _backlightDurationRX;            ///< Backlight duration in seconds during RX.
+  Color _channelNameColor;                  ///< Color of channel name.
+  Color _channelBNameColor;                 ///< Color of channel name for VFO B.
+  Color _zoneNameColor;                     ///< Color of zone name.
+  Color _zoneBNameColor;                    ///< Color of zone name for VFO B.
 };
 
 
@@ -1346,6 +1372,8 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   /** The SMS format. */
   Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
 
+  /** If @c true, the talker alias (name) is send. */
+  Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
 
 public:
   /** Possible monitor slot matches. */
@@ -1359,6 +1387,24 @@ public:
     Motorola = 0, Hytera = 1, DMR = 2
   };
   Q_ENUM(SMSFormat)
+
+  /** Talker alias display preference. */
+  enum class TalkerAliasSource {
+    Off = 0, Conctact = 1, Air = 2
+  };
+  Q_ENUM(TalkerAliasSource)
+
+  /** Talker alias encoding. */
+  enum class TalkerAliasEncoding {
+    ISO8 = 0, ISO7 = 1, Unicode = 2,
+  };
+  Q_ENUM(TalkerAliasEncoding)
+
+  /** Possible encryption types. */
+  enum class EncryptionType {
+    AES=0, DMR=1
+  };
+  Q_ENUM(EncryptionType)
 
 public:
   /** Constructor. */
@@ -1411,6 +1457,21 @@ public:
   /** Sets the SMS format. */
   void setSMSFormat(SMSFormat format);
 
+  /** Returns @c true if the talker alias is send. */
+  bool sendTalkerAlias() const;
+  /** Enables/disbales sending talker alias. */
+  void enableSendTalkerAlias(bool enable);
+
+  /** Returns the talker alias source. */
+  TalkerAliasSource talkerAliasSource() const;
+  /** Sets the talker alias source. */
+  void setTalkerAliasSource(TalkerAliasSource mode);
+
+  /** Returns the talker alias encoding. */
+  TalkerAliasEncoding talkerAliasEncoding() const ;
+  /** Sets the talker alias encoding. */
+  void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+
 protected:
   Interval _groupCallHangTime;          ///< Hang-time for group-calls in seconds.
   Interval _privateCallHangTime;        ///< Hang-time for private-calls in seconds.
@@ -1422,6 +1483,9 @@ protected:
   bool _monitorIDMatch;                 ///< Enables ID match for DMR monitor.
   bool _monitorTimeSlotHold;            ///< Enables the time-slot hold for the DMR monitor.
   SMSFormat _smsFormat;                 ///< Sets the SMS format.
+  bool _sendTalkerAlias;                ///< Enables sending talker alias.
+  TalkerAliasSource _talkerAliasSource; ///< Source for the talker alias.
+  TalkerAliasEncoding _talkerAliasEncoding; ///< Encoding for the talker alias.
 };
 
 

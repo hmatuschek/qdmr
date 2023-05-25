@@ -324,7 +324,8 @@ AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
     _privateCallHangTime(Interval::fromSeconds(5)), _preWaveDelay(Interval::fromMilliseconds(100)),
     _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
     _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
-    _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola)
+    _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola), _sendTalkerAlias(false),
+    _talkerAliasSource(TalkerAliasSource::Conctact), _talkerAliasEncoding(TalkerAliasEncoding::ISO7)
 {
   // pass...
 }
@@ -456,6 +457,42 @@ AnytoneDMRSettingsExtension::setSMSFormat(SMSFormat format) {
   if (_smsFormat == format)
     return;
   _smsFormat = format;
+  emit modified(this);
+}
+
+bool
+AnytoneDMRSettingsExtension::sendTalkerAlias() const {
+  return _sendTalkerAlias;
+}
+void
+AnytoneDMRSettingsExtension::enableSendTalkerAlias(bool enable) {
+  if (_sendTalkerAlias == enable)
+    return;
+  _sendTalkerAlias = enable;
+  emit modified(this);
+}
+
+AnytoneDMRSettingsExtension::TalkerAliasSource
+AnytoneDMRSettingsExtension::talkerAliasSource() const {
+  return _talkerAliasSource;
+}
+void
+AnytoneDMRSettingsExtension::setTalkerAliasSource(TalkerAliasSource mode) {
+  if (mode == _talkerAliasSource)
+    return;
+  _talkerAliasSource = mode;
+  emit modified(this);
+}
+
+AnytoneDMRSettingsExtension::TalkerAliasEncoding
+AnytoneDMRSettingsExtension::talkerAliasEncoding() const {
+  return _talkerAliasEncoding;
+}
+void
+AnytoneDMRSettingsExtension::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
+  if (_talkerAliasEncoding == encoding)
+    return;
+  _talkerAliasEncoding = encoding;
   emit modified(this);
 }
 
@@ -1611,7 +1648,8 @@ AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent
     _callColor(Color::Orange), _language(Language::English),
     _showChannelNumber(true), _showContact(true), _standbyTextColor(Color::White),
     _standbyBackgroundColor(Color::Black), _showLastHeard(false), _backlightDurationTX(),
-    _channelNameColor(Color::Orange), _backlightDurationRX()
+    _backlightDurationRX(), _channelNameColor(Color::Orange), _channelBNameColor(Color::Orange),
+    _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
 {
   // pass...
 }
@@ -1827,6 +1865,42 @@ AnytoneDisplaySettingsExtension::setChannelNameColor(Color color) {
   if (_channelNameColor == color)
     return;
   _channelNameColor = color;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Color
+AnytoneDisplaySettingsExtension::channelBNameColor() const {
+  return _channelBNameColor;
+}
+void
+AnytoneDisplaySettingsExtension::setChannelBNameColor(Color color) {
+  if (_channelBNameColor == color)
+    return;
+  _channelBNameColor = color;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Color
+AnytoneDisplaySettingsExtension::zoneNameColor() const {
+  return _zoneNameColor;
+}
+void
+AnytoneDisplaySettingsExtension::setZoneNameColor(Color color) {
+  if (_zoneNameColor == color)
+    return;
+  _zoneNameColor = color;
+  emit modified(this);
+}
+
+AnytoneDisplaySettingsExtension::Color
+AnytoneDisplaySettingsExtension::zoneBNameColor() const {
+  return _zoneBNameColor;
+}
+void
+AnytoneDisplaySettingsExtension::setZoneBNameColor(Color color) {
+  if (_zoneBNameColor == color)
+    return;
+  _zoneBNameColor = color;
   emit modified(this);
 }
 

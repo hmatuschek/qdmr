@@ -1181,16 +1181,6 @@ public:
   class ExtendedSettingsElement: public Element
   {
   public:
-    /** Talker alias display preference. */
-    enum class TalkerAliasSource {
-      Off = 0, Conctact = 1, Air = 2
-    };
-
-    /** Talker alias encoding. */
-    enum class TalkerAliasEncoding {
-      ISO8 = 0, ISO7 = 1, Unicode = 2,
-    };
-
     /** Possible GPS modes. */
     enum class GPSMode {
       GPS=0, BDS=1, Both=2
@@ -1207,14 +1197,14 @@ public:
     virtual void enableSendTalkerAlias(bool enable) = 0;
 
     /** Returns the talker alias source. */
-    virtual TalkerAliasSource talkerAliasSource() const = 0;
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const = 0;
     /** Sets the talker alias source. */
-    virtual void setTalkerAliasSource(TalkerAliasSource mode) = 0;
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode) = 0;
 
     /** Returns the talker alias encoding. */
-    virtual TalkerAliasEncoding talkerAliasEncoding() const = 0;
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const = 0;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding) = 0;
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) = 0;
 
     /** Returns the color of the channel name for VFO B. */
     virtual AnytoneDisplaySettingsExtension::Color channelBNameColor() const = 0;

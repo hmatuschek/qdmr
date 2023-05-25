@@ -2066,7 +2066,7 @@ AnytoneCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context
 
   // Encode display settings
   setChannelBNameColor(ext->displaySettings()->channelBNameColor());
-  setZoneANameColor(ext->displaySettings()->zoneANameColor());
+  setZoneANameColor(ext->displaySettings()->zoneNameColor());
   setZoneBNameColor(ext->displaySettings()->zoneBNameColor());
 
   return true;
@@ -2089,9 +2089,9 @@ AnytoneCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Error
   ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Store display settings
-  ext->dmrSettings()->setChannelBNameColor(channelBNameColor());
-  ext->dmrSettings()->setZoneANameColor(zoneANameColor());
-  ext->dmrSettings()->setZoneBNameColor(zoneBNameColor());
+  ext->displaySettings()->setChannelBNameColor(channelBNameColor());
+  ext->displaySettings()->setZoneNameColor(zoneANameColor());
+  ext->displaySettings()->setZoneBNameColor(zoneBNameColor());
 
   return true;
 }

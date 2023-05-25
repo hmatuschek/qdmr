@@ -1655,13 +1655,13 @@ D878UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const
  * Implementation of D878UVCodeplug::GeneralSettingsExtensionElement
  * ******************************************************************************************** */
 D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
+  : ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 D878UVCodeplug::GeneralSettingsExtensionElement::GeneralSettingsExtensionElement(uint8_t *ptr)
-  : Element(ptr, GeneralSettingsExtensionElement::size())
+  : ExtendedSettingsElement(ptr, GeneralSettingsExtensionElement::size())
 {
   // pass...
 }
@@ -1682,22 +1682,49 @@ D878UVCodeplug::GeneralSettingsExtensionElement::enableSendTalkerAlias(bool enab
   setUInt8(Offset::sendTalkerAlias(), (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasSource
+AnytoneDMRSettingsExtension::TalkerAliasSource
 D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasSource() const {
-  return (TalkerAliasSource)getUInt8(Offset::talkerAliasDisplay());
+  return (AnytoneDMRSettingsExtension::TalkerAliasSource)getUInt8(Offset::talkerAliasDisplay());
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasSource(TalkerAliasSource mode) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode) {
   setUInt8(Offset::talkerAliasDisplay(), (unsigned)mode);
 }
 
-D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasEncoding
+AnytoneDMRSettingsExtension::TalkerAliasEncoding
 D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasEncoding() const {
-  return (TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
+  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasEncoding(TalkerAliasEncoding enc) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding enc) {
   setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::bluetoothPTTLatch() const {
+  return getUInt8(Offset::btPTTLatch());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::enableBluetoothPTTLatch(bool enable) {
+  setUInt8(Offset::btPTTLatch(), enable ? 0x01 : 0x00);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::infiniteBluetoothPTTSleepDelay() const {
+  return  bluetoothPTTSleepDelay().isNull();
+}
+Interval
+D878UVCodeplug::GeneralSettingsExtensionElement::bluetoothPTTSleepDelay() const {
+  return Interval::fromMinutes(getUInt8(Offset::btPTTSleepDelay()));
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setBluetoothPTTSleepDelay(Interval delay) {
+  unsigned int t = std::min(Limit::maxBluetoothPTTSleepDelay(), (unsigned int)delay.minutes());
+  setUInt8(Offset::btPTTSleepDelay(), t);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setInfiniteBluetoothPTTSleepDelay() {
+  setBluetoothPTTSleepDelay(Interval::fromMinutes(0));
 }
 
 bool
@@ -1774,6 +1801,132 @@ D878UVCodeplug::GeneralSettingsExtensionElement::gpsMode() const {
 void
 D878UVCodeplug::GeneralSettingsExtensionElement::setGPSMode(GPSMode mode) {
   setUInt8(Offset::gpsMode(), (unsigned)mode);
+}
+
+Interval
+D878UVCodeplug::GeneralSettingsExtensionElement::steDuration() const {
+  return Interval::fromMilliseconds((getUInt8(Offset::steDuration())+1)*10);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setSTEDuration(Interval dur) {
+  unsigned int t = std::max(10U, std::min(1000U, (unsigned int)dur.milliseconds()));
+  setUInt8(Offset::steDuration(), t/10-1);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::infiniteManDialGroupCallHangTime() const {
+  return manDialGroupCallHangTime().isNull();
+}
+Interval
+D878UVCodeplug::GeneralSettingsExtensionElement::manDialGroupCallHangTime() const {
+  unsigned int t = getUInt8(Offset::manGrpCallHangTime())+1;
+  if (t<=30)
+    return Interval::fromSeconds(t);
+  else if (31==t)
+    return Interval::fromMinutes(30);
+  return Interval();
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setManDialGroupCallHangTime(Interval dur) {
+  unsigned int t = dur.seconds();
+  if (t > 30)
+    t = 31;  // = 30min
+  else if (0 == t)
+    t = 32;  // = infinite
+  setUInt8(Offset::manGrpCallHangTime(), t-1);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setManDialGroupCallHangTimeInfinite() {
+  setManDialGroupCallHangTime(Interval::fromSeconds(0));
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::infiniteManDialPrivateCallHangTime() const {
+  return manDialPrivateCallHangTime().isNull();
+}
+Interval
+D878UVCodeplug::GeneralSettingsExtensionElement::manDialPrivateCallHangTime() const {
+  unsigned int t = getUInt8(Offset::manPrivCallHangTime())+1;
+  if (t<=30)
+    return Interval::fromSeconds(t);
+  else if (31==t)
+    return Interval::fromMinutes(30);
+  return Interval();
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setManDialPrivateCallHangTime(Interval dur) {
+  unsigned int t = dur.seconds();
+  if (t > 30)
+    t = 31;  // = 30min
+  else if (0 == t)
+    t = 32;  // = infinite
+  setUInt8(Offset::manPrivCallHangTime(), t-1);
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setManDialPrivateCallHangTimeInfinite() {
+  setManDialPrivateCallHangTime(Interval::fromSeconds(0));
+}
+
+AnytoneDisplaySettingsExtension::Color
+D878UVCodeplug::GeneralSettingsExtensionElement::channelBNameColor() const {
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::channelBNameColor());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelBNameColor(), (unsigned int)color);
+}
+
+AnytoneDMRSettingsExtension::EncryptionType
+D878UVCodeplug::GeneralSettingsExtensionElement::encryption() const {
+  return (AnytoneDMRSettingsExtension::EncryptionType)getUInt8(Offset::encryptionType());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setEncryption(AnytoneDMRSettingsExtension::EncryptionType mode) {
+  setUInt8(Offset::encryptionType(), (unsigned int)mode);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::totPrediction() const {
+  return 0x00 != getUInt8(Offset::totPrediction());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::enableTOTPrediction(bool enable) {
+  setUInt8(Offset::totPrediction(), enable ? 0x01 : 0x00);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::alc() const {
+  return 0x00 != getUInt8(Offset::alc());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::enableALC(bool enable) {
+  setUInt8(Offset::alc(), enable ? 0x01 : 0x00);
+}
+
+AnytoneDisplaySettingsExtension::Color
+D878UVCodeplug::GeneralSettingsExtensionElement::zoneANameColor() const {
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::zoneANameColor());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneANameColor(), (unsigned int)color);
+}
+AnytoneDisplaySettingsExtension::Color
+D878UVCodeplug::GeneralSettingsExtensionElement::zoneBNameColor() const {
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::zoneBNameColor());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneBNameColor(), (unsigned int)color);
+}
+
+bool
+D878UVCodeplug::GeneralSettingsExtensionElement::resetAutoShutdownOnCall() const {
+  return 0x00 != getUInt8(Offset::autoShutdownMode());
+}
+void
+D878UVCodeplug::GeneralSettingsExtensionElement::enableResetAutoShutdownOnCall(bool enable) {
+  setUInt8(Offset::autoShutdownMode(), enable ? 0x01 : 0x00);
 }
 
 unsigned int

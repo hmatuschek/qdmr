@@ -868,11 +868,25 @@ public:
     bool sendTalkerAlias() const;
     void enableSendTalkerAlias(bool enable);
 
-    TalkerAliasSource talkerAliasSource() const;
-    void setTalkerAliasSource(TalkerAliasSource mode);
+    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
-    TalkerAliasEncoding talkerAliasEncoding() const;
-    void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+
+    /** Returns @c true if the BT PTT latch is enabled. */
+    virtual bool bluetoothPTTLatch() const;
+    /** Enables/disables bluetooth PTT latch. */
+    virtual void enableBluetoothPTTLatch(bool enable);
+
+    /** Returns @c true if the bluetooth PTT sleep delay is disabled (infinite). */
+    virtual bool infiniteBluetoothPTTSleepDelay() const;
+    /** Returns the bluetooth PTT sleep delay in minutes, 0=off. */
+    virtual Interval bluetoothPTTSleepDelay() const;
+    /** Sets the bluetooth PTT sleep delay in minutes. */
+    virtual void setBluetoothPTTSleepDelay(Interval delay);
+    /** Sets the bluetooth PTT sleep delay to infinite/disabled. */
+    virtual void setInfiniteBluetoothPTTSleepDelay();
 
     /** Returns @c true if the auto repeater UHF 2 offset index is set. */
     virtual bool hasAutoRepeaterUHF2OffsetIndex() const;
@@ -914,10 +928,46 @@ public:
     /** Sets the GPS mode. */
     virtual void setGPSMode(GPSMode mode);
 
-    /** Returns the FM Mic gain [1,10]. */
-    virtual unsigned int analogMicGain() const;
-    /** Sets the analog mic gain [1,10]. */
-    virtual void setAnalogMicGain(unsigned int gain);
+    /** Returns the STE (squelch tail elimination) duration. */
+    virtual Interval steDuration() const;
+    /** Sets the STE (squelch tail elimination) duration. */
+    virtual void setSTEDuration(Interval dur);
+
+    /** Returns @c true if the manual dialed group call hang time is infinite. */
+    virtual bool infiniteManDialGroupCallHangTime() const;
+    /** Returns the manual dial group call hang time. */
+    virtual Interval manDialGroupCallHangTime() const;
+    /** Sets the manual dial group call hang time. */
+    virtual void setManDialGroupCallHangTime(Interval dur);
+    /** Sets the manual dial group call hang time to infinite. */
+    virtual void setManDialGroupCallHangTimeInfinite();
+
+    /** Returns @c true if the manual dialed private call hang time is infinite. */
+    virtual bool infiniteManDialPrivateCallHangTime() const;
+    /** Returns the manual dial private call hang time. */
+    virtual Interval manDialPrivateCallHangTime() const;
+    /** Sets the manual dial private call hang time. */
+    virtual void setManDialPrivateCallHangTime(Interval dur);
+    /** Sets the manual dial private call hang time to infinite. */
+    virtual void setManDialPrivateCallHangTimeInfinite();
+
+    AnytoneDisplaySettingsExtension::Color channelBNameColor() const;
+    void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color);
+
+    /** Returns the encryption mode. */
+    virtual AnytoneDMRSettingsExtension::EncryptionType encryption() const;
+    /** Sets the encryption mode. */
+    virtual void setEncryption(AnytoneDMRSettingsExtension::EncryptionType mode);
+
+    /** Returns @c true if the transmit timeout prediction is enabled. */
+    virtual bool totPrediction() const;
+    /** Enables/disables transmit timeout prediction. */
+    virtual void enableTOTPrediction(bool enable);
+
+    /** Returns @c true if the ALC (TX power AGC) is enabled. */
+    virtual bool alc() const;
+    /** Enables/disables the ALC (TX power AGV). */
+    virtual void enableALC(bool enable);
 
     /** Encodes the settings from the config. */
     virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -926,6 +976,28 @@ public:
     /** Link config from settings extension. */
     virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
+    AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
+    void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color zoneBNameColor() const;
+    void setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color);
+
+    /** Returns @c true if the auto-shutdown timer is reset on a call. */
+    virtual bool resetAutoShutdownOnCall() const;
+    /** Enables/disables reset on call of the auto-shutdown timer. */
+    virtual void enableResetAutoShutdownOnCall(bool enable);
+
+    /** Returns the FM Mic gain [1,10]. */
+    virtual unsigned int analogMicGain() const;
+    /** Sets the analog mic gain [1,10]. */
+    virtual void setAnalogMicGain(unsigned int gain);
+
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit {
+      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
+    };
+
   protected:
     /** Internal used offset within the element. */
     struct Offset {
@@ -933,13 +1005,25 @@ public:
       static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
       static constexpr unsigned int talkerAliasEncoding()          { return 0x001f; }
+      static constexpr unsigned int btPTTLatch()                   { return 0x0020; }
       static constexpr unsigned int autoRepeaterUHF2OffsetIndex()  { return 0x0022; }
       static constexpr unsigned int autoRepeaterVHF2OffsetIndex()  { return 0x0023; }
       static constexpr unsigned int autoRepeaterVHF2MinFrequency() { return 0x0024; }
       static constexpr unsigned int autoRepeaterVHF2MaxFrequency() { return 0x0028; }
       static constexpr unsigned int autoRepeaterUHF2MinFrequency() { return 0x002c; }
       static constexpr unsigned int autoRepeaterUHF2MaxFrequency() { return 0x0030; }
+      static constexpr unsigned int btPTTSleepDelay()              { return 0x0034; }
       static constexpr unsigned int gpsMode()                      { return 0x0035; }
+      static constexpr unsigned int steDuration()                  { return 0x0036; }
+      static constexpr unsigned int manGrpCallHangTime()           { return 0x0037; }
+      static constexpr unsigned int manPrivCallHangTime()          { return 0x0038; }
+      static constexpr unsigned int channelBNameColor()            { return 0x0039; }
+      static constexpr unsigned int encryptionType()               { return 0x003a; }
+      static constexpr unsigned int totPrediction()                { return 0x003b; }
+      static constexpr unsigned int alc()                          { return 0x003c; }
+      static constexpr unsigned int zoneANameColor()               { return 0x003d; }
+      static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
+      static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
       static constexpr unsigned int analogMicGain()                { return 0x0043; }
       /// @endcond
     };
