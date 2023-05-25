@@ -1682,12 +1682,12 @@ D878UVCodeplug::GeneralSettingsExtensionElement::enableSendTalkerAlias(bool enab
   setUInt8(Offset::sendTalkerAlias(), (enable ? 0x01 : 0x00));
 }
 
-D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasDisplay
-D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasDisplay() const {
-  return (TalkerAliasDisplay)getUInt8(Offset::talkerAliasDisplay());
+D878UVCodeplug::GeneralSettingsExtensionElement::TalkerAliasSource
+D878UVCodeplug::GeneralSettingsExtensionElement::talkerAliasSource() const {
+  return (TalkerAliasSource)getUInt8(Offset::talkerAliasDisplay());
 }
 void
-D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasDisplay(TalkerAliasDisplay mode) {
+D878UVCodeplug::GeneralSettingsExtensionElement::setTalkerAliasSource(TalkerAliasSource mode) {
   setUInt8(Offset::talkerAliasDisplay(), (unsigned)mode);
 }
 
@@ -1788,10 +1788,13 @@ D878UVCodeplug::GeneralSettingsExtensionElement::setAnalogMicGain(unsigned int g
 
 bool
 D878UVCodeplug::GeneralSettingsExtensionElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  Q_UNUSED(err);
 
   if (! flags.updateCodePlug)
     this->clear();
+
+  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
+    return false;
 
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting

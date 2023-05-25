@@ -849,24 +849,8 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x200 bytes):
    * @verbinclude d878uv_generalsettingsextension.txt */
-  class GeneralSettingsExtensionElement: public Element
+  class GeneralSettingsExtensionElement: public ExtendedSettingsElement
   {
-  public:
-    /** Talker alias display preference. */
-    enum class TalkerAliasDisplay {
-      Off = 0, Conctact = 1, Air = 2
-    };
-
-    /** Talker alias encoding. */
-    enum class TalkerAliasEncoding {
-      ISO8 = 0, ISO7 = 1, Unicode = 2,
-    };
-
-    /** Possible GPS modes. */
-    enum class GPSMode {
-      GPS=0, BDS=1, Both=2
-    };
-
   protected:
     /** Hidden Constructor. */
     GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size);
@@ -881,20 +865,14 @@ public:
     /** Resets the settings. */
     void clear();
 
-    /** Returns @c true if talker alias is send. */
-    virtual bool sendTalkerAlias() const;
-    /** Enables/disables sending talker alias. */
-    virtual void enableSendTalkerAlias(bool enable);
+    bool sendTalkerAlias() const;
+    void enableSendTalkerAlias(bool enable);
 
-    /** Returns the talker alias display mode. */
-    virtual TalkerAliasDisplay talkerAliasDisplay() const;
-    /** Sets the talker alias display mode. */
-    virtual void setTalkerAliasDisplay(TalkerAliasDisplay mode);
+    TalkerAliasSource talkerAliasSource() const;
+    void setTalkerAliasSource(TalkerAliasSource mode);
 
-    /** Returns the talker alias encoding. */
-    virtual TalkerAliasEncoding talkerAliasEncoding() const;
-    /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+    TalkerAliasEncoding talkerAliasEncoding() const;
+    void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
 
     /** Returns @c true if the auto repeater UHF 2 offset index is set. */
     virtual bool hasAutoRepeaterUHF2OffsetIndex() const;

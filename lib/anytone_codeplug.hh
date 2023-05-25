@@ -1172,6 +1172,73 @@ public:
     };
   };
 
+  /** Represents the base class for the extended settings element in many AnyTone codeplugs. That
+   *  is, every device after the D868UVE. It provides additional settings to the
+   *  @c AnytoneGeneralSettingsElement.
+   *
+   *  As these elements differ heavily from device to device, there is no common encoding. This
+   *  class only defines an interface to get/set common settings. */
+  class ExtendedSettingsElement: public Element
+  {
+  public:
+    /** Talker alias display preference. */
+    enum class TalkerAliasSource {
+      Off = 0, Conctact = 1, Air = 2
+    };
+
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
+    /** Possible GPS modes. */
+    enum class GPSMode {
+      GPS=0, BDS=1, Both=2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ExtendedSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Returns @c true if the talker alias is send. */
+    virtual bool sendTalkerAlias() const = 0;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable) = 0;
+
+    /** Returns the talker alias source. */
+    virtual TalkerAliasSource talkerAliasSource() const = 0;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(TalkerAliasSource mode) = 0;
+
+    /** Returns the talker alias encoding. */
+    virtual TalkerAliasEncoding talkerAliasEncoding() const = 0;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding) = 0;
+
+    /** Returns the color of the channel name for VFO B. */
+    virtual AnytoneDisplaySettingsExtension::Color channelBNameColor() const = 0;
+    /** Sets the channel name color for the VFO B. */
+    virtual void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Returns the color of the zone name for VFO A. */
+    virtual AnytoneDisplaySettingsExtension::Color zoneANameColor() const = 0;
+    /** Sets the zone name color for the VFO A. */
+    virtual void setZoneANameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Returns the color of the zone name for VFO B. */
+    virtual AnytoneDisplaySettingsExtension::Color zoneBNameColor() const = 0;
+    /** Sets the zone name color for the VFO B. */
+    virtual void setZoneBNameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Encodes the settings from the config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Update config from settings. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Link config from settings extension. */
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+  };
+
   /** Represents the base class for zone channel list for all AnyTone codeplugs.
    * Zone channel lists assign a default channel to each zone for VFO A and B.
    *

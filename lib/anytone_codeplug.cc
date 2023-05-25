@@ -2036,6 +2036,80 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ExtendedSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (! flags.updateCodePlug)
+    this->clear();
+
+  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
+    // If there is no extension, done
+    return true;
+  }
+
+  // Get extension
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+
+  // Encode DMR settings
+  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
+  // Encode display settings
+  setChannelBNameColor(ext->displaySettings()->channelBNameColor());
+  setZoneANameColor(ext->displaySettings()->zoneANameColor());
+  setZoneBNameColor(ext->displaySettings()->zoneBNameColor());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Store DMR settings
+  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
+
+  // Store display settings
+  ext->dmrSettings()->setChannelBNameColor(channelBNameColor());
+  ext->dmrSettings()->setZoneANameColor(zoneANameColor());
+  ext->dmrSettings()->setZoneBNameColor(zoneBNameColor());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    errMsg(err) << "Cannot link config extension: not set.";
+    return false;
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ZoneChannelListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr, unsigned size)
