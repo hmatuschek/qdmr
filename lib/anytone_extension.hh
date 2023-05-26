@@ -824,6 +824,13 @@ public:
   };
   Q_ENUM(Language)
 
+  /** Possible date formats. */
+  enum class DateFormat {
+    YearFirst = 0,               ///< yyyy/mm/dd
+    DayFirst = 1                 ///< dd/mm/yyyy
+  };
+  Q_ENUM(DateFormat)
+
 public:
   /** Constructor. */
   explicit AnytoneDisplaySettingsExtension(QObject *parent=nullptr);

@@ -2,6 +2,8 @@
 #define DMR6X2UVCODEPLUG_HH
 
 #include "d878uv_codeplug.hh"
+#include "ranges.hh"
+
 
 /** Represents the device specific binary codeplug for BTECH DMR-6X2UV radios.
  *
@@ -600,29 +602,9 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_settingsextension.txt */
-  class ExtendedSettingsElement: public Codeplug::Element
+  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   public:
-    /** Possible talker alias encodings. */
-    enum class TalkerAliasEncoding {
-      ISO8=0x00, ISO7=0x01, Unicode=0x02
-    };
-
-    /** Possible display priorities for the talker alias. */
-    enum class TalkerAliasSource {
-      None=0x00, Database=0x01, OverTheAir=0x02
-    };
-
-    /** Possible font colors. */
-    enum class FontColor {
-      White=0x00, Black=0x01, Orange=0x02, Red=0x03, Yellow=0x04, Green=0x05, Turquoise=0x06, Blue=0x07
-    };
-
-    /** Possible name colors. */
-    enum class NameColor {
-      Orange=0x00, Red=0x01, Yellow=0x02, Green=0x03, Turquoise=0x04, Blue=0x05, White=0x06, Black=0x07
-    };
-
     /** Possible repeater out-of-range alerts. */
     enum class OutOfRangeAlert {
       None = 0x00, Bell = 0x01, Voice = 0x02
@@ -633,10 +615,6 @@ public:
       FixedTime=0x00, OutOfRange=0x01
     };
 
-    /** Possible encryption types. */
-    enum class EncryptionType {
-      Basic = 0x00, AES = 0x01
-    };
 
   protected:
     /** Hidden Constructor. */
@@ -652,23 +630,18 @@ public:
     /** Resets the general settings. */
     void clear();
 
-    /** Returns @c true, if a talker alias is send. */
-    virtual bool talkerAliasIsSend() const;
-    /** Enables/disables sending the talker alias. */
-    virtual void enableSendTalkerAlias(bool enable);
-    /** Retunrs the talker alias source. */
-    virtual TalkerAliasSource talkerAliasSource() const;
-    /** Sets the talker alias source. */
-    virtual void setTalkerAliasSource(TalkerAliasSource source);
-    /** Retunrs the talker alias encoding. */
-    virtual TalkerAliasEncoding talkerAliasEncoding() const;
-    /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+    bool sendTalkerAlias() const;
+    void enableSendTalkerAlias(bool enable);
+
+    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource source);
+    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
 
     /** Returns the font color. */
-    virtual FontColor fontColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color fontColor() const;
     /** Sets the font color. */
-    virtual void setFontColor(FontColor color);
+    virtual void setFontColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if the custom channel background is enabled. */
     virtual bool customChannelBackgroundEnabled() const;
@@ -689,9 +662,9 @@ public:
     /** Sets the number of times, the repeater out-of-range reminder is shown (1-10). */
     virtual void setRepeaterOutOfRangeReminder(unsigned int n);
     /** Returns the repeater check intervall in seconds (5-50s). */
-    virtual unsigned int repeaterCheckIntervall() const;
+    virtual Interval repeaterCheckIntervall() const;
     /** Sets the repeater check intervall in seconds (5-50s). */
-    virtual void setRepeaterCheckIntervall(unsigned int intervall);
+    virtual void setRepeaterCheckIntervall(Interval intv);
     /** Returns the repeater out-of-range alert type. */
     virtual OutOfRangeAlert repeaterOutOfRangeAlert() const;
     /** Sets the repeater out-of-range alert type. */
@@ -709,50 +682,98 @@ public:
     virtual RoamingCondition startRoamingCondition() const;
     /** Sets the condition to start roaming. */
     virtual void setStartRoamingCondition(RoamingCondition cond);
-    /** Returns the auto-roaming intervall in minutes (1-256). */
-    virtual unsigned int autoRoamingIntervall() const;
-    /** Sets the auto-roaming intervall in minutes (1-256). */
-    virtual void setAutoRoamingIntervall(unsigned int minutes);
+    /** Returns the auto-roaming interval in minutes (1-256). */
+    virtual Interval autoRoamingInterval() const;
+    /** Sets the auto-roaming interval in minutes (1-256). */
+    virtual void setAutoRoamingInterval(Interval minutes);
     /** Returns the effective roaming waiting time in seconds (0-30s). */
-    virtual unsigned int effectiveRoamingWaitingTime() const;
+    virtual Interval autoRoamDelay() const;
     /** Sets the effective roaming waiting time in seconds (0-30s). */
-    virtual void setEffectiveRoamingWaitingTime(unsigned int sec);
+    virtual void setAutoRoamDelay(Interval sec);
     /** Returns the roaming return condition. */
     virtual RoamingCondition roamingReturnCondition() const;
     /** Sets the roaming return condition. */
     virtual void setRoamingReturnCondition(RoamingCondition cond);
 
     /** Returns the mute timer in minutes. */
-    virtual unsigned int muteTimer() const;
+    virtual Interval muteTimer() const;
     /** Sets the mute timer in minutes. */
-    virtual void setMuteTimer(unsigned int minutes);
+    virtual void setMuteTimer(Interval minutes);
 
     /** Returns the encryption type. */
-    virtual EncryptionType encryptionType() const;
+    virtual AnytoneDMRSettingsExtension::EncryptionType encryptionType() const;
     /** Sets the encryption type. */
-    virtual void setEncryptionType(EncryptionType type);
+    virtual void setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType type);
 
-    /** Returns the name color for zone A. */
-    virtual NameColor zoneANameColor() const;
-    /** Sets the name color for zone A. */
-    virtual void setZoneANameColor(NameColor color);
-    /** Returns the name color for zone B. */
-    virtual NameColor zoneBNameColor() const;
-    /** Sets the name color for zone B. */
-    virtual void setZoneBNameColor(NameColor color);
+    AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
+    void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color zoneBNameColor() const;
+    void setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color);
     /** Returns the name color for channel A. */
-    virtual NameColor channelANameColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color channelANameColor() const;
     /** Sets the name color for channel A. */
-    virtual void setChannelANameColor(NameColor color);
-    /** Returns the name color for channel B. */
-    virtual NameColor channelBNameColor() const;
-    /** Sets the name color for channel B. */
-    virtual void setChannelBNameColor(NameColor color);
+    virtual void setChannelANameColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color channelBNameColor() const;
+    void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     /** Update config from settings. */
     virtual bool updateConfig(Context &ctx);
+
+  public:
+    /** Some limits for entries. */
+    struct Limit {
+      /// Out of range reminder count limits.
+      static constexpr IntRange repRangeReminder()    { return {1, 10}; }
+      /// Repeater range check interval limits.
+      static constexpr TimeRange rangeCheckInterval() {
+        return TimeRange{Interval::fromSeconds(1), Interval::fromSeconds(50)};
+      }
+      /// Repeater reconnection count limits.
+      static constexpr IntRange repeaterReconnections() { return {3,5}; }
+      /// Auto-roaming interval limits.
+      static constexpr TimeRange autoRoamingInterval() {
+        return TimeRange{Interval::fromMinutes(1), Interval::fromMinutes(256)};
+      }
+      /// Auto-roaming delay limits.
+      static constexpr TimeRange autoRoamDelay() {
+        return TimeRange{Interval::fromSeconds(0), Interval::fromSeconds(30)};
+      }
+      /// Mute-timer limits.
+      static constexpr TimeRange muteTimer() {
+        return TimeRange{Interval::fromMinutes(1), Interval::fromMinutes(256)};
+      }
+    };
+
+  protected:
+    /** Some internal offset within the codeplug element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUEMNT
+      static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
+      static constexpr unsigned int talkerAliasDisplay()           { return 0x0001; }
+      static constexpr unsigned int talkerAliasEncoding()          { return 0x0002; }
+      static constexpr unsigned int fontColor()                    { return 0x0003; }
+      static constexpr unsigned int customChannelBackground()      { return 0x0004; }
+      static constexpr unsigned int defaultRoamingZone()           { return 0x0005; }
+      static constexpr unsigned int roaming()                      { return 0x0006; }
+      static constexpr unsigned int repRangeCheck()                { return 0x0007; }
+      static constexpr unsigned int repRangeAlert()                { return 0x0008; }
+      static constexpr unsigned int repRangeReminder()             { return 0x0009; }
+      static constexpr unsigned int rangeCheckInterval()           { return 0x000a; }
+      static constexpr unsigned int rangeCheckCount()              { return 0x000b; }
+      static constexpr unsigned int roamStartCondition()           { return 0x000c; }
+      static constexpr unsigned int autoRoamPeriod()               { return 0x000d; }
+      static constexpr unsigned int autoRoamDelay()                { return 0x000e; }
+      static constexpr unsigned int roamReturnCondition()          { return 0x000f; }
+      static constexpr unsigned int muteDelay()                    { return 0x0010; }
+      static constexpr unsigned int encryptionType()               { return 0x0011; }
+      static constexpr unsigned int zoneANameColor()               { return 0x0012; }
+      static constexpr unsigned int zoneBNameColor()               { return 0x0013; }
+      static constexpr unsigned int channelANameColor()            { return 0x0014; }
+      static constexpr unsigned int channelBNameColor()            { return 0x0015; }
+      /// @endcond
+    };
   };
 
   /** Implements the channel element for the BTECH DMR-6X2UV.

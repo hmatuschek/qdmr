@@ -17,7 +17,11 @@ public:
 
 protected:
   /** Constructor from milliseconds. */
-  explicit Interval(unsigned long long ms);
+  explicit inline constexpr Interval(unsigned long long ms)
+    : _duration(ms)
+  {
+    // pass...
+  }
 
 public:
   /** Default constructor. */
@@ -41,13 +45,13 @@ public:
   inline unsigned long long seconds() const { return _duration/1000ULL; }   ///< Unit conversion.
   inline unsigned long long minutes() const { return _duration/60000ULL; }  ///< Unit conversion.
 
-  static inline Interval fromMilliseconds(unsigned long long ms) {          ///< Unit conversion.
+  static inline constexpr Interval fromMilliseconds(unsigned long long ms) {          ///< Unit conversion.
     return Interval(ms);
   }
-  static inline Interval fromSeconds(unsigned long long s) {                ///< Unit conversion.
+  static inline constexpr Interval fromSeconds(unsigned long long s) {                ///< Unit conversion.
     return Interval(s*1000ULL);
   }
-  static inline Interval fromMinutes(unsigned long long min) {              ///< Unit conversion.
+  static inline constexpr Interval fromMinutes(unsigned long long min) {              ///< Unit conversion.
     return Interval(min*60000ULL);
   }
 

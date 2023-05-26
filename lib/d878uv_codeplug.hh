@@ -849,15 +849,15 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x200 bytes):
    * @verbinclude d878uv_generalsettingsextension.txt */
-  class GeneralSettingsExtensionElement: public ExtendedSettingsElement
+  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
     /** Hidden Constructor. */
-    GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size);
+    ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
-    explicit GeneralSettingsExtensionElement(uint8_t *ptr);
+    explicit ExtendedSettingsElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x00000200; }
@@ -969,13 +969,6 @@ public:
     /** Enables/disables the ALC (TX power AGV). */
     virtual void enableALC(bool enable);
 
-    /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-    /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
-    /** Link config from settings extension. */
-    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
-
     AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
     void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
     AnytoneDisplaySettingsExtension::Color zoneBNameColor() const;
@@ -986,11 +979,54 @@ public:
     /** Enables/disables reset on call of the auto-shutdown timer. */
     virtual void enableResetAutoShutdownOnCall(bool enable);
 
+    /** Returns @c true if the color code is shown. */
+    virtual bool showColorCode() const;
+    /** Enables/disables display of color code. */
+    virtual void enableShowColorCode(bool enable);
+    /** Returns @c true if the time slot is shown. */
+    virtual bool showTimeSlot() const;
+    /** Enables/disables display of time slot. */
+    virtual void enableShowTimeSlot(bool enable);
+    /** Returns @c true if the channel type is shown. */
+    virtual bool showChannelType() const;
+    /** Enables/disables display of channel type. */
+    virtual void enableShowChannelType(bool enable);
+
+    /** Returns @c true if the FM idle channel tone is enabled. */
+    virtual bool fmIdleTone() const;
+    /** Enables/disables FM idle channel tone. */
+    virtual void enableFMIdleTone(bool enable);
+
+    /** Returns the date format. */
+    virtual AnytoneDisplaySettingsExtension::DateFormat dateFormat() const;
+    /** Sets the date format. */
+    virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
+
     /** Returns the FM Mic gain [1,10]. */
     virtual unsigned int analogMicGain() const;
     /** Sets the analog mic gain [1,10]. */
     virtual void setAnalogMicGain(unsigned int gain);
 
+    /** Returns @c true if the GPS roaming is enabled. */
+    virtual bool gpsRoaming() const;
+    /** Enables/disables GPS roaming. */
+    virtual void enableGPSRoaming(bool enable);
+
+    /** Returns the call-end tone melody. */
+    virtual void callEndToneMelody(Melody &melody) const;
+    /** Sets the call-end tone melody. */
+    virtual void setCallEndToneMelody(const Melody &melody);
+    /** Returns the all-call tone melody. */
+    virtual void allCallToneMelody(Melody &melody) const;
+    /** Sets the all-call tone melody. */
+    virtual void setAllCallToneMelody(const Melody &melody);
+
+    /** Encodes the settings from the config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Update config from settings. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Link config from settings extension. */
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the settings. */
@@ -1024,7 +1060,17 @@ public:
       static constexpr unsigned int zoneANameColor()               { return 0x003d; }
       static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
       static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
+      static constexpr unsigned int displayColorCode()             { return 0x0040; }  // bit 2
+      static constexpr unsigned int displayTimeSlot()              { return 0x0040; }  // bit 1
+      static constexpr unsigned int displayChannelType()           { return 0x0040; }  // bit 0
+      static constexpr unsigned int fmIdleTone()                   { return 0x0041; }
+      static constexpr unsigned int dateFormat()                   { return 0x0042; }
       static constexpr unsigned int analogMicGain()                { return 0x0043; }
+      static constexpr unsigned int gpsRoaming()                   { return 0x0044; }
+      static constexpr unsigned int callEndTones()                 { return 0x0046; }
+      static constexpr unsigned int callEndDurations()             { return 0x0050; }
+      static constexpr unsigned int allCallTones()                 { return 0x005a; }
+      static constexpr unsigned int allCallDurations()             { return 0x0064; }
       /// @endcond
     };
   };

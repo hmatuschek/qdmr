@@ -981,13 +981,13 @@ DMR6X2UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) con
  * Implementation of DMR6X2UVCodeplug::ExtendedSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
-  : Codeplug::Element(ptr, size)
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, ExtendedSettingsElement::size())
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
 {
   // pass...
 }
@@ -998,205 +998,216 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::clear() {
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasIsSend() const {
-  return 0x01 == getUInt8(0x0000);
+DMR6X2UVCodeplug::ExtendedSettingsElement::sendTalkerAlias() const {
+  return 0x01 == getUInt8(Offset::sendTalkerAlias());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableSendTalkerAlias(bool enable) {
-  setUInt8(0x0000, enable ? 0x01 : 0x00);
+  setUInt8(Offset::sendTalkerAlias(), enable ? 0x01 : 0x00);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasSource
+AnytoneDMRSettingsExtension::TalkerAliasSource
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasSource() const {
-  return (TalkerAliasSource) getUInt8(0x0001);
+  return (AnytoneDMRSettingsExtension::TalkerAliasSource) getUInt8(Offset::talkerAliasDisplay());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(TalkerAliasSource source) {
-  setUInt8(0x0001, (uint8_t)source);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource source) {
+  setUInt8(Offset::talkerAliasDisplay(), (uint8_t)source);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasEncoding
+AnytoneDMRSettingsExtension::TalkerAliasEncoding
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (TalkerAliasEncoding) getUInt8(0x0002);
+  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
-  setUInt8(0x0002, (uint8_t)encoding);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) {
+  setUInt8(Offset::talkerAliasEncoding(), (uint8_t)encoding);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::FontColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
-  return (FontColor) getUInt8(0x0003);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::fontColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(FontColor color) {
-  setUInt8(0x0003, (uint8_t)color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::fontColor(), (uint8_t)color);
 }
 
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::customChannelBackgroundEnabled() const {
-  return 0x01 == getUInt8(0x0004);
+  return 0x01 == getUInt8(Offset::customChannelBackground());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableCustomChannelBackground(bool enable) {
-  setUInt8(0x0004, enable ? 0x01 : 0x00);
+  setUInt8(Offset::customChannelBackground(), enable ? 0x01 : 0x00);
 }
 
 unsigned int
 DMR6X2UVCodeplug::ExtendedSettingsElement::roamingZoneIndex() const {
-  return getUInt8(0x0005);
+  return getUInt8(Offset::defaultRoamingZone());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingZoneIndex(unsigned int index) {
-  setUInt8(0x0005, index);
+  setUInt8(Offset::defaultRoamingZone(), index);
 }
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingEnabled() const {
-  return 0x01 == getUInt8(0x0006);
+  return 0x01 == getUInt8(Offset::roaming());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableAutoRoaming(bool enable) {
-  setUInt8(0x006, enable ? 0x01 : 0x00);
+  setUInt8(Offset::roaming(), enable ? 0x01 : 0x00);
 }
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckEnabled() const {
-  return 0x01 == getUInt8(0x0007);
+  return 0x01 == getUInt8(Offset::repRangeCheck());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterCheck(bool enable) {
-  setUInt8(0x0007, enable ? 0x01 : 0x00);
+  setUInt8(Offset::repRangeCheck(), enable ? 0x01 : 0x00);
 }
 DMR6X2UVCodeplug::ExtendedSettingsElement::OutOfRangeAlert
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeAlert() const {
-  return (OutOfRangeAlert) getUInt8(0x0008);
+  return (OutOfRangeAlert) getUInt8(Offset::repRangeAlert());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(OutOfRangeAlert alert) {
-  setUInt8(0x0008, (uint8_t)alert);
+  setUInt8(Offset::repRangeAlert(), (uint8_t)alert);
 }
 unsigned int
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeReminder() const {
-  return getUInt8(0x0009)+1;
+  return getUInt8(Offset::repRangeReminder())+1;
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeReminder(unsigned int n) {
-  n = std::max(1U, std::min(10U, n));
-  setUInt8(0x0009, n-1);
+  n = Limit::repRangeReminder().map(n);
+  setUInt8(Offset::repRangeReminder(), n-1);
 }
-unsigned int
+Interval
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckIntervall() const {
-  return (1+getUInt8(0x000a))*5;
+  return Interval::fromSeconds((1+getUInt8(Offset::rangeCheckInterval()))*5);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckIntervall(unsigned int intervall) {
-  intervall = std::min(50U, std::max(5U, intervall));
-  setUInt8(0x000a, intervall/5-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckIntervall(Interval intv) {
+  intv = Limit::rangeCheckInterval().map(intv);
+  setUInt8(Offset::rangeCheckInterval(), intv.seconds()/5-1);
 }
 unsigned int
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterReconnections() const {
-  return getUInt8(0x000b)+3;
+  return getUInt8(Offset::rangeCheckCount())+3;
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterReconnections(unsigned int n) {
-  n = std::max(3U, std::min(5U, n));
-  setUInt8(0x000b, n);
+  n = Limit::repeaterReconnections().map(n);
+  setUInt8(Offset::rangeCheckCount(), n-3);
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
 DMR6X2UVCodeplug::ExtendedSettingsElement::startRoamingCondition() const {
-  return (RoamingCondition) getUInt8(0x000c);
+  return (RoamingCondition) getUInt8(Offset::roamStartCondition());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setStartRoamingCondition(RoamingCondition cond) {
-  setUInt8(0x000c, (uint8_t)cond);
+  setUInt8(Offset::roamStartCondition(), (uint8_t)cond);
 }
 
-unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingIntervall() const {
-  return ((unsigned int) getUInt8(0x000d)) + 1;
+Interval
+DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingInterval() const {
+  return Interval::fromMinutes(getUInt8(Offset::autoRoamPeriod()) + 1);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamingIntervall(unsigned int minutes) {
-  minutes = std::max(1U, std::min(256U, minutes));
-  setUInt8(0x000d, minutes-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamingInterval(Interval minutes) {
+  minutes = Limit::autoRoamingInterval().map(minutes);
+  setUInt8(Offset::autoRoamPeriod(), minutes.minutes()-1);
 }
 
-unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::effectiveRoamingWaitingTime() const {
-  return getUInt8(0x000e);
+Interval
+DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamDelay() const {
+  return Interval::fromSeconds(getUInt8(Offset::autoRoamDelay()));
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setEffectiveRoamingWaitingTime(unsigned int sec) {
-  sec = std::min(30U, sec);
-  setUInt8(0x000e, sec);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamDelay(Interval sec) {
+  sec = Limit::autoRoamDelay().map(sec);
+  setUInt8(Offset::autoRoamDelay(), sec.seconds());
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
 DMR6X2UVCodeplug::ExtendedSettingsElement::roamingReturnCondition() const {
-  return (RoamingCondition) getUInt8(0x000f);
+  return (RoamingCondition) getUInt8(Offset::roamReturnCondition());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingReturnCondition(RoamingCondition cond) {
-  setUInt8(0x000f, (uint8_t)cond);
+  setUInt8(Offset::roamReturnCondition(), (uint8_t)cond);
 }
 
-unsigned int
+Interval
 DMR6X2UVCodeplug::ExtendedSettingsElement::muteTimer() const {
-  return ((unsigned int)getUInt8(0x0010)) + 1;
+  return Interval::fromMinutes(getUInt8(Offset::muteDelay()) + 1);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setMuteTimer(unsigned int minutes) {
-  minutes = std::max(1U, minutes);
-  setUInt8(0x0010, minutes-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setMuteTimer(Interval minutes) {
+  minutes = Limit::muteTimer().map(minutes);
+  setUInt8(Offset::muteDelay(), minutes.minutes()-1);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::EncryptionType
+AnytoneDMRSettingsExtension::EncryptionType
 DMR6X2UVCodeplug::ExtendedSettingsElement::encryptionType() const {
-  return (EncryptionType) getUInt8(0x0011);
+
+  return (0 == getUInt8(0x0011)) ? AnytoneDMRSettingsExtension::EncryptionType::DMR :
+                                   AnytoneDMRSettingsExtension::EncryptionType::AES;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(EncryptionType type) {
-  setUInt8(0x0011, (uint8_t)type);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType type) {
+  switch (type) {
+  case AnytoneDMRSettingsExtension::EncryptionType::DMR: setUInt8(Offset::encryptionType(), 0x00); break;
+  case AnytoneDMRSettingsExtension::EncryptionType::AES: setUInt8(Offset::encryptionType(), 0x01); break;
+  }
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
-  return (NameColor) getUInt8(0x0012);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneANameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(NameColor color) {
-  setUInt8(0x0012, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneANameColor(), (uint8_t) color);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
-  return (NameColor) getUInt8(0x0013);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneBNameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(NameColor color) {
-  setUInt8(0x0013, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneBNameColor(), (uint8_t) color);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelANameColor() const {
-  return (NameColor) getUInt8(0x0014);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelANameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(NameColor color) {
-  setUInt8(0x0014, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelANameColor(), (uint8_t) color);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
-  return (NameColor) getUInt8(0x0015);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelBNameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(NameColor color) {
-  setUInt8(0x0015, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelBNameColor(), (uint8_t) color);
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx)
+DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  Q_UNUSED(flags); Q_UNUSED(ctx);
+  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode extended settings for DMR-6X2 codeplug.";
+    return false;
+  }
+
+  // Encode device specific settings
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   return true;
 }
 

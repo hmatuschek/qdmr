@@ -7,11 +7,6 @@ Interval::Interval()
   // pass...
 }
 
-Interval::Interval(unsigned long long ms)
-  : _duration(ms)
-{
-  // pass...
-}
 
 Interval::Interval(const Interval &other)
   : _duration(other._duration)

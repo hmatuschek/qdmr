@@ -1995,7 +1995,7 @@ D578UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
   image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
   image(0).addElement(Offset::gpsMessages(), DMRAPRSMessageElement::size());
-  image(0).addElement(Offset::settingsExtension(), GeneralSettingsExtensionElement::size());
+  image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
 
 }
 bool
@@ -2004,7 +2004,7 @@ D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const Er
 
   GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).fromConfig(flags, ctx);
-  GeneralSettingsExtensionElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
+  ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
 }
 bool
@@ -2013,7 +2013,7 @@ D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).updateConfig(ctx);
-  GeneralSettingsExtensionElement(data(Offset::settingsExtension())).updateConfig(ctx);
+  ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;
 }
 
