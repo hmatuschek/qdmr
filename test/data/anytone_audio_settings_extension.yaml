@@ -12,8 +12,8 @@ settings:
   defaultID: id1
   anytone:
     audioSettings:
-      enableAnalogMicGain: true
-      analogMicGain: 6  # Must differ from settings->micLevel
+      enableFMMicGain: true
+      fmMicGain: 6  # Must differ from settings->micLevel
 
 radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}
