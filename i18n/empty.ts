@@ -2776,12 +2776,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="551"/>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>TS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>CC</source>
         <translation type="unfinished"></translation>
     </message>
