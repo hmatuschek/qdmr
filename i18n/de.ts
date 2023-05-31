@@ -2737,17 +2737,17 @@
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete roaming channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Roamingkanal löschen?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <source>Delete roaming channel %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Roamingkanal %1 löschen?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete %1 roaming channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Roamingkanäle löschen?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
