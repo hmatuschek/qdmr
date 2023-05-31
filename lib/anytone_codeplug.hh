@@ -1180,12 +1180,6 @@ public:
    *  class only defines an interface to get/set common settings. */
   class ExtendedSettingsElement: public Element
   {
-  public:
-    /** Possible GPS modes. */
-    enum class GPSMode {
-      GPS=0, BDS=1, Both=2
-    };
-
   protected:
     /** Hidden constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);

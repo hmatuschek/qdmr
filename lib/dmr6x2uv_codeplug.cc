@@ -1265,6 +1265,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorS
     ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }
 
+  return true;
 }
 
 
