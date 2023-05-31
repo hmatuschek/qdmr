@@ -1188,6 +1188,7 @@ AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
     _funcKeyAShort(KeyFunction::Off), _funcKeyALong(KeyFunction::Encryption),
     _funcKeyBShort(KeyFunction::Voltage), _funcKeyBLong(KeyFunction::Call),
     _funcKeyCShort(KeyFunction::Power), _funcKeyCLong(KeyFunction::VOX),
+    _funcKeyDShort(KeyFunction::Off), _funcKeyDLong(KeyFunction::Off),
     _longPressDuration(Interval::fromSeconds(1)), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
     _sideKeysLock(false), _forcedKeyLock(false)
 {

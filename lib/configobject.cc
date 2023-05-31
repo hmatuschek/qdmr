@@ -397,7 +397,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       if (nullptr == key) {
         errMsg(err) << "Cannot map value " << value.toUInt()
                     << " to enum " << e.name()
-                    << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                    << ". Ignore attribute '" << prop.name()
+                    << "' but this points to an incompatibility in some codeplug. "
                     << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
         continue;
       }
