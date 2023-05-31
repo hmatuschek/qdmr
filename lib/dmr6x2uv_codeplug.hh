@@ -610,12 +610,6 @@ public:
       None = 0x00, Bell = 0x01, Voice = 0x02
     };
 
-    /** Possible roaming conditions. */
-    enum class RoamingCondition {
-      FixedTime=0x00, OutOfRange=0x01
-    };
-
-
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -654,46 +648,46 @@ public:
     virtual void enableAutoRoaming(bool enable);
 
     /** Returns @c true if repeater check is enabled. */
-    virtual bool repeaterCheckEnabled() const;
+    virtual bool repeaterRangeCheckEnabled() const;
     /** Enables/disables repeater check. */
-    virtual void enableRepeaterCheck(bool enable);
+    virtual void enableRepeaterRangeCheck(bool enable);
     /** Returns the number of times, the repeater out-of-range reminder is shown (1-10). */
-    virtual unsigned int repeaterOutOfRangeReminder() const;
+    virtual unsigned int repeaterCheckNumNotifications() const;
     /** Sets the number of times, the repeater out-of-range reminder is shown (1-10). */
-    virtual void setRepeaterOutOfRangeReminder(unsigned int n);
-    /** Returns the repeater check intervall in seconds (5-50s). */
-    virtual Interval repeaterCheckIntervall() const;
-    /** Sets the repeater check intervall in seconds (5-50s). */
-    virtual void setRepeaterCheckIntervall(Interval intv);
+    virtual void setRepeaterCheckNumNotifications(unsigned int n);
+    /** Returns the repeater check interval in seconds (5-50s). */
+    virtual Interval repeaterRangeCheckInterval() const;
+    /** Sets the repeater check interval in seconds (5-50s). */
+    virtual void setRepeaterRangeCheckInterval(Interval intv);
     /** Returns the repeater out-of-range alert type. */
     virtual OutOfRangeAlert repeaterOutOfRangeAlert() const;
     /** Sets the repeater out-of-range alert type. */
     virtual void setRepeaterOutOfRangeAlert(OutOfRangeAlert alert);
     /** Returns the number of times, a repeater reconnection is tried (3-5). */
-    virtual unsigned int repeaterReconnections() const;
+    virtual unsigned int repeaterRangeCheckCount() const;
     /** Sets the number of times, a repeater reconnection is tried (3-5). */
-    virtual void setRepeaterReconnections(unsigned int n);
+    virtual void setRepeaterRangeCheckCount(unsigned int n);
 
     /** Retunrs the roaming zone index. */
-    virtual unsigned int roamingZoneIndex() const;
+    virtual unsigned int defaultRoamingZoneIndex() const;
     /** Sets the roaming zone index. */
-    virtual void setRoamingZoneIndex(unsigned int index);
+    virtual void setDefaultRoamingZoneIndex(unsigned int index);
     /** Returns the condition to start roaming. */
-    virtual RoamingCondition startRoamingCondition() const;
+    virtual AnytoneRoamingSettingsExtension::RoamStart roamingStartCondition() const;
     /** Sets the condition to start roaming. */
-    virtual void setStartRoamingCondition(RoamingCondition cond);
+    virtual void setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond);
     /** Returns the auto-roaming interval in minutes (1-256). */
-    virtual Interval autoRoamingInterval() const;
+    virtual Interval autoRoamPeriod() const;
     /** Sets the auto-roaming interval in minutes (1-256). */
-    virtual void setAutoRoamingInterval(Interval minutes);
+    virtual void setAutoRoamPeriod(Interval minutes);
     /** Returns the effective roaming waiting time in seconds (0-30s). */
     virtual Interval autoRoamDelay() const;
     /** Sets the effective roaming waiting time in seconds (0-30s). */
     virtual void setAutoRoamDelay(Interval sec);
     /** Returns the roaming return condition. */
-    virtual RoamingCondition roamingReturnCondition() const;
+    virtual AnytoneRoamingSettingsExtension::RoamStart roamingReturnCondition() const;
     /** Sets the roaming return condition. */
-    virtual void setRoamingReturnCondition(RoamingCondition cond);
+    virtual void setRoamingReturnCondition(AnytoneRoamingSettingsExtension::RoamStart cond);
 
     /** Returns the mute timer in minutes. */
     virtual Interval muteTimer() const;
@@ -716,10 +710,9 @@ public:
     AnytoneDisplaySettingsExtension::Color channelBNameColor() const;
     void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color);
 
-    /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-    /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx);
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+    bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for entries. */

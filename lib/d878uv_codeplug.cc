@@ -1534,6 +1534,7 @@ D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
     }
     ext->bootSettings()->priorityZoneB()->set(ctx.get<Zone>(priorityZoneBIndex()));
   }
+
   if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
     ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }

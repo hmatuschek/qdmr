@@ -1280,9 +1280,9 @@
   </listitem>
 </varlistentry>
 <varlistentry>
-  <term><token>roamStart</token></term>
+  <term><token>roamStart</token>,<token>roamReturn</token></term>
   <listitem>
-    <para>Specifies the roaming start condition. Must be one of <token>Periodic</token> or 
+    <para>Specifies the roaming start/end condition. Must be one of <token>Periodic</token> or 
     <token>OutOfRange</token>.</para>
   </listitem>
 </varlistentry>

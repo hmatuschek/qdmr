@@ -80,8 +80,8 @@ D878UVTest::testAnalogMicGain() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  QVERIFY(config.settings()->anytoneExtension()->audioSettings()->analogMicGainEnabled());
-  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->analogMicGain(), 6);
+  QVERIFY(config.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
+  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 6);
 }
 
 void

@@ -581,7 +581,8 @@ AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent
   : ConfigItem(parent),
     _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
     _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
-    _roamingStartCondition(RoamStart::Periodic), _notificationCount(1)
+    _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
+    _notificationCount(1)
 {
   // pass...
 }
@@ -664,6 +665,18 @@ AnytoneRoamingSettingsExtension::setRoamingStartCondition(RoamStart start) {
   if (_roamingStartCondition == start)
     return;
   _roamingStartCondition = start;
+  emit modified(this);
+}
+
+AnytoneRoamingSettingsExtension::RoamStart
+AnytoneRoamingSettingsExtension::roamingReturnCondition() const {
+  return _roamingReturnCondition;
+}
+void
+AnytoneRoamingSettingsExtension::setRoamingReturnCondition(RoamStart end) {
+  if (_roamingReturnCondition == end)
+    return;
+  _roamingReturnCondition = end;
   emit modified(this);
 }
 

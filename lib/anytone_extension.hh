@@ -1599,6 +1599,10 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   /** Auto-roaming start condition. */
   Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
 
+  Q_CLASSINFO("roamReturn", "Condition to return to the original repeater.")
+  /** Auto-roaming end/return condition. */
+  Q_PROPERTY(RoamStart roamReturn READ roamingReturnCondition WRITE setRoamingReturnCondition)
+
   Q_CLASSINFO("notificationDescription", "Enables the repeater-check notification.")
   /** Repeater-check notification. */
   Q_PROPERTY(bool notification READ notificationEnabled WRITE enableNotification)
@@ -1646,6 +1650,10 @@ public:
   RoamStart roamingStartCondition() const;
   /** Sets the auto-roaming start condition. */
   void setRoamingStartCondition(RoamStart start);
+  /** Returns the auto-roaming return condition. */
+  RoamStart roamingReturnCondition() const;
+  /** Sets the auto-roaming return condition. */
+  void setRoamingReturnCondition(RoamStart start);
 
   /** Returns @c true, if the repeater check notification is enabled. */
   bool notificationEnabled() const;
@@ -1663,6 +1671,7 @@ protected:
   Interval _repeaterCheckInterval;             ///< The repeater check interval in seconds.
   unsigned int _repeaterRangeCheckCount;       ///< Number of range checks before giving up.
   RoamStart _roamingStartCondition;            ///< Auto-roaming start condition.
+  RoamStart _roamingReturnCondition;           ///< Auto-roaming return condition.
   bool _notification;                          ///< Repeater check notification.
   unsigned int _notificationCount;             ///< Number of notifications.
 };

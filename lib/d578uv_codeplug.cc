@@ -2016,6 +2016,20 @@ D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;
 }
+bool
+D578UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  if (! GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err)) {
+    errMsg(err) << "Cannot link general settings extension.";
+    return false;
+  }
+
+  if (! ExtendedSettingsElement(data(Offset::settingsExtension())).linkConfig(ctx, err)) {
+    errMsg(err) << "Cannot link general settings extension.";
+    return false;
+  }
+
+  return true;
+}
 
 void
 D578UVCodeplug::allocateAirBand() {

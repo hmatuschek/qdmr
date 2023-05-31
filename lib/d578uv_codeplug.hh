@@ -865,7 +865,7 @@ public:
       static constexpr unsigned int btMicGain()           { return 0x00a9; }
       static constexpr unsigned int btSpeakerGain()       { return 0x00aa; }
       static constexpr unsigned int showChannelNumber()   { return 0x00ab; }
-      static constexpr unsigned int showCurrentContact()         { return 0x00ac; }
+      static constexpr unsigned int showCurrentContact()  { return 0x00ac; }
       static constexpr unsigned int autoRoamPeriod()      { return 0x00ad; }
       static constexpr unsigned int callColor()           { return 0x00ae; }
       static constexpr unsigned int gpsUnits()            { return 0x00af; }
@@ -1046,6 +1046,7 @@ protected:
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocates the air-band channels und VFO settings. */
   virtual void allocateAirBand();

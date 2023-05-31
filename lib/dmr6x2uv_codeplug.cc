@@ -1043,11 +1043,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::enableCustomChannelBackground(bool en
 }
 
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::roamingZoneIndex() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::defaultRoamingZoneIndex() const {
   return getUInt8(Offset::defaultRoamingZone());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingZoneIndex(unsigned int index) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setDefaultRoamingZoneIndex(unsigned int index) {
   setUInt8(Offset::defaultRoamingZone(), index);
 }
 bool
@@ -1059,11 +1059,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::enableAutoRoaming(bool enable) {
   setUInt8(Offset::roaming(), enable ? 0x01 : 0x00);
 }
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckEnabled() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckEnabled() const {
   return 0x01 == getUInt8(Offset::repRangeCheck());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterCheck(bool enable) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterRangeCheck(bool enable) {
   setUInt8(Offset::repRangeCheck(), enable ? 0x01 : 0x00);
 }
 DMR6X2UVCodeplug::ExtendedSettingsElement::OutOfRangeAlert
@@ -1075,48 +1075,48 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(OutOfRange
   setUInt8(Offset::repRangeAlert(), (uint8_t)alert);
 }
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeReminder() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckNumNotifications() const {
   return getUInt8(Offset::repRangeReminder())+1;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeReminder(unsigned int n) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
   n = Limit::repRangeReminder().map(n);
   setUInt8(Offset::repRangeReminder(), n-1);
 }
 Interval
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckIntervall() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckInterval() const {
   return Interval::fromSeconds((1+getUInt8(Offset::rangeCheckInterval()))*5);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckIntervall(Interval intv) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterRangeCheckInterval(Interval intv) {
   intv = Limit::rangeCheckInterval().map(intv);
   setUInt8(Offset::rangeCheckInterval(), intv.seconds()/5-1);
 }
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterReconnections() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckCount() const {
   return getUInt8(Offset::rangeCheckCount())+3;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterReconnections(unsigned int n) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterRangeCheckCount(unsigned int n) {
   n = Limit::repeaterReconnections().map(n);
   setUInt8(Offset::rangeCheckCount(), n-3);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
-DMR6X2UVCodeplug::ExtendedSettingsElement::startRoamingCondition() const {
-  return (RoamingCondition) getUInt8(Offset::roamStartCondition());
+AnytoneRoamingSettingsExtension::RoamStart
+DMR6X2UVCodeplug::ExtendedSettingsElement::roamingStartCondition() const {
+  return (AnytoneRoamingSettingsExtension::RoamStart) getUInt8(Offset::roamStartCondition());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setStartRoamingCondition(RoamingCondition cond) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond) {
   setUInt8(Offset::roamStartCondition(), (uint8_t)cond);
 }
 
 Interval
-DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingInterval() const {
+DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamPeriod() const {
   return Interval::fromMinutes(getUInt8(Offset::autoRoamPeriod()) + 1);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamingInterval(Interval minutes) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamPeriod(Interval minutes) {
   minutes = Limit::autoRoamingInterval().map(minutes);
   setUInt8(Offset::autoRoamPeriod(), minutes.minutes()-1);
 }
@@ -1131,12 +1131,12 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamDelay(Interval sec) {
   setUInt8(Offset::autoRoamDelay(), sec.seconds());
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
+AnytoneRoamingSettingsExtension::RoamStart
 DMR6X2UVCodeplug::ExtendedSettingsElement::roamingReturnCondition() const {
-  return (RoamingCondition) getUInt8(Offset::roamReturnCondition());
+  return (AnytoneRoamingSettingsExtension::RoamStart) getUInt8(Offset::roamReturnCondition());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingReturnCondition(RoamingCondition cond) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingReturnCondition(AnytoneRoamingSettingsExtension::RoamStart cond) {
   setUInt8(Offset::roamReturnCondition(), (uint8_t)cond);
 }
 
@@ -1202,19 +1202,69 @@ bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err)) {
-    errMsg(err) << "Cannot encode extended settings for DMR-6X2 codeplug.";
+    errMsg(err) << "Cannot encode extended settings for DMR-6X2UV codeplug.";
     return false;
   }
 
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  // Encode ranging/roaming settings.
+  setAutoRoamPeriod(ext->roamingSettings()->autoRoamPeriod());
+  setAutoRoamDelay(ext->roamingSettings()->autoRoamDelay());
+  enableRepeaterRangeCheck(ext->roamingSettings()->repeaterRangeCheckEnabled());
+  setRepeaterRangeCheckInterval(ext->roamingSettings()->repeaterCheckInterval());
+  setRepeaterRangeCheckCount(ext->roamingSettings()->repeaterRangeCheckCount());
+  setRoamingStartCondition(ext->roamingSettings()->roamingStartCondition());
+  setRoamingReturnCondition(ext->roamingSettings()->roamingReturnCondition());
+  setRepeaterCheckNumNotifications(ext->roamingSettings()->notificationCount());
+
   return true;
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx) {
-  Q_UNUSED(ctx);
+DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot decode extended settings for DMR-6X2UV codeplug";
+    return false;
+  }
+
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode ranging/roaming settings
+  ext->roamingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
+  ext->roamingSettings()->setAutoRoamDelay(this->autoRoamDelay());
+  ext->roamingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheckEnabled());
+  ext->roamingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
+  ext->roamingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
+  ext->roamingSettings()->setRoamingStartCondition(this->roamingStartCondition());
+  ext->roamingSettings()->setRoamingReturnCondition(this->roamingReturnCondition());
+  ext->roamingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
+
   return true;
+}
+
+bool
+DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err)) {
+    errMsg(err) << "Cannot link extended settings for DMR-6X2UV codeplug";
+    return false;
+  }
+
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return false;
+
+  if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
+    ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+  }
+
 }
 
 
