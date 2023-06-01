@@ -265,11 +265,6 @@ AnytoneRadio::upload() {
     emit uploadProgress(25+float(n*25)/_codeplug->image(0).numElements());
   }
 
-  // Update bitmaps for all elements representing the common Config
-  _codeplug->setBitmaps(_config);
-  // Allocate all memory elements representing the common config
-  _codeplug->allocateForEncoding();
-
   // Update binary codeplug from config
   if (! _codeplug->encode(_config, _codeplugFlags, _errorStack)) {
     errMsg(_errorStack) << "Cannot encode codeplug.";

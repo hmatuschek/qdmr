@@ -19,10 +19,14 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
 
+  void testAnalogMicGain();
   void testRoaming();
+  void testHangTime();
 
 protected:
+  QTextStream _stderr;
   Config _basicConfig;
+  Config _micGainConfig;
   Config _roamingConfig;
 };
 

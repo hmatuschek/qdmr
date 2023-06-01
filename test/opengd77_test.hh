@@ -3,6 +3,7 @@
 
 
 #include <QObject>
+#include <QTextStream>
 #include "config.hh"
 
 class OpenGD77Test : public QObject
@@ -20,6 +21,7 @@ private slots:
   void testBasicConfigDecoding();
 
 protected:
+  QTextStream _stderr;
   Config _basicConfig;
 };
 

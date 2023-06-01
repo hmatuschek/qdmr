@@ -13,11 +13,6 @@
 #define CHANNEL_BITMAP            0x024c1500
 #define CHANNEL_BITMAP_SIZE       0x00000200
 
-#define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x000000e0
-#define ADDR_EXTENDED_SETTINGS    0x02501400
-#define EXTENDED_SETTINGS_SIZE    0x00000030
-
 #define ADDR_APRS_SETTINGS        0x02501000
 #define APRS_SETTINGS_SIZE        0x00000040
 #define NUM_DMRAPRS_SYSTEMS                8
@@ -47,320 +42,938 @@
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, GENERAL_CONFIG_SIZE)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::DisplayColor
-DMR6X2UVCodeplug::GeneralSettingsElement::callsignDisplayColor() const {
-  return (DisplayColor)getUInt8(0x00b0);
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::idleChannelTone() const {
+  return getUInt8(Offset::idleChannelTone());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
+  return setUInt8(Offset::idleChannelTone(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
+  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
+  setUInt8(Offset::transmitTimeout(), tot/30);
+}
+
+AnytoneDisplaySettingsExtension::Language
+DMR6X2UVCodeplug::GeneralSettingsElement::language() const {
+  return (AnytoneDisplaySettingsExtension::Language)getUInt8(Offset::language());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtension::Language lang) {
+  setUInt8(Offset::language(), (unsigned)lang);
+}
+
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
+  switch (getUInt8(Offset::vfoFrequencyStep())) {
+  case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
+  case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
+  case FREQ_STEP_6_25kHz: return Frequency::fromkHz(6.25);
+  case FREQ_STEP_10kHz: return Frequency::fromkHz(10);
+  case FREQ_STEP_12_5kHz: return Frequency::fromkHz(12.5);
+  case FREQ_STEP_20kHz: return Frequency::fromkHz(20);
+  case FREQ_STEP_25kHz: return Frequency::fromkHz(25);
+  case FREQ_STEP_50kHz: return Frequency::fromkHz(50);
+  }
+  return Frequency::fromkHz(2.5);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
+  if (freq.inkHz() <= 2.5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_2_5kHz);
+  else if (freq.inkHz() <= 5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_5kHz);
+  else if (freq.inkHz() <= 6.25)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_6_25kHz);
+  else if (freq.inkHz() <= 10)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_10kHz);
+  else if (freq.inkHz() <= 12.5)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_12_5kHz);
+  else if (freq.inkHz() <= 20)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_20kHz);
+  else if (freq.inkHz() <= 25)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_25kHz);
+  else
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_50kHz);
+}
+
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::vfoModeA() const {
+  return getUInt8(Offset::vfoModeA());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
+  setUInt8(Offset::vfoModeA(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::vfoModeB() const {
+  return getUInt8(Offset::vfoModeB());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
+  setUInt8(Offset::vfoModeB(), (enable ? 0x01 : 0x00));
+}
+
+AnytoneSettingsExtension::STEType
+DMR6X2UVCodeplug::GeneralSettingsElement::steType() const {
+  return (AnytoneSettingsExtension::STEType)getUInt8(Offset::steType());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setSTEType(AnytoneSettingsExtension::STEType type) {
+  setUInt8(Offset::steType(), (unsigned)type);
+}
+double
+DMR6X2UVCodeplug::GeneralSettingsElement::steFrequency() const {
+  switch ((STEFrequency)getUInt8(Offset::steFrequency())) {
+  case STEFrequency::Off: return 0;
+  case STEFrequency::Hz55_2: return 55.2;
+  case STEFrequency::Hz259_2: return 259.2;
+  }
+  return 0;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setSTEFrequency(double freq) {
+  if (0 >= freq) {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Off);
+  } else if (100 > freq) {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Hz55_2);
+  } else {
+    setUInt8(Offset::steFrequency(), (unsigned)STEFrequency::Hz259_2);
+  }
+}
+
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::groupCallHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::groupCallHangTime()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(Interval intv) {
+  setUInt8(Offset::groupCallHangTime(), intv.seconds());
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::privateCallHangTime()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(Interval intv) {
+  setUInt8(Offset::privateCallHangTime(), intv.seconds());
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
+  return Interval::fromMilliseconds((unsigned)getUInt8(Offset::preWaveDelay())*20);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPreWaveDelay(Interval intv) {
+  setUInt8(Offset::preWaveDelay(), intv.milliseconds()/20);
+}
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::wakeHeadPeriod()))*20);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setWakeHeadPeriod(Interval intv) {
+  setUInt8(Offset::wakeHeadPeriod(), intv.milliseconds()/20);
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmChannelIndex() const {
+  return getUInt8(Offset::wfmChannelIndex());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(unsigned idx) {
+  setUInt8(Offset::wfmChannelIndex(), idx);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmVFOEnabled() const {
+  return getUInt8(Offset::wfmVFOEnabled());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableWFMVFO(bool enable) {
+  setUInt8(Offset::wfmVFOEnabled(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
+  switch (getUInt8(Offset::dtmfToneDuration())) {
+  case DTMF_DUR_50ms:  return 50;
+  case DTMF_DUR_100ms: return 100;
+  case DTMF_DUR_200ms: return 200;
+  case DTMF_DUR_300ms: return 300;
+  case DTMF_DUR_500ms: return 500;
+  }
+  return 50;
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setDTMFToneDuration(unsigned ms) {
+  if (ms<=50) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_50ms);
+  } else if (ms<=100) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_100ms);
+  } else if (ms<=200) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_200ms);
+  } else if (ms<=300) {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_300ms);
+  } else {
+    setUInt8(Offset::dtmfToneDuration(), DTMF_DUR_500ms);
+  }
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::manDown() const {
+  return getUInt8(Offset::manDown());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableManDown(bool enable) {
+  setUInt8(Offset::manDown(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::wfmMonitor() const {
+  return getUInt8(Offset::wfmMonitor());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableWFMMonitor(bool enable) {
+  setUInt8(Offset::wfmMonitor(), (enable ? 0x01 : 0x00));
+}
+
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+  switch ((TBSTFrequency)getUInt8(Offset::tbstFrequency())) {
+  case TBSTFrequency::Hz1000: return Frequency::fromHz(1000);
+  case TBSTFrequency::Hz1450: return Frequency::fromHz(1450);
+  case TBSTFrequency::Hz1750: return Frequency::fromHz(1750);
+  case TBSTFrequency::Hz2100: return Frequency::fromHz(2100);
+  }
+  return Frequency::fromHz(1750);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setTBSTFrequency(Frequency freq) {
+  if (1000 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1000);
+  } else if (1450 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1450);
+  } else if (1750 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1750);
+  } else if (2100 == freq.inHz()) {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz2100);
+  } else {
+    setUInt8(Offset::tbstFrequency(), (unsigned)TBSTFrequency::Hz1750);
+  }
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::proMode() const {
+  return getUInt8(Offset::proMode());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableProMode(bool enable) {
+  setUInt8(Offset::proMode(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::filterOwnID() const {
+  return getUInt8(Offset::filterOwnID());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableFilterOwnID(bool enable) {
+  setUInt8(Offset::filterOwnID(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
+  return 0x00 != getUInt8(Offset::enableKeyTone());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::remoteStunKill() const {
+  return getUInt8(Offset::remoteStunKill());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableRemoteStunKill(bool enable) {
+  setUInt8(Offset::remoteStunKill(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::remoteMonitor() const {
+  return getUInt8(Offset::remoteMonitor());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableRemoteMonitor(bool enable) {
+  setUInt8(Offset::remoteMonitor(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::selectTXContactEnabled() const {
+  return 0x01 == getUInt8(Offset::selectTXContact());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableSelectTXContact(bool enable) {
+  setUInt8(Offset::selectTXContact(), enable ? 0x01 : 0x00);
+}
+
+AnytoneDMRSettingsExtension::SlotMatch
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorSlotMatch() const {
+  return (AnytoneDMRSettingsExtension::SlotMatch)getUInt8(Offset::monSlotMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match) {
+  setUInt8(Offset::monSlotMatch(), (unsigned)match);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorColorCodeMatch() const {
+  return getUInt8(Offset::monColorCodeMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorColorCodeMatch(bool enable) {
+  setUInt8(Offset::monColorCodeMatch(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorIDMatch() const {
+  return getUInt8(Offset::monIDMatch());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorIDMatch(bool enable) {
+  setUInt8(Offset::monIDMatch(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::monitorTimeSlotHold() const {
+  return getUInt8(Offset::monTimeSlotHold());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorTimeSlotHold(bool enable) {
+  setUInt8(Offset::monTimeSlotHold(), (enable ? 0x01 : 0x00));
+}
+
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::manDownDelay() const {
+  return Interval::fromSeconds(getUInt8(Offset::manDownDelay()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setManDownDelay(Interval sec) {
+  setUInt8(Offset::manDownDelay(), sec.seconds());
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::fmCallHold() const {
+  return getUInt8(Offset::fmCallHold());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFMCallHold(unsigned sec) {
+  setUInt8(Offset::fmCallHold(), sec);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::gpsMessageEnabled() const {
+  return getUInt8(Offset::enableGPSMessage());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableGPSMessage(bool enable) {
+  setUInt8(Offset::enableGPSMessage(), (enable ? 0x01 : 0x00));
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::maintainCallChannel() const {
+  return getUInt8(Offset::maintainCallChannel());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableMaintainCallChannel(bool enable) {
+  setUInt8(Offset::maintainCallChannel(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::priorityZoneAIndex() const {
+  return getUInt8(Offset::priorityZoneA());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPriorityZoneAIndex(unsigned idx) {
+  setUInt8(Offset::priorityZoneA(), idx);
+}
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::priorityZoneBIndex() const {
+  return getUInt8(Offset::priorityZoneB());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setPriorityZoneBIndex(unsigned idx) {
+  setUInt8(Offset::priorityZoneB(), idx);
+}
+
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::smsConfirmEnabled() const {
+  return 0x01 == getUInt8(Offset::smsConfirm());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableSMSConfirm(bool enable) {
+  setUInt8(Offset::smsConfirm(), enable ? 0x01 : 0x00);
 }
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::simplexRepeaterEnabled() const {
-  return 0x01 == getUInt8(0x00b2);
+  return 0x01 == getUInt8(Offset::simplexRepEnable());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableSimplexRepeater(bool enable) {
-  setUInt8(0x00b2, enable ? 0x01 : 0x00);
+  setUInt8(Offset::simplexRepEnable(), enable ? 0x01 : 0x00);
+}
+
+Interval
+DMR6X2UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
+  return Interval::fromSeconds(getUInt8(Offset::gpsUpdatePeriod()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval intv) {
+  setUInt8(Offset::gpsUpdatePeriod(), intv.seconds());
 }
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::monitorSimplexRepeaterEnabled() const {
-  return 0x01 == getUInt8(0x00b3);
+  return 0x01 == getUInt8(Offset::simplxRepSpeaker());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableMonitorSimplexRepeater(bool enable) {
-  setUInt8(0x00b3, enable ? 0x01 : 0x00);
-}
-
-DMR6X2UVCodeplug::GeneralSettingsElement::SimplexRepeaterSlot
-DMR6X2UVCodeplug::GeneralSettingsElement::simplexRepeaterTimeslot() const {
-  switch (getUInt8(0x00b7)) {
-  case 0x00:
-    return SimplexRepeaterSlot::TS1;
-  case 0x01:
-    return SimplexRepeaterSlot::TS2;
-  case 0x02:
-  default:
-    return SimplexRepeaterSlot::Channel;
-  }
-}
-
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(SimplexRepeaterSlot slot) {
-  switch (slot) {
-  case SimplexRepeaterSlot::TS1:     setUInt8(0x00b7, 0x00); break;
-  case SimplexRepeaterSlot::TS2:     setUInt8(0x00b7, 0x01); break;
-  case SimplexRepeaterSlot::Channel: setUInt8(0x00b7, 0x02); break;
-  }
-}
-
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::gpsRangingIntervall() const {
-  return getUInt8(0x00b1);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setGPSRangingIntervall(unsigned int sec) {
-  setUInt8(0x00b1, sec);
+  setUInt8(Offset::simplxRepSpeaker(), enable ? 0x01 : 0x00);
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::currentContactShown() const {
-  return 0x01 == getUInt8(0x00b4);
+DMR6X2UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
+  return getUInt8(Offset::showContact());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::showCurrentContact(bool show) {
-  setUInt8(0x00b4, show ? 0x01 : 0x00);
-}
-
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::keySoundVolume() const {
-  return getUInt8(0x00b5);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setKeySoundVolume(unsigned int vol) {
-  vol = std::min(15U, vol);
-  setUInt8(0x00b5, vol);
+DMR6X2UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
+  setUInt8(Offset::showContact(), (enable ? 0x01 : 0x00));
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::professionalKeyLock() const {
-  return getBit(0x00b6, 0);
+DMR6X2UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
+  return 0 == keyToneLevel();
+}
+unsigned
+DMR6X2UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
+  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableProfessionalKeyLock(bool enable) {
-  setBit(0x00b6, 0, enable);
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::sideKeyLock() const {
-  return getBit(0x00b6, 1);
+DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
+  setUInt8(Offset::keyToneLevel(), level*10/15);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableSideKeyLock(bool enable) {
-  setBit(0x00b6, 1, enable);
-}
-
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::keyboadLock() const {
-  return getBit(0x00b6, 2);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyboradLock(bool enable) {
-  setBit(0x00b6, 2, enable);
+DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
+  setUInt8(Offset::keyToneLevel(), 0);
 }
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(0x00b6, 3);
+  return getBit(Offset::knobLock(), 0);
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(0x00b6, 3, enable);
+  setBit(Offset::knobLock(), 0, enable);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::keypadLock() const {
+  return getBit(Offset::keypadLock(), 1);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
+  setBit(Offset::keypadLock(), 1, enable);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
+  return getBit(Offset::sideKeyLock(), 3);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
+  setBit(Offset::sideKeyLock(), 3, enable);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::keyLockForced() const {
+  return getBit(Offset::forceKeyLock(), 4);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
+  setBit(Offset::forceKeyLock(), 4, enable);
+}
+
+AnytoneSimplexRepeaterSettingsExtension::TimeSlot
+DMR6X2UVCodeplug::GeneralSettingsElement::simplexRepeaterTimeslot() const {
+  return (AnytoneSimplexRepeaterSettingsExtension::TimeSlot)getUInt8(Offset::simplxRepSlot());
+}
+
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot) {
+  setUInt8(Offset::simplxRepSlot(), (unsigned int) slot);
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::lastCallShownOnStartup() const {
-  return 0x01 == getUInt8(0x00b8);
+DMR6X2UVCodeplug::GeneralSettingsElement::showLastHeard() const {
+  return getUInt8(Offset::showLastHeard());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastCallOnStartup(bool enable) {
-  setUInt8(0x00b8, enable ? 0x01 : 0x00);
+DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
+  setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::SMSFormat
+AnytoneDMRSettingsExtension::SMSFormat
 DMR6X2UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (SMSFormat) getUInt8(0x00b9);
+  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSFormat format) {
-  setUInt8(0x00b8, (uint8_t)format);
+DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format) {
+  setUInt8(Offset::smsFormat(), (unsigned int)format);
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::GPSUnits
-DMR6X2UVCodeplug::GeneralSettingsElement::gpsUnits() const {
-  return (GPSUnits) getUInt8(0x00ba);
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
+  return getUInt8(Offset::gpsUnits());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setGPSUnits(GPSUnits units) {
-  setUInt8(0x00ba, (uint8_t) units);
+DMR6X2UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
+  setUInt8(Offset::gpsUnits(), (enable ? 0x01 : 0x00));
 }
 
-QPair<double,double>
-DMR6X2UVCodeplug::GeneralSettingsElement::vhfAutoRepeaterFrequencyRange() const {
-  double min = double(getUInt32_le(0x00bc))/1.0e5; // Stored in 10Hz
-  double max = double(getUInt32_le(0x00c0))/1.0e5;
-  return QPair<double,double>(min,max);
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinVHF())*10);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setVHFAutoRepeaterFrequencyRange(double lower, double upper) {
-  setUInt32_le(0x00bc, uint32_t(lower*1e5));
-  setUInt32_le(0x00c0, uint32_t(upper*1e5));
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMinVHF(), freq.inHz()/10);
 }
-QPair<double,double>
-DMR6X2UVCodeplug::GeneralSettingsElement::uhfAutoRepeaterFrequencyRange() const {
-  double min = double(getUInt32_le(0x00c4))/1.0e5; // Stored in 10Hz
-  double max = double(getUInt32_le(0x00c8))/1.0e5;
-  return QPair<double,double>(min,max);
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxVHF())*10);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setUHFAutoRepeaterFrequencyRange(double lower, double upper) {
-  setUInt32_le(0x00c4, uint32_t(lower*1e5));
-  setUInt32_le(0x00c8, uint32_t(upper*1e5));
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMaxVHF(), freq.inHz()/10);
 }
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
+
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinUHF())*10);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMinUHF(), freq.inHz()/10);
+}
+Frequency
+DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxUHF())*10);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMaxUHF(), freq.inHz()/10);
+}
+
+AnytoneAutoRepeaterSettingsExtension::Direction
 DMR6X2UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00cc);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(Offset::autoRepeaterDirB());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
-  setUInt8(0x00cc, (uint8_t)dir);
+DMR6X2UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
+  setUInt8(Offset::autoRepeaterDirB(), (uint8_t)dir);
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::addressBookIsSendWithOwnCode() const {
-  return 0x01 == getUInt8(0x00cd);
+DMR6X2UVCodeplug::GeneralSettingsElement::fmSendIDAndContact() const {
+  return 0 != getUInt8(Offset::fmSendIDAndContact());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableSendAddressbookWithOwnCode(bool enable) {
-  setUInt8(0x00cd, enable ? 0x01 : 0x00);
+DMR6X2UVCodeplug::GeneralSettingsElement::enableFMSendIDAndContact(bool enable) {
+  setUInt8(Offset::fmSendIDAndContact(), enable ? 0x01 : 0x00);
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::defaultBootChannelEnabled() const {
-  return 0x01 == getUInt8(0x00ce);
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannel() const {
+  return 0x01 == getUInt8(Offset::defaultChannels());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::enableDefaultBootChannel(bool enable) {
-  setUInt8(0x00ce, enable ? 0x01 : 0x00);
-}
-
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootZoneAIndex() const {
-  return getUInt8(0x00cf);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootZoneAIndex(unsigned int index) {
-  setUInt8(0x00cf, index);
-}
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelAIsVFO() const {
-  return 0xff == bootChannelAIndex();
-}
-unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelAIndex() const {
-  return getUInt8(0x00d1);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelAIndex(unsigned int index) {
-  return setUInt8(0x00d1, index);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelAIsVFO() {
-  setBootChannelAIndex(0xff);
+DMR6X2UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
+  setUInt8(Offset::defaultChannels(), enable ? 0x01 : 0x00);
 }
 
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootZoneBIndex() const {
-  return getUInt8(0x00d0);
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
+  return getUInt8(Offset::defaultZoneA());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootZoneBIndex(unsigned int index) {
-  setUInt8(0x00d0, index);
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned int index) {
+  setUInt8(Offset::defaultZoneA(), index);
 }
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelBIsVFO() const {
-  return 0xff == bootChannelBIndex();
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
+  return 0xff == defaultChannelAIndex();
 }
 unsigned int
-DMR6X2UVCodeplug::GeneralSettingsElement::bootChannelBIndex() const {
-  return getUInt8(0x00d2);
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
+  return getUInt8(Offset::defaultChannelA());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelBIndex(unsigned int index) {
-  return setUInt8(0x00d2, index);
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned int index) {
+  return setUInt8(Offset::defaultChannelA(), index);
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBootChannelBIsVFO() {
-  setBootChannelBIndex(0xff);
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
+  setDefaultChannelAIndex(0xff);
+}
+
+unsigned int
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
+  return getUInt8(Offset::defaultZoneB());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned int index) {
+  setUInt8(Offset::defaultZoneB(), index);
+}
+bool
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
+  return 0xff == defaultChannelBIndex();
+}
+unsigned int
+DMR6X2UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
+  return getUInt8(Offset::defaultChannelB());
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned int index) {
+  return setUInt8(Offset::defaultChannelB(), index);
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
+  setDefaultChannelBIndex(0xff);
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::lastCallerIsKept() const {
-  return 0x01 == getUInt8(0x00d3);
+DMR6X2UVCodeplug::GeneralSettingsElement::keepLastCaller() const {
+  return getUInt8(Offset::keepLastCaller());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
-  setUInt8(0x00d3, enable ? 0x01 : 0x00);
+  setUInt8(Offset::keepLastCaller(), (enable ? 0x01 : 0x00));
 }
 
-bool
-DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightIsAlwaysOn() const {
-  return 0x00 == rxBacklightDuration();
-}
-unsigned int
+Interval
 DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return getUInt8(0x00d4);
+  return Interval::fromSeconds(getUInt8(Offset::rxBacklightDuration()));
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(unsigned int dur) {
-  dur = std::max(30U, dur);
-  setUInt8(0x00d4, dur);
-}
-void
-DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightAlwaysOn() {
-  setRXBacklightDuration(0);
+DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
+  unsigned int secs = std::max(30ULL, dur.seconds());
+  setUInt8(Offset::rxBacklightDuration(), secs);
 }
 
-DMR6X2UVCodeplug::GeneralSettingsElement::BackgroundColor
-DMR6X2UVCodeplug::GeneralSettingsElement::backgroundColor() const {
-  return (BackgroundColor) getUInt8(0x00d5);
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::GeneralSettingsElement::standbyBackgroundColor() const {
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::standbyBackground());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setBackgroundColor(BackgroundColor color) {
-  setUInt8(0x00d5, (uint8_t)color);
+DMR6X2UVCodeplug::GeneralSettingsElement::setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::standbyBackground(), (unsigned)color);
 }
 
 unsigned int
 DMR6X2UVCodeplug::GeneralSettingsElement::manualDialedGroupCallHangTime() const {
-  return getUInt8(0x00d6);
+  return getUInt8(Offset::manGrpCallHangTime());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedGroupCallHangTime(unsigned int dur) {
-  setUInt8(0x00d6, dur);
+  setUInt8(Offset::manGrpCallHangTime(), dur);
 }
 unsigned int
 DMR6X2UVCodeplug::GeneralSettingsElement::manualDialedPrivateCallHangTime() const {
-  return getUInt8(0x00d7);
+  return getUInt8(Offset::manPrvCallHangTime());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedPrivateCallHangTime(unsigned int dur) {
-  setUInt8(0x00d7, dur);
+  setUInt8(Offset::manPrvCallHangTime(), dur);
 }
+
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx)
 {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
+
   // apply DMR-6X2UV specific settings.
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  // Encode boot settings
+  if (ext->bootSettings()->priorityZoneA()->isNull())
+    setPriorityZoneAIndex(0xff);
+  else
+    setPriorityZoneAIndex(ctx.index(ext->bootSettings()->priorityZoneA()->as<Zone>()));
+  if (ext->bootSettings()->priorityZoneB()->isNull())
+    setPriorityZoneBIndex(0xff);
+  else
+    setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
+
+  // Encode key settings
+  enableKnobLock(ext->keySettings()->knobLockEnabled());
+  enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+  enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+  enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
+  // Encode tone settings
+  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+  // Encode display settings
+  setCallDisplayColor(ext->displaySettings()->callColor());
+  setStandbyBackgroundColor(ext->displaySettings()->standbyBackgroundColor());
+  setLanguage(ext->displaySettings()->language());
+  enableShowCurrentContact(ext->displaySettings()->showContact());
+  enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
+  setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
+
+  // Encode auto-repeater settings
+  setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+  setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+  setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+  setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+  setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+  // Encode DMR settings
+  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
+  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
+  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
+  setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
+  enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
+  setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
+  enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
+  enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
+  enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
+  setSMSFormat(ext->dmrSettings()->smsFormat());
+
+  // Encode GPS settings.
+  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
+  setGPSTimeZone(ext->gpsSettings()->timeZone());
+  enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
+  setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
+
+  // Encode other settings
+  enableKeepLastCaller(ext->keepLastCallerEnabled());
+  setVFOFrequencyStep(ext->vfoStep());
+  setSTEType(ext->steType());
+  setSTEFrequency(ext->steFrequency());
+  setTBSTFrequency(ext->tbstFrequency());
+  enableProMode(ext->proModeEnabled());
+  enableMaintainCallChannel(ext->maintainCallChannelEnabled());
+
+  // Apply simplex repeater settings
+  enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
+  enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
+  setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
+
   return true;
 }
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
-  // Extract DMR-6X2UV specific settings.
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode key settings
+  ext->keySettings()->enableKnobLock(this->knobLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
+  ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
+
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Decode display settings
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+  ext->displaySettings()->setLanguage(this->language());
+  ext->displaySettings()->enableShowContact(this->showCurrentContact());
+  ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
+  ext->displaySettings()->setBacklightDurationRX(this->rxBacklightDuration());
+  ext->displaySettings()->setStandbyBackgroundColor(this->standbyBackgroundColor());
+
+  // Decode auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
+
+  // Encode dmr settings
+  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
+  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
+  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
+  ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
+  ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
+  ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
+  ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
+  ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
+  ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
+  ext->dmrSettings()->setSMSFormat(this->smsFormat());
+
+  // Encode GPS settings
+  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
+                                                          AnytoneGPSSettingsExtension::Units::Metric);
+  ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
+  ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
+  ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
+
+  // Decode other settings
+  ext->enableKeepLastCaller(this->keepLastCaller());
+  ext->setVFOStep(this->vfoFrequencyStep());
+  ext->setSTEType(this->steType());
+  ext->setSTEFrequency(this->steFrequency());
+  ext->setTBSTFrequency(this->tbstFrequency());
+  ext->enableProMode(this->proMode());
+  ext->enableMaintainCallChannel(this->maintainCallChannel());
+
+  // Decode simplex-repeater feature.
+  ext->simplexRepeaterSettings()->enable(this->simplexRepeaterEnabled());
+  ext->simplexRepeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());
+  ext->simplexRepeaterSettings()->setTimeSlot(this->simplexRepeaterTimeslot());
+
   return true;
+}
+
+uint8_t
+DMR6X2UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const {
+  switch (func) {
+  case AnytoneKeySettingsExtension::KeyFunction::Off:               return (uint8_t)KeyFunction::Off;
+  case AnytoneKeySettingsExtension::KeyFunction::Voltage:           return (uint8_t)KeyFunction::Voltage;
+  case AnytoneKeySettingsExtension::KeyFunction::Power:             return (uint8_t)KeyFunction::Power;
+  case AnytoneKeySettingsExtension::KeyFunction::Repeater:          return (uint8_t)KeyFunction::Repeater;
+  case AnytoneKeySettingsExtension::KeyFunction::Reverse:           return (uint8_t)KeyFunction::Reverse;
+  case AnytoneKeySettingsExtension::KeyFunction::Encryption:        return (uint8_t)KeyFunction::Encryption;
+  case AnytoneKeySettingsExtension::KeyFunction::Call:              return (uint8_t)KeyFunction::Call;
+  case AnytoneKeySettingsExtension::KeyFunction::VOX:               return (uint8_t)KeyFunction::VOX;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleVFO:         return (uint8_t)KeyFunction::ToggleVFO;
+  case AnytoneKeySettingsExtension::KeyFunction::SubPTT:            return (uint8_t)KeyFunction::SubPTT;
+  case AnytoneKeySettingsExtension::KeyFunction::Scan:              return (uint8_t)KeyFunction::Scan;
+  case AnytoneKeySettingsExtension::KeyFunction::WFM:               return (uint8_t)KeyFunction::WFM;
+  case AnytoneKeySettingsExtension::KeyFunction::Alarm:             return (uint8_t)KeyFunction::Alarm;
+  case AnytoneKeySettingsExtension::KeyFunction::RecordSwitch:      return (uint8_t)KeyFunction::RecordSwitch;
+  case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
+  case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
+  case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
+  case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey2:           return (uint8_t)KeyFunction::HotKey2;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey3:           return (uint8_t)KeyFunction::HotKey3;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey4:           return (uint8_t)KeyFunction::HotKey4;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey5:           return (uint8_t)KeyFunction::HotKey5;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey6:           return (uint8_t)KeyFunction::HotKey6;
+  case AnytoneKeySettingsExtension::KeyFunction::WorkAlone:         return (uint8_t)KeyFunction::WorkAlone;
+  case AnytoneKeySettingsExtension::KeyFunction::SkipChannel:       return (uint8_t)KeyFunction::SkipChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::DMRMonitor:        return (uint8_t)KeyFunction::DMRMonitor;
+  case AnytoneKeySettingsExtension::KeyFunction::SubChannel:        return (uint8_t)KeyFunction::SubChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::PriorityZone:      return (uint8_t)KeyFunction::PriorityZone;
+  case AnytoneKeySettingsExtension::KeyFunction::VFOScan:           return (uint8_t)KeyFunction::VFOScan;
+  case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
+  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;    
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater:   return (uint8_t)KeyFunction::SimplexRepeater;
+  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
+  case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
+  case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
+  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
+  case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
+  case AnytoneKeySettingsExtension::KeyFunction::Zone:              return (uint8_t)KeyFunction::Zone;
+  case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
+  case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
+  case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
+  default:                                                          return (uint8_t)KeyFunction::Off;
+  }
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const {
+  switch ((KeyFunction)code) {
+  case KeyFunction::Off:               return AnytoneKeySettingsExtension::KeyFunction::Off;
+  case KeyFunction::Voltage:           return AnytoneKeySettingsExtension::KeyFunction::Voltage;
+  case KeyFunction::Power:             return AnytoneKeySettingsExtension::KeyFunction::Power;
+  case KeyFunction::Repeater:          return AnytoneKeySettingsExtension::KeyFunction::Repeater;
+  case KeyFunction::Reverse:           return AnytoneKeySettingsExtension::KeyFunction::Reverse;
+  case KeyFunction::Encryption:        return AnytoneKeySettingsExtension::KeyFunction::Encryption;
+  case KeyFunction::Call:              return AnytoneKeySettingsExtension::KeyFunction::Call;
+  case KeyFunction::VOX:               return AnytoneKeySettingsExtension::KeyFunction::VOX;
+  case KeyFunction::ToggleVFO:         return AnytoneKeySettingsExtension::KeyFunction::ToggleVFO;
+  case KeyFunction::SubPTT:            return AnytoneKeySettingsExtension::KeyFunction::SubPTT;
+  case KeyFunction::Scan:              return AnytoneKeySettingsExtension::KeyFunction::Scan;
+  case KeyFunction::WFM:               return AnytoneKeySettingsExtension::KeyFunction::WFM;
+  case KeyFunction::Alarm:             return AnytoneKeySettingsExtension::KeyFunction::Alarm;
+  case KeyFunction::RecordSwitch:      return AnytoneKeySettingsExtension::KeyFunction::RecordSwitch;
+  case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
+  case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
+  case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
+  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
+  case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
+  case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
+  case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
+  case KeyFunction::HotKey2:           return AnytoneKeySettingsExtension::KeyFunction::HotKey2;
+  case KeyFunction::HotKey3:           return AnytoneKeySettingsExtension::KeyFunction::HotKey3;
+  case KeyFunction::HotKey4:           return AnytoneKeySettingsExtension::KeyFunction::HotKey4;
+  case KeyFunction::HotKey5:           return AnytoneKeySettingsExtension::KeyFunction::HotKey5;
+  case KeyFunction::HotKey6:           return AnytoneKeySettingsExtension::KeyFunction::HotKey6;
+  case KeyFunction::WorkAlone:         return AnytoneKeySettingsExtension::KeyFunction::WorkAlone;
+  case KeyFunction::SkipChannel:       return AnytoneKeySettingsExtension::KeyFunction::SkipChannel;
+  case KeyFunction::DMRMonitor:        return AnytoneKeySettingsExtension::KeyFunction::DMRMonitor;
+  case KeyFunction::SubChannel:        return AnytoneKeySettingsExtension::KeyFunction::SubChannel;
+  case KeyFunction::PriorityZone:      return AnytoneKeySettingsExtension::KeyFunction::PriorityZone;
+  case KeyFunction::VFOScan:           return AnytoneKeySettingsExtension::KeyFunction::VFOScan;
+  case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
+  case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
+  case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::SimplexRepeater:   return AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater;
+  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
+  case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
+  case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
+  case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
+  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
+  case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
+  case KeyFunction::Zone:              return AnytoneKeySettingsExtension::KeyFunction::Zone;
+  case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
+  case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
+  case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
+  case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
+  case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
+  default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
+  }
 }
 
 
@@ -368,13 +981,13 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
  * Implementation of DMR6X2UVCodeplug::ExtendedSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
-  : Codeplug::Element(ptr, size)
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, EXTENDED_SETTINGS_SIZE)
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
 {
   // pass...
 }
@@ -385,211 +998,307 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::clear() {
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasIsSend() const {
-  return 0x01 == getUInt8(0x0000);
+DMR6X2UVCodeplug::ExtendedSettingsElement::sendTalkerAlias() const {
+  return 0x01 == getUInt8(Offset::sendTalkerAlias());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableSendTalkerAlias(bool enable) {
-  setUInt8(0x0000, enable ? 0x01 : 0x00);
+  setUInt8(Offset::sendTalkerAlias(), enable ? 0x01 : 0x00);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasSource
+AnytoneDMRSettingsExtension::TalkerAliasSource
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasSource() const {
-  return (TalkerAliasSource) getUInt8(0x0001);
+  return (AnytoneDMRSettingsExtension::TalkerAliasSource) getUInt8(Offset::talkerAliasDisplay());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(TalkerAliasSource source) {
-  setUInt8(0x0001, (uint8_t)source);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource source) {
+  setUInt8(Offset::talkerAliasDisplay(), (uint8_t)source);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::TalkerAliasEncoding
+AnytoneDMRSettingsExtension::TalkerAliasEncoding
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (TalkerAliasEncoding) getUInt8(0x0002);
+  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
-  setUInt8(0x0002, (uint8_t)encoding);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) {
+  setUInt8(Offset::talkerAliasEncoding(), (uint8_t)encoding);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::FontColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
-  return (FontColor) getUInt8(0x0003);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::fontColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(FontColor color) {
-  setUInt8(0x0003, (uint8_t)color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::fontColor(), (uint8_t)color);
 }
 
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::customChannelBackgroundEnabled() const {
-  return 0x01 == getUInt8(0x0004);
+  return 0x01 == getUInt8(Offset::customChannelBackground());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableCustomChannelBackground(bool enable) {
-  setUInt8(0x0004, enable ? 0x01 : 0x00);
+  setUInt8(Offset::customChannelBackground(), enable ? 0x01 : 0x00);
 }
 
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::roamingZoneIndex() const {
-  return getUInt8(0x0005);
+DMR6X2UVCodeplug::ExtendedSettingsElement::defaultRoamingZoneIndex() const {
+  return getUInt8(Offset::defaultRoamingZone());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingZoneIndex(unsigned int index) {
-  setUInt8(0x0005, index);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setDefaultRoamingZoneIndex(unsigned int index) {
+  setUInt8(Offset::defaultRoamingZone(), index);
 }
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingEnabled() const {
-  return 0x01 == getUInt8(0x0006);
+  return 0x01 == getUInt8(Offset::roaming());
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableAutoRoaming(bool enable) {
-  setUInt8(0x006, enable ? 0x01 : 0x00);
+  setUInt8(Offset::roaming(), enable ? 0x01 : 0x00);
 }
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckEnabled() const {
-  return 0x01 == getUInt8(0x0007);
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckEnabled() const {
+  return 0x01 == getUInt8(Offset::repRangeCheck());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterCheck(bool enable) {
-  setUInt8(0x0007, enable ? 0x01 : 0x00);
+DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterRangeCheck(bool enable) {
+  setUInt8(Offset::repRangeCheck(), enable ? 0x01 : 0x00);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::OutOfRangeAlert
+AnytoneRoamingSettingsExtension::OutOfRangeAlert
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeAlert() const {
-  return (OutOfRangeAlert) getUInt8(0x0008);
+  return (AnytoneRoamingSettingsExtension::OutOfRangeAlert) getUInt8(Offset::repRangeAlert());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(OutOfRangeAlert alert) {
-  setUInt8(0x0008, (uint8_t)alert);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(AnytoneRoamingSettingsExtension::OutOfRangeAlert alert) {
+  setUInt8(Offset::repRangeAlert(), (uint8_t)alert);
 }
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeReminder() const {
-  return getUInt8(0x0009)+1;
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckNumNotifications() const {
+  return getUInt8(Offset::repRangeReminder())+1;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeReminder(unsigned int n) {
-  n = std::max(1U, std::min(10U, n));
-  setUInt8(0x0009, n-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
+  n = Limit::repRangeReminder().map(n);
+  setUInt8(Offset::repRangeReminder(), n-1);
+}
+Interval
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckInterval() const {
+  return Interval::fromSeconds((1+getUInt8(Offset::rangeCheckInterval()))*5);
+}
+void
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterRangeCheckInterval(Interval intv) {
+  intv = Limit::rangeCheckInterval().map(intv);
+  setUInt8(Offset::rangeCheckInterval(), intv.seconds()/5-1);
 }
 unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterCheckIntervall() const {
-  return (1+getUInt8(0x000a))*5;
+DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterRangeCheckCount() const {
+  return getUInt8(Offset::rangeCheckCount())+3;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterCheckIntervall(unsigned int intervall) {
-  intervall = std::min(50U, std::max(5U, intervall));
-  setUInt8(0x000a, intervall/5-1);
-}
-unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterReconnections() const {
-  return getUInt8(0x000b)+3;
-}
-void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterReconnections(unsigned int n) {
-  n = std::max(3U, std::min(5U, n));
-  setUInt8(0x000b, n);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterRangeCheckCount(unsigned int n) {
+  n = Limit::repeaterReconnections().map(n);
+  setUInt8(Offset::rangeCheckCount(), n-3);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
-DMR6X2UVCodeplug::ExtendedSettingsElement::startRoamingCondition() const {
-  return (RoamingCondition) getUInt8(0x000c);
+AnytoneRoamingSettingsExtension::RoamStart
+DMR6X2UVCodeplug::ExtendedSettingsElement::roamingStartCondition() const {
+  return (AnytoneRoamingSettingsExtension::RoamStart) getUInt8(Offset::roamStartCondition());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setStartRoamingCondition(RoamingCondition cond) {
-  setUInt8(0x000c, (uint8_t)cond);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond) {
+  setUInt8(Offset::roamStartCondition(), (uint8_t)cond);
 }
 
-unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamingIntervall() const {
-  return ((unsigned int) getUInt8(0x000d)) + 1;
+Interval
+DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamPeriod() const {
+  return Interval::fromMinutes(getUInt8(Offset::autoRoamPeriod()) + 1);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamingIntervall(unsigned int minutes) {
-  minutes = std::max(1U, std::min(256U, minutes));
-  setUInt8(0x000d, minutes-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamPeriod(Interval minutes) {
+  minutes = Limit::autoRoamingInterval().map(minutes);
+  setUInt8(Offset::autoRoamPeriod(), minutes.minutes()-1);
 }
 
-unsigned int
-DMR6X2UVCodeplug::ExtendedSettingsElement::effectiveRoamingWaitingTime() const {
-  return getUInt8(0x000e);
+Interval
+DMR6X2UVCodeplug::ExtendedSettingsElement::autoRoamDelay() const {
+  return Interval::fromSeconds(getUInt8(Offset::autoRoamDelay()));
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setEffectiveRoamingWaitingTime(unsigned int sec) {
-  sec = std::min(30U, sec);
-  setUInt8(0x000e, sec);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setAutoRoamDelay(Interval sec) {
+  sec = Limit::autoRoamDelay().map(sec);
+  setUInt8(Offset::autoRoamDelay(), sec.seconds());
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::RoamingCondition
+AnytoneRoamingSettingsExtension::RoamStart
 DMR6X2UVCodeplug::ExtendedSettingsElement::roamingReturnCondition() const {
-  return (RoamingCondition) getUInt8(0x000f);
+  return (AnytoneRoamingSettingsExtension::RoamStart) getUInt8(Offset::roamReturnCondition());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingReturnCondition(RoamingCondition cond) {
-  setUInt8(0x000f, (uint8_t)cond);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRoamingReturnCondition(AnytoneRoamingSettingsExtension::RoamStart cond) {
+  setUInt8(Offset::roamReturnCondition(), (uint8_t)cond);
 }
 
-unsigned int
+Interval
 DMR6X2UVCodeplug::ExtendedSettingsElement::muteTimer() const {
-  return ((unsigned int)getUInt8(0x0010)) + 1;
+  return Interval::fromMinutes(getUInt8(Offset::muteDelay()) + 1);
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setMuteTimer(unsigned int minutes) {
-  minutes = std::max(1U, minutes);
-  setUInt8(0x0010, minutes-1);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setMuteTimer(Interval minutes) {
+  minutes = Limit::muteTimer().map(minutes);
+  setUInt8(Offset::muteDelay(), minutes.minutes()-1);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::EncryptionType
+AnytoneDMRSettingsExtension::EncryptionType
 DMR6X2UVCodeplug::ExtendedSettingsElement::encryptionType() const {
-  return (EncryptionType) getUInt8(0x0011);
+
+  return (0 == getUInt8(0x0011)) ? AnytoneDMRSettingsExtension::EncryptionType::DMR :
+                                   AnytoneDMRSettingsExtension::EncryptionType::AES;
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(EncryptionType type) {
-  setUInt8(0x0011, (uint8_t)type);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType type) {
+  switch (type) {
+  case AnytoneDMRSettingsExtension::EncryptionType::DMR: setUInt8(Offset::encryptionType(), 0x00); break;
+  case AnytoneDMRSettingsExtension::EncryptionType::AES: setUInt8(Offset::encryptionType(), 0x01); break;
+  }
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
-  return (NameColor) getUInt8(0x0012);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneANameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(NameColor color) {
-  setUInt8(0x0012, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneANameColor(), (uint8_t) color);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
-  return (NameColor) getUInt8(0x0013);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneBNameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(NameColor color) {
-  setUInt8(0x0013, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneBNameColor(), (uint8_t) color);
 }
 
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelANameColor() const {
-  return (NameColor) getUInt8(0x0014);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelANameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(NameColor color) {
-  setUInt8(0x0014, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelANameColor(), (uint8_t) color);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::NameColor
+AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
-  return (NameColor) getUInt8(0x0015);
+  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelBNameColor());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(NameColor color) {
-  setUInt8(0x0015, (uint8_t) color);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelBNameColor(), (uint8_t) color);
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx)
+DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  Q_UNUSED(flags); Q_UNUSED(ctx);
+  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode extended settings for DMR-6X2UV codeplug.";
+    return false;
+  }
+
+  // Encode device specific settings
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  // Encode audio settings
+  setMuteTimer(ext->audioSettings()->muteDelay());
+
+  // Encode display settings
+  setChannelANameColor(ext->displaySettings()->channelNameColor());
+  setFontColor(ext->displaySettings()->standbyTextColor());
+  enableCustomChannelBackground(ext->displaySettings()->customChannelBackground());
+
+  // Encode DMR settings
+  setEncryptionType(ext->dmrSettings()->encryption());
+
+  // Encode ranging/roaming settings.
+  enableAutoRoaming(ext->roamingSettings()->autoRoam());
+  setAutoRoamPeriod(ext->roamingSettings()->autoRoamPeriod());
+  setAutoRoamDelay(ext->roamingSettings()->autoRoamDelay());
+  enableRepeaterRangeCheck(ext->roamingSettings()->repeaterRangeCheckEnabled());
+  setRepeaterRangeCheckInterval(ext->roamingSettings()->repeaterCheckInterval());
+  setRepeaterRangeCheckCount(ext->roamingSettings()->repeaterRangeCheckCount());
+  setRepeaterOutOfRangeAlert(ext->roamingSettings()->outOfRangeAlert());
+  setRoamingStartCondition(ext->roamingSettings()->roamingStartCondition());
+  setRoamingReturnCondition(ext->roamingSettings()->roamingReturnCondition());
+  setRepeaterCheckNumNotifications(ext->roamingSettings()->notificationCount());
+  if (! ext->roamingSettings()->defaultZone()->isNull())
+    setDefaultRoamingZoneIndex(
+          ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
+
   return true;
 }
 
 bool
-DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx) {
-  Q_UNUSED(ctx);
+DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot decode extended settings for DMR-6X2UV codeplug";
+    return false;
+  }
+
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode audio settings
+  ext->audioSettings()->setMuteDelay(this->muteTimer());
+
+  // Decode display settings
+  ext->displaySettings()->setChannelNameColor(this->channelANameColor());
+  ext->displaySettings()->setStandbyTextColor(this->fontColor());
+  ext->displaySettings()->enableCustomChannelBackground(this->customChannelBackgroundEnabled());
+
+  // Decode DMR settings
+  ext->dmrSettings()->setEncryption(this->encryptionType());
+
+  // Decode ranging/roaming settings
+  ext->roamingSettings()->enableAutoRoam(this->autoRoamingEnabled());
+  ext->roamingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
+  ext->roamingSettings()->setAutoRoamDelay(this->autoRoamDelay());
+  ext->roamingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheckEnabled());
+  ext->roamingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
+  ext->roamingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
+  ext->roamingSettings()->setOutOfRangeAlert(this->repeaterOutOfRangeAlert());
+  ext->roamingSettings()->setRoamingStartCondition(this->roamingStartCondition());
+  ext->roamingSettings()->setRoamingReturnCondition(this->roamingReturnCondition());
+  ext->roamingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err)) {
+    errMsg(err) << "Cannot link extended settings for DMR-6X2UV codeplug";
+    return false;
+  }
+
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return false;
+
+  if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
+    if (! ctx.has<RoamingZone>(this->defaultRoamingZoneIndex())) {
+      errMsg(err) << "Cannot link roaming zone, index " << this->defaultRoamingZoneIndex()
+                  << " not defined.";
+      return false;
+    }
+    ext->roamingSettings()->defaultZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+  }
+
   return true;
 }
 
@@ -696,22 +1405,24 @@ DMR6X2UVCodeplug::allocateBitmaps() {
 }
 
 void
-DMR6X2UVCodeplug::setBitmaps(Config *config)
+DMR6X2UVCodeplug::setBitmaps(Context& ctx)
 {
   // First set everything common between D868UV and D878UV codeplugs.
-  D868UVCodeplug::setBitmaps(config);
+  D868UVCodeplug::setBitmaps(ctx);
 
   // Mark roaming zones
   uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
   memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  for (int i=0; i<config->roamingZones()->count(); i++)
+  unsigned int num_roaming_zones = std::min((unsigned int) NUM_ROAMING_ZONES, ctx.count<RoamingZone>());
+  for (unsigned int i=0; i<num_roaming_zones; i++)
     roaming_zone_bitmap[i/8] |= (1<<(i%8));
 
   // Mark roaming channels
   uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
   memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
+  unsigned int num_roaming_channels = std::min((unsigned int)NUM_ROAMING_CHANNEL,ctx.count<RoamingChannel>());
   // Get all (unique) channels used in roaming
-  for (int i=0; i<std::min(NUM_ROAMING_CHANNEL,config->roamingChannels()->count()); i++)
+  for (unsigned int i=0; i<num_roaming_channels; i++)
     roaming_ch_bitmap[i/8] |= (1<<(i%8));
 }
 
@@ -768,18 +1479,18 @@ DMR6X2UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 
 void
 DMR6X2UVCodeplug::allocateGeneralSettings() {
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
-  image(0).addElement(ADDR_EXTENDED_SETTINGS, EXTENDED_SETTINGS_SIZE);
+  image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
+  image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
 }
 
 bool
 DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx)) {
     errMsg(err) << "Cannot encode general settings element.";
     return false;
   }
 
-  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).fromConfig(flags, ctx)) {
+  if (! ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx)) {
     errMsg(err) << "Cannot encode extended settings element.";
     return false;
   }
@@ -789,17 +1500,21 @@ DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const 
 
 bool
 DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx)) {
     errMsg(err) << "Cannot decode general settings element.";
     return false;
   }
 
-  if (! ExtendedSettingsElement(data(ADDR_EXTENDED_SETTINGS)).updateConfig(ctx)) {
+  if (! ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx)) {
     errMsg(err) << "Cannot decode extended settings element.";
     return false;
   }
 
   return true;
+}
+bool
+DMR6X2UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err);
 }
 
 
@@ -877,7 +1592,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   }
 
   // Encode GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps(data(ADDR_DMRAPRS_SETTINGS));
   if (! gps.fromGPSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
@@ -910,7 +1625,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Create GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
     if (0 == gps_systems.destination(i))
       continue;
@@ -936,7 +1651,7 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   }
 
   // Link GPS systems
-  D878UVCodeplug::DMRAPRSSystemsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
+  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
     if (0 == gps_systems.destination(i))
       continue;

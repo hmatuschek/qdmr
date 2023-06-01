@@ -171,6 +171,9 @@ public:
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
 
+    /** Retunrs @c true if the specified address is allocated. */
+    virtual bool isAllocated(uint32_t offset) const;
+
     /** Returns a pointer to the encoded raw data at the specified offset. */
     virtual unsigned char *data(uint32_t offset);
     /** Returns a const pointer to the encoded raw data at the specified offset. */
@@ -231,6 +234,9 @@ public:
 
   /** Dumps a text representation of the DFU file structure to the specified text stream. */
 	void dump(QTextStream &stream) const;
+
+  /** Returns @c true if the specified address (and image) is allocated. */
+  virtual bool isAllocated(uint32_t offset, uint32_t img=0) const;
 
   /** Returns a pointer to the encoded raw data at the specified offset. */
   virtual unsigned char *data(uint32_t offset, uint32_t img=0);

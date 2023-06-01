@@ -43,13 +43,13 @@ UV390Test::testBasicConfigDecoding() {
   UV390Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT UV390: {}")
+    QFAIL(QString("Cannot encode codeplug for TyT UV390: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for TyT UV390: {}")
+    QFAIL(QString("Cannot decode codeplug for TyT UV390: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }

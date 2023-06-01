@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.11.2)
+project(qdmr VERSION 0.11.3)
 
 set(RELEASE_SUFFIX "")
 
@@ -37,7 +37,8 @@ endif(${BUILD_TESTS})
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 INCLUDE_DIRECTORIES(${Qt5Core_INCLUDE_DIRS})
@@ -74,7 +75,7 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wextra")
 
 
 # Get default install directories under Linux
