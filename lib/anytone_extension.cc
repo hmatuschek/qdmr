@@ -633,6 +633,7 @@ AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent
   : ConfigItem(parent),
     _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
     _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
+    _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
     _notificationCount(1), _gpsRoaming(false)
 {
@@ -647,6 +648,18 @@ AnytoneRoamingSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
+}
+
+bool
+AnytoneRoamingSettingsExtension::autoRoam() const {
+  return _autoRoam;
+}
+void
+AnytoneRoamingSettingsExtension::enableAutoRoam(bool enable) {
+  if (enable == _autoRoam)
+    return;
+  _autoRoam = enable;
+  emit modified(this);
 }
 
 Interval
@@ -705,6 +718,18 @@ AnytoneRoamingSettingsExtension::setRepeaterRangeCheckCount(unsigned int sec) {
   if (_repeaterRangeCheckCount == sec)
     return;
   _repeaterRangeCheckCount = sec;
+  emit modified(this);
+}
+
+AnytoneRoamingSettingsExtension::OutOfRangeAlert
+AnytoneRoamingSettingsExtension::outOfRangeAlert() const {
+  return _outOfRangeAlert;
+}
+void
+AnytoneRoamingSettingsExtension::setOutOfRangeAlert(OutOfRangeAlert type) {
+  if (type == _outOfRangeAlert)
+    return;
+  _outOfRangeAlert = type;
   emit modified(this);
 }
 
@@ -1800,8 +1825,8 @@ AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent
     _showChannelNumber(true), _showColorCode(true), _showTimeSlot(true), _showChannelType(true),
     _showContact(true), _standbyTextColor(Color::White),
     _standbyBackgroundColor(Color::Black), _showLastHeard(false), _backlightDurationTX(),
-    _backlightDurationRX(), _channelNameColor(Color::Orange), _channelBNameColor(Color::Orange),
-    _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
+    _backlightDurationRX(), _customChannelBackground(false), _channelNameColor(Color::Orange),
+    _channelBNameColor(Color::Orange), _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
 {
   // pass...
 }
@@ -2113,6 +2138,18 @@ AnytoneDisplaySettingsExtension::setBacklightDurationRX(Interval sec) {
   if (_backlightDurationRX == sec)
     return;
   _backlightDurationRX = sec;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::customChannelBackground() const {
+  return _customChannelBackground;
+}
+void
+AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
+  if (enable == _customChannelBackground)
+    return;
+  _customChannelBackground = enable;
   emit modified(this);
 }
 

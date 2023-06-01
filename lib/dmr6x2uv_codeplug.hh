@@ -604,12 +604,6 @@ public:
    * @verbinclude dmr6x2uv_settingsextension.txt */
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
-  public:
-    /** Possible repeater out-of-range alerts. */
-    enum class OutOfRangeAlert {
-      None = 0x00, Bell = 0x01, Voice = 0x02
-    };
-
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -660,9 +654,9 @@ public:
     /** Sets the repeater check interval in seconds (5-50s). */
     virtual void setRepeaterRangeCheckInterval(Interval intv);
     /** Returns the repeater out-of-range alert type. */
-    virtual OutOfRangeAlert repeaterOutOfRangeAlert() const;
+    virtual AnytoneRoamingSettingsExtension::OutOfRangeAlert repeaterOutOfRangeAlert() const;
     /** Sets the repeater out-of-range alert type. */
-    virtual void setRepeaterOutOfRangeAlert(OutOfRangeAlert alert);
+    virtual void setRepeaterOutOfRangeAlert(AnytoneRoamingSettingsExtension::OutOfRangeAlert alert);
     /** Returns the number of times, a repeater reconnection is tried (3-5). */
     virtual unsigned int repeaterRangeCheckCount() const;
     /** Sets the number of times, a repeater reconnection is tried (3-5). */

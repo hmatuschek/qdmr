@@ -781,8 +781,11 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
 
   Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
                                      "A value of 0 means off.")
-  /** TR backlight duration. */
+  /** RX backlight duration. */
   Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
+
+  /** Enables custom channel background. */
+  Q_PROPERTY(bool customChannelBackground READ customChannelBackground WRITE enableCustomChannelBackground)
 
   /** The volume-change prompt is shown. */
   Q_PROPERTY(bool volumeChangePrompt READ volumeChangePromptEnabled WRITE enableVolumeChangePrompt)
@@ -984,6 +987,10 @@ public:
   Interval backlightDurationRX() const;
   /** Sets the backlight duration during RX in seconds. */
   void setBacklightDurationRX(Interval sec);
+  /** Returns @c true if the custom channel background is enabled. */
+  bool customChannelBackground() const;
+  /** Enables/disables the custom channel background. */
+  void enableCustomChannelBackground(bool enable);
 
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
@@ -1007,6 +1014,7 @@ protected:
   bool _showLastHeard;                      ///< Shows the last caller.
   Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
   Interval _backlightDurationRX;            ///< Backlight duration in seconds during RX.
+  bool _customChannelBackground;            ///< Custom channel background enabled.
   Color _channelNameColor;                  ///< Color of channel name.
   Color _channelBNameColor;                 ///< Color of channel name for VFO B.
   Color _zoneNameColor;                     ///< Color of zone name.
@@ -1685,6 +1693,9 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   /** Retry count. */
   Q_PROPERTY(unsigned int retryCount READ repeaterRangeCheckCount WRITE setRepeaterRangeCheckCount)
 
+  /** Repeater out-of-range alert type. */
+  Q_PROPERTY(OutOfRangeAlert outOfRangeAlert READ outOfRangeAlert WRITE setOutOfRangeAlert)
+
   Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
   /** Auto-roaming start condition. */
   Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
@@ -1711,11 +1722,22 @@ public:
   };
   Q_ENUM(RoamStart)
 
+  /** Possible repeater out-of-range alerts. */
+  enum class OutOfRangeAlert {
+    None = 0x00, Bell = 0x01, Voice = 0x02
+  };
+  Q_ENUM(OutOfRangeAlert)
+
 public:
   /** Constructor. */
   explicit AnytoneRoamingSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
+
+  /** Returns @c true if auto-roaming is enabled. */
+  bool autoRoam() const;
+  /** Enables/disables auto-roaming. */
+  void enableAutoRoam(bool enable);
 
   /** Returns the auto-roaming period in minutes. */
   Interval autoRoamPeriod() const;
@@ -1738,6 +1760,10 @@ public:
   unsigned int repeaterRangeCheckCount() const;
   /** Sets the number of retries before giving up. */
   void setRepeaterRangeCheckCount(unsigned int count);
+  /** Returns the repeater out-of-range alert type. */
+  OutOfRangeAlert outOfRangeAlert() const;
+  /** Sets the repeater out-of-range alert type. */
+  void setOutOfRangeAlert(OutOfRangeAlert type);
 
   /** Returns the auto-roaming start condition. */
   RoamStart roamingStartCondition() const;
@@ -1763,11 +1789,13 @@ public:
   void enableGPSRoaming(bool enable);
 
 protected:
+  bool _autoRoam;                              ///< Enables auto roaming.
   Interval _autoRoamPeriod;                    ///< The auto-roam period in minutes.
   Interval _autoRoamDelay;                     ///< The auto-roam delay in seconds.
   bool _repeaterRangeCheck;                    ///< Enables the repeater range-check.
   Interval _repeaterCheckInterval;             ///< The repeater check interval in seconds.
   unsigned int _repeaterRangeCheckCount;       ///< Number of range checks before giving up.
+  OutOfRangeAlert _outOfRangeAlert;            ///< Type of the out-out-range alert.
   RoamStart _roamingStartCondition;            ///< Auto-roaming start condition.
   RoamStart _roamingReturnCondition;           ///< Auto-roaming return condition.
   bool _notification;                          ///< Repeater check notification.
