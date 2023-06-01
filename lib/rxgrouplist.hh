@@ -13,7 +13,7 @@ class DMRContact;
 class RXGroupList: public ConfigObject
 {
   Q_OBJECT
-  Q_CLASSINFO("IdPrefix", "grp");
+  Q_CLASSINFO("IdPrefix", "grp")
 
   /** The list of contacts. */
   Q_PROPERTY(DMRContactRefList* contacts READ contacts)

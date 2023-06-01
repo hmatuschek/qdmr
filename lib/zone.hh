@@ -14,7 +14,7 @@ class Config;
 class Zone : public ConfigObject
 {
   Q_OBJECT
-  Q_CLASSINFO("IdPrefix", "zone");
+  Q_CLASSINFO("IdPrefix", "zone")
 
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)

@@ -1338,11 +1338,11 @@ class AnytoneDMRSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.");
+  Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.")
   /** Group-call hang-time in seconds. */
   Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
 
-  Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.");
+  Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.")
   /** Private-call hang-time in seconds. */
   Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
 
@@ -1379,13 +1379,19 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   /** The SMS format. */
   Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
 
+  Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
   /** If @c true, the talker alias (name) is send. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
+
+  /** Specifies the talker alias source. */
+  Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
+  /** Specifies the talker alias encoding. */
+  Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
 
 public:
   /** Possible monitor slot matches. */
   enum class SlotMatch {
-    Off = 0, Single = 1, Both = 2,
+    Off = 0, Single = 1, Both = 2
   };
   Q_ENUM(SlotMatch)
 

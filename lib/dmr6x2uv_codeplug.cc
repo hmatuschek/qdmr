@@ -1262,9 +1262,15 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorS
     return false;
 
   if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
+    if (! ctx.has<RoamingZone>(this->defaultRoamingZoneIndex())) {
+      errMsg(err) << "Cannot link roaming zone, index " << this->defaultRoamingZoneIndex()
+                  << " not defined.";
+      return false;
+    }
     ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }
 
+  return true;
 }
 
 
