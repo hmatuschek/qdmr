@@ -483,11 +483,15 @@ OpenGD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
 }
 
 void
-OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(err)
   setName(lst->name());
   // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
     if (lst->count() > i) {
+      /*logDebug() << "Store member '" << lst->contact(i)->name()
+                 << "' at index " << ctx.index(lst->contact(i))
+                 << " in group list '" << lst->name() << "'.";*/
       setMember(i, ctx.index(lst->contact(i)));
     } else {
       // Clear entry.
@@ -874,13 +878,13 @@ OpenGD77Codeplug::clearGroupLists() {
 
 bool
 OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags);
 
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     GroupListElement el(bank.get(i));
     if (i < config->rxGroupLists()->count()) {
-      el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+      el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err);
       bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
     }
   }
@@ -889,14 +893,12 @@ OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &
 
 bool
 OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    RXGroupList *list = el.toRXGroupListObj(ctx);
+    RXGroupList *list = el.toRXGroupListObj(ctx, err);
     config->rxGroupLists()->add(list); ctx.add(list, i+1);
   }
   return true;
@@ -913,7 +915,7 @@ OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack 
     GroupListElement el(bank.get(i));
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }

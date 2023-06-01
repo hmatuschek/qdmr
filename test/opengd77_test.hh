@@ -3,6 +3,9 @@
 
 
 #include "libdmrconfigtest.hh"
+#include <QObject>
+#include <QTextStream>
+#include "config.hh"
 
 class OpenGD77Test : public UnitTestBase
 {
@@ -15,6 +18,9 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+
+protected:
+  QTextStream _stderr;
 };
 
 #endif // OPENGD77TEST_HH

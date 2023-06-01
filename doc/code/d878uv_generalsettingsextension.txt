@@ -1,27 +1,87 @@
-      7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-00  | Enable send alias             | Unused set to 0x00                                                                         ...
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-1c   ...                                                            | Talker alias display          | Talker alias encoding         |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-20  | Unused set to 0x00                                            | AutoRep UHF 2 offset index    | AutoRep VHF 2 offset index    |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-24  | AutoRep VHF 2 minimum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-28  | AutoRep VHF 2 maximum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c  | AutoRep UHF 2 minimum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-30  | AutoRep UHF 2 maximum frequency in 10Hz, 8-digit BCD, big-endian.                                                             |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-34  | Unknown                       | GPS mode                      | Unknown settings                                           ...
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-fc   ...                                                                                                                            |
-    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+        7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0   7   6   5   4   3   2   1   0
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0000  | Enable send alias             | Unused set to 0x00                                                                            |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0004  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0008  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+000c  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0010  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0014  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0018  | Unknown settings                                                                                                              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+001c  | Unknown settings                                              | Talker alias priority         | Talker alias encoding         |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0020  | Enable BT PTT latch           | Unknown                       | AutoRep UHF 2 offset index    | AutoRep VHF 2 offset index    |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0024  | AutoRep VHF 2 minimum frequency in 10Hz, 32 bit uint, little-endian.                                                          |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0028  | AutoRep VHF 2 maximum frequency in 10Hz, 32 bit uint, little-endian.                                                          |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+002c  | AutoRep UHF 2 minimum frequency in 10Hz, 32 bit uint, little-endian.                                                          |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0030  | AutoRep UHF 2 maximum frequency in 10Hz, 32 bit uint, little-endian.                                                          |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0034  | BT PTT sleep interval         | GPS mode                      | STE duration                  | Man dial group call hangtime  |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0038  | Man dial priv call hangtime   | Channel name B color          | Encryption type               | Enable TOT prediction         |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+003c  | Enable TX power AGC           | Zone name A color             | Zone name B color             | Auto shutdown mode            |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0040  |                   |DCC|DSl|DCT| FM idle channel tone enable   | Date format                   | FM mic gain [0,4]             |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0044  | GPS roaming enable            | Unknown setting               | Call end tone 1 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0048  | Call end tone 2 in Hz, 16bit uint, little endian              | Call end tone 3 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+004c  | Call end tone 4 in Hz, 16bit uint, little endian              | Call end tone 5 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0050  | Call end tone 1 duration in 10ms, 16bit uint, little endian   | Call end tone 2 duration in 10ms, 16bit uint, little endian   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0054  | Call end tone 3 duration in 10ms, 16bit uint, little endian   | Call end tone 4 duration in 10ms, 16bit uint, little endian   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0058  | Call end tone 5 duration in 10ms, 16bit uint, little endian   | All call tone 1 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+005c  | All call tone 2 in Hz, 16bit uint, little endian              | All call tone 3 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0060  | All call tone 4 in Hz, 16bit uint, little endian              | All call tone 5 in Hz, 16bit uint, little endian              |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0064  | All call tone 1 duration in 10ms, 16bit uint, little endian   | All call tone 2 duration in 10ms, 16bit uint, little endian   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+0068  | All call tone 3 duration in 10ms, 16bit uint, little endian   | All call tone 4 duration in 10ms, 16bit uint, little endian   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+006c  | All call tone 5 duration in 10ms, 16bit uint, little endian   | Unknown settings                                           ...
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+01fc   ...                                                                                                                            |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
- - Talker alias display: 0=off, 1=contacts, 2=air.
- - Talker alias encoding: 0=ISO-7, 1=ISO-8, 2=Unicode.
- - AutoRep UHF 2 offset index: 0-based, 0xff = off.
- - AutoRep VHF 2 offset index: 0-based, 0xff = off.
- - GPS mode: 0=GPS, 1=BDS, 2=both;
+  - Bluetooth settings:
+    - BT PTT sleep interval: 0=Infinite, 1=1min, ..., 4=4min.
+  - STE settings:
+    - STE duration in multiples of 10ms. 0=10ms, ..., 24=250ms (default), ..., 99=1000ms.
+  - Power save settings:
+    - Auto shutdown mode: 0=Auto shutdown timer is reset on call, 1=timer is not reset on call.
+  - Other settings:
+    - Encryption type: 0=AES, 1=DMR standard
+  - DMR settings:
+    - Man dial group/private call hangtime: 0=1s, ..., 29=30s, 30=30min, 31=infinite.
+  - Display settings:
+    - Channel name B; zone name A/B color: 0=Orange, 1=Red, 2=Yellow, 3=Green, 4=Turquoise, 5=Blue, 6=White
+    - DCT: Display channel type
+    - DSl: Display slot
+    - DCC: Display color code
+    - Date format: 0=yyyy/mm/dd, 1=dd/mm/yyyy
+  - GPS settings:
+    - GPS mode: 0=GPS, 1=Baidu, 2=Both
+  - Auto repeater settings:
+    - AutoRep VHF/UHF 2 offset index: 0-based, 0xff = off.
+  - Audio settings:
+    - FM mic gain 0=1 (default), ..., 4=5
+  - Talker alias:
+    - Talker alias priority 0=Off, 1=Contacts, 2=over-the-air
+    - Talker alias encoding: 0=ISO-8, 1=ISO-7, 2=Unicode

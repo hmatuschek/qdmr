@@ -253,6 +253,8 @@ public:
 
     /** Adds a table for the given type. */
     bool addTable(const QMetaObject *obj);
+    /** Returns @c true if a table is defined for the given type. */
+    bool hasTable(const QMetaObject *obj) const;
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -283,8 +285,6 @@ public:
     };
 
   protected:
-    /** Returns @c true if a table is defined for the given type. */
-    bool hasTable(const QMetaObject *obj) const;
     /** Returns a reference to the table for the given type. */
     Table &getTable(const QMetaObject *obj);
 

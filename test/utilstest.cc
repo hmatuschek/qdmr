@@ -2,6 +2,7 @@
 
 #include <QTest>
 #include "utils.hh"
+#include "frequency.hh"
 
 UtilsTest::UtilsTest(QObject *parent) : QObject(parent)
 {
@@ -69,6 +70,21 @@ UtilsTest::testEncodeDMRID_bcd() {
   QByteArray res(4, 0);
   encode_dmr_id_bcd((uint8_t *)res.data(), num);
   QCOMPARE(res, QByteArray(bcd, 4));
+}
+
+void
+UtilsTest::testFrequencyParser() {
+  QCOMPARE(Frequency::fromString("100Hz").inHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100 Hz").inHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100kHz").inHz(), 100000ULL);
+  QCOMPARE(Frequency::fromString("100 kHz").inHz(), 100000ULL);
+  QCOMPARE(Frequency::fromString("100MHz").inHz(), 100000000ULL);
+  QCOMPARE(Frequency::fromString("100 MHz").inHz(), 100000000ULL);
+  QCOMPARE(Frequency::fromString("100GHz").inHz(), 100000000000ULL);
+  QCOMPARE(Frequency::fromString("100 GHz").inHz(), 100000000000ULL);
+
+  QCOMPARE(Frequency::fromString("100").inHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
 }
 
 
