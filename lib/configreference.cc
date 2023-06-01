@@ -7,6 +7,7 @@
 #include "radioid.hh"
 #include "rxgrouplist.hh"
 #include "roamingzone.hh"
+#include "zone.hh"
 #include "encryptionextension.hh"
 
 
@@ -309,3 +310,15 @@ EncryptionKeyReference::EncryptionKeyReference(QObject *parent)
 {
   // pass...
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of ZoneReference
+ * ********************************************************************************************* */
+ZoneReference::ZoneReference(QObject *parent)
+  : ConfigObjectReference(Zone::staticMetaObject, parent)
+{
+  // pass...
+}
+
+

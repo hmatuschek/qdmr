@@ -18,6 +18,10 @@ private slots:
 
   void testCloneChannelBasic();
 
+  void testMelodyLilypond();
+  void testMelodyEncoding();
+  void testMelodyDecoding();
+
 protected:
   Config _config;
 };

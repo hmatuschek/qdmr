@@ -51,7 +51,7 @@ class DMREncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-  Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
+  explicit Q_INVOKABLE DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);

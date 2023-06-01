@@ -18,7 +18,7 @@ RD5RTest::testBasicConfigEncoding() {
   RD5RCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -29,13 +29,13 @@ RD5RTest::testBasicConfigDecoding() {
   RD5RCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: {}")
+    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -46,13 +46,13 @@ RD5RTest::testChannelFrequency() {
   RD5RCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: {}")
+    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: %1")
           .arg(err.format()).toStdString().c_str());
   }
 

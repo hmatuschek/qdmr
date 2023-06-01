@@ -302,4 +302,15 @@ public:
 };
 
 
+/** Implements a reference to a zone.
+ * @ingroup conf */
+class ZoneReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit ZoneReference(QObject *parent=nullptr);
+};
+
+
 #endif // CONFIGREFERENCE_HH

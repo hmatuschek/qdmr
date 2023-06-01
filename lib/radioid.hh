@@ -2,7 +2,6 @@
 #define RADIOID_HH
 
 #include "configobject.hh"
-#include <QAbstractListModel>
 
 
 /** Abstract base class for all radio IDs.

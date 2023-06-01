@@ -13,165 +13,6 @@
 #include <QtEndian>
 #include <QSet>
 
-
-#define NUM_CHANNELS              4000
-#define NUM_CHANNEL_BANKS         32
-#define CHANNEL_BANK_0            0x00800000
-#define CHANNEL_BANK_SIZE         0x00002000
-#define CHANNEL_BANK_31           0x00fc0000
-#define CHANNEL_BANK_31_SIZE      0x00000800
-#define CHANNEL_BANK_OFFSET       0x00040000
-#define CHANNEL_BITMAP            0x024c1500
-#define CHANNEL_BITMAP_SIZE       0x00000200
-#define CHANNEL_SIZE              0x00000040
-
-#define VFO_A_ADDR                0x00fc0800 // Address of VFO A settings (channel_t)
-#define VFO_B_ADDR                0x00fc0840 // Address of VFO B settings (channel_t)
-#define VFO_SIZE                  0x00000040 // Size of each VFO settings.
-
-#define NUM_CONTACTS              10000      // Total number of contacts
-#define CONTACTS_PER_BLOCK        4
-#define CONTACT_BLOCK_0           0x02680000 // First bank of 4 contacts
-#define CONTACT_BLOCK_SIZE        0x00000190 // Size of 4 contacts
-#define CONTACT_BANK_SIZE         0x00040000 // Size of one contact bank
-#define CONTACTS_PER_BANK         1000       // Number of contacts per bank
-#define CONTACT_INDEX_LIST        0x02600000 // Address of contact index list
-#define CONTACTS_BITMAP           0x02640000 // Address of contact bitmap
-#define CONTACTS_BITMAP_SIZE      0x00000500 // Size of contact bitmap
-#define CONTACT_SIZE              0x00000064 // Size of contact element
-#define CONTACT_ID_MAP            0x04340000 // Address of ID->Contact index map
-#define CONTACT_ID_ENTRY_SIZE     0x00000008 // Size of each map entry
-
-
-#define NUM_ANALOGCONTACTS        128
-#define NUM_ANALOGCONTACT_BANKS   64
-#define ANALOGCONTACTS_PER_BANK   2
-#define ANALOGCONTACT_BANK_0      0x02940000
-#define ANALOGCONTACT_BANK_SIZE   0x00000030
-#define ANALOGCONTACT_INDEX_LIST  0x02900000 // Address of analog contact index list
-#define ANALOGCONTACT_LIST_SIZE   0x00000080 // Size of analog contact index list
-#define ANALOGCONTACT_BYTEMAP     0x02900100 // Address of contact bytemap
-#define ANALOGCONTACT_BYTEMAP_SIZE 0x00000080 // Size of contact bytemap
-#define ANALOGCONTACT_SIZE        0x00000018 // Size of analog contact
-
-#define NUM_RXGRP                 250        // Total number of RX group lists
-#define ADDR_RXGRP_0              0x02980000 // Address of the first RX group list.
-#define RXGRP_SIZE                0x00000120 // Size of each RX group list.
-#define RXGRP_OFFSET              0x00000200 // Offset between group lists.
-#define RXGRP_BITMAP              0x025C0B10 // Address of RX group list bitmap.
-#define RXGRP_BITMAP_SIZE         0x00000020 // Storage size of RX group list bitmap.
-
-#define NUM_ZONES                 250        // Maximum number of zones
-#define NUM_CH_PER_ZONE           250        // Maximum number of channels per zone
-#define ADDR_ZONE                 0x01000000 // Address of zone-channel lists, see zone_t
-#define ZONE_SIZE                 0x00000200 // Size of each zone-channel list
-#define ZONE_OFFSET               0x00000200 // Offset between zone-channel lists
-#define ADDR_ZONE_NAME            0x02540000 // Address of zone names.
-#define ZONE_NAME_SIZE            0x00000010 // Size of zone names
-#define ZONE_NAME_OFFSET          0x00000020 // Offset between zone names.
-#define ZONE_BITMAPS              0x024c1300 // Bitmap of all enabled zones
-#define ZONE_BITMAPS_SIZE         0x00000020 // Size of the zone bitmap
-
-#define NUM_RADIOIDS              250
-#define ADDR_RADIOIDS             0x02580000
-#define RADIOID_SIZE              0x00000020
-#define RADIOID_BITMAP            0x024c1320
-#define RADIOID_BITMAP_SIZE       0x00000020
-
-#define NUM_SCAN_LISTS            250
-#define NUM_SCANLISTS_PER_BANK    16
-#define SCAN_LIST_BANK_0          0x01080000 // First scanlist bank
-#define SCAN_LIST_OFFSET          0x00000200 // Offset to next list.
-#define SCAN_LIST_SIZE            0x00000090 // Size of scan-list.
-#define SCAN_LIST_BANK_OFFSET     0x00040000 // Offset to next bank
-#define SCAN_BITMAP               0x024c1340 // Address of scan-list bitmap.
-#define SCAN_BITMAP_SIZE          0x00000020 // Size of scan-list bitmap.
-
-#define ADDR_GENERAL_CONFIG       0x02500000
-#define GENERAL_CONFIG_SIZE       0x000000d0
-
-#define ADDR_ZONE_CHANNELS        0x02500100
-#define ZONE_CHANNELS_SIZE        0x00000400
-
-#define ADDR_DTMF_NUMBERS         0x02500500
-#define DTMF_NUMBERS_SIZE         0x00000100
-
-#define ADDR_BOOT_SETTINGS        0x02500600
-#define BOOT_SETTINGS_SIZE        0x00000030
-
-#define ADDR_GPS_SETTINGS         0x02501000
-#define GPS_SETTINGS_SIZE         0x00000030
-
-#define ADDR_GPS_MESSAGE          0x02501100
-#define GPS_MESSAGE_SIZE          0x00000030
-
-#define NUM_MESSAGES              100
-#define NUM_MESSAGES_PER_BANK     8
-#define MESSAGE_SIZE              0x00000100
-#define MESSAGE_BANK_0            0x02140000
-#define MESSAGE_BANK_SIZE         0x00000800
-#define MESSAGE_BANK_OFFSET       0x00040000
-#define MESSAGE_INDEX_LIST        0x01640000
-#define MESSAGE_BYTEMAP           0x01640800
-#define MESSAGE_BYTEMAP_SIZE      0x00000090
-
-#define ADDR_HOTKEY               0x025C0000
-#define HOTKEY_SIZE               0x00000860
-#define STATUSMESSAGE_BITMAP      0x025C0B00
-#define STATUSMESSAGE_BITMAP_SIZE 0x00000010
-
-#define ADDR_OFFSET_FREQ          0x024C2000
-#define OFFSET_FREQ_SIZE          0x000003F0
-
-#define ADDR_ALARM_SETTING        0x024C1400
-#define ALARM_SETTING_SIZE        0x00000020
-
-#define ADDR_ALARM_SETTING_EXT    0x024c1440
-#define ALARM_SETTING_EXT_SIZE    0x00000030
-
-#define FMBC_BITMAP               0x02480210
-#define FMBC_BITMAP_SIZE          0x00000020
-#define ADDR_FMBC                 0x02480000
-#define FMBC_SIZE                 0x00000200
-#define ADDR_FMBC_VFO             0x02480200
-#define FMBC_VFO_SIZE             0x00000010
-
-#define FIVE_TONE_ID_BITMAP       0x024C0C80
-#define FIVE_TONE_ID_BITMAP_SIZE  0x00000010
-#define NUM_FIVE_TONE_IDS         100
-#define ADDR_FIVE_TONE_ID_LIST    0x024C0000
-#define FIVE_TONE_ID_SIZE         0x00000020
-#define FIVE_TONE_ID_LIST_SIZE    0x00000c80
-#define NUM_FIVE_TONE_FUNCTIONS   16
-#define ADDR_FIVE_TONE_FUNCTIONS  0x024C0D00
-#define FIVE_TONE_FUNCTION_SIZE   0x00000020
-#define FIVE_TONE_FUNCTIONS_SIZE  0x00000200
-#define ADDR_FIVE_TONE_SETTINGS   0x024C1000
-#define FIVE_TONE_SETTINGS_SIZE   0x00000080
-
-#define ADDR_DTMF_SETTINGS        0x024C1080
-#define DTMF_SETTINGS_SIZE        0x00000050
-
-#define NUM_TWO_TONE_IDS          24
-#define TWO_TONE_IDS_BITMAP       0x024C1280
-#define TWO_TONE_IDS_BITMAP_SIZE  0x00000010
-#define ADDR_TWO_TONE_IDS         0x024C1100
-#define TWO_TONE_ID_SIZE          0x00000010
-
-#define NUM_TWO_TONE_FUNCTIONS    16
-#define TWO_TONE_FUNCTIONS_BITMAP 0x024c2600
-#define TWO_TONE_FUNC_BITMAP_SIZE 0x00000010
-#define ADDR_TWO_TONE_FUNCTIONS   0x024c2400
-#define TWO_TONE_FUNCTION_SIZE    0x00000020
-
-#define ADDR_TWO_TONE_SETTINGS    0x024C1290
-#define TWO_TONE_SETTINGS_SIZE    0x00000010
-
-#define ADDR_DMR_ENCRYPTION_LIST  0x024C1700
-#define DMR_ENCRYPTION_LIST_SIZE  0x00000040
-#define ADDR_DMR_ENCRYPTION_KEYS  0x024C1800
-#define DMR_ENCRYPTION_KEYS_SIZE  0x00000500
-
 using namespace Signaling;
 
 Code _ctcss_num2code[52] = {
@@ -387,7 +228,7 @@ D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, uns
 }
 
 D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : D868UVCodeplug::GeneralSettingsElement(ptr, 0x00d0)
+  : D868UVCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
@@ -397,31 +238,612 @@ D868UVCodeplug::GeneralSettingsElement::clear() {
   AnytoneCodeplug::GeneralSettingsElement::clear();
 }
 
-D868UVCodeplug::GeneralSettingsElement::Color
-D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (Color)getUInt8(0x00b0);
+bool
+D868UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
+  return 0x00 != getUInt8(Offset::enableKeyTone());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(Color color) {
-  setUInt8(0x00b0, (unsigned)color);
+D868UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
+}
+
+AnytonePowerSaveSettingsExtension::PowerSave
+D868UVCodeplug::GeneralSettingsElement::powerSave() const {
+  return (AnytonePowerSaveSettingsExtension::PowerSave)getUInt8(Offset::powerSaveMode());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytonePowerSaveSettingsExtension::PowerSave mode) {
+  setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
 }
 
 unsigned
-D868UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
-  return getUInt8(0x00b1);
+D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
+  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(unsigned sec) {
-  setUInt8(0x00b1, sec);
+D868UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
+  setUInt8(Offset::voxLevel(), level/3);
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::voxDelay() const {
+  return Interval::fromMilliseconds(100 + 500*((unsigned)getUInt8(Offset::voxDelay())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVOXDelay(Interval intv) {
+  setUInt8(Offset::voxDelay(), (std::max(100ULL, intv.milliseconds())-100)/500);
+}
+
+AnytoneSettingsExtension::VFOScanType
+D868UVCodeplug::GeneralSettingsElement::vfoScanType() const {
+  return (AnytoneSettingsExtension::VFOScanType) getUInt8(Offset::vfoScanType());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension::VFOScanType type) {
+  setUInt8(Offset::vfoScanType(), (unsigned)type);
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
+  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
+  gain = std::min(1U, std::min(10U, gain));
+  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyAShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyAShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyAShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyBShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyBShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyCShort() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKeyCShort()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCShort(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKey1Short() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey1Short()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Short(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKey2Short() const {
+  return this->mapCodeToKeyFunction(getUInt8(Offset::progFuncKey2Short()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Short(), this->mapKeyFunctionToCode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyALong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyALong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyALong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyBLong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyBLong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBLong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKeyCLong() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKeyCLong());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCLong(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKey1Long() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey1Long());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Long(), (unsigned)func);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::funcKey2Long() const {
+  return (AnytoneKeySettingsExtension::KeyFunction)getUInt8(Offset::progFuncKey2Long());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Long(), (unsigned)func);
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::longPressDuration() const {
+  return Interval::fromSeconds(((unsigned)getUInt8(Offset::longPressDuration()))+1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setLongPressDuration(Interval ms) {
+  setUInt8(Offset::longPressDuration(), std::max(1ULL,ms.seconds())-1);
 }
 
 bool
-D868UVCodeplug::GeneralSettingsElement::showZoneAndContact() const {
-  return getUInt8(0x00b2);
+D868UVCodeplug::GeneralSettingsElement::vfoModeA() const {
+  return getUInt8(Offset::vfoModeA());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::enableShowZoneAndContact(bool enable) {
-  setUInt8(0x00b2, (enable ? 0x01 : 0x00));
+D868UVCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
+  setUInt8(Offset::vfoModeA(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::vfoModeB() const {
+  return getUInt8(Offset::vfoModeB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
+  setUInt8(Offset::vfoModeB(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::memoryZoneA() const {
+  return getUInt8(Offset::memZoneA());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMemoryZoneA(unsigned zone) {
+  setUInt8(Offset::memZoneA(), zone);
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::memoryZoneB() const {
+  return getUInt8(Offset::memZoneB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMemoryZoneB(unsigned zone) {
+  setUInt8(Offset::memZoneB(), zone);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::recording() const {
+  return getUInt8(Offset::enableRecoding());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
+  setUInt8(Offset::enableRecoding(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::brightness() const {
+  return (getUInt8(Offset::displayBrightness())*10)/4;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
+  setUInt8(Offset::displayBrightness(), (level*4)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::backlightPermanent() const {
+  return rxBacklightDuration().isNull();
+}
+Interval
+D868UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
+  return Interval::fromSeconds(5*((unsigned)getUInt8(Offset::backlightDuration())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
+  setUInt8(Offset::backlightDuration(), intv.seconds()/5);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
+  setRXBacklightDuration(Interval());
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::gps() const {
+  return getUInt8(Offset::gpsEnable());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableGPS(bool enable) {
+  setUInt8(Offset::gpsEnable(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::smsAlert() const {
+  return getUInt8(Offset::smsAlert());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableSMSAlert(bool enable) {
+  setUInt8(Offset::smsAlert(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::activeChannelB() const {
+  return getUInt8(Offset::activeChannelB());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableActiveChannelB(bool enable) {
+  setUInt8(Offset::activeChannelB(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::subChannel() const {
+  return getUInt8(Offset::subChannel());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableSubChannel(bool enable) {
+  setUInt8(Offset::subChannel(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::callAlert() const {
+  return getUInt8(Offset::callAlert());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
+  setUInt8(Offset::callAlert(), (enable ? 0x01 : 0x00));
+}
+
+QTimeZone
+D868UVCodeplug::GeneralSettingsElement::gpsTimeZone() const {
+  return QTimeZone((((int)getUInt8(Offset::gpsTimeZone()))-12)*3600);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
+  int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
+  setUInt8(Offset::gpsTimeZone(), (12 + offset/3600));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::dmrTalkPermit() const {
+  return getBit(Offset::talkPermit(), 0);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDMRTalkPermit(bool enable) {
+  return setBit(Offset::talkPermit(), 0, enable);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::fmTalkPermit() const {
+  return getBit(Offset::talkPermit(), 1);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableFMTalkPermit(bool enable) {
+  return setBit(Offset::talkPermit(), 1, enable);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::dmrResetTone() const {
+  return getUInt8(Offset::dmrResetTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDMRResetTone(bool enable) {
+  return setUInt8(Offset::dmrResetTone(), (enable ? 0x01 : 0x00));
+}
+
+AnytoneAudioSettingsExtension::VoxSource
+D868UVCodeplug::GeneralSettingsElement::voxSource() const {
+  return (AnytoneAudioSettingsExtension::VoxSource)getUInt8(Offset::voxSource());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setVOXSource(AnytoneAudioSettingsExtension::VoxSource source) {
+  setUInt8(Offset::voxSource(), (unsigned)source);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::idleChannelTone() const {
+  return getUInt8(Offset::idleChannelTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
+  return setUInt8(Offset::idleChannelTone(), (enable ? 0x01 : 0x00));
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::menuExitTime() const {
+  return Interval::fromSeconds(5 + 5*((unsigned) getUInt8(Offset::menuExitTime())));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMenuExitTime(Interval intv) {
+  setUInt8(Offset::menuExitTime(), (std::max(5ULL, intv.seconds())-5)/5);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::startupTone() const {
+  return getUInt8(Offset::startupTone());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableStartupTone(bool enable) {
+  return setUInt8(Offset::startupTone(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::callEndPrompt() const {
+  return getUInt8(Offset::callEndPrompt());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
+  return setUInt8(Offset::callEndPrompt(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::maxSpeakerVolume() const {
+  return (((unsigned)getUInt8(Offset::maxSpeakerVolume()))*10)/8;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(unsigned level) {
+  setUInt8(Offset::maxSpeakerVolume(), (level*8)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::getGPSPosition() const {
+  return getUInt8(Offset::getGPSPosition());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
+  return setUInt8(Offset::getGPSPosition(), (enable ? 0x01 : 0x00));
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
+  return getUInt8(Offset::volumeChangePrompt());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+}
+
+AnytoneAutoRepeaterSettingsExtension::Direction
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
+  return (AnytoneAutoRepeaterSettingsExtension::Direction) getUInt8(Offset::autoRepeaterDirA());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
+  setUInt8(Offset::autoRepeaterDirA(), (unsigned)dir);
+}
+
+AnytoneDisplaySettingsExtension::LastCallerDisplayMode
+D868UVCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
+  return (AnytoneDisplaySettingsExtension::LastCallerDisplayMode)getUInt8(Offset::lastCallerDisplay());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) {
+  setUInt8(Offset::lastCallerDisplay(), (unsigned)mode);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::displayClock() const {
+  return getUInt8(Offset::showClock());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
+  setUInt8(Offset::showClock(), (enable ? 0x01 : 0x00));
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::maxHeadPhoneVolume() const {
+  return (((unsigned)getUInt8(Offset::maxHeadPhoneVolume()))*10)/8;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(unsigned max) {
+  setUInt8(Offset::maxHeadPhoneVolume(), (max*8)/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::enhanceAudio() const {
+  return getUInt8(Offset::enhanceAudio());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
+  setUInt8(Offset::enhanceAudio(), (enable ? 0x01 : 0x00));
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::minVFOScanUHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::minVFOScanUHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::maxVFOScanUHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::maxVFOScanUHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::minVFOScanVHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::minVFOScanVHF(), freq.inHz()/10);
+}
+
+Frequency
+D868UVCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
+  return Frequency::fromHz(((unsigned)getUInt32_le(Offset::maxVFOScanVHF()))*10);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::maxVFOScanVHF(), freq.inHz()/10);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexUHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexUHF();
+}
+unsigned
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexUHF() const {
+  return getUInt8(Offset::autoRepOffsetUHF());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) {
+  setUInt8(Offset::autoRepOffsetUHF(), idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexUHF() {
+  setAutoRepeaterOffsetFrequenyIndexUHF(0xff);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexVHF() const {
+  return 0xff != autoRepeaterOffsetFrequencyIndexVHF();
+}
+unsigned
+D868UVCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexVHF() const {
+  return getUInt8(Offset::autoRepOffsetVHF());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) {
+  setUInt8(Offset::autoRepOffsetVHF(), idx);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVHF() {
+  setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::callToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double freq = getUInt16_le(Offset::callToneTones()+2*i);
+    unsigned int duration = getUInt16_le(Offset::callToneDurations()+2*i);
+    if (duration) tones.append({freq, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::callToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::callToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::idleToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double frequency = getUInt16_le(Offset::idleToneTones()+2*i);
+    unsigned int duration  = getUInt16_le(Offset::idleToneDurations()+2*i);
+    if (duration) tones.append({frequency, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::idleToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::idleToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+void
+D868UVCodeplug::GeneralSettingsElement::resetToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double frequency = getUInt16_le(Offset::resetToneTones()+2*i);
+    unsigned int duration  = getUInt16_le(Offset::resetToneDurations()+2*i);
+    if (duration) tones.append({frequency, duration});
+  }
+  melody.infer(tones);
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::resetToneTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::resetToneDurations()+2*i, tones.at(i).second);
+  }
+}
+
+unsigned
+D868UVCodeplug::GeneralSettingsElement::recordingDelay() const {
+  return ((unsigned)getUInt8(Offset::recordingDelay()))*200;
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setRecodringDelay(unsigned ms) {
+  setUInt8(Offset::recordingDelay(), ms/200);
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::displayCall() const {
+  return getUInt8(Offset::callDisplayMode());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
+  setUInt8(Offset::callDisplayMode(), (enable ? 0x01 : 0x00));
+}
+
+
+AnytoneDisplaySettingsExtension::Color
+D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
+  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::callColor());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
+  switch (color) {
+  case AnytoneDisplaySettingsExtension::Color::White:
+  case AnytoneDisplaySettingsExtension::Color::Black:
+    break;
+  default:
+    color = AnytoneDisplaySettingsExtension::Color::Black;
+    break;
+  }
+  setUInt8(Offset::callColor(), (unsigned)color);
+}
+
+Interval
+D868UVCodeplug::GeneralSettingsElement::gpsUpdatePeriod() const {
+  return Interval::fromSeconds(getUInt8(Offset::gpsPeriod()));
+}
+void
+D868UVCodeplug::GeneralSettingsElement::setGPSUpdatePeriod(Interval sec) {
+  setUInt8(Offset::gpsPeriod(), sec.seconds());
+}
+
+bool
+D868UVCodeplug::GeneralSettingsElement::showCurrentContact() const {
+  return getUInt8(Offset::showCurrentContact());
+}
+void
+D868UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
+  setUInt8(Offset::showCurrentContact(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -430,136 +852,136 @@ D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(0x00b3))*10/15;
+  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(0x00b3, level*10/15);
+  setUInt8(Offset::keyToneLevel(), level*10/15);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
-  setUInt8(0x00b3, 0);
+  setUInt8(Offset::keyToneLevel(), 0);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
-  return getUInt8(0x00b4);
+  return getUInt8(Offset::gpsUnits());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
-  setUInt8(0x00b4, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::gpsUnits(), (enable ? 0x01 : 0x00));
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(0x00b5, 0);
+  return getBit(Offset::knobLock(), 0);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(0x00b5, 0, enable);
+  setBit(Offset::knobLock(), 0, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(0x00b5, 1);
+  return getBit(Offset::keypadLock(), 1);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(0x00b5, 1, enable);
+  setBit(Offset::keypadLock(), 1, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(0x00b5, 3);
+  return getBit(Offset::sideKeyLock(), 3);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(0x00b5, 3, enable);
+  setBit(Offset::sideKeyLock(), 3, enable);
 }
 bool
 D868UVCodeplug::GeneralSettingsElement::keyLockForced() const {
-  return getBit(0x00b5, 4);
+  return getBit(Offset::forceKeyLock(), 4);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
-  setBit(0x00b5, 4, enable);
+  setBit(Offset::forceKeyLock(), 4, enable);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::showLastHeard() const {
-  return getUInt8(0x00b6);
+  return getUInt8(Offset::showLastHeard());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
-  setUInt8(0x00b6, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
-  return getBCD8_be(0x00b8)*10;
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinVHF())*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00b8, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMinVHF(), freq.inHz()/10);
 }
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyVHF() const {
-  return getBCD8_be(0x00bc)*10;
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxVHF())*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(unsigned Hz) {
-  setBCD8_be(0x00bc, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyVHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMaxVHF(), freq.inHz()/10);
 }
 
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyUHF() const {
-  return getBCD8_be(0x00c0)*10;
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMinUHF())*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00c0, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMinFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMinUHF(), freq.inHz()/10);
 }
-unsigned
+Frequency
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterMaxFrequencyUHF() const {
-  return getBCD8_be(0x00c4)*10;
+  return Frequency::fromHz(getUInt32_le(Offset::autoRepMaxUHF())*10);
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(unsigned Hz) {
-  setBCD8_be(0x00c4, Hz/10);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterMaxFrequencyUHF(Frequency freq) {
+  setUInt32_le(Offset::autoRepMaxUHF(), freq.inHz()/10);
 }
 
-D868UVCodeplug::GeneralSettingsElement::AutoRepDir
+AnytoneAutoRepeaterSettingsExtension::Direction
 D868UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
-  return (AutoRepDir)getUInt8(0x00c8);
+  return (AnytoneAutoRepeaterSettingsExtension::Direction)getUInt8(Offset::autoRepeaterDirB());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AutoRepDir dir) {
-  setUInt8(0x00c8, (unsigned)dir);
+D868UVCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) {
+  setUInt8(Offset::autoRepeaterDirB(), (unsigned)dir);
 }
 
 bool
 D868UVCodeplug::GeneralSettingsElement::defaultChannel() const {
-  return getUInt8(0x00ca);
+  return getUInt8(Offset::defaultChannels());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableDefaultChannel(bool enable) {
-  setUInt8(0x00ca, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::defaultChannels(), (enable ? 0x01 : 0x00));
 }
 
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexA() const {
-  return getUInt8(0x00cb);
+  return getUInt8(Offset::defaultZoneA());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexA(unsigned idx) {
-  setUInt8(0x00cb, idx);
+  setUInt8(Offset::defaultZoneA(), idx);
 }
 
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultZoneIndexB() const {
-  return getUInt8(0x00cc);
+  return getUInt8(Offset::defaultZoneB());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultZoneIndexB(unsigned idx) {
-  setUInt8(0x00cc, idx);
+  setUInt8(Offset::defaultZoneB(), idx);
 }
 
 bool
@@ -568,11 +990,11 @@ D868UVCodeplug::GeneralSettingsElement::defaultChannelAIsVFO() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelAIndex() const {
-  return getUInt8(0x00cd);
+  return getUInt8(Offset::defaultChannelA());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAIndex(unsigned idx) {
-  setUInt8(0x00cd, idx);
+  setUInt8(Offset::defaultChannelA(), idx);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelAToVFO() {
@@ -585,11 +1007,11 @@ D868UVCodeplug::GeneralSettingsElement::defaultChannelBIsVFO() const {
 }
 unsigned
 D868UVCodeplug::GeneralSettingsElement::defaultChannelBIndex() const {
-  return getUInt8(0x00ce);
+  return getUInt8(Offset::defaultChannelB());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBIndex(unsigned idx) {
-  setUInt8(0x00ce, idx);
+  setUInt8(Offset::defaultChannelB(), idx);
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
@@ -598,11 +1020,11 @@ D868UVCodeplug::GeneralSettingsElement::setDefaultChannelBToVFO() {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::keepLastCaller() const {
-  return getUInt8(0x00cf);
+  return getUInt8(Offset::keepLastCaller());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
-  setUInt8(0x00cf, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::keepLastCaller(), (enable ? 0x01 : 0x00));
 }
 
 bool
@@ -610,9 +1032,36 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  setGPSUpdatePeriod(0x05);
+  setGPSUpdatePeriod(Interval::fromSeconds(5));
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+  // Set default VOX sensitivity
+  setVOXLevel(ctx.config()->settings()->vox());
+
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  // Power save settings
+  setPowerSave(ext->powerSaveSettings()->powerSave());
+
+  // Encode key settings
+  enableKnobLock(ext->keySettings()->knobLockEnabled());
+  enableKeypadLock(ext->keySettings()->keypadLockEnabled());
+  enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
+  enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
+
+  // Encode tone settings
+  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
+
+  // Encode audio settings
+  setVOXDelay(ext->audioSettings()->voxDelay());
+  setVOXSource(ext->audioSettings()->voxSource());
+  setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
+
+  // Encode display settings
+  setRXBacklightDuration(ext->displaySettings()->backlightDuration());
+  enableShowCurrentContact(ext->displaySettings()->showContact());
 
   return true;
 }
@@ -621,7 +1070,150 @@ bool
 D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+
+  ctx.config()->settings()->setVOX(voxLevel());
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode power save settings:
+  ext->powerSaveSettings()->setPowerSave(powerSave());
+
+  // Decode key settings
+  ext->keySettings()->enableKnobLock(this->knobLock());
+  ext->keySettings()->enableKeypadLock(this->keypadLock());
+  ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
+  ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
+
+  // Decode tone settings
+  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
+
+  // Decode audio settings
+  ext->audioSettings()->setVOXDelay(voxDelay());
+  ext->audioSettings()->setVOXSource(voxSource());
+  ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
+
+  // Decode display settings
+  ext->displaySettings()->enableShowContact(this->showCurrentContact());
+  ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
+
   return true;
+}
+
+
+bool
+D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+    return false;
+
+  // Get or add settings extension
+  AnytoneSettingsExtension *ext = settings->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    settings->setAnytoneExtension(ext);
+  }
+
+  // Nothing to link
+
+  return true;
+}
+
+uint8_t
+D868UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const {
+  switch (func) {
+  case AnytoneKeySettingsExtension::KeyFunction::Off:               return (uint8_t)KeyFunction::Off;
+  case AnytoneKeySettingsExtension::KeyFunction::Voltage:           return (uint8_t)KeyFunction::Voltage;
+  case AnytoneKeySettingsExtension::KeyFunction::Power:             return (uint8_t)KeyFunction::Power;
+  case AnytoneKeySettingsExtension::KeyFunction::Repeater:          return (uint8_t)KeyFunction::Repeater;
+  case AnytoneKeySettingsExtension::KeyFunction::Reverse:           return (uint8_t)KeyFunction::Reverse;
+  case AnytoneKeySettingsExtension::KeyFunction::Encryption:        return (uint8_t)KeyFunction::Encryption;
+  case AnytoneKeySettingsExtension::KeyFunction::Call:              return (uint8_t)KeyFunction::Call;
+  case AnytoneKeySettingsExtension::KeyFunction::VOX:               return (uint8_t)KeyFunction::VOX;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleVFO:         return (uint8_t)KeyFunction::ToggleVFO;
+  case AnytoneKeySettingsExtension::KeyFunction::SubPTT:            return (uint8_t)KeyFunction::SubPTT;
+  case AnytoneKeySettingsExtension::KeyFunction::Scan:              return (uint8_t)KeyFunction::Scan;
+  case AnytoneKeySettingsExtension::KeyFunction::WFM:               return (uint8_t)KeyFunction::WFM;
+  case AnytoneKeySettingsExtension::KeyFunction::Alarm:             return (uint8_t)KeyFunction::Alarm;
+  case AnytoneKeySettingsExtension::KeyFunction::RecordSwitch:      return (uint8_t)KeyFunction::RecordSwitch;
+  case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
+  case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
+  case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
+  case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey2:           return (uint8_t)KeyFunction::HotKey2;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey3:           return (uint8_t)KeyFunction::HotKey3;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey4:           return (uint8_t)KeyFunction::HotKey4;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey5:           return (uint8_t)KeyFunction::HotKey5;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey6:           return (uint8_t)KeyFunction::HotKey6;
+  case AnytoneKeySettingsExtension::KeyFunction::WorkAlone:         return (uint8_t)KeyFunction::WorkAlone;
+  case AnytoneKeySettingsExtension::KeyFunction::SkipChannel:       return (uint8_t)KeyFunction::SkipChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::DMRMonitor:        return (uint8_t)KeyFunction::DMRMonitor;
+  case AnytoneKeySettingsExtension::KeyFunction::SubChannel:        return (uint8_t)KeyFunction::SubChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::PriorityZone:      return (uint8_t)KeyFunction::PriorityZone;
+  case AnytoneKeySettingsExtension::KeyFunction::VFOScan:           return (uint8_t)KeyFunction::VFOScan;
+  case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
+  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
+  case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
+  case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
+  default:                                                          return (uint8_t)KeyFunction::Off;
+  }
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D868UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const {
+  switch ((KeyFunction)code) {
+  case KeyFunction::Off:               return AnytoneKeySettingsExtension::KeyFunction::Off;
+  case KeyFunction::Voltage:           return AnytoneKeySettingsExtension::KeyFunction::Voltage;
+  case KeyFunction::Power:             return AnytoneKeySettingsExtension::KeyFunction::Power;
+  case KeyFunction::Repeater:          return AnytoneKeySettingsExtension::KeyFunction::Repeater;
+  case KeyFunction::Reverse:           return AnytoneKeySettingsExtension::KeyFunction::Reverse;
+  case KeyFunction::Encryption:        return AnytoneKeySettingsExtension::KeyFunction::Encryption;
+  case KeyFunction::Call:              return AnytoneKeySettingsExtension::KeyFunction::Call;
+  case KeyFunction::VOX:               return AnytoneKeySettingsExtension::KeyFunction::VOX;
+  case KeyFunction::ToggleVFO:         return AnytoneKeySettingsExtension::KeyFunction::ToggleVFO;
+  case KeyFunction::SubPTT:            return AnytoneKeySettingsExtension::KeyFunction::SubPTT;
+  case KeyFunction::Scan:              return AnytoneKeySettingsExtension::KeyFunction::Scan;
+  case KeyFunction::WFM:               return AnytoneKeySettingsExtension::KeyFunction::WFM;
+  case KeyFunction::Alarm:             return AnytoneKeySettingsExtension::KeyFunction::Alarm;
+  case KeyFunction::RecordSwitch:      return AnytoneKeySettingsExtension::KeyFunction::RecordSwitch;
+  case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
+  case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
+  case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
+  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
+  case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
+  case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
+  case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
+  case KeyFunction::HotKey2:           return AnytoneKeySettingsExtension::KeyFunction::HotKey2;
+  case KeyFunction::HotKey3:           return AnytoneKeySettingsExtension::KeyFunction::HotKey3;
+  case KeyFunction::HotKey4:           return AnytoneKeySettingsExtension::KeyFunction::HotKey4;
+  case KeyFunction::HotKey5:           return AnytoneKeySettingsExtension::KeyFunction::HotKey5;
+  case KeyFunction::HotKey6:           return AnytoneKeySettingsExtension::KeyFunction::HotKey6;
+  case KeyFunction::WorkAlone:         return AnytoneKeySettingsExtension::KeyFunction::WorkAlone;
+  case KeyFunction::SkipChannel:       return AnytoneKeySettingsExtension::KeyFunction::SkipChannel;
+  case KeyFunction::DMRMonitor:        return AnytoneKeySettingsExtension::KeyFunction::DMRMonitor;
+  case KeyFunction::SubChannel:        return AnytoneKeySettingsExtension::KeyFunction::SubChannel;
+  case KeyFunction::PriorityZone:      return AnytoneKeySettingsExtension::KeyFunction::PriorityZone;
+  case KeyFunction::VFOScan:           return AnytoneKeySettingsExtension::KeyFunction::VFOScan;
+  case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
+  case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
+  case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
+  case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
+  case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
+  case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
+  default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
+  }
 }
 
 
@@ -649,12 +1241,12 @@ D868UVCodeplug::allocateUpdated() {
   this->allocateZoneChannelList();
   this->allocateDTMFNumbers();
   this->allocateBootSettings();
+  this->allocateRepeaterOffsetFrequencies();
 
   this->allocateGPSSystems();
 
   this->allocateSMSMessages();
   this->allocateHotKeySettings();
-  this->allocateRepeaterOffsetSettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
 
@@ -668,8 +1260,8 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateDTMFSettings();
 
-  image(0).addElement(ADDR_DMR_ENCRYPTION_LIST, DMR_ENCRYPTION_LIST_SIZE);
-  image(0).addElement(ADDR_DMR_ENCRYPTION_KEYS, DMR_ENCRYPTION_KEYS_SIZE);
+  image(0).addElement(Offset::dmrEncryptionIDs(), DMREncryptionKeyIDListElement::size());
+  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
 }
 
 void
@@ -697,6 +1289,7 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateGeneralSettings();
   this->allocateZoneChannelList();
   this->allocateBootSettings();
+  this->allocateRepeaterOffsetFrequencies();
 
   // GPS settings
   this->allocateGPSSystems();
@@ -706,97 +1299,78 @@ D868UVCodeplug::allocateForDecoding() {
 bool
 D868UVCodeplug::allocateBitmaps() {
   // Channel bitmap
-  image(0).addElement(CHANNEL_BITMAP, CHANNEL_BITMAP_SIZE);
+  image(0).addElement(Offset::channelBitmap(), ChannelBitmapElement::size());
   // Zone bitmap
-  image(0).addElement(ZONE_BITMAPS, ZONE_BITMAPS_SIZE);
+  image(0).addElement(Offset::zoneBitmap(), ZoneBitmapElement::size());
   // Contacts bitmap
-  image(0).addElement(CONTACTS_BITMAP, CONTACTS_BITMAP_SIZE);
+  image(0).addElement(Offset::contactBitmap(), ContactBitmapElement::size());
   // Analog contacts bytemap
-  image(0).addElement(ANALOGCONTACT_BYTEMAP, ANALOGCONTACT_BYTEMAP_SIZE);
+  image(0).addElement(Offset::dtmfContactBytemap(), DTMFContactBytemapElement::size());
   // RX group list bitmaps
-  image(0).addElement(RXGRP_BITMAP, RXGRP_BITMAP_SIZE);
+  image(0).addElement(Offset::groupListBitmap(), GroupListBitmapElement::size());
   // Scan list bitmaps
-  image(0).addElement(SCAN_BITMAP, SCAN_BITMAP_SIZE);
+  image(0).addElement(Offset::scanListBitmap(), ScanListBitmapElement::size());
   // Radio IDs bitmaps
-  image(0).addElement(RADIOID_BITMAP, RADIOID_BITMAP_SIZE);
+  image(0).addElement(Offset::radioIDBitmap(), RadioIDBitmapElement::size());
   // Message bitmaps
-  image(0).addElement(MESSAGE_BYTEMAP, MESSAGE_BYTEMAP_SIZE);
+  image(0).addElement(Offset::messageBytemap(), MessageBytemapElement::size());
   // Status messages
-  image(0).addElement(STATUSMESSAGE_BITMAP, STATUSMESSAGE_BITMAP_SIZE);
+  image(0).addElement(Offset::statusMessageBitmap(), StatusMessageBitmapElement::size());
   // FM Broadcast bitmaps
-  image(0).addElement(FMBC_BITMAP, FMBC_BITMAP_SIZE);
+  image(0).addElement(Offset::wfmChannelBitmap(), WFMChannelBitmapElement::size());
   // 5-Tone function bitmaps
-  image(0).addElement(FIVE_TONE_ID_BITMAP, FIVE_TONE_ID_BITMAP_SIZE);
+  image(0).addElement(Offset::fiveToneIdBitmap(), FiveToneIDBitmapElement::size());
   // 2-Tone function bitmaps
-  image(0).addElement(TWO_TONE_IDS_BITMAP, TWO_TONE_IDS_BITMAP_SIZE);
-  image(0).addElement(TWO_TONE_FUNCTIONS_BITMAP, TWO_TONE_FUNC_BITMAP_SIZE);
+  image(0).addElement(Offset::twoToneIdBitmap(), TwoToneIDBitmapElement::size());
+  image(0).addElement(Offset::twoToneFunctionBitmap(), TwoToneFunctionBitmapElement::size());
 
   return true;
 }
 
 
 void
-D868UVCodeplug::setBitmaps(Config *config)
+D868UVCodeplug::setBitmaps(Context& ctx)
 {
   // Mark first radio ID as valid
-  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  memset(radioid_bitmap, 0, RADIOID_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_RADIOIDS, config->radioIDs()->count()); i++)
-    radioid_bitmap[i/8] |= (1 << (i%8));
+  RadioIDBitmapElement radioid_bitmap(data(Offset::radioIDBitmap()));
+  unsigned int num_radio_ids = std::min(Limit::numRadioIDs(), ctx.count<DMRRadioID>());
+  radioid_bitmap.clear(); radioid_bitmap.enableFirst(num_radio_ids);
 
   // Mark valid channels (set bit)
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  memset(channel_bitmap, 0, CHANNEL_BITMAP_SIZE);
-  for (int i=0,c=0; i<std::min(NUM_CHANNELS, config->channelList()->count()); i++) {
-    Channel *channel = config->channelList()->channel(i);
-    if ((! channel->is<DMRChannel>()) && (! channel->is<FMChannel>()))
-      continue;
-    channel_bitmap[c/8] |= (1 << (c%8)); c++;
-  }
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  unsigned int num_channels = std::min(Limit::numChannels(), ctx.count<Channel>());
+  channel_bitmap.clear(); channel_bitmap.enableFirst(num_channels);
 
   // Mark valid contacts (clear bit)
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  memset(contact_bitmap, 0x00, CONTACTS_BITMAP_SIZE);
-  memset(contact_bitmap, 0xff, NUM_CONTACTS/8+1);
-  for (int i=0, c=0; i<std::min(NUM_CONTACTS, config->contacts()->count()); i++) {
-    Contact *contact = config->contacts()->contact(i);
-    if (! contact->is<DMRContact>())
-      continue;
-    contact_bitmap[c/8] &= ~(1 << (c%8)); c++;
-  }
+  ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
+  unsigned int num_contacts = std::min(Limit::numContacts(), ctx.count<DMRContact>());
+  contact_bitmap.clear(); contact_bitmap.enableFirst(num_contacts);
 
   // Mark valid analog contacts (clear bytes)
-  uint8_t *analog_contact_bitmap = data(ANALOGCONTACT_BYTEMAP);
-  memset(analog_contact_bitmap, 0xff, ANALOGCONTACT_BYTEMAP_SIZE);
-  for (int i=0, c=0; i<std::min(NUM_ANALOGCONTACTS, config->contacts()->count()); i++) {
-    Contact *contact = config->contacts()->contact(i);
-    if (! contact->is<DTMFContact>())
-      continue;
-    analog_contact_bitmap[i] = 0x00; c++;
-  }
+  DTMFContactBytemapElement analog_contact_bitmap(data(Offset::dtmfContactBytemap()));
+  unsigned int num_dtmf_contacts = std::min(Limit::numDTMFContacts(), ctx.count<DTMFContact>());
+  analog_contact_bitmap.clear(); analog_contact_bitmap.enableFirst(num_dtmf_contacts);
 
   // Mark valid zones (set bits)
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
-  memset(zone_bitmap, 0x00, ZONE_BITMAPS_SIZE);
-  for (int i=0,z=0; i<std::min(NUM_ZONES, config->zones()->count()); i++) {
-    zone_bitmap[z/8] |= (1 << (z%8)); z++;
-    if (config->zones()->zone(i)->B()->count()) {
-      zone_bitmap[z/8] |= (1 << (z%8)); z++;
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
+  unsigned int num_zones = std::min(Limit::numZones(), ctx.count<Zone>());
+  zone_bitmap.clear();
+  for (unsigned int i=0,z=0; i<num_zones; i++) {
+    zone_bitmap.setEncoded(z, true); z++;
+    if (0 != ctx.get<Zone>(i)->B()->count()) {
+      zone_bitmap.setEncoded(z, true); z++;
     }
   }
 
   // Mark group lists
-  uint8_t *group_bitmap = data(RXGRP_BITMAP);
-  memset(group_bitmap, 0x00, RXGRP_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_RXGRP, config->rxGroupLists()->count()); i++)
-    group_bitmap[i/8] |= (1 << (i%8));
+  GroupListBitmapElement group_bitmap(data(Offset::groupListBitmap()));
+  unsigned int num_group_lists = std::min(Limit::numGroupLists(), ctx.count<RXGroupList>());
+  group_bitmap.clear(); group_bitmap.enableFirst(num_group_lists);
 
   // Mark scan lists
-  uint8_t *scan_bitmap = data(SCAN_BITMAP);
-  memset(scan_bitmap, 0x00, SCAN_BITMAP_SIZE);
-  for (int i=0; i<std::min(NUM_SCAN_LISTS, config->scanlists()->count()); i++) {
-    scan_bitmap[i/8] |= (1<<(i%8));
-  }
+  ScanListBitmapElement scan_bitmap(data(Offset::scanListBitmap()));
+  unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
+  scan_bitmap.clear(); scan_bitmap.enableFirst(num_scan_lists);
 }
 
 
@@ -807,6 +1381,9 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
     return false;
 
   if (! this->encodeGeneralSettings(flags, ctx, err))
+    return false;
+
+  if (! this->encodeRepeaterOffsetFrequencies(flags, ctx, err))
     return false;
 
   if (! this->encodeBootSettings(flags, ctx, err))
@@ -843,6 +1420,9 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
     return false;
 
   if (! this->decodeGeneralSettings(ctx, err))
+    return false;
+
+  if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
     return false;
 
   if (! this->decodeBootSettings(ctx, err))
@@ -884,6 +1464,10 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
   if (! this->linkGPSSystems(ctx, err))
     return false;
 
+  if (! this->linkGeneralSettings(ctx, err)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -891,19 +1475,18 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 void
 D868UVCodeplug::allocateChannels() {
   /* Allocate channels */
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
-    // Get byte and bit for channel, as well as bank of channel
-    uint16_t bit = i%8, byte = i/8, bank = i/128, idx=i%128;
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // if disabled -> skip
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    if (! channel_bitmap.isEncoded(i))
       continue;
     // compute address for channel
-    uint32_t addr = CHANNEL_BANK_0
-        + bank*CHANNEL_BANK_OFFSET
-        + idx*CHANNEL_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, CHANNEL_SIZE);
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() +
+        + bank * Offset::betweenChannelBanks()
+        + idx * ChannelElement::size();
+    if (!isAllocated(addr, 0)) {
+      image(0).addElement(addr, ChannelElement::size());
     }
   }
 }
@@ -915,8 +1498,9 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   // Encode channels
   for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
-    uint16_t bank = i/128, idx = i%128;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
+                           + idx * ChannelElement::size()));
     if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
   }
@@ -926,14 +1510,16 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
 bool
 D868UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+
   // Create channels
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
@@ -944,14 +1530,15 @@ D868UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 bool
 D868UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
   // Link channel objects
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
@@ -962,35 +1549,35 @@ D868UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateVFOSettings() {
   // Allocate VFO channels
-  image(0).addElement(VFO_A_ADDR, CHANNEL_SIZE);
-  image(0).addElement(VFO_A_ADDR+0x2000, CHANNEL_SIZE);
-  image(0).addElement(VFO_B_ADDR, CHANNEL_SIZE);
-  image(0).addElement(VFO_B_ADDR+0x2000, CHANNEL_SIZE);
+  image(0).addElement(Offset::vfoA(), ChannelElement::size());
+  image(0).addElement(Offset::vfoA()+0x2000, ChannelElement::size());
+  image(0).addElement(Offset::vfoB(), ChannelElement::size());
+  image(0).addElement(Offset::vfoB()+0x2000, ChannelElement::size());
 }
 
 void
 D868UVCodeplug::allocateContacts() {
   /* Allocate contacts */
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
+  ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
   unsigned contactCount=0;
-  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+  for (uint16_t i=0; i<Limit::numContacts(); i++) {
     // enabled if false (ass hole)
-    if (1 == ((contact_bitmap[i/8]>>(i%8)) & 0x01))
+    if (! contact_bitmap.isEncoded(i))
       continue;
     contactCount++;
-    uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
-    uint32_t addr = bank_addr + ((i%CONTACTS_PER_BANK)/CONTACTS_PER_BLOCK)*CONTACT_BLOCK_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, CONTACT_BLOCK_SIZE);
-      memset(data(addr), 0x00, CONTACT_BLOCK_SIZE);
+    uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
+    uint32_t addr = bank_addr + ((i%Limit::contactsPerBank())/Limit::contactsPerBlock())*Offset::betweenContactBlocks();
+    if (!isAllocated(addr, 0)) {
+      image(0).addElement(addr, Offset::betweenContactBlocks());
+      memset(data(addr), 0x00, Offset::betweenContactBlocks());
     }
   }
 
   if (contactCount) {
-    image(0).addElement(CONTACT_INDEX_LIST, align_size(4*contactCount, 16));
-    memset(data(CONTACT_INDEX_LIST), 0xff, align_size(4*contactCount, 16));
-    image(0).addElement(CONTACT_ID_MAP, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
-    memset(data(CONTACT_ID_MAP), 0xff, align_size(CONTACT_ID_ENTRY_SIZE*(1+contactCount), 16));
+    image(0).addElement(Offset::contactIndex(), align_size(4*contactCount, 16));
+    memset(data(Offset::contactIndex()), 0xff, align_size(4*contactCount, 16));
+    image(0).addElement(Offset::contactIdTable(), align_size(ContactMapElement::size()*(1+contactCount), 16));
+    memset(data(Offset::contactIdTable()), 0xff, align_size(ContactMapElement::size()*(1+contactCount), 16));
   }
 }
 
@@ -1001,13 +1588,13 @@ D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
   for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
-    uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
-    uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
+    uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
+    uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));
     DMRContact *contact = ctx.get<DMRContact>(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
-    ((uint32_t *)data(CONTACT_INDEX_LIST))[i] = qToLittleEndian(i);
+    ((uint32_t *)data(Offset::contactIndex()))[i] = qToLittleEndian(i);
     contacts.append(contact);
   }
   // encode index map for contacts
@@ -1016,7 +1603,7 @@ D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
     return a->number() < b->number();
   });
   for (int i=0; i<contacts.size(); i++) {
-    ContactMapElement el(data(CONTACT_ID_MAP + i*CONTACT_ID_ENTRY_SIZE));
+    ContactMapElement el(data(Offset::contactIdTable() + i*ContactMapElement::size()));
     el.setID(contacts[i]->number(), (DMRContact::GroupCall==contacts[i]->type()));
     el.setIndex(ctx.index(contacts[i]));
   }
@@ -1028,14 +1615,13 @@ D868UVCodeplug::createContacts(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create digital contacts
-  uint8_t *contact_bitmap = data(CONTACTS_BITMAP);
-  for (uint16_t i=0; i<NUM_CONTACTS; i++) {
+  ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
+  for (uint16_t i=0; i<Limit::numContacts(); i++) {
     // Check if contact is enabled:
-    uint16_t  bit = i%8, byte = i/8;
-    if (1 == ((contact_bitmap[byte]>>bit) & 0x01))
+    if (! contact_bitmap.isEncoded(i))
       continue;
-    uint32_t bank_addr = CONTACT_BLOCK_0 + (i/CONTACTS_PER_BANK)*CONTACT_BANK_SIZE;
-    uint32_t addr = bank_addr + (i%CONTACTS_PER_BANK)*CONTACT_SIZE;
+    uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
+    uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));
     if (DMRContact *obj = con.toContactObj(ctx)) {
       ctx.config()->contacts()->add(obj); ctx.add(obj, i);
@@ -1048,29 +1634,27 @@ D868UVCodeplug::createContacts(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateAnalogContacts() {
   /* Allocate analog contacts */
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i+=2) {
+  DTMFContactBytemapElement analog_contact_bytemap(data(Offset::dtmfContactBytemap()));
+  for (uint8_t i=0; i<Limit::numDTMFContacts(); i++) {
     // if disabled -> skip
-    if (0xff == analog_contact_bytemap[i])
+    if (! analog_contact_bytemap.isEncoded(i))
       continue;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, ANALOGCONTACT_BANK_SIZE);
+    uint32_t bank_addr = Offset::dtmfContacts() + (i/2)*(2*DTMFContactElement::size());
+    if (! isAllocated(bank_addr, 0)) {
+      image(0).addElement(bank_addr, 2*DTMFContactElement::size());
     }
   }
-  image(0).addElement(ANALOGCONTACT_INDEX_LIST, ANALOGCONTACT_LIST_SIZE);
+  image(0).addElement(Offset::dtmfIndex(), 1*Limit::numDTMFContacts());
 }
 
 bool
 D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  uint8_t *idxlst = data(ANALOGCONTACT_INDEX_LIST);
-  memset(idxlst, 0xff, ANALOGCONTACT_LIST_SIZE);
+  uint8_t *idxlst = data(Offset::dtmfIndex());
+  memset(idxlst, 0xff, 1*Limit::numDTMFContacts());
   for (unsigned int i=0; i<ctx.count<DTMFContact>(); i++) {
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
-        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    DTMFContactElement cont(data(addr));
+    DTMFContactElement cont(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
     cont.fromContact(ctx.get<DTMFContact>(i));
     idxlst[i] = i;
   }
@@ -1081,19 +1665,18 @@ bool
 D868UVCodeplug::createAnalogContacts(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *analog_contact_bytemap = data(ANALOGCONTACT_BYTEMAP);
-  for (uint8_t i=0; i<NUM_ANALOGCONTACTS; i++) {
+  DTMFContactBytemapElement analog_contact_bytemap(data(Offset::dtmfContactBytemap()));
+  for (unsigned int i=0; i<Limit::numDTMFContacts(); i++) {
     // if disabled -> skip
-    if (0xff == analog_contact_bytemap[i])
+    if (! analog_contact_bytemap.isEncoded(i))
       continue;
-    uint32_t addr = ANALOGCONTACT_BANK_0 + (i/ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_BANK_SIZE
-        + (i%ANALOGCONTACTS_PER_BANK)*ANALOGCONTACT_SIZE;
-    DTMFContactElement cont(data(addr));
+    DTMFContactElement cont(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
     if (DTMFContact *dtmf = cont.toContact()) {
       ctx.config()->contacts()->add(dtmf);
       ctx.add(dtmf, i);
     }
   }
+
   return true;
 }
 
@@ -1101,17 +1684,15 @@ D868UVCodeplug::createAnalogContacts(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateRadioIDs() {
   /* Allocate radio IDs */
-  uint8_t *radioid_bitmap = data(RADIOID_BITMAP);
-  for (uint8_t i=0; i<NUM_RADIOIDS; i++) {
-    // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
+  RadioIDBitmapElement radioid_bitmap(data(Offset::radioIDBitmap()));
+  for (uint8_t i=0; i<Limit::numRadioIDs(); i++) {
     // if disabled -> skip
-    if (0 == ((radioid_bitmap[byte]>>bit) & 0x01))
+    if (! radioid_bitmap.isEncoded(i))
       continue;
     // Allocate radio IDs individually
-    uint32_t addr = ADDR_RADIOIDS + i*RADIOID_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, RADIOID_SIZE);
+    uint32_t addr = Offset::radioIDs() + i*RadioIDElement::size();
+    if (! isAllocated(addr, 0)) {
+      image(0).addElement(addr, RadioIDElement::size());
     }
   }
 }
@@ -1121,8 +1702,8 @@ D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
-    RadioIDElement(data(ADDR_RADIOIDS + i*RADIOID_SIZE)).fromRadioID(
+  for (unsigned int i=0; i<ctx.count<DMRRadioID>(); i++) {
+    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size())).fromRadioID(
           ctx.config()->radioIDs()->getId(i));
   }
   return true;
@@ -1133,12 +1714,11 @@ D868UVCodeplug::setRadioID(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Find a valid RadioID
-  uint8_t *radio_id_bitmap = data(RADIOID_BITMAP);
-  for (uint16_t i=0; i<NUM_RADIOIDS; i++) {
-    if (0 == (radio_id_bitmap[i/8] & (1 << (i%8))))
+  RadioIDBitmapElement radio_id_bitmap(data(Offset::radioIDBitmap()));
+  for (uint16_t i=0; i<Limit::numRadioIDs(); i++) {
+    if (! radio_id_bitmap.isEncoded(i))
       continue;
-    RadioIDElement id(data(ADDR_RADIOIDS + i*RADIOID_SIZE));
-    logDebug() << "Store id " << id.number() << " at idx " << i << ".";
+    RadioIDElement id(data(Offset::radioIDs() + i*RadioIDElement::size()));
     if (DMRRadioID *rid = id.toRadioID()) {
       ctx.config()->radioIDs()->add(rid);  ctx.add(rid, i);
     }
@@ -1152,18 +1732,16 @@ D868UVCodeplug::allocateRXGroupLists() {
   /*
    * Allocate group lists
    */
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
-    // Get byte and bit for group list
-    uint16_t bit = i%8, byte = i/8;
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // if disabled -> skip
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
     // Allocate RX group lists indivitually
-    uint32_t addr = ADDR_RXGRP_0 + i*RXGRP_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, RXGRP_SIZE);
-      memset(data(addr), 0xff, RXGRP_SIZE);
+    uint32_t addr = Offset::groupLists() + i*Offset::betweenGroupLists();
+    if (! isAllocated(addr, 0)) {
+      image(0).addElement(addr, GroupListElement::size());
+      GroupListElement(data(addr)).clear();
     }
   }
 
@@ -1175,9 +1753,10 @@ D868UVCodeplug::encodeRXGroupLists(const Flags &flags, Context &ctx, const Error
 
   // Encode RX group-lists
   for (int i=0; i<ctx.config()->rxGroupLists()->count(); i++) {
-    GroupListElement grp(data(ADDR_RXGRP_0 + i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     grp.fromGroupListObj(ctx.config()->rxGroupLists()->list(i), ctx);
   }
+
   return true;
 }
 
@@ -1186,14 +1765,13 @@ D868UVCodeplug::createRXGroupLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create RX group lists
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // check if group list is enabled
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
     // construct RXGroupList from definition
-    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     if (RXGroupList *obj = grp.toGroupListObj()) {
       ctx.config()->rxGroupLists()->add(obj); ctx.add(obj, i);
     }
@@ -1205,78 +1783,78 @@ bool
 D868UVCodeplug::linkRXGroupLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *grouplist_bitmap = data(RXGRP_BITMAP);
-  for (uint16_t i=0; i<NUM_RXGRP; i++) {
+  GroupListBitmapElement grouplist_bitmap(data(Offset::groupListBitmap()));
+  for (uint16_t i=0; i<Limit::numGroupLists(); i++) {
     // check if group list is enabled
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == ((grouplist_bitmap[byte]>>bit) & 0x01))
+    if (! grouplist_bitmap.isEncoded(i))
       continue;
+
     // link group list
-    GroupListElement grp(data(ADDR_RXGRP_0+i*RXGRP_OFFSET));
+    GroupListElement grp(data(Offset::groupLists() + i*Offset::betweenGroupLists()));
     if (! grp.linkGroupList(ctx.get<RXGroupList>(i), ctx)) {
       logError() << "Cannot link RX group list idx=" << i;
       return false;
     }
   }
+
   return true;
 }
 
 
 void
 D868UVCodeplug::allocateZones() {
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
-    // Get byte and bit for zone
-    uint16_t bit = i%8, byte = i/8;
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // if invalid -> skip
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Allocate zone itself
-    image(0).addElement(ADDR_ZONE+i*ZONE_OFFSET, ZONE_SIZE);
-    image(0).addElement(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET, ZONE_NAME_SIZE);
+    image(0).addElement(Offset::zoneChannels()+i*Offset::betweenZoneChannels(), Size::zoneChannels());
+    image(0).addElement(Offset::zoneNames()+i*Offset::betweenZoneNames(), Size::zoneName());
   }
 }
 
 bool
 D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode zones
   unsigned zidx = 0;
-  for (int i=0; i<ctx.config()->zones()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Zone>(); i++) {
+    Zone *zone = ctx.get<Zone>(i);
     // Clear name and channel list
-    uint8_t  *name     = (uint8_t *)data(ADDR_ZONE_NAME + zidx*ZONE_NAME_OFFSET);
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE + zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_SIZE);
-    memset(channels, 0xff, ZONE_SIZE);
-    if (ctx.config()->zones()->zone(i)->B()->count())
-      encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" A", 16, 0);
+    uint8_t  *name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    memset(name, 0, Size::zoneName());
+    memset(channels, 0xff, Size::zoneChannels());
+    if (zone->B()->count())
+      encode_ascii(name, zone->name()+" A", Limit::zoneNameLength(), 0);
     else
-      encode_ascii(name, ctx.config()->zones()->zone(i)->name(), 16, 0);
+      encode_ascii(name, zone->name(), Limit::zoneNameLength(), 0);
     // Handle list A
-    for (int j=0; j<ctx.config()->zones()->zone(i)->A()->count(); j++) {
-      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->A()->get(j)));
+    for (int j=0; j<zone->A()->count(); j++) {
+      channels[j] = qToLittleEndian(ctx.index(zone->A()->get(j)->as<Channel>()));
     }
 
-    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), false, flags, ctx, err))
+    if (! encodeZone(zidx, zone, false, flags, ctx, err))
       return false;
     zidx++;
 
-    if (! ctx.config()->zones()->zone(i)->B()->count())
+    if (0 == zone->B()->count())
       continue;
 
     // Process list B if present
-    name     = (uint8_t *)data(ADDR_ZONE_NAME+zidx*ZONE_NAME_OFFSET);
-    channels = (uint16_t *)data(ADDR_ZONE+zidx*ZONE_OFFSET);
-    memset(name, 0, ZONE_NAME_SIZE);
-    memset(channels, 0xff, ZONE_SIZE);
-    encode_ascii(name, ctx.config()->zones()->zone(i)->name()+" B", 16, 0);
+    name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
+    channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
+    memset(name, 0, Size::zoneName());
+    memset(channels, 0xff, Size::zoneChannels());
+    encode_ascii(name, zone->name()+" B", Limit::zoneNameLength(), 0);
     // Handle list B
-    for (int j=0; j<ctx.config()->zones()->zone(i)->B()->count(); j++) {
-      channels[j] = qToLittleEndian(ctx.index(ctx.config()->zones()->zone(i)->B()->get(j)));
+    for (int j=0; j<zone->B()->count(); j++) {
+      channels[j] = qToLittleEndian(ctx.index(zone->B()->get(j)->as<Channel>()));
     }
 
-    if (! encodeZone(zidx, ctx.config()->zones()->zone(i), true, flags, ctx, err))
+    if (! encodeZone(zidx, zone, true, flags, ctx, err))
       return false;
     zidx++;
   }
@@ -1294,16 +1872,17 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create zones
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
-    uint16_t bit = i%8, byte = i/8;
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    QString zonename = decode_ascii(
+          data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+          Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1319,6 +1898,7 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
         return false;
       }
       // add to config
+      logDebug() << "Store zone '" << zonename << "' at index " << i << ".";
       ctx.config()->zones()->add(last_zone); ctx.add(last_zone, i);
     } else {
       // when extending the last zone, chop its name to remove the "... A" part.
@@ -1327,6 +1907,8 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
         last_zone->deleteLater();
         return false;
       }
+      logDebug() << "Store merged zone '" << last_zonebasename << "' at index " << i << ".";
+      ctx.add(last_zone, i);
     }
   }
   return true;
@@ -1343,16 +1925,17 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create zones
-  uint8_t *zone_bitmap = data(ZONE_BITMAPS);
+  ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
   QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
   bool extend_last_zone = false;
-  for (uint16_t i=0; i<NUM_ZONES; i++) {
+  for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
-    uint16_t bit = i%8, byte = i/8;
-    if (0 == ((zone_bitmap[byte]>>bit) & 0x01))
+    if (! zone_bitmap.isEncoded(i))
       continue;
     // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(data(ADDR_ZONE_NAME+i*ZONE_NAME_OFFSET), 16, 0);
+    QString zonename = decode_ascii(
+          data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
+          Limit::zoneNameLength(), 0);
     QString zonebasename = zonename; zonebasename.chop(2);
     extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
                          && (zonebasename == last_zonebasename)
@@ -1369,8 +1952,8 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
     }
 
     // link zone
-    uint16_t *channels = (uint16_t *)data(ADDR_ZONE+i*ZONE_OFFSET);
-    for (uint8_t j=0; j<NUM_CH_PER_ZONE; j++, channels++) {
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels()+i*Offset::betweenZoneChannels());
+    for (uint8_t j=0; j<Limit::numChannelsPerZone(); j++, channels++) {
       // If not enabled -> continue
       if (0xffff == *channels)
         continue;
@@ -1399,34 +1982,32 @@ D868UVCodeplug::linkZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorS
 
 void
 D868UVCodeplug::allocateScanLists() {
-  /*
-   * Allocate scan lists
-   */
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (uint8_t i=0; i<NUM_SCAN_LISTS; i++) {
-    // Get byte and bit for scan list, bank and bank_idx
-    uint16_t bit = i%8, byte = i/8;
-    uint8_t bank = (i/NUM_SCANLISTS_PER_BANK), bank_idx = (i%NUM_SCANLISTS_PER_BANK);
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (uint8_t i=0; i<Limit::numScanLists(); i++) {
     // if disabled -> skip
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
     // Allocate scan lists indivitually
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, SCAN_LIST_SIZE);
-      memset(data(addr), 0xff, SCAN_LIST_SIZE);
+    uint8_t bank = (i/Limit::numScanListsPerBank()), bank_idx = (i%Limit::numScanListsPerBank());
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
+    if (!isAllocated(addr, 0)) {
+      image(0).addElement(addr, ScanListElement::size());
+      ScanListElement(data(addr)).clear();
     }
   }
 }
 
 bool
 D868UVCodeplug::encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode scan lists
-  for (int i=0; i<ctx.config()->scanlists()->count(); i++) {
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, idx = i%NUM_SCANLISTS_PER_BANK;
-    ScanListElement scan(data(SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + idx*SCAN_LIST_OFFSET));
+  unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
+  for (unsigned int i=0; i<num_scan_lists; i++) {
+    uint8_t bank = i/Limit::numScanListsPerBank(), idx = i%Limit::numScanListsPerBank();
+    ScanListElement scan(data(Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+                              + idx*Offset::betweenScanLists()));
     scan.fromScanListObj(ctx.config()->scanlists()->scanlist(i), ctx);
   }
   return true;
@@ -1437,13 +2018,13 @@ D868UVCodeplug::createScanLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create scan lists
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (unsigned int i=0; i<Limit::numScanLists(); i++) {
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    uint8_t bank = i/Limit::numScanListsPerBank(), bank_idx = i%Limit::numScanListsPerBank();
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
     ScanListElement scanl(data(addr));
     // Create scanlist
     ScanList *obj = scanl.toScanListObj();
@@ -1456,13 +2037,13 @@ bool
 D868UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  uint8_t *scanlist_bitmap = data(SCAN_BITMAP);
-  for (unsigned i=0; i<NUM_SCAN_LISTS; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((scanlist_bitmap[byte]>>bit) & 0x01))
+  ScanListBitmapElement scanlist_bitmap(data(Offset::scanListBitmap()));
+  for (unsigned i=0; i<Limit::numScanLists(); i++) {
+    if (! scanlist_bitmap.isEncoded(i))
       continue;
-    uint8_t bank = i/NUM_SCANLISTS_PER_BANK, bank_idx = i%NUM_SCANLISTS_PER_BANK;
-    uint32_t addr = SCAN_LIST_BANK_0 + bank*SCAN_LIST_BANK_OFFSET + bank_idx*SCAN_LIST_OFFSET;
+    uint8_t bank = i/Limit::numScanListsPerBank(), bank_idx = i%Limit::numScanListsPerBank();
+    uint32_t addr = Offset::scanListBanks() + bank*Offset::betweenScanListBanks()
+        + bank_idx*Offset::betweenScanLists();
     ScanListElement scanl(data(addr));
     // Create scanlist
     ScanList *obj = ctx.get<ScanList>(i);
@@ -1475,67 +2056,71 @@ D868UVCodeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
 
 void
 D868UVCodeplug::allocateGeneralSettings() {
-  image(0).addElement(ADDR_GENERAL_CONFIG, GENERAL_CONFIG_SIZE);
+  image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
 }
 
 bool
 D868UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).fromConfig(flags, ctx);
+  return GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
 }
 
 bool
 D868UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return GeneralSettingsElement(data(ADDR_GENERAL_CONFIG)).updateConfig(ctx);
+  return GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
 }
 
+bool
+D868UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
+  return GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err);
+}
 
 void
 D868UVCodeplug::allocateZoneChannelList() {
-  image(0).addElement(ADDR_ZONE_CHANNELS, ZONE_CHANNELS_SIZE);
+  image(0).addElement(Offset::zoneChannelList(), ZoneChannelListElement::size());
 }
 
 
 void
 D868UVCodeplug::allocateDTMFNumbers() {
-  image(0).addElement(ADDR_DTMF_NUMBERS, DTMF_NUMBERS_SIZE);
+  image(0).addElement(Offset::dtmfIDList(), DTMFIDListElement::size());
 }
 
 
 void
 D868UVCodeplug::allocateBootSettings() {
-  image(0).addElement(ADDR_BOOT_SETTINGS, BOOT_SETTINGS_SIZE);
+  image(0).addElement(Offset::bootSettings(), BootSettingsElement::size());
 }
 
 bool
 D868UVCodeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).fromConfig(flags, ctx);
+  return BootSettingsElement(data(Offset::bootSettings())).fromConfig(flags, ctx);
 }
 
 bool
 D868UVCodeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  return BootSettingsElement(data(ADDR_BOOT_SETTINGS)).updateConfig(ctx);
+  return BootSettingsElement(data(Offset::bootSettings())).updateConfig(ctx);
 }
 
 
 void
 D868UVCodeplug::allocateGPSSystems() {
-  image(0).addElement(ADDR_GPS_SETTINGS, GPS_SETTINGS_SIZE);
-  image(0).addElement(ADDR_GPS_MESSAGE, GPS_MESSAGE_SIZE);
+  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
+  image(0).addElement(Offset::dmrAPRSMessage(), DMRAPRSMessageElement::size());
 }
 
 bool
 D868UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   return gps.fromConfig(flags, ctx);
 }
 
@@ -1546,20 +2131,21 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   QSet<uint8_t> systems;
   // First find all GPS systems linked, that is referenced by any channel
   // Create channels
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    uint16_t  bank = i/128, idx = i%128;
+    if (! channel_bitmap.isEncoded(i))
       continue;
     if (ctx.get<Channel>(i)->is<FMChannel>())
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (ch.txDigitalAPRS())
       systems.insert(ch.digitalAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
     gps.createGPSSystem(*idx, ctx);
   return true;
@@ -1569,9 +2155,9 @@ bool
 D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(ADDR_GPS_SETTINGS));
+  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
   // Then link all referenced GPS systems
-  for (uint8_t i=0; i<8; i++) {
+  for (uint8_t i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (! ctx.has<GPSSystem>(i))
       continue;
     gps.linkGPSSystem(i, ctx);
@@ -1583,79 +2169,123 @@ D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
 void
 D868UVCodeplug::allocateSMSMessages() {
   // Prefab. SMS messages
-  uint8_t *messages_bytemap = data(MESSAGE_BYTEMAP);
+  MessageBytemapElement messages_bytemap(data(Offset::messageBytemap()));
   unsigned message_count = 0;
-  for (uint8_t i=0; i<NUM_MESSAGES; i++) {
-    uint8_t bank = i/NUM_MESSAGES_PER_BANK;
-    if (0xff == messages_bytemap[i])
+  for (uint8_t i=0; i<Limit::numMessages(); i++) {
+    if (! messages_bytemap.isEncoded(i))
       continue;
     message_count++;
-    uint32_t addr = MESSAGE_BANK_0 + bank*MESSAGE_BANK_SIZE;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, MESSAGE_BANK_SIZE);
+    uint32_t addr = Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks();
+    if (!isAllocated(addr, 0)) {
+      image(0).addElement(addr, Size::messageBank());
     }
   }
   if (message_count) {
-    image(0).addElement(MESSAGE_INDEX_LIST, 0x10*message_count);
+    image(0).addElement(Offset::messageIndex(), Size::messageIndex()*message_count);
   }
 }
 
 void
 D868UVCodeplug::allocateHotKeySettings() {
   // Allocate Hot Keys
-  image(0).addElement(ADDR_HOTKEY, HOTKEY_SIZE);
+  image(0).addElement(Offset::analogQuickCall(), AnalogQuickCallsElement::size());
+  image(0).addElement(Offset::statusMessages(), StatusMessagesElement::size());
+  image(0).addElement(Offset::hotKeySettings(), HotKeySettingsElement::size());
 }
 
 void
-D868UVCodeplug::allocateRepeaterOffsetSettings() {
+D868UVCodeplug::allocateRepeaterOffsetFrequencies() {
   // Offset frequencies
-  image(0).addElement(ADDR_OFFSET_FREQ, OFFSET_FREQ_SIZE);
+  image(0).addElement(Offset::offsetFrequencies(), RepeaterOffsetListElement::size());
 }
+
+bool
+D868UVCodeplug::encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+
+  // If no AnyTone extension is present -> leave untouched.
+  if (! ctx.config()->settings()->anytoneExtension())
+    return true;
+
+  RepeaterOffsetListElement offsets(data(Offset::offsetFrequencies()));
+  offsets.clear();
+  for (unsigned int i=0; i<ctx.count<AnytoneAutoRepeaterOffset>(); i++) {
+    offsets.setOffset(i, ctx.get<AnytoneAutoRepeaterOffset>(i)->offset());
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Allocate extension, if not present.
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension()) {
+    ext = ctx.config()->settings()->anytoneExtension();
+  } else {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Decode offsets.
+  RepeaterOffsetListElement offsets(data(Offset::offsetFrequencies()));
+  for (unsigned int i=0; i<RepeaterOffsetListElement::Limit::numEntries(); i++) {
+    if (offsets.isSet(i)) {
+      AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
+      offset->setOffset(offsets.offset(i));
+      ext->autoRepeaterSettings()->offsets()->add(offset);
+      ctx.add(offset, i);
+    }
+  }
+
+  return true;
+}
+
 
 void
 D868UVCodeplug::allocateAlarmSettings() {
   // Alarm settings
-  image(0).addElement(ADDR_ALARM_SETTING, ALARM_SETTING_SIZE);
-  image(0).addElement(ADDR_ALARM_SETTING_EXT, ALARM_SETTING_EXT_SIZE);
+  image(0).addElement(Offset::alarmSettings(), AlarmSettingElement::size());
+  image(0).addElement(Offset::alarmSettingsExtension(), DigitalAlarmExtensionElement::size());
 }
 
 void
 D868UVCodeplug::allocateFMBroadcastSettings() {
   // FM broad-cast settings
-  image(0).addElement(ADDR_FMBC, FMBC_SIZE+FMBC_VFO_SIZE);
+  image(0).addElement(Offset::wfmChannels(), WFMChannelListElement::size());
+  image(0).addElement(Offset::wfmVFO(), WFMVFOElement::size());
 }
 
 void
 D868UVCodeplug::allocate5ToneIDs() {
   // Allocate 5-tone functions
-  uint8_t *bitmap = data(FIVE_TONE_ID_BITMAP);
-  for (uint8_t i=0; i<NUM_FIVE_TONE_IDS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (bitmap[byte] & (1<<bit)))
+  FiveToneIDBitmapElement bitmap(data(Offset::fiveToneIdBitmap()));
+  for (uint8_t i=0; i<FiveToneIDListElement::Limit::numEntries(); i++) {
+    if (! bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_FIVE_TONE_ID_LIST + i*FIVE_TONE_ID_SIZE, FIVE_TONE_ID_SIZE);
+    image(0).addElement(Offset::fiveToneIdList() + i*FiveToneIDElement::size(), FiveToneIDElement::size());
   }
 }
 
 void
 D868UVCodeplug::allocate5ToneFunctions() {
-  image(0).addElement(ADDR_FIVE_TONE_FUNCTIONS, FIVE_TONE_FUNCTIONS_SIZE);
+  image(0).addElement(Offset::fiveToneFunctions(), FiveToneFunctionListElement::size());
 }
 
 void
 D868UVCodeplug::allocate5ToneSettings() {
-  image(0).addElement(ADDR_FIVE_TONE_SETTINGS, FIVE_TONE_SETTINGS_SIZE);
+  image(0).addElement(Offset::fiveToneSettings(), FiveToneSettingsElement::size());
 }
 
 void
 D868UVCodeplug::allocate2ToneIDs() {
   // Allocate 2-tone encoding
-  uint8_t *enc_bitmap = data(TWO_TONE_IDS_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_IDS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (enc_bitmap[byte] & (1<<bit)))
+  TwoToneIDBitmapElement enc_bitmap(data(Offset::twoToneIdBitmap()));
+  for (uint8_t i=0; i<Limit::numTwoToneIDs(); i++) {
+    if (! enc_bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_IDS + i*TWO_TONE_ID_SIZE, TWO_TONE_ID_SIZE);
+    image(0).addElement(Offset::twoToneIdList() + i*TwoToneIDElement::size(), TwoToneIDElement::size());
   }
 }
 
@@ -1663,22 +2293,22 @@ D868UVCodeplug::allocate2ToneIDs() {
 void
 D868UVCodeplug::allocate2ToneFunctions() {
   // Allocate 2-tone decoding
-  uint8_t *dec_bitmap = data(TWO_TONE_FUNCTIONS_BITMAP);
-  for (uint8_t i=0; i<NUM_TWO_TONE_FUNCTIONS; i++) {
-    uint16_t  bit = i%8, byte = i/8;
-    if (0 == (dec_bitmap[byte] & (1<<bit)))
+  TwoToneFunctionBitmapElement dec_bitmap(data(Offset::twoToneFunctionBitmap()));
+  for (uint8_t i=0; i<Limit::numTwoToneFunctions(); i++) {
+    if (! dec_bitmap.isEncoded(i))
       continue;
-    image(0).addElement(ADDR_TWO_TONE_FUNCTIONS + i*TWO_TONE_FUNCTION_SIZE, TWO_TONE_FUNCTION_SIZE);
+    image(0).addElement(Offset::twoToneFunctionList() + i*TwoToneFunctionElement::size(),
+                        TwoToneFunctionElement::size());
   }
 }
 
 void
 D868UVCodeplug::allocate2ToneSettings() {
-  image(0).addElement(ADDR_TWO_TONE_SETTINGS, TWO_TONE_SETTINGS_SIZE);
+  image(0).addElement(Offset::twoToneSettings(), TwoToneSettingsElement::size());
 }
 
 
 void
 D868UVCodeplug::allocateDTMFSettings() {
-  image(0).addElement(ADDR_DTMF_SETTINGS, DTMF_SETTINGS_SIZE);
+  image(0).addElement(Offset::dtmfSettings(), DTMFSettingsElement::size());
 }

@@ -227,7 +227,7 @@ public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
 
-    void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+    void fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
 public:

@@ -650,14 +650,14 @@ GD77Codeplug::clearGroupLists() {
 
 bool
 GD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
 
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
       continue;
     GroupListElement el(bank.get(i));
-    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err);
     bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
   }
   return true;
@@ -665,14 +665,12 @@ GD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
 
 bool
 GD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    RXGroupList *list = el.toRXGroupListObj(ctx);
+    RXGroupList *list = el.toRXGroupListObj(ctx, err);
     config->rxGroupLists()->add(list); ctx.add(list, i+1);
   }
   return true;
@@ -689,7 +687,7 @@ GD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
     GroupListElement el(bank.get(i));
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }

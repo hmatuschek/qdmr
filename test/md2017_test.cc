@@ -17,7 +17,7 @@ MD2017Test::testBasicConfigEncoding() {
   MD2017Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT MD2017: {}")
+    QFAIL(QString("Cannot encode codeplug for TyT MD2017: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -28,13 +28,13 @@ MD2017Test::testBasicConfigDecoding() {
   MD2017Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT MD2017: {}")
+    QFAIL(QString("Cannot encode codeplug for TyT MD2017: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for TyT MD2017: {}")
+    QFAIL(QString("Cannot decode codeplug for TyT MD2017: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }

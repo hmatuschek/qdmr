@@ -4,11 +4,14 @@
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
+#include <iostream>
+#include "logger.hh"
+
 
 OpenGD77Test::OpenGD77Test(QObject *parent)
-  : UnitTestBase(parent)
+  : UnitTestBase(parent), _stderr(stderr)
 {
-  // pass...
+  Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
 }
 
 void
@@ -17,7 +20,7 @@ OpenGD77Test::testBasicConfigEncoding() {
   OpenGD77Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for OpenGD77: {}")
+    QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -28,13 +31,13 @@ OpenGD77Test::testBasicConfigDecoding() {
   OpenGD77Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for OpenGD77: {}")
+    QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for OpenGD77: {}")
+    QFAIL(QString("Cannot decode codeplug for OpenGD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }

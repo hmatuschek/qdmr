@@ -17,7 +17,7 @@ DM1701Test::testBasicConfigEncoding() {
   DM1701Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for BTECH MD1701: {}")
+    QFAIL(QString("Cannot encode codeplug for BTECH MD1701: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -28,13 +28,13 @@ DM1701Test::testBasicConfigDecoding() {
   DM1701Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for BTECH DM1701: {}")
+    QFAIL(QString("Cannot encode codeplug for BTECH DM1701: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for BTECH DM1701: {}")
+    QFAIL(QString("Cannot decode codeplug for BTECH DM1701: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
