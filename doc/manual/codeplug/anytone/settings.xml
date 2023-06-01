@@ -29,25 +29,6 @@
 <variablelist>
   <title>General settings extension fields</title>
   <varlistentry>
-    <term><token>autoShutDownDelay</token></term>
-    <listitem>
-      <para>
-        The auto shut-down delay. Any interval can be specified here, a unit is needed 
-        unless the interval is given in seconds. The interval is stored in minute resolution.
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>powerSave</token></term>
-    <listitem>
-      <para>
-        The power-save mode, must be one of <token>Off</token>, <token>Save50</token> or 
-        <token>Save66</token>. The first disables the power-save feature, while the latter two 
-        save 50% and 66% power, respectively. 
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>subChannel</token></term>
     <listitem>
       <para>
@@ -83,14 +64,6 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>timeZone</token></term>
-    <listitem>
-      <para>
-        Specifies time-zone. Can by any IANA time-zone name as a string.
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>vfoScanType</token></term>
     <listitem>
       <para>
@@ -114,15 +87,6 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>units</token></term>
-    <listitem>
-      <para>
-        Specifies the distance units used to display GPS information. This must be 
-        <token>Metric</token> or <token>Archaic</token>.
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>keepLastCaller</token></term>
     <listitem>
       <para>
@@ -141,12 +105,13 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>steType</token>, <token>steFrequency</token></term>
+    <term><token>steType</token>, <token>steFrequency</token>, <token>steDuration</token></term>
     <listitem>
       <para>
-        Specifies the squelch-tail elimination type and frequency. The type must be one of 
+        Specifies the squelch-tail elimination type, frequency and duration. The type must be one of 
         <token>Off</token>, <token>Silent</token>, <token>Deg120</token>, <token>Deg180</token> or 
-        <token>Deg240</token>. The frequency is specified as a floating point number in Hz. 
+        <token>Deg240</token>. The frequency is specified as a floating point number in Hz. The 
+        duration is specified in ms.
       </para>
       <para>
         This option is applicable to <productname>AT-D878UV</productname>, 
@@ -198,10 +163,11 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>bootSettings</token>, <token>keySettings</token>, <token>toneSettings</token>, 
-      <token>displaySettings</token>, <token>audioSettings</token>, <token>menuSettings</token>, 
-      <token>autoRepeaterSettings</token>, <token>dmrSettings</token>, 
-      <token>rangingSettings</token>, <token>simplexRepeaterSettings</token></term>
+    <term><token>bootSettings</token>, <token>powerSaveSettings</token>, <token>keySettings</token>, 
+      <token>toneSettings</token>, <token>displaySettings</token>, <token>audioSettings</token>, 
+      <token>menuSettings</token>, <token>autoRepeaterSettings</token>, <token>dmrSettings</token>, 
+      <token>roamingSettings</token>, <token>gpsSettings</token>, 
+      <token>simplexRepeaterSettings</token></term>
     <listitem>
       <para>
         Many more funny settings, grouped by domain. For details, see the descriptions below.
@@ -298,6 +264,44 @@
 </variablelist>
 </section>
 
+<section>
+<info><title>Power-save settings</title></info>
+<para>
+  Collects some settings, that configure the power-save features. These settings are collected under
+  the <token>powerSaveSettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+
+<variablelist>
+  <title>Power-save setting extension fields</title>
+  <varlistentry>
+    <term><token>autoShutdown</token></term>
+    <listitem>
+      <para> Specifies the time-out for the automatic shut down. If <token>0</token>, the automatic 
+      shut-down is disabled. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>resetAutoShutdownOnCall</token></term>
+    <listitem>
+      <para>If <token>true</token>, the automatic showdown timer is reset on every call.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSave</token></term>
+    <listitem>
+      <para>Specifies the power-save mode. Must be one of <token>Off</token>, <token>Save50</token>
+      or <token>Save66</token>. The latter two will save 50% or 66%, respectively.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>atpc</token></term>
+    <listitem>
+      <para>Enables the ATPC (Adaptive Transmission Power Control). It reduces the transmission 
+      power, if a strong signal is received.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 
 <section>
 <info><title>Keypad settings</title></info>
@@ -708,13 +712,21 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>funcKeyCShort</token>, <token>funcKeyCLong</token>, <token>funcKeyDShort</token>, 
-    <token>funcKeyDLong</token></term>
+    <term><token>funcKeyCShort</token>, <token>funcKeyCLong</token></term>
     <listitem>
       <para>
-        Specifies the function associated with the programmable function keys <keycap>C</keycap> 
-        &amp; <keycap>D</keycap>. This button is located on the hand microphone 
-        (<productname>AT-D578UV</productname>).
+        Specifies the function associated with the programmable function key <keycap>PF3</keycap> or 
+        <keycap>C</keycap>. THis button is the colorful one on the top (on handheld radios) or 
+        labled <keycap>C</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyDShort</token>, <token>funcKeyDLong</token></term>
+    <listitem>
+      <para>
+        Specifies the function associated with the programmable function key <keycap>D</keycap>. 
+        This button is located on the hand microphone (<productname>AT-D578UV</productname> only).
       </para>
     </listitem>
   </varlistentry>
@@ -788,15 +800,20 @@
     <listitem><para>Enables the DMR reset tone. See also <token>resetMelody</token>.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>idle</token></term>
-    <listitem><para>Enables the idle tone. See also <token>idleMelody</token>.</para></listitem>
+    <term><token>dmrIdle</token>, <token>fmIdle</token></term>
+    <listitem><para>Enables the idle tone (for DMR and FM channels). See also <token>idleMelody</token>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>startup</token></term>
     <listitem><para>Enables a startup tone.</para></listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>callMelody</token>, <token>idleMelody</token>, <token>resetMelody</token></term>
+    <term><token>tot</token></term>
+    <listitem><para>Transmit time-out warning tone.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callMelody</token>, <token>idleMelody</token>, <token>resetMelody</token>, 
+      <token>callEndMelody</token></term>
     <listitem><para>Specifies the melody played on each of these occasions. These melodies can 
     contain up to 5 notes (and pauses). For the sake of simplicity, qdmr supports the LilyPond 
     musical notation for these melodies. E.g., <code>a8 b e2 des4 d</code>. </para></listitem>
@@ -833,9 +850,23 @@
     </listitem>
   </varlistentry>
   <varlistentry>
+    <term><token>customChannelBackground</token></term>
+    <listitem>
+      <para>If <token>true</token>, the custom channel background is enabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
     <term><token>volumeChangePrompt</token>, <token>callEndPrompt</token></term>
     <listitem>
       <para>If <token>true</token> the volume change and call-end prompts are shown.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>showClock</token>, <token>showCall</token>, <token>showContact</token>,
+      <token>showChannelNumber</token>, <token>showColorCode</token>, <token>showTimeSlot</token>,
+      <token>showChannelType</token>, <token>showLastHeard</token></term>
+    <listitem>
+      <para>Enables/disables various display elements.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -846,47 +877,12 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>showClock</token></term>
-    <listitem>
-      <para>If <token>true</token>, the clock is shown.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>showCall</token></term>
-    <listitem>
-      <para>If <token>true</token>, the call is shown.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>callColor</token></term>
     <listitem>
       <para>Specifies the call color. Must be one of <token>White</token>, <token>Black</token>, 
       <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, <token>Green</token>, 
       <token>Turquoise</token>, <token>Blue</token>. Please note, that not all devices allow for 
       all colors. Especially the <productname>AT-D868UV</productname> has only limited colors.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>language</token></term>
-    <listitem>
-      <para>Specifies the UI language. Must be one of <token>English</token> or 
-      <token>German</token>. Applicable to <productname>AT-D878UV</productname>, 
-      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
-      <productname>DMR-6X2UV</productname>.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>showChannelNumber</token></term>
-    <listitem>
-      <para>If <token>true</token>, the channel number is shown. Applicable to 
-      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and 
-      <productname>AT-D578UV</productname>.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>showContact</token></term>
-    <listitem>
-      <para>If <token>true</token> the current transmit contact is shown.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -901,19 +897,39 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>showLastHeard</token></term>
-    <listitem>
-      <para>If <token>true</token>, the last heard contact is shown.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>channelNameColor</token></term>
+    <term><token>channelNameColor</token>, <token>channelBNameColor</token></term>
     <listitem>
       <para>Specifies the color of the channel name. Must be one of <token>White</token>, 
       <token>Black</token>, <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, 
       <token>Green</token>, <token>Turquoise</token>, <token>Blue</token>. Please note, that not all
       devices allow for all colors. Applicable to <productname>AT-D878UV</productname>, 
       <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>zoneNameColor</token>, <token>zoneBNameColor</token></term>
+    <listitem>
+      <para>Specifies the color of the channel name. Must be one of <token>White</token>, 
+      <token>Black</token>, <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, 
+      <token>Green</token>, <token>Turquoise</token>, <token>Blue</token>. Please note, that not all
+      devices allow for all colors. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>language</token></term>
+    <listitem>
+      <para>Specifies the UI language. Must be one of <token>English</token> or 
+      <token>German</token>. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dateFormat</token></term>
+    <listitem>
+      <para>Specifies the date format. Must be one of <token>YearFirst</token> (i.e., yyyy/mm/dd) or 
+        <token>DayFirst</token> (i.e., dd/mm/yyyy). Obviously, they got everything covered.</para>
     </listitem>
   </varlistentry>
 </variablelist>
@@ -1143,11 +1159,18 @@
 
 <variablelist>
 <varlistentry>
-  <term><token>groupCallHangTime</token>, <token>privateCallHangTime</token></term>
+  <term><token>groupCallHangTime</token>, <token>privateCallHangTime</token>, 
+    <token>manualGroupCallHangTime</token>, <token>manualPrivateCallHangTime</token></term>
   <listitem>
     <para>Specifies the group and private call hang time. That is, the time, within you could answer 
     a call by pressing the PTT, even if the group or private call is not the default transmit 
     contact of the channel.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>preWaveDelay</token>, <token>wakeHeadPeriod</token></term>
+  <listitem>
+    <para>Don't touch. Should both be 100ms.</para>
   </listitem>
 </varlistentry>
 <varlistentry>
@@ -1191,9 +1214,23 @@
   </listitem>
 </varlistentry>
 <varlistentry>
-  <term><token>preWaveDelay</token>, <token>wakeHeadPeriod</token></term>
+  <term><token>sendTalkerAlias</token></term>
   <listitem>
-    <para>Don't touch. Should both be 100ms.</para>
+    <para>If enabled, sends the radio name as talker alias over the air.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>takerAliasSource</token></term>
+  <listitem>
+    <para>Specifies the source for the talker alias display. Must be one of <token>Off</token>, 
+      <token>UserDB</token> or <token>Air</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>talkerAliasEncoding</token></term>
+  <listitem>
+    <para>Specifies the encoding of the taker alias. Must be one of <token>ISO8</token>,
+      <token>ISO7</token> or <token>Unicode</token>. </para>
   </listitem>
 </varlistentry>
 </variablelist>
@@ -1202,7 +1239,7 @@
 <section>
 <info><title>GPS settings</title></info>
 <para>
-  This section collects settings concerning GPS position reporting and ranging. These settings are 
+  This section collects settings concerning GPS position reporting. These settings are 
   collected under the <token>gpsSettings</token> key within the <token>anytoneSettings</token> entry. 
 </para>
 
@@ -1225,7 +1262,7 @@
 <varlistentry>
   <term><token>reportPosition</token></term>
   <listitem>
-    <para>If <token>true</token>, GPS position reporting and ranging is enabled.</para>
+    <para>If <token>true</token>, GPS position reporting is enabled.</para>
   </listitem>
 </varlistentry>
 <varlistentry>
@@ -1235,17 +1272,31 @@
     here. E.g., <code>5 min</code> or <code>360 s</code>.</para>
   </listitem>
 </varlistentry>
+<varlistentry>
+  <term><token>mode</token></term>
+  <listitem>
+    <para>Specifies the GPS mode. Must be one of <token>GPS</token>, <token>Beidou</token> or 
+    <token>Both</token>.</para>
+  </listitem>
+</varlistentry>
 </variablelist>
 </section>
 
 <section>
-<info><title>Ranging/Roaming settings</title></info>
+<info><title>Roaming settings</title></info>
 <para>
-  This section collects settings concerning the GPS raging and roaming. These settings are collected 
-  under the <token>rangingSettings</token> key within the <token>anytoneSettings</token> entry. 
+  This section collects settings concerning the roaming. These settings are collected 
+  under the <token>roamingSettings</token> key within the <token>anytoneSettings</token> entry. 
 </para>
 
 <variablelist>
+<varlistentry>
+  <term><token>autoRoam</token></term>
+  <listitem>
+    <para>If <token>true</token>, the auto-roaming is enabled. If <token>false</token>, the roaming
+    must be started manually.</para>
+  </listitem>
+</varlistentry>
 <varlistentry>
   <term><token>autoRoamPeriod</token></term>
   <listitem>
@@ -1258,6 +1309,13 @@
   <listitem>
     <para>Specifies some additional delay in seconds before the auto-roaming is started. Any 
     interval specification is valid here like <code>60 s</code> or <code>1 min</code>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>roamStart</token>,<token>roamReturn</token></term>
+  <listitem>
+    <para>Specifies the roaming start/end condition. Must be one of <token>Periodic</token> or 
+    <token>OutOfRange</token>.</para>
   </listitem>
 </varlistentry>
 <varlistentry>
@@ -1280,10 +1338,10 @@
   </listitem>
 </varlistentry>
 <varlistentry>
-  <term><token>roamStart</token>,<token>roamReturn</token></term>
+  <term><token>outOfRangeAlert</token></term>
   <listitem>
-    <para>Specifies the roaming start/end condition. Must be one of <token>Periodic</token> or 
-    <token>OutOfRange</token>.</para>
+    <para>Specifies the alert type for the out-of-range notification. Must be one of 
+    <token>Off</token>, <token>Bell</token> or <token>Voice</token></para>
   </listitem>
 </varlistentry>
 <varlistentry>
@@ -1298,6 +1356,43 @@
     <para>The number of repeater check notifications.</para>
   </listitem>
 </varlistentry>
+<varlistentry>
+  <term><token>defaultZone</token></term>
+  <listitem>
+    <para>Specifies the default roaming zone. Must be a roaming zone ID or 
+    <token>null</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>gpsRoaming</token></term>
+  <listitem>
+    <para>If <token>true</token>, GPS based roaming is enabled.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Bluetooth settings</title></info>
+<para>
+  This section collects settings concerning bluetooth feature. These settings are 
+  collected under the <token>bluetoothSettings</token> key within the 
+  <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>pttLatch</token></term>
+    <listitem>
+      <para>If <token>true</token>, the bluetooth PTT button latches.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>pttSleepTimer</token></term>
+    <listitem>
+      <para>Specifies the timeout for the sleep mode of the bluetooth PTT button.</para>
+    </listitem>
+  </varlistentry>
 </variablelist>
 </section>
 

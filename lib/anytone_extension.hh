@@ -308,8 +308,11 @@ class AnytoneBootSettingsExtension: public ConfigItem
   Q_PROPERTY(ZoneReference* priorityZoneA READ priorityZoneA)
   /** The priority zone for VFO B. */
   Q_PROPERTY(ZoneReference* priorityZoneB READ priorityZoneB)
+
   /** Enables the GPS check. */
   Q_PROPERTY(bool gpsCheck READ gpsCheckEnabled WRITE enableGPSCheck)
+  /** Enables the MCU reset on boot. */
+  Q_PROPERTY(bool reset READ resetEnabled WRITE enableReset)
 
 public:
   /** What to display during boot. */
@@ -390,7 +393,7 @@ class AnytonePowerSaveSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("autoShutDownDelayDescription", "The auto shut-down delay in minutes.")
   /** The auto shut-down delay in minutes. */
-  Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+  Q_PROPERTY(Interval autoShutdown READ autoShutdown WRITE setAutoShutdown)
 
   /** Resets the auto shut-down timer on every call. */
   Q_PROPERTY(bool resetAutoShutdownOnCall READ resetAutoShutdownOnCall WRITE enableResetAutoShutdownOnCall)
@@ -417,9 +420,9 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the auto shut-down delay in minutes. */
-  Interval autoShutDownDelay() const;
+  Interval autoShutdown() const;
   /** Sets the auto shut-down delay. */
-  void setAutoShutDownDelay(Interval min);
+  void setAutoShutdown(Interval min);
 
   /** Returns @c true, if the auto shut-down timer is reset on every call. */
   bool resetAutoShutdownOnCall() const;
@@ -494,6 +497,7 @@ class AnytoneKeySettingsExtension: public ConfigItem
   Q_PROPERTY(KeyFunction funcKeyDLong READ funcKeyDLong WRITE setFuncKeyDLong)
   /** The long press duration in ms. */
   Q_PROPERTY(Interval longPressDuration READ longPressDuration WRITE setLongPressDuration)
+
   /** The auto key-lock property. */
   Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
 
@@ -708,13 +712,13 @@ class AnytoneToneSettingsExtension: public ConfigItem
   /** If @c true, the DMR talk permit tone is enabled. */
   Q_PROPERTY(bool dmrTalkPermit READ talkPermitDigitalEnabled WRITE enableTalkPermitDigital)
 
-  Q_CLASSINFO("fmTalkPermitDescription", "Enables/disables the talk-permit tone for FM channels.")
-  /** If @c true, the FM talk permit tone is enabled. */
-  Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
-
   Q_CLASSINFO("dmrResetDescription", "Enables/disables the reset tone for DMR channels.")
   /** If @c true, the DMR reset tone is enabled. */
   Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
+
+  Q_CLASSINFO("fmTalkPermitDescription", "Enables/disables the talk-permit tone for FM channels.")
+  /** If @c true, the FM talk permit tone is enabled. */
+  Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
 
   /** If @c true, the idle tone is enabled for DMR channels. */
   Q_PROPERTY(bool dmrIdle READ dmrIdleChannelToneEnabled WRITE enableDMRIdleChannelTone)
@@ -1091,18 +1095,23 @@ class AnytoneAudioSettingsExtension: public ConfigItem
 
   /** The VOX delay in ms. */
   Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
-  /** If @c true, recording is enabled. */
-  Q_PROPERTY(bool recording READ recordingEnabled WRITE enableRecording)
   /** The VOX source. */
   Q_PROPERTY(VoxSource voxSource READ voxSource WRITE setVOXSource)
+
+  /** If @c true, recording is enabled. */
+  Q_PROPERTY(bool recording READ recordingEnabled WRITE enableRecording)
+
+  /** If @c true, the audio is "enhanced". */
+  Q_PROPERTY(bool enhance READ enhanceAudioEnabled WRITE enableEnhanceAudio)
+
+  /** The mute delay in minutes. */
+  Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
+
   /** The maximum volume setting [0-10]. */
   Q_PROPERTY(unsigned int maxVolume READ maxVolume WRITE setMaxVolume)
   /** The maximum head-phone volume setting [0-10]. */
   Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
-  /** If @c true, the audio is "enhanced". */
-  Q_PROPERTY(bool enhance READ enhanceAudioEnabled WRITE enableEnhanceAudio)
-  /** The mute delay in minutes. */
-  Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
+
   /** Enables the separate FM mic gain. If disabled, the DMR mic gain setting is used for FM too. */
   Q_PROPERTY(bool enableFMMicGain READ fmMicGainEnabled WRITE enableFMMicGain)
   /** The FM mic gain [1,10]. */
@@ -1126,15 +1135,15 @@ public:
   /** Sets the VOX delay in ms. */
   void setVOXDelay(Interval ms);
 
-  /** Returns @c true if recording is enabled. */
-  bool recordingEnabled() const;
-  /** Enables/disables recording. */
-  void enableRecording(bool enable);
-
   /** Returns the VOX source. */
   VoxSource voxSource() const;
   /** Sets the VOX source. */
   void setVOXSource(VoxSource source);
+
+  /** Returns @c true if recording is enabled. */
+  bool recordingEnabled() const;
+  /** Enables/disables recording. */
+  void enableRecording(bool enable);
 
   /** Returns the maximum volume setting [0-10]. */
   unsigned int maxVolume() const;
@@ -1529,7 +1538,7 @@ public:
 
   /** Talker alias display preference. */
   enum class TalkerAliasSource {
-    Off = 0, Conctact = 1, Air = 2
+    Off = 0, UserDB = 1, Air = 2
   };
   Q_ENUM(TalkerAliasSource)
 
@@ -1680,7 +1689,7 @@ public:
 
   /** Possible GPS modes. */
   enum class GPSMode {
-    GPS=0, BDS=1, Both=2
+    GPS=0, Beidou=1, Both=2
   };
   Q_ENUM(GPSMode)
 
@@ -1738,6 +1747,9 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("Description", "Collects all ranging/roaming settings for AnyTone devices.")
 
+  /** Enables auto-roaming. */
+  Q_PROPERTY(bool autoRoam READ autoRoam WRITE enableAutoRoam)
+
   Q_CLASSINFO("autoRoamPeriodDescription", "Specifies the auto-roaming period in minutes.")
   /** The auto-roaming period in minutes. */
   Q_PROPERTY(Interval autoRoamPeriod READ autoRoamPeriod WRITE setAutoRoamPeriod)
@@ -1745,6 +1757,14 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   Q_CLASSINFO("autoRoamDelayDescription", "A delay in seconds before starting the auto-roaming.")
   /** The auto-roam delay. */
   Q_PROPERTY(Interval autoRoamDelay READ autoRoamDelay WRITE setAutoRoamDelay)
+
+  Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
+  /** Auto-roaming start condition. */
+  Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
+
+  Q_CLASSINFO("roamReturn", "Condition to return to the original repeater.")
+  /** Auto-roaming end/return condition. */
+  Q_PROPERTY(RoamStart roamReturn READ roamingReturnCondition WRITE setRoamingReturnCondition)
 
   Q_CLASSINFO("rangeCheckDescription", "Repeater range check.")
   /** Repeater range check. */
@@ -1760,14 +1780,6 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
 
   /** Repeater out-of-range alert type. */
   Q_PROPERTY(OutOfRangeAlert outOfRangeAlert READ outOfRangeAlert WRITE setOutOfRangeAlert)
-
-  Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
-  /** Auto-roaming start condition. */
-  Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
-
-  Q_CLASSINFO("roamReturn", "Condition to return to the original repeater.")
-  /** Auto-roaming end/return condition. */
-  Q_PROPERTY(RoamStart roamReturn READ roamingReturnCondition WRITE setRoamingReturnCondition)
 
   Q_CLASSINFO("notificationDescription", "Enables the repeater-check notification.")
   /** Repeater-check notification. */

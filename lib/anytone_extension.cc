@@ -328,7 +328,7 @@ AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
     _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
     _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
     _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola), _sendTalkerAlias(false),
-    _talkerAliasSource(TalkerAliasSource::Conctact), _talkerAliasEncoding(TalkerAliasEncoding::ISO7),
+    _talkerAliasSource(TalkerAliasSource::UserDB), _talkerAliasEncoding(TalkerAliasEncoding::ISO7),
     _encryption(EncryptionType::DMR)
 {
   // pass...
@@ -1284,11 +1284,11 @@ AnytonePowerSaveSettingsExtension::clone() const {
 }
 
 Interval
-AnytonePowerSaveSettingsExtension::autoShutDownDelay() const {
+AnytonePowerSaveSettingsExtension::autoShutdown() const {
   return _autoShutDownDelay;
 }
 void
-AnytonePowerSaveSettingsExtension::setAutoShutDownDelay(Interval intv) {
+AnytonePowerSaveSettingsExtension::setAutoShutdown(Interval intv) {
   if (_autoShutDownDelay == intv)
     return;
   _autoShutDownDelay = intv;

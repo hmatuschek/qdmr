@@ -1722,7 +1722,7 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Handle extensions
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
-    setAutoShutdownDelay(ext->powerSaveSettings()->autoShutDownDelay());
+    setAutoShutdownDelay(ext->powerSaveSettings()->autoShutdown());
     setVFOScanType(ext->vfoScanType());
     enableVFOModeA(AnytoneSettingsExtension::VFOMode::VFO == ext->modeA());
     enableVFOModeB(AnytoneSettingsExtension::VFOMode::VFO == ext->modeB());
@@ -1860,7 +1860,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   else
     ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
 
-  ext->powerSaveSettings()->setAutoShutDownDelay(autoShutdownDelay());
+  ext->powerSaveSettings()->setAutoShutdown(autoShutdownDelay());
   ext->setVFOScanType(vfoScanType());
   ext->setModeA(vfoModeA() ? AnytoneSettingsExtension::VFOMode::VFO
                            : AnytoneSettingsExtension::VFOMode::Memory);
