@@ -16,6 +16,68 @@ class AnytoneCodeplug : public Codeplug
   Q_OBJECT
 
 public:
+  /** Represents the base class for bitmaps in all AnyTone codeplugs. */
+  class BitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+  /** Represents the base class for inverted bitmaps in all AnyTone codeplugs. */
+  class InvertedBitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+  /** Represents the base class for inverted bytemaps in all AnyTone codeplugs.
+   * This is obviously a result of a lazy firmware developer. There is already some code in the
+   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewere. It is
+   * inverted, because reased flash memory is usually initialized with 0xff. However, the AnyTone
+   * memory gets erased to 0x00. So the inversion is not necessary. Someone really took pride in
+   * his/her work and consequently, I need to implement some BS elements more. */
+  class InvertedBytemapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
   /** Represents the base class for channel encodings in all AnyTone codeplugs.
    *
    * Memory layout of encoded channel (0x40 bytes):
@@ -81,6 +143,9 @@ public:
     ChannelElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
 
     /** Resets the channel. */
     void clear();
@@ -309,6 +374,21 @@ public:
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
   };
 
+  /** Represents the channel bitmaps in all AnyTone codeplugs. */
+  class ChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ChannelBitmapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+  };
+
   /** Represents the base class for conacts in all AnyTone codeplugs.
    *
    * Memory layout of encoded contact (0x64 bytes):
@@ -325,6 +405,9 @@ public:
     explicit ContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ContactElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0064; }
 
     /** Resets the contact element. */
     void clear();
@@ -357,19 +440,27 @@ public:
     virtual bool fromContactObj(const DMRContact *contact, Context &ctx);
   };
 
+  /** Represents the contact bitmaps in all AnyTone codeplugs. */
+  class ContactBitmapElement: public InvertedBitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ContactBitmapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0500; }
+  };
+
   /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
    *
    * Encoding of the DTMF contact (0x30 bytes):
    * @verbinclude anytone_dtmfcontact.txt */
   class DTMFContactElement: public Element
   {
-    enum Offsets {
-      DIGITS = 0x0,
-      DIGIT_COUNT = 0x7,
-      NAME = DIGIT_COUNT + 1
-    };
-    static const unsigned NAME_LEN = 15;
-
   protected:
     /** Hidden constructor. */
     DTMFContactElement(uint8_t *ptr, unsigned size);
@@ -379,6 +470,9 @@ public:
     explicit DTMFContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~DTMFContactElement();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0018; }
 
     /** Resets the contact element. */
     void clear();
@@ -397,6 +491,38 @@ public:
     virtual DTMFContact *toContact() const;
     /** Encodes an DTMF contact from the given one. */
     virtual bool fromContact(const DTMFContact *contact);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int digitCount() { return 14; }       ///< The max number of digits.
+      static constexpr unsigned int nameLength() { return 15; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Internal used offsets within the codeplug. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int digits()    { return 0x0000; }
+      static constexpr unsigned int numDigits() { return 0x0007; }
+      static constexpr unsigned int name()      { return 0x0008; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the DTMF contact byte map, indicating which contacts are valid. */
+  class DTMFContactBytemapElement: public InvertedBytemapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFContactBytemapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
   };
 
   /** Represents the base class for group lists in all AnyTone codeplugs.
@@ -412,6 +538,9 @@ public:
   public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0120; }
 
     /** Clears the group list. */
     void clear();
@@ -441,6 +570,21 @@ public:
     virtual bool linkGroupList(RXGroupList *lst, Context &ctx) const;
     /** Constructs this group list from the given @c RXGroupList. */
     virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
+  };
+
+  /** Represents the bitmap indicating which group list element is valid. */
+  class GroupListBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit GroupListBitmapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
   /** Represents the base class for scan lists in all AnyTone codeplugs.
@@ -477,6 +621,9 @@ public:
   public:
     /** Constructor. */
     ScanListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
 
     /** Resets the scan list. */
     void clear();
@@ -557,6 +704,21 @@ public:
     virtual bool fromScanListObj(ScanList *lst, Context &ctx);
   };
 
+  /** Represents the bitmap indicating which scanlist elements are valid. */
+  class ScanListBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00000020; }
+  };
+
   /** Represents the base class for radio IDs in all AnyTone codeplugs.
    *
    * Memory layout of encoded scanlist (0x20 bytes):
@@ -570,6 +732,9 @@ public:
   public:
     /** Constructor. */
     RadioIDElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Resets the radio ID. */
     void clear();
@@ -590,7 +755,24 @@ public:
     virtual DMRRadioID *toRadioID() const;
   };
 
-  /** Represents the base class for the settings element in all AnyTone codeplugs.
+  /** Represents the bitmap indicating which radio IDs are valid. */
+  class RadioIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RadioIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RadioIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+  /** Represents the base class for the settings elements in all AnyTone codeplugs.
+   * This class only implements those few settings, common to all devices and encoded the same way.
+   * It also defines all common settings as interaces.
    *
    * Memory layout of encoded general settings (0xd0 bytes):
    * @verbinclude anytone_generalsettings.txt
@@ -603,92 +785,19 @@ public:
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
 
-    /** What to display during boot. */
-    enum class BootDisplay {
-      Default = 0, CustomText = 1, CustomImage = 2
-    };
-
-    /** Possible power save modes. */
-    enum class PowerSave {
-      Off = 0, Save50 = 1, Save66 = 2
-    };
-
-    /** Encodes the possible VFO scan types. */
-    enum class VFOScanType {
-      TO = 0, CO = 1, SE = 2
-    };
-
-    /** All possible key functions. */
-    enum class KeyFunction {
-      Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
-      DigitalEncryption = 0x05, Call = 0x06, VOX = 0x07, VFOChannel = 0x08, SubPTT = 0x09,
-      Scan = 0x0a, FM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-      Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, MainChannelSwitch = 0x13, HotKey1 = 0x14,
-      HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
-      WorkAlone = 0x1a, NuisanceDelete = 0x1b, DigitalMonitor = 0x1c, SubChannelSwitch = 0x1d,
-      PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-      ChannelTypeSwitch = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
-      MaxVolume = 0x26, SlotSwitch = 0x27, APRSTypeSwitch = 0x28, ZoneSelect = 0x29,
-      TimedRoamingSet = 0x2a, APRSSet = 0x2b, MuteTimeing = 0x2c, CtcssDcsSet = 0x2d,
-      TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32
-    };
-
-    /** Source for the VOX. */
-    enum class VoxSource {
-      Internal = 0, External = 1, Both = 2
-    };
-
-    /** Encodes the auto-repeater offset sign. */
-    enum class AutoRepDir {
-      Off = 0,       ///< Disabled.
-      Positive = 1,  ///< Positive frequency offset.
-      Negative = 2   ///< Negative frequency offset.
-    };
-
-    /** What to show from the last caller. */
-    enum class LastCallerDisplayMode {
-      Off = 0, ID = 1, Call = 2, Both = 3
-    };
-
-    /** Represents a configurable ring tone melody. */
-    struct Melody {
-      /** Represents a note of the melody. */
-      struct Note {
-        unsigned frequency; ///< Tone frequency in Hz.
-        unsigned duration;  ///< Tone duration in ms.
-      };
-
-      /** Holds the 5 notes of the melody. */
-      Note notes[5];
-
-      /** Empty constructor. */
-      Melody();
-      /** Copy constructor. */
-      Melody(const Melody &other);
-      /** Assignment operator. */
-      Melody &operator =(const Melody &other);
-    };
-
-    /** Possible display colors. */
-    enum class Color {
-      Black = 0, Red = 1
-    };
-
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constructor. */
-    explicit GeneralSettingsElement(uint8_t *ptr);
-
     /** Resets the general settings. */
     void clear();
 
-    /** Returns @c true if the key tone is enabled. */
-    virtual bool keyTone() const;
-    /** Enables/disables the key tone. */
-    virtual void enableKeyTone(bool enable);
+    /** Returns @c true, if the key tone is enabled. */
+    virtual bool keyToneEnabled() const = 0;
+    /** Enables/disables the key-tone. */
+    virtual void enableKeyTone(bool enable) = 0;
+
     /** Returns @c true if the radio displays frequecies instead of channels is enabled. */
     virtual bool displayFrequency() const;
     /** Enables/disables the frequency display. */
@@ -698,13 +807,13 @@ public:
     /** Enables/disables auto key-lock. */
     virtual void enableAutoKeyLock(bool enable);
     /** Returns the auto-shutdown delay in minutes. */
-    virtual unsigned autoShutdownDelay() const;
+    virtual Interval autoShutdownDelay() const;
     /** Sets the auto-shutdown delay in minutes. */
-    virtual void setAutoShutdownDelay(unsigned min);
+    virtual void setAutoShutdownDelay(Interval min);
     /** Returns the boot display mode. */
-    virtual BootDisplay bootDisplay() const;
+    virtual AnytoneBootSettingsExtension::BootDisplay bootDisplay() const;
     /** Sets the boot display mode. */
-    virtual void setBootDisplay(BootDisplay mode);
+    virtual void setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode);
     /** Returns @c true if boot password is enabled. */
     virtual bool bootPassword() const;
     /** Enables/disables boot password. */
@@ -717,254 +826,401 @@ public:
     virtual unsigned squelchLevelB() const;
     /** Returns the squelch level for VFO B, (0=off). */
     virtual void setSquelchLevelB(unsigned level);
-    /** Returns the power-save mode. */
-    virtual PowerSave powerSave() const;
-    /** Sets the power-save mode. */
-    virtual void setPowerSave(PowerSave mode);
-    /** Returns the VOX level. */
-    virtual unsigned voxLevel() const;
-    /** Sets the VOX level. */
-    virtual void setVOXLevel(unsigned level);
-    /** Returns the VOX delay in ms. */
-    virtual unsigned voxDelay() const;
-    /** Sets the VOX delay in ms. */
-    virtual void setVOXDelay(unsigned ms);
+
     /** Returns the VFO scan type. */
-    virtual VFOScanType vfoScanType() const;
+    virtual AnytoneSettingsExtension::VFOScanType vfoScanType() const = 0;
     /** Sets the VFO scan type. */
-    virtual void setVFOScanType(VFOScanType type);
+    virtual void setVFOScanType(AnytoneSettingsExtension::VFOScanType type) = 0;
     /** Returns the mirophone gain. */
-    virtual unsigned micGain() const;
+    virtual unsigned dmrMicGain() const = 0;
     /** Sets the microphone gain. */
-    virtual void setMICGain(unsigned gain);
+    virtual void setDMRMicGain(unsigned int gain) = 0;
 
-    /** Returns the key function for a short press on the programmable function key 1. */
-    virtual KeyFunction progFuncKey1Short() const;
-    /** Sets the key function for a short press on the programmable function key 1. */
-    virtual void setProgFuncKey1Short(KeyFunction func);
-    /** Returns the key function for a short press on the programmable function key 2. */
-    virtual KeyFunction progFuncKey2Short() const;
-    /** Sets the key function for a short press on the programmable function key 2. */
-    virtual void setProgFuncKey2Short(KeyFunction func);
-    /** Returns the key function for a short press on the programmable function key 3. */
-    virtual KeyFunction progFuncKey3Short() const;
-    /** Sets the key function for a short press on the programmable function key 3. */
-    virtual void setProgFuncKey3Short(KeyFunction func);
+    /** Returns the key function for a short press on the function key 1/A. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const = 0;
+    /** Sets the key function for a short press on the function key 1/A. */
+    virtual void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a short press on the function key 2/B. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const = 0;
+    /** Sets the key function for a short press on the function key 2/B. */
+    virtual void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a short press on the function key 3/C. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const = 0;
+    /** Sets the key function for a short press on the function key 3/C. */
+    virtual void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a short press on the function key 1. */
-    virtual KeyFunction funcKey1Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const = 0;
     /** Sets the key function for a short press on the function key 1. */
-    virtual void setFuncKey1Short(KeyFunction func);
+    virtual void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
     /** Returns the key function for a short press on the function key 2. */
-    virtual KeyFunction funcKey2Short() const;
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const = 0;
     /** Sets the key function for a short press on the function key 2. */
-    virtual void setFuncKey2Short(KeyFunction func);
-    /** Returns @c true if the VFO A is in VFO mode. */
-    virtual bool vfoModeA() const;
-    /** Enables/disables VFO mode for VFO A. */
-    virtual void enableVFOModeA(bool enable);
-    /** Returns @c true if the VFO B is in VFO mode. */
-    virtual bool vfoModeB() const;
-    /** Enables/disables VFO mode for VFO B. */
-    virtual void enableVFOModeB(bool enable);
-    /** Returns the memory zone for VFO A. */
-    virtual unsigned memoryZoneA() const;
-    /** Sets the memory zone for VFO A. */
-    virtual void setMemoryZoneA(unsigned zone);
+    virtual void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) = 0;
 
+    /** Returns the key function for a long press on the function key 1. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const = 0;
+    /** Sets the key function for a long press on the function key 1. */
+    virtual void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 2. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const = 0;
+    /** Sets the key function for a long press on the function key 2. */
+    virtual void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 3. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const = 0;
+    /** Sets the key function for a long press on the function key 3. */
+    virtual void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 1. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const = 0;
+    /** Sets the key function for a long press on the function key 1. */
+    virtual void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+    /** Returns the key function for a long press on the function key 2. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const = 0;
+    /** Sets the key function for a long press on the function key 2. */
+    virtual void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) = 0;
+
+    /** Returns the long-press duration in ms. */
+    virtual Interval longPressDuration() const = 0;
+    /** Sets the long-press duration in ms. */
+    virtual void setLongPressDuration(Interval ms) = 0;
+
+    /** Returns @c true if the knob is locked. */
+    virtual bool knobLock() const = 0;
+    /** Enables/disables the knob lock. */
+    virtual void enableKnobLock(bool enable) = 0;
+    /** Returns @c true if the keypad is locked. */
+    virtual bool keypadLock() const = 0;
+    /** Enables/disables the keypad lock. */
+    virtual void enableKeypadLock(bool enable) = 0;
+    /** Returns @c true if the sidekeys are locked. */
+    virtual bool sidekeysLock() const = 0;
+    /** Enables/disables the sidekeys lock. */
+    virtual void enableSidekeysLock(bool enable) = 0;
+    /** Returns @c true if the "professional" key is locked. */
+    virtual bool keyLockForced() const = 0;
+    /** Enables/disables the "professional" key lock. */
+    virtual void enableKeyLockForced(bool enable) = 0;
+
+  protected:
+    /** Maps the key function to the device specific function code. */
+    virtual uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const = 0;
+    /** Maps the device specific function code to the key function. */
+    virtual AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const = 0;
+
+  public:
+    /** Returns @c true if the VFO A is in VFO mode. */
+    virtual bool vfoModeA() const = 0;
+    /** Enables/disables VFO mode for VFO A. */
+    virtual void enableVFOModeA(bool enable) = 0;
+    /** Returns @c true if the VFO B is in VFO mode. */
+    virtual bool vfoModeB() const = 0;
+    /** Enables/disables VFO mode for VFO B. */
+    virtual void enableVFOModeB(bool enable) = 0;
+
+    /** Returns the memory zone for VFO A. */
+    virtual unsigned memoryZoneA() const = 0;
+    /** Sets the memory zone for VFO A. */
+    virtual void setMemoryZoneA(unsigned zone) = 0;
     /** Returns the memory zone for VFO B. */
-    virtual unsigned memoryZoneB() const;
+    virtual unsigned memoryZoneB() const = 0;
     /** Sets the memory zone for VFO B. */
-    virtual void setMemoryZoneB(unsigned zone);
+    virtual void setMemoryZoneB(unsigned zone) = 0;
+
     /** Returns @c true if recording is enabled. */
-    virtual bool recording() const;
+    virtual bool recording() const = 0;
     /** Enables/disables recording. */
-    virtual void enableRecording(bool enable);
+    virtual void enableRecording(bool enable) = 0;
+
     /** Returns the display brightness. */
-    virtual unsigned brightness() const;
+    virtual unsigned brightness() const = 0;
     /** Sets the display brightness. */
-    virtual void setBrightness(unsigned level);
-    /** Returns @c true if the backlight is always on. */
-    virtual bool backlightPermanent() const;
-    /** Returns the backlight duration in seconds. */
-    virtual unsigned backlightDuration() const;
-    /** Sets the backlight duration in seconds. */
-    virtual void setBacklightDuration(unsigned sec);
-    /** Sets the backlight to permanent (always on). */
-    virtual void enableBacklightPermanent();
+    virtual void setBrightness(unsigned level) = 0;
+
     /** Returns @c true if GPS is enabled. */
-    virtual bool gps() const;
+    virtual bool gps() const = 0;
     /** Enables/disables recording. */
-    virtual void enableGPS(bool enable);
+    virtual void enableGPS(bool enable) = 0;
     /** Returns @c true if SMS alert is enabled. */
-    virtual bool smsAlert() const;
+    virtual bool smsAlert() const = 0;
     /** Enables/disables SMS alert. */
-    virtual void enableSMSAlert(bool enable);
+    virtual void enableSMSAlert(bool enable) = 0;
     /** Returns @c true if the active channel is VFO B. */
-    virtual bool activeChannelB() const;
+    virtual bool activeChannelB() const = 0;
     /** Enables/disables VFO B as the active channel. */
-    virtual void enableActiveChannelB(bool enable);
+    virtual void enableActiveChannelB(bool enable) = 0;
     /** Returns @c true if sub channel is enabled. */
-    virtual bool subChannel() const;
+    virtual bool subChannel() const = 0;
     /** Enables/disables sub channel. */
-    virtual void enableSubChannel(bool enable);
+    virtual void enableSubChannel(bool enable) = 0;
     /** Returns @c true if call alert is enabled. */
-    virtual bool callAlert() const;
+    virtual bool callAlert() const = 0;
     /** Enables/disables call alert. */
-    virtual void enableCallAlert(bool enable);
+    virtual void enableCallAlert(bool enable) = 0;
 
     /** Returns the GPS time zone. */
-    virtual QTimeZone gpsTimeZone() const;
+    virtual QTimeZone gpsTimeZone() const = 0;
     /** Sets the GPS time zone. */
-    virtual void setGPSTimeZone(const QTimeZone &zone);
+    virtual void setGPSTimeZone(const QTimeZone &zone) = 0;
     /** Returns @c true if the talk permit tone is enabled for digital channels. */
-    virtual bool talkPermitDigital() const;
+    virtual bool dmrTalkPermit() const = 0;
     /** Returns @c true if the talk permit tone is enabled for digital channels. */
-    virtual bool talkPermitAnalog() const;
+    virtual bool fmTalkPermit() const = 0;
     /** Enables/disables the talk permit tone for digital channels. */
-    virtual void enableTalkPermitDigital(bool enable);
+    virtual void enableDMRTalkPermit(bool enable) = 0;
     /** Enables/disables the talk permit tone for analog channels. */
-    virtual void enableTalkPermitAnalog(bool enable);
+    virtual void enableFMTalkPermit(bool enable) = 0;
     /** Returns @c true if the reset tone is enabled for digital calls. */
-    virtual bool digitalResetTone() const;
+    virtual bool dmrResetTone() const = 0;
     /** Enables/disables the reset tone for digital calls. */
-    virtual void enableDigitalResetTone(bool enable);
-    /** Returns the VOX source. */
-    virtual VoxSource voxSource() const;
-    /** Sets the VOX source. */
-    virtual void setVOXSource(VoxSource source);
-    /** Returns @c true if the idle channel tone is enabled. */
-    virtual bool idleChannelTone() const;
-    /** Enables/disables the idle channel tone. */
-    virtual void enableIdleChannelTone(bool enable);
-    /** Returns the menu exit time in seconds. */
-    virtual unsigned menuExitTime() const;
-    /** Sets the menu exit time in seconds. */
-    virtual void setMenuExitTime(unsigned sec);
-    /** Returns @c true if the startup tone is enabled. */
-    virtual bool startupTone() const;
-    /** Enables/disables the startup tone. */
-    virtual void enableStartupTone(bool enable);
-    /** Returns @c true if the call-end prompt is enabled. */
-    virtual bool callEndPrompt() const;
-    /** Enables/disables the call-end prompt. */
-    virtual void enableCallEndPrompt(bool enable);
-    /** Returns the maximum volume. */
-    virtual unsigned maxVolume() const;
-    /** Sets the maximum volume. */
-    virtual void setMaxVolume(unsigned level);
-    /** Returns @c true if get GPS position is enabled. */
-    virtual bool getGPSPosition() const;
-    /** Enables/disables get GPS position. */
-    virtual void enableGetGPSPosition(bool enable);
+    virtual void enableDMRResetTone(bool enable) = 0;
 
-    /** Returns the key function for a long press on the programmable function key 1. */
-    virtual KeyFunction progFuncKey1Long() const;
-    /** Sets the key function for a long press on the programmable function key 1. */
-    virtual void setProgFuncKey1Long(KeyFunction func);
-    /** Returns the key function for a long press on the programmable function key 2. */
-    virtual KeyFunction progFuncKey2Long() const;
-    /** Sets the key function for a long press on the programmable function key 2. */
-    virtual void setProgFuncKey2Long(KeyFunction func);
-    /** Returns the key function for a long press on the programmable function key 3. */
-    virtual KeyFunction progFuncKey3Long() const;
-    /** Sets the key function for a long press on the programmable function key 3. */
-    virtual void setProgFuncKey3Long(KeyFunction func);
-    /** Returns the key function for a long press on the function key 1. */
-    virtual KeyFunction funcKey1Long() const;
-    /** Sets the key function for a long press on the function key 1. */
-    virtual void setFuncKey1Long(KeyFunction func);
-    /** Returns the key function for a long press on the function key 2. */
-    virtual KeyFunction funcKey2Long() const;
-    /** Sets the key function for a long press on the function key 2. */
-    virtual void setFuncKey2Long(KeyFunction func);
-    /** Returns the long-press duration in ms. */
-    virtual unsigned longPressDuration() const;
-    /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(unsigned ms);
+    /** Returns @c true if the idle channel tone is enabled. */
+    virtual bool idleChannelTone() const = 0;
+    /** Enables/disables the idle channel tone. */
+    virtual void enableIdleChannelTone(bool enable) = 0;
+    /** Returns the menu exit time in seconds. */
+    virtual Interval menuExitTime() const = 0;
+    /** Sets the menu exit time in seconds. */
+    virtual void setMenuExitTime(Interval intv) = 0;
+    /** Returns @c true if the startup tone is enabled. */
+    virtual bool startupTone() const = 0;
+    /** Enables/disables the startup tone. */
+    virtual void enableStartupTone(bool enable) = 0;
+    /** Returns @c true if the call-end prompt is enabled. */
+    virtual bool callEndPrompt() const = 0;
+    /** Enables/disables the call-end prompt. */
+    virtual void enableCallEndPrompt(bool enable) = 0;
+    /** Returns the maximum volume. */
+    virtual unsigned maxSpeakerVolume() const = 0;
+    /** Sets the maximum volume. */
+    virtual void setMaxSpeakerVolume(unsigned level) = 0;
+    /** Returns @c true if get GPS position is enabled. */
+    virtual bool getGPSPosition() const = 0;
+    /** Enables/disables get GPS position. */
+    virtual void enableGetGPSPosition(bool enable) = 0;
+
     /** Returns @c true if the volume change prompt is enabled. */
-    virtual bool volumeChangePrompt() const;
+    virtual bool volumeChangePrompt() const = 0;
     /** Enables/disables the volume change prompt. */
-    virtual void enableVolumeChangePrompt(bool enable);
+    virtual void enableVolumeChangePrompt(bool enable) = 0;
     /** Returns the auto repeater offset direction for VFO A. */
-    virtual AutoRepDir autoRepeaterDirectionA() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionA() const = 0;
     /** Sets the auto-repeater offset direction for VFO A. */
-    virtual void setAutoRepeaterDirectionA(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionA(AnytoneAutoRepeaterSettingsExtension::Direction dir) = 0;
     /** Returns the last-caller display mode. */
-    virtual LastCallerDisplayMode lastCallerDisplayMode() const;
+    virtual AnytoneDisplaySettingsExtension::LastCallerDisplayMode lastCallerDisplayMode() const = 0;
     /** Sets the last-caller display mode. */
-    virtual void setLastCallerDisplayMode(LastCallerDisplayMode mode);
+    virtual void setLastCallerDisplayMode(AnytoneDisplaySettingsExtension::LastCallerDisplayMode mode) = 0;
 
     /** Returns @c true if the clock is shown. */
-    virtual bool displayClock() const;
+    virtual bool displayClock() const = 0;
     /** Enables/disables clock display. */
-    virtual void enableDisplayClock(bool enable);
-    /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadphoneVolume() const;
-    /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(unsigned max);
+    virtual void enableDisplayClock(bool enable) = 0;
     /** Returns @c true if the audio is "enhanced". */
-    virtual bool enhanceAudio() const;
+    virtual bool enhanceAudio() const = 0;
     /** Enables/disables "enhanced" audio. */
-    virtual void enableEnhancedAudio(bool enable);
+    virtual void enableEnhancedAudio(bool enable) = 0;
     /** Returns the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual unsigned minVFOScanFrequencyUHF() const;
+    virtual Frequency minVFOScanFrequencyUHF() const = 0;
     /** Sets the minimum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMinVFOScanFrequencyUHF(unsigned hz);
+    virtual void setMinVFOScanFrequencyUHF(Frequency hz) = 0;
     /** Returns the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual unsigned maxVFOScanFrequencyUHF() const;
+    virtual Frequency maxVFOScanFrequencyUHF() const = 0;
     /** Sets the maximum VFO scan frequency for the UHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyUHF(unsigned hz);
+    virtual void setMaxVFOScanFrequencyUHF(Frequency hz) = 0;
 
     /** Returns the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual unsigned minVFOScanFrequencyVHF() const;
+    virtual Frequency minVFOScanFrequencyVHF() const = 0;
     /** Sets the minimum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMinVFOScanFrequencyVHF(unsigned hz);
+    virtual void setMinVFOScanFrequencyVHF(Frequency hz) = 0;
     /** Returns the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual unsigned maxVFOScanFrequencyVHF() const;
+    virtual Frequency maxVFOScanFrequencyVHF() const = 0;
     /** Sets the maximum VFO scan frequency for the VHF band in Hz. */
-    virtual void setMaxVFOScanFrequencyVHF(unsigned hz);
+    virtual void setMaxVFOScanFrequencyVHF(Frequency hz) = 0;
+
     /** Returns @c true if the auto-repeater offset frequency for UHF is set. */
-    virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const;
+    virtual bool hasAutoRepeaterOffsetFrequencyIndexUHF() const = 0;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual unsigned autoRepeaterOffsetFrequencyIndexUHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexUHF() const = 0;
     /** Sets the auto-repeater offset frequency index for UHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) = 0;
     /** Clears the auto-repeater offset frequency index for UHF. */
-    virtual void clearAutoRepeaterOffsetFrequencyIndexUHF();
+    virtual void clearAutoRepeaterOffsetFrequencyIndexUHF() = 0;
     /** Returns @c true if the auto-repeater offset frequency for VHF is set. */
-    virtual bool hasAutoRepeaterOffsetFrequencyIndexVHF() const;
+    virtual bool hasAutoRepeaterOffsetFrequencyIndexVHF() const = 0;
     /** Returns the auto-repeater offset frequency index for UHF. */
-    virtual unsigned autoRepeaterOffsetFrequencyIndexVHF() const;
+    virtual unsigned autoRepeaterOffsetFrequencyIndexVHF() const = 0;
     /** Sets the auto-repeater offset frequency index for VHF. */
-    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx);
+    virtual void setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) = 0;
     /** Clears the auto-repeater offset frequency index for VHF. */
-    virtual void clearAutoRepeaterOffsetFrequencyIndexVHF();
+    virtual void clearAutoRepeaterOffsetFrequencyIndexVHF() = 0;
+
+    /** Returns @c true if the current contact is shown. */
+    virtual bool showCurrentContact() const = 0;
+    /** Enables/disables display of current contact. */
+    virtual void enableShowCurrentContact(bool enable) = 0;
 
     /** Returns the call-tone melody. */
-    virtual Melody callToneMelody() const;
+    virtual void callToneMelody(Melody &melody) const = 0;
     /** Sets the call-tone melody. */
-    virtual void setCallToneMelody(const Melody &melody);
+    virtual void setCallToneMelody(const Melody &melody) = 0;
     /** Returns the idle-tone melody. */
-    virtual Melody idleToneMelody() const;
+    virtual void idleToneMelody(Melody &melody) const = 0;
     /** Sets the idle-tone melody. */
-    virtual void setIdleToneMelody(const Melody &melody);
+    virtual void setIdleToneMelody(const Melody &melody) = 0;
     /** Returns the reset-tone melody. */
-    virtual Melody resetToneMelody() const;
+    virtual void resetToneMelody(Melody &melody) const = 0;
     /** Sets the reset-tone melody. */
-    virtual void setResetToneMelody(const Melody &melody);
-    /** Returns the recording delay in ms. */
-    virtual unsigned recordingDelay() const;
-    /** Sets the recording delay in ms. */
-    virtual void setRecodringDelay(unsigned ms);
+    virtual void setResetToneMelody(const Melody &melody) = 0;
+
+    /** Returns @c true if the default boot channel is enabled. */
+    virtual bool defaultChannel() const = 0;
+    /** Enables/disables default boot channel. */
+    virtual void enableDefaultChannel(bool enable) = 0;
+    /** Returns the default zone index (0-based) for VFO A. */
+    virtual unsigned defaultZoneIndexA() const = 0;
+    /** Sets the default zone (0-based) for VFO A. */
+    virtual void setDefaultZoneIndexA(unsigned idx) = 0;
+    /** Returns the default zone index (0-based) for VFO B. */
+    virtual unsigned defaultZoneIndexB() const = 0;
+    /** Sets the default zone (0-based) for VFO B. */
+    virtual void setDefaultZoneIndexB(unsigned idx) = 0;
+    /** Returns @c true if the default channel for VFO A is VFO. */
+    virtual bool defaultChannelAIsVFO() const = 0;
+    /** Returns the default channel index for VFO A.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual unsigned defaultChannelAIndex() const = 0;
+    /** Sets the default channel index for VFO A. */
+    virtual void setDefaultChannelAIndex(unsigned idx) = 0;
+    /** Sets the default channel for VFO A to be VFO. */
+    virtual void setDefaultChannelAToVFO() = 0;
+    /** Returns @c true if the default channel for VFO B is VFO. */
+    virtual bool defaultChannelBIsVFO() const = 0;
+    /** Returns the default channel index for VFO B.
+     * Must be within default zone. If 0xff, default channel is VFO. */
+    virtual unsigned defaultChannelBIndex() const = 0;
+    /** Sets the default channel index for VFO B. */
+    virtual void setDefaultChannelBIndex(unsigned idx) = 0;
+    /** Sets the default channel for VFO B to be VFO. */
+    virtual void setDefaultChannelBToVFO() = 0;
+
     /** Returns @c true if the call is displayed instead of the name. */
-    virtual bool displayCall() const;
+    virtual bool displayCall() const = 0;
     /** Enables/disables call display. */
-    virtual void enableDisplayCall(bool enable);
+    virtual void enableDisplayCall(bool enable) = 0;
+
+    /** Returns the display color for callsigns. */
+    virtual AnytoneDisplaySettingsExtension::Color callDisplayColor() const = 0;
+    /** Sets the display color for callsigns. */
+    virtual void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) = 0;
+
+    /** Returns @c true if the GPS units are imperial. */
+    virtual bool gpsUnitsImperial() const = 0;
+    /** Enables/disables imperial GPS units. */
+    virtual void enableGPSUnitsImperial(bool enable) = 0;
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual Frequency autoRepeaterMinFrequencyVHF() const = 0;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz) = 0;
+    /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const = 0;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz) = 0;
+
+    /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual Frequency autoRepeaterMinFrequencyUHF() const = 0;
+    /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz) = 0;
+    /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const = 0;
+    /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz) = 0;
+    /** Returns the auto-repeater direction for VFO B. */
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const = 0;
+    /** Sets the auto-repeater direction for VFO B. */
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) = 0;
+
+    /** Returns @c true if the last heard is shown while pressing PTT. */
+    virtual bool showLastHeard() const = 0;
+    /** Enables/disables showing last heard. */
+    virtual void enableShowLastHeard(bool enable) = 0;
+
+    /** Returns @c true if the last caller is kept when changing channel. */
+    virtual bool keepLastCaller() const = 0;
+    /** Enables/disables keeping the last caller when changing the channel. */
+    virtual void enableKeepLastCaller(bool enable) = 0;
 
     /** Encodes the general settings. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
     /** Updates the abstract config from general settings. */
     virtual bool updateConfig(Context &ctx);
+    /** Links the general settings. */
+    virtual bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int displayMode()     { return 0x0001; }
+      static constexpr unsigned int autoKeyLock()     { return 0x0002; }
+      static constexpr unsigned int autoShutDown()    { return 0x0003; }
+      static constexpr unsigned int bootDisplay()     { return 0x0006; }
+      static constexpr unsigned int bootPassword()    { return 0x0007; }
+      static constexpr unsigned int squelchLevelA()   { return 0x0009; }
+      static constexpr unsigned int squelchLevelB()   { return 0x000a; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the base class for the extended settings element in many AnyTone codeplugs. That
+   *  is, every device after the D868UVE. It provides additional settings to the
+   *  @c AnytoneGeneralSettingsElement.
+   *
+   *  As these elements differ heavily from device to device, there is no common encoding. This
+   *  class only defines an interface to get/set common settings. */
+  class ExtendedSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ExtendedSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Returns @c true if the talker alias is send. */
+    virtual bool sendTalkerAlias() const = 0;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable) = 0;
+
+    /** Returns the talker alias source. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const = 0;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode) = 0;
+
+    /** Returns the talker alias encoding. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const = 0;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) = 0;
+
+    /** Returns the color of the channel name for VFO B. */
+    virtual AnytoneDisplaySettingsExtension::Color channelBNameColor() const = 0;
+    /** Sets the channel name color for the VFO B. */
+    virtual void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Returns the color of the zone name for VFO A. */
+    virtual AnytoneDisplaySettingsExtension::Color zoneANameColor() const = 0;
+    /** Sets the zone name color for the VFO A. */
+    virtual void setZoneANameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Returns the color of the zone name for VFO B. */
+    virtual AnytoneDisplaySettingsExtension::Color zoneBNameColor() const = 0;
+    /** Sets the zone name color for the VFO B. */
+    virtual void setZoneBNameColor(AnytoneDisplaySettingsExtension::Color) = 0;
+
+    /** Encodes the settings from the config. */
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Update config from settings. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Link config from settings extension. */
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Represents the base class for zone channel list for all AnyTone codeplugs.
@@ -981,6 +1237,9 @@ public:
   public:
     /** Constructor. */
     ZoneChannelListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0400; }
 
     /** Resets the zone channel list. */
     void clear();
@@ -1004,6 +1263,21 @@ public:
     virtual void clearChannelIndexB(unsigned n);
   };
 
+  /** Represents the bitmap indcating which zones are valid. */
+  class ZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
   /** Represents the base class of the boot settings for all AnyTone codeplug.
    *
    * Memory layout of encoded boot settings (size 0x0030):
@@ -1017,6 +1291,9 @@ public:
   public:
     /** Constructor. */
     BootSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the boot settings. */
     void clear();
@@ -1054,6 +1331,9 @@ public:
   public:
     /** Constructor. */
     explicit DMRAPRSSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the APRS settings. */
     void clear();
@@ -1134,6 +1414,91 @@ public:
     virtual bool linkGPSSystem(uint8_t i, Context &ctx);
   };
 
+  /** Represents the base class of a DMR APRS message for all AnyTone codeplugs. */
+  class DMRAPRSMessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMRAPRSMessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMRAPRSMessageElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
+    void clear();
+
+    /** Returns the message. */
+    virtual QString message() const;
+    /** Sets the message. */
+    void setMessage(const QString &message);
+
+    /** Encodes the message. */
+    virtual bool fromConfig(Codeplug::Flags flags, Context &ctx);
+    /** Decodes the message. */
+    virtual bool updateConfig(Context &ctx) const;
+
+  public:
+    /** Some limits for the message. */
+    struct Limit {
+      static constexpr unsigned int length() { return 32; }      ///< Maximum message length.
+    };
+
+  protected:
+    /** Some internal used offset. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int message() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the table of repeater offset frequencies.
+   *
+   * Memory representation of the offset frequency table (size 0x03F0 bytes):
+   * @verbinclude anytone_repeateroffsetfrequencies.txt */
+  class RepeaterOffsetListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    RepeaterOffsetListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit RepeaterOffsetListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x03f0; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th offset frequency is set. */
+    virtual bool isSet(unsigned int n) const;
+    /** Returns the n-th offset frequency. */
+    virtual Frequency offset(unsigned int n) const;
+    /** Sets the n-th offset frequency. */
+    virtual void setOffset(unsigned int n, Frequency freq);
+    /** Clears the n-th offset frequency. */
+    virtual void clearOffset(unsigned int n);
+
+  public:
+    /** Some limts for the offset frequency table. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 250; }      ///< Max number of entries in the table.
+    };
+
+  protected:
+    /** Some internal used offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int frequencies() { return 0x0000; }
+      static constexpr unsigned int betweenFrequencies() { return sizeof(uint32_t); }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class of prefabricated message linked list for all AnyTone codeplugs.
    * This element is some weird linked list that determines some order for the prefabricated
    * SMS messages.
@@ -1149,6 +1514,9 @@ public:
   public:
     /** Constructor. */
     explicit MessageListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
 
     /** Clears the message list item. */
     void clear();
@@ -1186,6 +1554,9 @@ public:
     /** Constructor. */
     MessageElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
     /** Resets the message. */
     void clear();
 
@@ -1193,6 +1564,21 @@ public:
     virtual QString message() const;
     /** Sets the message text. */
     virtual void setMessage(const QString &msg);
+  };
+
+  /** Represents the bytemap indicating which message is valid. */
+  class MessageBytemapElement: public InvertedBytemapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBytemapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageBytemapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
   };
 
   /** Represents base class of a analog quick call entry for all AnyTone codeplugs.
@@ -1218,6 +1604,9 @@ public:
     /** Constructor. */
     explicit AnalogQuickCallElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0002; }
+
     /** Resets the quick call entry. */
     void clear();
 
@@ -1234,6 +1623,100 @@ public:
     virtual void setContactIndex(unsigned idx);
     /** Clears the contact index. */
     virtual void clearContactIndex();
+  };
+
+  /** Implements the list of analog quick-call settings for all AnyTone codeplugs.
+   *
+   * Memory reresentation of the quick-call settings (size 0x0100 bytes):
+   * @verbinclude anytone_analogquickcalls.txt */
+  class AnalogQuickCallsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogQuickCallsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AnalogQuickCallsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    /** Clears the quick calls. */
+    void clear();
+
+    /** Returns a pointer to the n-th entry. */
+    uint8_t *quickCall(unsigned int n) const;
+
+  public:
+    /** Some limits for the quick calls. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 4; }   ///< The maximum number of quick-call entries.
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int quickCalls() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
+  /** Implements the list of status messages for all AnyTone codeplugs.
+   *
+   * Memory reresentation of the status messages (size 0x0400 bytes):
+   * @verbinclude anytone_statusmessages.txt */
+  class StatusMessagesElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    StatusMessagesElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    StatusMessagesElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0400; }
+
+    void clear();
+
+    /** Retunrs the n-th status message. */
+    virtual QString message(unsigned int n) const;
+    /** Sets the n-th status message. */
+    virtual void setMessage(unsigned int n, const QString &msg);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int numMessages()   { return 32; }    ///< Maximum number of messages.
+      static constexpr unsigned int messageLength() { return 32; }    ///< Maximum length of the messages.
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messages()        { return 0x0000; }
+      static constexpr unsigned int betweenMessages() { return 0x0020; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which status messages are valid. */
+  class StatusMessageBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    StatusMessageBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    StatusMessageBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents the base class of a hot-key setting entry for all AnyTone codeplugs.
@@ -1286,6 +1769,9 @@ public:
     /** Constructor. */
     explicit HotKeyElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
     /** Resets the hot-key entry. */
     void clear();
 
@@ -1336,6 +1822,46 @@ public:
     virtual void clearMessageIndex();
   };
 
+  /** Represents the list of hot-key settings for all AnyTone codeplugs.
+   *
+   * See @c HotKeyElement for encoding of each element.
+   *
+   *  Memory encoding of the hot-key settings (size 0x0360 bytes):
+   * @verbinclude anytone_hotkeysettings.txt */
+  class HotKeySettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    HotKeySettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HotKeySettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0360; }
+
+    void clear();
+
+    /** Returns a pointer to the n-th hot key setting. */
+    virtual uint8_t *hotKeySetting(unsigned int n) const;
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 18; }   ///< Maximum number of hot-key entries.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int hotKeySettings()        { return 0x0000; }
+      static constexpr unsigned int betweenHotKeySettings() { return HotKeySettingsElement::size(); }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class of alarm setting entry for all AnyTone codeplugs.
    *
    * Memory encoding of an alarm setting (size 0x0020 bytes):
@@ -1372,6 +1898,9 @@ public:
     public:
       /** Constructor. */
       AnalogAlarm(uint8_t *ptr);
+
+      /** Returns the size of the element. */
+      static constexpr unsigned int size() { return 0x000a; }
 
       /** Resets the alarm. */
       void clear();
@@ -1446,6 +1975,9 @@ public:
       /** Constructor. */
       explicit DigitalAlarm(uint8_t *ptr);
 
+      /** Returns the size of the element. */
+      static constexpr unsigned int size() { return 0x000c; }
+
       /** Resets the digital alarm settings. */
       void clear();
 
@@ -1512,6 +2044,9 @@ public:
     /** Constructor. */
     AlarmSettingElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Clears the alarm settings. */
     void clear();
 
@@ -1519,6 +2054,15 @@ public:
     virtual uint8_t *analog() const;
     /** Returns a pointer to the digital alarm settings. */
     virtual uint8_t *digital() const;
+
+  protected:
+    /** Internal offsets within the element */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int analog()  { return 0x0000; }
+      static constexpr unsigned int digital() { return 0x000a; }
+      /// @endcond
+    };
   };
 
   /** Represents the base class of digital alarm setting extension for all AnyTone codeplugs.
@@ -1535,6 +2079,9 @@ public:
     /** Constructor. */
     DigitalAlarmExtensionElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
     /** Clears the settings. */
     void clear();
 
@@ -1547,6 +2094,15 @@ public:
     virtual unsigned destination() const;
     /** Sets the destination DMR number. */
     virtual void setDestination(unsigned number);
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int callType()    { return 0x0000; }
+      static constexpr unsigned int destination() { return 0x0023; }
+      /// @endcond
+    };
   };
 
   /** Represents the base-class for 5Tone IDs for all AnyTone codeplugs.
@@ -1570,6 +2126,9 @@ public:
     /** Constructor. */
     FiveToneIDElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Clears the ID. */
     void clear();
 
@@ -1592,6 +2151,50 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+  };
+
+  /** Represents the bitmap indicating which five-tone IDs are valid. */
+  class FiveToneIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+  };
+
+  /** Represents the list of five-tone IDs.
+   *
+   * Memory encoding of the ID list (size 0x0c80 bytes):
+   * @verbinclude anytone_5toneidlist.txt */
+  class FiveToneIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0c80; }
+
+    void clear();
+
+    /** Returns a pointer to the n-th five-tone ID. */
+    virtual uint8_t *member(unsigned int n) const;
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 100; }   ///< Maximum number of entries.
+    };
   };
 
   /** Represents the base-class for 5Tone function for all AnyTone codeplugs.
@@ -1620,6 +2223,9 @@ public:
     /** Constructor. */
     explicit FiveToneFunctionElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Clears the function settings. */
     void clear();
 
@@ -1643,6 +2249,35 @@ public:
     virtual void setName(const QString &name);
   };
 
+  /** Represents the list of five-tone functions for all AnyTone codeplugs.
+   *
+   * Memory representation of the function list (size 0x0200 bytes):
+   * @verbinclude anytone_5tonefunctionlist.txt */
+  class FiveToneFunctionListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    FiveToneFunctionListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    FiveToneFunctionListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+
+    void clear();
+
+    /** Returns the pointer to the n-th function setting. */
+    virtual uint8_t *function(unsigned int n) const;
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numFunctions() { return 16; }     ///< The max number of functions.
+    };
+  };
+
   /** Represents the base-class for 5Tone settings for all AnyTone codeplugs.
    *
    * Memory encoding of the settings (size 0x0080 bytes):
@@ -1664,6 +2299,9 @@ public:
   public:
     /** Constructor. */
     FiveToneSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
 
     /** Resets the 5tone settings. */
     void clear();
@@ -1778,6 +2416,9 @@ public:
     /** Constructor. */
     TwoToneIDElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
     /** Resets the ID. */
     void clear();
 
@@ -1795,6 +2436,37 @@ public:
     virtual QString name() const;
     /** Sets the name of the function. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 7; }          ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstTone()  { return 0x0000; }
+      static constexpr unsigned int secondTone() { return 0x0002; }
+      static constexpr unsigned int name()       { return 0x0008; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the two-tone ID bitmap, indicating the which two-tone IDs are valid. */
+  class TwoToneIDBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneIDBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    TwoToneIDBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents the base-class for a 2-tone function for all AnyTone codeplugs.
@@ -1816,6 +2488,9 @@ public:
   public:
     /** Constructor. */
     TwoToneFunctionElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Resets the function. */
     void clear();
@@ -1839,6 +2514,38 @@ public:
     virtual QString name() const;
     /** Sets the name of the function. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits of the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 7; }      ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstTone()  { return 0x0000; }
+      static constexpr unsigned int secondTone() { return 0x0002; }
+      static constexpr unsigned int response()   { return 0x0004; }
+      static constexpr unsigned int name()       { return 0x0005; }
+      /// @endcond
+    };
+  };
+
+  /** Rerpesents the two-tone function bitmap, indicating which two-tone functions are valid. */
+  class TwoToneFunctionBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    TwoToneFunctionBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    TwoToneFunctionBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents the base class of 2-tone settings for all AnyTone codeplugs.
@@ -1854,6 +2561,9 @@ public:
   public:
     /** Constructor. */
     TwoToneSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
 
     /** Resets the settings. */
     void clear();
@@ -1908,6 +2618,9 @@ public:
   public:
     /** Constructor. */
     explicit DTMFSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0050; }
 
     /** Resets the settings. */
     void clear();
@@ -1993,6 +2706,199 @@ public:
     virtual void setRemoteStunID(const QString &id);
   };
 
+  /** Represents a list of DTMF IDs to be send.
+   *
+   * Memory encoding of the DTMF IDs (size 0x0100 bytes):
+   * @verbinclude anytone_dtmfidlist.txt */
+  class DTMFIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th number is set. */
+    virtual bool hasNumber(unsigned int n) const;
+    /** Returns the n-th number. */
+    virtual QString number(unsigned int n) const;
+    /** Sets the n-th number. */
+    virtual void setNumber(unsigned int n, const QString &number);
+    /** Clears the n-th number. */
+    virtual void clearNumber(unsigned int n);
+
+  public:
+    /** Some limits of the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries()   { return 16; }      ///< The maximum number of entries in the list.
+      static constexpr unsigned int numberLength() { return 16; }      ///< The maximum length of the numbers.
+    };
+  };
+
+  /** Represents a list of 100 FM broad cast channels.
+   *
+   * Memory representation of the channel list (size 0x0200 bytes):
+   * @verbinclude anytone_wfmchannellist.txt */
+  class WFMChannelListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMChannelListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit WFMChannelListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+
+    void clear();
+
+    /** Returns @c true, if the n-th channel is set. */
+    virtual bool hasChannel(unsigned int n) const;
+    /** Returns the n-th channel frequency. */
+    virtual Frequency channel(unsigned int n) const;
+    /** Sets the n-th channel frequency. */
+    virtual void setChannel(unsigned int n, Frequency freq);
+    /** Clears the n-th channel frequency. */
+    virtual void clearChannel(unsigned int n);
+
+  public:
+    /** Some limits for the channel list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 100; }     ///< Maximum number of channels in the list.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenChannels() { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which WFM (FM broadcast) channels are valid. */
+  class WFMChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    WFMChannelBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+  /** Represents the WFM (FM broadcast) VFO frquency. */
+  class WFMVFOElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    WFMVFOElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    WFMVFOElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    void clear();
+
+    /** Returns the VFO frequency. */
+    virtual Frequency frequency() const;
+    /** Sets the VFO frequency. */
+    virtual void setFrequency(Frequency freq);
+  };
+
+  /** Represents a list of DMR encryption key IDs. */
+  class DMREncryptionKeyIDListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMREncryptionKeyIDListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    /** Returns @c true if the n-th id is set. */
+    virtual bool hasID(unsigned int n) const;
+    /** Returns the ID of the encryption key. */
+    virtual uint16_t id(unsigned int n) const;
+    /** Sets the ID of the encryption key. */
+    virtual void setID(unsigned int n, uint16_t id);
+    /** Clears the n-th id. */
+    virtual void clearID(unsigned int n);
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 32; }      ///< Maximum number of DMR encryption key IDs.
+    };
+
+  protected:
+    /** Some internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenIDs() { return 0x0002; }
+      /// @endcond
+    };
+  };
+
+  /** Represents a list of DMR encryption keys. */
+  class DMREncryptionKeyListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMREncryptionKeyListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMREncryptionKeyListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0500; }
+
+    void clear();
+
+    /** Returns the n-th key. */
+    QByteArray key(unsigned int n) const;
+    /** Sets the n-th key. */
+    void setKey(unsigned int n, const QByteArray &key);
+
+  public:
+    /** Some limits of the list. */
+    struct Limit {
+      static constexpr unsigned numEntries() { return DMREncryptionKeyIDListElement::Limit::numEntries(); } ///< Maximum number of keys.
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keys() { return 0x0010; }
+      static constexpr unsigned int betweenKeys() { return 0x0028; }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class for entries to the contact indices in all AnyTone codeplugs.
    *
    * Memory representation of the entry (size 0x0008):
@@ -2006,6 +2912,9 @@ public:
   public:
     /** Constructor. */
     ContactMapElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0008; }
 
     /** Clears the entry. */
     void clear();
@@ -2022,10 +2931,6 @@ public:
     virtual unsigned index() const;
     /** Sets the index. */
     virtual void setIndex(unsigned idx);
-
-  public:
-    /** Returns the size of this entry. */
-    static unsigned size();
   };
 
 protected:
@@ -2048,7 +2953,7 @@ protected:
   /** Allocates the bitmaps. This is also performed during a clear. */
   virtual bool allocateBitmaps() = 0;
   /** Sets all bitmaps for the given config. */
-  virtual void setBitmaps(Config *config) = 0;
+  virtual void setBitmaps(Context &ctx) = 0;
 
   /** Allocate all code-plug elements that must be written back to the device to maintain a working
    * codeplug. These elements might be updated during encoding. */

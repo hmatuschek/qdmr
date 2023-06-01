@@ -1,7 +1,6 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "config.hh"
-#include "anytone_extension.hh"
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

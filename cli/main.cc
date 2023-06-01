@@ -159,26 +159,33 @@ int main(int argc, char *argv[])
   if (parser.isSet("verbose"))
     handler->setMinLevel(LogMessage::DEBUG);
 
+  int res = -1;
   QString command = parser.positionalArguments().at(0);
-  if ("detect" == command)
-    return detect(parser, app);
-  if ("verify" == command)
-    return verify(parser, app);
-  if ("read" == command)
-    return readCodeplug(parser, app);
-  if ("write" == command)
-    return writeCodeplug(parser, app);
-  if ("write-db" == command)
-    return writeCallsignDB(parser, app);
-  if ("encode" == command)
-    return encodeCodeplug(parser, app);
-  if ("encode-db" == command)
-    return encodeCallsignDB(parser, app);
-  if ("decode" == command)
-    return decodeCodeplug(parser, app);
-  if ("info" == command)
-    return infoFile(parser, app);
 
-  parser.showHelp(-1);
-  return -1;
+  if ("detect" == command)
+    res = detect(parser, app);
+  else if ("verify" == command)
+    res = verify(parser, app);
+  else if ("read" == command)
+    res = readCodeplug(parser, app);
+  else if ("write" == command)
+    res = writeCodeplug(parser, app);
+  else if ("write-db" == command)
+    res = writeCallsignDB(parser, app);
+  else if ("encode" == command)
+    res = encodeCodeplug(parser, app);
+  else if ("encode-db" == command)
+    res = encodeCallsignDB(parser, app);
+  else if ("decode" == command)
+    res = decodeCodeplug(parser, app);
+  else if ("info" == command)
+    res = infoFile(parser, app);
+  else
+    parser.showHelp(-1);
+
+  // Allow some pending events to be processed (e.g., deleteLater())
+  QEventLoop loop;
+  while(loop.processEvents()) {}
+
+  return res;
 }
