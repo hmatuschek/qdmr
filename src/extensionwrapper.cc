@@ -3,6 +3,8 @@
 #include "logger.hh"
 #include "configreference.hh"
 #include "configobjecttypeselectiondialog.hh"
+#include "frequency.hh"
+#include "interval.hh"
 
 
 /* ******************************************************************************************** *
@@ -468,16 +470,21 @@ PropertyWrapper::flags(const QModelIndex &index) const {
   if (isProperty(index)) {
     // check if property is a config object or atomic (or reference)
     QMetaProperty prop = propertyAt(index);
-    if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop)) {
+    // Object can be selected and expanded, but not edited directly
+    if (propIsInstance<ConfigItem>(prop) || propIsInstance<ConfigObjectList>(prop))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    }
-
+    // References are edited directly by combo-box. See PropertyDelegate. They cannot be expanded.
+    if (propIsInstance<ConfigObjectReference>(prop) && prop.isScriptable() && (1 == index.column()))
+      return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+    // Atomic properties are directly editable, see also PropertyDelegate. They cannot be expanded.
     if (prop.isWritable() && (1 == index.column()))
       return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemNeverHasChildren;
+    // Some default values.
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
   } else if (isListElement(index)) {
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   }
+
   return Qt::NoItemFlags;
 }
 
@@ -579,6 +586,16 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
                  (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
                 && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
       return value;
+    } else if (QString("Frequency") == prop.typeName()) {
+      if (Qt::DisplayRole == role)
+        return value.value<Frequency>().format();
+      else if (Qt::EditRole == role)
+        return value;
+    } else if (QString("Interval") == prop.typeName()) {
+      if (Qt::DisplayRole == role)
+        return value.value<Interval>().format();
+      else if (Qt::EditRole == role)
+        return value;
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
       ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
       ConfigObject *obj = ref->as<ConfigObject>();
@@ -599,6 +616,8 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
       ConfigObjectList *lst = value.value<ConfigObjectList*>();
       if (Qt::DisplayRole == role)
         return tr("List of %1 instances").arg(lst->classNames().join(", "));
+    } else if (Qt::DisplayRole == role) {
+      logWarn() << "Unhandled property '" << prop.name() << "' of type " << prop.typeName() << ".";
     }
   } else if (isListElement(index)) {
     ConfigObjectList *lst = parentList(index);

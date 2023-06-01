@@ -1,7 +1,9 @@
 #include "dfufile.hh"
 #include <QFile>
 #include <QtEndian>
+
 #include "crc32.hh"
+#include "logger.hh"
 
 
 typedef struct __attribute((packed)) {
@@ -244,6 +246,13 @@ DFUFile::write(QFile &file, const ErrorStack &err) {
   }
 
   return true;
+}
+
+bool
+DFUFile::isAllocated(uint32_t offset, uint32_t img) const {
+  if (int(img) >= _images.size())
+    return false;
+  return image(img).isAllocated(offset);
 }
 
 unsigned char *
@@ -644,21 +653,18 @@ DFUFile::Image::dump(QTextStream &stream) const {
   }
 }
 
+bool
+DFUFile::Image::isAllocated(uint32_t offset) const {
+  return 0 <= _addressmap.find(offset);
+}
+
 unsigned char *
 DFUFile::Image::data(uint32_t offset) {
-  // Search for element that contains address
-  /*for  (int i=0; i<numElements(); i++) {
-    if ((offset >= element(i).address()) &&
-        (offset < (element(i).address()+element(i).data().size())))
-    {
-      return (unsigned char *)(element(i).data().data()+
-                               (offset-element(i).address()));
-    }
-  }
-  return nullptr;*/
   int idx = _addressmap.find(offset);
-  if (0 > idx)
+  if (0 > idx) {
+    logFatal() << "Cannot resolve offset " << QString::number(offset, 16) << "h.";
     return nullptr;
+  }
   return (unsigned char *)(element(idx).data().data()+
                            (offset-element(idx).address()));
 }
@@ -666,8 +672,10 @@ DFUFile::Image::data(uint32_t offset) {
 const unsigned char *
 DFUFile::Image::data(uint32_t offset) const {
   int idx = _addressmap.find(offset);
-  if (0 > idx)
+  if (0 > idx) {
+    logFatal() << "Cannot resolve offset " << QString::number(offset, 16) << "h.";
     return nullptr;
+  }
   return (unsigned char *)(element(idx).data().data()+
                            (offset-element(idx).address()));
 }

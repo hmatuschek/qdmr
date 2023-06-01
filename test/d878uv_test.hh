@@ -12,11 +12,19 @@ public:
   explicit D878UVTest(QObject *parent = nullptr);
 
 private slots:
+  void initTestCase();
+
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
 
+  void testAnalogMicGain();
   void testRoaming();
+  void testHangTime();
+
+protected:
+  Config _micGainConfig;
+  QTextStream _stderr;
 };
 
 #endif // D878UVTEST_HH

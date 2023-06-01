@@ -7,6 +7,8 @@
 #include "logger.hh"
 #include "tyt_extensions.hh"
 #include "encryptionextension.hh"
+#include "commercial_extension.hh"
+
 #include <QTimeZone>
 #include <QtEndian>
 #include <QChar>
