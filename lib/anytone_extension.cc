@@ -635,7 +635,7 @@ AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent
     _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
     _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
-    _notificationCount(1), _gpsRoaming(false)
+    _notificationCount(1), _gpsRoaming(false), _defaultRoamingZone(new RoamingZoneReference(this))
 {
   // pass...
 }
@@ -792,12 +792,19 @@ AnytoneRoamingSettingsExtension::enableGPSRoaming(bool enable) {
   emit modified(this);
 }
 
+RoamingZoneReference *
+AnytoneRoamingSettingsExtension::defaultZone() const {
+  return _defaultRoamingZone;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneSettingsExtension
  * ********************************************************************************************* */
 AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
-  : ConfigExtension(parent), _bootSettings(new AnytoneBootSettingsExtension(this)),
+  : ConfigExtension(parent),
+    _bootSettings(new AnytoneBootSettingsExtension(this)),
+    _powerSaveSettings(new AnytonePowerSaveSettingsExtension(this)),
     _keySettings(new AnytoneKeySettingsExtension(this)),
     _toneSettings(new AnytoneToneSettingsExtension(this)),
     _displaySettings(new AnytoneDisplaySettingsExtension(this)),
@@ -809,14 +816,13 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _roamingSettings(new AnytoneRoamingSettingsExtension(this)),
     _bluetoothSettings(new AnytoneBluetoothSettingsExtension(this)),
     _simplexRepeaterSettings(new AnytoneSimplexRepeaterSettingsExtension(this)),
-    _autoShutDownDelay(), _resetAutoShutdownOnCall(true), _powerSave(PowerSave::Save50),
     _vfoScanType(VFOScanType::Time), _modeA(VFOMode::Memory), _modeB(VFOMode::Memory),
     _zoneA(), _zoneB(), _selectedVFO(VFO::A), _subChannel(true),
     _minVFOScanFrequencyUHF(Frequency::fromMHz(430)), _maxVFOScanFrequencyUHF(Frequency::fromMHz(440)),
     _minVFOScanFrequencyVHF(Frequency::fromMHz(144)), _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)),
     _keepLastCaller(false), _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
     _steDuration(Interval::fromMilliseconds(300)), _tbstFrequency(Frequency::fromHz(1750)),
-    _proMode(false), _maintainCallChannel(false), _atpc(false)
+    _proMode(false), _maintainCallChannel(false)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -854,6 +860,11 @@ AnytoneSettingsExtension::clone() const {
 AnytoneBootSettingsExtension *
 AnytoneSettingsExtension::bootSettings() const {
   return _bootSettings;
+}
+
+AnytonePowerSaveSettingsExtension *
+AnytoneSettingsExtension::powerSaveSettings() const {
+  return _powerSaveSettings;
 }
 
 AnytoneKeySettingsExtension *
@@ -909,42 +920,6 @@ AnytoneSettingsExtension::bluetoothSettings() const {
 AnytoneSimplexRepeaterSettingsExtension *
 AnytoneSettingsExtension::simplexRepeaterSettings() const {
   return _simplexRepeaterSettings;
-}
-
-Interval
-AnytoneSettingsExtension::autoShutDownDelay() const {
-  return _autoShutDownDelay;
-}
-void
-AnytoneSettingsExtension::setAutoShutDownDelay(Interval intv) {
-  if (_autoShutDownDelay == intv)
-    return;
-  _autoShutDownDelay = intv;
-  emit modified(this);
-}
-
-bool
-AnytoneSettingsExtension::resetAutoShutdownOnCall() const {
-  _resetAutoShutdownOnCall;
-}
-void
-AnytoneSettingsExtension::enableResetAutoShutdownOnCall(bool enable) {
-  if (enable == _resetAutoShutdownOnCall)
-    return;
-  _resetAutoShutdownOnCall = enable;
-  emit modified(this);
-}
-
-AnytoneSettingsExtension::PowerSave
-AnytoneSettingsExtension::powerSave() const {
-  return _powerSave;
-}
-void
-AnytoneSettingsExtension::setPowerSave(PowerSave save) {
-  if (_powerSave == save)
-    return;
-  _powerSave = save;
-  emit modified(this);
 }
 
 AnytoneSettingsExtension::VFOScanType
@@ -1165,18 +1140,6 @@ AnytoneSettingsExtension::enableMaintainCallChannel(bool enable) {
   emit modified(this);
 }
 
-bool
-AnytoneSettingsExtension::atpc() const {
-  return _atpc;
-}
-void
-AnytoneSettingsExtension::enableATPC(bool enable) {
-  if (enable == _atpc)
-    return;
-  _atpc = enable;
-  emit modified(this);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneBootSettingsExtension
@@ -1186,7 +1149,7 @@ AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
     _defaultChannel(false), _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
     _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this)),
     _priorityZoneA(new ZoneReference(this)), _priorityZoneB(new ZoneReference(this)),
-    _defaultRoamingZone(new RoamingZoneReference(this)), _gpsCheck(false), _reset(true)
+    _gpsCheck(false), _reset(true)
 {
   // pass...
 }
@@ -1275,11 +1238,6 @@ AnytoneBootSettingsExtension::priorityZoneB() const {
   return _priorityZoneB;
 }
 
-RoamingZoneReference *
-AnytoneBootSettingsExtension::defaultRoamingZone() const {
-  return _defaultRoamingZone;
-}
-
 bool
 AnytoneBootSettingsExtension::gpsCheckEnabled() const {
   return _gpsCheck;
@@ -1301,6 +1259,75 @@ AnytoneBootSettingsExtension::enableReset(bool enable) {
   if (_reset == enable)
     return;
   _reset = enable;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytonePowerSaveSettingsExtension
+ * ********************************************************************************************* */
+AnytonePowerSaveSettingsExtension::AnytonePowerSaveSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _autoShutDownDelay(), _resetAutoShutdownOnCall(true),
+    _powerSave(PowerSave::Save50), _atpc(false)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytonePowerSaveSettingsExtension::clone() const {
+  AnytonePowerSaveSettingsExtension *ext = new AnytonePowerSaveSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+Interval
+AnytonePowerSaveSettingsExtension::autoShutDownDelay() const {
+  return _autoShutDownDelay;
+}
+void
+AnytonePowerSaveSettingsExtension::setAutoShutDownDelay(Interval intv) {
+  if (_autoShutDownDelay == intv)
+    return;
+  _autoShutDownDelay = intv;
+  emit modified(this);
+}
+
+bool
+AnytonePowerSaveSettingsExtension::resetAutoShutdownOnCall() const {
+  return _resetAutoShutdownOnCall;
+}
+void
+AnytonePowerSaveSettingsExtension::enableResetAutoShutdownOnCall(bool enable) {
+  if (enable == _resetAutoShutdownOnCall)
+    return;
+  _resetAutoShutdownOnCall = enable;
+  emit modified(this);
+}
+
+AnytonePowerSaveSettingsExtension::PowerSave
+AnytonePowerSaveSettingsExtension::powerSave() const {
+  return _powerSave;
+}
+void
+AnytonePowerSaveSettingsExtension::setPowerSave(PowerSave save) {
+  if (_powerSave == save)
+    return;
+  _powerSave = save;
+  emit modified(this);
+}
+
+bool
+AnytonePowerSaveSettingsExtension::atpc() const {
+  return _atpc;
+}
+void
+AnytonePowerSaveSettingsExtension::enableATPC(bool enable) {
+  if (enable == _atpc)
+    return;
+  _atpc = enable;
   emit modified(this);
 }
 

@@ -1337,8 +1337,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setPriorityZoneBIndex(0xff);
   else
     setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
-  if (! ext->bootSettings()->defaultRoamingZone()->isNull())
-    setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
+  if (! ext->roamingSettings()->defaultZone()->isNull())
+    setDefaultRoamingZoneIndex(ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
   enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
   enableBootReset(ext->bootSettings()->resetEnabled());
 
@@ -1536,7 +1536,7 @@ D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
   }
 
   if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
-    ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+    ext->roamingSettings()->defaultZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }
 
   return true;
@@ -2053,8 +2053,10 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Some general settings
   setSTEDuration(ext->steDuration());
-  enableATPC(ext->atpc());
-  enableResetAutoShutdownOnCall(ext->resetAutoShutdownOnCall());
+
+  // Power save settings
+  enableATPC(ext->powerSaveSettings()->atpc());
+  enableResetAutoShutdownOnCall(ext->powerSaveSettings()->resetAutoShutdownOnCall());
 
   // Encode tone settings
   enableTOTNotification(ext->toneSettings()->totNotification());
@@ -2127,8 +2129,10 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
-  ext->enableATPC(this->atpc());
-  ext->enableResetAutoShutdownOnCall(this->resetAutoShutdownOnCall());
+
+  // Some power-save settings
+  ext->powerSaveSettings()->enableATPC(this->atpc());
+  ext->powerSaveSettings()->enableResetAutoShutdownOnCall(this->resetAutoShutdownOnCall());
 
   // Store tone settings
   ext->toneSettings()->enableTOTNotification(this->totNotification());

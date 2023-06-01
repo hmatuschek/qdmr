@@ -294,9 +294,9 @@ public:
     void clear();
 
     /** Returns the power-save mode. */
-    virtual AnytoneSettingsExtension::PowerSave powerSave() const;
+    virtual AnytonePowerSaveSettingsExtension::PowerSave powerSave() const;
     /** Sets the power-save mode. */
-    virtual void setPowerSave(AnytoneSettingsExtension::PowerSave mode);
+    virtual void setPowerSave(AnytonePowerSaveSettingsExtension::PowerSave mode);
 
     /** Returns the VOX level. */
     virtual unsigned voxLevel() const;

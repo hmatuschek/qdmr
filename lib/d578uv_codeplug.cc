@@ -1570,8 +1570,8 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     setPriorityZoneBIndex(0xff);
   else
     setPriorityZoneBIndex(ctx.index(ext->bootSettings()->priorityZoneB()->as<Zone>()));
-  if (! ext->bootSettings()->defaultRoamingZone()->isNull())
-    setDefaultRoamingZoneIndex(ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
+  if (! ext->roamingSettings()->defaultZone()->isNull())
+    setDefaultRoamingZoneIndex(ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
 
   // Encode key settings
   enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -1758,7 +1758,7 @@ D578UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
     ext->bootSettings()->priorityZoneB()->set(ctx.get<Zone>(priorityZoneBIndex()));
   }
   if (ctx.has<RoamingZone>(defaultRoamingZoneIndex())) {
-    ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+    ext->roamingSettings()->defaultZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }
 
   return true;

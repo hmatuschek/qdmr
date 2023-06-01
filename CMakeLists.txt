@@ -37,7 +37,7 @@ endif(${BUILD_TESTS})
 ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
 #add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
 
-set(CMAKE_C_STANDARD 14)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -74,8 +74,8 @@ message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wextra -pedantic-errors")
+set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wextra")
 
 
 # Get default install directories under Linux

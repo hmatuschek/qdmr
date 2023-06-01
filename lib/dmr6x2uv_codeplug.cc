@@ -1233,9 +1233,9 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
   setRoamingStartCondition(ext->roamingSettings()->roamingStartCondition());
   setRoamingReturnCondition(ext->roamingSettings()->roamingReturnCondition());
   setRepeaterCheckNumNotifications(ext->roamingSettings()->notificationCount());
-  if (! ext->bootSettings()->defaultRoamingZone()->isNull())
+  if (! ext->roamingSettings()->defaultZone()->isNull())
     setDefaultRoamingZoneIndex(
-          ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
+          ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
 
   return true;
 }
@@ -1296,7 +1296,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorS
                   << " not defined.";
       return false;
     }
-    ext->bootSettings()->defaultRoamingZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
+    ext->roamingSettings()->defaultZone()->set(ctx.get<RoamingZone>(this->defaultRoamingZoneIndex()));
   }
 
   return true;

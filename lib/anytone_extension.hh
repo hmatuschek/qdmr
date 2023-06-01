@@ -308,8 +308,6 @@ class AnytoneBootSettingsExtension: public ConfigItem
   Q_PROPERTY(ZoneReference* priorityZoneA READ priorityZoneA)
   /** The priority zone for VFO B. */
   Q_PROPERTY(ZoneReference* priorityZoneB READ priorityZoneB)
-  /** The default roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* defaultRoamingZone READ defaultRoamingZone)
   /** Enables the GPS check. */
   Q_PROPERTY(bool gpsCheck READ gpsCheckEnabled WRITE enableGPSCheck)
 
@@ -355,8 +353,6 @@ public:
   ZoneReference *priorityZoneA() const;
   /** Returns a reference to the priority zone for VFO B. */
   ZoneReference *priorityZoneB() const;
-  /** Returns a reference to the default roaming zone. */
-  RoamingZoneReference *defaultRoamingZone() const;
 
   /** Returns @c true if the GPS check is enabled. */
   bool gpsCheckEnabled() const;
@@ -379,9 +375,72 @@ protected:
   ChannelReference *_channelB;     ///< Default channel for VFO B, must be member of zone for VFO B.
   ZoneReference *_priorityZoneA;   ///< Priority zone for VFO A.
   ZoneReference *_priorityZoneB;   ///< Priority zone for VFO B.
-  RoamingZoneReference *_defaultRoamingZone; ///< The default roaming zone.
   bool _gpsCheck;                  ///< Enables GPS check.
   bool _reset;                     ///< Enables MCU reset on boot.
+};
+
+
+/** Implements the power-save settings for AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytonePowerSaveSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("autoShutDownDelayDescription", "The auto shut-down delay in minutes.")
+  /** The auto shut-down delay in minutes. */
+  Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
+
+  /** Resets the auto shut-down timer on every call. */
+  Q_PROPERTY(bool resetAutoShutdownOnCall READ resetAutoShutdownOnCall WRITE enableResetAutoShutdownOnCall)
+
+  Q_CLASSINFO("powerSaveDescription", "Specifies the power save mode. "
+                                      "D686UV, D878UV(2) and DMR-6X2UV only.")
+  /** The power-save mode. */
+  Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
+
+  /** If @c true, the adaptive transmission power control is enabled. */
+  Q_PROPERTY(bool atpc READ atpc WRITE enableATPC)
+
+public:
+  /** Possible power save modes. */
+  enum class PowerSave {
+    Off = 0, Save50 = 1, Save66 = 2
+  };
+  Q_ENUM(PowerSave)
+
+public:
+  /** Default constructor. */
+  explicit AnytonePowerSaveSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the auto shut-down delay in minutes. */
+  Interval autoShutDownDelay() const;
+  /** Sets the auto shut-down delay. */
+  void setAutoShutDownDelay(Interval min);
+
+  /** Returns @c true, if the auto shut-down timer is reset on every call. */
+  bool resetAutoShutdownOnCall() const;
+  /** Enables/disables reset of auto shut-down timer on every call. */
+  void enableResetAutoShutdownOnCall(bool enable);
+
+  /** Returns the power-save mode. */
+  PowerSave powerSave() const;
+  /** Sets the power-save mode. */
+  void setPowerSave(PowerSave mode);
+
+  /** Returns @c true if the adaptive transmission power control is enabled. */
+  bool atpc() const;
+  /** Enables/disables the adaptive transmission power control. */
+  void enableATPC(bool enable);
+
+protected:
+  Interval _autoShutDownDelay;     ///< The auto shut-down delay in minutes.
+  bool _resetAutoShutdownOnCall;   ///< Enables reset of auto shut-down timer on every call.
+  PowerSave _powerSave;            ///< Power save mode property.
+  bool _atpc;                      ///< Adaptive Transmission Power Control.
 };
 
 
@@ -1718,6 +1777,9 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   /** Repeater-check notification count. */
   Q_PROPERTY(unsigned int notificationCount READ notificationCount WRITE setNotificationCount)
 
+  /** The default roaming zone. */
+  Q_PROPERTY(RoamingZoneReference* defaultZone READ defaultZone)
+
   /** GPS roaming enabled. */
   Q_PROPERTY(bool gpsRoaming READ gpsRoaming WRITE enableGPSRoaming)
 
@@ -1794,6 +1856,9 @@ public:
   /** Enables/disables GPS roaming. */
   void enableGPSRoaming(bool enable);
 
+  /** Returns a reference to the default roaming zone. */
+  RoamingZoneReference *defaultZone() const;
+
 protected:
   bool _autoRoam;                              ///< Enables auto roaming.
   Interval _autoRoamPeriod;                    ///< The auto-roam period in minutes.
@@ -1807,6 +1872,7 @@ protected:
   bool _notification;                          ///< Repeater check notification.
   unsigned int _notificationCount;             ///< Number of notifications.
   bool _gpsRoaming;                            ///< Enables GPS roaming.
+  RoamingZoneReference *_defaultRoamingZone;   ///< The default roaming zone.
 };
 
 
@@ -1914,18 +1980,6 @@ class AnytoneSettingsExtension: public ConfigExtension
 
   Q_CLASSINFO("description", "Device specific settings for AnyTone devices.")
 
-  Q_CLASSINFO("autoShutDownDelayDescription", "The auto shut-down delay in minutes.")
-  /** The auto shut-down delay in minutes. */
-  Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
-
-  /** Resets the auto shut-down timer on every call. */
-  Q_PROPERTY(bool resetAutoShutdownOnCall READ resetAutoShutdownOnCall WRITE enableResetAutoShutdownOnCall)
-
-  Q_CLASSINFO("powerSaveDescription", "Specifies the power save mode. "
-                                      "D686UV, D878UV(2) and DMR-6X2UV only.")
-  /** The power-save mode. */
-  Q_PROPERTY(PowerSave powerSave READ powerSave WRITE setPowerSave)
-
   Q_CLASSINFO("subChannelDescription", "Enables/disables the sub-channel.")
   /** If @c true, the sub-channel is enabled. */
   Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
@@ -1986,11 +2040,10 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** If @c true, the call-channel is maintained (whatever that means). */
   Q_PROPERTY(bool maintainCallChannel READ maintainCallChannelEnabled WRITE enableMaintainCallChannel)
 
-  /** If @c true, the adaptive transmission power control is enabled. */
-  Q_PROPERTY(bool atpc READ atpc WRITE enableATPC)
-
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
+  /** The power-save settings. */
+  Q_PROPERTY(AnytonePowerSaveSettingsExtension* powerSaveSettings READ powerSaveSettings)
   /** The key settings. */
   Q_PROPERTY(AnytoneKeySettingsExtension* keySettings READ keySettings)
   /** The tone settings. */
@@ -2018,12 +2071,6 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneSimplexRepeaterSettingsExtension * simplexRepeaterSettings READ simplexRepeaterSettings)
 
 public:
-  /** Possible power save modes. */
-  enum class PowerSave {
-    Off = 0, Save50 = 1, Save66 = 2
-  };
-  Q_ENUM(PowerSave)
-
   /** Encodes the possible VFO scan types. */
   enum class VFOScanType {
     Time = 0, Carrier = 1, Stop = 2
@@ -2057,6 +2104,8 @@ public:
 
   /** A reference to the boot settings. */
   AnytoneBootSettingsExtension *bootSettings() const;
+  /** A reference to the power-save settings. */
+  AnytonePowerSaveSettingsExtension *powerSaveSettings() const;
   /** A reference to the key settings. */
   AnytoneKeySettingsExtension *keySettings() const;
   /** A reference to the tone settings. */
@@ -2079,21 +2128,6 @@ public:
   AnytoneBluetoothSettingsExtension *bluetoothSettings() const;
   /** A reference to the simplex repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *simplexRepeaterSettings() const;
-
-  /** Returns the auto shut-down delay in minutes. */
-  Interval autoShutDownDelay() const;
-  /** Sets the auto shut-down delay. */
-  void setAutoShutDownDelay(Interval min);
-
-  /** Returns @c true, if the auto shut-down timer is reset on every call. */
-  bool resetAutoShutdownOnCall() const;
-  /** Enables/disables reset of auto shut-down timer on every call. */
-  void enableResetAutoShutdownOnCall(bool enable);
-
-  /** Returns the power-save mode. */
-  PowerSave powerSave() const;
-  /** Sets the power-save mode. */
-  void setPowerSave(PowerSave mode);
 
   /** Returns the VFO scan type. */
   VFOScanType vfoScanType() const;
@@ -2186,14 +2220,11 @@ public:
   /** Enables/disables maintaining the call-channel. */
   void enableMaintainCallChannel(bool enable);
 
-  /** Returns @c true if the adaptive transmission power control is enabled. */
-  bool atpc() const;
-  /** Enables/disables the adaptive transmission power control. */
-  void enableATPC(bool enable);
-
 protected:
   /** The boot settings. */
   AnytoneBootSettingsExtension *_bootSettings;
+  /** The power-save settings. */
+  AnytonePowerSaveSettingsExtension *_powerSaveSettings;
   /** The key settings. */
   AnytoneKeySettingsExtension *_keySettings;
   /** The tone settings. */
@@ -2217,9 +2248,6 @@ protected:
   /** The simplex-repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *_simplexRepeaterSettings;
 
-  Interval _autoShutDownDelay;     ///< The auto shut-down delay in minutes.
-  bool _resetAutoShutdownOnCall;   ///< Enables reset of auto shut-down timer on every call.
-  PowerSave _powerSave;            ///< Power save mode property.
   VFOScanType _vfoScanType;        ///< The VFO scan-type property.
   VFOMode _modeA;                  ///< Mode of VFO A.
   VFOMode _modeB;                  ///< Mode of VFO B.
@@ -2239,7 +2267,6 @@ protected:
   Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
-  bool _atpc;                      ///< Adaptive Transmission Power Control.
 };
 
 #endif // ANYTONEEXTENSION_HH

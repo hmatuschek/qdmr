@@ -247,12 +247,12 @@ D868UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
 }
 
-AnytoneSettingsExtension::PowerSave
+AnytonePowerSaveSettingsExtension::PowerSave
 D868UVCodeplug::GeneralSettingsElement::powerSave() const {
-  return (AnytoneSettingsExtension::PowerSave)getUInt8(Offset::powerSaveMode());
+  return (AnytonePowerSaveSettingsExtension::PowerSave)getUInt8(Offset::powerSaveMode());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytoneSettingsExtension::PowerSave mode) {
+D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytonePowerSaveSettingsExtension::PowerSave mode) {
   setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
 }
 
@@ -1043,7 +1043,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     return true;
 
   // Power save settings
-  setPowerSave(ext->powerSave());
+  setPowerSave(ext->powerSaveSettings()->powerSave());
 
   // Encode key settings
   enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -1083,7 +1083,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   }
 
   // Decode power save settings:
-  ext->setPowerSave(powerSave());
+  ext->powerSaveSettings()->setPowerSave(powerSave());
 
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
