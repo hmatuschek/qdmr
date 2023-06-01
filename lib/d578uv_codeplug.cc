@@ -1558,8 +1558,11 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   // Handle D578UV specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
-  if (nullptr == ext) // <- if extension is not set
+  if (nullptr == ext) { // <- if extension is not set
+    setPriorityZoneAIndex(0xff);
+    setPriorityZoneBIndex(0xff);
     return true;
+  }
 
   // Encode boot settings
   if (ext->bootSettings()->priorityZoneA()->isNull())
