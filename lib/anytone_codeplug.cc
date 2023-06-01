@@ -1789,7 +1789,7 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
     enableFMTalkPermit(ext->toneSettings()->talkPermitAnalogEnabled());
     enableDMRResetTone(ext->toneSettings()->digitalResetToneEnabled());
-    enableIdleChannelTone(ext->toneSettings()->idleChannelToneEnabled());
+    enableIdleChannelTone(ext->toneSettings()->dmrIdleChannelToneEnabled());
     enableStartupTone(ext->toneSettings()->startupToneEnabled());
     setCallToneMelody(*(ext->toneSettings()->callMelody()));
     setIdleToneMelody(*(ext->toneSettings()->idleMelody()));
@@ -1904,7 +1904,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
   ext->toneSettings()->enableTalkPermitAnalog(this->fmTalkPermit());
   ext->toneSettings()->enableDigitalResetTone(this->dmrResetTone());
-  ext->toneSettings()->enableIdleChannelTone(this->idleChannelTone());
+  ext->toneSettings()->enableDMRIdleChannelTone(this->idleChannelTone());
   ext->toneSettings()->enableStartupTone(this->startupTone());
   this->callToneMelody(*(ext->toneSettings()->callMelody()));
   this->idleToneMelody(*(ext->toneSettings()->idleMelody()));

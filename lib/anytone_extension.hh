@@ -657,16 +657,23 @@ class AnytoneToneSettingsExtension: public ConfigItem
   /** If @c true, the DMR reset tone is enabled. */
   Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
 
-  /** If @c true, the idle tone is enabled. */
-  Q_PROPERTY(bool idle READ idleChannelToneEnabled WRITE enableIdleChannelTone)
+  /** If @c true, the idle tone is enabled for DMR channels. */
+  Q_PROPERTY(bool dmrIdle READ dmrIdleChannelToneEnabled WRITE enableDMRIdleChannelTone)
+  /** If @c true, the idle tone is enabled for FM channels. */
+  Q_PROPERTY(bool fmIdle READ fmIdleChannelToneEnabled WRITE enableFMIdleChannelTone)
   /** If @c true, the startup tone is enabled. */
   Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
+  /** Enables transmit timeout notification (5s before TOT). */
+  Q_PROPERTY(bool tot READ totNotification WRITE enableTOTNotification)
+
   /** The call melody. */
   Q_PROPERTY(Melody * callMelody READ callMelody)
   /** The idle melody. */
   Q_PROPERTY(Melody * idleMelody READ idleMelody)
   /** The reset melody. */
   Q_PROPERTY(Melody * resetMelody READ resetMelody)
+  /** The call-end melody. */
+  Q_PROPERTY(Melody * callEndMelody READ callEndMelody)
 
 public:
   /** Empty constructor. */
@@ -700,14 +707,22 @@ public:
   bool digitalResetToneEnabled() const;
   /** Enables/disables the reset tone for digital calls. */
   void enableDigitalResetTone(bool enable);
-  /** Returns @c true if the idle channel tone is enabled. */
-  bool idleChannelToneEnabled() const;
-  /** Enables/disables the idle channel tone. */
-  void enableIdleChannelTone(bool enable);
+  /** Returns @c true if the idle channel tone is enabled for DMR channel. */
+  bool dmrIdleChannelToneEnabled() const;
+  /** Enables/disables the idle DMR channel tone. */
+  void enableDMRIdleChannelTone(bool enable);
+  /** Returns @c true if the idle channel tone is enabled for FM channel. */
+  bool fmIdleChannelToneEnabled() const;
+  /** Enables/disables the idle FM channel tone. */
+  void enableFMIdleChannelTone(bool enable);
   /** Retunrs @c true if the startup tone is enabled. */
   bool startupToneEnabled() const;
   /** Enables/disables the startup tone. */
   void enableStartupTone(bool enable);
+  /** Returns @c true if the transmit timeout notification is enabled (5s before TOT). */
+  bool totNotification() const;
+  /** Enables/disables the transmit timeout notification (5s before TOT). */
+  void enableTOTNotification(bool enable);
 
   /** Returns a reference to the call melody. */
   Melody *callMelody() const;
@@ -715,6 +730,8 @@ public:
   Melody *idleMelody() const;
   /** Returns a reference to the reset melody. */
   Melody *resetMelody() const;
+  /** Returns a reference to the call-end melody. */
+  Melody *callEndMelody() const;
 
   /** Returns the key-tone level. */
   unsigned int keyToneLevel() const;
@@ -728,11 +745,14 @@ protected:
   bool _talkPermitDigital;         ///< DMR talk permit tone.
   bool _talkPermitAnalog;          ///< FM talk permit tone.
   bool _resetToneDigital;          ///< DMR reset tone.
-  bool _idleChannelTone;           ///< Idle channel tone.
+  bool _dmrIdleChannelTone;        ///< Idle channel tone (DMR).
+  bool _fmIdleChannelTone;         ///< Idle channel tone (FM).
   bool _startupTone;               ///< Startup tone enabled.
+  bool _totNotification;           ///< TOT notification enabled.
   Melody *_callMelody;             ///< Call melody.
   Melody *_idleMelody;             ///< Idle melody.
   Melody *_resetMelody;            ///< Reset melody.
+  Melody *_callEndMelody;          ///< Call end melody.
   unsigned int _keyToneLevel;      ///< The level of key-tones, 0=user adjustable.
 
 };
@@ -761,34 +781,42 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
 
   Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
                                      "A value of 0 means off.")
-  /** TR backlight duration. */
+  /** RX backlight duration. */
   Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
+
+  /** Enables custom channel background. */
+  Q_PROPERTY(bool customChannelBackground READ customChannelBackground WRITE enableCustomChannelBackground)
 
   /** The volume-change prompt is shown. */
   Q_PROPERTY(bool volumeChangePrompt READ volumeChangePromptEnabled WRITE enableVolumeChangePrompt)
   /** The call-end prompt is shown. */
   Q_PROPERTY(bool callEndPrompt READ callEndPromptEnabled WRITE enableCallEndPrompt)
-  /** The last-caller display mode. */
-  Q_PROPERTY(LastCallerDisplayMode lastCallerDisplay READ lastCallerDisplay WRITE setLastCallerDisplay)
 
   /** If @c true, the clock is shown. */
   Q_PROPERTY(bool showClock READ showClockEnabled WRITE enableShowClock)
   /** If @c true, the call is shown. */
   Q_PROPERTY(bool showCall READ showCallEnabled WRITE enableShowCall)
-  /** The color of the call. */
-  Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
-  /** Specifies the UI language. */
-  Q_PROPERTY(Language language READ language WRITE setLanguage)
-  /** Shows the channel number. */
-  Q_PROPERTY(bool showChannelNumber READ showChannelNumberEnabled WRITE enableShowChannelNumber)
   /** Shows the contact. */
   Q_PROPERTY(bool showContact READ showContact WRITE enableShowContact)
+  /** Shows the channel number. */
+  Q_PROPERTY(bool showChannelNumber READ showChannelNumberEnabled WRITE enableShowChannelNumber)
+  /** Shows the color code. */
+  Q_PROPERTY(bool showColorCode READ showColorCode WRITE enableShowColorCode)
+  /** Shows the time slot. */
+  Q_PROPERTY(bool showTimeSlot READ showTimeSlot WRITE enableShowTimeSlot)
+  /** Shows the channel type. */
+  Q_PROPERTY(bool showChannelType READ showChannelType WRITE enableShowChannelType)
+  /** Shows the last caller. */
+  Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
+  /** The last-caller display mode. */
+  Q_PROPERTY(LastCallerDisplayMode lastCallerDisplay READ lastCallerDisplay WRITE setLastCallerDisplay)
+
+  /** The color of the call. */
+  Q_PROPERTY(Color callColor READ callColor WRITE setCallColor)
   /** The standby text color. */
   Q_PROPERTY(Color standbyTextColor READ standbyTextColor WRITE setStandbyTextColor)
   /** The standby background color. */
   Q_PROPERTY(Color standbyBackgroundColor READ standbyBackgroundColor WRITE setStandbyBackgroundColor)
-  /** Shows the last caller. */
-  Q_PROPERTY(bool showLastHeard READ showLastHeardEnabled WRITE enableShowLastHeard)
 
   Q_CLASSINFO("channelNameColorDescription", "Specifies the color of the channel name.")
   /** The channel name color. */
@@ -803,6 +831,11 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_CLASSINFO("zoneBNameColorDescription", "Specifies the color of the zone name for VFO B.")
   /** The zone name color for VFO B. */
   Q_PROPERTY(Color zoneBNameColor READ zoneBNameColor WRITE setZoneBNameColor)
+
+  /** Specifies the UI language. */
+  Q_PROPERTY(Language language READ language WRITE setLanguage)
+  /** Specifies the date format. */
+  Q_PROPERTY(DateFormat dateFormat READ dateFormat WRITE setDateFormat)
 
 public:
   /** What to show from the last caller. */
@@ -886,11 +919,27 @@ public:
   Language language() const;
   /** Sets the UI language. */
   void setLanguage(Language lang);
+  /** Returns the date format */
+  DateFormat dateFormat() const;
+  /** Sets the date format. */
+  void setDateFormat(DateFormat format);
 
   /** Returns @c true if the channel number is shown. */
   bool showChannelNumberEnabled() const;
   /** Enables/disables the display of the channel number. */
   void enableShowChannelNumber(bool enable);
+  /** Returns @c true if the color code is shown. */
+  bool showColorCode() const;
+  /** Shows/hides color code. */
+  void enableShowColorCode(bool enable);
+  /** Returns @c true if the time slot is shown. */
+  bool showTimeSlot() const;
+  /** Shows/hides time slot. */
+  void enableShowTimeSlot(bool enable);
+  /** Returns @c true if the channel type is shown. */
+  bool showChannelType() const;
+  /** Shows/hides channel type. */
+  void enableShowChannelType(bool enable);
 
   /** Returns @c true if the contact is shown. */
   bool showContact() const;
@@ -938,6 +987,10 @@ public:
   Interval backlightDurationRX() const;
   /** Sets the backlight duration during RX in seconds. */
   void setBacklightDurationRX(Interval sec);
+  /** Returns @c true if the custom channel background is enabled. */
+  bool customChannelBackground() const;
+  /** Enables/disables the custom channel background. */
+  void enableCustomChannelBackground(bool enable);
 
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
@@ -950,13 +1003,18 @@ protected:
   bool _showCall;                           ///< Display call.
   Color _callColor;                         ///< Color of call.
   Language _language;                       ///< UI language.
+  DateFormat _dateFormat;                   ///< The date format.
   bool _showChannelNumber;                  ///< Show channel number.
+  bool _showColorCode;                      ///< Show color code.
+  bool _showTimeSlot;                       ///< Show time slot.
+  bool _showChannelType;                    ///< Show channel type.
   bool _showContact;                        ///< Enables showing the contact.
   Color _standbyTextColor;                  ///< Standby text color.
   Color _standbyBackgroundColor;            ///< Standby background color.
   bool _showLastHeard;                      ///< Shows the last caller.
   Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
   Interval _backlightDurationRX;            ///< Backlight duration in seconds during RX.
+  bool _customChannelBackground;            ///< Custom channel background enabled.
   Color _channelNameColor;                  ///< Color of channel name.
   Color _channelBNameColor;                 ///< Color of channel name for VFO B.
   Color _zoneNameColor;                     ///< Color of zone name.
@@ -1341,10 +1399,14 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.")
   /** Group-call hang-time in seconds. */
   Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+  /** Manual dialed group-call hang-time in seconds. */
+  Q_PROPERTY(Interval manualGroupCallHangTime READ manualGroupCallHangTime WRITE setManualGroupCallHangTime)
 
   Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.")
   /** Private-call hang-time in seconds. */
   Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+  /** Manual dialed private-call hang-time in seconds. */
+  Q_PROPERTY(Interval manualPrivateCallHangTime READ manualPrivateCallHangTime WRITE setManualPrivateCallHangTime)
 
   Q_CLASSINFO("preWaveDelay", "Sets the pre-wave delay in ms. Should be set to 100ms.")
   /** Pre-wave delay in ms. */
@@ -1382,6 +1444,11 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
   /** If @c true, the talker alias (name) is send. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
+  Q_PROPERTY(TalkerAliasSource takerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
+  Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
+
+  /** The encryption type to be used. */
+  Q_PROPERTY(EncryptionType encryption READ encryption WRITE setEncryption)
 
   /** Specifies the talker alias source. */
   Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
@@ -1429,10 +1496,18 @@ public:
   Interval groupCallHangTime() const;
   /** Sets the group-call hang-time in seconds. */
   void setGroupCallHangTime(Interval sec);
+  /** Returns the manual dialed group-call hang-time in seconds. */
+  Interval manualGroupCallHangTime() const;
+  /** Sets the manual dialed group-call hang-time in seconds. */
+  void setManualGroupCallHangTime(Interval sec);
   /** Returns the private-call hang-time in seconds. */
   Interval privateCallHangTime() const;
   /** Sets the private-call hang-time in seconds. */
   void setPrivateCallHangTime(Interval sec);
+  /** Returns the manual dialed private-call hang-time in seconds. */
+  Interval manualPrivateCallHangTime() const;
+  /** Sets the manual dialed private-call hang-time in seconds. */
+  void setManualPrivateCallHangTime(Interval sec);
 
   /** Returns the pre-wave delay in ms. */
   Interval preWaveDelay() const;
@@ -1485,9 +1560,16 @@ public:
   /** Sets the talker alias encoding. */
   void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
 
+  /** Returns the encryption type. */
+  EncryptionType encryption() const;
+  /** Sets the encryption type. */
+  void setEncryption(EncryptionType type);
+
 protected:
   Interval _groupCallHangTime;          ///< Hang-time for group-calls in seconds.
+  Interval _manualGroupCallHangTime;    ///< Hang-time for manual dialed group-calls in seconds.
   Interval _privateCallHangTime;        ///< Hang-time for private-calls in seconds.
+  Interval _manualPrivateCallHangTime;  ///< Hang-time for manual dialed private-calls in seconds.
   Interval _preWaveDelay;               ///< Pre-wave time in ms, should be 100ms.
   Interval _wakeHeadPeriod;             ///< Wake head-period in ms, should be 100ms.
   bool _filterOwnID;                    ///< If enabled, the own ID is not shown in call lists.
@@ -1499,6 +1581,7 @@ protected:
   bool _sendTalkerAlias;                ///< Enables sending talker alias.
   TalkerAliasSource _talkerAliasSource; ///< Source for the talker alias.
   TalkerAliasEncoding _talkerAliasEncoding; ///< Encoding for the talker alias.
+  EncryptionType _encryption;           ///< DMR encryption type.
 };
 
 
@@ -1526,12 +1609,21 @@ class AnytoneGPSSettingsExtension: public ConfigItem
   /** GPS ranging interval in seconds. */
   Q_PROPERTY(Interval updatePeriod READ updatePeriod WRITE setUpdatePeriod)
 
+  /** The GPS mode. */
+  Q_PROPERTY(GPSMode mode READ mode WRITE setMode)
+
 public:
   /** Possible unit systems. */
   enum class Units {
     Metric = 0, Archaic = 1
   };
   Q_ENUM(Units)
+
+  /** Possible GPS modes. */
+  enum class GPSMode {
+    GPS=0, BDS=1, Both=2
+  };
+  Q_ENUM(GPSMode)
 
 public:
   /** Constructor. */
@@ -1563,11 +1655,17 @@ public:
   /** Sets the GPS ranging interval in seconds. */
   void setUpdatePeriod(Interval sec);
 
+  /** returns the GPS mode. */
+  GPSMode mode() const;
+  /** Sets the GPS mode. */
+  void setMode(GPSMode mode);
+
 protected:
   Units _gpsUnits;                             ///< The GPS units.
   QTimeZone _timeZone;                         ///< The time zone.
   bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
   Interval _gpsRangingInterval;                ///< The GPS ranging interval in seconds.
+  GPSMode _mode;                               ///< The GPS mode (GPS, Baidu, both).
 };
 
 
@@ -1601,6 +1699,9 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   /** Retry count. */
   Q_PROPERTY(unsigned int retryCount READ repeaterRangeCheckCount WRITE setRepeaterRangeCheckCount)
 
+  /** Repeater out-of-range alert type. */
+  Q_PROPERTY(OutOfRangeAlert outOfRangeAlert READ outOfRangeAlert WRITE setOutOfRangeAlert)
+
   Q_CLASSINFO("roamStart", "Start condition for auto-roaming.")
   /** Auto-roaming start condition. */
   Q_PROPERTY(RoamStart roamStart READ roamingStartCondition WRITE setRoamingStartCondition)
@@ -1617,6 +1718,9 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   /** Repeater-check notification count. */
   Q_PROPERTY(unsigned int notificationCount READ notificationCount WRITE setNotificationCount)
 
+  /** GPS roaming enabled. */
+  Q_PROPERTY(bool gpsRoaming READ gpsRoaming WRITE enableGPSRoaming)
+
 public:
   /** Possible roaming start conditions. */
   enum class RoamStart {
@@ -1624,11 +1728,22 @@ public:
   };
   Q_ENUM(RoamStart)
 
+  /** Possible repeater out-of-range alerts. */
+  enum class OutOfRangeAlert {
+    None = 0x00, Bell = 0x01, Voice = 0x02
+  };
+  Q_ENUM(OutOfRangeAlert)
+
 public:
   /** Constructor. */
   explicit AnytoneRoamingSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
+
+  /** Returns @c true if auto-roaming is enabled. */
+  bool autoRoam() const;
+  /** Enables/disables auto-roaming. */
+  void enableAutoRoam(bool enable);
 
   /** Returns the auto-roaming period in minutes. */
   Interval autoRoamPeriod() const;
@@ -1651,6 +1766,10 @@ public:
   unsigned int repeaterRangeCheckCount() const;
   /** Sets the number of retries before giving up. */
   void setRepeaterRangeCheckCount(unsigned int count);
+  /** Returns the repeater out-of-range alert type. */
+  OutOfRangeAlert outOfRangeAlert() const;
+  /** Sets the repeater out-of-range alert type. */
+  void setOutOfRangeAlert(OutOfRangeAlert type);
 
   /** Returns the auto-roaming start condition. */
   RoamStart roamingStartCondition() const;
@@ -1670,21 +1789,66 @@ public:
   /** Sets the number of repeater-check notifications. */
   void setNotificationCount(unsigned int n);
 
+  /** Returns @c true if GPS roaming is enabled. */
+  bool gpsRoaming() const;
+  /** Enables/disables GPS roaming. */
+  void enableGPSRoaming(bool enable);
+
 protected:
+  bool _autoRoam;                              ///< Enables auto roaming.
   Interval _autoRoamPeriod;                    ///< The auto-roam period in minutes.
   Interval _autoRoamDelay;                     ///< The auto-roam delay in seconds.
   bool _repeaterRangeCheck;                    ///< Enables the repeater range-check.
   Interval _repeaterCheckInterval;             ///< The repeater check interval in seconds.
   unsigned int _repeaterRangeCheckCount;       ///< Number of range checks before giving up.
+  OutOfRangeAlert _outOfRangeAlert;            ///< Type of the out-out-range alert.
   RoamStart _roamingStartCondition;            ///< Auto-roaming start condition.
   RoamStart _roamingReturnCondition;           ///< Auto-roaming return condition.
   bool _notification;                          ///< Repeater check notification.
   unsigned int _notificationCount;             ///< Number of notifications.
+  bool _gpsRoaming;                            ///< Enables GPS roaming.
+};
+
+
+/** Implements the bluetooth settings for some AnyTone devices.
+ * This extension is part of the @c AnytoneSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneBluetoothSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("Description", "Collects all bluetooth settings for AnyTone devices.")
+
+  /** If @c true, the PTT latch is enabled. */
+  Q_PROPERTY(bool pttLatch READ pttLatch WRITE enablePTTLatch)
+  /** The sleep timeout of the PTT button. If 0, sleep timer is disabled. */
+  Q_PROPERTY(Interval pttSleepTimer READ pttSleepTimer WRITE setPTTSleepTimer)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneBluetoothSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns @c true if the PTT latch is enabled. */
+  bool pttLatch() const;
+  /** Enables/disables the PTT latch. */
+  void enablePTTLatch(bool enable);
+
+  /** Returns the PTT sleep timeout, 0 means off. */
+  Interval pttSleepTimer() const;
+  /** Sets the PTT sleep timeout, 0 means off. */
+  void setPTTSleepTimer(Interval intv);
+
+protected:
+  bool _pttLatch;              ///< PTT latch flag.
+  Interval _pttSleep;          ///< PTT sleep timer, 0 is off.
 };
 
 
 /** Implements the simplex repeater settings for the BTECH DMR-6X2UV.
- * This extension is part of the @c AnytonSettingsExtension
+ * This extension is part of the @c AnytoneSettingsExtension
  *
  * @ingroup anytone */
 class AnytoneSimplexRepeaterSettingsExtension: public ConfigItem
@@ -1754,6 +1918,9 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The auto shut-down delay in minutes. */
   Q_PROPERTY(Interval autoShutDownDelay READ autoShutDownDelay WRITE setAutoShutDownDelay)
 
+  /** Resets the auto shut-down timer on every call. */
+  Q_PROPERTY(bool resetAutoShutdownOnCall READ resetAutoShutdownOnCall WRITE enableResetAutoShutdownOnCall)
+
   Q_CLASSINFO("powerSaveDescription", "Specifies the power save mode. "
                                       "D686UV, D878UV(2) and DMR-6X2UV only.")
   /** The power-save mode. */
@@ -1803,6 +1970,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_CLASSINFO("steFrequencyDescription", "Specifies the STE (squelch tail elimination) frequency in Hz.")
   /** The STE frequency in Hz. */
   Q_PROPERTY(double steFrequency READ steFrequency WRITE setSTEFrequency)
+  /** The STE duration in ms. */
+  Q_PROPERTY(Interval steDuration READ steDuration WRITE setSTEDuration)
 
   Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz. Should be one of "
                                           "1000, 1450, 1750 and 2100 Hz. "
@@ -1816,6 +1985,9 @@ class AnytoneSettingsExtension: public ConfigExtension
 
   /** If @c true, the call-channel is maintained (whatever that means). */
   Q_PROPERTY(bool maintainCallChannel READ maintainCallChannelEnabled WRITE enableMaintainCallChannel)
+
+  /** If @c true, the adaptive transmission power control is enabled. */
+  Q_PROPERTY(bool atpc READ atpc WRITE enableATPC)
 
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
@@ -1837,6 +2009,8 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneGPSSettingsExtension* gpsSettings READ gpsSettings)
   /** The Roaming settings. */
   Q_PROPERTY(AnytoneRoamingSettingsExtension* roamingSettings READ roamingSettings)
+  /** The bluethooth settings. */
+  Q_PROPERTY(AnytoneBluetoothSettingsExtension* bluetoothSettings READ bluetoothSettings)
 
   Q_CLASSINFO("simplexRepeaterSettingsDescription",
               "Configuration for the DMR-6X2UV simplex-repeater feature.")
@@ -1901,6 +2075,8 @@ public:
   AnytoneGPSSettingsExtension *gpsSettings() const;
   /** A reference to the roaming settings. */
   AnytoneRoamingSettingsExtension *roamingSettings() const;
+  /** A reference to the bluetooth settings. */
+  AnytoneBluetoothSettingsExtension *bluetoothSettings() const;
   /** A reference to the simplex repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *simplexRepeaterSettings() const;
 
@@ -1908,6 +2084,11 @@ public:
   Interval autoShutDownDelay() const;
   /** Sets the auto shut-down delay. */
   void setAutoShutDownDelay(Interval min);
+
+  /** Returns @c true, if the auto shut-down timer is reset on every call. */
+  bool resetAutoShutdownOnCall() const;
+  /** Enables/disables reset of auto shut-down timer on every call. */
+  void enableResetAutoShutdownOnCall(bool enable);
 
   /** Returns the power-save mode. */
   PowerSave powerSave() const;
@@ -1985,6 +2166,10 @@ public:
   /** Sets the STE (squelch tail elimination) frequency in Hz.
    * A frequency of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
   void setSTEFrequency(double freq);
+  /** Returns the STE duration in ms. */
+  Interval steDuration() const;
+  /** Sets the STE duration. */
+  void setSTEDuration(Interval intv);
 
   /** Returns the TBST frequency in Hz. */
   Frequency tbstFrequency() const;
@@ -2000,6 +2185,11 @@ public:
   bool maintainCallChannelEnabled() const;
   /** Enables/disables maintaining the call-channel. */
   void enableMaintainCallChannel(bool enable);
+
+  /** Returns @c true if the adaptive transmission power control is enabled. */
+  bool atpc() const;
+  /** Enables/disables the adaptive transmission power control. */
+  void enableATPC(bool enable);
 
 protected:
   /** The boot settings. */
@@ -2020,12 +2210,15 @@ protected:
   AnytoneDMRSettingsExtension *_dmrSettings;
   /** The GSP settings. */
   AnytoneGPSSettingsExtension *_gpsSettings;
-  /** The ranging settings. */
-  AnytoneRoamingSettingsExtension *_roaminSettings;
+  /** The roaming settings. */
+  AnytoneRoamingSettingsExtension *_roamingSettings;
+  /** The bluetooth settings. */
+  AnytoneBluetoothSettingsExtension *_bluetoothSettings;
   /** The simplex-repeater settings. */
   AnytoneSimplexRepeaterSettingsExtension *_simplexRepeaterSettings;
 
   Interval _autoShutDownDelay;     ///< The auto shut-down delay in minutes.
+  bool _resetAutoShutdownOnCall;   ///< Enables reset of auto shut-down timer on every call.
   PowerSave _powerSave;            ///< Power save mode property.
   VFOScanType _vfoScanType;        ///< The VFO scan-type property.
   VFOMode _modeA;                  ///< Mode of VFO A.
@@ -2041,10 +2234,12 @@ protected:
   bool _keepLastCaller;            ///< If @c true, the last caller is kept on channel switch.
   Frequency _vfoStep;              ///< The VFO tuning step in kHz.
   STEType _steType;                ///< The STE type.
-  double _steFrequency;            ///< STE Frequency in Hz.
+  double _steFrequency;            ///< STE frequency in Hz.
+  Interval _steDuration;           ///< STE duration
   Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
+  bool _atpc;                      ///< Adaptive Transmission Power Control.
 };
 
 #endif // ANYTONEEXTENSION_HH

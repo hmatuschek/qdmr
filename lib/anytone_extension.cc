@@ -321,11 +321,15 @@ AnytoneContactExtension::setAlertType(AlertType type) {
  * ********************************************************************************************* */
 AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
   : ConfigItem(parent), _groupCallHangTime(Interval::fromSeconds(3)),
-    _privateCallHangTime(Interval::fromSeconds(5)), _preWaveDelay(Interval::fromMilliseconds(100)),
+    _manualGroupCallHangTime(Interval::fromSeconds(5)),
+    _privateCallHangTime(Interval::fromSeconds(5)),
+    _manualPrivateCallHangTime(Interval::fromSeconds(7)),
+    _preWaveDelay(Interval::fromMilliseconds(100)),
     _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
     _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
     _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola), _sendTalkerAlias(false),
-    _talkerAliasSource(TalkerAliasSource::Conctact), _talkerAliasEncoding(TalkerAliasEncoding::ISO7)
+    _talkerAliasSource(TalkerAliasSource::Conctact), _talkerAliasEncoding(TalkerAliasEncoding::ISO7),
+    _encryption(EncryptionType::DMR)
 {
   // pass...
 }
@@ -353,6 +357,18 @@ AnytoneDMRSettingsExtension::setGroupCallHangTime(Interval sec) {
 }
 
 Interval
+AnytoneDMRSettingsExtension::manualGroupCallHangTime() const {
+  return _manualGroupCallHangTime;
+}
+void
+AnytoneDMRSettingsExtension::setManualGroupCallHangTime(Interval sec) {
+  if (_manualGroupCallHangTime == sec)
+    return;
+  _manualGroupCallHangTime = sec;
+  emit modified(this);
+}
+
+Interval
 AnytoneDMRSettingsExtension::privateCallHangTime() const {
   return _privateCallHangTime;
 }
@@ -361,6 +377,18 @@ AnytoneDMRSettingsExtension::setPrivateCallHangTime(Interval sec) {
   if (_privateCallHangTime == sec)
     return;
   _privateCallHangTime = sec;
+  emit modified(this);
+}
+
+Interval
+AnytoneDMRSettingsExtension::manualPrivateCallHangTime() const {
+  return _manualPrivateCallHangTime;
+}
+void
+AnytoneDMRSettingsExtension::setManualPrivateCallHangTime(Interval sec) {
+  if (_manualPrivateCallHangTime == sec)
+    return;
+  _manualPrivateCallHangTime = sec;
   emit modified(this);
 }
 
@@ -496,13 +524,25 @@ AnytoneDMRSettingsExtension::setTalkerAliasEncoding(TalkerAliasEncoding encoding
   emit modified(this);
 }
 
+AnytoneDMRSettingsExtension::EncryptionType
+AnytoneDMRSettingsExtension::encryption() const {
+  return _encryption;
+}
+void
+AnytoneDMRSettingsExtension::setEncryption(EncryptionType type) {
+  if (type == _encryption)
+    return;
+  _encryption = type;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneGPSSettingsExtension
  * ********************************************************************************************* */
 AnytoneGPSSettingsExtension::AnytoneGPSSettingsExtension(QObject *parent)
   : ConfigItem(parent), _gpsUnits(Units::Metric), _timeZone(QTimeZone::utc()),
-    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300))
+    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300)), _mode(GPSMode::GPS)
 {
   // pass...
 }
@@ -573,6 +613,18 @@ AnytoneGPSSettingsExtension::setUpdatePeriod(Interval sec) {
   emit modified(this);
 }
 
+AnytoneGPSSettingsExtension::GPSMode
+AnytoneGPSSettingsExtension::mode() const {
+  return _mode;
+}
+void
+AnytoneGPSSettingsExtension::setMode(GPSMode mode) {
+  if (mode == _mode)
+    return;
+  _mode = mode;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneRangingSettingsExtension
@@ -581,8 +633,9 @@ AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent
   : ConfigItem(parent),
     _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
     _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
+    _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
-    _notificationCount(1)
+    _notificationCount(1), _gpsRoaming(false)
 {
   // pass...
 }
@@ -595,6 +648,18 @@ AnytoneRoamingSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
+}
+
+bool
+AnytoneRoamingSettingsExtension::autoRoam() const {
+  return _autoRoam;
+}
+void
+AnytoneRoamingSettingsExtension::enableAutoRoam(bool enable) {
+  if (enable == _autoRoam)
+    return;
+  _autoRoam = enable;
+  emit modified(this);
 }
 
 Interval
@@ -656,6 +721,18 @@ AnytoneRoamingSettingsExtension::setRepeaterRangeCheckCount(unsigned int sec) {
   emit modified(this);
 }
 
+AnytoneRoamingSettingsExtension::OutOfRangeAlert
+AnytoneRoamingSettingsExtension::outOfRangeAlert() const {
+  return _outOfRangeAlert;
+}
+void
+AnytoneRoamingSettingsExtension::setOutOfRangeAlert(OutOfRangeAlert type) {
+  if (type == _outOfRangeAlert)
+    return;
+  _outOfRangeAlert = type;
+  emit modified(this);
+}
+
 AnytoneRoamingSettingsExtension::RoamStart
 AnytoneRoamingSettingsExtension::roamingStartCondition() const {
   return _roamingStartCondition;
@@ -703,6 +780,18 @@ AnytoneRoamingSettingsExtension::setNotificationCount(unsigned int n) {
   emit modified(this);
 }
 
+bool
+AnytoneRoamingSettingsExtension::gpsRoaming() const {
+  return _gpsRoaming;
+}
+void
+AnytoneRoamingSettingsExtension::enableGPSRoaming(bool enable) {
+  if (enable == _gpsRoaming)
+    return;
+  _gpsRoaming = enable;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneSettingsExtension
@@ -717,16 +806,17 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _autoRepeaterSettings(new AnytoneAutoRepeaterSettingsExtension(this)),
     _dmrSettings(new AnytoneDMRSettingsExtension(this)),
     _gpsSettings(new AnytoneGPSSettingsExtension(this)),
-    _roaminSettings(new AnytoneRoamingSettingsExtension(this)),
+    _roamingSettings(new AnytoneRoamingSettingsExtension(this)),
+    _bluetoothSettings(new AnytoneBluetoothSettingsExtension(this)),
     _simplexRepeaterSettings(new AnytoneSimplexRepeaterSettingsExtension(this)),
-    _autoShutDownDelay(), _powerSave(PowerSave::Save50), _vfoScanType(VFOScanType::Time),
-    _modeA(VFOMode::Memory), _modeB(VFOMode::Memory), _zoneA(), _zoneB(), _selectedVFO(VFO::A),
-    _subChannel(true), _minVFOScanFrequencyUHF(Frequency::fromMHz(430)),
-    _maxVFOScanFrequencyUHF(Frequency::fromMHz(440)), _minVFOScanFrequencyVHF(Frequency::fromMHz(144)),
-    _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)), _keepLastCaller(false),
-    _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
-    _tbstFrequency(Frequency::fromHz(1750)), _proMode(false),
-    _maintainCallChannel(false)
+    _autoShutDownDelay(), _resetAutoShutdownOnCall(true), _powerSave(PowerSave::Save50),
+    _vfoScanType(VFOScanType::Time), _modeA(VFOMode::Memory), _modeB(VFOMode::Memory),
+    _zoneA(), _zoneB(), _selectedVFO(VFO::A), _subChannel(true),
+    _minVFOScanFrequencyUHF(Frequency::fromMHz(430)), _maxVFOScanFrequencyUHF(Frequency::fromMHz(440)),
+    _minVFOScanFrequencyVHF(Frequency::fromMHz(144)), _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)),
+    _keepLastCaller(false), _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
+    _steDuration(Interval::fromMilliseconds(300)), _tbstFrequency(Frequency::fromHz(1750)),
+    _proMode(false), _maintainCallChannel(false), _atpc(false)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -744,7 +834,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
           this, &AnytoneSettingsExtension::modified);
   connect(_dmrSettings, &AnytoneDMRSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
-  connect(_roaminSettings, &AnytoneRoamingSettingsExtension::modified,
+  connect(_roamingSettings, &AnytoneRoamingSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
   connect(_simplexRepeaterSettings, &AnytoneSimplexRepeaterSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -808,7 +898,12 @@ AnytoneSettingsExtension::gpsSettings() const {
 
 AnytoneRoamingSettingsExtension *
 AnytoneSettingsExtension::roamingSettings() const {
-  return _roaminSettings;
+  return _roamingSettings;
+}
+
+AnytoneBluetoothSettingsExtension *
+AnytoneSettingsExtension::bluetoothSettings() const {
+  return _bluetoothSettings;
 }
 
 AnytoneSimplexRepeaterSettingsExtension *
@@ -825,6 +920,18 @@ AnytoneSettingsExtension::setAutoShutDownDelay(Interval intv) {
   if (_autoShutDownDelay == intv)
     return;
   _autoShutDownDelay = intv;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::resetAutoShutdownOnCall() const {
+  _resetAutoShutdownOnCall;
+}
+void
+AnytoneSettingsExtension::enableResetAutoShutdownOnCall(bool enable) {
+  if (enable == _resetAutoShutdownOnCall)
+    return;
+  _resetAutoShutdownOnCall = enable;
   emit modified(this);
 }
 
@@ -1010,6 +1117,18 @@ AnytoneSettingsExtension::setSTEFrequency(double freq) {
   emit modified(this);
 }
 
+Interval
+AnytoneSettingsExtension::steDuration() const {
+  return _steDuration;
+}
+void
+AnytoneSettingsExtension::setSTEDuration(Interval intv) {
+  if (intv == _steDuration)
+    return;
+  _steDuration = intv;
+  emit modified(this);
+}
+
 Frequency
 AnytoneSettingsExtension::tbstFrequency() const {
   return _tbstFrequency;
@@ -1043,6 +1162,18 @@ AnytoneSettingsExtension::enableMaintainCallChannel(bool enable) {
   if (_maintainCallChannel == enable)
     return;
   _maintainCallChannel = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneSettingsExtension::atpc() const {
+  return _atpc;
+}
+void
+AnytoneSettingsExtension::enableATPC(bool enable) {
+  if (enable == _atpc)
+    return;
+  _atpc = enable;
   emit modified(this);
 }
 
@@ -1512,8 +1643,11 @@ AnytoneKeySettingsExtension::enableForcedKeyLock(bool enable) {
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
     _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
-    _idleChannelTone(false), _startupTone(false), _callMelody(new Melody(100, this)),
-    _idleMelody(new Melody(100, this)), _resetMelody(new Melody(100, this)), _keyToneLevel(0)
+    _dmrIdleChannelTone(false), _fmIdleChannelTone(false), _startupTone(false),
+    _totNotification(false),
+    _callMelody(new Melody(100, this)), _idleMelody(new Melody(100, this)),
+    _resetMelody(new Melody(100, this)), _callEndMelody(new Melody(100, this)),
+    _keyToneLevel(0)
 {
   connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
   connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
@@ -1603,14 +1737,26 @@ AnytoneToneSettingsExtension::enableDigitalResetTone(bool enable) {
 }
 
 bool
-AnytoneToneSettingsExtension::idleChannelToneEnabled() const {
-  return _idleChannelTone;
+AnytoneToneSettingsExtension::dmrIdleChannelToneEnabled() const {
+  return _dmrIdleChannelTone;
 }
 void
-AnytoneToneSettingsExtension::enableIdleChannelTone(bool enable) {
-  if (_idleChannelTone == enable)
+AnytoneToneSettingsExtension::enableDMRIdleChannelTone(bool enable) {
+  if (_dmrIdleChannelTone == enable)
     return;
-  _idleChannelTone = enable;
+  _dmrIdleChannelTone = enable;
+  return modified(this);
+}
+
+bool
+AnytoneToneSettingsExtension::fmIdleChannelToneEnabled() const {
+  return _fmIdleChannelTone;
+}
+void
+AnytoneToneSettingsExtension::enableFMIdleChannelTone(bool enable) {
+  if (_fmIdleChannelTone == enable)
+    return;
+  _fmIdleChannelTone = enable;
   return modified(this);
 }
 
@@ -1626,6 +1772,18 @@ AnytoneToneSettingsExtension::enableStartupTone(bool enable) {
   return modified(this);
 }
 
+bool
+AnytoneToneSettingsExtension::totNotification() const {
+  return _totNotification;
+}
+void
+AnytoneToneSettingsExtension::enableTOTNotification(bool enable) {
+  if (enable == _totNotification)
+    return;
+  _totNotification = enable;
+  emit modified(this);
+}
+
 Melody *
 AnytoneToneSettingsExtension::callMelody() const {
   return _callMelody;
@@ -1637,6 +1795,10 @@ AnytoneToneSettingsExtension::idleMelody() const {
 Melody *
 AnytoneToneSettingsExtension::resetMelody() const {
   return _resetMelody;
+}
+Melody *
+AnytoneToneSettingsExtension::callEndMelody() const {
+  return _callEndMelody;
 }
 
 unsigned int
@@ -1659,11 +1821,12 @@ AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent
   : ConfigItem(parent), _displayFrequency(false), _brightness(5),
     _backlightDuration(Interval::fromSeconds(10)), _volumeChangePrompt(true), _callEndPrompt(true),
     _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
-    _callColor(Color::Orange), _language(Language::English),
-    _showChannelNumber(true), _showContact(true), _standbyTextColor(Color::White),
+    _callColor(Color::Orange), _language(Language::English), _dateFormat(DateFormat::DayFirst),
+    _showChannelNumber(true), _showColorCode(true), _showTimeSlot(true), _showChannelType(true),
+    _showContact(true), _standbyTextColor(Color::White),
     _standbyBackgroundColor(Color::Black), _showLastHeard(false), _backlightDurationTX(),
-    _backlightDurationRX(), _channelNameColor(Color::Orange), _channelBNameColor(Color::Orange),
-    _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
+    _backlightDurationRX(), _customChannelBackground(false), _channelNameColor(Color::Orange),
+    _channelBNameColor(Color::Orange), _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
 {
   // pass...
 }
@@ -1798,6 +1961,18 @@ AnytoneDisplaySettingsExtension::setLanguage(Language lang) {
   emit modified(this);
 }
 
+AnytoneDisplaySettingsExtension::DateFormat
+AnytoneDisplaySettingsExtension::dateFormat() const {
+  return _dateFormat;
+}
+void
+AnytoneDisplaySettingsExtension::setDateFormat(DateFormat format) {
+  if (format == _dateFormat)
+    return;
+  _dateFormat = format;
+  emit modified(this);
+}
+
 bool
 AnytoneDisplaySettingsExtension::showChannelNumberEnabled() const {
   return _showChannelNumber;
@@ -1807,6 +1982,42 @@ AnytoneDisplaySettingsExtension::enableShowChannelNumber(bool enable) {
   if (_showChannelNumber == enable)
     return;
   _showChannelNumber = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showColorCode() const {
+  return _showColorCode;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowColorCode(bool enable) {
+  if (_showColorCode == enable)
+    return;
+  _showColorCode = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showTimeSlot() const {
+  return _showTimeSlot;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowTimeSlot(bool enable) {
+  if (_showTimeSlot == enable)
+    return;
+  _showTimeSlot = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::showChannelType() const {
+  return _showChannelType;
+}
+void
+AnytoneDisplaySettingsExtension::enableShowChannelType(bool enable) {
+  if (_showChannelType == enable)
+    return;
+  _showChannelType = enable;
   emit modified(this);
 }
 
@@ -1927,6 +2138,18 @@ AnytoneDisplaySettingsExtension::setBacklightDurationRX(Interval sec) {
   if (_backlightDurationRX == sec)
     return;
   _backlightDurationRX = sec;
+  emit modified(this);
+}
+
+bool
+AnytoneDisplaySettingsExtension::customChannelBackground() const {
+  return _customChannelBackground;
+}
+void
+AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
+  if (enable == _customChannelBackground)
+    return;
+  _customChannelBackground = enable;
   emit modified(this);
 }
 
@@ -2323,6 +2546,50 @@ AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
   : ConfigObjectList(AnytoneAutoRepeaterOffset::staticMetaObject, parent)
 {
   // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneBluetoothSettingsExtension
+ * ********************************************************************************************* */
+AnytoneBluetoothSettingsExtension::AnytoneBluetoothSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _pttLatch(false), _pttSleep(Interval::fromMilliseconds(0))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneBluetoothSettingsExtension::clone() const {
+  AnytoneBluetoothSettingsExtension *ext = new AnytoneBluetoothSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+bool
+AnytoneBluetoothSettingsExtension::pttLatch() const {
+  return _pttLatch;
+}
+void
+AnytoneBluetoothSettingsExtension::enablePTTLatch(bool enable) {
+  if (enable == _pttLatch)
+    return;
+  _pttLatch = enable;
+  emit modified(this);
+}
+
+Interval
+AnytoneBluetoothSettingsExtension::pttSleepTimer() const {
+  return _pttSleep;
+}
+void
+AnytoneBluetoothSettingsExtension::setPTTSleepTimer(Interval intv) {
+  if (intv == _pttSleep)
+    return;
+  _pttSleep = intv;
+  emit modified(this);
 }
 
 

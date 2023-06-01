@@ -1066,12 +1066,12 @@ void
 DMR6X2UVCodeplug::ExtendedSettingsElement::enableRepeaterRangeCheck(bool enable) {
   setUInt8(Offset::repRangeCheck(), enable ? 0x01 : 0x00);
 }
-DMR6X2UVCodeplug::ExtendedSettingsElement::OutOfRangeAlert
+AnytoneRoamingSettingsExtension::OutOfRangeAlert
 DMR6X2UVCodeplug::ExtendedSettingsElement::repeaterOutOfRangeAlert() const {
-  return (OutOfRangeAlert) getUInt8(Offset::repRangeAlert());
+  return (AnytoneRoamingSettingsExtension::OutOfRangeAlert) getUInt8(Offset::repRangeAlert());
 }
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(OutOfRangeAlert alert) {
+DMR6X2UVCodeplug::ExtendedSettingsElement::setRepeaterOutOfRangeAlert(AnytoneRoamingSettingsExtension::OutOfRangeAlert alert) {
   setUInt8(Offset::repRangeAlert(), (uint8_t)alert);
 }
 unsigned int
@@ -1211,15 +1211,31 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
   if (nullptr == ext)
     return true;
 
+  // Encode audio settings
+  setMuteTimer(ext->audioSettings()->muteDelay());
+
+  // Encode display settings
+  setChannelANameColor(ext->displaySettings()->channelNameColor());
+  setFontColor(ext->displaySettings()->standbyTextColor());
+  enableCustomChannelBackground(ext->displaySettings()->customChannelBackground());
+
+  // Encode DMR settings
+  setEncryptionType(ext->dmrSettings()->encryption());
+
   // Encode ranging/roaming settings.
+  enableAutoRoaming(ext->roamingSettings()->autoRoam());
   setAutoRoamPeriod(ext->roamingSettings()->autoRoamPeriod());
   setAutoRoamDelay(ext->roamingSettings()->autoRoamDelay());
   enableRepeaterRangeCheck(ext->roamingSettings()->repeaterRangeCheckEnabled());
   setRepeaterRangeCheckInterval(ext->roamingSettings()->repeaterCheckInterval());
   setRepeaterRangeCheckCount(ext->roamingSettings()->repeaterRangeCheckCount());
+  setRepeaterOutOfRangeAlert(ext->roamingSettings()->outOfRangeAlert());
   setRoamingStartCondition(ext->roamingSettings()->roamingStartCondition());
   setRoamingReturnCondition(ext->roamingSettings()->roamingReturnCondition());
   setRepeaterCheckNumNotifications(ext->roamingSettings()->notificationCount());
+  if (! ext->bootSettings()->defaultRoamingZone()->isNull())
+    setDefaultRoamingZoneIndex(
+          ctx.index(ext->bootSettings()->defaultRoamingZone()->as<RoamingZone>()));
 
   return true;
 }
@@ -1237,12 +1253,25 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Decode audio settings
+  ext->audioSettings()->setMuteDelay(this->muteTimer());
+
+  // Decode display settings
+  ext->displaySettings()->setChannelNameColor(this->channelANameColor());
+  ext->displaySettings()->setStandbyTextColor(this->fontColor());
+  ext->displaySettings()->enableCustomChannelBackground(this->customChannelBackgroundEnabled());
+
+  // Decode DMR settings
+  ext->dmrSettings()->setEncryption(this->encryptionType());
+
   // Decode ranging/roaming settings
+  ext->roamingSettings()->enableAutoRoam(this->autoRoamingEnabled());
   ext->roamingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
   ext->roamingSettings()->setAutoRoamDelay(this->autoRoamDelay());
   ext->roamingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheckEnabled());
   ext->roamingSettings()->setRepeaterCheckInterval(this->repeaterRangeCheckInterval());
   ext->roamingSettings()->setRepeaterRangeCheckCount(this->repeaterRangeCheckCount());
+  ext->roamingSettings()->setOutOfRangeAlert(this->repeaterOutOfRangeAlert());
   ext->roamingSettings()->setRoamingStartCondition(this->roamingStartCondition());
   ext->roamingSettings()->setRoamingReturnCondition(this->roamingReturnCondition());
   ext->roamingSettings()->setNotificationCount(this->repeaterCheckNumNotifications());

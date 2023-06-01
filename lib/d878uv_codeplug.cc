@@ -1795,12 +1795,12 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
   setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
-D878UVCodeplug::ExtendedSettingsElement::GPSMode
+AnytoneGPSSettingsExtension::GPSMode
 D878UVCodeplug::ExtendedSettingsElement::gpsMode() const {
-  return (GPSMode)getUInt8(Offset::gpsMode());
+  return (AnytoneGPSSettingsExtension::GPSMode)getUInt8(Offset::gpsMode());
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setGPSMode(GPSMode mode) {
+D878UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
   setUInt8(Offset::gpsMode(), (unsigned)mode);
 }
 
@@ -1887,21 +1887,21 @@ D878UVCodeplug::ExtendedSettingsElement::setEncryption(AnytoneDMRSettingsExtensi
 }
 
 bool
-D878UVCodeplug::ExtendedSettingsElement::totPrediction() const {
-  return 0x00 != getUInt8(Offset::totPrediction());
+D878UVCodeplug::ExtendedSettingsElement::totNotification() const {
+  return 0x00 != getUInt8(Offset::totNotification());
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::enableTOTPrediction(bool enable) {
-  setUInt8(Offset::totPrediction(), enable ? 0x01 : 0x00);
+D878UVCodeplug::ExtendedSettingsElement::enableTOTNotification(bool enable) {
+  setUInt8(Offset::totNotification(), enable ? 0x01 : 0x00);
 }
 
 bool
-D878UVCodeplug::ExtendedSettingsElement::alc() const {
-  return 0x00 != getUInt8(Offset::alc());
+D878UVCodeplug::ExtendedSettingsElement::atpc() const {
+  return 0x00 != getUInt8(Offset::atpc());
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::enableALC(bool enable) {
-  setUInt8(Offset::alc(), enable ? 0x01 : 0x00);
+D878UVCodeplug::ExtendedSettingsElement::enableATPC(bool enable) {
+  setUInt8(Offset::atpc(), enable ? 0x01 : 0x00);
 }
 
 AnytoneDisplaySettingsExtension::Color
@@ -1974,11 +1974,11 @@ D878UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
 }
 
 unsigned int
-D878UVCodeplug::ExtendedSettingsElement::analogMicGain() const {
+D878UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
   return (getUInt8(Offset::analogMicGain())+1)*10/5;
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setAnalogMicGain(unsigned int gain) {
+D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
   gain = std::min(10U, std::max(1U, gain));
   setUInt8(Offset::analogMicGain(), gain*4/10);
 }
@@ -2044,18 +2044,46 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
-    setAnalogMicGain(ctx.config()->settings()->micLevel());
+    setFMMicGain(ctx.config()->settings()->micLevel());
     return true;
   }
 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
+  // Some general settings
+  setSTEDuration(ext->steDuration());
+  enableATPC(ext->atpc());
+  enableResetAutoShutdownOnCall(ext->resetAutoShutdownOnCall());
+
+  // Encode tone settings
+  enableTOTNotification(ext->toneSettings()->totNotification());
+  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
+  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
+
+  // Encode audio settings
+  if (ext->audioSettings()->fmMicGainEnabled())
+    setFMMicGain(ext->audioSettings()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->micLevel());
+
+  // Encode DMR settings
+  setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
+  setManDialPrivateCallHangTime(ext->dmrSettings()->manualPrivateCallHangTime());
+  setEncryption(ext->dmrSettings()->encryption());
+
+  // Encode display settings
+  enableShowColorCode(ext->displaySettings()->showColorCode());
+  enableShowTimeSlot(ext->displaySettings()->showTimeSlot());
+  enableShowChannelType(ext->displaySettings()->showChannelType());
+  setDateFormat(ext->displaySettings()->dateFormat());
+
   // Encode auto-repeater frequency ranges
   setAutoRepeaterVHF2MinFrequency(ext->autoRepeaterSettings()->vhf2Min());
   setAutoRepeaterVHF2MaxFrequency(ext->autoRepeaterSettings()->vhf2Max());
   setAutoRepeaterUHF2MinFrequency(ext->autoRepeaterSettings()->uhf2Min());
   setAutoRepeaterUHF2MaxFrequency(ext->autoRepeaterSettings()->uhf2Max());
+
   // Encode auto-repeater offset indices
   clearAutoRepeaterVHF2OffsetIndex();
   if (! ext->autoRepeaterSettings()->vhf2Ref()->isNull()) {
@@ -2070,11 +2098,15 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
             ext->autoRepeaterSettings()->uhf2Ref()->as<AnytoneAutoRepeaterOffset>()));
   }
 
-  // Encode audio settings
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setAnalogMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setAnalogMicGain(ctx.config()->settings()->micLevel());
+  // Encode GPS settings
+  setGPSMode(ext->gpsSettings()->mode());
+
+  // Encode roaming settings
+  enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
+
+  // Encode bluetooth settings
+  enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
+  setBluetoothPTTSleepDelay(ext->bluetoothSettings()->pttSleepTimer());
 
   return true;
 }
@@ -2083,6 +2115,9 @@ bool
 D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
 
+  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
+    return false;
+
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
@@ -2090,23 +2125,57 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Some general settings
+  ext->setSTEDuration(this->steDuration());
+  ext->enableATPC(this->atpc());
+  ext->enableResetAutoShutdownOnCall(this->resetAutoShutdownOnCall());
+
+  // Store tone settings
+  ext->toneSettings()->enableTOTNotification(this->totNotification());
+  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
+  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
+
+  // Store FM mic gain separately
+  ext->audioSettings()->setFMMicGain(fmMicGain());
+  // Enable separate mic gain, if it differs from the DMR mic gain:
+  ext->audioSettings()->enableFMMicGain(
+        ctx.config()->settings()->micLevel() != fmMicGain());
+
+  // Store display settings
+  ext->displaySettings()->enableShowColorCode(this->showColorCode());
+  ext->displaySettings()->enableShowTimeSlot(this->showTimeSlot());
+  ext->displaySettings()->enableShowChannelType(this->showChannelType());
+  ext->displaySettings()->setDateFormat(this->dateFormat());
+
+  // Store some DMR settings
+  ext->dmrSettings()->setManualGroupCallHangTime(this->manDialGroupCallHangTime());
+  ext->dmrSettings()->setManualPrivateCallHangTime(this->manDialPrivateCallHangTime());
+  ext->dmrSettings()->setEncryption(this->encryption());
+
   // Store auto-repeater frequency ranges
   ext->autoRepeaterSettings()->setVHF2Min(this->autoRepeaterVHF2MinFrequency());
   ext->autoRepeaterSettings()->setVHF2Max(this->autoRepeaterVHF2MaxFrequency());
   ext->autoRepeaterSettings()->setUHF2Min(this->autoRepeaterUHF2MinFrequency());
   ext->autoRepeaterSettings()->setUHF2Max(this->autoRepeaterUHF2MaxFrequency());
 
-  // Store FM mic gain separately
-  ext->audioSettings()->setFMMicGain(analogMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-        ctx.config()->settings()->micLevel() != analogMicGain());
+  // Store GPS settings
+  ext->gpsSettings()->setMode(this->gpsMode());
+
+  // Store roaming settings
+  ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());
+
+  // Store bluetooth settings
+  ext->bluetoothSettings()->enablePTTLatch(this->bluetoothPTTLatch());
+  ext->bluetoothSettings()->setPTTSleepTimer(this->bluetoothPTTSleepDelay());
 
   return true;
 }
 
 bool
 D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err))
+    return false;
+
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {

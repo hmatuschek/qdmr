@@ -924,9 +924,9 @@ public:
     virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
-    virtual GPSMode gpsMode() const;
+    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(GPSMode mode);
+    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
 
     /** Returns the STE (squelch tail elimination) duration. */
     virtual Interval steDuration() const;
@@ -959,15 +959,15 @@ public:
     /** Sets the encryption mode. */
     virtual void setEncryption(AnytoneDMRSettingsExtension::EncryptionType mode);
 
-    /** Returns @c true if the transmit timeout prediction is enabled. */
-    virtual bool totPrediction() const;
-    /** Enables/disables transmit timeout prediction. */
-    virtual void enableTOTPrediction(bool enable);
+    /** Returns @c true if the transmit timeout notification is enabled. */
+    virtual bool totNotification() const;
+    /** Enables/disables transmit timeout notification. */
+    virtual void enableTOTNotification(bool enable);
 
-    /** Returns @c true if the ALC (TX power AGC) is enabled. */
-    virtual bool alc() const;
-    /** Enables/disables the ALC (TX power AGV). */
-    virtual void enableALC(bool enable);
+    /** Returns @c true if the ATPC (Adaptiv Transmission Power Control) is enabled. */
+    virtual bool atpc() const;
+    /** Enables/disables the ATPC (Adaptiv Transmission Power Control). */
+    virtual void enableATPC(bool enable);
 
     AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
     void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
@@ -1003,9 +1003,9 @@ public:
     virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
 
     /** Returns the FM Mic gain [1,10]. */
-    virtual unsigned int analogMicGain() const;
+    virtual unsigned int fmMicGain() const;
     /** Sets the analog mic gain [1,10]. */
-    virtual void setAnalogMicGain(unsigned int gain);
+    virtual void setFMMicGain(unsigned int gain);
 
     /** Returns @c true if the GPS roaming is enabled. */
     virtual bool gpsRoaming() const;
@@ -1055,8 +1055,8 @@ public:
       static constexpr unsigned int manPrivCallHangTime()          { return 0x0038; }
       static constexpr unsigned int channelBNameColor()            { return 0x0039; }
       static constexpr unsigned int encryptionType()               { return 0x003a; }
-      static constexpr unsigned int totPrediction()                { return 0x003b; }
-      static constexpr unsigned int alc()                          { return 0x003c; }
+      static constexpr unsigned int totNotification()              { return 0x003b; }
+      static constexpr unsigned int atpc()                         { return 0x003c; }
       static constexpr unsigned int zoneANameColor()               { return 0x003d; }
       static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
       static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
