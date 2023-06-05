@@ -370,6 +370,19 @@ public:
       } KeyFunctionCode;
     };
 
+    /** Device specific time zones. */
+    struct TimeZone {
+    public:
+      /** Encodes time zone. */
+      static uint8_t encode(const QTimeZone& zone);
+      /** Decodes time zone. */
+      static QTimeZone decode(uint8_t code);
+
+    protected:
+      /** Vector of possible time-zones. */
+      static QVector<QTimeZone> _timeZones;
+    };
+
   protected:
     /** Possible VFO frequency steps. */
     enum FreqStep {

@@ -280,6 +280,19 @@ public:
       } KeyFunctionCode;
     };
 
+    /** Device specific time zones. */
+    struct TimeZone {
+    public:
+      /** Encodes time zone. */
+      static uint8_t encode(const QTimeZone& zone);
+      /** Decodes time zone. */
+      static QTimeZone decode(uint8_t code);
+
+    protected:
+      /** Vector of possible time-zones. */
+      static QVector<QTimeZone> _timeZones;
+    };
+
     /** TBST (open repeater) frequencies. */
     enum class TBSTFrequency {
       Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3

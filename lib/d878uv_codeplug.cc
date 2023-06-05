@@ -586,9 +586,10 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::GeneralSettingsElement
+ * Implementation of D878UVCodeplug::GeneralSettingsElement::TimeZone
  * ******************************************************************************************** */
-static QVector<QTimeZone> _indexToTZ = {
+QVector<QTimeZone>
+D878UVCodeplug::GeneralSettingsElement::TimeZone::_timeZones = {
   QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400),
   QTimeZone(-28800), QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000),
   QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone(- 7200),
@@ -599,6 +600,23 @@ static QVector<QTimeZone> _indexToTZ = {
   QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600), QTimeZone( 43200),
   QTimeZone( 46800) };
 
+QTimeZone
+D878UVCodeplug::GeneralSettingsElement::TimeZone::decode(uint8_t code) {
+  if (code >= _timeZones.size())
+    return _timeZones.back();
+  return _timeZones.at(code);
+}
+uint8_t
+D878UVCodeplug::GeneralSettingsElement::TimeZone::encode(const QTimeZone &zone) {
+  if (! _timeZones.contains(zone))
+    return 13; //<- UTC
+  return _timeZones.indexOf(zone);
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
 D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
   : D868UVCodeplug::GeneralSettingsElement(ptr, size)
 {
@@ -618,17 +636,11 @@ D878UVCodeplug::GeneralSettingsElement::clear() {
 
 QTimeZone
 D878UVCodeplug::GeneralSettingsElement::gpsTimeZone() const {
-  int index = getUInt8(Offset::gpsTimeZone());
-  if (index >= _indexToTZ.size())
-    return _indexToTZ.back();
-  return _indexToTZ.at(index);
+  return TimeZone::decode(getUInt8(Offset::gpsTimeZone()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
-  if (! _indexToTZ.contains(zone))
-    setUInt8(Offset::gpsTimeZone(), 13); // <- Set to UTC
-  else
-    setUInt8(Offset::gpsTimeZone(), _indexToTZ.indexOf(zone));
+  setUInt8(Offset::gpsTimeZone(), TimeZone::encode(zone)); // <- Set to UTC
 }
 
 unsigned
