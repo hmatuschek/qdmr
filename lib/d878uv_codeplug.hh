@@ -347,21 +347,28 @@ public:
   {
   protected:
     /** Device specific key functions. */
-    enum class KeyFunction {
-      Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
-      Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
-      Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-      Dial = 0x10, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
-      HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
-      WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
-      PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-      ChannelType = 0x22, Roaming = 0x24, MaxVolume = 0x25, Slot = 0x26, Zone = 0x29,
-      RoamingSet = 0x2a, Mute=0x2c, CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
-      ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34
-    };
+    struct KeyFunction {
+    public:
+      /** Encodes key function. */
+      static uint8_t encode(AnytoneKeySettingsExtension::KeyFunction tone);
+      /** Decodes key function. */
+      static AnytoneKeySettingsExtension::KeyFunction decode(uint8_t code);
 
-    AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
-    uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
+    protected:
+      /** Device specific key functions. */
+      typedef enum {
+        Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+        Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
+        Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
+        Dial = 0x10, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
+        HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
+        WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
+        PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
+        ChannelType = 0x22, Roaming = 0x24, MaxVolume = 0x25, Slot = 0x26, Zone = 0x29,
+        RoamingSet = 0x2a, Mute=0x2c, CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
+        ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34
+      } KeyFunctionCode;
+    };
 
   protected:
     /** Possible VFO frequency steps. */
@@ -427,6 +434,27 @@ public:
     virtual Frequency vfoFrequencyStep() const;
     /** Sets the VFO frequency step in kHz. */
     virtual void setVFOFrequencyStep(Frequency kHz);
+
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
 
     /** Returns the STE (squelch tail eliminate) type. */
     virtual AnytoneSettingsExtension::STEType steType() const;
