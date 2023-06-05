@@ -231,6 +231,22 @@ class D878UVCodeplug : public D868UVCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Text colors supported by the D878UV. */
+  struct Color {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      Orange=0, Red=1, Yellow=2, Green=3, Turquoise=4, Blue=5, White = 6
+    } CodedColor;
+  };
+
 public:
   /** Represents the actual channel encoded within the binary D878UV codeplug.
    *
@@ -373,6 +389,11 @@ public:
     /** All possible STE (squelch tail eliminate) frequencies. */
     enum class STEFrequency {
       Off = 0, Hz55_2  = 1, Hz259_2 = 2
+    };
+
+    /** Possible background images. */
+    enum class BackgroundImage {
+      Default=0, Custom1=1, Custom2=2
     };
 
   protected:
@@ -604,10 +625,10 @@ public:
     virtual AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
     /** Sets the standby text color. */
     virtual void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
-    /** Returns the standby image color. */
-    virtual AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
-    /** Sets the standby image color. */
-    virtual void setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the standby background image. */
+    virtual BackgroundImage standbyBackgroundImage() const;
+    /** Sets the standby background image. */
+    virtual void setStandbyBackgroundImage(D878UVCodeplug::GeneralSettingsElement::BackgroundImage img);
 
     bool showLastHeard() const;
     void enableShowLastHeard(bool enable);

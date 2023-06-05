@@ -44,6 +44,7 @@ Code _ctcss_num2code[52] = {
   SIGNALING_NONE, SIGNALING_NONE // 254.1 and custom CTCSS not supported.
 };
 
+
 uint8_t
 D868UVCodeplug::ctcss_code2num(Signaling::Code code) {
   for (uint8_t i=0; i<52; i++) {
@@ -59,6 +60,37 @@ D868UVCodeplug::ctcss_num2code(uint8_t num) {
     return Signaling::SIGNALING_NONE;
   return _ctcss_num2code[num];
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of D868UVCodeplug::Color
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+D868UVCodeplug::Color::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Red:   return AnytoneDisplaySettingsExtension::Color::Red;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+D868UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Red;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -813,19 +845,11 @@ D868UVCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
 
 AnytoneDisplaySettingsExtension::Color
 D868UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::callColor());
+  return Color::decode(getUInt8(Offset::callColor()));
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
-  switch (color) {
-  case AnytoneDisplaySettingsExtension::Color::White:
-  case AnytoneDisplaySettingsExtension::Color::Black:
-    break;
-  default:
-    color = AnytoneDisplaySettingsExtension::Color::Black;
-    break;
-  }
-  setUInt8(Offset::callColor(), (unsigned)color);
+  setUInt8(Offset::callColor(), Color::encode(color));
 }
 
 Interval

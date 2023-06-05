@@ -189,6 +189,22 @@ class D868UVCodeplug : public AnytoneCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Colors supported by the D868UVE. */
+  struct Color {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      White = 0, Red=1
+    } CodedColor;
+  };
+
 public:
   /** Represents the channel element for AnyTone D868UV devices.
    *  This class derives from @c AnytoneCodeplug::ChannelElement and implements the device-specific

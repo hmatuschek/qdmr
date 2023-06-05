@@ -190,6 +190,52 @@ class DMR6X2UVCodeplug : public D868UVCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Colors supported by the DMR-6X2UV. */
+  struct Color {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      Orange=0, Red=1, Yellow=2, Green=3, Turquoise=4, Blue=5, White = 6, Black = 7
+    } CodedColor;
+  };
+
+  /** Background colors supported by the DMR-6X2UV. */
+  struct BackgroundColor {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      Black = 0, Blue = 1
+    } CodedColor;
+  };
+
+  /** Font colors supported by the DMR-6X2UV. */
+  struct FontColor {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      White = 0, Black = 1, Orange=2, Red=3, Yellow=4, Green=5, Turquoise=6, Blue=7
+    } CodedColor;
+  };
+
 public:
   /** General settings element for the DMR-6X2UV.
    *
@@ -243,12 +289,6 @@ public:
     /** All possible STE (squelch tail eliminate) frequencies. */
     enum class STEFrequency {
       Off = 0, Hz55_2  = 1, Hz259_2 = 2
-    };
-
-  public:
-    /** Possible colors for the callsign etc. */
-    enum class DisplayColor {
-      Orange=0x00, Red=0x01, Yellow=0x02, Green=0x03, Turquoise=0x04, Blue=0x05, White=0x06, Black=0x07
     };
 
 

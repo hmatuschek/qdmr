@@ -38,6 +38,100 @@
 #define ROAMING_ZONE_OFFSET         0x00000080
 
 
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::Color
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::Color::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+DMR6X2UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) Yellow;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) Green;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) Turquoise;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::BackgroundColor
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::BackgroundColor::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::Black;
+}
+
+uint8_t
+DMR6X2UVCodeplug::BackgroundColor::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  default: break;
+  }
+  return (uint8_t) Black;
+}
+
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::FontColor
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::FontColor::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+DMR6X2UVCodeplug::FontColor::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) Yellow;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) Green;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) Turquoise;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
@@ -687,11 +781,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::GeneralSettingsElement::standbyBackgroundColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::standbyBackground());
+  return BackgroundColor::decode(getUInt8(Offset::standbyBackground()));
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::standbyBackground(), (unsigned)color);
+  setUInt8(Offset::standbyBackground(), BackgroundColor::encode(color));
 }
 
 unsigned int
@@ -1026,11 +1120,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSett
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::fontColor());
+  return FontColor::decode(getUInt8(Offset::fontColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::fontColor(), (uint8_t)color);
+  setUInt8(Offset::fontColor(), FontColor::encode(color));
 }
 
 bool
@@ -1166,36 +1260,36 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(AnytoneDMRSettingsE
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneANameColor());
+  return Color::decode(getUInt8(Offset::zoneANameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneANameColor(), (uint8_t) color);
+  setUInt8(Offset::zoneANameColor(), Color::encode(color));
 }
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneBNameColor());
+  return Color::decode(getUInt8(Offset::zoneBNameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneBNameColor(), (uint8_t) color);
+  setUInt8(Offset::zoneBNameColor(), Color::encode(color));
 }
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelANameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelANameColor());
+  return Color::decode(getUInt8(Offset::channelANameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelANameColor(), (uint8_t) color);
+  setUInt8(Offset::channelANameColor(), Color::encode(color));
 }
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelBNameColor());
+  return Color::decode(getUInt8(Offset::channelBNameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelBNameColor(), (uint8_t) color);
+  setUInt8(Offset::channelBNameColor(), Color::encode(color));
 }
 
 bool
