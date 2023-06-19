@@ -1,19 +1,6 @@
 #include "interval.hh"
 #include <QRegularExpression>
 
-Interval::Interval()
-  : _duration(0)
-{
-  // pass...
-}
-
-
-Interval::Interval(const Interval &other)
-  : _duration(other._duration)
-{
-  // pass...
-}
-
 QString
 Interval::format(Format f) const {
   if (0 == _duration)
