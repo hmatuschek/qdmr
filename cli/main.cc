@@ -85,6 +85,12 @@ int main(int argc, char *argv[])
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
                    });
+  parser.addOption({
+                     {"","database"},
+                     QCoreApplication::translate("main", "Specifies the user DB json file when "
+                     "writing the callsign db."),
+                     "FILENAME"
+                   });
   parser.addOption(QCommandLineOption(
                      "init-codeplug",
                      QCoreApplication::translate(
