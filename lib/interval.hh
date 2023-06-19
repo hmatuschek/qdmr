@@ -25,9 +25,18 @@ protected:
 
 public:
   /** Default constructor. */
-  Interval();
+  Interval()
+    : _duration(0)
+  {
+    // pass...
+  }
+
   /** Copy constructor. */
-  Interval(const Interval &other);
+  constexpr Interval(const Interval &other)
+    : _duration(other._duration)
+  {
+    // pass...
+  }
 
   inline Interval &operator =(const Interval &other) {   ///< Assignment.
     _duration = other._duration; return *this;
