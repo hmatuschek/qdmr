@@ -66,6 +66,24 @@
   (both prefixes for Germany).
 </para>
 
+<section>
+<info><title>Specifying own databases</title></info>
+<para> 
+  With version 0.11.3, it is possible, to specify a user-crafted JSON database. Then, this 
+  file will be used for selecting the call signs for writing the call-sign DB. 
+</para>
+
+<informalexample>
+  <programlisting><![CDATA[dmrconf write-db --id=262 --limit=10000 --database=my_db.json]]></programlisting>
+</informalexample>
+
+<para>
+  Here, up to 10000 call signs are written from the <filename>my_db.json</filename> JSON file 
+  starting with those IDs closest to the prefix 262. Specifying a user-curated call-sign DB, simply
+  replaces the public one and thus all methods described above still work.
+</para>
+</section>
+
 <section xml:id="cmdEncodeDB">
 <info><title>Encoding a call-sign DB</title></info>
 
