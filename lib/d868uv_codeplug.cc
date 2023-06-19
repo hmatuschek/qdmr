@@ -420,7 +420,7 @@ D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::min(1U, std::min(10U, gain));
+  gain = std::max(1U, std::min(10U, gain));
   setUInt8(Offset::dmrMicGain(), (gain*4)/10);
 }
 
