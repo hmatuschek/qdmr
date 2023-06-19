@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate("main", "N")
                    });
   parser.addOption({
-                     {"","database"},
+                     {"B","database"},
                      QCoreApplication::translate("main", "Specifies the user DB json file when "
                      "writing the callsign db."),
                      "FILENAME"

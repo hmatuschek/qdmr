@@ -7,7 +7,7 @@
     <refentrytitle>dmrconf</refentrytitle>
     <manvolnum>1</manvolnum>
     <refmiscinfo class="source">dmrconf</refmiscinfo>
-    <refmiscinfo class="version">0.10.2</refmiscinfo>
+    <refmiscinfo class="version">0.11.3</refmiscinfo>
     <refmiscinfo class="manual">User Commands</refmiscinfo>
   </refmeta>
 
@@ -243,7 +243,7 @@
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term><option>-D</option> or <option>--database=</option>JSON_FILE</term>
+        <term><option>-B</option> or <option>--database=</option>JSON_FILE</term>
         <listitem>
           <para>
             Specifies the call-sign database to use for writing a user-db to the device.
