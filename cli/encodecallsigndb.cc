@@ -24,7 +24,12 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
 
   UserDatabase userdb;
-  if (0 == userdb.count()) {
+  if (parser.isSet("database")) {
+    if (! userdb.load(parser.value("database"))) {
+      logError() << "Cannot load user-db from '" << parser.value("database") << "'.";
+      return -1;
+    }
+  } else if (0 == userdb.count()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
     QEventLoop loop;

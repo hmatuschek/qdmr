@@ -243,6 +243,14 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>-B</option> or <option>--database=</option>JSON_FILE</term>
+        <listitem>
+          <para>
+            Specifies the call-sign database to use for writing a user-db to the device.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>--init-codeplug</option></term>
         <listitem>
           <para>

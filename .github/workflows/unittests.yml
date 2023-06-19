@@ -1,4 +1,4 @@
-name: CMake
+name: unittest-linux-gcc
 
 on:
   push:
