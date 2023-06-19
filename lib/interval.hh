@@ -17,7 +17,7 @@ public:
 
 protected:
   /** Constructor from milliseconds. */
-  explicit inline constexpr Interval(unsigned long long ms)
+  constexpr explicit Interval(unsigned long long ms)
     : _duration(ms)
   {
     // pass...
