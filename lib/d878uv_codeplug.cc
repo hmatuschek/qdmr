@@ -12,10 +12,10 @@
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::Color
+ * Implementation of D878UVCodeplug::NameColor
  * ******************************************************************************************** */
 AnytoneDisplaySettingsExtension::Color
-D878UVCodeplug::Color::decode(uint8_t code) {
+D878UVCodeplug::NameColor::decode(uint8_t code) {
   switch((CodedColor) code) {
   case White: return AnytoneDisplaySettingsExtension::Color::White;
   case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
@@ -30,7 +30,7 @@ D878UVCodeplug::Color::decode(uint8_t code) {
 }
 
 uint8_t
-D878UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
+D878UVCodeplug::NameColor::encode(AnytoneDisplaySettingsExtension::Color color) {
   switch(color) {
   case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
   case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
@@ -43,6 +43,41 @@ D878UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
   }
   return (uint8_t) White;
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::TextColor
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+D878UVCodeplug::TextColor::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+D878UVCodeplug::TextColor::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) Yellow;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) Green;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) Turquoise;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::ChannelElement
@@ -1168,11 +1203,11 @@ D878UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
 
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return Color::decode(getUInt8(Offset::callColor()));
+  return NameColor::decode(getUInt8(Offset::callColor()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::callColor(), Color::encode(color));
+  setUInt8(Offset::callColor(), NameColor::encode(color));
 }
 
 bool
@@ -1228,11 +1263,11 @@ D878UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(Interval intv) {
 
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
-  return Color::decode(getUInt8(Offset::standbyTextColor()));
+  return TextColor::decode(getUInt8(Offset::standbyTextColor()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::standbyTextColor(), Color::encode(color));
+  setUInt8(Offset::standbyTextColor(), TextColor::encode(color));
 }
 
 D878UVCodeplug::GeneralSettingsElement::BackgroundImage
@@ -1449,11 +1484,11 @@ D878UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::GeneralSettingsElement::channelNameColor() const {
-  return Color::decode(getUInt8(Offset::channelNameColor()));
+  return NameColor::decode(getUInt8(Offset::channelNameColor()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setChannelNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelNameColor(), Color::encode(color));
+  setUInt8(Offset::channelNameColor(), NameColor::encode(color));
 }
 
 bool
@@ -1610,7 +1645,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setStandbyTextColor(ext->displaySettings()->standbyTextColor());
   //setStandbyBackgroundImage(ext->displaySettings()->standbyBackgroundColor());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
-  setChannelNameColor(ext->displaySettings()->callColor());
+  setChannelNameColor(ext->displaySettings()->channelNameColor());
   setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
   setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
 
@@ -2009,11 +2044,11 @@ D878UVCodeplug::ExtendedSettingsElement::setManDialPrivateCallHangTimeInfinite()
 
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
-  return Color::decode(getUInt8(Offset::channelBNameColor()));
+  return NameColor::decode(getUInt8(Offset::channelBNameColor()));
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelBNameColor(), Color::encode(color));
+  setUInt8(Offset::channelBNameColor(), NameColor::encode(color));
 }
 
 AnytoneDMRSettingsExtension::EncryptionType
@@ -2045,19 +2080,19 @@ D878UVCodeplug::ExtendedSettingsElement::enableATPC(bool enable) {
 
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
-  return Color::decode(getUInt8(Offset::zoneANameColor()));
+  return NameColor::decode(getUInt8(Offset::zoneANameColor()));
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneANameColor(), Color::encode(color));
+  setUInt8(Offset::zoneANameColor(), NameColor::encode(color));
 }
 AnytoneDisplaySettingsExtension::Color
 D878UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
-  return Color::decode(getUInt8(Offset::zoneBNameColor()));
+  return NameColor::decode(getUInt8(Offset::zoneBNameColor()));
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneBNameColor(), Color::encode(color));
+  setUInt8(Offset::zoneBNameColor(), NameColor::encode(color));
 }
 
 bool

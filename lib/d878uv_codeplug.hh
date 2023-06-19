@@ -232,8 +232,8 @@ class D878UVCodeplug : public D868UVCodeplug
   Q_OBJECT
 
 protected:
-  /** Text colors supported by the D878UV. */
-  struct Color {
+  /** Channel name and call-sign colors supported by the D878UV. */
+  struct NameColor {
   public:
     /** Maps code -> color. */
     static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
@@ -244,6 +244,21 @@ protected:
     /** Encoding of the supported colors. */
     typedef enum {
       Orange=0, Red=1, Yellow=2, Green=3, Turquoise=4, Blue=5, White = 6
+    } CodedColor;
+  };
+
+  /** Text colors supported by the D878UV. */
+  struct TextColor {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      White=0, Black=1, Orange=2, Red=3, Yellow=4, Green=5, Turquoise=6, Blue=7
     } CodedColor;
   };
 
