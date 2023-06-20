@@ -1512,7 +1512,7 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
   /** If @c true, the talker alias (name) is send. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
-  Q_PROPERTY(TalkerAliasSource takerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
+  Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
   Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
 
   /** The encryption type to be used. */
