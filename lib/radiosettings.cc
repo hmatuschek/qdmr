@@ -32,6 +32,8 @@ RadioSettings::clone() const {
 
 void
 RadioSettings::clear() {
+  ConfigItem::clear();
+
   _introLine1.clear();
   _introLine2.clear();
   _micLevel = 3;
@@ -40,9 +42,6 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
-
-  setTyTExtension(nullptr);
-  setRadioddityExtension(nullptr);
 }
 
 const QString &
