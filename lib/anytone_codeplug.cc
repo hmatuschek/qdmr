@@ -1695,7 +1695,10 @@ AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
 bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   // Set microphone gain
+  // For the 868UV, this setting sets both, FM and DMR mic gain.
+  // For all other devices, there is an additional FM mic gain setting.
   setDMRMicGain(ctx.config()->settings()->micLevel());
+
   // If auto-enable GPS is enabled
   if (flags.autoEnableGPS) {
     // Check if GPS is required -> enable

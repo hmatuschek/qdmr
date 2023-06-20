@@ -189,6 +189,35 @@ class D868UVCodeplug : public AnytoneCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Colors supported by the D868UVE. */
+  struct Color {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      White = 0, Red=1
+    } CodedColor;
+  };
+
+  /** Implements encoding of CTCSS tones. */
+  struct CTCSS {
+  public:
+    /** Encodes Signaling::Code CTCSS tones. */
+    static uint8_t encode(Signaling::Code tone);
+    /** Decodes to Signaling::Code CTCSS tones. */
+    static Signaling::Code decode(uint8_t code);
+
+  protected:
+    /** Translation table. */
+    static Signaling::Code _codeTable[52];
+  };
+
 public:
   /** Represents the channel element for AnyTone D868UV devices.
    *  This class derives from @c AnytoneCodeplug::ChannelElement and implements the device-specific
@@ -265,19 +294,26 @@ public:
   {
   protected:
     /** Device specific key functions. */
-    enum class KeyFunction {
-      Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
-      Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
-      Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-      Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
-      HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
-      WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
-      PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-      ChannelType = 0x22, Ranging = 0x23, ChannelRanging = 0x24, MaxVolume = 0x25, Slot = 0x26
-    };
+    struct KeyFunction {
+    public:
+      /** Encodes key function. */
+      static uint8_t encode(AnytoneKeySettingsExtension::KeyFunction tone);
+      /** Decodes key function. */
+      static AnytoneKeySettingsExtension::KeyFunction decode(uint8_t code);
 
-    AnytoneKeySettingsExtension::KeyFunction mapCodeToKeyFunction(uint8_t code) const;
-    uint8_t mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const;
+    protected:
+      /** Encoded key functions. */
+      typedef enum {
+        Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+        Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
+        Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
+        Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
+        HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
+        WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
+        PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
+        ChannelType = 0x22, Ranging = 0x23, ChannelRanging = 0x24, MaxVolume = 0x25, Slot = 0x26
+      } KeyFunctionCode;
+    };
 
   protected:
     /** Hidden constructor. */
@@ -742,12 +778,6 @@ protected:
 
   /** Allocates DTMF settings. */
   virtual void allocateDTMFSettings();
-
-protected:
-  /** Internal used function to encode CTCSS frequencies. */
-  static uint8_t ctcss_code2num(Signaling::Code code);
-  /** Internal used function to decode CTCSS frequencies. */
-  static Signaling::Code ctcss_num2code(uint8_t num);
 
 public:
   /** Some limits for the codeplug. */
