@@ -1687,7 +1687,7 @@ public:
 
   /** Possible GPS modes. */
   enum class GPSMode {
-    GPS=0, Beidou=1, Both=2
+    GPS=0, Beidou=1, GPS_Beidou=2, Glonass=3, GPS_Glonas=4, Beidou_Glonass=5, All=6
   };
   Q_ENUM(GPSMode)
 
