@@ -2266,6 +2266,7 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
     if (offsets.isSet(i)) {
       AnytoneAutoRepeaterOffset *offset = new AnytoneAutoRepeaterOffset();
       offset->setOffset(offsets.offset(i));
+      offset->setName(QString("%1 offset").arg(offsets.offset(i).format()));
       ext->autoRepeaterSettings()->offsets()->add(offset);
       ctx.add(offset, i);
     }
