@@ -107,6 +107,7 @@ DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QO
     libusb_unref_device(dev);
     libusb_exit(_ctx);
     _ctx = nullptr;
+    return;
   }
 
 
