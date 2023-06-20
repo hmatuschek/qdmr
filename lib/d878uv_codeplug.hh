@@ -379,8 +379,9 @@ public:
         HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
         WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
         PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-        ChannelType = 0x22, Roaming = 0x24, MaxVolume = 0x25, Slot = 0x26, Zone = 0x29,
-        RoamingSet = 0x2a, Mute=0x2c, CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
+        ChannelType = 0x22, Roaming = 0x24, ChannelRanging = 0x25, MaxVolume = 0x26, Slot = 0x27,
+        APRSType = 0x28, Zone = 0x29, RoamingSet = 0x2a, APRSSet = 0x2b, Mute=0x2c,
+        CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
         ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34
       } KeyFunctionCode;
     };
