@@ -1771,7 +1771,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    D878UVCodeplug::AnalogAPRSSettingsElement(data(ADDR_APRS_SETTINGS))
+    D878UVCodeplug::APRSSettingsElement(data(ADDR_APRS_SETTINGS))
         .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
     encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
@@ -1784,7 +1784,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+    D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
     aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
     aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
   }
@@ -1798,7 +1798,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX interval
-  D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
   unsigned pos_intervall = aprs.autoTXInterval();
 
   // Create APRS system (if enabled)
@@ -1831,7 +1831,7 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
-  D878UVCodeplug::AnalogAPRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
   if (aprs.isValid()) {
     aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }

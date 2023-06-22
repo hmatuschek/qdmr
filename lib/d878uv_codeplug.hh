@@ -136,12 +136,8 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>0000f0</td> <td>APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
- *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
+ *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings,
+ *    see @c D878UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settigs.</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
@@ -1158,15 +1154,15 @@ public:
    * Memory layout of APRS settings (size 0x00f0 bytes):
    * @verbinclude d878uv_aprssetting.txt
    */
-  class AnalogAPRSSettingsElement: public Element
+  class APRSSettingsElement: public Element
   {
   protected:
     /** Hidden constructor. */
-    AnalogAPRSSettingsElement(uint8_t *ptr, unsigned size);
+    APRSSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
-    explicit AnalogAPRSSettingsElement(uint8_t *ptr);
+    explicit APRSSettingsElement(uint8_t *ptr);
 
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x00f0; }
@@ -1175,15 +1171,10 @@ public:
     void clear();
     bool isValid() const;
 
-    /** Returns the transmit frequency in Hz. */
-    virtual unsigned frequency() const;
-    /** Sets the transmit frequency in Hz. */
-    virtual void setFrequency(unsigned hz);
-
     /** Returns the TX delay in ms. */
-    virtual unsigned txDelay() const;
+    virtual unsigned fmTXDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setTXDelay(unsigned ms);
+    virtual void setFMTXDelay(unsigned ms);
 
     /** Returns the sub tone settings. */
     virtual Signaling::Code txTone() const;
@@ -1255,6 +1246,67 @@ public:
      * defined within this APRS system. */
     virtual bool linkAPRSSystem(APRSSystem *sys, Context &ctx);
 
+  public:
+    /** Some static limits for this element. */
+    struct Limit {
+      /// Maximum length of call signs.
+      static constexpr unsigned int callLength()                           { return 0x0006; }
+      /// Maximum length of the repeater path string.
+      static constexpr unsigned int pathLength()                           { return 0x0020; }
+      /// Maximum number of DMR APRS systems.
+      static constexpr unsigned int dmrSystems()                           { return 0x0008; }
+      /// Maximum number of FM APRS frequencies.
+      static constexpr unsigned int fmFrequencies()                        { return 0x0008; }
+    };
+
+  protected:
+    /** Internal used offsets within the codeplug element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int fmTXDelay()                            { return 0x0005; }
+      static constexpr unsigned int fmSigType()                            { return 0x0006; }
+      static constexpr unsigned int fmCTCSS()                              { return 0x0007; }
+      static constexpr unsigned int fmDCS()                                { return 0x0008; }
+      static constexpr unsigned int manualTXInterval()                     { return 0x000a; }
+      static constexpr unsigned int autoTXInterval()                       { return 0x000b; }
+      static constexpr unsigned int fmTXMonitor()                          { return 0x000c; }
+      static constexpr unsigned int fixedLocation()                        { return 0x000d; }
+      static constexpr unsigned int fixedLatDeg()                          { return 0x000e; }
+      static constexpr unsigned int fixedLatMin()                          { return 0x000f; }
+      static constexpr unsigned int fixedLatSec()                          { return 0x0010; }
+      static constexpr unsigned int fixedLatSouth()                        { return 0x0011; }
+      static constexpr unsigned int fixedLonDeg()                          { return 0x0012; }
+      static constexpr unsigned int fixedLonMin()                          { return 0x0013; }
+      static constexpr unsigned int fixedLonSec()                          { return 0x0014; }
+      static constexpr unsigned int fixedLonWest()                         { return 0x0015; }
+      static constexpr unsigned int destinationCall()                      { return 0x0016; }
+      static constexpr unsigned int destinationSSID()                      { return 0x001c; }
+      static constexpr unsigned int sourceCall()                           { return 0x001d; }
+      static constexpr unsigned int sourceSSID()                           { return 0x0023; }
+      static constexpr unsigned int path()                                 { return 0x0024; }
+      static constexpr unsigned int symbolTable()                          { return 0x0039; }
+      static constexpr unsigned int symbol()                               { return 0x003a; }
+      static constexpr unsigned int fmPower()                              { return 0x003b; }
+      static constexpr unsigned int fmPrewaveDelay()                       { return 0x003c; }
+      static constexpr unsigned int dmrChannelIndices()                    { return 0x0040; }
+      static constexpr unsigned int betweenDMRChannelIndices()             { return 0x0002; }
+      static constexpr unsigned int dmrDestinations()                      { return 0x0050; }
+      static constexpr unsigned int betweenDMRDestinations()               { return 0x0004; }
+      static constexpr unsigned int dmrCallTypes()                         { return 0x0070; }
+      static constexpr unsigned int betweenDMRCallTypes()                  { return 0x0001; }
+      static constexpr unsigned int roamingSupport()                       { return 0x0078; }
+      static constexpr unsigned int dmrTimeSlots()                         { return 0x0079; }
+      static constexpr unsigned int betweenDMRTimeSlots()                  { return 0x0001; }
+      static constexpr unsigned int dmrPrewaveDelay()                      { return 0x0081; }
+      static constexpr unsigned int displayInterval()                      { return 0x0082; }
+      static constexpr unsigned int fixedHeight()                          { return 0x00a6; }
+      static constexpr unsigned int fmWidth()                              { return 0x00aa; }
+      static constexpr unsigned int passAll()                              { return 0x00ab; }
+      static constexpr unsigned int fmFrequencies()                        { return 0x00ac; }
+      static constexpr unsigned int betweenFMFrequencies()                 { return 0x0004; }
+
+      /// @endcond
+    };
   };
 
   /** Represents an extension to the APRS settings.
