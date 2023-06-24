@@ -1785,8 +1785,8 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
     D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
-    aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
-    aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
+    aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
   }
   return true;
 }
@@ -1799,7 +1799,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
-  unsigned pos_intervall = aprs.autoTXInterval();
+  unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);

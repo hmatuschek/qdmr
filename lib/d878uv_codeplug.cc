@@ -2428,21 +2428,21 @@ D878UVCodeplug::APRSSettingsElement::isValid() const {
 
 unsigned
 D878UVCodeplug::APRSSettingsElement::fmTXDelay() const {
-  return ((unsigned)getUInt8(0x0005))*20;
+  return ((unsigned)getUInt8(Offset::fmTXDelay()))*20;
 }
 void
 D878UVCodeplug::APRSSettingsElement::setFMTXDelay(unsigned ms) {
-  setUInt8(0x0005, ms/20);
+  setUInt8(Offset::fmTXDelay(), ms/20);
 }
 
 Signaling::Code
 D878UVCodeplug::APRSSettingsElement::txTone() const {
-  if (0 == getUInt8(0x0006)) { // none
+  if ((uint8_t)SignalingType::Off ==getUInt8(Offset::fmSigType())) { // none
     return Signaling::SIGNALING_NONE;
-  } else if (1 == getUInt8(0x0006)) { // CTCSS
-    return CTCSS::decode(getUInt8(0x0007));
-  } else if (2 == getUInt8(0x0006)) { // DCS
-    uint16_t code = getUInt16_le(0x0008);
+  } else if ((uint8_t)SignalingType::CTCSS == getUInt8(Offset::fmSigType())) { // CTCSS
+    return CTCSS::decode(getUInt8(Offset::fmCTCSS()));
+  } else if ((uint8_t)SignalingType::DCS == getUInt8(Offset::fmSigType())) { // DCS
+    uint16_t code = getUInt16_le(Offset::fmDCS());
     if (512 < code)
       return Signaling::fromDCSNumber(dec_to_oct(code), false);
     return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
@@ -2453,56 +2453,63 @@ D878UVCodeplug::APRSSettingsElement::txTone() const {
 void
 D878UVCodeplug::APRSSettingsElement::setTXTone(Signaling::Code code) {
   if (Signaling::SIGNALING_NONE == code) {
-    setUInt8(0x0006, 0x00);
+    setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::Off);
   } else if (Signaling::isCTCSS(code)) {
-    setUInt8(0x0006, 0x01);
-    setUInt8(0x0007, CTCSS::encode(code));
+    setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::CTCSS);
+    setUInt8(Offset::fmCTCSS(), CTCSS::encode(code));
   } else if (Signaling::isDCSNormal(code)) {
-    setUInt8(0x0006, 0x02);
-    setUInt16_le(0x0008, oct_to_dec(Signaling::toDCSNumber(code)));
+    setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::DCS);
+    setUInt16_le(Offset::fmDCS(), oct_to_dec(Signaling::toDCSNumber(code)));
   } else if (Signaling::isDCSInverted(code)) {
-    setUInt8(0x0006, 0x02);
-    setUInt16_le(0x0008, oct_to_dec(Signaling::toDCSNumber(code))+512);
+    setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::DCS);
+    setUInt16_le(Offset::fmDCS(), oct_to_dec(Signaling::toDCSNumber(code))+512);
   }
 }
 
-unsigned
+Interval
 D878UVCodeplug::APRSSettingsElement::manualTXInterval() const {
-  return getUInt8(0x000a);
+  return Interval::fromSeconds(getUInt8(Offset::manualTXInterval()));
 }
 void
-D878UVCodeplug::APRSSettingsElement::setManualTXInterval(unsigned sec) {
-  setUInt8(0x000a, sec);
+D878UVCodeplug::APRSSettingsElement::setManualTXInterval(Interval sec) {
+  setUInt8(Offset::manualTXInterval(), sec.seconds());
 }
 
 bool
 D878UVCodeplug::APRSSettingsElement::autoTX() const {
-  return 0!=autoTXInterval();
+  return ! autoTXInterval().isNull();
 }
-unsigned
+Interval
 D878UVCodeplug::APRSSettingsElement::autoTXInterval() const {
-  return ((unsigned)getUInt8(0x000b))*30;
+  return Interval::fromSeconds( ((unsigned)getUInt8(Offset::autoTXInterval()))*30 );
 }
 void
-D878UVCodeplug::APRSSettingsElement::setAutoTXInterval(unsigned sec) {
-  setUInt8(0x000b, sec/30);
+D878UVCodeplug::APRSSettingsElement::setAutoTXInterval(Interval sec) {
+  setUInt8(Offset::autoTXInterval(), sec.seconds()/30);
 }
 void
 D878UVCodeplug::APRSSettingsElement::disableAutoTX() {
-  setAutoTXInterval(0);
+  setAutoTXInterval(Interval::fromMilliseconds(0));
 }
 
 bool
 D878UVCodeplug::APRSSettingsElement::fixedLocationEnabled() const {
-  return getUInt8(0x000d);
+  return getUInt8(Offset::fixedLocation());
 }
 QGeoCoordinate
 D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
-  double latitude  = getUInt8(0x000e) + double(getUInt8(0x000f))/60 + double(getUInt8(0x0010))/3600;
-  if (getUInt8(0x0011)) latitude *= -1;
-  double longitude = getUInt8(0x0012) + double(getUInt8(0x0013))/60 + double(getUInt8(0x0014))/3600;
-  if (getUInt8(0x0015)) longitude *= -1;
-  return QGeoCoordinate(latitude, longitude);
+  double latitude  = getUInt8(Offset::fixedLatDeg()) + double(getUInt8(Offset::fixedLatMin()))/60
+      + double(getUInt8(Offset::fixedLatSec()))/3600;
+  if (getUInt8(Offset::fixedLatSouth()))
+    latitude *= -1;
+
+  double longitude = getUInt8(Offset::fixedLonDeg()) + double(getUInt8(Offset::fixedLonMin()))/60
+      + double(getUInt8(Offset::fixedLonSec()))/3600;
+  if (getUInt8(Offset::fixedLonWest()))
+    longitude *= -1;
+
+  double height_ft = getUInt16_le(Offset::fixedHeight());
+  return QGeoCoordinate(latitude, longitude, height_ft/3.281);
 }
 void
 D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
@@ -2516,10 +2523,18 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
   unsigned lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
   unsigned lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
   unsigned lon_sec = int(longitude);
-  setUInt8(0x000e, lat_deg); setUInt8(0x000f, lat_min); setUInt8(0x0010, lat_sec); setUInt8(0x0011, (south ? 0x01 : 0x00));
-  setUInt8(0x0012, lon_deg); setUInt8(0x0013, lon_min); setUInt8(0x0014, lon_sec); setUInt8(0x0015, (west ? 0x01 : 0x00));
+  unsigned height_ft = int(loc.altitude()*3.281);
+  setUInt8(Offset::fixedLatDeg(), lat_deg);
+  setUInt8(Offset::fixedLatMin(), lat_min);
+  setUInt8(Offset::fixedLatSec(), lat_sec);
+  setUInt8(Offset::fixedLatSouth(), (south ? 0x01 : 0x00));
+  setUInt8(Offset::fixedLonDeg(), lon_deg);
+  setUInt8(Offset::fixedLonMin(), lon_min);
+  setUInt8(Offset::fixedLonSec(), lon_sec);
+  setUInt8(Offset::fixedLonWest(), (west ? 0x01 : 0x00));
+  setUInt16_le(Offset::fixedHeight(), height_ft);
   // enable fixed location.
-  setUInt8(0x000d, 0x01);
+  setUInt8(Offset::fixedLocation(), 0x01);
 }
 void
 D878UVCodeplug::APRSSettingsElement::disableFixedLocation() {
@@ -2529,56 +2544,56 @@ D878UVCodeplug::APRSSettingsElement::disableFixedLocation() {
 QString
 D878UVCodeplug::APRSSettingsElement::destination() const {
   // Terminated/padded with space
-  return readASCII(0x0016, 6, ' ');
+  return readASCII(Offset::destinationCall(), 6, ' ');
 }
 unsigned
 D878UVCodeplug::APRSSettingsElement::destinationSSID() const {
-  return getUInt8(0x001c);
+  return getUInt8(Offset::destinationSSID());
 }
 void
 D878UVCodeplug::APRSSettingsElement::setDestination(const QString &call, unsigned ssid) {
   // Terminated/padded with space
-  writeASCII(0x0016, call, 6, ' ');
-  setUInt8(0x001c, ssid);
+  writeASCII(Offset::destinationCall(), call, 6, ' ');
+  setUInt8(Offset::destinationSSID(), ssid);
 }
 QString
 D878UVCodeplug::APRSSettingsElement::source() const {
   // Terminated/padded with space
-  return readASCII(0x001d, 6, ' ');
+  return readASCII(Offset::sourceCall(), 6, ' ');
 }
 unsigned
 D878UVCodeplug::APRSSettingsElement::sourceSSID() const {
-  return getUInt8(0x0023);
+  return getUInt8(Offset::sourceSSID());
 }
 void
 D878UVCodeplug::APRSSettingsElement::setSource(const QString &call, unsigned ssid) {
   // Terminated/padded with space
-  writeASCII(0x001d, call, 6, ' ');
-  setUInt8(0x0023, ssid);
+  writeASCII(Offset::sourceCall(), call, 6, ' ');
+  setUInt8(Offset::sourceSSID(), ssid);
 }
 
 QString
 D878UVCodeplug::APRSSettingsElement::path() const {
-  return readASCII(0x0024, 20, 0x00);
+  return readASCII(Offset::path(), 20, 0x00);
 }
 void
 D878UVCodeplug::APRSSettingsElement::setPath(const QString &path) {
-  writeASCII(0x0024, path, 20, 0x00);
+  writeASCII(Offset::path(), path, 20, 0x00);
 }
 
 APRSSystem::Icon
 D878UVCodeplug::APRSSettingsElement::icon() const {
-  return code2aprsicon(getUInt8(0x0039), getUInt8(0x003a));
+  return code2aprsicon(getUInt8(Offset::symbolTable()), getUInt8(Offset::symbol()));
 }
 void
 D878UVCodeplug::APRSSettingsElement::setIcon(APRSSystem::Icon icon) {
-  setUInt8(0x0039, aprsicon2tablecode(icon));
-  setUInt8(0x003a, aprsicon2iconcode(icon));
+  setUInt8(Offset::symbolTable(), aprsicon2tablecode(icon));
+  setUInt8(Offset::symbol(), aprsicon2iconcode(icon));
 }
 
 Channel::Power
 D878UVCodeplug::APRSSettingsElement::power() const {
-  switch (getUInt8(0x003b)) {
+  switch (getUInt8(Offset::fmPower())) {
   case 0: return Channel::Power::Low;
   case 1: return Channel::Power::Mid;
   case 2: return Channel::Power::High;
@@ -2590,20 +2605,20 @@ void
 D878UVCodeplug::APRSSettingsElement::setPower(Channel::Power power) {
   switch (power) {
   case Channel::Power::Min:
-  case Channel::Power::Low:  setUInt8(0x003b, 0x00); break;
-  case Channel::Power::Mid:  setUInt8(0x003b, 0x01); break;
-  case Channel::Power::High: setUInt8(0x003b, 0x02); break;
-  case Channel::Power::Max:  setUInt8(0x003b, 0x03); break;
+  case Channel::Power::Low:  setUInt8(Offset::fmPower(), 0x00); break;
+  case Channel::Power::Mid:  setUInt8(Offset::fmPower(), 0x01); break;
+  case Channel::Power::High: setUInt8(Offset::fmPower(), 0x02); break;
+  case Channel::Power::Max:  setUInt8(Offset::fmPower(), 0x03); break;
   }
 }
 
-unsigned
+Interval
 D878UVCodeplug::APRSSettingsElement::preWaveDelay() const {
-  return ((unsigned)getUInt8(0x003c))*10;
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::fmPrewaveDelay()))*10);
 }
 void
-D878UVCodeplug::APRSSettingsElement::setPreWaveDelay(unsigned ms) {
-  setUInt8(0x003c, ms/10);
+D878UVCodeplug::APRSSettingsElement::setPreWaveDelay(Interval ms) {
+  setUInt8(Offset::fmPrewaveDelay(), ms.milliseconds()/10);
 }
 
 bool
@@ -2618,8 +2633,8 @@ D878UVCodeplug::APRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Conte
   setFrequency(sys->revertChannel()->txFrequency()*1e6);
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
-  setManualTXInterval(sys->period());
-  setAutoTXInterval(sys->period());
+  setManualTXInterval(Interval::fromSeconds(sys->period()));
+  setAutoTXInterval(Interval::fromSeconds(sys->period()));
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
@@ -3491,7 +3506,7 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
     //  This setting might be overridden by any analog APRS system below
     APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
     aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
-    aprs.setManualTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+    aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
   }
   return true;
 }

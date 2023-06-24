@@ -1160,6 +1160,11 @@ public:
     /** Hidden constructor. */
     APRSSettingsElement(uint8_t *ptr, unsigned size);
 
+    /** Possible settings for the FM APRS subtone type. */
+    enum class SignalingType {
+      Off=0, CTCSS=1, DCS=2
+    };
+
   public:
     /** Constructor. */
     explicit APRSSettingsElement(uint8_t *ptr);
@@ -1182,16 +1187,16 @@ public:
     virtual void setTXTone(Signaling::Code code);
 
     /** Returns the manual TX interval in seconds. */
-    virtual unsigned manualTXInterval() const;
+    virtual Interval manualTXInterval() const;
     /** Sets the manual TX interval in seconds. */
-    virtual void setManualTXInterval(unsigned sec);
+    virtual void setManualTXInterval(Interval sec);
 
     /** Returns @c true if the auto transmit is enabled. */
     virtual bool autoTX() const;
     /** Returns the auto TX interval in seconds. */
-    virtual unsigned autoTXInterval() const;
+    virtual Interval autoTXInterval() const;
     /** Sets the auto TX interval in seconds. */
-    virtual void setAutoTXInterval(unsigned sec);
+    virtual void setAutoTXInterval(Interval sec);
     /** Disables auto tx. */
     virtual void disableAutoTX();
 
@@ -1233,9 +1238,9 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Returns the pre-wave delay in ms. */
-    virtual unsigned preWaveDelay() const;
+    virtual Interval preWaveDelay() const;
     /** Sets the pre-wave delay in ms. */
-    virtual void setPreWaveDelay(unsigned ms);
+    virtual void setPreWaveDelay(Interval ms);
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx,
