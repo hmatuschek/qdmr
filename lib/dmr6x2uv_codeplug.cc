@@ -1769,22 +1769,21 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
+  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    D878UVCodeplug::APRSSettingsElement(data(ADDR_APRS_SETTINGS))
-        .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
     uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
     encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
   }
 
   // Encode GPS systems
-  D878UVCodeplug::DMRAPRSSettingsElement gps(data(ADDR_DMRAPRS_SETTINGS));
-  if (! gps.fromGPSSystems(ctx))
+  if (! aprs.fromDMRAPRSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
     aprs.setAutoTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
     aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
   }
@@ -1804,18 +1803,17 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toAPRSSystem();
+    APRSSystem *sys = aprs.toFMAPRSSystem();
     sys->setPeriod(pos_intervall);
     sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
 
   // Create GPS systems
-  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
-    if (0 == gps_systems.destination(i))
+    if (0 == aprs.dmrDestination(i))
       continue;
-    if (GPSSystem *sys = gps_systems.toGPSSystemObj(i)) {
+    if (GPSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
       sys->setPeriod(pos_intervall);
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
     } else {
@@ -1833,15 +1831,14 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // Link APRS system
   D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
   if (aprs.isValid()) {
-    aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
 
   // Link GPS systems
-  D878UVCodeplug::DMRAPRSSettingsElement gps_systems(data(ADDR_DMRAPRS_SETTINGS));
   for (int i=0; i<NUM_DMRAPRS_SYSTEMS; i++) {
-    if (0 == gps_systems.destination(i))
+    if (0 == aprs.dmrDestination(i))
       continue;
-    gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
+    aprs.linkDMRAPRSSystem(i, ctx.get<GPSSystem>(i), ctx);
   }
 
   return true;

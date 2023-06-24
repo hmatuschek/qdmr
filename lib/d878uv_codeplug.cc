@@ -2613,16 +2613,160 @@ D878UVCodeplug::APRSSettingsElement::setPower(Channel::Power power) {
 }
 
 Interval
-D878UVCodeplug::APRSSettingsElement::preWaveDelay() const {
+D878UVCodeplug::APRSSettingsElement::fmPreWaveDelay() const {
   return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::fmPrewaveDelay()))*10);
 }
 void
-D878UVCodeplug::APRSSettingsElement::setPreWaveDelay(Interval ms) {
+D878UVCodeplug::APRSSettingsElement::setFMPreWaveDelay(Interval ms) {
   setUInt8(Offset::fmPrewaveDelay(), ms.milliseconds()/10);
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
+D878UVCodeplug::APRSSettingsElement::dmrChannelIsSelected(unsigned n) const {
+  return 0xfa2 == dmrChannelIndex(n);
+}
+unsigned
+D878UVCodeplug::APRSSettingsElement::dmrChannelIndex(unsigned n) const {
+  return getUInt16_le(Offset::dmrChannelIndices() + n*Offset::betweenDMRChannelIndices());
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRChannelIndex(unsigned n, unsigned idx) {
+  setUInt16_le(Offset::dmrChannelIndices() + n*Offset::betweenDMRChannelIndices(), idx);
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRChannelSelected(unsigned n) {
+  setDMRChannelIndex(n, 0xfa2);
+}
+
+unsigned
+D878UVCodeplug::APRSSettingsElement::dmrDestination(unsigned n) const {
+  return getBCD8_be(Offset::dmrDestinations() + n*Offset::betweenDMRDestinations());
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRDestination(unsigned n, unsigned idx) {
+  setBCD8_be(Offset::dmrDestinations() + n*Offset::betweenDMRDestinations(), idx);
+}
+
+DMRContact::Type
+D878UVCodeplug::APRSSettingsElement::dmrCallType(unsigned n) const {
+  switch(getUInt8(Offset::dmrCallTypes() + n*Offset::betweenDMRCallTypes())) {
+  case 0: return DMRContact::PrivateCall;
+  case 1: return DMRContact::GroupCall;
+  case 2: return DMRContact::AllCall;
+  }
+  return DMRContact::PrivateCall;
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRCallType(unsigned n, DMRContact::Type type) {
+  switch(type) {
+  case DMRContact::PrivateCall: setUInt8(Offset::dmrCallTypes() + n*Offset::betweenDMRCallTypes(), 0x00); break;
+  case DMRContact::GroupCall: setUInt8(Offset::dmrCallTypes() + n*Offset::betweenDMRCallTypes(), 0x01); break;
+  case DMRContact::AllCall: setUInt8(Offset::dmrCallTypes() + n*Offset::betweenDMRCallTypes(), 0x02); break;
+  }
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::dmrTimeSlotOverride(unsigned n) {
+  return 0x00 != getUInt8(Offset::dmrTimeSlots() + n*Offset::betweenDMRTimeSlots());
+}
+DMRChannel::TimeSlot
+D878UVCodeplug::APRSSettingsElement::dmrTimeSlot(unsigned n) const {
+  switch (getUInt8(Offset::dmrTimeSlots() + n*Offset::betweenDMRTimeSlots())) {
+  case 1: return DMRChannel::TimeSlot::TS1;
+  case 2: return DMRChannel::TimeSlot::TS2;
+  }
+  return DMRChannel::TimeSlot::TS1;
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
+  switch (ts) {
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::dmrTimeSlots() + n*Offset::betweenDMRTimeSlots(), 0x01); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::dmrTimeSlots() + n*Offset::betweenDMRTimeSlots(), 0x02); break;
+  }
+}
+void
+D878UVCodeplug::APRSSettingsElement::clearDMRTimeSlotOverride(unsigned n) {
+  setUInt8(Offset::dmrTimeSlots() + n*Offset::betweenDMRTimeSlots(), 0);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::dmrRoaming() const {
+  return getUInt8(Offset::roamingSupport());
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableDMRRoaming(bool enable) {
+  setUInt8(Offset::roamingSupport(), (enable ? 0x01 : 0x00));
+}
+
+Interval
+D878UVCodeplug::APRSSettingsElement::dmrPreWaveDelay() const {
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::dmrPrewaveDelay()))*100);
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDMRPreWaveDelay(Interval ms) {
+  setUInt8(Offset::dmrPrewaveDelay(), ms.milliseconds()/100);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::infiniteDisplayTime() const {
+  return 13 == getUInt8(Offset::displayInterval());
+}
+Interval
+D878UVCodeplug::APRSSettingsElement::displayTime() const {
+  return Interval::fromSeconds(3 + getUInt8(Offset::displayInterval()));
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDisplayTime(Interval dur) {
+  unsigned int sec = dur.seconds();
+  sec = std::min(16U, std::max(3U, sec));
+  setUInt8(Offset::displayInterval(), sec-3);
+}
+void
+D878UVCodeplug::APRSSettingsElement::setDisplayTimeInifinite() {
+  setUInt8(Offset::displayInterval(), 13);
+}
+
+D878UVCodeplug::APRSSettingsElement::ChannelWidth
+D878UVCodeplug::APRSSettingsElement::fmChannelWidth() const {
+  return (ChannelWidth)getUInt8(Offset::fmWidth());
+}
+void
+D878UVCodeplug::APRSSettingsElement::setFMChannelWidth(ChannelWidth width) {
+  setUInt8(Offset::fmWidth(), (uint8_t)width);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::passAll() const {
+  return 0x00 != getUInt8(Offset::passAll());
+}
+void
+D878UVCodeplug::APRSSettingsElement::enablePassAll(bool enable) {
+  setUInt8(Offset::passAll(), enable ? 0x01 : 0x00);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::fmFrequencySet(unsigned int n) const {
+  n = std::min(Limit::fmFrequencies()-1, n);
+  return 0 != getBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies());
+}
+Frequency
+D878UVCodeplug::APRSSettingsElement::fmFrequency(unsigned int n) const {
+  n = std::min(Limit::fmFrequencies()-1, n);
+  return Frequency::fromHz(getBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies())*10);
+}
+void
+D878UVCodeplug::APRSSettingsElement::setFMFrequency(unsigned int n, Frequency f) {
+  n = std::min(Limit::fmFrequencies()-1, n);
+  setBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies(), f.inHz()/10);
+}
+void
+D878UVCodeplug::APRSSettingsElement::clearFMFrequency(unsigned int n) {
+  n = std::min(Limit::fmFrequencies()-1, n);
+  setBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies(), 0);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   clear();
   if (! sys->revertChannel()) {
@@ -2630,45 +2774,103 @@ D878UVCodeplug::APRSSettingsElement::fromAPRSSystem(const APRSSystem *sys, Conte
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  setFrequency(sys->revertChannel()->txFrequency()*1e6);
+  setFMFrequency(0, Frequency::fromHz(sys->revertChannel()->txFrequency()*1e6));
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
+  setFMChannelWidth(FMChannel::Bandwidth::Wide == sys->revertChannel()->bandwidth() ?
+                        ChannelWidth::Wide : ChannelWidth::Narrow);
   setManualTXInterval(Interval::fromSeconds(sys->period()));
   setAutoTXInterval(Interval::fromSeconds(sys->period()));
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setPreWaveDelay(0);
+  setFMPreWaveDelay(Interval());
   return true;
 }
 
 APRSSystem *
-D878UVCodeplug::APRSSettingsElement::toAPRSSystem() {
+D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
   return new APRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
-        path(), icon(), "", autoTXInterval());
+        path(), icon(), "", autoTXInterval().seconds());
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Context &ctx) {
+D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(frequency()/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(double(fmFrequency(0).inHz())/1e6);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(frequency()/1e6);
-    ch->setTXFrequency(frequency()/1e6);
+    ch->setRXFrequency(double(fmFrequency(0).inHz())/1e6);
+    ch->setTXFrequency(double(fmFrequency(0).inHz())/1e6);
     ch->setPower(power());
     ch->setTXTone(txTone());
-    ch->setBandwidth(FMChannel::Bandwidth::Wide);
-    logInfo() << "No matching APRS channel found for TX frequency " << frequency()/1e6
+    ch->setBandwidth(ChannelWidth::Wide == fmChannelWidth() ?
+                         FMChannel::Bandwidth::Wide : FMChannel::Bandwidth::Narrow);
+    logInfo() << "No matching APRS channel found for TX frequency " << double(fmFrequency(0).inHz())/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
   sys->setRevertChannel(ch);
+  return true;
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystems(Context &ctx) {
+  unsigned int n = std::min(ctx.count<GPSSystem>(), Limit::dmrSystems());
+  for (unsigned int idx=0; idx<n; idx++)
+    fromDMRAPRSSystemObj(idx, ctx.get<GPSSystem>(idx), ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx) {
+  if (sys->hasContact()) {
+    setDMRDestination(idx, sys->contactObj()->number());
+    setDMRCallType(idx, sys->contactObj()->type());
+  }
+  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+    setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
+    clearDMRTimeSlotOverride(idx);
+  } else { // no revert channel specified or "selected channel":
+    setDMRChannelSelected(idx);
+  }
+  return true;
+}
+
+GPSSystem *
+D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
+  if (0 == dmrDestination(idx))
+    return nullptr;
+  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
+  // Clear revert channel from GPS system
+  sys->setRevertChannel(nullptr);
+
+  // if a revert channel is defined -> link to it
+  if (dmrChannelIsSelected(idx))
+    sys->setRevertChannel(nullptr);
+  else if (ctx.has<Channel>(dmrChannelIndex(idx)) && ctx.get<Channel>(dmrChannelIndex(idx))->is<DMRChannel>())
+    sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
+
+  // Search for a matching contact in contacts
+  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(dmrDestination(idx));
+  // If no matching contact is found, create one
+  if (nullptr == cont) {
+    cont = new DMRContact(dmrCallType(idx), tr("GPS #%1 Contact").arg(idx+1),
+                          dmrDestination(idx), false);
+    ctx.config()->contacts()->add(cont);
+  }
+  // link contact to GPS system.
+  sys->setContactObj(cont);
+
   return true;
 }
 
@@ -2853,168 +3055,6 @@ D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, unsigned 
   writeASCII(0x0001, call, 6, 0x00); // Store call
   setUInt8(0x0007, ssid);            // Store SSID
   setUInt8(0x0000, 0x01);            // Enable entry.
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::DMRAPRSSystemsElement
- * ******************************************************************************************** */
-D878UVCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr)
-  : Element(ptr, DMRAPRSSettingsElement::size())
-{
-  // pass...
-}
-
-void
-D878UVCodeplug::DMRAPRSSettingsElement::clear() {
-  memset(_data, 0x00, _size);
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::channelIsSelected(unsigned n) const {
-  return 0xfa2 == channelIndex(n);
-}
-unsigned
-D878UVCodeplug::DMRAPRSSettingsElement::channelIndex(unsigned n) const {
-  return getUInt16_le(Offset::channels() + n*Offset::betweenChannels());
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setChannelIndex(unsigned n, unsigned idx) {
-  setUInt16_le(Offset::channels() + n*Offset::betweenChannels(), idx);
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setChannelSelected(unsigned n) {
-  setChannelIndex(n, 0xfa2);
-}
-
-unsigned
-D878UVCodeplug::DMRAPRSSettingsElement::destination(unsigned n) const {
-  return getBCD8_be(Offset::destinations() + n*Offset::betweenDestinations());
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setDestination(unsigned n, unsigned idx) {
-  setBCD8_be(Offset::destinations() + n*Offset::betweenDestinations(), idx);
-}
-
-DMRContact::Type
-D878UVCodeplug::DMRAPRSSettingsElement::callType(unsigned n) const {
-  switch(getUInt8(Offset::callTypes() + n*Offset::betweenCallTypes())) {
-  case 0: return DMRContact::PrivateCall;
-  case 1: return DMRContact::GroupCall;
-  case 2: return DMRContact::AllCall;
-  }
-  return DMRContact::PrivateCall;
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setCallType(unsigned n, DMRContact::Type type) {
-  switch(type) {
-  case DMRContact::PrivateCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x00); break;
-  case DMRContact::GroupCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x01); break;
-  case DMRContact::AllCall: setUInt8(Offset::callTypes() + n*Offset::betweenCallTypes(), 0x02); break;
-  }
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::timeSlotOverride(unsigned n) {
-  return 0x00 != getUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots());
-}
-DMRChannel::TimeSlot
-D878UVCodeplug::DMRAPRSSettingsElement::timeSlot(unsigned n) const {
-  switch (getUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots())) {
-  case 1: return DMRChannel::TimeSlot::TS1;
-  case 2: return DMRChannel::TimeSlot::TS2;
-  }
-  return DMRChannel::TimeSlot::TS1;
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setTimeSlot(unsigned n, DMRChannel::TimeSlot ts) {
-  switch (ts) {
-  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0x01); break;
-  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0x02); break;
-  }
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::clearTimeSlotOverride(unsigned n) {
-  setUInt8(Offset::timeSlots() + n*Offset::betweenTimeSlots(), 0);
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::roaming() const {
-  return getUInt8(Offset::roaming());
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::enableRoaming(bool enable) {
-  setUInt8(Offset::roaming(), (enable ? 0x01 : 0x00));
-}
-
-Interval
-D878UVCodeplug::DMRAPRSSettingsElement::repeaterActivationDelay() const {
-  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::repeaterActivationDelay()))*100);
-}
-void
-D878UVCodeplug::DMRAPRSSettingsElement::setRepeaterActivationDelay(Interval ms) {
-  setUInt8(Offset::repeaterActivationDelay(), ms.milliseconds()/100);
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystems(Context &ctx) {
-  unsigned int n = std::min(ctx.count<GPSSystem>(), Limit::systemCount());
-  for (unsigned int idx=0; idx<n; idx++)
-    fromGPSSystemObj(idx, ctx.get<GPSSystem>(idx), ctx);
-  return true;
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::fromGPSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx) {
-  if (sys->hasContact()) {
-    setDestination(idx, sys->contactObj()->number());
-    setCallType(idx, sys->contactObj()->type());
-  }
-  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
-    setChannelIndex(idx, ctx.index(sys->revertChannel()));
-    clearTimeSlotOverride(idx);
-  } else { // no revert channel specified or "selected channel":
-    setChannelSelected(idx);
-  }
-  return true;
-}
-
-GPSSystem *
-D878UVCodeplug::DMRAPRSSettingsElement::toGPSSystemObj(int idx) const {
-  if (0 == destination(idx))
-    return nullptr;
-  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
-}
-
-bool
-D878UVCodeplug::DMRAPRSSettingsElement::linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const {
-  // Clear revert channel from GPS system
-  sys->setRevertChannel(nullptr);
-
-  // if a revert channel is defined -> link to it
-  if (channelIsSelected(idx))
-    sys->setRevertChannel(nullptr);
-  else if (ctx.has<Channel>(channelIndex(idx)) && ctx.get<Channel>(channelIndex(idx))->is<DMRChannel>())
-    sys->setRevertChannel(ctx.get<Channel>(channelIndex(idx))->as<DMRChannel>());
-
-  // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(destination(idx));
-  // If no matching contact is found, create one
-  if (nullptr == cont) {
-    cont = new DMRContact(callType(idx), tr("GPS #%1 Contact").arg(idx+1),
-                              destination(idx), false);
-    ctx.config()->contacts()->add(cont);
-  }
-  // link contact to GPS system.
-  sys->setContactObj(cont);
-
-  return true;
 }
 
 
@@ -3489,23 +3529,22 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
+  APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    APRSSettingsElement(data(Offset::analogAPRSSettings()))
-        .fromAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
         .setMessage(ctx.config()->posSystems()->aprsSystem(0)->message());
   }
 
   // Encode GPS systems
-  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
-  if (! gps.fromGPSSystems(ctx))
+  if (! aprs.fromDMRAPRSSystems(ctx))
     return false;
   if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
     APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
-    aprs.setAutoTXInterval(ctx.config()->posSystems()->gpsSystem(0)->period());
+    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
     aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
   }
   return true;
@@ -3520,22 +3559,21 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
-  unsigned pos_intervall = aprs.autoTXInterval();
+  unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toAPRSSystem();
+    APRSSystem *sys = aprs.toFMAPRSSystem();
     sys->setPeriod(pos_intervall);
     sys->setMessage(aprsMessage.message());
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
 
   // Create GPS systems
-  DMRAPRSSettingsElement gps_systems(data(Offset::dmrAPRSSettings()));
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
-    if (0 == gps_systems.destination(i))
+    if (0 == aprs.dmrDestination(i))
       continue;
-    if (GPSSystem *sys = gps_systems.toGPSSystemObj(i)) {
+    if (GPSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
       sys->setPeriod(pos_intervall);
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
@@ -3554,15 +3592,14 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // Link APRS system
   APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
   if (aprs.isValid()) {
-    aprs.linkAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
 
   // Link GPS systems
-  DMRAPRSSettingsElement gps_systems(data(Offset::dmrAPRSSettings()));
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
-    if (0 == gps_systems.destination(i))
+    if (0 == aprs.dmrDestination(i))
       continue;
-    gps_systems.linkGPSSystem(i, ctx.get<GPSSystem>(i), ctx);
+    aprs.linkDMRAPRSSystem(i, ctx.get<GPSSystem>(i), ctx);
   }
 
   return true;

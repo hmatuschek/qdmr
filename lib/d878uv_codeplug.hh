@@ -1166,6 +1166,12 @@ public:
     };
 
   public:
+    /** Possible FM APRS channel widths. */
+    enum class ChannelWidth {
+      Narrow = 0, Wide = 1
+    };
+
+  public:
     /** Constructor. */
     explicit APRSSettingsElement(uint8_t *ptr);
 
@@ -1238,18 +1244,93 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Returns the pre-wave delay in ms. */
-    virtual Interval preWaveDelay() const;
+    virtual Interval fmPreWaveDelay() const;
     /** Sets the pre-wave delay in ms. */
-    virtual void setPreWaveDelay(Interval ms);
+    virtual void setFMPreWaveDelay(Interval ms);
+
+    /** Returns @c true if the channel points to the current/selected channel. */
+    virtual bool dmrChannelIsSelected(unsigned n) const;
+    /** Returns the digital channel index for the n-th system. */
+    virtual unsigned dmrChannelIndex(unsigned n) const;
+    /** Sets the digital channel index for the n-th system. */
+    virtual void setDMRChannelIndex(unsigned n, unsigned idx);
+    /** Sets the channel to the current/selected channel. */
+    virtual void setDMRChannelSelected(unsigned n);
+
+    /** Returns the destination contact for the n-th system. */
+    virtual unsigned dmrDestination(unsigned n) const;
+    /** Sets the destination contact for the n-th system. */
+    virtual void setDMRDestination(unsigned n, unsigned idx);
+
+    /** Returns the call type for the n-th system. */
+    virtual DMRContact::Type dmrCallType(unsigned n) const;
+    /** Sets the call type for the n-th system. */
+    virtual void setDMRCallType(unsigned n, DMRContact::Type type);
+
+    /** Returns @c true if the n-th system overrides the channel time-slot. */
+    virtual bool dmrTimeSlotOverride(unsigned n);
+    /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
+    virtual DMRChannel::TimeSlot dmrTimeSlot(unsigned n) const;
+    /** Overrides the time slot of the n-th selected channel. */
+    virtual void setDMRTimeSlot(unsigned n, DMRChannel::TimeSlot ts);
+    /** Clears the time-slot override. */
+    virtual void clearDMRTimeSlotOverride(unsigned n);
+
+    /** Returns @c true if the roaming is enabled. */
+    virtual bool dmrRoaming() const;
+    /** Enables/disables roaming. */
+    virtual void enableDMRRoaming(bool enable);
+
+    /** Returns the the repeater activation delay in ms. */
+    virtual Interval dmrPreWaveDelay() const;
+    /** Sets the repeater activation delay in ms. */
+    virtual void setDMRPreWaveDelay(Interval ms);
+
+    /** Returns @c true if a received APRS message is shown indefinitely. */
+    virtual bool infiniteDisplayTime() const;
+    /** Returns the time, a received APRS message is shown. */
+    virtual Interval displayTime() const;
+    /** Sets the time, a received APRS is shown. */
+    virtual void setDisplayTime(Interval dur);
+    /** Sets the APRS display time to infinite. */
+    virtual void setDisplayTimeInifinite();
+
+    /** Returns the FM APRS channel width. */
+    virtual ChannelWidth fmChannelWidth() const;
+    /** Sets the FM APRS channel width. */
+    virtual void setFMChannelWidth(ChannelWidth width);
+
+    /** Retruns @c true if "pass all" is enabled, whatever that means. */
+    virtual bool passAll() const;
+    /** Enables/disables "pass all". */
+    virtual void enablePassAll(bool enable);
+
+    /** Retruns @c true if the n-th of 8 FM APRS frequencies is set. */
+    virtual bool fmFrequencySet(unsigned int n) const;
+    /** Returns the n-th of 8 FM APRS frequencies. */
+    virtual Frequency fmFrequency(unsigned int n) const;
+    /** Sets the n-th of 8 FM APRS frequencies. */
+    virtual void setFMFrequency(unsigned int n, Frequency f);
+    /** Clears the n-th of 8 FM APRS frequencies. */
+    virtual void clearFMFrequency(unsigned int n);
 
     /** Configures this APRS system from the given generic config. */
-    virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx,
-                                const ErrorStack &err=ErrorStack());
+    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                  const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toAPRSSystem();
+    virtual APRSSystem *toFMAPRSSystem();
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
-    virtual bool linkAPRSSystem(APRSSystem *sys, Context &ctx);
+    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+
+    /** Constructs all GPS system from the generic configuration. */
+    virtual bool fromDMRAPRSSystems(Context &ctx);
+    /** Encodes the given GPS system. */
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
+    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
+    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
 
   public:
     /** Some static limits for this element. */
@@ -1433,98 +1514,6 @@ public:
     virtual unsigned ssid() const;
     /** Sets the call, SSID and enables the entry. */
     virtual void setCall(const QString &call, unsigned ssid);
-  };
-
-  /** Represents the 8 DMR-APRS systems within the binary codeplug.
-   *
-   * Memory layout of encoded DMR-APRS systems (size 0x0060 bytes):
-   * @verbinclude d878uv_dmraprssettings.txt */
-  class DMRAPRSSettingsElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    DMRAPRSSettingsElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    DMRAPRSSettingsElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0060; }
-
-    /** Resets the systems. */
-    void clear();
-
-    /** Returns @c true if the channel points to the current/selected channel. */
-    virtual bool channelIsSelected(unsigned n) const;
-    /** Returns the digital channel index for the n-th system. */
-    virtual unsigned channelIndex(unsigned n) const;
-    /** Sets the digital channel index for the n-th system. */
-    virtual void setChannelIndex(unsigned n, unsigned idx);
-    /** Sets the channel to the current/selected channel. */
-    virtual void setChannelSelected(unsigned n);
-
-    /** Returns the destination contact for the n-th system. */
-    virtual unsigned destination(unsigned n) const;
-    /** Sets the destination contact for the n-th system. */
-    virtual void setDestination(unsigned n, unsigned idx);
-
-    /** Returns the call type for the n-th system. */
-    virtual DMRContact::Type callType(unsigned n) const;
-    /** Sets the call type for the n-th system. */
-    virtual void setCallType(unsigned n, DMRContact::Type type);
-
-    /** Returns @c true if the n-th system overrides the channel time-slot. */
-    virtual bool timeSlotOverride(unsigned n);
-    /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
-    virtual DMRChannel::TimeSlot timeSlot(unsigned n) const;
-    /** Overrides the time slot of the n-th selected channel. */
-    virtual void setTimeSlot(unsigned n, DMRChannel::TimeSlot ts);
-    /** Clears the time-slot override. */
-    virtual void clearTimeSlotOverride(unsigned n);
-
-    /** Returns @c true if the roaming is enabled. */
-    virtual bool roaming() const;
-    /** Enables/disables roaming. */
-    virtual void enableRoaming(bool enable);
-
-    /** Returns the the repeater activation delay in ms. */
-    virtual Interval repeaterActivationDelay() const;
-    /** Sets the repeater activation delay in ms. */
-    virtual void setRepeaterActivationDelay(Interval ms);
-
-    /** Constructs all GPS system from the generic configuration. */
-    virtual bool fromGPSSystems(Context &ctx);
-    /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
-    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    virtual GPSSystem *toGPSSystemObj(int idx) const;
-    /** Links the specified generic GPS system. */
-    virtual bool linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const;
-
-  public:
-    /** Some limits. */
-    struct Limit {
-      /// Maximum number of channels, destinations, call types and time slots.
-      static constexpr unsigned int systemCount() { return 8; }
-    };
-
-  protected:
-    /** Internal used offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int channels()                { return 0x0000; }
-      static constexpr unsigned int betweenChannels()         { return 0x0002; }
-      static constexpr unsigned int destinations()            { return 0x0010; }
-      static constexpr unsigned int betweenDestinations()     { return 0x0004; }
-      static constexpr unsigned int callTypes()               { return 0x0030; }
-      static constexpr unsigned int betweenCallTypes()        { return 0x0001; }
-      static constexpr unsigned int timeSlots()               { return 0x0039; }
-      static constexpr unsigned int betweenTimeSlots()        { return 0x0001; }
-      static constexpr unsigned int roaming()                 { return 0x0038; }
-      static constexpr unsigned int repeaterActivationDelay() { return 0x0041; }
-      /// @endcond
-    };
   };
 
   /** Implements the binary representation of a roaming channel within the codeplug.
