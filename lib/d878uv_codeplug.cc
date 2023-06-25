@@ -2538,7 +2538,7 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
 }
 void
 D878UVCodeplug::APRSSettingsElement::disableFixedLocation() {
-  setUInt8(0x000d, 0x00);
+  setUInt8(Offset::fixedLocation(), 0x00);
 }
 
 QString
@@ -2726,6 +2726,87 @@ D878UVCodeplug::APRSSettingsElement::setDisplayTimeInifinite() {
   setUInt8(Offset::displayInterval(), 13);
 }
 
+bool
+D878UVCodeplug::APRSSettingsElement::reportPosition() const {
+  return getBit(Offset::reportPosition(), 0);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportPosition(bool enable) {
+  setBit(Offset::reportPosition(), 0, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportMicE() const {
+  return getBit(Offset::reportMicE(), 1);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportMicE(bool enable) {
+  setBit(Offset::reportMicE(), 1, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportObject() const {
+  return getBit(Offset::reportObject(), 2);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportObject(bool enable) {
+  setBit(Offset::reportObject(), 2, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportItem() const {
+  return getBit(Offset::reportItem(), 3);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportItem(bool enable) {
+  setBit(Offset::reportItem(), 3, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportMessage() const {
+  return getBit(Offset::reportMessage(), 4);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportMessage(bool enable) {
+  setBit(Offset::reportMessage(), 4, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportWeather() const {
+  return getBit(Offset::reportWeather(), 5);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportWeather(bool enable) {
+  setBit(Offset::reportWeather(), 5, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportNMEA() const {
+  return getBit(Offset::reportNMEA(), 6);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportNMEA(bool enable) {
+  setBit(Offset::reportNMEA(), 6, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportStatus() const {
+  return getBit(Offset::reportStatus(), 7);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportStatus(bool enable) {
+  setBit(Offset::reportStatus(), 7, enable);
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::reportOther() const {
+  return getBit(Offset::reportOther(), 0);
+}
+void
+D878UVCodeplug::APRSSettingsElement::enableReportOther(bool enable) {
+  setBit(Offset::reportOther(), 0, enable);
+}
+
 D878UVCodeplug::APRSSettingsElement::ChannelWidth
 D878UVCodeplug::APRSSettingsElement::fmChannelWidth() const {
   return (ChannelWidth)getUInt8(Offset::fmWidth());
@@ -2736,11 +2817,11 @@ D878UVCodeplug::APRSSettingsElement::setFMChannelWidth(ChannelWidth width) {
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::passAll() const {
+D878UVCodeplug::APRSSettingsElement::fmPassAll() const {
   return 0x00 != getUInt8(Offset::passAll());
 }
 void
-D878UVCodeplug::APRSSettingsElement::enablePassAll(bool enable) {
+D878UVCodeplug::APRSSettingsElement::enableFMPassAll(bool enable) {
   setUInt8(Offset::passAll(), enable ? 0x01 : 0x00);
 }
 
@@ -2872,117 +2953,6 @@ D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, 
   sys->setContactObj(cont);
 
   return true;
-}
-
-
-/* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::AnalogAPRSSettingsExtensionElement
- * ******************************************************************************************** */
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::AnalogAPRSSettingsExtensionElement(uint8_t *ptr)
-  : Element(ptr, AnalogAPRSSettingsExtensionElement::size())
-{
-  // pass...
-}
-
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::clear() {
-  memset(_data, 0x00, _size);
-}
-
-unsigned
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::fixedAltitude() const {
-  return getUInt16_le(0x0006)/3.28;
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::setFixedAltitude(unsigned m) {
-  setUInt16_le(0x0006, m*3.28);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportPosition() const {
-  return getBit(0x0008, 0);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportPosition(bool enable) {
-  setBit(0x0008, 0, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportMicE() const {
-  return getBit(0x0008, 1);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportMicE(bool enable) {
-  setBit(0x0008, 1, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportObject() const {
-  return getBit(0x0008, 2);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportObject(bool enable) {
-  setBit(0x0008, 2, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportItem() const {
-  return getBit(0x0008, 3);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportItem(bool enable) {
-  setBit(0x0008, 3, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportMessage() const {
-  return getBit(0x0008, 4);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportMessage(bool enable) {
-  setBit(0x0008, 4, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportWeather() const {
-  return getBit(0x0008, 5);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportWeather(bool enable) {
-  setBit(0x0008, 5, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportNMEA() const {
-  return getBit(0x0008, 6);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportNMEA(bool enable) {
-  setBit(0x0008, 6, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportStatus() const {
-  return getBit(0x0008, 7);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportStatus(bool enable) {
-  setBit(0x0008, 7, enable);
-}
-
-bool
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::reportOther() const {
-  return getBit(0x0009, 0);
-}
-void
-D878UVCodeplug::AnalogAPRSSettingsExtensionElement::enableReportOther(bool enable) {
-  setBit(0x0009, 0, enable);
 }
 
 
@@ -3287,10 +3257,6 @@ D878UVCodeplug::allocateUpdated() {
   // Encryption keys
   image(0).addElement(Offset::aesKeys(), Limit::aesKeys()*AESEncryptionKeyElement::size());
 
-  // allocate APRS settings extension
-  image(0).addElement(Offset::analogAPRSSettingsExtension(),
-                      AnalogAPRSSettingsExtensionElement::size());
-
   // allocate APRS RX list
   image(0).addElement(Offset::analogAPRSRXEntries(),
                       Limit::analogAPRSRXEntries()*AnalogAPRSRXEntryElement::size());
@@ -3310,7 +3276,6 @@ D878UVCodeplug::allocateForDecoding() {
   this->allocateRoaming();
 }
 
-
 void
 D878UVCodeplug::setBitmaps(Context& ctx)
 {
@@ -3327,7 +3292,6 @@ D878UVCodeplug::setBitmaps(Context& ctx)
   unsigned int num_roaming_channel = std::min(Limit::roamingChannels(), ctx.count<RoamingChannel>());
   roaming_ch_bitmap.clear(); roaming_ch_bitmap.enableFirst(num_roaming_channel);
 }
-
 
 bool
 D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
@@ -3519,7 +3483,7 @@ D878UVCodeplug::allocateGPSSystems() {
   // replaces D868UVCodeplug::allocateGPSSystems
 
   // APRS settings
-  image(0).addElement(Offset::analogAPRSSettings(), APRSSettingsElement::size());
+  image(0).addElement(Offset::aprsSettings(), APRSSettingsElement::size());
   image(0).addElement(Offset::analogAPRSMessage(), AnalogAPRSMessageElement::size());
   image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
 }
@@ -3529,7 +3493,7 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
-  APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
+  APRSSettingsElement aprs(data(Offset::aprsSettings()));
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
     aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
@@ -3543,7 +3507,7 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   if (0 < ctx.config()->posSystems()->gpsCount()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
+    APRSSettingsElement aprs(data(Offset::aprsSettings()));
     aprs.setAutoTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
     aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
   }
@@ -3557,7 +3521,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX interval
-  APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
+  APRSSettingsElement aprs(data(Offset::aprsSettings()));
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
   unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
@@ -3590,7 +3554,7 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
-  APRSSettingsElement aprs(data(Offset::analogAPRSSettings()));
+  APRSSettingsElement aprs(data(Offset::aprsSettings()));
   if (aprs.isValid()) {
     aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }

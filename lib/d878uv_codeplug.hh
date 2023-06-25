@@ -139,7 +139,7 @@ class GPSSystem;
  *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings,
  *    see @c D878UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settigs.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>APRS template text (optional settings).</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
  *
@@ -1176,7 +1176,7 @@ public:
     explicit APRSSettingsElement(uint8_t *ptr);
 
     /** The size of the element. */
-    static constexpr unsigned int size() { return 0x00f0; }
+    static constexpr unsigned int size() { return 0x0100; }
 
     /** Resets the settings. */
     void clear();
@@ -1300,10 +1300,10 @@ public:
     /** Sets the FM APRS channel width. */
     virtual void setFMChannelWidth(ChannelWidth width);
 
-    /** Retruns @c true if "pass all" is enabled, whatever that means. */
-    virtual bool passAll() const;
-    /** Enables/disables "pass all". */
-    virtual void enablePassAll(bool enable);
+    /** Retruns @c true if the CRC check on received FM APRS messages is disabled. */
+    virtual bool fmPassAll() const;
+    /** Enables/disables "pass all", that is the CRC check on FM APRS messages is disabled. */
+    virtual void enableFMPassAll(bool enable);
 
     /** Retruns @c true if the n-th of 8 FM APRS frequencies is set. */
     virtual bool fmFrequencySet(unsigned int n) const;
@@ -1331,6 +1331,43 @@ public:
     virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
     virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+
+    /** Returns @c true if the report position flag is set. */
+    virtual bool reportPosition() const;
+    /** Enables/disables report position flag. */
+    virtual void enableReportPosition(bool enable);
+    /** Returns @c true if the report Mic-E flag is set. */
+    virtual bool reportMicE() const;
+    /** Enables/disables report Mic-E flag. */
+    virtual void enableReportMicE(bool enable);
+    /** Returns @c true if the report object flag is set. */
+    virtual bool reportObject() const;
+    /** Enables/disables report object flag. */
+    virtual void enableReportObject(bool enable);
+    /** Returns @c true if the report item flag is set. */
+    virtual bool reportItem() const;
+    /** Enables/disables report item flag. */
+    virtual void enableReportItem(bool enable);
+    /** Returns @c true if the report message flag is set. */
+    virtual bool reportMessage() const;
+    /** Enables/disables report message flag. */
+    virtual void enableReportMessage(bool enable);
+    /** Returns @c true if the report weather flag is set. */
+    virtual bool reportWeather() const;
+    /** Enables/disables report weather flag. */
+    virtual void enableReportWeather(bool enable);
+    /** Returns @c true if the report NMEA flag is set. */
+    virtual bool reportNMEA() const;
+    /** Enables/disables report NMEA flag. */
+    virtual void enableReportNMEA(bool enable);
+    /** Returns @c true if the report status flag is set. */
+    virtual bool reportStatus() const;
+    /** Enables/disables report status flag. */
+    virtual void enableReportStatus(bool enable);
+    /** Returns @c true if the report other flag is set. */
+    virtual bool reportOther() const;
+    /** Enables/disables report other flag. */
+    virtual void enableReportOther(bool enable);
 
   public:
     /** Some static limits for this element. */
@@ -1386,6 +1423,15 @@ public:
       static constexpr unsigned int dmrPrewaveDelay()                      { return 0x0081; }
       static constexpr unsigned int displayInterval()                      { return 0x0082; }
       static constexpr unsigned int fixedHeight()                          { return 0x00a6; }
+      static constexpr unsigned int reportPosition()                       { return 0x00a8; }
+      static constexpr unsigned int reportMicE()                           { return 0x00a8; }
+      static constexpr unsigned int reportObject()                         { return 0x00a8; }
+      static constexpr unsigned int reportItem()                           { return 0x00a8; }
+      static constexpr unsigned int reportMessage()                        { return 0x00a8; }
+      static constexpr unsigned int reportWeather()                        { return 0x00a8; }
+      static constexpr unsigned int reportNMEA()                           { return 0x00a8; }
+      static constexpr unsigned int reportStatus()                         { return 0x00a8; }
+      static constexpr unsigned int reportOther()                          { return 0x00a9; }
       static constexpr unsigned int fmWidth()                              { return 0x00aa; }
       static constexpr unsigned int passAll()                              { return 0x00ab; }
       static constexpr unsigned int fmFrequencies()                        { return 0x00ac; }
@@ -1393,69 +1439,6 @@ public:
 
       /// @endcond
     };
-  };
-
-  /** Represents an extension to the APRS settings.
-   *
-   * Memory layout of APRS settings (0x60byte):
-   * @verbinclude d878uv_aprssettingext.txt */
-  class AnalogAPRSSettingsExtensionElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    AnalogAPRSSettingsExtensionElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    AnalogAPRSSettingsExtensionElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0060; }
-
-    /** Resets the settings. */
-    void clear();
-
-    /** Returns the fixed altitude in meter. */
-    virtual unsigned fixedAltitude() const;
-    /** Sets the fixed altitude in meter. */
-    virtual void setFixedAltitude(unsigned m);
-
-    /** Returns @c true if the report position flag is set. */
-    virtual bool reportPosition() const;
-    /** Enables/disables report position flag. */
-    virtual void enableReportPosition(bool enable);
-    /** Returns @c true if the report Mic-E flag is set. */
-    virtual bool reportMicE() const;
-    /** Enables/disables report Mic-E flag. */
-    virtual void enableReportMicE(bool enable);
-    /** Returns @c true if the report object flag is set. */
-    virtual bool reportObject() const;
-    /** Enables/disables report object flag. */
-    virtual void enableReportObject(bool enable);
-    /** Returns @c true if the report item flag is set. */
-    virtual bool reportItem() const;
-    /** Enables/disables report item flag. */
-    virtual void enableReportItem(bool enable);
-    /** Returns @c true if the report message flag is set. */
-    virtual bool reportMessage() const;
-    /** Enables/disables report message flag. */
-    virtual void enableReportMessage(bool enable);
-    /** Returns @c true if the report weather flag is set. */
-    virtual bool reportWeather() const;
-    /** Enables/disables report weather flag. */
-    virtual void enableReportWeather(bool enable);
-    /** Returns @c true if the report NMEA flag is set. */
-    virtual bool reportNMEA() const;
-    /** Enables/disables report NMEA flag. */
-    virtual void enableReportNMEA(bool enable);
-    /** Returns @c true if the report status flag is set. */
-    virtual bool reportStatus() const;
-    /** Enables/disables report status flag. */
-    virtual void enableReportStatus(bool enable);
-    /** Returns @c true if the report other flag is set. */
-    virtual bool reportOther() const;
-    /** Enables/disables report other flag. */
-    virtual void enableReportOther(bool enable);
   };
 
   /** Represents an (analog/FM) APRS message. */
@@ -1892,12 +1875,9 @@ protected:
   struct Offset: public D868UVCodeplug::Offset {
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int settingsExtension()           { return 0x02501400; }
-    static constexpr unsigned int analogAPRSSettings()          { return 0x02501000; }
-    static constexpr unsigned int analogAPRSSettingsExtension() { return 0x025010A0; }
+    static constexpr unsigned int aprsSettings()                { return 0x02501000; }
     static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
     static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
-    static constexpr unsigned int dmrAPRSSettings()             { return 0x02501040; }
-    static constexpr unsigned int dmrAPRSMessage()              { return 0x02501280; }
     static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
     static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
     static constexpr unsigned int roamingChannels()             { return 0x01040000; }
