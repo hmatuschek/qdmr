@@ -3485,7 +3485,7 @@ D878UVCodeplug::allocateGPSSystems() {
   // APRS settings
   image(0).addElement(Offset::aprsSettings(), APRSSettingsElement::size());
   image(0).addElement(Offset::analogAPRSMessage(), AnalogAPRSMessageElement::size());
-  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
+  image(0).addElement(Offset::aprsSettings(), DMRAPRSSettingsElement::size());
 }
 
 bool

@@ -3,39 +3,6 @@
 #include "logger.hh"
 
 
-#define NUM_CHANNELS              4000
-#define NUM_CHANNEL_BANKS         32
-#define CHANNEL_BANK_0            0x00800000
-#define CHANNEL_BANK_SIZE         0x00002000
-#define CHANNEL_BANK_31           0x00fc0000
-#define CHANNEL_BANK_31_SIZE      0x00000800
-#define CHANNEL_BANK_OFFSET       0x00040000
-#define CHANNEL_SIZE              0x00000040
-#define CHANNEL_BITMAP            0x024c1500
-#define CHANNEL_BITMAP_SIZE       0x00000200
-
-#define ADDR_APRS_SETTINGS        0x02501000
-#define APRS_SETTINGS_SIZE        0x000000A0
-
-#define ADDR_APRS_MESSAGE         0x02501200 // Address of APRS messages
-#define APRS_MESSAGE_SIZE         0x00000040 // Size of APRS messages
-
-#define NUM_ROAMING_CHANNEL         250
-#define ADDR_ROAMING_CHANNEL_BITMAP 0x01042000
-#define ROAMING_CHANNEL_BITMAP_SIZE 0x00000020
-#define ADDR_ROAMING_CHANNEL_0      0x01040000
-#define ROAMING_CHANNEL_SIZE        0x00000020
-#define ROAMING_CHANNEL_OFFSET      0x00000020
-
-#define NUM_ROAMING_ZONES           64
-#define NUM_CH_PER_ROAMINGZONE      64
-#define ADDR_ROAMING_ZONE_BITMAP    0x01042080
-#define ROAMING_ZONE_BITMAP_SIZE    0x00000010
-#define ADDR_ROAMING_ZONE_0         0x01043000
-#define ROAMING_ZONE_SIZE           0x00000080
-#define ROAMING_ZONE_OFFSET         0x00000080
-
-
 /* ******************************************************************************************** *
  * Implementation of DMR6X2UVCodeplug::Color
  * ******************************************************************************************** */
@@ -2005,9 +1972,9 @@ DMR6X2UVCodeplug::allocateBitmaps() {
     return false;
 
   // Roaming channel bitmaps
-  image(0).addElement(ADDR_ROAMING_CHANNEL_BITMAP, ROAMING_CHANNEL_BITMAP_SIZE);
+  image(0).addElement(Offset::roamingChannelBitmap(), RoamingChannelBitmapElement::size());
   // Roaming zone bitmaps
-  image(0).addElement(ADDR_ROAMING_ZONE_BITMAP, ROAMING_ZONE_BITMAP_SIZE);
+  image(0).addElement(Offset::roamingZoneBitmap(), RoamingZoneBitmapElement::size());
 
   return true;
 }
@@ -2019,19 +1986,14 @@ DMR6X2UVCodeplug::setBitmaps(Context& ctx)
   D868UVCodeplug::setBitmaps(ctx);
 
   // Mark roaming zones
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  memset(roaming_zone_bitmap, 0x00, ROAMING_ZONE_BITMAP_SIZE);
-  unsigned int num_roaming_zones = std::min((unsigned int) NUM_ROAMING_ZONES, ctx.count<RoamingZone>());
-  for (unsigned int i=0; i<num_roaming_zones; i++)
-    roaming_zone_bitmap[i/8] |= (1<<(i%8));
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  unsigned int num_roaming_zones = std::min(Limit::roamingZones(), ctx.count<RoamingZone>());
+  roaming_zone_bitmap.clear(); roaming_zone_bitmap.enableFirst(num_roaming_zones);
 
   // Mark roaming channels
-  uint8_t *roaming_ch_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  memset(roaming_ch_bitmap, 0x00, ROAMING_CHANNEL_BITMAP_SIZE);
-  unsigned int num_roaming_channels = std::min((unsigned int)NUM_ROAMING_CHANNEL,ctx.count<RoamingChannel>());
-  // Get all (unique) channels used in roaming
-  for (unsigned int i=0; i<num_roaming_channels; i++)
-    roaming_ch_bitmap[i/8] |= (1<<(i%8));
+  RoamingChannelBitmapElement roaming_ch_bitmap(data(Offset::roamingChannelBitmap()));
+  unsigned int num_roaming_channel = std::min(Limit::roamingChannels(), ctx.count<RoamingChannel>());
+  roaming_ch_bitmap.clear(); roaming_ch_bitmap.enableFirst(num_roaming_channel);
 }
 
 void
@@ -2133,8 +2095,9 @@ DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
-    uint16_t bank = i/128, idx = i%128;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
+                           + idx * ChannelElement::size()));
     if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
       return false;
   }
@@ -2145,13 +2108,14 @@ bool
 DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   // Create channels
-  uint8_t *channel_bitmap = data(CHANNEL_BITMAP);
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == ((channel_bitmap[byte]>>bit) & 0x01))
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
@@ -2163,16 +2127,19 @@ bool
 DMR6X2UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
   // Link channel objects
-  for (uint16_t i=0; i<NUM_CHANNELS; i++) {
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
-    uint16_t  bit = i%8, byte = i/8, bank = i/128, idx = i%128;
-    if (0 == (((*data(CHANNEL_BITMAP+byte))>>bit) & 0x01))
+    if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(CHANNEL_BANK_0 + bank*CHANNEL_BANK_OFFSET + idx*CHANNEL_SIZE));
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                           + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
   }
+
   return true;
 }
 
@@ -2181,8 +2148,8 @@ DMR6X2UVCodeplug::allocateGPSSystems() {
   // replaces D868UVCodeplug::allocateGPSSystems
 
   // APRS settings
-  image(0).addElement(ADDR_APRS_SETTINGS, APRS_SETTINGS_SIZE);
-  image(0).addElement(ADDR_APRS_MESSAGE, APRS_MESSAGE_SIZE);
+  image(0).addElement(Offset::aprsSettings(), APRSSettingsElement::size());
+  image(0).addElement(Offset::fmAPRSMessage(), Size::fmAPRSMessage());
 }
 
 bool
@@ -2190,13 +2157,13 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
-  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
     aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
-    uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
-    encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), 60, 0x00);
+    uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
+    encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), Limit::fmAPRSMessage(), 0x00);
   }
 
   // Encode GPS systems
@@ -2218,15 +2185,15 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::createGPSSystems
 
   // Before creating any GPS/APRS systems, get global auto TX interval
-  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
   unsigned pos_interval = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
-  uint8_t *aprsmsg = (uint8_t *)data(ADDR_APRS_MESSAGE);
+  uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
   if (aprs.isValid()) {
     APRSSystem *sys = aprs.toFMAPRSSystem();
     sys->setPeriod(pos_interval);
-    sys->setMessage(decode_ascii(aprsmsg, 60, 0x00));
+    sys->setMessage(decode_ascii(aprsmsg, Limit::fmAPRSMessage(), 0x00));
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
 
@@ -2250,7 +2217,7 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // replaces D868UVCodeplug::linkGPSSystems
 
   // Link APRS system
-  D878UVCodeplug::APRSSettingsElement aprs(data(ADDR_APRS_SETTINGS));
+  D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
   if (aprs.isValid()) {
     aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
   }
@@ -2269,44 +2236,45 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
 void
 DMR6X2UVCodeplug::allocateRoaming() {
   /* Allocate roaming channels */
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_CHANNEL; i++) {
+  RoamingChannelBitmapElement roaming_channel_bitmap(data(Offset::roamingChannelBitmap()));
+  for (uint8_t i=0; i<Limit::roamingChannels(); i++) {
     // Get byte and bit for roaming channel
-    uint16_t bit = i%8, byte = i/8;
     // if disabled -> skip
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+    if (! roaming_channel_bitmap.isEncoded(i))
       continue;
     // Allocate roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    if (nullptr == data(addr, 0))
-      image(0).addElement(addr, ROAMING_CHANNEL_SIZE);
+    uint32_t addr = Offset::roamingChannels() + i*D878UVCodeplug::RoamingChannelElement::size();
+    if (!isAllocated(addr, 0))
+      image(0).addElement(addr, D878UVCodeplug::RoamingChannelElement::size());
   }
 
   /* Allocate roaming zones. */
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (uint8_t i=0; i<NUM_ROAMING_ZONES; i++) {
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  for (uint8_t i=0; i<Limit::roamingZones(); i++) {
     // Get byte and bit for radio ID
-    uint16_t bit = i%8, byte = i/8;
     // if disabled -> skip
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+    if (! roaming_zone_bitmap.isEncoded(i))
       continue;
     // Allocate roaming zone
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    if (nullptr == data(addr, 0)) {
-      image(0).addElement(addr, ROAMING_ZONE_SIZE);
+    uint32_t addr = Offset::roamingZones() + i*D878UVCodeplug::RoamingZoneElement::size();
+    if (!isAllocated(addr, 0)) {
+      logDebug() << "Allocate roaming zone at " << QString::number(addr, 16);
+      image(0).addElement(addr, D878UVCodeplug::RoamingZoneElement::size());
     }
   }
 }
 
 bool
 DMR6X2UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode roaming channels
-  for (uint8_t i=0; i<std::min(NUM_ROAMING_CHANNEL, ctx.config()->roamingChannels()->count()); i++) {
+  unsigned int num_roaming_channel = std::min(
+        Limit::roamingChannels(), ctx.count<RoamingChannel>());
+  for (uint8_t i=0; i<num_roaming_channel; i++) {
     // Encode roaming channel
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    D878UVCodeplug::RoamingChannelElement rch_elm(data(addr));
+    uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
+    RoamingChannelElement rch_elm(data(addr));
     RoamingChannel *rch = ctx.config()->roamingChannels()->get(i)->as<RoamingChannel>();
     rch_elm.clear();
     rch_elm.fromChannel(rch);
@@ -2318,9 +2286,12 @@ DMR6X2UVCodeplug::encodeRoaming(const Flags &flags, Context &ctx, const ErrorSta
   }
 
   // Encode roaming zones
-  for (int i=0; i<ctx.config()->roamingZones()->count(); i++){
-    uint32_t addr = ADDR_ROAMING_ZONE_0+i*ROAMING_ZONE_OFFSET;
-    D878UVCodeplug::RoamingZoneElement zone(data(addr));
+  for (unsigned int i=0; i<ctx.count<RoamingZone>(); i++){
+    uint32_t addr = Offset::roamingZones() + i*RoamingZoneElement::size();
+    RoamingZoneElement zone(data(addr));
+    logDebug() << "Encode roaming zone " << ctx.config()->roamingZones()->zone(i)->name()
+               << " (" << (i+1) << ") at " << QString::number(addr, 16)
+               << " with " << ctx.config()->roamingZones()->zone(i)->count() << " elements.";
     zone.fromRoamingZone(ctx.config()->roamingZones()->zone(i), ctx);
   }
 
@@ -2332,25 +2303,23 @@ DMR6X2UVCodeplug::createRoaming(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Create or find roaming channels
-  uint8_t *roaming_channel_bitmap = data(ADDR_ROAMING_CHANNEL_BITMAP);
-  for (int i=0; i<NUM_ROAMING_CHANNEL; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_channel_bitmap[byte]>>bit) & 0x01))
+  RoamingChannelBitmapElement roaming_channel_bitmap(data(Offset::roamingChannelBitmap()));
+  for (unsigned int i=0; i<Limit::roamingChannels(); i++) {
+    if (! roaming_channel_bitmap.isEncoded(i))
       continue;
-    uint32_t addr = ADDR_ROAMING_CHANNEL_0 + i*ROAMING_CHANNEL_OFFSET;
-    D878UVCodeplug::RoamingChannelElement ch(data(addr));
+    uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
+    RoamingChannelElement ch(data(addr));
     RoamingChannel *digi = ch.toChannel(ctx);
     ctx.add(digi, i);
   }
 
   // Create and link roaming zones
-  uint8_t *roaming_zone_bitmap = data(ADDR_ROAMING_ZONE_BITMAP);
-  for (int i=0; i<NUM_ROAMING_ZONES; i++) {
-    uint8_t byte=i/8, bit=i%8;
-    if (0 == ((roaming_zone_bitmap[byte]>>bit) & 0x01))
+  RoamingZoneBitmapElement roaming_zone_bitmap(data(Offset::roamingZoneBitmap()));
+  for (unsigned int i=0; i<Limit::roamingZones(); i++) {
+    if (! roaming_zone_bitmap.isEncoded(i))
       continue;
-    uint32_t addr = ADDR_ROAMING_ZONE_0 + i*ROAMING_ZONE_OFFSET;
-    D878UVCodeplug::RoamingZoneElement z(data(addr));
+    uint32_t addr = Offset::roamingZones() + i*RoamingZoneElement::size();
+    RoamingZoneElement z(data(addr));
     RoamingZone *zone = z.toRoamingZone(ctx, err);
     ctx.config()->roamingZones()->add(zone); ctx.add(zone, i);
     z.linkRoamingZone(zone, ctx, err);
