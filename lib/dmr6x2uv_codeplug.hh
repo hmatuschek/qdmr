@@ -1084,6 +1084,11 @@ public:
     };
   };
 
+  typedef D878UVCodeplug::RoamingChannelBitmapElement RoamingChannelBitmapElement ;
+  typedef D878UVCodeplug::RoamingChannelElement RoamingChannelElement;
+  typedef D878UVCodeplug::RoamingZoneBitmapElement RoamingZoneBitmapElement;
+  typedef D878UVCodeplug::RoamingZoneElement RoamingZoneElement;
+
 public:
   /** Hidden constructor. */
   explicit DMR6X2UVCodeplug(const QString &label, QObject *parent=nullptr);
@@ -1125,12 +1130,35 @@ protected:
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 
+public:
+  /** Some limits for the codeplug. */
+  struct Limit : public D868UVCodeplug::Limit {
+    /// Maximum length of the FM APRS message
+    static constexpr unsigned int fmAPRSMessage()                 { return 60; }
+    /// Maximum number of roaming channels.
+    static constexpr unsigned int roamingChannels()               { return 250; }
+    /// Maximum number of roaming zones.
+    static constexpr unsigned int roamingZones()                  { return 64; }
+  };
+
 protected:
   /** Some internal used offsets within the codeplug. */
-  struct Offset {
+  struct Offset: public D868UVCodeplug::Offset {
     ///@cond DO_NOT_DOCUMENT
-    static constexpr unsigned int settings()          { return 0x02500000; }
-    static constexpr unsigned int settingsExtension() { return 0x02501400; }
+    static constexpr unsigned int roamingChannelBitmap()          { return 0x01042000; }
+    static constexpr unsigned int roamingChannels()               { return 0x01040000; }
+    static constexpr unsigned int roamingZoneBitmap()             { return 0x01042080; }
+    static constexpr unsigned int roamingZones()                  { return 0x01043000; }
+
+    static constexpr unsigned int fmAPRSMessage()                 { return 0x02501200; }
+    static constexpr unsigned int settingsExtension()             { return 0x02501400; }
+    /// @endcond
+  };
+
+  /** Some internal used sizes. */
+  struct Size: public D868UVCodeplug::Size {
+    ///@cond DO_NOT_DOCUMENT
+    static constexpr unsigned int fmAPRSMessage()                 { return 0x00000040; }
     /// @endcond
   };
 };
