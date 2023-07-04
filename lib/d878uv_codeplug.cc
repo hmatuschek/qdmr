@@ -3485,7 +3485,6 @@ D878UVCodeplug::allocateGPSSystems() {
   // APRS settings
   image(0).addElement(Offset::aprsSettings(), APRSSettingsElement::size());
   image(0).addElement(Offset::analogAPRSMessage(), AnalogAPRSMessageElement::size());
-  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
 }
 
 bool
@@ -3581,8 +3580,10 @@ D878UVCodeplug::allocateRoaming() {
       continue;
     // Allocate roaming channel
     uint32_t addr = Offset::roamingChannels() + i*RoamingChannelElement::size();
-    if (!isAllocated(addr, 0))
+    if (!isAllocated(addr, 0)) {
+      //logDebug() << "Allocate roaming channel at " << QString::number(addr, 16) << "h.";
       image(0).addElement(addr, RoamingChannelElement::size());
+    }
   }
 
   /* Allocate roaming zones. */
