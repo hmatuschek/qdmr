@@ -1166,12 +1166,6 @@ public:
     };
 
   public:
-    /** Possible FM APRS channel widths. */
-    enum class ChannelWidth {
-      Narrow = 0, Wide = 1
-    };
-
-  public:
     /** Constructor. */
     explicit APRSSettingsElement(uint8_t *ptr);
 
@@ -1183,9 +1177,9 @@ public:
     bool isValid() const;
 
     /** Returns the TX delay in ms. */
-    virtual unsigned fmTXDelay() const;
+    virtual Interval fmTXDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setFMTXDelay(unsigned ms);
+    virtual void setFMTXDelay(Interval ms);
 
     /** Returns the sub tone settings. */
     virtual Signaling::Code txTone() const;
@@ -1296,9 +1290,9 @@ public:
     virtual void setDisplayTimeInifinite();
 
     /** Returns the FM APRS channel width. */
-    virtual ChannelWidth fmChannelWidth() const;
+    virtual AnytoneFMAPRSSettingsExtension::Bandwidth fmChannelWidth() const;
     /** Sets the FM APRS channel width. */
-    virtual void setFMChannelWidth(ChannelWidth width);
+    virtual void setFMChannelWidth(AnytoneFMAPRSSettingsExtension::Bandwidth width);
 
     /** Retruns @c true if the CRC check on received FM APRS messages is disabled. */
     virtual bool fmPassAll() const;
@@ -1313,24 +1307,6 @@ public:
     virtual void setFMFrequency(unsigned int n, Frequency f);
     /** Clears the n-th of 8 FM APRS frequencies. */
     virtual void clearFMFrequency(unsigned int n);
-
-    /** Configures this APRS system from the given generic config. */
-    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
-                                  const ErrorStack &err=ErrorStack());
-    /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toFMAPRSSystem();
-    /** Links the transmit channel within the generic APRS system based on the transmit frequency
-     * defined within this APRS system. */
-    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
-
-    /** Constructs all GPS system from the generic configuration. */
-    virtual bool fromDMRAPRSSystems(Context &ctx);
-    /** Encodes the given GPS system. */
-    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
-    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
-    /** Links the specified generic GPS system. */
-    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
 
     /** Returns @c true if the report position flag is set. */
     virtual bool reportPosition() const;
@@ -1368,6 +1344,24 @@ public:
     virtual bool reportOther() const;
     /** Enables/disables report other flag. */
     virtual void enableReportOther(bool enable);
+
+    /** Configures this APRS system from the given generic config. */
+    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                  const ErrorStack &err=ErrorStack());
+    /** Constructs a generic APRS system configuration from this APRS system. */
+    virtual APRSSystem *toFMAPRSSystem();
+    /** Links the transmit channel within the generic APRS system based on the transmit frequency
+     * defined within this APRS system. */
+    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+
+    /** Constructs all GPS system from the generic configuration. */
+    virtual bool fromDMRAPRSSystems(Context &ctx);
+    /** Encodes the given GPS system. */
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
+    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
+    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
 
   public:
     /** Some static limits for this element. */

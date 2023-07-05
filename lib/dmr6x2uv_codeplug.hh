@@ -1084,9 +1084,13 @@ public:
     };
   };
 
+  /** Reuse roaming channel bitmap from D878UV. */
   typedef D878UVCodeplug::RoamingChannelBitmapElement RoamingChannelBitmapElement ;
+  /** Reuse roaming channel from D878UV. */
   typedef D878UVCodeplug::RoamingChannelElement RoamingChannelElement;
+  /** Reuse roaming zone bitmap from D878UV. */
   typedef D878UVCodeplug::RoamingZoneBitmapElement RoamingZoneBitmapElement;
+  /** Reuse roaming zone from D878UV. */
   typedef D878UVCodeplug::RoamingZoneElement RoamingZoneElement;
 
 public:

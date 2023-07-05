@@ -3,6 +3,7 @@
 
 #include "configreference.hh"
 #include <QAbstractTableModel>
+#include "anytone_extension.hh"
 
 class Config;
 class DMRContact;
@@ -137,6 +138,8 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
   Q_PROPERTY(QString message READ message WRITE setMessage)
+  /** Anytone sepecific settings. */
+  Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytoneExtension READ anytoneExtension WRITE setAnytoneExtension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -224,6 +227,11 @@ public:
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
+  /** Returns the Anytone settings extension, if set. */
+  AnytoneFMAPRSSettingsExtension *anytoneExtension() const;
+  /** Sets the Anytone settings extension. */
+  void setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -248,6 +256,8 @@ protected:
   Icon _icon;
   /** Holds the optional message. */
   QString _message;
+  /** Owns the Anytone settings extension. */
+  AnytoneFMAPRSSettingsExtension *_anytone;
 };
 
 

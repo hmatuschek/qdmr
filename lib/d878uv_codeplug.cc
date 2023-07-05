@@ -6,6 +6,7 @@
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
+#include "channel.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -2414,7 +2415,7 @@ void
 D878UVCodeplug::APRSSettingsElement::clear() {
   memset(_data, 0x00, _size);
   setUInt8(0x0000, 0xff);
-  setFMTXDelay(60);
+  setFMTXDelay(Interval::fromMilliseconds(60));
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
 }
 
@@ -2426,13 +2427,12 @@ D878UVCodeplug::APRSSettingsElement::isValid() const {
       && (! source().simplified().isEmpty());
 }
 
-unsigned
-D878UVCodeplug::APRSSettingsElement::fmTXDelay() const {
-  return ((unsigned)getUInt8(Offset::fmTXDelay()))*20;
+Interval D878UVCodeplug::APRSSettingsElement::fmTXDelay() const {
+  return Interval::fromMilliseconds( ((unsigned)getUInt8(Offset::fmTXDelay())) * 20);
 }
 void
-D878UVCodeplug::APRSSettingsElement::setFMTXDelay(unsigned ms) {
-  setUInt8(Offset::fmTXDelay(), ms/20);
+D878UVCodeplug::APRSSettingsElement::setFMTXDelay(Interval ms) {
+  setUInt8(Offset::fmTXDelay(), ms.milliseconds()/20);
 }
 
 Signaling::Code
@@ -2807,12 +2807,12 @@ D878UVCodeplug::APRSSettingsElement::enableReportOther(bool enable) {
   setBit(Offset::reportOther(), 0, enable);
 }
 
-D878UVCodeplug::APRSSettingsElement::ChannelWidth
+AnytoneFMAPRSSettingsExtension::Bandwidth
 D878UVCodeplug::APRSSettingsElement::fmChannelWidth() const {
-  return (ChannelWidth)getUInt8(Offset::fmWidth());
+  return (AnytoneFMAPRSSettingsExtension::Bandwidth)getUInt8(Offset::fmWidth());
 }
 void
-D878UVCodeplug::APRSSettingsElement::setFMChannelWidth(ChannelWidth width) {
+D878UVCodeplug::APRSSettingsElement::setFMChannelWidth(AnytoneFMAPRSSettingsExtension::Bandwidth width) {
   setUInt8(Offset::fmWidth(), (uint8_t)width);
 }
 
@@ -2859,7 +2859,8 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Con
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setFMChannelWidth(FMChannel::Bandwidth::Wide == sys->revertChannel()->bandwidth() ?
-                        ChannelWidth::Wide : ChannelWidth::Narrow);
+                      AnytoneFMAPRSSettingsExtension::Bandwidth::Wide :
+                      AnytoneFMAPRSSettingsExtension::Bandwidth::Narrow);
   setManualTXInterval(Interval::fromSeconds(sys->period()));
   setAutoTXInterval(Interval::fromSeconds(sys->period()));
   setDestination(sys->destination(), sys->destSSID());
@@ -2867,15 +2868,35 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Con
   setPath(sys->path());
   setIcon(sys->icon());
   setFMPreWaveDelay(Interval());
+
+  // Handle FM APRS Settings if set
+  AnytoneFMAPRSSettingsExtension *ext = sys->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  setFMTXDelay(ext->txDelay());
+  setFMPreWaveDelay(ext->preWaveDelay());
+  enableFMPassAll(ext->passAll());
+
   return true;
 }
 
 APRSSystem *
 D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
-  return new APRSSystem(
+  APRSSystem *sys = new APRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
         path(), icon(), "", autoTXInterval().seconds());
+
+  // Decode extension
+  AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
+  sys->setAnytoneExtension(ext);
+
+  ext->setTXDelay(fmTXDelay());
+  ext->setPreWaveDelay(fmPreWaveDelay());
+  ext->enablePassAll(fmPassAll());
+
+  return sys;
 }
 
 bool
@@ -2890,8 +2911,8 @@ D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &
     ch->setTXFrequency(double(fmFrequency(0).inHz())/1e6);
     ch->setPower(power());
     ch->setTXTone(txTone());
-    ch->setBandwidth(ChannelWidth::Wide == fmChannelWidth() ?
-                         FMChannel::Bandwidth::Wide : FMChannel::Bandwidth::Narrow);
+    ch->setBandwidth(AnytoneFMAPRSSettingsExtension::Bandwidth::Wide == fmChannelWidth() ?
+                       FMChannel::Bandwidth::Wide : FMChannel::Bandwidth::Narrow);
     logInfo() << "No matching APRS channel found for TX frequency " << double(fmFrequency(0).inHz())/1e6
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);

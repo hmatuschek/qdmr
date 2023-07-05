@@ -6,6 +6,7 @@
 #include "melody.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "signaling.hh"
 
 #include <QTimeZone>
 
@@ -2277,6 +2278,130 @@ protected:
   Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
+};
+
+/** Implements some additional settings for the FM APRS system.
+ * This extension gets attached to a @c APRSSystem instance.
+ */
+class AnytoneFMAPRSSettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The transmit delay in milliseconds. */
+  Q_PROPERTY(Interval txDelay READ txDelay WRITE setTXDelay)
+  /** The transmit pre-wave delay in milliseconds. */
+  Q_PROPERTY(Interval preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
+  /** If @c true, all APRS messages are processed, including those with invalid CRC. */
+  Q_PROPERTY(bool passAll READ passAll WRITE enablePassAll)
+  /** If @c true, the report position flag is set. */
+  Q_PROPERTY(bool reportPosition READ reportPosition WRITE enableReportPosition)
+  /** If @c true, the report Mic-E flag is set. */
+  Q_PROPERTY(bool reportMicE READ reportMicE WRITE enableReportMicE)
+  /** If @c true, the report object flag is set. */
+  Q_PROPERTY(bool reportObject READ reportObject WRITE enableReportObject)
+  /** If @c true, the report item flag is set. */
+  Q_PROPERTY(bool reportItem READ reportItem WRITE enableReportItem)
+  /** If @c true, the report message flag is set. */
+  Q_PROPERTY(bool reportMessage READ reportMessage WRITE enableReportMessage)
+  /** If @c true, the report weather flag is set. */
+  Q_PROPERTY(bool reportWeather READ reportWeather WRITE enableReportWeather)
+  /** If @c true, the report NMEA flag is set. */
+  Q_PROPERTY(bool reportNMEA READ reportNMEA WRITE enableReportNMEA)
+  /** If @c true, the report status flag is set. */
+  Q_PROPERTY(bool reportStatus READ reportStatus WRITE enableReportStatus)
+  /** If @c true, the report other flag is set. */
+  Q_PROPERTY(bool reportOther READ reportOther WRITE enableReportOther)
+
+public:
+  /** Possible bandwidth settings. */
+  enum class Bandwidth {
+    Narrow = 0, Wide = 1
+  };
+  Q_ENUM(Bandwidth)
+
+public:
+  /** Default constructor. */
+  explicit Q_INVOKABLE AnytoneFMAPRSSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the transmit delay. */
+  Interval txDelay() const;
+  /** Sets the transmit delay. */
+  void setTXDelay(Interval intv);
+
+  /** Returns the pre-wave delay in ms. */
+  Interval preWaveDelay() const;
+  /** Sets the pre-wave delay in ms. */
+  void setPreWaveDelay(Interval ms);
+
+  /** Returns @c true if all received APRS messages are processed, even those with invalid CRC. */
+  bool passAll() const;
+  /** Enables processing of all received APRS messages, including those with invalid CRC. */
+  void enablePassAll(bool enable);
+
+  /** Returns @c true if the report position flag is set. */
+  bool reportPosition() const;
+  /** Enables/disables report position flag. */
+  void enableReportPosition(bool enable);
+  /** Returns @c true if the report Mic-E flag is set. */
+  bool reportMicE() const;
+  /** Enables/disables report Mic-E flag. */
+  void enableReportMicE(bool enable);
+  /** Returns @c true if the report object flag is set. */
+  bool reportObject() const;
+  /** Enables/disables report object flag. */
+  void enableReportObject(bool enable);
+  /** Returns @c true if the report item flag is set. */
+  bool reportItem() const;
+  /** Enables/disables report item flag. */
+  void enableReportItem(bool enable);
+  /** Returns @c true if the report message flag is set. */
+  bool reportMessage() const;
+  /** Enables/disables report message flag. */
+  void enableReportMessage(bool enable);
+  /** Returns @c true if the report weather flag is set. */
+  bool reportWeather() const;
+  /** Enables/disables report weather flag. */
+  void enableReportWeather(bool enable);
+  /** Returns @c true if the report NMEA flag is set. */
+  bool reportNMEA() const;
+  /** Enables/disables report NMEA flag. */
+  void enableReportNMEA(bool enable);
+  /** Returns @c true if the report status flag is set. */
+  bool reportStatus() const;
+  /** Enables/disables report status flag. */
+  void enableReportStatus(bool enable);
+  /** Returns @c true if the report other flag is set. */
+  bool reportOther() const;
+  /** Enables/disables report other flag. */
+  void enableReportOther(bool enable);
+
+protected:
+  /** The transmit delay. */
+  Interval _txDelay;
+  /** The pre-wave delay. */
+  Interval _preWaveDelay;
+  /** If @c true, all APRS messages are processed. */
+  bool _passAll;
+  /** If @c true the report position flag is set. */
+  bool _reportPosition;
+  /** The report Mic-E flag. */
+  bool _reportMicE;
+  /** The report object flag. */
+  bool _reportObject;
+  /** The report item flag. */
+  bool _reportItem;
+  /** The report message flag. */
+  bool _reportMessage;
+  /** The report weather flag. */
+  bool _reportWeather;
+  /** The report NMEA flag. */
+  bool _reportNMEA;
+  /** The report status flag. */
+  bool _reportStatus;
+  /** The report other flag. */
+  bool _reportOther;
 };
 
 #endif // ANYTONEEXTENSION_HH
