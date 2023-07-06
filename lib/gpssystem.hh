@@ -139,7 +139,7 @@ class APRSSystem: public PositioningSystem
   /** An optional text message. */
   Q_PROPERTY(QString message READ message WRITE setMessage)
   /** Anytone sepecific settings. */
-  Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytoneExtension READ anytoneExtension WRITE setAnytoneExtension)
+  Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
