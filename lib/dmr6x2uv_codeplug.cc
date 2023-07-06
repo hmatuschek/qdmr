@@ -2000,12 +2000,16 @@ void
 DMR6X2UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and DMR-6X2UV codeplugs.
   D868UVCodeplug::allocateUpdated();
+
+  // allocate FM APRS frequency names
+  image(0).addElement(Offset::fmAPRSFrequencyNames(), D878UVCodeplug::FMAPRSFrequencyNamesElement::size());
 }
 
 void
 DMR6X2UVCodeplug::allocateForEncoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForEncoding();
+
   this->allocateRoaming();
 }
 
@@ -2013,7 +2017,11 @@ void
 DMR6X2UVCodeplug::allocateForDecoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForDecoding();
+
   this->allocateRoaming();
+
+  // allocate FM APRS frequency names
+  image(0).addElement(Offset::fmAPRSFrequencyNames(), D878UVCodeplug::FMAPRSFrequencyNamesElement::size());
 }
 
 bool
@@ -2158,10 +2166,11 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   // replaces D868UVCodeplug::encodeGPSSystems
 
   D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
+  D878UVCodeplug::FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx, aprsNames);
     uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
     encode_ascii(aprsmsg, ctx.config()->posSystems()->aprsSystem(0)->message(), Limit::fmAPRSMessage(), 0x00);
   }
@@ -2186,12 +2195,17 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
+  D878UVCodeplug::FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
   unsigned pos_interval = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toFMAPRSSystem();
+    APRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
+    if (nullptr == sys) {
+      errMsg(err) << "Cannot decode positioning systems.";
+      return false;
+    }
     sys->setPeriod(pos_interval);
     sys->setMessage(decode_ascii(aprsmsg, Limit::fmAPRSMessage(), 0x00));
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);

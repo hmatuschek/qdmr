@@ -10,6 +10,62 @@
 
 #include <QTimeZone>
 
+/** Implements the config representation of an FM APRS frequency.
+ * @ingroup anytone */
+class AnytoneAPRSFrequency: public ConfigObject
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("IdPrefix", "af")
+
+  Q_CLASSINFO("frequencyDecription",
+              "Transmit-frequency.")
+  /** The frequency. */
+  Q_PROPERTY(Frequency frequency READ frequency WRITE setFrequency)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit AnytoneAPRSFrequency(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the transmit frequency. */
+  Frequency frequency() const;
+  /** Sets the transmit frequency. */
+  void setFrequency(Frequency freq);
+
+protected:
+  /** The transmit frequency. */
+  Frequency _frequency;
+};
+
+
+/** Represents a reference to an APRS frequency.
+ * @ingroup anytone */
+class AnytoneAPRSFrequencyRef: public ConfigObjectReference
+{
+  Q_OBJECT
+
+public:
+  /** Default constructor. */
+  explicit AnytoneAPRSFrequencyRef(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of APRS transmit frequencies.
+ * @ingroup anytone */
+class AnytoneAPRSFrequencyList: public ConfigObjectList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit AnytoneAPRSFrequencyList(QObject *parent=nullptr);
+
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err);
+};
+
+
 /** Implements the common properties for analog and digital AnyTone channels.
  * This class cannot be instantiated directly, use one of the derived classes.
  * @ingroup anytone */
@@ -23,6 +79,8 @@ class AnytoneChannelExtension: public ConfigExtension
   Q_PROPERTY(int frequencyCorrection READ frequencyCorrection WRITE setFrequencyCorrection)
   /** If @c true, the hands-free featrue is enabled for this channel. */
   Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
+  /** A reference to the FM APRS frequency. If not set, the default will be used. */
+  Q_PROPERTY(AnytoneAPRSFrequencyRef *fmAPRSFrequency READ fmAPRSFrequency())
 
 protected:
   /** Hidden constructor. */
@@ -44,6 +102,8 @@ public:
   /** Enables/disables the hands-free feature for this channel. */
   void enableHandsFree(bool enable);
 
+  /** Holds a reference to the FM APRS frequency to be used if FM APRS is enabled on the channel. */
+  AnytoneAPRSFrequencyRef *fmAPRSFrequency() const;
 
 protected:
   /** If @c true, talkaround is enabled. */
@@ -52,6 +112,8 @@ protected:
   int _frequencyCorrection;
   /** If @c true, the hands-free featrue is enabled for this channel. */
   bool _handsFree;
+  /** A reference to the FM APRS frequency. */
+  AnytoneAPRSFrequencyRef *_fmAPRSFrequency;
 };
 
 
@@ -2280,6 +2342,7 @@ protected:
   bool _maintainCallChannel;       ///< Maintains the call channel.
 };
 
+
 /** Implements some additional settings for the FM APRS system.
  * This extension gets attached to a @c APRSSystem instance.
  */
@@ -2311,6 +2374,9 @@ class AnytoneFMAPRSSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool reportStatus READ reportStatus WRITE enableReportStatus)
   /** If @c true, the report other flag is set. */
   Q_PROPERTY(bool reportOther READ reportOther WRITE enableReportOther)
+
+  /** The list of additional APRS frequencies. */
+  Q_PROPERTY(AnytoneAPRSFrequencyList *frequencies READ frequencies)
 
 public:
   /** Possible bandwidth settings. */
@@ -2377,6 +2443,9 @@ public:
   /** Enables/disables report other flag. */
   void enableReportOther(bool enable);
 
+  /** Returns the list of additional FM APRS frequencies. */
+  AnytoneAPRSFrequencyList *frequencies() const;
+
 protected:
   /** The transmit delay. */
   Interval _txDelay;
@@ -2402,6 +2471,8 @@ protected:
   bool _reportStatus;
   /** The report other flag. */
   bool _reportOther;
+  /** The list of additional FM APRS frequencies. */
+  AnytoneAPRSFrequencyList *_frequencies;
 };
 
 #endif // ANYTONEEXTENSION_HH

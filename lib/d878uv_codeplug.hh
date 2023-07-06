@@ -142,6 +142,9 @@ class GPSSystem;
  *  <tr><td>02501280</td> <td>000030</td> <td>APRS template text (optional settings).</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -339,12 +342,33 @@ public:
     /** Sets the frequency correction in ???. */
     virtual void setFrequencyCorrection(int corr);
 
+    /** Returns the index of the FM APRS frequency [0,7]. */
+    virtual unsigned int fmAPRSFrequencyIndex() const;
+    /** Sets the FM APRS frequency index [0,7]. */
+    virtual void setFMAPRSFrequencyIndex(unsigned int idx);
+
     /** Constructs a Channel object from this element. */
     Channel *toChannelObj(Context &ctx) const;
     /** Links a previously created channel object. */
     bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Encodes the given channel object. */
     bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset : public D868UVCodeplug::ChannelElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int pttIDSetting()         { return 0x0019; }
+      static constexpr unsigned int roamingEnabled()       { return 0x0034; }
+      static constexpr unsigned int dataACK()              { return 0x0034; }
+      static constexpr unsigned int txDMRAPRS()            { return 0x0035; }
+      static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
+      static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
+      static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
+      static constexpr unsigned int frequenyCorrection()   { return 0x0039; }
+      static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
+      /// @endcond
+    };
   };
 
   /** Represents the general config of the radio within the D878UV binary codeplug.
@@ -1149,6 +1173,45 @@ public:
     };
   };
 
+
+  /** Implements some storage to hold the names for the FM APRS frequencies.
+   * @verbinclude d878uv_fm_aprs_frequency_names.txt */
+  class FMAPRSFrequencyNamesElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit FMAPRSFrequencyNamesElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
+
+    void clear();
+
+    /** Returns the n-th name. The 0-th name, is the name of the FM APRS system. */
+    virtual QString name(unsigned int n) const;
+    /** Sets the n-th name. The 0-th name, is the name of the FM APRS system. */
+    virtual void setName(unsigned int n, const QString &name);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenNames() { return 0x0010; }
+      /// @endcond
+    };
+  };
+
+
   /** Represents the APRS settings within the binary D878UV codeplug.
    *
    * Memory layout of APRS settings (size 0x00f0 bytes):
@@ -1347,9 +1410,11 @@ public:
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                  FMAPRSFrequencyNamesElement &names,
                                   const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toFMAPRSSystem();
+    virtual APRSSystem *toFMAPRSSystem(
+        Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err=ErrorStack());
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
     virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
@@ -1576,6 +1641,7 @@ public:
       /// @endcond
     };
   };
+
 
   /** Represents the bitmap, indicating which roaming channel is valid. */
   class RoamingChannelBitmapElement: public BitmapElement
@@ -1872,6 +1938,7 @@ protected:
     static constexpr unsigned int aprsSettings()                { return 0x02501000; }
     static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
     static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
+    static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
     static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
     static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
     static constexpr unsigned int roamingChannels()             { return 0x01040000; }

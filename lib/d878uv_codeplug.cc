@@ -103,86 +103,96 @@ D878UVCodeplug::ChannelElement::clear() {
 
 D878UVCodeplug::ChannelElement::PTTId
 D878UVCodeplug::ChannelElement::pttIDSetting() const {
-  return (PTTId)getUInt2(0x0019, 0);
+  return (PTTId)getUInt2(Offset::pttIDSetting(), 0);
 }
 void
 D878UVCodeplug::ChannelElement::setPTTIDSetting(PTTId ptt) {
-  setUInt2(0x0019, 0, (unsigned)ptt);
+  setUInt2(Offset::pttIDSetting(), 0, (unsigned)ptt);
 }
 
 bool
 D878UVCodeplug::ChannelElement::roamingEnabled() const {
   // inverted
-  return !getBit(0x0034, 2);
+  return !getBit(Offset::roamingEnabled(), 2);
 }
 void
 D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted
-  setBit(0x0034, 2, !enable);
+  setBit(Offset::roamingEnabled(), 2, !enable);
 }
 bool
 D878UVCodeplug::ChannelElement::dataACK() const {
   // inverted
-  return !getBit(0x0034, 3);
+  return !getBit(Offset::dataACK(), 3);
 }
 void
 D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted
-  setBit(0x0034, 3, !enable);
+  setBit(Offset::dataACK(), 3, !enable);
 }
 
 bool
 D878UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return 2 == getUInt2(0x0035, 0);
+  return 2 == getUInt2(Offset::txDMRAPRS(), 0);
 }
 void
 D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setUInt2(0x0035, 0, (enable ? 0x02 : 0x00));
+  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x02 : 0x00));
 }
 bool
 D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
-  return 1 == getUInt2(0x0035, 0);
+  return 1 == getUInt2(Offset::txDMRAPRS(), 0);
 }
 void
 D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
-  setUInt2(0x0035, 0, (enable ? 0x01 : 0x00));
+  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x01 : 0x00));
 }
 
 D878UVCodeplug::ChannelElement::APRSPTT
 D878UVCodeplug::ChannelElement::analogAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(0x0036);
+  return (APRSPTT)getUInt8(Offset::fmAPRSPTTSetting());
 }
 void
 D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(0x0036, (unsigned)ptt);
+  setUInt8(Offset::fmAPRSPTTSetting(), (unsigned)ptt);
 }
 
 D878UVCodeplug::ChannelElement::APRSPTT
 D878UVCodeplug::ChannelElement::digitalAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(0x0037);
+  return (APRSPTT)getUInt8(Offset::dmrAPRSPTTSetting());
 }
 void
 D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(0x0037, (unsigned)ptt);
+  setUInt8(Offset::dmrAPRSPTTSetting(), (unsigned)ptt);
 }
 
 unsigned
 D878UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0038);
+  return getUInt8(Offset::dmrAPRSSystemIndex());
 }
 void
 D878UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0038, idx);
+  setUInt8(Offset::dmrAPRSSystemIndex(), idx);
 }
 
 int
 D878UVCodeplug::ChannelElement::frequenyCorrection() const {
-  return ((int)getInt8(0x0039))*10;
+  return ((int)getInt8(Offset::frequenyCorrection()))*10;
 }
 void
 D878UVCodeplug::ChannelElement::setFrequencyCorrection(int corr) {
-  setInt8(0x0039, corr/10);
+  setInt8(Offset::frequenyCorrection(), corr/10);
 }
+
+unsigned int
+D878UVCodeplug::ChannelElement::fmAPRSFrequencyIndex() const {
+  return getUInt8(Offset::fmAPRSFrequencyIndex());
+}
+void
+D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
+  setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
+}
+
 
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
@@ -224,12 +234,26 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
       dc->setRoamingZone(DefaultRoamingZone::get());
+    if (auto *ext = dc->anytoneChannelExtension()) {
+      // If not default FM APRS frequency
+      if (0 != fmAPRSFrequencyIndex()) {
+        if (ctx.has<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()))
+          ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
+      }
+    }
   } else if (c->is<FMChannel>()) {
     FMChannel *ac = c->as<FMChannel>();
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
     if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
       ac->setAPRSSystem(ctx.get<APRSSystem>(0));
+    if (auto *ext = ac->anytoneChannelExtension()) {
+      // If not default FM APRS frequency
+      if (0 != fmAPRSFrequencyIndex()) {
+        if (ctx.has<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()))
+          ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
+      }
+    }
   }
 
   return true;
@@ -272,10 +296,53 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply extension settings
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
       setFrequencyCorrection(ext->frequencyCorrection());
+      if (! ext->fmAPRSFrequency()->isNull()) {
+        int idx = ctx.index(ext->fmAPRSFrequency()->as<AnytoneAPRSFrequency>());
+        if ((0 <= idx) && (7 >= idx))
+          setFMAPRSFrequencyIndex(idx);
+        else
+          setFMAPRSFrequencyIndex(0);
+      } else {
+        // Use default
+        setFMAPRSFrequencyIndex(0);
+      }
     }
   }
 
   return true;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::FMAPRSFrequencyNamesElement
+ * ******************************************************************************************** */
+D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::FMAPRSFrequencyNamesElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+QString
+D878UVCodeplug::FMAPRSFrequencyNamesElement::name(unsigned int n) const {
+  n = std::min(n, 7U);
+  return readASCII(n*Offset::betweenNames(), Limit::nameLength(), 0xff);
+}
+
+void
+D878UVCodeplug::FMAPRSFrequencyNamesElement::setName(unsigned int n, const QString &name) {
+  n = std::min(n, 7U);
+  writeASCII(n*Offset::betweenNames(), name, Limit::nameLength(), 0xff);
 }
 
 
@@ -2847,7 +2914,9 @@ D878UVCodeplug::APRSSettingsElement::clearFMFrequency(unsigned int n) {
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
+D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
+    const APRSSystem *sys, Context &ctx, FMAPRSFrequencyNamesElement &names, const ErrorStack &err)
+{
   Q_UNUSED(ctx)
   clear();
   if (! sys->revertChannel()) {
@@ -2855,6 +2924,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Con
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
+  names.setName(0, sys->name());
   setFMFrequency(0, Frequency::fromHz(sys->revertChannel()->txFrequency()*1e6));
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
@@ -2878,13 +2948,23 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Con
   setFMPreWaveDelay(ext->preWaveDelay());
   enableFMPassAll(ext->passAll());
 
+  // Encode additional FM APRS frequencies
+  for (int i=0; i<ext->frequencies()->count(); i++) {
+    setFMFrequency(ctx.index(ext->frequencies()->get(i)),
+                   ext->frequencies()->get(i)->as<AnytoneAPRSFrequency>()->frequency());
+    names.setName(ctx.index(ext->frequencies()->get(i)),
+                  ext->frequencies()->get(i)->name());
+  }
   return true;
 }
 
 APRSSystem *
-D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
+D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
+  QString name = QString("APRS %1").arg(destination());
+  if (! names.name(0).isEmpty())
+    name = names.name(0);
   APRSSystem *sys = new APRSSystem(
-        tr("APRS %1").arg(destination()), nullptr,
+        name, nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
         path(), icon(), "", autoTXInterval().seconds());
 
@@ -2895,6 +2975,19 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
   ext->setTXDelay(fmTXDelay());
   ext->setPreWaveDelay(fmPreWaveDelay());
   ext->enablePassAll(fmPassAll());
+
+  for (unsigned int i=1; i<Limit::fmFrequencies(); i++) {
+    if (! fmFrequencySet(i))
+      continue;
+    auto *f = new AnytoneAPRSFrequency();
+    f->setFrequency(fmFrequency(i));
+    QString name = QString("APRS %1").arg(i);
+    if (! names.name(i).isEmpty())
+      name = names.name(i);
+    f->setName(name);
+    ext->frequencies()->add(f);
+    ctx.add(f, i);
+  }
 
   return sys;
 }
@@ -3281,6 +3374,9 @@ D878UVCodeplug::allocateUpdated() {
   // allocate APRS RX list
   image(0).addElement(Offset::analogAPRSRXEntries(),
                       Limit::analogAPRSRXEntries()*AnalogAPRSRXEntryElement::size());
+
+  // allocate FM APRS frequency names
+  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -3295,6 +3391,8 @@ D878UVCodeplug::allocateForDecoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForDecoding();
   this->allocateRoaming();
+  // allocate FM APRS frequency names
+  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -3514,9 +3612,11 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   // replaces D868UVCodeplug::encodeGPSSystems
 
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
+  FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
+
   // Encode APRS system (there can only be one)
   if (0 < ctx.config()->posSystems()->aprsCount()) {
-    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx, aprsNames, err);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
         .setMessage(ctx.config()->posSystems()->aprsSystem(0)->message());
   }
@@ -3542,12 +3642,17 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
+  FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
   unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toFMAPRSSystem();
+    APRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
+    if (nullptr == sys) {
+      errMsg(err) << "Cannot decode positioning systems.";
+      return false;
+    }
     sys->setPeriod(pos_intervall);
     sys->setMessage(aprsMessage.message());
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);

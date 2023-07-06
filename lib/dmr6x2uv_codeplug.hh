@@ -103,6 +103,9 @@
  *    see @c DMR6X2UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501280</td> <td>000030</td> <td>GPS template message, ASCII, 0-padded.</td> </tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -1155,6 +1158,7 @@ protected:
     static constexpr unsigned int roamingZones()                  { return 0x01043000; }
 
     static constexpr unsigned int fmAPRSMessage()                 { return 0x02501200; }
+    static constexpr unsigned int fmAPRSFrequencyNames()          { return 0x02502000; }
     static constexpr unsigned int settingsExtension()             { return 0x02501400; }
     /// @endcond
   };

@@ -2,10 +2,69 @@
 #include "signaling.hh"
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequency
+ * ********************************************************************************************* */
+AnytoneAPRSFrequency::AnytoneAPRSFrequency(QObject *parent)
+  : ConfigObject(parent), _frequency(Frequency::fromHz(0))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAPRSFrequency::clone() const {
+  AnytoneAPRSFrequency *obj = new AnytoneAPRSFrequency();
+  if (! obj->copy(*this)) {
+    obj->deleteLater();
+    return nullptr;
+  }
+  return obj;
+}
+
+Frequency
+AnytoneAPRSFrequency::frequency() const {
+  return _frequency;
+}
+void
+AnytoneAPRSFrequency::setFrequency(Frequency freq) {
+  if (_frequency == freq)
+    return;
+  _frequency = freq;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequencyRef
+ * ********************************************************************************************* */
+AnytoneAPRSFrequencyRef::AnytoneAPRSFrequencyRef(QObject *parent)
+  : ConfigObjectReference(AnytoneAPRSFrequency::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequencyList
+ * ********************************************************************************************* */
+AnytoneAPRSFrequencyList::AnytoneAPRSFrequencyList(QObject *parent)
+  : ConfigObjectList(AnytoneAPRSFrequency::staticMetaObject, parent)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAPRSFrequencyList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err);
+  return new AnytoneAPRSFrequency();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneChannelExtension
  * ********************************************************************************************* */
 AnytoneChannelExtension::AnytoneChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false)
+  : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false),
+    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this))
 {
   // pass...
 }
@@ -44,6 +103,11 @@ AnytoneChannelExtension::enableHandsFree(bool enable) {
     return;
   _handsFree = enable;
   emit modified(this);
+}
+
+AnytoneAPRSFrequencyRef *
+AnytoneChannelExtension::fmAPRSFrequency() const {
+  return _fmAPRSFrequency;
 }
 
 
@@ -2683,7 +2747,8 @@ AnytoneFMAPRSSettingsExtension::AnytoneFMAPRSSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _txDelay(Interval::fromMilliseconds(60)),
     _preWaveDelay(Interval::fromMilliseconds(0)), _passAll(false), _reportPosition(false),
     _reportMicE(false), _reportObject(false), _reportItem(false), _reportMessage(false),
-    _reportWeather(false), _reportNMEA(false), _reportStatus(false), _reportOther(false)
+    _reportWeather(false), _reportNMEA(false), _reportStatus(false), _reportOther(false),
+    _frequencies(new AnytoneAPRSFrequencyList(this))
 {
   // pass...
 }
@@ -2842,3 +2907,7 @@ AnytoneFMAPRSSettingsExtension::enableReportOther(bool enable) {
   emit modified(this);
 }
 
+AnytoneAPRSFrequencyList *
+AnytoneFMAPRSSettingsExtension::frequencies() const {
+  return _frequencies;
+}
