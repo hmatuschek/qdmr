@@ -1275,8 +1275,9 @@
 <varlistentry>
   <term><token>mode</token></term>
   <listitem>
-    <para>Specifies the GPS mode. Must be one of <token>GPS</token>, <token>Beidou</token> or 
-    <token>Both</token>.</para>
+    <para>Specifies the GPS mode. Must be one of <token>GPS</token>, <token>Beidou</token>, 
+    <token>GPS_Beidou</token>, <token>Glonass</token>, <token>GPS_Glonass</token>, 
+    <token>Beidou_Glonass</token> or <token>All</token>.</para>
   </listitem>
 </varlistentry>
 </variablelist>

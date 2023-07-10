@@ -118,8 +118,8 @@ DM1701Codeplug::ChannelElement::setPower(Channel::Power pwr) {
 }
 
 Channel *
-DM1701Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+DM1701Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj(err);
   if (nullptr == ch)
     return ch;
 
@@ -130,6 +130,7 @@ DM1701Codeplug::ChannelElement::toChannelObj() const {
     ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
     ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
   }
+
   return ch;
 }
 

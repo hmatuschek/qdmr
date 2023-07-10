@@ -38,6 +38,213 @@
 #define ROAMING_ZONE_OFFSET         0x00000080
 
 
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::Color
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::Color::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+DMR6X2UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) Yellow;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) Green;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) Turquoise;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::BackgroundColor
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::BackgroundColor::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::Black;
+}
+
+uint8_t
+DMR6X2UVCodeplug::BackgroundColor::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  default: break;
+  }
+  return (uint8_t) Black;
+}
+
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::FontColor
+ * ******************************************************************************************** */
+AnytoneDisplaySettingsExtension::Color
+DMR6X2UVCodeplug::FontColor::decode(uint8_t code) {
+  switch((CodedColor) code) {
+  case Orange: return AnytoneDisplaySettingsExtension::Color::Orange;
+  case Red: return AnytoneDisplaySettingsExtension::Color::Red;
+  case Yellow: return AnytoneDisplaySettingsExtension::Color::Yellow;
+  case Green: return AnytoneDisplaySettingsExtension::Color::Green;
+  case Turquoise: return AnytoneDisplaySettingsExtension::Color::Turquoise;
+  case Blue: return AnytoneDisplaySettingsExtension::Color::Blue;
+  case White: return AnytoneDisplaySettingsExtension::Color::White;
+  case Black: return AnytoneDisplaySettingsExtension::Color::Black;
+  default: break;
+  }
+  return AnytoneDisplaySettingsExtension::Color::White;
+}
+
+uint8_t
+DMR6X2UVCodeplug::FontColor::encode(AnytoneDisplaySettingsExtension::Color color) {
+  switch(color) {
+  case AnytoneDisplaySettingsExtension::Color::Orange: return (uint8_t) Orange;
+  case AnytoneDisplaySettingsExtension::Color::Red: return (uint8_t) Red;
+  case AnytoneDisplaySettingsExtension::Color::Yellow: return (uint8_t) Yellow;
+  case AnytoneDisplaySettingsExtension::Color::Green: return (uint8_t) Green;
+  case AnytoneDisplaySettingsExtension::Color::Turquoise: return (uint8_t) Turquoise;
+  case AnytoneDisplaySettingsExtension::Color::Blue: return (uint8_t) Blue;
+  case AnytoneDisplaySettingsExtension::Color::White: return (uint8_t) White;
+  case AnytoneDisplaySettingsExtension::Color::Black: return (uint8_t) Black;
+  default: break;
+  }
+  return (uint8_t) White;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement::KeyFunction
+ * ********************************************************************************************* */
+uint8_t
+DMR6X2UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsExtension::KeyFunction func) {
+  switch (func) {
+  case AnytoneKeySettingsExtension::KeyFunction::Off:               return (uint8_t)KeyFunction::Off;
+  case AnytoneKeySettingsExtension::KeyFunction::Voltage:           return (uint8_t)KeyFunction::Voltage;
+  case AnytoneKeySettingsExtension::KeyFunction::Power:             return (uint8_t)KeyFunction::Power;
+  case AnytoneKeySettingsExtension::KeyFunction::Repeater:          return (uint8_t)KeyFunction::Repeater;
+  case AnytoneKeySettingsExtension::KeyFunction::Reverse:           return (uint8_t)KeyFunction::Reverse;
+  case AnytoneKeySettingsExtension::KeyFunction::Encryption:        return (uint8_t)KeyFunction::Encryption;
+  case AnytoneKeySettingsExtension::KeyFunction::Call:              return (uint8_t)KeyFunction::Call;
+  case AnytoneKeySettingsExtension::KeyFunction::VOX:               return (uint8_t)KeyFunction::VOX;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleVFO:         return (uint8_t)KeyFunction::ToggleVFO;
+  case AnytoneKeySettingsExtension::KeyFunction::SubPTT:            return (uint8_t)KeyFunction::SubPTT;
+  case AnytoneKeySettingsExtension::KeyFunction::Scan:              return (uint8_t)KeyFunction::Scan;
+  case AnytoneKeySettingsExtension::KeyFunction::WFM:               return (uint8_t)KeyFunction::WFM;
+  case AnytoneKeySettingsExtension::KeyFunction::Alarm:             return (uint8_t)KeyFunction::Alarm;
+  case AnytoneKeySettingsExtension::KeyFunction::RecordSwitch:      return (uint8_t)KeyFunction::RecordSwitch;
+  case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
+  case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
+  case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
+  case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
+  case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey2:           return (uint8_t)KeyFunction::HotKey2;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey3:           return (uint8_t)KeyFunction::HotKey3;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey4:           return (uint8_t)KeyFunction::HotKey4;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey5:           return (uint8_t)KeyFunction::HotKey5;
+  case AnytoneKeySettingsExtension::KeyFunction::HotKey6:           return (uint8_t)KeyFunction::HotKey6;
+  case AnytoneKeySettingsExtension::KeyFunction::WorkAlone:         return (uint8_t)KeyFunction::WorkAlone;
+  case AnytoneKeySettingsExtension::KeyFunction::SkipChannel:       return (uint8_t)KeyFunction::SkipChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::DMRMonitor:        return (uint8_t)KeyFunction::DMRMonitor;
+  case AnytoneKeySettingsExtension::KeyFunction::SubChannel:        return (uint8_t)KeyFunction::SubChannel;
+  case AnytoneKeySettingsExtension::KeyFunction::PriorityZone:      return (uint8_t)KeyFunction::PriorityZone;
+  case AnytoneKeySettingsExtension::KeyFunction::VFOScan:           return (uint8_t)KeyFunction::VFOScan;
+  case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
+  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater:   return (uint8_t)KeyFunction::SimplexRepeater;
+  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
+  case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
+  case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
+  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
+  case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
+  case AnytoneKeySettingsExtension::KeyFunction::Zone:              return (uint8_t)KeyFunction::Zone;
+  case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
+  case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
+  case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
+  default:                                                          return (uint8_t)KeyFunction::Off;
+  }
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
+  switch ((KeyFunctionCode)code) {
+  case KeyFunction::Off:               return AnytoneKeySettingsExtension::KeyFunction::Off;
+  case KeyFunction::Voltage:           return AnytoneKeySettingsExtension::KeyFunction::Voltage;
+  case KeyFunction::Power:             return AnytoneKeySettingsExtension::KeyFunction::Power;
+  case KeyFunction::Repeater:          return AnytoneKeySettingsExtension::KeyFunction::Repeater;
+  case KeyFunction::Reverse:           return AnytoneKeySettingsExtension::KeyFunction::Reverse;
+  case KeyFunction::Encryption:        return AnytoneKeySettingsExtension::KeyFunction::Encryption;
+  case KeyFunction::Call:              return AnytoneKeySettingsExtension::KeyFunction::Call;
+  case KeyFunction::VOX:               return AnytoneKeySettingsExtension::KeyFunction::VOX;
+  case KeyFunction::ToggleVFO:         return AnytoneKeySettingsExtension::KeyFunction::ToggleVFO;
+  case KeyFunction::SubPTT:            return AnytoneKeySettingsExtension::KeyFunction::SubPTT;
+  case KeyFunction::Scan:              return AnytoneKeySettingsExtension::KeyFunction::Scan;
+  case KeyFunction::WFM:               return AnytoneKeySettingsExtension::KeyFunction::WFM;
+  case KeyFunction::Alarm:             return AnytoneKeySettingsExtension::KeyFunction::Alarm;
+  case KeyFunction::RecordSwitch:      return AnytoneKeySettingsExtension::KeyFunction::RecordSwitch;
+  case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
+  case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
+  case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
+  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
+  case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
+  case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
+  case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
+  case KeyFunction::HotKey2:           return AnytoneKeySettingsExtension::KeyFunction::HotKey2;
+  case KeyFunction::HotKey3:           return AnytoneKeySettingsExtension::KeyFunction::HotKey3;
+  case KeyFunction::HotKey4:           return AnytoneKeySettingsExtension::KeyFunction::HotKey4;
+  case KeyFunction::HotKey5:           return AnytoneKeySettingsExtension::KeyFunction::HotKey5;
+  case KeyFunction::HotKey6:           return AnytoneKeySettingsExtension::KeyFunction::HotKey6;
+  case KeyFunction::WorkAlone:         return AnytoneKeySettingsExtension::KeyFunction::WorkAlone;
+  case KeyFunction::SkipChannel:       return AnytoneKeySettingsExtension::KeyFunction::SkipChannel;
+  case KeyFunction::DMRMonitor:        return AnytoneKeySettingsExtension::KeyFunction::DMRMonitor;
+  case KeyFunction::SubChannel:        return AnytoneKeySettingsExtension::KeyFunction::SubChannel;
+  case KeyFunction::PriorityZone:      return AnytoneKeySettingsExtension::KeyFunction::PriorityZone;
+  case KeyFunction::VFOScan:           return AnytoneKeySettingsExtension::KeyFunction::VFOScan;
+  case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
+  case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
+  case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::SimplexRepeater:   return AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater;
+  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
+  case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
+  case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
+  case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
+  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
+  case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
+  case KeyFunction::Zone:              return AnytoneKeySettingsExtension::KeyFunction::Zone;
+  case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
+  case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
+  case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
+  case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
+  case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
+  default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
+  }
+}
+
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
@@ -114,6 +321,95 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
     setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_50kHz);
 }
 
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyAShort() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyAShort()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyAShort(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyBShort() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyBShort()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBShort(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyCShort() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyCShort()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCShort(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKey1Short() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1Short()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Short(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKey2Short() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2Short()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Short(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyALong() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyALong()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyALong(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyBLong() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyBLong()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBLong(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKeyCLong() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyCLong()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyCLong(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKey1Long() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1Long()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey1Long(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+DMR6X2UVCodeplug::GeneralSettingsElement::funcKey2Long() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2Long()));
+}
+void
+DMR6X2UVCodeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKey2Long(), KeyFunction::encode(func));
+}
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::vfoModeA() const {
@@ -687,11 +983,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::GeneralSettingsElement::standbyBackgroundColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::standbyBackground());
+  return BackgroundColor::decode(getUInt8(Offset::standbyBackground()));
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::standbyBackground(), (unsigned)color);
+  setUInt8(Offset::standbyBackground(), BackgroundColor::encode(color));
 }
 
 unsigned int
@@ -866,116 +1162,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   return true;
 }
 
-uint8_t
-DMR6X2UVCodeplug::GeneralSettingsElement::mapKeyFunctionToCode(AnytoneKeySettingsExtension::KeyFunction func) const {
-  switch (func) {
-  case AnytoneKeySettingsExtension::KeyFunction::Off:               return (uint8_t)KeyFunction::Off;
-  case AnytoneKeySettingsExtension::KeyFunction::Voltage:           return (uint8_t)KeyFunction::Voltage;
-  case AnytoneKeySettingsExtension::KeyFunction::Power:             return (uint8_t)KeyFunction::Power;
-  case AnytoneKeySettingsExtension::KeyFunction::Repeater:          return (uint8_t)KeyFunction::Repeater;
-  case AnytoneKeySettingsExtension::KeyFunction::Reverse:           return (uint8_t)KeyFunction::Reverse;
-  case AnytoneKeySettingsExtension::KeyFunction::Encryption:        return (uint8_t)KeyFunction::Encryption;
-  case AnytoneKeySettingsExtension::KeyFunction::Call:              return (uint8_t)KeyFunction::Call;
-  case AnytoneKeySettingsExtension::KeyFunction::VOX:               return (uint8_t)KeyFunction::VOX;
-  case AnytoneKeySettingsExtension::KeyFunction::ToggleVFO:         return (uint8_t)KeyFunction::ToggleVFO;
-  case AnytoneKeySettingsExtension::KeyFunction::SubPTT:            return (uint8_t)KeyFunction::SubPTT;
-  case AnytoneKeySettingsExtension::KeyFunction::Scan:              return (uint8_t)KeyFunction::Scan;
-  case AnytoneKeySettingsExtension::KeyFunction::WFM:               return (uint8_t)KeyFunction::WFM;
-  case AnytoneKeySettingsExtension::KeyFunction::Alarm:             return (uint8_t)KeyFunction::Alarm;
-  case AnytoneKeySettingsExtension::KeyFunction::RecordSwitch:      return (uint8_t)KeyFunction::RecordSwitch;
-  case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
-  case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
-  case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
-  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
-  case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
-  case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey2:           return (uint8_t)KeyFunction::HotKey2;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey3:           return (uint8_t)KeyFunction::HotKey3;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey4:           return (uint8_t)KeyFunction::HotKey4;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey5:           return (uint8_t)KeyFunction::HotKey5;
-  case AnytoneKeySettingsExtension::KeyFunction::HotKey6:           return (uint8_t)KeyFunction::HotKey6;
-  case AnytoneKeySettingsExtension::KeyFunction::WorkAlone:         return (uint8_t)KeyFunction::WorkAlone;
-  case AnytoneKeySettingsExtension::KeyFunction::SkipChannel:       return (uint8_t)KeyFunction::SkipChannel;
-  case AnytoneKeySettingsExtension::KeyFunction::DMRMonitor:        return (uint8_t)KeyFunction::DMRMonitor;
-  case AnytoneKeySettingsExtension::KeyFunction::SubChannel:        return (uint8_t)KeyFunction::SubChannel;
-  case AnytoneKeySettingsExtension::KeyFunction::PriorityZone:      return (uint8_t)KeyFunction::PriorityZone;
-  case AnytoneKeySettingsExtension::KeyFunction::VFOScan:           return (uint8_t)KeyFunction::VFOScan;
-  case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
-  case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;    
-  case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
-  case AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater:   return (uint8_t)KeyFunction::SimplexRepeater;
-  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
-  case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
-  case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
-  case AnytoneKeySettingsExtension::KeyFunction::Slot:              return (uint8_t)KeyFunction::Slot;
-  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
-  case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
-  case AnytoneKeySettingsExtension::KeyFunction::Zone:              return (uint8_t)KeyFunction::Zone;
-  case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
-  case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
-  case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
-  case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
-  case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
-  default:                                                          return (uint8_t)KeyFunction::Off;
-  }
-}
-
-AnytoneKeySettingsExtension::KeyFunction
-DMR6X2UVCodeplug::GeneralSettingsElement::mapCodeToKeyFunction(uint8_t code) const {
-  switch ((KeyFunction)code) {
-  case KeyFunction::Off:               return AnytoneKeySettingsExtension::KeyFunction::Off;
-  case KeyFunction::Voltage:           return AnytoneKeySettingsExtension::KeyFunction::Voltage;
-  case KeyFunction::Power:             return AnytoneKeySettingsExtension::KeyFunction::Power;
-  case KeyFunction::Repeater:          return AnytoneKeySettingsExtension::KeyFunction::Repeater;
-  case KeyFunction::Reverse:           return AnytoneKeySettingsExtension::KeyFunction::Reverse;
-  case KeyFunction::Encryption:        return AnytoneKeySettingsExtension::KeyFunction::Encryption;
-  case KeyFunction::Call:              return AnytoneKeySettingsExtension::KeyFunction::Call;
-  case KeyFunction::VOX:               return AnytoneKeySettingsExtension::KeyFunction::VOX;
-  case KeyFunction::ToggleVFO:         return AnytoneKeySettingsExtension::KeyFunction::ToggleVFO;
-  case KeyFunction::SubPTT:            return AnytoneKeySettingsExtension::KeyFunction::SubPTT;
-  case KeyFunction::Scan:              return AnytoneKeySettingsExtension::KeyFunction::Scan;
-  case KeyFunction::WFM:               return AnytoneKeySettingsExtension::KeyFunction::WFM;
-  case KeyFunction::Alarm:             return AnytoneKeySettingsExtension::KeyFunction::Alarm;
-  case KeyFunction::RecordSwitch:      return AnytoneKeySettingsExtension::KeyFunction::RecordSwitch;
-  case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
-  case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
-  case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
-  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
-  case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
-  case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
-  case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
-  case KeyFunction::HotKey2:           return AnytoneKeySettingsExtension::KeyFunction::HotKey2;
-  case KeyFunction::HotKey3:           return AnytoneKeySettingsExtension::KeyFunction::HotKey3;
-  case KeyFunction::HotKey4:           return AnytoneKeySettingsExtension::KeyFunction::HotKey4;
-  case KeyFunction::HotKey5:           return AnytoneKeySettingsExtension::KeyFunction::HotKey5;
-  case KeyFunction::HotKey6:           return AnytoneKeySettingsExtension::KeyFunction::HotKey6;
-  case KeyFunction::WorkAlone:         return AnytoneKeySettingsExtension::KeyFunction::WorkAlone;
-  case KeyFunction::SkipChannel:       return AnytoneKeySettingsExtension::KeyFunction::SkipChannel;
-  case KeyFunction::DMRMonitor:        return AnytoneKeySettingsExtension::KeyFunction::DMRMonitor;
-  case KeyFunction::SubChannel:        return AnytoneKeySettingsExtension::KeyFunction::SubChannel;
-  case KeyFunction::PriorityZone:      return AnytoneKeySettingsExtension::KeyFunction::PriorityZone;
-  case KeyFunction::VFOScan:           return AnytoneKeySettingsExtension::KeyFunction::VFOScan;
-  case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
-  case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
-  case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
-  case KeyFunction::SimplexRepeater:   return AnytoneKeySettingsExtension::KeyFunction::SimplexRepeater;
-  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
-  case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
-  case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
-  case KeyFunction::Slot:              return AnytoneKeySettingsExtension::KeyFunction::Slot;
-  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
-  case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
-  case KeyFunction::Zone:              return AnytoneKeySettingsExtension::KeyFunction::Zone;
-  case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
-  case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
-  case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
-  case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
-  case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
-  default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
-  }
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of DMR6X2UVCodeplug::ExtendedSettingsElement
@@ -1026,11 +1212,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSett
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::fontColor());
+  return FontColor::decode(getUInt8(Offset::fontColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setFontColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::fontColor(), (uint8_t)color);
+  setUInt8(Offset::fontColor(), FontColor::encode(color));
 }
 
 bool
@@ -1166,36 +1352,36 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setEncryptionType(AnytoneDMRSettingsE
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneANameColor());
+  return Color::decode(getUInt8(Offset::zoneANameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneANameColor(), (uint8_t) color);
+  setUInt8(Offset::zoneANameColor(), Color::encode(color));
 }
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::zoneBNameColor());
+  return Color::decode(getUInt8(Offset::zoneBNameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::zoneBNameColor(), (uint8_t) color);
+  setUInt8(Offset::zoneBNameColor(), Color::encode(color));
 }
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelANameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelANameColor());
+  return Color::decode(getUInt8(Offset::channelANameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelANameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelANameColor(), (uint8_t) color);
+  setUInt8(Offset::channelANameColor(), Color::encode(color));
 }
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelBNameColor());
+  return Color::decode(getUInt8(Offset::channelBNameColor()));
 }
 void
 DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelBNameColor(), (uint8_t) color);
+  setUInt8(Offset::channelBNameColor(), Color::encode(color));
 }
 
 bool

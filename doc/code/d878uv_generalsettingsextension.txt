@@ -77,7 +77,7 @@ Field description:
     - DCC: Display color code
     - Date format: 0=yyyy/mm/dd, 1=dd/mm/yyyy
   - GPS settings:
-    - GPS mode: 0=GPS, 1=Baidu, 2=Both
+    - GPS mode: 0=GPS, 1=Beidou, 2=GPS+Beidou, 3=GLONASS, 4=GPS+GLONASS, 5=Beidou+GLONASS, 6=All 3
   - Auto repeater settings:
     - AutoRep VHF/UHF 2 offset index: 0-based, 0xff = off.
   - Audio settings:
