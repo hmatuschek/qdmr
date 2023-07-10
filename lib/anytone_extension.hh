@@ -1512,16 +1512,14 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
   /** If @c true, the talker alias (name) is send. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
-  Q_PROPERTY(TalkerAliasSource takerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
+  /** Specifies the talker alias source. */
+  Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
+  /** Specifies the talker alias encoding. */
   Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
 
   /** The encryption type to be used. */
   Q_PROPERTY(EncryptionType encryption READ encryption WRITE setEncryption)
 
-  /** Specifies the talker alias source. */
-  Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
-  /** Specifies the talker alias encoding. */
-  Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
 
 public:
   /** Possible monitor slot matches. */
@@ -1689,7 +1687,7 @@ public:
 
   /** Possible GPS modes. */
   enum class GPSMode {
-    GPS=0, Beidou=1, Both=2
+    GPS=0, Beidou=1, GPS_Beidou=2, Glonass=3, GPS_Glonas=4, Beidou_Glonass=5, All=6
   };
   Q_ENUM(GPSMode)
 
