@@ -264,7 +264,7 @@ public:
   /** Returns the positioning system at the specified index. */
   PositioningSystem *system(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Returns the number of defined GPS systems. */
   int gpsCount() const;

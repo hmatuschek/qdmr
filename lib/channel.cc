@@ -1001,12 +1001,12 @@ ChannelList::ChannelList(QObject *parent)
 }
 
 int
-ChannelList::add(ConfigObject *obj, int row) {
+ChannelList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<Channel>())) {
     logError() << "Cannot add nullptr or non-channel objects to channel list.";
     return -1;
   }
-  return ConfigObjectList::add(obj, row);
+  return ConfigObjectList::add(obj, row, unique);
 }
 
 Channel *

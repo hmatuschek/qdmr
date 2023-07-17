@@ -548,7 +548,7 @@ public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;

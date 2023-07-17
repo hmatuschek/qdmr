@@ -13,7 +13,7 @@ SET(libdmrconf_SOURCES
     ranges.cc
     radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc usbdevice.cc radiolimits.cc
     csvreader.cc dfufile.cc userdatabase.cc logger.cc
-    visitor.cc configlabelingvisitor.cc melody.cc
+    visitor.cc configlabelingvisitor.cc configcopyvisitor.cc melody.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
     channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc roamingzone.cc roamingchannel.cc
     callsigndb.cc talkgroupdatabase.cc radioid.cc encryptionextension.cc commercial_extension.cc
@@ -61,7 +61,8 @@ SET(libdmrconf_MOC_HEADERS
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh
     md390_filereader.hh
-    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh)
+    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
+    visitor.hh configlabelingvisitor.hh configcopyvisitor.hh)
 
 
 configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)

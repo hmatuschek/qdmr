@@ -8,6 +8,10 @@ qt5_wrap_cpp(configtest_MOC_SOURCES configtest.hh)
 add_executable(configtest configtest.cc ${configtest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(configtest ${LIBS} libdmrconf)
 
+qt5_wrap_cpp(copytest_MOC_SOURCES copytest.hh)
+add_executable(copytest copytest.cc ${copytest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(copytest ${LIBS} libdmrconf libdmrconfigtest)
+
 qt5_wrap_cpp(crc32test_MOC_SOURCES crc32test.hh)
 add_executable(crc32test crc32test.cc ${crc32test_MOC_SOURCES})
 target_link_libraries(crc32test ${LIBS} libdmrconf)

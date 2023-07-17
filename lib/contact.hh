@@ -227,7 +227,7 @@ public:
   /** Constructs an empty contact list. */
 	explicit ContactList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Returns the number of digital contacts. */
 	int digitalCount() const;

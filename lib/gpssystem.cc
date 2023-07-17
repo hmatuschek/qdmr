@@ -428,9 +428,9 @@ PositioningSystems::system(int idx) const {
 }
 
 int
-PositioningSystems::add(ConfigObject *obj, int row) {
+PositioningSystems::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<PositioningSystem>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 
