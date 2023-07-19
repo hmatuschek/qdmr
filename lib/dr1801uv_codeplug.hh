@@ -130,13 +130,13 @@ public:
     virtual void setPower(Channel::Power pwr);
 
     /** Retunrs the RX frequency in MHz. */
-    virtual double rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency in MHz. */
-    virtual void setRXFrequency(double MHz);
+    virtual void setRXFrequency(Frequency MHz);
     /** Retunrs the TX frequency in MHz. */
-    virtual double txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency in MHz. */
-    virtual void setTXFrequency(double MHz);
+    virtual void setTXFrequency(Frequency MHz);
 
     /** Returns @c true if a contact index is set. */
     virtual bool hasTransmitContact() const;

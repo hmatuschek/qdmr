@@ -178,21 +178,21 @@ DR1801UVCodeplug::ChannelElement::setPower(Channel::Power pwr) {
   }
 }
 
-double
+Frequency
 DR1801UVCodeplug::ChannelElement::rxFrequency() const {
-  return double(getUInt32_le(Offset::rxFrequency()))/1e6;
+  return Frequency::fromHz(getUInt32_le(Offset::rxFrequency()));
 }
 void
-DR1801UVCodeplug::ChannelElement::setRXFrequency(double MHz) {
-  setUInt32_le(Offset::rxFrequency(), MHz*1e6);
+DR1801UVCodeplug::ChannelElement::setRXFrequency(Frequency MHz) {
+  setUInt32_le(Offset::rxFrequency(), MHz.inHz());
 }
-double
+Frequency
 DR1801UVCodeplug::ChannelElement::txFrequency() const {
-  return double(getUInt32_le(Offset::txFrequency()))/1e6;
+  return Frequency::fromHz(getUInt32_le(Offset::txFrequency()));
 }
 void
-DR1801UVCodeplug::ChannelElement::setTXFrequency(double MHz) {
-  setUInt32_le(Offset::txFrequency(), MHz*1e6);
+DR1801UVCodeplug::ChannelElement::setTXFrequency(Frequency MHz) {
+  setUInt32_le(Offset::txFrequency(), MHz.inHz());
 }
 
 bool
