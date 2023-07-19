@@ -2947,6 +2947,15 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
   setFMTXDelay(ext->txDelay());
   setFMPreWaveDelay(ext->preWaveDelay());
   enableFMPassAll(ext->passAll());
+  enableReportPosition(ext->reportPosition());
+  enableReportMicE(ext->reportMicE());
+  enableReportObject(ext->reportObject());
+  enableReportItem(ext->reportItem());
+  enableReportMessage(ext->reportMessage());
+  enableReportWeather(ext->reportWeather());
+  enableReportNMEA(ext->reportNMEA());
+  enableReportStatus(ext->reportStatus());
+  enableReportOther(ext->reportOther());
 
   // Encode additional FM APRS frequencies
   for (int i=0; i<ext->frequencies()->count(); i++) {
@@ -2955,6 +2964,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
     names.setName(ctx.index(ext->frequencies()->get(i)),
                   ext->frequencies()->get(i)->name());
   }
+
   return true;
 }
 
@@ -2975,6 +2985,16 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
   ext->setTXDelay(fmTXDelay());
   ext->setPreWaveDelay(fmPreWaveDelay());
   ext->enablePassAll(fmPassAll());
+
+  ext->enableReportPosition(reportPosition());
+  ext->enableReportMicE(reportMicE());
+  ext->enableReportObject(reportObject());
+  ext->enableReportItem(reportItem());
+  ext->enableReportMessage(reportMessage());
+  ext->enableReportWeather(reportWeather());
+  ext->enableReportNMEA(reportNMEA());
+  ext->enableReportStatus(reportStatus());
+  ext->enableReportOther(reportOther());
 
   for (unsigned int i=1; i<Limit::fmFrequencies(); i++) {
     if (! fmFrequencySet(i))
