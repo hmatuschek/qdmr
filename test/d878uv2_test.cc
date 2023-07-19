@@ -58,9 +58,9 @@ D878UV2Test::testChannelFrequency() {
   }
 
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
-           123456780ULL);
+           Frequency::fromHz(123456780ULL));
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
-           999999990ULL);
+           Frequency::fromHz(999999990ULL));
 }
 
 

@@ -1981,8 +1981,8 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
   DMRChannel *chan = new DMRChannel();
   chan->setName(name);
-  chan->setRXFrequency(rx*1e6);
-  chan->setTXFrequency(tx*1e6);
+  chan->setRXFrequency(Frequency::fromMHz(rx*1e6));
+  chan->setTXFrequency(Frequency::fromMHz(tx*1e6));
   chan->setPower(power);
   chan->setTimeout(tot);
   chan->setRXOnly(ro);
@@ -2039,8 +2039,8 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
 
   FMChannel *chan = new FMChannel();
   chan->setName(name);
-  chan->setRXFrequency(rx*1e6);
-  chan->setTXFrequency(tx*1e6);
+  chan->setRXFrequency(Frequency::fromMHz(rx*1e6));
+  chan->setTXFrequency(Frequency::fromMHz(tx*1e6));
   chan->setPower(power);
   chan->setTimeout(tot);
   chan->setRXOnly(ro);
