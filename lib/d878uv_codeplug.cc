@@ -2971,7 +2971,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 APRSSystem *
 D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
   QString name = QString("APRS %1").arg(destination());
-  if (! names.name(0).isEmpty())
+  if (names.isValid() && (! names.name(0).isEmpty()))
     name = names.name(0);
   APRSSystem *sys = new APRSSystem(
         name, nullptr,
@@ -3002,7 +3002,7 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
     auto *f = new AnytoneAPRSFrequency();
     f->setFrequency(fmFrequency(i));
     QString name = QString("APRS %1").arg(i);
-    if (! names.name(i).isEmpty())
+    if (names.isValid() && (! names.name(i).isEmpty()))
       name = names.name(i);
     f->setName(name);
     ext->frequencies()->add(f);
@@ -3662,7 +3662,9 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
+  FMAPRSFrequencyNamesElement aprsNames(isAllocated(Offset::fmAPRSFrequencyNames()) ?
+                                          data(Offset::fmAPRSFrequencyNames()):
+                                          nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
   unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
