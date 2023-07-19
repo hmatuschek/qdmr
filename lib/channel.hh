@@ -35,9 +35,9 @@ class Channel: public ConfigObject
   Q_OBJECT
 
   /** The receive frequency of the channel in Hz. */
-  Q_PROPERTY(qulonglong rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
   /** The transmit frequency of the channel in Hz. */
-  Q_PROPERTY(qulonglong txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
@@ -79,13 +79,13 @@ public:
   void clear();
 
   /** Returns the RX frequency of the channel in Hz. */
-  qulonglong rxFrequency() const;
+  Frequency rxFrequency() const;
   /** (Re-)Sets the RX frequency of the channel in Hz. */
-  bool setRXFrequency(qulonglong freq);
+  bool setRXFrequency(Frequency freq);
   /** Returns the TX frequency of the channel in Hz. */
-  qulonglong txFrequency() const;
+  Frequency txFrequency() const;
   /** (Re-)Sets the TX frequency of the channel in Hz. */
-  bool setTXFrequency(qulonglong freq);
+  bool setTXFrequency(Frequency freq);
 
   /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
@@ -161,9 +161,9 @@ protected slots:
 
 protected:
   /** The RX frequency in Hz. */
-  qulonglong _rxFreq;
+  Frequency _rxFreq;
   /** The TX frequency in Hz. */
-  qulonglong _txFreq;
+  Frequency _txFreq;
   /** If @c true, the channel uses the global power setting. */
   bool _defaultPower;
   /** The transmit power setting. */
@@ -553,9 +553,9 @@ public:
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
   /** Finds a digital channel with the given frequencies, time slot and color code. */
-  DMRChannel *findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsigned cc) const;
+  DMRChannel *findDMRChannel(Frequency rx, Frequency tx, DMRChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequency. */
-  FMChannel *findFMChannelByTxFreq(double freq) const;
+  FMChannel *findFMChannelByTxFreq(Frequency freq) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
