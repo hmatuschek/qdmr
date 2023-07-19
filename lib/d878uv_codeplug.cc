@@ -360,8 +360,8 @@ D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
 bool
 D878UVCodeplug::RoamingChannelElement::fromChannel(const RoamingChannel* ch) {
   setName(ch->name());
-  setRXFrequency(ch->rxFrequency());
-  setTXFrequency(ch->txFrequency());
+  setRXFrequency(ch->rxFrequency().inHz());
+  setTXFrequency(ch->txFrequency().inHz());
   if (ch->colorCodeOverridden())
     setColorCode(ch->colorCode());
   else
@@ -374,8 +374,8 @@ RoamingChannel *
 D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   RoamingChannel *roam = new RoamingChannel();
   roam->setName(name());
-  roam->setRXFrequency(rxFrequency());
-  roam->setTXFrequency(txFrequency());
+  roam->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  roam->setTXFrequency(Frequency::fromHz(txFrequency()));
   if (hasColorCode())
     roam->setColorCode(colorCode());
   else
@@ -2624,7 +2624,7 @@ D878UVCodeplug::AnalogAPRSSettingsElement::fromAPRSSystem(const APRSSystem *sys,
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  setFrequency(sys->revertChannel()->txFrequency());
+  setFrequency(sys->revertChannel()->txFrequency().inHz());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setManualTXInterval(sys->period());
@@ -2648,13 +2648,14 @@ D878UVCodeplug::AnalogAPRSSettingsElement::toAPRSSystem() {
 bool
 D878UVCodeplug::AnalogAPRSSettingsElement::linkAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(frequency()/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(
+        Frequency::fromHz(frequency()));
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(frequency());
-    ch->setTXFrequency(frequency());
+    ch->setRXFrequency(Frequency::fromHz(frequency()));
+    ch->setTXFrequency(Frequency::fromHz(frequency()));
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(FMChannel::Bandwidth::Wide);

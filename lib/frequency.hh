@@ -30,6 +30,9 @@ public:
   inline bool operator==  (const Frequency &other) const {   ///< Comparison.
     return _frequency == other._frequency;
   }
+  inline bool operator != (const Frequency &other) const {   ///< Comparison.
+    return _frequency != other._frequency;
+  }
   inline bool operator<   (const Frequency &other) const {   ///< Comparison.
     return _frequency < other._frequency;
   }
