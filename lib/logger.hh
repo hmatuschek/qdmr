@@ -16,8 +16,13 @@
 /** Constructs an error message. */
 #define logError() LogMessage(LogMessage::ERROR, __FILE__, __LINE__)
 /** Constructs a fatal error message. */
+#ifdef __cpp_lib_stacktrace
+#include <stacktrace>
+#define logFatal() LogMessage(LogMessage::FATAL, __FILE__, __LINE__) << \
+  QString::fromStdString(std::to_string(std::stacktrace::current()))
+#else
 #define logFatal() LogMessage(LogMessage::FATAL, __FILE__, __LINE__)
-
+#endif
 
 /** Implements a log-message.
  * Instances of this class will forward the content of this message automatically to the @c Logger

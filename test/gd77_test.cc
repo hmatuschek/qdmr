@@ -33,7 +33,7 @@ GD77Test::testBasicConfigEncoding() {
   GD77Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity GD77: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
@@ -44,13 +44,13 @@ GD77Test::testBasicConfigDecoding() {
   GD77Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity GD77: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for Radioddity GD77: {}")
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }

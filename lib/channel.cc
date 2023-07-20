@@ -19,8 +19,6 @@
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 
-#include "opengd77_extension.hh"
-
 
 /* ********************************************************************************************* *
  * Implementation of Channel

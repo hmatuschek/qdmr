@@ -1,0 +1,1432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Settings extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some device specific settings for
+   <trademark>AnyTone</trademark> devices. As there are a myriad of settings for these devices, the
+   settings extension is split into several sub-extensions, grouping the settings by domain.
+</para>
+
+<para>
+  The <trademark>AnyTone</trademark> settings extension is a mapping named <token>anytone</token>. 
+  It contains the device specific settings for AnyTone devices.
+</para>
+
+<section>
+<info>
+  <title>General settings attributes</title>
+</info>
+
+<variablelist>
+  <title>General settings extension fields</title>
+  <varlistentry>
+    <term><token>subChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the sub-channel is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>selectedVFO</token></term>
+    <listitem>
+      <para>
+        Specifies the currently selected VFO. Must be one of <token>A</token> or <token>B</token>,
+        selecting VFO A and B, respectively.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>modeA</token>, <token>modeB</token></term>
+    <listitem>
+      <para>
+        Specifies the VFO mode for VFOs A and B. Must be one of <token>Memory</token> or 
+        <token>VFO</token>. The former selects the memory/channel mode while the latter selects the 
+        VFO mode.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>zoneA</token>, <token>zoneB</token></term>
+    <listitem>
+      <para>
+        Specifies the current zones for VFO A and B. Must be a reference to a zone.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vfoScanType</token></term>
+    <listitem>
+      <para>
+        Specifies scan-type for the VFO mode. Must be one of <token>Time</token>,
+        <token>Carrier</token> or <token>Stop</token>. Default is <token>Time</token>. If 
+        <token>Time</token> is selected, the scan is stops for a specified period. If 
+        <token>Carrier</token> is selected, the scan stops as long as a carrier is detected. If 
+        <token>Stop</token> is selected, the scan stops entirely.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>minVFOScanFrequencyVHF</token>, <token>maxVFOScanFrequencyVHF</token>, 
+      <token>minVFOScanFrequencyUHF</token>, <token>maxVFOScanFrequencyUHF</token></term>
+    <listitem>
+      <para>
+        Specifies the frequency ranges for the VFO scan in the VHF and UHF bands. These frequency 
+        can be specified arbitrarily. If a unit-less floating point value is given, it is 
+        interpreted as in MHz. If a unit-less integer value is given, it is interpreted as in Hz.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keepLastCaller</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the last caller ID is kept even, when the channel is changed. 
+        Seriously, who needs that option? Just keep it or don't. Why is it so important? AnyTone
+        codeplugs are full of these unnecessary settings.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vfoStep</token></term>
+    <listitem>
+      <para>
+        Specifies the VFO tuning step-size.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>steType</token>, <token>steFrequency</token>, <token>steDuration</token></term>
+    <listitem>
+      <para>
+        Specifies the squelch-tail elimination type, frequency and duration. The type must be one of 
+        <token>Off</token>, <token>Silent</token>, <token>Deg120</token>, <token>Deg180</token> or 
+        <token>Deg240</token>. The frequency is specified as a floating point number in Hz. The 
+        duration is specified in ms.
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>tbstFrequency</token></term>
+    <listitem>
+      <para>
+        Specifies TBST/pilot-tone frequency used to enable/open a repeater. This should be one of 
+        the common frequencies like 1000, 1450, 1750 and 2100 Hz.
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>proMode</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, enables the professional mode. If enabled, some menu options are 
+        hidden. 
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname> and 
+        <productname>DMR-6X2UV</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>maintainCallChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, maintains the call-channel. Whatever that now means. If you find it
+        out, let it me know. 
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname> and 
+        <productname>DMR-6X2UV</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootSettings</token>, <token>powerSaveSettings</token>, <token>keySettings</token>, 
+      <token>toneSettings</token>, <token>displaySettings</token>, <token>audioSettings</token>, 
+      <token>menuSettings</token>, <token>autoRepeaterSettings</token>, <token>dmrSettings</token>, 
+      <token>roamingSettings</token>, <token>gpsSettings</token>, 
+      <token>simplexRepeaterSettings</token></term>
+    <listitem>
+      <para>
+        Many more funny settings, grouped by domain. For details, see the descriptions below.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Boot settings</title></info>
+<para>
+  Collects some settings, that control the startup of the radio. These settings are collected 
+  under the <token>bootSettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+
+<variablelist>
+  <title>Boot settings extension fields</title>
+  <varlistentry>
+    <term><token>bootDisplay</token></term>
+    <listitem>
+      <para>
+        Specifies what is seen on the display during boot. Must be one of <token>Default</token>, 
+        <token>CustomText</token> or <token>CustomImage</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootPasswordEnabled</token>, <token>bootPassword</token></term>
+    <listitem>
+      <para>
+        Enables/disables and specifies the boot password. The boot password is a string of up to 8 
+        number chars.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultChannel</token>, <token>zoneA</token>, <token>channelA</token>, 
+      <token>zoneB</token>, <token>channelB</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, <token>defaultChannel</token> enables the specified zones and 
+        channels to be set on startup. <token>zoneA</token> and <token>zoneB</token> specify the 
+        startup zone for VFOs A and B, respectively, and must reference a defined zone. While
+        <token>channelA</token> and <token>channelB</token> specify the startup channels for each
+        VFO. If no channels are defined, the VFO is chosen.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>priorityZoneA</token>, <token>priorityZoneB</token></term>
+    <listitem>
+      <para>
+        Specifies the priority zones for each VFO. These must reference a defined zone. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultRoamingZone</token></term>
+    <listitem>
+      <para>
+        Specifies the startup roaming zone. Must refer to a defined roaming zone.
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>gpsCheck</token></term>
+    <listitem>
+      <para>
+        Enables the GPS check on boot.
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname> and 
+        <productname>AT-D878UV II</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>reset</token></term>
+    <listitem>
+      <para>
+        Enables a MCU reset on boot.
+      </para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname> and
+        <productname>AT-D878UV II</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Power-save settings</title></info>
+<para>
+  Collects some settings, that configure the power-save features. These settings are collected under
+  the <token>powerSaveSettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+
+<variablelist>
+  <title>Power-save setting extension fields</title>
+  <varlistentry>
+    <term><token>autoShutdown</token></term>
+    <listitem>
+      <para> Specifies the time-out for the automatic shut down. If <token>0</token>, the automatic 
+      shut-down is disabled. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>resetAutoShutdownOnCall</token></term>
+    <listitem>
+      <para>If <token>true</token>, the automatic showdown timer is reset on every call.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSave</token></term>
+    <listitem>
+      <para>Specifies the power-save mode. Must be one of <token>Off</token>, <token>Save50</token>
+      or <token>Save66</token>. The latter two will save 50% or 66%, respectively.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>atpc</token></term>
+    <listitem>
+      <para>Enables the ATPC (Adaptive Transmission Power Control). It reduces the transmission 
+      power, if a strong signal is received.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Keypad settings</title></info>
+<para>
+  Collects some settings, that configure the keypad, lock etc. These settings are collected 
+  under the <token>keySettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+<para>
+  This extension also allows to assign specific functions to the programmable function keys on the 
+  radio. These are the side-keys, top-key and the front buttons labeled <keycap>P1</keycap> and 
+  <keycap>P2</keycap>. The following list shows all functions, that can be assigned to each of these 
+  buttons. Some function are not available on all devices.
+</para>
+
+<variablelist>
+  <title>Key functions</title>
+  <varlistentry>
+    <term><token>Off</token></term>
+    <listitem><para>No function at all.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Voltage</token></term>
+    <listitem><para>Shows the battery voltage. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Power</token></term>
+    <listitem><para>Toggles though the power settings. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Repeater</token></term>
+    <listitem><para>Toggles the talk-around feature. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Reverse</token></term>
+    <listitem><para>Swaps the RX and TX frequencies. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Encryption</token></term>
+    <listitem><para>Shows the encryption key selection. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Call</token></term>
+    <listitem><para>Performs an FM call with the configured DMTF/two-tone/five-tone ID. Applicable 
+      to <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>VOX</token></term>
+    <listitem><para>Shows the VOX level selection. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleVFO</token></term>
+    <listitem><para>Toggles between VFO and memory/channel mode. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SubPTT</token></term>
+    <listitem><para>PTT for the sub channel. Only applicable for <keycap>PF1</keycap>, 
+      <keycap>PF2</keycap> and <keycap>PF3</keycap> keys. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Scan</token></term>
+    <listitem><para>Starts/stops a scan. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>WFM</token></term>
+    <listitem><para>Toggles the WFM (or Air band) receiver. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Alarm</token></term>
+    <listitem><para>Starts/stops an alarm call. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>RecordSwitch</token></term>
+    <listitem><para>Enables/disables recoding function. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Record</token></term>
+    <listitem><para>Start/stops a recoding. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SMS</token></term>
+    <listitem><para>Start writing an SMS. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Dial</token></term>
+    <listitem><para>Start manual dial. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPSInformation</token></term>
+    <listitem><para>Applicable to <productname>AT-D868UV</productname>, 
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para> </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Monitor</token></term>
+    <listitem><para>Enables the (FM) monitor. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleMainChannel</token></term>
+    <listitem><para>Toggles betwen VFOs A and B for the main channel. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>HotKey1</token>, <token>HotKey2</token>, <token>HotKey3</token>, 
+      <token>HotKey4</token>, <token>HotKey5</token>, <token>HotKey6</token></term>
+    <listitem><para>Tiggers one of the programmed hot-key function. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>WorkAlone</token></term>
+    <listitem><para>Toggles the lone-worker mode. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SkipChannel</token></term>
+    <listitem><para>During a scan, use this function to skip the current channel. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>DigitalMonitor</token></term>
+    <listitem><para>Toggles the digital monitor. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SubChannel</token></term>
+    <listitem><para>Enables/disables the sub-channel. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>PriorityZone</token></term>
+    <listitem><para>Change to the priority zone. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>VFOScan</token></term>
+    <listitem><para>Toggles the VFO scan. Applicable to <productname>AT-D868UV</productname>, 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MICSoundQuality</token></term>
+    <listitem><para>Toggle <quote>enhanced</quote> sound mode in DMR mode. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>LastCallReply</token></term>
+    <listitem><para>Allows to answer the last call, after the hang-time has passed. Applicable to 
+      <productname>AT-D868UVE</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D578UV</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelType</token></term>
+    <listitem><para>Change the channel type. Applicable to <productname>AT-D868UV</productname>, 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SimplexRepeater</token></term>
+    <listitem><para>Enables/disables the simplex repeater feature. Applicable to 
+      <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Ranging</token></term>
+    <listitem><para>Applicable to <productname>AT-D868UV</productname>, 
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname> </para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Roaming</token></term>
+    <listitem><para>Manually starts roaming. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>. </para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelRanging</token></term>
+    <listitem><para>Applicable to <productname>AT-D868UV</productname>, 
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname> </para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MaxVolume</token></term>
+    <listitem><para>Shows the maximum volume setting. Applicable to 
+      <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Slot</token></term>
+    <listitem><para>Changes the time-slot, <productname>AT-D868UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Squelch</token></term>
+    <listitem><para>Shows squelch settings. Applicable to 
+      <productname>AT-D578UV</productname> and <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSTypeSwitch</token></term>
+    <listitem><para>Applicable to <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Zone</token></term>
+    <listitem><para>Shows the zone selection dialog. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>RoamingSet</token></term>
+    <listitem><para>Shows the roaming settings(?). Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSSet</token></term>
+    <listitem><para>???</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Mute</token></term>
+    <listitem><para>Mutes the radio for a specified interval. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>MuteA</token>, <token>MuteB</token></term>
+    <listitem><para>Mutes the VFO A/B for a specified interval. Applicable to 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>XBandRepeater</token></term>
+    <listitem><para>Enables the cross-band repeater function. Applicable to 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Speaker</token></term>
+    <listitem><para>Applicable to <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>CtcssDcsSet</token></term>
+    <listitem><para>Shows the CTCSS/DCS settings for FM channels. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>TBSTSend</token></term>
+    <listitem><para>Sends the TBST tone. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>Bluetooth</token></term>
+    <listitem><para>Enables/disables bluetooth function. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>,
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPS</token></term>
+    <listitem><para>Enables/disables GPS. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ChannelName</token></term>
+    <listitem><para>Toggle channel name and frequency display. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>,
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>CDTScan</token></term>
+    <listitem><para>Starts CTCSS/DCS scan for FM channel. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+      <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSSend</token></term>
+    <listitem><para>Transmits the positioning information. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>,
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>APRSInfo</token></term>
+    <listitem><para>Shows received APRS information. Applicable to 
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>,
+      <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>GPSRoaming</token></term>
+    <listitem><para>Applicable to <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>NoiseReductionTX</token></term>
+    <listitem><para>Applicable to <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+  The following list contains all keypad setting fields.
+</para>
+
+<variablelist>
+  <title>Keypad settings extension fields</title>
+  <varlistentry>
+    <term><token>funcKey1Short</token>, <token>funcKey1Long</token>, <token>funcKey2Short</token>, 
+      <token>funcKey2Long</token>, <token>funcKey3Short</token>, <token>funcKey3Long</token>, 
+      <token>funcKey4Short</token>, <token>funcKey4Long</token>, <token>funcKey5Short</token>, 
+      <token>funcKey5Long</token>, <token>funcKey6Short</token>, <token>funcKey6Long</token></term>
+    <listitem>
+      <para>
+        Specifies the functions associated with the function keys <keycap>P1</keycap>-<keycap>P6</keycap>
+        for a short and long press. Must be one of the items in the key function list above. The 
+        function keys 1-6 are labeled <keycap>P1</keycap>-<keycap>P6</keycap> and are located either 
+        below or next to the display.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyAShort</token>, <token>funcKeyALong</token></term>
+    <listitem>
+      <para>
+        Specifies the function associated with the programmable function key <keycap>PF1</keycap> or 
+        <keycap>A</keycap>. This button is located right below the PTT button (on handheld radios) 
+        or labeled <keycap>A</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+      </para>
+    </listitem>
+  </varlistentry>
+    <varlistentry>
+    <term><token>funcKeyBShort</token>, <token>funcKeyBLong</token></term>
+    <listitem>
+      <para>
+        Specifies the function associated with the programmable function key <keycap>PF2</keycap> or 
+        <keycap>B</keycap>. This button is the second one below the PTT button (on handheld radios) 
+        or labeled <keycap>B</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyCShort</token>, <token>funcKeyCLong</token></term>
+    <listitem>
+      <para>
+        Specifies the function associated with the programmable function key <keycap>PF3</keycap> or 
+        <keycap>C</keycap>. THis button is the colorful one on the top (on handheld radios) or 
+        labled <keycap>C</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyDShort</token>, <token>funcKeyDLong</token></term>
+    <listitem>
+      <para>
+        Specifies the function associated with the programmable function key <keycap>D</keycap>. 
+        This button is located on the hand microphone (<productname>AT-D578UV</productname> only).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>longPressDuration</token></term>
+    <listitem>
+      <para>
+        Specifies the minimum duration of a <quote>long press</quote> on one of the programmable 
+        function keys. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>autoKeyLock</token></term>
+    <listitem>
+      <para>
+        Enables/disables the automatic key lock.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>knobLock</token>, <token>keypadLock</token>, <token>sideKeysLock</token></term>
+    <listitem>
+      <para>
+        Specifies, whether the knob, keypad and side-keys are locked, when the key-lock is enabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>forcedKeyLock</token></term>
+    <listitem>
+      <para>
+        Don't use. Prevents the manual key-lock release. Only applicable to commercial applications.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Tone settings</title></info>
+<para>
+  Collects some settings, that configure signal tones. These settings are collected 
+  under the <token>toneSettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+
+<variablelist>
+  <title>Tone settings extension fields</title>
+  <varlistentry>
+    <term><token>keyTone</token></term>
+    <listitem><para>Enables the key-pad tones. Should be disabled.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keyToneLevel</token></term>
+    <listitem><para>Specifies the key-tone level, 0 means user adjustable.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>smsAlert</token></term>
+    <listitem><para>Enables the SMS alert tone.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callAlert</token></term>
+    <listitem><para>Enables the call alert tone. See also <token>callMelody</token>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dmrTalkPermit</token>, <token>fmTalkPermit</token></term>
+    <listitem><para>Enables the DMR talk permit tone.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dmrReset</token></term>
+    <listitem><para>Enables the DMR reset tone. See also <token>resetMelody</token>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dmrIdle</token>, <token>fmIdle</token></term>
+    <listitem><para>Enables the idle tone (for DMR and FM channels). See also <token>idleMelody</token>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>startup</token></term>
+    <listitem><para>Enables a startup tone.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>tot</token></term>
+    <listitem><para>Transmit time-out warning tone.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callMelody</token>, <token>idleMelody</token>, <token>resetMelody</token>, 
+      <token>callEndMelody</token></term>
+    <listitem><para>Specifies the melody played on each of these occasions. These melodies can 
+    contain up to 5 notes (and pauses). For the sake of simplicity, qdmr supports the LilyPond 
+    musical notation for these melodies. E.g., <code>a8 b e2 des4 d</code>. </para></listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Display settings</title></info>
+<para>
+  Collects all display settings. These settings are collected under the 
+  <token>displaySettings</token> key within the <token>anytoneSettings</token> entry.
+</para>
+
+<variablelist>
+  <title>Display settings extension fields</title>
+  <varlistentry>
+    <term><token>displayFrequency</token></term>
+    <listitem>
+      <para>If true, the channel frequency is shown instead of the channel name.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>brightness</token></term>
+    <listitem>
+      <para>Specifies the brightness of the backlight in a range 1-10.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlightDuration</token>, <token>backlightDurationRX</token>, 
+      <token>backlightDurationTX</token></term>
+    <listitem>
+      <para>Specifies the backlight duration. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>customChannelBackground</token></term>
+    <listitem>
+      <para>If <token>true</token>, the custom channel background is enabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>volumeChangePrompt</token>, <token>callEndPrompt</token></term>
+    <listitem>
+      <para>If <token>true</token> the volume change and call-end prompts are shown.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>showClock</token>, <token>showCall</token>, <token>showContact</token>,
+      <token>showChannelNumber</token>, <token>showColorCode</token>, <token>showTimeSlot</token>,
+      <token>showChannelType</token>, <token>showLastHeard</token></term>
+    <listitem>
+      <para>Enables/disables various display elements.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>lastCallerDisplay</token></term>
+    <listitem>
+      <para>Specifies how the last caller is shown. Must be one of <token>Off</token>, 
+      <token>ID</token>, <token>Call</token> or <token>Both</token></para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>callColor</token></term>
+    <listitem>
+      <para>Specifies the call color. Must be one of <token>White</token>, <token>Black</token>, 
+      <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, <token>Green</token>, 
+      <token>Turquoise</token>, <token>Blue</token>. Please note, that not all devices allow for 
+      all colors. Especially the <productname>AT-D868UV</productname> has only limited colors.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>standbyTextColor</token>, <token>standbyBackgroundColor</token></term>
+    <listitem>
+      <para>Specifies the text or background color in stand-by. Must be one of <token>White</token>, 
+      <token>Black</token>, <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, 
+      <token>Green</token>, <token>Turquoise</token>, <token>Blue</token>. Please note, that not all
+      devices allow for all colors. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>channelNameColor</token>, <token>channelBNameColor</token></term>
+    <listitem>
+      <para>Specifies the color of the channel name. Must be one of <token>White</token>, 
+      <token>Black</token>, <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, 
+      <token>Green</token>, <token>Turquoise</token>, <token>Blue</token>. Please note, that not all
+      devices allow for all colors. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>zoneNameColor</token>, <token>zoneBNameColor</token></term>
+    <listitem>
+      <para>Specifies the color of the channel name. Must be one of <token>White</token>, 
+      <token>Black</token>, <token>Orange</token>, <token>Red</token>, <token>Yellow</token>, 
+      <token>Green</token>, <token>Turquoise</token>, <token>Blue</token>. Please note, that not all
+      devices allow for all colors. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>language</token></term>
+    <listitem>
+      <para>Specifies the UI language. Must be one of <token>English</token> or 
+      <token>German</token>. Applicable to <productname>AT-D878UV</productname>, 
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+      <productname>DMR-6X2UV</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dateFormat</token></term>
+    <listitem>
+      <para>Specifies the date format. Must be one of <token>YearFirst</token> (i.e., yyyy/mm/dd) or 
+        <token>DayFirst</token> (i.e., dd/mm/yyyy). Obviously, they got everything covered.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Audio settings</title></info>
+<para>
+  This entry collects all audio-related settings. These settings are collected under the 
+  <token>audioSettings</token> key within the <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+<title>Audio settings extension fields</title>
+<varlistentry>
+  <term><token>voxDelay</token></term>
+  <listitem>
+    <para>An interval specifying the delay to activate the VOX. Stored in ms resolution. </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>voxSource</token></term>
+  <listitem>
+    <para>Specifies the source for the VOX. Must be one of <token>Internal</token>, 
+    <token>External</token> or <token>Both</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>recording</token></term>
+  <listitem>
+    <para>If <token>true</token>, recording is enabled.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>enhance</token></term>
+  <listitem>
+    <para>If <token>true</token>, enabled some TX audio enhancement. I don't know what it does nor 
+    if it is reasonable to enable.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>muteDelay</token></term>
+  <listitem>
+    <para>Specifies some muting delay in minutes.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>maxVolume</token>, <token>maxHeadPhoneVolume</token></term>
+  <listitem>
+    <para>Specifies the maximum speaker and headphone volume.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>enableFMMicGain</token>, <token>fmMicGain</token></term>
+  <listitem>
+    <para>Enables and sets a separate microphone gain for FM. If disabled, the global mic gain 
+    is used for both, DMR and FM.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Menu settings</title></info>
+<para>
+    This entry collects all menu-related settings (there aren't many). These settings are collected 
+    under the <token>menuSettings</token> key within the <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+<title>Menu settings extension fields</title>
+<varlistentry>
+  <term><token>duration</token></term>
+  <listitem>
+    <para>Specifies the duration, the menu is shown.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>separator</token></term>
+  <listitem>
+    <para>If <token>true</token>, the menu items are separated by a line. Again WTF AnyTone? Why 
+    the hack is an option needed for this? For me, this is just another useless option to check on 
+    every firmware update.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Auto-Repeater settings</title></info>
+<para>
+  The auto-repeater settings of anytone-devices is quiet complex. It allows to specify rules, in 
+  which frequency ranges some auto-repeater settings are applied referencing a particular offset
+  for that rule. These offsets are specified within a separate list of frequency offsets. 
+</para>
+<para>
+  These settings are needlessly complicated. It would be sufficient to specify a range and offset. 
+  AnyTone, however, decided that this would be way to simple and user friendly. However, fitting 
+  their concept into qdmr's concept of references to objects, makes it even worse. You will see.
+</para>
+<para>
+  The auto-repeater settings are specified within the <token>autoRepeaterSettings</token> item
+  within the <token>anytoneSettings</token> item.
+</para>
+
+<variablelist>
+<title>Auto-repeater extension fields</title>
+<varlistentry>
+  <term><token>directionA</token>, <token>directionB</token></term>
+  <listitem>
+    <para>Specifies the direction of the repeater offset for VFO A and B. I have absolutely no 
+    clue, why this depends on the VFO and not on the BAND (VHF/UHF) or even per offset. Only the 
+    wise people at AnyTone will know the answer.</para>
+    <para>However, must be one of <token>Off</token>, <token>Positive</token> or 
+    <token>Negative</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>vhfMin</token>, <token>vhfMax</token>, <token>uhfMin</token>, <token>uhfMax</token>,
+    <token>vhf2Min</token>, <token>vhf2Max</token>, <token>uhf2Min</token>, <token>uhf2Max</token></term>
+  <listitem>
+    <para>Specifies the VHF and UHF frequency range for which the auto-repeater feature is defined. 
+    These can be any frequencies by the way.</para>
+    <para>The <token>vhf2</token> and <token>uhf2</token> 
+    variants are only present for <productname>AT-D878UV</productname>, 
+    <productname>AT-D878UV II</productname> and <productname>AT-D578UV</productname> radios and 
+    allow for a second pair of frequency ranges with a different offset.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>vhf</token>, <token>uhf</token>, <token>vhf2</token>, <token>uhf2</token></term>
+  <listitem>
+    <para>References the offset for the VHF and UHF frequency range specified above. This must be 
+    a reference to one of the auto-repeater offsets defined below. </para>
+    <para>The <token>vhf2</token> and <token>uhf2</token> references are only present for 
+    <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and 
+    <productname>AT-D578UV</productname> radios and allow for a different offset.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>offset</token></term>
+  <listitem>
+    <para>A list of auto-repeater offsets. As qdmr only allows references to named objects, they 
+    must be relatively complex. Each entry has an ID (to reference the offset), name (because qdmr 
+    objects have names) and the actual offset frequency. See below for a description of these 
+    elements.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+
+<section>
+<info><title>Auto-repeater offsets</title></info>
+<para>
+  As mentioned above, qdmr requires any object referenced within the codeplug to be a proper
+  object. That is with an ID and name. This makes sense, as almost all referenced elements within 
+  the codeplug are complex objects and have a display name. However, AnyTone decided to reference a 
+  mere offset frequency. Consequently, you have to give names to them in qdmr. Sorry.
+</para>
+<para>
+  The below you find a list with the properties of the offset frequencies.
+</para>
+
+<variablelist>
+<title>Offset frequency fields</title>
+<varlistentry>
+  <term><token>id</token></term>
+  <listitem>
+    <para>Specifies the unique ID of the offset frequency. Used to reference it.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>name</token></term>
+  <listitem>
+    <para>Specifies the name of the offset frequency. Any string is valid and not needed. However, 
+    references are shown in qdmr with their name. So don't keep that field empty.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>offset</token></term>
+  <listitem>
+    <para>Specifies the actual frequency offset. </para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<example>
+<title>An example for two auto-repeater frequency ranges active only on VFO A.</title>
+ <programlisting><![CDATA[anytoneSettings:
+  # ...  
+  autoRepeaterSettings:
+    directionA: Negative   # <- Only on VFO A. Beacause.
+    directionB: Off
+    # VHF range 
+    vhfMin: 145.569 MHz
+    vhfMax: 145.794 MHz
+    vhf: offsetVHF
+    # UHF range
+    uhfMin: 438.55 MHz
+    uhfMax: 439.4375 MHz
+    uhf: offsetUHF
+    # Some generic but disabled ranges. 
+    vhf2Min: 136 MHz
+    vhf2Max: 174 MHz
+    vhf2: ~
+    uhf2Min: 400 MHz
+    uhf2Max: 480 MHz
+    uhf2: ~
+    # The offsets
+    offset:
+      - id: offsetVHF
+        name: VHF
+        offset: 600 kHz
+      - id: offsetUHF
+        name: UHF
+        offset: 7.6 Mhz
+  # ...  
+]]></programlisting>
+</example>
+</section>
+
+<section>
+<info><title>DMR related settings</title></info>
+<para>
+  Some DMR related settings. Some of these should not be touched.
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>groupCallHangTime</token>, <token>privateCallHangTime</token>, 
+    <token>manualGroupCallHangTime</token>, <token>manualPrivateCallHangTime</token></term>
+  <listitem>
+    <para>Specifies the group and private call hang time. That is, the time, within you could answer 
+    a call by pressing the PTT, even if the group or private call is not the default transmit 
+    contact of the channel.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>preWaveDelay</token>, <token>wakeHeadPeriod</token></term>
+  <listitem>
+    <para>Don't touch. Should both be 100ms.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>filterOwnID</token></term>
+  <listitem>
+    <para>If <token>true</token>, your own ID is not shown in the call lists.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>smsFormat</token></term>
+  <listitem>
+    <para>Specifies the SMS format. Must be one of <token>Motorola</token>, <token>Hytera</token>, 
+    <token>DMR</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>monitorSlotMatch</token></term>
+  <listitem>
+    <para>Specifies if and how the DMR monitor will match the time slot of the current channel. Must
+    be one of <token>Off</token>, <token>Single</token>, <token>Both</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>monitorColorCodeMatch</token></term>
+  <listitem>
+    <para>If <token>true</token>, the DMR monitor will match the color code of the current 
+    channel.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>monitorIDMatch</token></term>
+  <listitem>
+    <para>If <token>true</token>, the DMR monitor will match the DMR IDs to the group list of the 
+    current channel.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>monitorTimeSlotHold</token></term>
+  <listitem>
+    <para>If <token>true</token>, the DMR monitor will hold the time slot first received on.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>sendTalkerAlias</token></term>
+  <listitem>
+    <para>If enabled, sends the radio name as talker alias over the air.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>takerAliasSource</token></term>
+  <listitem>
+    <para>Specifies the source for the talker alias display. Must be one of <token>Off</token>, 
+      <token>UserDB</token> or <token>Air</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>talkerAliasEncoding</token></term>
+  <listitem>
+    <para>Specifies the encoding of the taker alias. Must be one of <token>ISO8</token>,
+      <token>ISO7</token> or <token>Unicode</token>. </para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>GPS settings</title></info>
+<para>
+  This section collects settings concerning GPS position reporting. These settings are 
+  collected under the <token>gpsSettings</token> key within the <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>units</token></term>
+  <listitem>
+    <para>Specifies the unit system to use for distance reporting (ranging). This must be one of 
+    <token>Metric</token> or <token>Archaic</token>. This software was developed by a European, so 
+    don't mail me to tell me, that I am silly.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>timeZone</token></term>
+  <listitem>
+    <para>Specifies the time-zone for the device. Any IANA time-zone ID is valid here. E.g., 
+    <code>Europe/Paris</code> or <code>UTC+5</code>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>reportPosition</token></term>
+  <listitem>
+    <para>If <token>true</token>, GPS position reporting is enabled.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>updatePeriod</token></term>
+  <listitem>
+    <para>Specifies the update/reporting interval in seconds. Any interval specification is valid 
+    here. E.g., <code>5 min</code> or <code>360 s</code>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>mode</token></term>
+  <listitem>
+    <para>Specifies the GPS mode. Must be one of <token>GPS</token>, <token>Beidou</token>, 
+    <token>GPS_Beidou</token>, <token>Glonass</token>, <token>GPS_Glonass</token>, 
+    <token>Beidou_Glonass</token> or <token>All</token>.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Roaming settings</title></info>
+<para>
+  This section collects settings concerning the roaming. These settings are collected 
+  under the <token>roamingSettings</token> key within the <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>autoRoam</token></term>
+  <listitem>
+    <para>If <token>true</token>, the auto-roaming is enabled. If <token>false</token>, the roaming
+    must be started manually.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>autoRoamPeriod</token></term>
+  <listitem>
+    <para>Specifies the auto-roaming period in minutes. Any interval specification is valid here. 
+    E.g., <code>30 min</code> or <code>1 h</code>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>autoRoamDelay</token></term>
+  <listitem>
+    <para>Specifies some additional delay in seconds before the auto-roaming is started. Any 
+    interval specification is valid here like <code>60 s</code> or <code>1 min</code>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>roamStart</token>,<token>roamReturn</token></term>
+  <listitem>
+    <para>Specifies the roaming start/end condition. Must be one of <token>Periodic</token> or 
+    <token>OutOfRange</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>rangeCheck</token></term>
+  <listitem>
+    <para>If <token>true</token>, the periodic range check is enabled.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>checkInterval</token></term>
+  <listitem>
+    <para>Specifies the range check period in seconds. Any interval specification is valid here. 
+    E.g., <code>3 min</code> or <code>180 s</code>. </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>retryCount</token></term>
+  <listitem>
+    <para>Number of retries to connect to a repeater before giving up and starting the roaming.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>outOfRangeAlert</token></term>
+  <listitem>
+    <para>Specifies the alert type for the out-of-range notification. Must be one of 
+    <token>Off</token>, <token>Bell</token> or <token>Voice</token></para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>notification</token></term>
+  <listitem>
+    <para>If <token>true</token>, the repeater check notification is enabled.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>notificationCount</token></term>
+  <listitem>
+    <para>The number of repeater check notifications.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>defaultZone</token></term>
+  <listitem>
+    <para>Specifies the default roaming zone. Must be a roaming zone ID or 
+    <token>null</token>.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>gpsRoaming</token></term>
+  <listitem>
+    <para>If <token>true</token>, GPS based roaming is enabled.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Bluetooth settings</title></info>
+<para>
+  This section collects settings concerning bluetooth feature. These settings are 
+  collected under the <token>bluetoothSettings</token> key within the 
+  <token>anytoneSettings</token> entry. 
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>pttLatch</token></term>
+    <listitem>
+      <para>If <token>true</token>, the bluetooth PTT button latches.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>pttSleepTimer</token></term>
+    <listitem>
+      <para>Specifies the timeout for the sleep mode of the bluetooth PTT button.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Simplex repeater settings</title></info>
+<para>
+  Collects all settings related to the <productname>DMR-6X2UV</productname> simplex-repeater 
+  feature. These settings are collected under the <token>simplexRepeaterSettings</token> key 
+  within the <token>anytoneSettings</token> entry. This extension is only relevant for the 
+  <productname>DMR-6X2UV</productname> series.
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>enabled</token></term>
+  <listitem>
+    <para>If <token>true</token>, the simplex repeater function is enabled.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>monitor</token></term>
+  <listitem>
+    <para>If <token>true</token>, the traffic can be monitored on the speaker.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>timeSlot</token></term>
+  <listitem>
+    <para>Specifies the time-slot of the repeater. This must be one of <token>TS1</token>, 
+    <token>TS2</token> or <token>Channel</token>. The latter implies, that the repeater uses the 
+    time-slot of the channel.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+</section>

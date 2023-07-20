@@ -76,8 +76,8 @@ MD390Codeplug::ChannelElement::enableCompressedUDPHeader(bool enable) {
 }
 
 Channel *
-MD390Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = DM1701Codeplug::ChannelElement::toChannelObj();
+MD390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  Channel *ch = DM1701Codeplug::ChannelElement::toChannelObj(err);
   if (nullptr == ch)
     return ch;
 
@@ -85,6 +85,7 @@ MD390Codeplug::ChannelElement::toChannelObj() const {
   if (ch->tytChannelExtension()) {
     ch->tytChannelExtension()->enableCompressedUDPHeader(compressedUDPHeader());
   }
+
   return ch;
 }
 

@@ -2,7 +2,6 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logger.hh"
-#include "opengd77_extension.hh"
 
 
 /* ********************************************************************************************* *

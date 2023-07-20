@@ -86,7 +86,15 @@ UserDatabase::load(const QString &filename) {
   QByteArray data = file.readAll();
   file.close();
 
-  QJsonDocument doc = QJsonDocument::fromJson(data);
+  QJsonParseError err;
+  QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+  if (doc.isEmpty()) {
+    QString msg = "Failed to load user DB: " + err.errorString();
+    logError() << msg;
+    emit error(msg);
+    return false;
+  }
+
   if (! doc.isObject()) {
     QString msg = "Failed to load user DB: JSON document is not an object!";
     logError() << msg;

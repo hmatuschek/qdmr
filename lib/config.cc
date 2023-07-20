@@ -3,7 +3,6 @@
 
 #include "rxgrouplist.hh"
 #include "channel.hh"
-#include "encryptionextension.hh"
 #include "csvreader.hh"
 #include "userdatabase.hh"
 #include "logger.hh"
@@ -111,7 +110,7 @@ Config::toYAML(QTextStream &stream, const ErrorStack &err) {
   // Print YAML
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc << doc << YAML::EndDoc;
-  stream << emitter.c_str();
+  stream << QString(emitter.c_str());
   return true;
 }
 

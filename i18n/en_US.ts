@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
@@ -382,15 +382,6 @@
         <translation>No radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="491"/>
-        <location filename="../src/application.cc" line="507"/>
-        <location filename="../src/application.cc" line="550"/>
-        <location filename="../src/application.cc" line="610"/>
-        <location filename="../src/application.cc" line="644"/>
-        <source>No matching device was found.</source>
-        <translation>No matching device was found.</translation>
-    </message>
-    <message>
         <location filename="../src/application.cc" line="522"/>
         <source>Verification success</source>
         <translation>Verification success</translation>
@@ -398,7 +389,7 @@
     <message>
         <location filename="../src/application.cc" line="523"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
+        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="562"/>
@@ -418,7 +409,7 @@
     <message>
         <location filename="../src/application.cc" line="630"/>
         <source>Upload ...</source>
-        <translation>Write …</translation>
+        <translation>Upload …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="650"/>
@@ -431,6 +422,15 @@
         <location filename="../src/application.cc" line="651"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="491"/>
+        <location filename="../src/application.cc" line="507"/>
+        <location filename="../src/application.cc" line="550"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="644"/>
+        <source>No matching device was found.</source>
+        <translation>No matching device was found.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="661"/>
@@ -547,12 +547,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="259"/>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="261"/>
         <source>DMR</source>
-        <translation type="unfinished">DMR</translation>
+        <translation>DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="273"/>
@@ -708,11 +708,6 @@
         <translation>Scanlist</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="452"/>
-        <source>Zones</source>
-        <translation type="unfinished">Zones</translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>CC</source>
         <translation>CC</translation>
@@ -725,7 +720,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="455"/>
         <source>RX Group List</source>
-        <translation>Group List</translation>
+        <translation>RX Group List</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="456"/>
@@ -761,6 +756,11 @@
         <location filename="../src/configitemwrapper.cc" line="462"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="452"/>
+        <source>Zones</source>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="463"/>
@@ -805,7 +805,7 @@
         <location filename="../src/configobjecttableview.cc" line="70"/>
         <location filename="../src/configobjecttableview.cc" line="94"/>
         <source>Cannot move items.</source>
-        <translation>Cannot move items</translation>
+        <translation>Cannot move items.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="71"/>
@@ -995,7 +995,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation></translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
@@ -2740,23 +2740,19 @@
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone?</source>
-        <translation>Delete roaming zone?</translation>
+        <location filename="../src/roamingchannellistview.cc" line="78"/>
+        <source>Delete roaming channel?</source>
+        <translation>Delete roaming channel?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
-        <source>Delete roaming zone %1?</source>
-        <translation>Delete roaming zone &apos;%1&apos;?</translation>
+        <source>Delete roaming channel %1?</source>
+        <translation>Delete roaming channel %1?</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete roaming zones?</source>
-        <translation>Delete roaming zones?</translation>
-    </message>
-    <message>
-        <location filename="../src/roamingchannellistview.cc" line="78"/>
-        <source>Delete %1 roaming zones?</source>
-        <translation>Delete %1 roaming zones?</translation>
+        <source>Delete %1 roaming channel?</source>
+        <translation>Delete %1 roaming channel?</translation>
     </message>
 </context>
 <context>
@@ -2783,12 +2779,12 @@
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="551"/>
+        <location filename="../src/configitemwrapper.cc" line="552"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="552"/>
+        <location filename="../src/configitemwrapper.cc" line="551"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>

@@ -7,6 +7,7 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "config.hh"
+#include "commercial_extension.hh"
 
 
 /* ********************************************************************************************* *
@@ -982,7 +983,7 @@ RadioddityCodeplug::GroupListElement::setName(const QString &name) {
 
 bool
 RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
-  return 0!=member(n);
+  return 0 != member(n);
 }
 unsigned
 RadioddityCodeplug::GroupListElement::member(unsigned n) const {
@@ -1028,7 +1029,7 @@ RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst,
   // Iterate over all entries in the codeplug
   for (unsigned int i=0; i<Limit::memberCount(); i++) {
     if (lst->count() > j) {
-      // Skip non-private-call entries
+      // Skip non-group-call entries
       while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
         logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
                   << "' is not a group call. Skip entry.";
@@ -2752,8 +2753,10 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack 
 
   // Create index<->object table.
   Context ctx(config);
-  if (! index(config, ctx, err))
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot index configuration objects.";
     return false;
+  }
 
   return this->encodeElements(flags, ctx);
 }
