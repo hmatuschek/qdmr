@@ -5,8 +5,8 @@ settings:
   introLine2: DM3MAT
   micLevel: 6
   speech: false
-  power: High
-  squelch: 1
+  power: Max
+  squelch: 0
   vox: 0
   tot: 0
   defaultID: id1
@@ -25,7 +25,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.825 MHz
       txFrequency: 145.825 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -37,7 +37,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.81 MHz
       txFrequency: 145.9875 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
@@ -50,7 +50,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.805 MHz
       txFrequency: 145.99 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
@@ -63,7 +63,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.8 MHz
       txFrequency: 145.99 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
@@ -76,7 +76,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.795 MHz
       txFrequency: 145.99 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
@@ -89,7 +89,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.79 MHz
       txFrequency: 145.9925 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
@@ -102,7 +102,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.21 MHz
       txFrequency: 144.3525 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -114,7 +114,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.205 MHz
       txFrequency: 144.35 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -126,7 +126,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.2 MHz
       txFrequency: 144.35 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -138,7 +138,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.195 MHz
       txFrequency: 144.35 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -150,7 +150,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 437.19 MHz
       txFrequency: 144.3475 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -162,7 +162,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 435.61 MHz
       txFrequency: 145.9225 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -174,7 +174,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 435.605 MHz
       txFrequency: 145.925 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -186,7 +186,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 435.6 MHz
       txFrequency: 145.925 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -198,7 +198,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 435.595 MHz
       txFrequency: 145.925 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -210,7 +210,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 435.59 MHz
       txFrequency: 145.9275 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
@@ -282,7 +282,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.9025 MHz
       txFrequency: 437.59 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 141.300003}
@@ -295,7 +295,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.9 MHz
       txFrequency: 437.495 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 141.300003}
@@ -308,7 +308,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.9 MHz
       txFrequency: 437.5 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 141.300003}
@@ -321,7 +321,7 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.9 MHz
       txFrequency: 437.505 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 141.300003}
@@ -334,398 +334,411 @@ channels:
       bandwidth: Narrow
       rxFrequency: 145.8975 MHz
       txFrequency: 437.51 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 141.300003}
       squelch: 0
   - analog:
       id: ch27
+      name: SO-50 EN
+      rxOnly: false
+      admit: Always
+      bandwidth: Narrow
+      rxFrequency: 436.79 MHz
+      txFrequency: 145.85 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      txTone: {ctcss: 74.4000015}
+      squelch: 0
+  - analog:
+      id: ch28
       name: SO-50 AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.8 MHz
       txFrequency: 145.8525 MHz
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-      txTone: {ctcss: 67}
-      squelch: 0
-  - analog:
-      id: ch28
-      name: SO-50 UP
-      rxOnly: false
-      admit: Always
-      bandwidth: Narrow
-      rxFrequency: 436.795 MHz
-      txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch29
-      name: SO-50 APO
+      name: SO-50 UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 436.79 MHz
+      rxFrequency: 436.795 MHz
       txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch30
-      name: SO-50 DWN
+      name: SO-50 APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 436.785 MHz
+      rxFrequency: 436.79 MHz
       txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch31
-      name: SO-50 LOS
+      name: SO-50 DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 436.77 MHz
-      txFrequency: 145.8475 MHz
-      power: High
+      rxFrequency: 436.785 MHz
+      txFrequency: 145.85 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch32
+      name: SO-50 LOS
+      rxOnly: false
+      admit: Always
+      bandwidth: Narrow
+      rxFrequency: 436.77 MHz
+      txFrequency: 145.8475 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      txTone: {ctcss: 67}
+      squelch: 0
+  - analog:
+      id: ch33
       name: AO-27 AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.805 MHz
       txFrequency: 145.8475 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch33
+      id: ch34
       name: AO-27 UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.8 MHz
       txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch34
+      id: ch35
       name: AO-27 APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.795 MHz
       txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch35
+      id: ch36
       name: AO-27 DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.79 MHz
       txFrequency: 145.85 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch36
+      id: ch37
       name: AO-27 LOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.785 MHz
       txFrequency: 145.8525 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch37
+      id: ch38
       name: AO-92 AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 145.8825 MHz
       txFrequency: 435.34 MHz
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-      txTone: {ctcss: 67}
-      squelch: 0
-  - analog:
-      id: ch38
-      name: AO-92 UP
-      rxOnly: false
-      admit: Always
-      bandwidth: Narrow
-      rxFrequency: 145.88 MHz
-      txFrequency: 435.345 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch39
-      name: AO-92 APO
+      name: AO-92 UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 145.88 MHz
-      txFrequency: 435.35 MHz
-      power: High
+      txFrequency: 435.345 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch40
-      name: AO-92 DWN
+      name: AO-92 APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 145.88 MHz
-      txFrequency: 435.355 MHz
-      power: High
+      txFrequency: 435.35 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch41
-      name: AO-92 LOS
+      name: AO-92 DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 145.8775 MHz
-      txFrequency: 435.36 MHz
-      power: High
+      rxFrequency: 145.88 MHz
+      txFrequency: 435.355 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch42
-      name: AO-91 AOS
+      name: AO-92 LOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 145.9625 MHz
-      txFrequency: 435.24 MHz
-      power: High
+      rxFrequency: 145.8775 MHz
+      txFrequency: 435.36 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch43
-      name: AO-91 UP
+      name: AO-91 AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 145.96 MHz
-      txFrequency: 435.245 MHz
-      power: High
+      rxFrequency: 145.9625 MHz
+      txFrequency: 435.24 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch44
-      name: AO-91 APO
+      name: AO-91 UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 145.96 MHz
-      txFrequency: 435.25 MHz
-      power: High
+      txFrequency: 435.245 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch45
-      name: AO-91 DWN
+      name: AO-91 APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 145.96 MHz
-      txFrequency: 435.255 MHz
-      power: High
+      txFrequency: 435.25 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch46
-      name: AO-91 LOS
+      name: AO-91 DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      rxFrequency: 145.9575 MHz
-      txFrequency: 435.26 MHz
-      power: High
+      rxFrequency: 145.96 MHz
+      txFrequency: 435.255 MHz
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch47
+      name: AO-91 LOS
+      rxOnly: false
+      admit: Always
+      bandwidth: Narrow
+      rxFrequency: 145.9575 MHz
+      txFrequency: 435.26 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      txTone: {ctcss: 67}
+      squelch: 0
+  - analog:
+      id: ch48
       name: TEVEL AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.41 MHz
       txFrequency: 145.9675 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch48
+      id: ch49
       name: TEVEL UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.405 MHz
       txFrequency: 145.97 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch49
+      id: ch50
       name: TEVEL APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.4 MHz
       txFrequency: 145.97 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch50
+      id: ch51
       name: TEVEL DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.395 MHz
       txFrequency: 145.97 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch51
+      id: ch52
       name: TEVEL LOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 436.39 MHz
       txFrequency: 145.9725 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch52
+      id: ch53
       name: UVSQ AOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 437.03 MHz
       txFrequency: 145.9025 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch53
+      id: ch54
       name: UVSQ UP
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 437.025 MHz
       txFrequency: 145.905 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch54
+      id: ch55
       name: UVSQ APO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 437.02 MHz
       txFrequency: 145.905 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch55
+      id: ch56
       name: UVSQ DWN
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 437.015 MHz
       txFrequency: 145.905 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch56
+      id: ch57
       name: UVSQ LOS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
       rxFrequency: 437.01 MHz
       txFrequency: 145.9075 MHz
-      power: High
+      power: !<!default> ""
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
 zones:
   - id: zone1
     name: AO-27
-    A: [ch32, ch33, ch34, ch35, ch36]
+    A: [ch33, ch34, ch35, ch36, ch37]
     B: []
   - id: zone2
     name: AO-91 FOX-1B
-    A: [ch42, ch43, ch44, ch45, ch46]
+    A: [ch43, ch44, ch45, ch46, ch47]
     B: []
   - id: zone3
     name: AO-92 FOX-1D
-    A: [ch37, ch38, ch39, ch40, ch41]
+    A: [ch38, ch39, ch40, ch41, ch42]
     B: []
   - id: zone4
     name: CAS-3H Lilac-2
@@ -749,15 +762,15 @@ zones:
     B: []
   - id: zone9
     name: SO-50 SaudiSat-1C
-    A: [ch27, ch28, ch29, ch30, ch31]
+    A: [ch27, ch28, ch29, ch30, ch31, ch32]
     B: []
   - id: zone10
     name: TEVEL 1-8
-    A: [ch47, ch48, ch49, ch50, ch51]
+    A: [ch48, ch49, ch50, ch51, ch52]
     B: []
   - id: zone11
     name: UVSQ
-    A: [ch52, ch53, ch54, ch55, ch56]
+    A: [ch53, ch54, ch55, ch56, ch57]
     B: []
 commercial:
   encryptionKeys:
