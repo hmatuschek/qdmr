@@ -196,24 +196,24 @@ OpenRTXCodeplug::ChannelElement::setPower(float dBm) {
 }
 
 
-double
+Frequency
 OpenRTXCodeplug::ChannelElement::rxFrequency() const {
-  return ((double)getUInt32_le(OffsetRXFrequency))/1e6;
+  return Frequency::fromHz(getUInt32_le(OffsetRXFrequency));
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setRXFrequency(double MHz) {
-  setUInt32_le(OffsetRXFrequency, (uint32_t)(MHz*1e6));
+OpenRTXCodeplug::ChannelElement::setRXFrequency(Frequency MHz) {
+  setUInt32_le(OffsetRXFrequency, MHz.inHz());
 }
 
-double
+Frequency
 OpenRTXCodeplug::ChannelElement::txFrequency() const {
-  return ((double)getUInt32_le(OffsetTXFrequency))/1e6;
+  return Frequency::fromHz(getUInt32_le(OffsetTXFrequency));
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setTXFrequency(double MHz) {
-  setUInt32_le(OffsetTXFrequency, (uint32_t)(MHz*1e6));
+OpenRTXCodeplug::ChannelElement::setTXFrequency(Frequency MHz) {
+  setUInt32_le(OffsetTXFrequency, MHz.inHz());
 }
 
 

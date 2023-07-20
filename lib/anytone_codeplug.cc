@@ -757,8 +757,8 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   }
 
   ch->setName(name());
-  ch->setRXFrequency(rxFrequency());
-  ch->setTXFrequency(txFrequency());
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
 
@@ -824,8 +824,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
+  setRXFrequency(c->rxFrequency().inHz());
+  setTXFrequency(c->txFrequency().inHz());
   // set power
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
