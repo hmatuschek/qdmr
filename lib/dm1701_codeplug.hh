@@ -82,9 +82,9 @@ public:
     virtual void setPower(Channel::Power pwr);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj() const;
+    Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual void fromChannelObj(const Channel *c, Context &ctx);
+    void fromChannelObj(const Channel *c, Context &ctx);
   };
 
   /** Extends the @c ChannelElement to implement the VFO channel settings for the DM-1701.
