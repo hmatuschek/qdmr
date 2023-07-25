@@ -56,8 +56,8 @@ public:
 
   /** Represents the base class for inverted bytemaps in all AnyTone codeplugs.
    * This is obviously a result of a lazy firmware developer. There is already some code in the
-   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewere. It is
-   * inverted, because reased flash memory is usually initialized with 0xff. However, the AnyTone
+   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewhere. It is
+   * inverted, because erased flash memory is usually initialized with 0xff. However, the AnyTone
    * memory gets erased to 0x00. So the inversion is not necessary. Someone really took pride in
    * his/her work and consequently, I need to implement some BS elements more. */
   class InvertedBytemapElement: public Element
@@ -772,7 +772,7 @@ public:
 
   /** Represents the base class for the settings elements in all AnyTone codeplugs.
    * This class only implements those few settings, common to all devices and encoded the same way.
-   * It also defines all common settings as interaces.
+   * It also defines all common settings as interfaces.
    *
    * Memory layout of encoded general settings (0xd0 bytes):
    * @verbinclude anytone_generalsettings.txt
@@ -1179,7 +1179,7 @@ public:
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Returns @c true if the talker alias is send. */
+    /** Returns @c true if the talker alias is sent. */
     virtual bool sendTalkerAlias() const = 0;
     /** Enables/disables sending the talker alias. */
     virtual void enableSendTalkerAlias(bool enable) = 0;
@@ -1478,7 +1478,7 @@ public:
     virtual void clearOffset(unsigned int n);
 
   public:
-    /** Some limts for the offset frequency table. */
+    /** Some limits for the offset frequency table. */
     struct Limit {
       static constexpr unsigned int numEntries() { return 250; }      ///< Max number of entries in the table.
     };
@@ -1676,7 +1676,7 @@ public:
 
     void clear();
 
-    /** Retunrs the n-th status message. */
+    /** Returns the n-th status message. */
     virtual QString message(unsigned int n) const;
     /** Sets the n-th status message. */
     virtual void setMessage(unsigned int n, const QString &msg);

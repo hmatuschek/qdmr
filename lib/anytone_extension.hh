@@ -327,7 +327,7 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Retunrs the boot display setting. */
+  /** Returns the boot display setting. */
   BootDisplay bootDisplay() const;
   /** Sets the boot display. */
   void setBootDisplay(BootDisplay mode);
@@ -631,7 +631,7 @@ public:
   /** Sets the long-press duration in ms. */
   void setLongPressDuration(Interval ms);
 
-  /** Retruns @c true, if the automatic key-lock feature is enabled. */
+  /** Returns @c true, if the automatic key-lock feature is enabled. */
   bool autoKeyLockEnabled() const;
   /** Enables/disables auto key-lock. */
   void enableAutoKeyLock(bool enabled);
@@ -778,7 +778,7 @@ public:
   bool fmIdleChannelToneEnabled() const;
   /** Enables/disables the idle FM channel tone. */
   void enableFMIdleChannelTone(bool enable);
-  /** Retunrs @c true if the startup tone is enabled. */
+  /** Returns @c true if the startup tone is enabled. */
   bool startupToneEnabled() const;
   /** Enables/disables the startup tone. */
   void enableStartupTone(bool enable);
@@ -1023,7 +1023,7 @@ public:
   /** Enables/disables display of last caller. */
   void enableShowLastHeard(bool enable);
 
-  /** Retuns backlight duration during TX. */
+  /** Returns backlight duration during TX. */
   Interval backlightDurationTX() const;
   /** Sets the backlight duration during TX in seconds. */
   void setBacklightDurationTX(Interval sec);
@@ -1046,7 +1046,7 @@ public:
   /** Sets the zone name color for VFO B. */
   void setZoneBNameColor(Color color);
 
-  /** Retuns backlight duration during RX. */
+  /** Returns backlight duration during RX. */
   Interval backlightDurationRX() const;
   /** Sets the backlight duration during RX in seconds. */
   void setBacklightDurationRX(Interval sec);
@@ -1510,7 +1510,7 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
 
   Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
-  /** If @c true, the talker alias (name) is send. */
+  /** If @c true, the talker alias (name) is sent. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
   /** Specifies the talker alias source. */
   Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
@@ -1611,9 +1611,9 @@ public:
   /** Sets the SMS format. */
   void setSMSFormat(SMSFormat format);
 
-  /** Returns @c true if the talker alias is send. */
+  /** Returns @c true if the talker alias is sent. */
   bool sendTalkerAlias() const;
-  /** Enables/disbales sending talker alias. */
+  /** Enables/disables sending talker alias. */
   void enableSendTalkerAlias(bool enable);
 
   /** Returns the talker alias source. */
@@ -1668,7 +1668,7 @@ class AnytoneGPSSettingsExtension: public ConfigItem
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
 
   Q_CLASSINFO("positionReportingDescription", "Enables GPS range reporting.")
-  /** Enables GPS range reporing. */
+  /** Enables GPS range reporting. */
   Q_PROPERTY(bool reportPosition READ positionReportingEnabled WRITE enablePositionReporting)
 
   Q_CLASSINFO("updatePeriodDescription", "Specifies the GPS reporting interval in seconds.")
@@ -1711,7 +1711,7 @@ public:
   /** Sets the time zone. */
   void setTimeZone(const QTimeZone &zone);
 
-  /** Returns @c true if the GPS range reporing is enabled. */
+  /** Returns @c true if the GPS range reporting is enabled. */
   bool positionReportingEnabled() const;
   /** Enables/disables the GPS range reporting. */
   void enablePositionReporting(bool enable);
@@ -1769,7 +1769,7 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   Q_PROPERTY(bool rangeCheck READ repeaterRangeCheckEnabled WRITE enableRepeaterRangeCheck)
 
   Q_CLASSINFO("checkIntervalDescription", "Repeater range check interval in seconds.")
-  /** Repeater range check intervall in seconds. */
+  /** Repeater range check interval in seconds. */
   Q_PROPERTY(Interval checkInterval READ repeaterCheckInterval WRITE setRepeaterCheckInterval)
 
   Q_CLASSINFO("retryCount", "Number of retries to connect to a repeater before giving up.")
@@ -1826,7 +1826,7 @@ public:
   /** Sets the auto-roam delay in seconds. */
   void setAutoRoamDelay(Interval sec);
 
-  /** Retruns @c true if the repeater range check is enabled. */
+  /** Returns @c true if the repeater range check is enabled. */
   bool repeaterRangeCheckEnabled() const;
   /** Enables/disables repeater range check. */
   void enableRepeaterRangeCheck(bool enable);
@@ -1978,7 +1978,7 @@ protected:
 };
 
 
-/** Implements the device specific extension for the gerneral settings of AnyTone devices.
+/** Implements the device specific extension for the general settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
  * One for each topic.
@@ -2024,7 +2024,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The keep-last-caller setting. */
   Q_PROPERTY(bool keepLastCaller READ keepLastCallerEnabled WRITE enableKeepLastCaller)
 
-  Q_CLASSINFO("vfoStepDescription", "Specifes the VFO tuning steps in kHz.")
+  Q_CLASSINFO("vfoStepDescription", "Specifies the VFO tuning steps in kHz.")
   /** The VFO tuning step-size in kHz. */
   Q_PROPERTY(Frequency vfoStep READ vfoStep WRITE setVFOStep)
 
@@ -2153,9 +2153,9 @@ public:
   /** Sets the mode for VFO B. */
   void setModeB(VFOMode mode);
 
-  /** Retruns a reference to the current zone for VFO A. */
+  /** Returns a reference to the current zone for VFO A. */
   ZoneReference *zoneA();
-  /** Retruns a reference to the current zone for VFO A. */
+  /** Returns a reference to the current zone for VFO A. */
   const ZoneReference *zoneA() const;
   /** Returns a reference to the current zone for VFO B. */
   ZoneReference *zoneB();
@@ -2204,7 +2204,7 @@ public:
   STEType steType() const;
   /** Sets the STE (squelch tail elimination) type. */
   void setSTEType(STEType type);
-  /** Retruns the STE (squelch tail elimination) frequency in Hz.
+  /** Returns the STE (squelch tail elimination) frequency in Hz.
    * A frequency of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
   double steFrequency() const;
   /** Sets the STE (squelch tail elimination) frequency in Hz.

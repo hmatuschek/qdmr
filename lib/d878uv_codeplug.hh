@@ -143,7 +143,7 @@ class GPSSystem;
  *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings,
  *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settigs.</td></tr>
+ *  <tr><td>02501280</td> <td>000030</td> <td>Unknown settings.</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
  *
@@ -222,8 +222,8 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">Unknown settings.</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C1090</td> <td>000040</td> <td>Uknown, filled with 0xff.</td></tr>
- *  <tr><td>02504000</td> <td>000400</td> <td>Uknown, filled with 0xff.</td></tr>
+ *  <tr><td>024C1090</td> <td>000040</td> <td>Unknown, filled with 0xff.</td></tr>
+ *  <tr><td>02504000</td> <td>000400</td> <td>Unknown, filled with 0xff.</td></tr>
  * </table>
  *
  * @ingroup d878uv */
@@ -611,12 +611,12 @@ public:
     /** Enables/disables bluetooth. */
     virtual void enableBluetooth(bool enable);
 
-    /** Returns @c true if the internal mic is addionally active when BT is active. */
+    /** Returns @c true if the internal mic is additionally active when BT is active. */
     virtual bool btAndInternalMic() const;
     /** Enables/disables the internal mic when BT is active. */
     virtual void enableBTAndInternalMic(bool enable);
 
-    /** Returns @c true if the internal speaker is addionally active when BT is active. */
+    /** Returns @c true if the internal speaker is additionally active when BT is active. */
     virtual bool btAndInternalSpeaker() const;
     /** Enables/disables the internal speaker when BT is active. */
     virtual void enableBTAndInternalSpeaker(bool enable);
@@ -631,11 +631,11 @@ public:
     /** Sets the GPS ranging interval in seconds. */
     virtual void setGPSUpdatePeriod(Interval sec);
 
-    /** Retunrs the bluetooth microphone gain [1,10]. */
+    /** Returns the bluetooth microphone gain [1,10]. */
     virtual unsigned int btMicGain() const;
     /** Sets the bluetooth microphone gain [1,10]. */
     virtual void setBTMicGain(unsigned int gain);
-    /** Retunrs the bluetooth speaker gain [1,10]. */
+    /** Returns the bluetooth speaker gain [1,10]. */
     virtual unsigned int btSpeakerGain() const;
     /** Sets the bluetooth speaker gain [1,10]. */
     virtual void setBTSpeakerGain(unsigned int gain);
@@ -718,7 +718,7 @@ public:
     /** Sets the auto-repeater direction for VFO B. */
     virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** If enabled, the FM ID is send together with selected contact. */
+    /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);
@@ -1204,7 +1204,7 @@ public:
     /** Disables auto tx. */
     virtual void disableAutoTX();
 
-    /** Returns @c true if a fixed location is send. */
+    /** Returns @c true if a fixed location is sent. */
     virtual bool fixedLocationEnabled() const;
     /** Returns the fixed location send. */
     virtual QGeoCoordinate fixedLocation() const;

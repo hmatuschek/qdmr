@@ -31,7 +31,7 @@ class RoamingChannel : public ConfigObject
   Q_PROPERTY(DMRChannel::TimeSlot timeSlot READ timeSlot WRITE setTimeSlot SCRIPTABLE false)
 
 public:
-  /** Default constuctor for a roaming channel. */
+  /** Default constructor for a roaming channel. */
   explicit RoamingChannel(QObject *parent = nullptr);
   /** Copy constructor. */
   RoamingChannel(const RoamingChannel &other, QObject *parent=nullptr);
@@ -70,7 +70,7 @@ public:
 
 public:
   /** Helper method to construct a Roaming channel from a given DMR channel. Optionally with
-   * reference to a thid one. */
+   * reference to a third one. */
   static RoamingChannel *fromDMRChannel(DMRChannel *ch, DMRChannel *ref=nullptr);
 
 protected:
