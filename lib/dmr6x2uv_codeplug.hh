@@ -434,7 +434,7 @@ public:
     /** Enables/disables remote monitor. */
     virtual void enableRemoteMonitor(bool enable);
 
-    /** Retunrs @c true, if the selection of a TX contact is enabled. */
+    /** Returns @c true, if the selection of a TX contact is enabled. */
     virtual bool selectTXContactEnabled() const;
     /** Enables/disables selection of the TX contact. */
     virtual void enableSelectTXContact(bool enable);
@@ -485,7 +485,7 @@ public:
     /** Sets the priority zone B index. */
     virtual void setPriorityZoneBIndex(unsigned idx);
 
-    /** Returns @c true, if a SMS confirmation is send. */
+    /** Returns @c true, if a SMS confirmation is sent. */
     virtual bool smsConfirmEnabled() const;
     /** Enables/disables SMS confirmation. */
     virtual void enableSMSConfirm(bool enable);
@@ -549,7 +549,7 @@ public:
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** If enabled, the FM ID is send together with selected contact. */
+    /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);
@@ -730,7 +730,7 @@ public:
     /** Sets the number of times, a repeater reconnection is tried (3-5). */
     virtual void setRepeaterRangeCheckCount(unsigned int n);
 
-    /** Retunrs the roaming zone index. */
+    /** Returns the roaming zone index. */
     virtual unsigned int defaultRoamingZoneIndex() const;
     /** Sets the roaming zone index. */
     virtual void setDefaultRoamingZoneIndex(unsigned int index);
