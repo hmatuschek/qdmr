@@ -156,7 +156,7 @@ Melody::quantizationTimingError(const QVector<QPair<double, unsigned int> > &ton
  * Implementation of Melody::Note
  * ********************************************************************************************* */
 Melody::Note::Note()
-  : tone(Tone::C), duration(Duration::Quater), dotted(false), octave(0)
+  : tone(Tone::C), duration(Duration::Quarter), dotted(false), octave(0)
 {
   // pass...
 }
@@ -190,7 +190,7 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
     if (0 == note_match.capturedLength(3)) duration = currentDuration;
     else if ("1" == note_match.captured(3)) duration = Duration::Whole;
     else if ("2" == note_match.captured(3)) duration = Duration::Half;
-    else if ("4" == note_match.captured(3)) duration = Duration::Quater;
+    else if ("4" == note_match.captured(3)) duration = Duration::Quarter;
     else if ("8" == note_match.captured(3)) duration = Duration::Eighth;
     else if ("16" == note_match.captured(3)) duration = Duration::Sixteenth;
     else return false;
@@ -206,7 +206,7 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
     if (0 == note_match.capturedLength(1)) duration = currentDuration;
     else if ("1" == note_match.captured(1)) duration = Duration::Whole;
     else if ("2" == note_match.captured(1)) duration = Duration::Half;
-    else if ("4" == note_match.captured(1)) duration = Duration::Quater;
+    else if ("4" == note_match.captured(1)) duration = Duration::Quarter;
     else if ("8" == note_match.captured(1)) duration = Duration::Eighth;
     else if ("16" == note_match.captured(1)) duration = Duration::Sixteenth;
     else return false;
@@ -248,7 +248,7 @@ Melody::Note::toLilypond(Duration currentDuration) const {
     switch (duration) {
     case Duration::Whole: res.append("1"); break;
     case Duration::Half: res.append("2"); break;
-    case Duration::Quater: res.append("4"); break;
+    case Duration::Quarter: res.append("4"); break;
     case Duration::Eighth: res.append("8"); break;
     case Duration::Sixteenth: res.append("16"); break;
     }
@@ -266,7 +266,7 @@ Melody::Note::toTone(unsigned int bpm) const {
     dur = bar; if (dotted) dur += dur/2;
   } else if (Duration::Half == duration) {
     dur = bar/2; if (dotted) dur += dur/2;
-  } else if (Duration::Quater == duration) {
+  } else if (Duration::Quarter == duration) {
     dur = bar/4; if (dotted) dur += dur/2;
   } else if (Duration::Eighth == duration) {
     dur = bar/8; if (dotted) dur += dur/2;
@@ -325,7 +325,7 @@ Melody::Note::infer(double frequency, unsigned int ms, unsigned int bpm) {
     octave = 0; tone = Tone::Rest;
   } else {
     logWarn() << "Cannot infer a note of frequency and duration 0.";
-    octave = 0; tone = Tone::Rest; duration = Duration::Quater; dotted=false;
+    octave = 0; tone = Tone::Rest; duration = Duration::Quarter; dotted=false;
   }
 
   // Try to infer note duration from duration and BPM
@@ -339,7 +339,7 @@ Melody::Note::infer(double frequency, unsigned int ms, unsigned int bpm) {
     duration = Duration::Half;
     diff = std::abs((int)ms-(int)bar/2);
   } else if (3 > fraction) {
-    duration = Duration::Quater;
+    duration = Duration::Quarter;
     diff = std::abs((int)ms-(int)bar/4);
   } else if (4 > fraction) {
     duration = Duration::Eighth;

@@ -34,7 +34,7 @@ public:
     };
     /** Note durations as fractions of a bar. */
     enum class Duration {
-      Whole, Half, Quater, Eighth, Sixteenth
+      Whole, Half, Quarter, Eighth, Sixteenth
     };
 
     /** The note tone. */
