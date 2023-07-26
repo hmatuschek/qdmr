@@ -11,7 +11,7 @@
  * This however, comes with some difficulties. While the translation from musical notation to
  * tone frequencies and durations is easy, the reverse direction is not. The note duration is the
  * most difficult. In musical notation, durations are expressed in terms of fractions of a bar,
- * implicitly defined by the beat frequency. This additional information must be infered. To achive
+ * implicitly defined by the beat frequency. This additional information must be inferred. To achieve
  * this, this class searches for the BPM, that minimizes the quantization error in the duration
  * while keeping the BPM as close as possible to 100 BPM. Yes, this is utterly over-engineered.
  *
@@ -46,7 +46,7 @@ public:
     /** The octave of the note, 0 means middle. */
     int octave;
 
-    /** Default constructor. A middle C quater note. */
+    /** Default constructor. A middle C quarter note. */
     Note();
 
     /** Reads a note in Lilypond notation. */
@@ -60,7 +60,7 @@ public:
 
     /** Infers the note from the given frequency and duration in ms.
      * This is guesswork, consequently there will be some issues. The function updates the note and
-     * returns the timeing error in ms. */
+     * returns the timing error in ms. */
     unsigned int infer(double frequency, unsigned int ms, unsigned int bpm);
 
     /** Computes the quantization timing error for the given duration and BPM. */

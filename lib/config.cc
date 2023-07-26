@@ -394,7 +394,7 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     return false;
   if (node["roamingZones"] && (! _roamingZones->parse(node["roamingZones"], ctx, err)))
     return false;
-  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  /** @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0.*/
   else if (node["roaming"] && (! _roamingZones->parse(node["roaming"], ctx, err)))
     return false;
 
@@ -447,7 +447,7 @@ Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) 
     return false;
   if (node["roamingZones"] && (! _roamingZones->link(node["roamingZones"], ctx, err)))
     return false;
-  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  /** @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0.*/
   else if (node["roaming"] && (! _roamingZones->link(node["roaming"], ctx, err)))
     return false;
 

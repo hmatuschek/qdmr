@@ -106,7 +106,7 @@ cc | Auto repeater UHF 1 min frequency in 10Hz, 32bit uint, little endian       
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d0 | Auto repeater UHF 1 max frequency in 10Hz, 32bit uint, little endian                                                          |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-d4 | Auto rep. VFO B direction     | Addrbook is send w own code   | Unused set to 0x00            | Boot channel enable           |
+d4 | Auto rep. VFO B direction     | Addrbook is sent w own code   | Unused set to 0x00            | Boot channel enable           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d8 | VFO A default zone index      | VFO B default zone index      | VFO A default channel index   | VFO B default channel index   |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -149,7 +149,7 @@ Field description:
     - LKB: Keyboard lock
     - LKN: Knob lock
   - Other settings:
-    - Addrbook is send w own code: Analog call send radio ID together with selected address book entry.
+    - Addrbook is sent w own code: Analog call send radio ID together with selected address book entry.
     - Transmit timeout in multiples of 30s. 0=Off, 1=30s, ..., 8=240s
     - Language: 0=English, 1=German
     - VFO frequency step: 0=2.5kHz, 1=5kHz, 2=6.25kHz, 3=8.33kHz, 4=10kHz, 5=12.5kHz, 6=20kHz, 7=25kHz

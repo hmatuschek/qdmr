@@ -102,7 +102,7 @@ c4 | Auto repeater lower UHF frequency, in 10Hz, little endian                  
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 c8 | Auto repeater upper UHF frequency, in 10Hz, little endian                                                                     |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-cc | Auto repeater B direction     | AddrBk is send with own code  | Enable default boot channel   | Boot zone A idx               |
+cc | Auto repeater B direction     | AddrBk is sent with own code  | Enable default boot channel   | Boot zone A idx               |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 d0 | Boot zone B idx               | Boot ch A idx, 0xff=VFO       | Boot ch B idx, 0xff=VFO       | Enable keep last caller       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

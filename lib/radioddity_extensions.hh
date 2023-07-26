@@ -53,7 +53,7 @@ class RadiodditySettingsExtension: public ConfigExtension
               "there is no activity on the current channel. However, the radio may need some time "
               "to wake up from this mode. Hence, the 'wakeupPreamble' need to be enabled by all "
               "radios in the network to provide this wake-up delay.")
-  /** If @c true, a wakeup preamble is send. */
+  /** If @c true, a wakeup preamble is sent. */
   Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
   Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
               "preamble before each call.")
@@ -196,7 +196,7 @@ public:
   bool powerSaveMode() const;
   /** Enables the power save mode. */
   void enablePowerSaveMode(bool enable);
-  /** Returns @c true if the wake-up preamble is send. */
+  /** Returns @c true if the wake-up preamble is sent. */
   bool wakeupPreamble() const;
   /** Enables transmission of wakeup preamble. */
   void enableWakeupPreamble(bool enable);
@@ -284,7 +284,7 @@ protected:
   bool _disableAllTones;
   /** If @c true, the power save mode is enabled. */
   bool _powerSaveMode;
-  /** If @c true, the wake-up preamble is send. */
+  /** If @c true, the wake-up preamble is sent. */
   bool _wakeupPreamble;
   /** If @c true, all LEDs are disabled. */
   bool _disableAllLEDs;
