@@ -171,7 +171,7 @@ public:
     /** Prints a textual representation of the image into the given stream. */
 		void dump(QTextStream &stream) const;
 
-    /** Retunrs @c true if the specified address is allocated. */
+    /** Returns @c true if the specified address is allocated. */
     virtual bool isAllocated(uint32_t offset) const;
 
     /** Returns a pointer to the encoded raw data at the specified offset. */

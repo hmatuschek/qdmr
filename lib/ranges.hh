@@ -23,7 +23,7 @@ public:
   }
 
   /** Checks, if the given value lays within the range. */
-  inline T conains(const T &n) const {
+  inline T contains(const T &n) const {
     return ((lower<n) || (lower==n)) && ((n<upper) || (n==upper));
   }
 
