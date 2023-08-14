@@ -372,6 +372,12 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset {
+      /// @todo Implement
+    };
   };
 
   /** Represents the channel bitmaps in all AnyTone codeplugs. */

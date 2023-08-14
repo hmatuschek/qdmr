@@ -1,10 +1,70 @@
 #include "anytone_extension.hh"
+#include "signaling.hh"
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequency
+ * ********************************************************************************************* */
+AnytoneAPRSFrequency::AnytoneAPRSFrequency(QObject *parent)
+  : ConfigObject(parent), _frequency(Frequency::fromHz(0))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAPRSFrequency::clone() const {
+  AnytoneAPRSFrequency *obj = new AnytoneAPRSFrequency();
+  if (! obj->copy(*this)) {
+    obj->deleteLater();
+    return nullptr;
+  }
+  return obj;
+}
+
+Frequency
+AnytoneAPRSFrequency::frequency() const {
+  return _frequency;
+}
+void
+AnytoneAPRSFrequency::setFrequency(Frequency freq) {
+  if (_frequency == freq)
+    return;
+  _frequency = freq;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequencyRef
+ * ********************************************************************************************* */
+AnytoneAPRSFrequencyRef::AnytoneAPRSFrequencyRef(QObject *parent)
+  : ConfigObjectReference(AnytoneAPRSFrequency::staticMetaObject, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneAPRSFrequencyList
+ * ********************************************************************************************* */
+AnytoneAPRSFrequencyList::AnytoneAPRSFrequencyList(QObject *parent)
+  : ConfigObjectList(AnytoneAPRSFrequency::staticMetaObject, parent)
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneAPRSFrequencyList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err);
+  return new AnytoneAPRSFrequency();
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneChannelExtension
  * ********************************************************************************************* */
 AnytoneChannelExtension::AnytoneChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false)
+  : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false),
+    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this))
 {
   // pass...
 }
@@ -43,6 +103,11 @@ AnytoneChannelExtension::enableHandsFree(bool enable) {
     return;
   _handsFree = enable;
   emit modified(this);
+}
+
+AnytoneAPRSFrequencyRef *
+AnytoneChannelExtension::fmAPRSFrequency() const {
+  return _fmAPRSFrequency;
 }
 
 
@@ -2673,4 +2738,176 @@ AnytoneSimplexRepeaterSettingsExtension::setTimeSlot(TimeSlot ts) {
     return;
   _timeSlot = ts;
   emit modified(this);
+}
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneFMAPRSSettingsExtension
+ * ********************************************************************************************* */
+AnytoneFMAPRSSettingsExtension::AnytoneFMAPRSSettingsExtension(QObject *parent)
+  : ConfigExtension(parent), _txDelay(Interval::fromMilliseconds(60)),
+    _preWaveDelay(Interval::fromMilliseconds(0)), _passAll(false), _reportPosition(false),
+    _reportMicE(false), _reportObject(false), _reportItem(false), _reportMessage(false),
+    _reportWeather(false), _reportNMEA(false), _reportStatus(false), _reportOther(false),
+    _frequencies(new AnytoneAPRSFrequencyList(this))
+{
+  // pass...
+}
+
+ConfigItem *
+AnytoneFMAPRSSettingsExtension::clone() const {
+  AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+Interval
+AnytoneFMAPRSSettingsExtension::txDelay() const {
+  return _txDelay;
+}
+void
+AnytoneFMAPRSSettingsExtension::setTXDelay(Interval intv) {
+  if (_txDelay == intv)
+    return;
+  _txDelay = intv;
+  emit modified(this);
+}
+
+Interval
+AnytoneFMAPRSSettingsExtension::preWaveDelay() const {
+  return _preWaveDelay;
+}
+void
+AnytoneFMAPRSSettingsExtension::setPreWaveDelay(Interval intv) {
+  if (_preWaveDelay == intv)
+    return;
+  _preWaveDelay = intv;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::passAll() const {
+  return _passAll;
+}
+void
+AnytoneFMAPRSSettingsExtension::enablePassAll(bool enable) {
+  if (_passAll == enable)
+    return;
+  _passAll = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportPosition() const {
+  return _reportPosition;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportPosition(bool enable) {
+  if (_reportPosition == enable)
+    return;
+  _reportPosition = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportMicE() const {
+  return _reportMicE;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportMicE(bool enable) {
+  if (_reportMicE == enable)
+    return;
+  _reportMicE = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportObject() const {
+  return _reportObject;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportObject(bool enable) {
+  if (_reportObject == enable)
+    return;
+  _reportObject = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportItem() const {
+  return _reportItem;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportItem(bool enable) {
+  if (_reportItem == enable)
+    return;
+  _reportItem = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportMessage() const {
+  return _reportMessage;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportMessage(bool enable) {
+  if (_reportMessage == enable)
+    return;
+  _reportMessage = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportWeather() const {
+  return _reportWeather;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportWeather(bool enable) {
+  if (_reportWeather == enable)
+    return;
+  _reportWeather = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportNMEA() const {
+  return _reportNMEA;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportNMEA(bool enable) {
+  if (_reportNMEA == enable)
+    return;
+  _reportNMEA = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportStatus() const {
+  return _reportStatus;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportStatus(bool enable) {
+  if (_reportStatus == enable)
+    return;
+  _reportStatus = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneFMAPRSSettingsExtension::reportOther() const {
+  return _reportOther;
+}
+void
+AnytoneFMAPRSSettingsExtension::enableReportOther(bool enable) {
+  if (_reportOther == enable)
+    return;
+  _reportOther = enable;
+  emit modified(this);
+}
+
+AnytoneAPRSFrequencyList *
+AnytoneFMAPRSSettingsExtension::frequencies() const {
+  return _frequencies;
 }
