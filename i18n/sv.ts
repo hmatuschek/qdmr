@@ -1976,17 +1976,17 @@
 <context>
     <name>PropertyDelegate</name>
     <message>
-        <location filename="../src/propertydelegate.cc" line="91"/>
+        <location filename="../src/propertydelegate.cc" line="97"/>
         <source>False</source>
         <translation>Falsk</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="92"/>
+        <location filename="../src/propertydelegate.cc" line="98"/>
         <source>True</source>
         <translation>Sann</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="111"/>
+        <location filename="../src/propertydelegate.cc" line="121"/>
         <source>[None]</source>
         <translation>[Ingen]</translation>
     </message>
@@ -1994,48 +1994,48 @@
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="347"/>
+        <location filename="../src/extensionwrapper.cc" line="349"/>
         <source>new element</source>
         <translation>nytt element</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="518"/>
+        <location filename="../src/extensionwrapper.cc" line="525"/>
         <source>Property</source>
         <translation>Egenskap</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="519"/>
+        <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Value</source>
         <translation>Värde</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="520"/>
+        <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Description</source>
         <translation>Beskrivning</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="576"/>
+        <location filename="../src/extensionwrapper.cc" line="583"/>
         <source>true</source>
         <translation>sann</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="577"/>
+        <location filename="../src/extensionwrapper.cc" line="584"/>
         <source>false</source>
         <translation>falsk</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="586"/>
-        <location filename="../src/extensionwrapper.cc" line="594"/>
+        <location filename="../src/extensionwrapper.cc" line="603"/>
+        <location filename="../src/extensionwrapper.cc" line="611"/>
         <source>[None]</source>
         <translation>[Ingen]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="596"/>
+        <location filename="../src/extensionwrapper.cc" line="613"/>
         <source>Instance of %1</source>
         <translation>Förekomst av &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="601"/>
+        <location filename="../src/extensionwrapper.cc" line="618"/>
         <source>List of %1 instances</source>
         <translation>Lista över %1 instanser</translation>
     </message>
