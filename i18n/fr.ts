@@ -55,7 +55,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Basiques</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
