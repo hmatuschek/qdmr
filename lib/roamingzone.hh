@@ -40,6 +40,8 @@ public:
   /** Clears the zone list. */
   void clear();
 
+  /** Returns @c true, if the given roaming channel is member of this zone. */
+  bool contains(const RoamingChannel *ch) const;
   /** Returns the roaming channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
   RoamingChannel *channel(int idx) const;
