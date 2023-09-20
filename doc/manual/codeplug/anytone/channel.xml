@@ -56,7 +56,7 @@
 </info>
 
 <para>
-  This section describes the common channel attributes. Theses attributes are shared between FM
+  This section describes the common channel attributes. These attributes are shared between FM
   and DMR channels.
 </para>
 
@@ -83,6 +83,13 @@
         setting is only applicable to the <productname>AT-D578UV</productname> device.</para>
     </listitem>
   </varlistentry>  
+  <varlistentry>
+    <term><token>fmAPRSFrequency</token></term>
+    <listitem>
+      <para>Optional alternative FM APRS frequency specified in the AnyTone extension to the APRS
+      settings.</para>
+    </listitem>
+  </varlistentry>  
 </variablelist>
 </section>
 
@@ -99,7 +106,7 @@
     <varlistentry>
       <term><token>reverseBurst</token></term>
       <listitem>
-        <para>If <token>true</token>, a CTCSS phase-reverse burst is send at the end of 
+        <para>If <token>true</token>, a CTCSS phase-reverse burst is sent at the end of 
           transmission. This phase reversal of the CTCSS tone at the end of the transmission
           can be used to prevent a noise tail at the end of the transmission on the receiver 
           side. See 

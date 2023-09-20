@@ -1,7 +1,7 @@
 /** @defgroup dmr6x2uv BTECH DMR-6X2UV
  * Device specific classes for BTECH DMR-6X2UV.
  *
- * Athough labeled BTECH (Baofeng USA), this device is basically a relabled AnyTone AT-D868UV.
+ * Although labeled BTECH (Baofeng USA), this device is basically a relabeled AnyTone AT-D868UV.
  * However, there are some minor differences in the codeplug format, hence it needs a separate
  * implementation.
  *

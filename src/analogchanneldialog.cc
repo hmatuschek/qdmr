@@ -80,8 +80,8 @@ AnalogChannelDialog::construct() {
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
   channelName->setText(_myChannel->name());
-  rxFrequency->setText(format_frequency(_myChannel->rxFrequency()));
-  txFrequency->setText(format_frequency(_myChannel->txFrequency()));
+  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
+  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
   if (! _myChannel->defaultPower()) {
     powerDefault->setChecked(false); powerValue->setEnabled(true);
     switch (_myChannel->power()) {
@@ -134,8 +134,8 @@ FMChannel *
 AnalogChannelDialog::channel()
 {
   _myChannel->setName(channelName->text());
-  _myChannel->setRXFrequency(read_frequency(rxFrequency->text()));
-  _myChannel->setTXFrequency(read_frequency(txFrequency->text()));
+  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
+  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
   if (powerDefault->isChecked()) {
     _myChannel->setDefaultPower();
   } else {

@@ -230,7 +230,7 @@ public:
 protected:
   virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
-  /** Helper for find the @c IdPrefix class info in the class hierachy. */
+  /** Helper to find the @c IdPrefix class info in the class hierarchy. */
   static QString findIdPrefix(const QMetaObject* meta);
 
 protected:

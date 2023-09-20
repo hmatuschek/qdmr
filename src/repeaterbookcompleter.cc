@@ -234,7 +234,9 @@ RepeaterBookEntry::toCache() const {
  * RepeaterBookList
  * ********************************************************************************************* */
 RepeaterBookList::RepeaterBookList(QObject *parent)
-  : QAbstractListModel(parent), _network(), _currentReply(nullptr)
+  : QAbstractListModel(parent), _network(), _currentReply(nullptr),
+    _callsignPattern(R"re(([a-z]|[a-z0-9][a-z]|[a-z][a-z0-9])[0-9]+[a-z]*)re",
+                     QRegularExpression::CaseInsensitiveOption)
 {
   load();
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
@@ -402,20 +404,31 @@ RepeaterBookList::store() const {
 }
 
 void
-RepeaterBookList::search(const QString &call) {
+RepeaterBookList::search(const QString &text) {
   // Cancel running requests
   if (_currentReply)
     _currentReply->abort();
+
+  QRegularExpressionMatch match = _callsignPattern.match(text);
+  if (! match.hasMatch())
+    return;
+  QString call = match.captured().toUpper();
+  logDebug() << "Search for (partial) call '" << call << "'.";
 
   if ((_queries.contains(call)) && (_queries[call].daysTo(QDateTime::currentDateTime())<3))
     return;
 
   QUrl url("https://www.repeaterbook.com/api/exportROW.php");
   QUrlQuery query;
-  query.addQueryItem("callsign", QString("%1%").arg(call.toUpper()));
+  query.addQueryItem("callsign", QString("%1%").arg(call));
   url.setQuery(query);
-  logDebug() << "Query RepeaterBook at " << url.toString();
   QNetworkRequest request(url);
+  request.setHeader(
+        QNetworkRequest::UserAgentHeader,
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/115.0.0.0 Safari/537.36 Edg/114.0.1823.86");
+  logDebug() << "Query RepeaterBook at " << url.toString()
+             << " as '" << request.header(QNetworkRequest::UserAgentHeader).toString() << "'.";
   _currentReply = _network.get(request);
 }
 
@@ -428,10 +441,12 @@ RepeaterBookList::onRequestFinished(QNetworkReply *reply) {
     return;
   }
 
+  QByteArray content = reply->readAll();
   QJsonParseError err;
-  QJsonDocument doc = QJsonDocument::fromJson(reply->readAll(), &err);
+  QJsonDocument doc = QJsonDocument::fromJson(content, &err);
   if (doc.isNull()) {
     logError() << "Cannot parse response: " << err.errorString() << ".";
+    logDebug() << "Got '" << content << "'.";
     reply->deleteLater();
     _currentReply = nullptr;
     return;

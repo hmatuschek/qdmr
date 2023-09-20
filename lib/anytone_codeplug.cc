@@ -757,8 +757,8 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   }
 
   ch->setName(name());
-  ch->setRXFrequency(rxFrequency());
-  ch->setTXFrequency(txFrequency());
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
 
@@ -824,8 +824,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency());
-  setTXFrequency(c->txFrequency());
+  setRXFrequency(c->rxFrequency().inHz());
+  setTXFrequency(c->txFrequency().inHz());
   // set power
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
@@ -4545,7 +4545,15 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     if (config->posSystems()->system(i)->is<GPSSystem>()) {
       ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d); d++;
     } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
+      auto *aprs = config->posSystems()->system(i)->as<APRSSystem>();
+      ctx.add(aprs, a); a++;
+      // Index FM APRS frequencies (referenced in channel extensions).
+      if (auto *ext = aprs->anytoneExtension()) {
+        for (int j=0; j<ext->frequencies()->count(); j++) {
+          // Index 0 = default, so index is 1-based
+          ctx.add(ext->frequencies()->get(j)->as<AnytoneAPRSFrequency>(), j+1);
+        }
+      }
     }
   }
 
@@ -4570,6 +4578,8 @@ AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
   Context ctx(config);
   // Register table for auto-repeater offsets
   ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
+  // Register table for FM APRS frequencies
+  ctx.addTable(&AnytoneAPRSFrequency::staticMetaObject);
 
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode anytone codeplug.";
@@ -4597,8 +4607,11 @@ bool
 AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
   // Maps code-plug indices to objects
   Context ctx(config);
+
   // Register table for auto-repeater offsets
   ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
+  // Register table for FM APRS frequencies
+  ctx.addTable(&AnytoneAPRSFrequency::staticMetaObject);
 
   return this->decodeElements(ctx, err);
 }

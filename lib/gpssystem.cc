@@ -195,7 +195,7 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(QObject *parent)
   : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
-    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message()
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(), _anytone(nullptr)
 {
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -205,7 +205,7 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message), _anytone(nullptr)
 {
   // Set channel reference
   _channel.set(channel);
@@ -316,6 +316,23 @@ void
 APRSSystem::setMessage(const QString &msg) {
   _message = msg;
   emit modified(this);
+}
+
+AnytoneFMAPRSSettingsExtension *
+APRSSystem::anytoneExtension() const {
+  return _anytone;
+}
+void
+APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
+  if (_anytone) {
+    _anytone->deleteLater();
+    _anytone = nullptr;
+  }
+  if (ext) {
+    _anytone = ext;
+    ext->setParent(this);
+    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
 }
 
 YAML::Node

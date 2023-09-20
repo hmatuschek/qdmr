@@ -13,7 +13,7 @@ class AbstractConfigObjectList;
 
 /** Base visitor class for the config tree.
  *
- *  This class can be used to implement a convenient tree taversal for the entrie configuration.
+ *  This class can be used to implement a convenient tree taversal for the entry configuration.
  *
  * @ingroup config */
 class Visitor
@@ -75,7 +75,7 @@ public:
   virtual bool processUnknownType(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
 
   /** Traverses the specified config item.
-   * This method calles @c processProperty on all properties of the item. */
+   * This method calls @c processProperty on all properties of the item. */
   virtual bool processItem(ConfigItem *item, const ErrorStack &err=ErrorStack());
 
   /** Traverses the list of objects or references.

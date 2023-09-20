@@ -40,9 +40,9 @@ RoamingChannelDialog::construct() {
 
   ui->name->setText(_myChannel->name());
   ui->rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  ui->rxFrequency->setText(format_frequency(_myChannel->rxFrequency()));
+  ui->rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
   ui->txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  ui->txFrequency->setText(format_frequency(_myChannel->txFrequency()));
+  ui->txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
   ui->timeSlot->addItem(tr("TS 1"), QVariant::fromValue(DMRChannel::TimeSlot::TS1));
   ui->timeSlot->addItem(tr("TS 2"), QVariant::fromValue(DMRChannel::TimeSlot::TS2));
   ui->timeSlot->setCurrentIndex(
@@ -77,8 +77,8 @@ RoamingChannelDialog::onOverrideColorCodeToggled(bool override) {
 RoamingChannel *
 RoamingChannelDialog::channel() {
   _myChannel->setName(ui->name->text().simplified());
-  _myChannel->setRXFrequency(read_frequency(ui->rxFrequency->text()));
-  _myChannel->setTXFrequency(read_frequency(ui->txFrequency->text()));
+  _myChannel->setRXFrequency(Frequency::fromString(ui->rxFrequency->text()));
+  _myChannel->setTXFrequency(Frequency::fromString(ui->txFrequency->text()));
   _myChannel->setTimeSlot(ui->timeSlot->currentData().value<DMRChannel::TimeSlot>());
   _myChannel->overrideTimeSlot(! ui->overrideTimeSlot->isChecked());
   _myChannel->setColorCode(ui->colorCode->value());

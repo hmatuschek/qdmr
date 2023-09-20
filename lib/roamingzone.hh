@@ -59,10 +59,10 @@ public:
   RoamingChannelRefList *channels();
 
   /** Links the channel reference list.
-   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+   * @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0. */
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err);
   /** Serializes the channel reference list.
-   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+   * @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0. */
   bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
