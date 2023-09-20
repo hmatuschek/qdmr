@@ -1887,8 +1887,8 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context
     ch->setTXFrequency(fmFrequency());
     ch->setPower(power());
     ch->setTXTone(txTone());
-    logInfo() << "No matching APRS channel found for TX frequency " << fmFrequency().inMHz()
-              << "MHz, create one as 'APRS Channel'";
+    logInfo() << "No matching APRS channel found for TX frequency " << fmFrequency().format()
+              << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
   sys->setRevertChannel(ch);
