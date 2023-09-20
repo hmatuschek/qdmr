@@ -255,66 +255,80 @@ ConfigItem::compare(const ConfigItem &other) const {
     // Handle comparison of basic types
     if ((prop.isEnumType()) || (QVariant::Bool == prop.type()) || (QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
       int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
-      if (a<b) return -1;
-      if (a>b) return 1;
+      if (a<b)
+        return -1;
+      if (a>b)
+        return 1;
       continue;
     }
 
     if (QVariant::Double == prop.type()) {
       double a=prop.read(this).toDouble(), b=oprop.read(&other).toDouble();
-      if (a<b) return -1;
-      if (a>b) return 1;
+      if (a<b)
+        return -1;
+      if (a>b)
+        return 1;
       continue;
     }
 
     if (QVariant::String == prop.type()) {
       int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
-      if (cmp) return cmp;
+      if (cmp)
+        return cmp;
       continue;
     }
 
     if (QString("Frequency") == prop.typeName()) {
       Frequency a = prop.read(this).value<Frequency>(), b = oprop.read(&other).value<Frequency>();
-      if (a<b) return -1;
-      if (b<a) return 1;
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
       continue;
     }
 
     if (QString("Interval") == prop.typeName()) {
       Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
-      if (a<b) return -1;
-      if (b<a) return 1;
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
       continue;
     }
 
     if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       int cmp = ref->compare(*oprop.read(&other).value<ConfigObjectReference*>());
-      if (cmp) return cmp;
+      if (cmp)
+        return cmp;
       continue;
     }
 
     if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectList*>());
-      if (cmp) return cmp;
+      if (cmp)
+        return cmp;
       continue;
     }
 
-    if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
+    if (propIsInstance<ConfigObjectRefList>(prop)) {
+      ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>();
       int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectRefList*>());
-      if (cmp) return cmp;
+      if (cmp)
+        return cmp;
       continue;
     }
 
     if (propIsInstance<ConfigItem>(prop)) {
       // If the owned item is writeable -> clone if set in other
-      if (prop.read(&other).isNull() && !oprop.read(&other).isNull())
+      if (prop.read(this).isNull() && !oprop.read(&other).isNull())
         return -1;
-      if (!prop.read(&other).isNull() && oprop.read(&other).isNull())
+      if (!prop.read(this).isNull() && oprop.read(&other).isNull())
         return 1;
-      if (prop.read(&other).isNull() && oprop.read(&other).isNull())
+      if (prop.read(this).isNull() && oprop.read(&other).isNull())
         continue;
-      int cmp = prop.read(&other).value<ConfigItem*>()->compare(*oprop.read(&other).value<ConfigItem*>());
-      if (cmp) return cmp;
+      int cmp = prop.read(this).value<ConfigItem*>()->compare(*oprop.read(&other).value<ConfigItem*>());
+      if (cmp)
+        return cmp;
       continue;
     }
   }

@@ -71,7 +71,7 @@ class GPSSystem : public PositioningSystem
 
 public:
   /** Default constructor. */
-  explicit GPSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit GPSSystem(QObject *parent=nullptr);
   /** Constructor.
    *
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
@@ -164,7 +164,7 @@ public:
 
 public:
   /** Default constructor. */
-  explicit APRSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit APRSSystem(QObject *parent=nullptr);
   /** Constructor for a APRS system.
    * @param name Specifies the name of the APRS system. This property is just a name, it does not
    *        affect the radio configuration.

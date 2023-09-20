@@ -26,7 +26,7 @@ class Zone : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit Zone(QObject *parent=nullptr);
+  Q_INVOKABLE explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
   Zone(const QString &name, QObject *parent = nullptr);
 

@@ -11,17 +11,17 @@ CopyTest::CopyTest(QObject *parent)
 void
 CopyTest::testConfigClone() {
   QHash<ConfigObject *, ConfigObject *> map;
-  ErrorStack err;
-
   ConfigCloneVisitor cloner(map);
+
+  ErrorStack err;
   if (! cloner.process(&_basicConfig, err)) {
     QFAIL(err.format().toLocal8Bit().constData());
   }
 
   ConfigItem *item = cloner.takeResult(err);
-  QVERIFY(nullptr != item);
+  QVERIFY(item);
 
-  QVERIFY(0 == _basicConfig.compare(*item));
+  QCOMPARE(_basicConfig.compare(*item), 0);
 }
 
 void

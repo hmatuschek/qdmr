@@ -94,7 +94,7 @@ class DTMFContact: public AnalogContact
 
 public:
   /** Default constructor. */
-  explicit DTMFContact(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DTMFContact(QObject *parent=nullptr);
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
@@ -161,7 +161,7 @@ public:
 
 public:
   /** Default constructor. */
-  explicit DMRContact(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRContact(QObject *parent=nullptr);
 
   /** Constructs a DMR (digital) contact.
    * @param type   Specifies the call type (private, group, all-call).

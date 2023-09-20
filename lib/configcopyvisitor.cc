@@ -17,38 +17,41 @@ bool
 ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
   if (prop.isEnumType() || (QString("bool") == prop.typeName())
       || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
-      || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())) {
-    return Visitor::processProperty(item, prop, err);
-  } else if (prop.read(item).value<ConfigObjectReference *>()) {
-    // Do not handle references yet.
-    return true;
-  } else if (ConfigObjectRefList *refs = prop.read(item).value<ConfigObjectRefList *>()) {
-    // Reference lists are always owned by the item. So dig up the ref list and put it on the stack
-    ConfigItem *clone = dynamic_cast<ConfigItem *>(_stack.back());
+      || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
+      || (QString("Frequency") == prop.typeName())) {
+    if (! Visitor::processProperty(item, prop, err))
+      return false;
+    // Get clone
+    ConfigItem *clone = qobject_cast<ConfigItem*>(_stack.back());
     if (nullptr == clone) {
       errMsg(err) << "Unexpected element on the stack. Found object of type " <<
                      _stack.back()->metaObject()->className() << ", expected ConfigItem.";
       return false;
     }
-
+    // Find the property
     int pidx = clone->metaObject()->indexOfProperty(prop.name());
     if (0 > pidx) {
-      errMsg(err) << "Cannot read property " << prop.name() << " on element on stack.";
+      errMsg(err) << "Cannot set property " << prop.name() << " on element on stack.";
       return false;
     }
-
-    QVariant value = clone->metaObject()->property(pidx).read(clone);
-    if (!value.isValid()) {
-      errMsg(err) << "Cannot read property " << prop.name() << " on element on stack.";
+    // Set it
+    if (! clone->metaObject()->property(pidx).write(clone, prop.read(item))) {
+      errMsg(err) << "Cannot set property " << prop.name() << " on element on stack.";
       return false;
     }
-
-    _stack.push_back(value.value<ConfigObjectRefList *>());
-    if (! Visitor::processList(refs, err)) {
-      errMsg(err) << "Cannot process reference list in property " << prop.name() << ".";
+    return true;
+  } else if (propIsInstance<ConfigObjectReference>(prop)) {
+    // Get clone
+    ConfigItem *clone = qobject_cast<ConfigItem*>(_stack.back());
+    if (nullptr == clone) {
+      errMsg(err) << "Unexpected element on the stack. Found object of type " <<
+                     _stack.back()->metaObject()->className() << ", expected ConfigItem.";
       return false;
     }
-    _stack.pop_back();
+    // Set reference to same object, will be replaced later.
+    ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>();
+    ConfigObjectReference *cloneRef = prop.read(clone).value<ConfigObjectReference*>();
+    cloneRef->set(ref->as<ConfigObject>());
     return true;
   } else if (propIsInstance<ConfigItem>(prop)) {
     if (nullptr == prop.read(item).value<ConfigItem *>())
@@ -126,8 +129,36 @@ ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop,
     }
 
     _stack.push_back(value.value<ConfigObjectList *>());
-    if (! Visitor::processList(lst, err)) {
+    if (! processList(lst, err)) {
       errMsg(err) << "Cannot process object list in property " << prop.name() << ".";
+      return false;
+    }
+    _stack.pop_back();
+    return true;
+  } else if (ConfigObjectRefList *refs = prop.read(item).value<ConfigObjectRefList *>()) {
+    // Lists are always owned by the item. So dig up the parent and get the list
+    ConfigItem *clone = dynamic_cast<ConfigItem *>(_stack.back());
+    if (nullptr == clone) {
+      errMsg(err) << "Unexpected element on the stack. Found object of type " <<
+                     _stack.back()->metaObject()->className() << ", expected ConfigItem.";
+      return false;
+    }
+
+    int pidx = clone->metaObject()->indexOfProperty(prop.name());
+    if (0 > pidx) {
+      errMsg(err) << "Cannot read property " << prop.name() << " on element on stack.";
+      return false;
+    }
+
+    QVariant value = clone->metaObject()->property(pidx).read(clone);
+    if (!value.isValid()) {
+      errMsg(err) << "Cannot read property " << prop.name() << " on element on stack.";
+      return false;
+    }
+
+    _stack.push_back(value.value<ConfigObjectRefList *>());
+    if (! processList(refs, err)) {
+      errMsg(err) << "Cannot process reference list in property " << prop.name() << ".";
       return false;
     }
     _stack.pop_back();
@@ -173,7 +204,7 @@ ConfigCloneVisitor::processList(AbstractConfigObjectList *list, const ErrorStack
                   << _stack.back()->metaObject()->className() << ".";
       return false;
     }
-    // Just copy references, will be replaced later
+    // Just copy references, they will be replaced later
     for (int i=0; i<refs->count(); i++) {
       clone->add(refs->get(i));
     }

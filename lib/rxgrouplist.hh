@@ -20,7 +20,7 @@ class RXGroupList: public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit RXGroupList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit RXGroupList(QObject *parent=nullptr);
   /** Constructor.
    * @param name Specifies the name of the group list.
    * @param parent @c QObject parent instance. */
