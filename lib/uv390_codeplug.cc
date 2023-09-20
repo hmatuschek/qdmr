@@ -204,13 +204,12 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
     setPower(ctx.config()->settings()->power());
   else
     setPower(chan->power());
-  setSquelch(0);
+  // By default, set to global default value.
+  setSquelch(ctx.config()->settings()->squelch());
 
   if (chan->is<FMChannel>()) {
     const FMChannel *achan = chan->as<const FMChannel>();
-    if (achan->defaultSquelch())
-      setSquelch(ctx.config()->settings()->squelch());
-    else
+    if (! achan->defaultSquelch())
       setSquelch(achan->squelch());
   }
 

@@ -2144,7 +2144,7 @@ D868UVCodeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
 
 void
 D868UVCodeplug::allocateGPSSystems() {
-  image(0).addElement(Offset::dmrAPRSSettings(), DMRAPRSSettingsElement::size());
+  image(0).addElement(Offset::aprsSettings(), DMRAPRSSettingsElement::size());
   image(0).addElement(Offset::dmrAPRSMessage(), DMRAPRSMessageElement::size());
 }
 
@@ -2152,7 +2152,7 @@ bool
 D868UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
   return gps.fromConfig(flags, ctx);
 }
 
@@ -2177,7 +2177,7 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       systems.insert(ch.digitalAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
-  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
     gps.createGPSSystem(*idx, ctx);
   return true;
@@ -2187,7 +2187,7 @@ bool
 D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  DMRAPRSSettingsElement gps(data(Offset::dmrAPRSSettings()));
+  DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
   // Then link all referenced GPS systems
   for (uint8_t i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (! ctx.has<GPSSystem>(i))

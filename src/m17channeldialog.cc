@@ -77,8 +77,8 @@ M17ChannelDialog::construct() {
 
   if (_channel) {
     ui->channelName->setText(_myChannel->name());
-    ui->rxFrequency->setText(format_frequency(_myChannel->rxFrequency()));
-    ui->txFrequency->setText(format_frequency(_myChannel->txFrequency()));
+    ui->rxFrequency->setText(_myChannel->rxFrequency().format());
+    ui->txFrequency->setText(_myChannel->txFrequency().format());
     if (! _myChannel->defaultPower()) {
       ui->powerDefault->setChecked(false); ui->powerValue->setEnabled(true);
       switch (_myChannel->power()) {
@@ -114,8 +114,8 @@ M17ChannelDialog::construct() {
 M17Channel *
 M17ChannelDialog::channel() {
   _myChannel->setName(ui->channelName->text());
-  _myChannel->setRXFrequency(ui->rxFrequency->text().toDouble());
-  _myChannel->setTXFrequency(ui->txFrequency->text().toDouble());
+  _myChannel->setRXFrequency(Frequency::fromString(ui->rxFrequency->text()));
+  _myChannel->setTXFrequency(Frequency::fromString(ui->txFrequency->text()));
   if (ui->powerDefault->isChecked())
     _myChannel->setDefaultPower();
   else

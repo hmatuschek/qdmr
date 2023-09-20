@@ -122,10 +122,17 @@ TyTCallsignDB::EntryElement::set(const UserDatabase::User &user) {
 
   // Set name
   QString name = user.name;
-  if (! user.surname.isEmpty())
+  if ((! user.surname.isEmpty()) && (100 >= name.length() + 1 + user.surname.size()))
     name += " " + user.surname;
-  if (! user.country.isEmpty())
+  if ((! user.city.isEmpty()) && (100 >= name.length() + 2 + user.city.size()))
+    name += ", " + user.city;
+  if ((! user.state.isEmpty()) && (100 >= name.length() + 2 + user.state.size()))
+    name += ", " + user.state;
+  if ((! user.country.isEmpty()) && (100 >= name.length() + 2 + user.country.size()))
     name += ", " + user.country;
+  if ((! user.comment.isEmpty()) && (100 >= name.length() + 2 + user.comment.size()))
+    name += ". " + user.comment;
+
   encode_ascii(_data + 0x0014, name, 100);
 }
 
