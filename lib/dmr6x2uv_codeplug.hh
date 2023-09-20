@@ -99,12 +99,13 @@
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>DMR-APRS systems,
- *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
+ *  <tr><td>02501000</td> <td>0000A0</td> <td>APRS settings (DMR + FM),
+ *    see @c DMR6X2UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501280</td> <td>000030</td> <td>GPS template message, ASCII, 0-padded.</td> </tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -434,7 +435,7 @@ public:
     /** Enables/disables remote monitor. */
     virtual void enableRemoteMonitor(bool enable);
 
-    /** Retunrs @c true, if the selection of a TX contact is enabled. */
+    /** Returns @c true, if the selection of a TX contact is enabled. */
     virtual bool selectTXContactEnabled() const;
     /** Enables/disables selection of the TX contact. */
     virtual void enableSelectTXContact(bool enable);
@@ -485,7 +486,7 @@ public:
     /** Sets the priority zone B index. */
     virtual void setPriorityZoneBIndex(unsigned idx);
 
-    /** Returns @c true, if a SMS confirmation is send. */
+    /** Returns @c true, if a SMS confirmation is sent. */
     virtual bool smsConfirmEnabled() const;
     /** Enables/disables SMS confirmation. */
     virtual void enableSMSConfirm(bool enable);
@@ -549,7 +550,7 @@ public:
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** If enabled, the FM ID is send together with selected contact. */
+    /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);
@@ -730,7 +731,7 @@ public:
     /** Sets the number of times, a repeater reconnection is tried (3-5). */
     virtual void setRepeaterRangeCheckCount(unsigned int n);
 
-    /** Retunrs the roaming zone index. */
+    /** Returns the roaming zone index. */
     virtual unsigned int defaultRoamingZoneIndex() const;
     /** Sets the roaming zone index. */
     virtual void setDefaultRoamingZoneIndex(unsigned int index);
@@ -877,6 +878,224 @@ public:
 
   };
 
+  /** Represents the APRS settings within the binary DMR-6X2UV codeplug.
+   *
+   * Memory layout of APRS settings (size 0x00a0 bytes):
+   * @verbinclude dmr6x2uv_aprssetting.txt
+   */
+  class APRSSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    APRSSettingsElement(uint8_t *ptr, unsigned size);
+
+    /** Possible settings for the FM APRS subtone type. */
+    enum class SignalingType {
+      Off=0, CTCSS=1, DCS=2
+    };
+
+  public:
+    /** Constructor. */
+    explicit APRSSettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00a0; }
+
+    /** Resets the settings. */
+    void clear();
+    bool isValid() const;
+
+    /** Returns the FM APRS frequency. */
+    virtual Frequency fmFrequency() const;
+    /** Sets the FM APRS frequency. */
+    virtual void setFMFrequency(Frequency f);
+
+    /** Returns the TX delay in ms. */
+    virtual unsigned fmTXDelay() const;
+    /** Sets the TX delay in ms. */
+    virtual void setFMTXDelay(unsigned ms);
+
+    /** Returns the sub tone settings. */
+    virtual Signaling::Code txTone() const;
+    /** Sets the sub tone settings. */
+    virtual void setTXTone(Signaling::Code code);
+
+    /** Returns the manual TX interval in seconds. */
+    virtual Interval manualTXInterval() const;
+    /** Sets the manual TX interval in seconds. */
+    virtual void setManualTXInterval(Interval sec);
+
+    /** Returns @c true if the auto transmit is enabled. */
+    virtual bool autoTX() const;
+    /** Returns the auto TX interval in seconds. */
+    virtual Interval autoTXInterval() const;
+    /** Sets the auto TX interval in seconds. */
+    virtual void setAutoTXInterval(Interval sec);
+    /** Disables auto tx. */
+    virtual void disableAutoTX();
+
+    /** Returns @c true if a fixed location is send. */
+    virtual bool fixedLocationEnabled() const;
+    /** Returns the fixed location send. */
+    virtual QGeoCoordinate fixedLocation() const;
+    /** Sets the fixed location to send. */
+    virtual void setFixedLocation(QGeoCoordinate &loc);
+    /** Disables sending a fixed location. */
+    virtual void disableFixedLocation();
+
+    /** Returns the destination call. */
+    virtual QString destination() const;
+    /** Returns the destination SSID. */
+    virtual unsigned destinationSSID() const;
+    /** Sets the destination call & SSID. */
+    virtual void setDestination(const QString &call, unsigned ssid);
+    /** Returns the source call. */
+    virtual QString source() const;
+    /** Returns the source SSID. */
+    virtual unsigned sourceSSID() const;
+    /** Sets the source call & SSID. */
+    virtual void setSource(const QString &call, unsigned ssid);
+
+    /** Returns the path string. */
+    virtual QString path() const;
+    /** Sets the path string. */
+    virtual void setPath(const QString &path);
+
+    /** Returns the APRS icon. */
+    virtual APRSSystem::Icon icon() const;
+    /** Sets the APRS icon. */
+    virtual void setIcon(APRSSystem::Icon icon);
+
+    /** Returns the transmit power. */
+    virtual Channel::Power power() const;
+    /** Sets the transmit power. */
+    virtual void setPower(Channel::Power power);
+
+    /** Returns the pre-wave delay in ms. */
+    virtual Interval fmPreWaveDelay() const;
+    /** Sets the pre-wave delay in ms. */
+    virtual void setFMPreWaveDelay(Interval ms);
+
+    /** Returns @c true if the channel points to the current/selected channel. */
+    virtual bool dmrChannelIsSelected(unsigned n) const;
+    /** Returns the digital channel index for the n-th system. */
+    virtual unsigned dmrChannelIndex(unsigned n) const;
+    /** Sets the digital channel index for the n-th system. */
+    virtual void setDMRChannelIndex(unsigned n, unsigned idx);
+    /** Sets the channel to the current/selected channel. */
+    virtual void setDMRChannelSelected(unsigned n);
+
+    /** Returns the destination contact for the n-th system. */
+    virtual unsigned dmrDestination(unsigned n) const;
+    /** Sets the destination contact for the n-th system. */
+    virtual void setDMRDestination(unsigned n, unsigned idx);
+
+    /** Returns the call type for the n-th system. */
+    virtual DMRContact::Type dmrCallType(unsigned n) const;
+    /** Sets the call type for the n-th system. */
+    virtual void setDMRCallType(unsigned n, DMRContact::Type type);
+
+    /** Returns @c true if the n-th system overrides the channel time-slot. */
+    virtual bool dmrTimeSlotOverride(unsigned n);
+    /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
+    virtual DMRChannel::TimeSlot dmrTimeSlot(unsigned n) const;
+    /** Overrides the time slot of the n-th selected channel. */
+    virtual void setDMRTimeSlot(unsigned n, DMRChannel::TimeSlot ts);
+    /** Clears the time-slot override. */
+    virtual void clearDMRTimeSlotOverride(unsigned n);
+
+    /** Returns @c true if the roaming is enabled. */
+    virtual bool dmrRoaming() const;
+    /** Enables/disables roaming. */
+    virtual void enableDMRRoaming(bool enable);
+
+    /** Returns the the repeater activation delay in ms. */
+    virtual Interval dmrPreWaveDelay() const;
+    /** Sets the repeater activation delay in ms. */
+    virtual void setDMRPreWaveDelay(Interval ms);
+
+    /** Configures this APRS system from the given generic config. */
+    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                  const ErrorStack &err=ErrorStack());
+    /** Constructs a generic APRS system configuration from this APRS system. */
+    virtual APRSSystem *toFMAPRSSystem();
+    /** Links the transmit channel within the generic APRS system based on the transmit frequency
+     * defined within this APRS system. */
+    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+
+    /** Constructs all GPS system from the generic configuration. */
+    virtual bool fromDMRAPRSSystems(Context &ctx);
+    /** Encodes the given GPS system. */
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
+    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
+    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+
+  public:
+    /** Some static limits for this element. */
+    struct Limit {
+      /// Maximum length of call signs.
+      static constexpr unsigned int callLength()                           { return 0x0006; }
+      /// Maximum length of the repeater path string.
+      static constexpr unsigned int pathLength()                           { return 0x0020; }
+      /// Maximum number of DMR APRS systems.
+      static constexpr unsigned int dmrSystems()                           { return 0x0008; }
+    };
+
+  protected:
+    /** Internal used offsets within the codeplug element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int fmFrequency()                          { return 0x0001; }
+      static constexpr unsigned int fmTXDelay()                            { return 0x0005; }
+      static constexpr unsigned int fmSigType()                            { return 0x0006; }
+      static constexpr unsigned int fmCTCSS()                              { return 0x0007; }
+      static constexpr unsigned int fmDCS()                                { return 0x0008; }
+      static constexpr unsigned int manualTXInterval()                     { return 0x000a; }
+      static constexpr unsigned int autoTXInterval()                       { return 0x000b; }
+      static constexpr unsigned int fmTXMonitor()                          { return 0x000c; }
+      static constexpr unsigned int fixedLocation()                        { return 0x000d; }
+      static constexpr unsigned int fixedLatDeg()                          { return 0x000e; }
+      static constexpr unsigned int fixedLatMin()                          { return 0x000f; }
+      static constexpr unsigned int fixedLatSec()                          { return 0x0010; }
+      static constexpr unsigned int fixedLatSouth()                        { return 0x0011; }
+      static constexpr unsigned int fixedLonDeg()                          { return 0x0012; }
+      static constexpr unsigned int fixedLonMin()                          { return 0x0013; }
+      static constexpr unsigned int fixedLonSec()                          { return 0x0014; }
+      static constexpr unsigned int fixedLonWest()                         { return 0x0015; }
+      static constexpr unsigned int destinationCall()                      { return 0x0016; }
+      static constexpr unsigned int destinationSSID()                      { return 0x001c; }
+      static constexpr unsigned int sourceCall()                           { return 0x001d; }
+      static constexpr unsigned int sourceSSID()                           { return 0x0023; }
+      static constexpr unsigned int path()                                 { return 0x0024; }
+      static constexpr unsigned int symbolTable()                          { return 0x0039; }
+      static constexpr unsigned int symbol()                               { return 0x003a; }
+      static constexpr unsigned int fmPower()                              { return 0x003b; }
+      static constexpr unsigned int fmPrewaveDelay()                       { return 0x003c; }
+      static constexpr unsigned int dmrChannelIndices()                    { return 0x0040; }
+      static constexpr unsigned int betweenDMRChannelIndices()             { return 0x0002; }
+      static constexpr unsigned int dmrDestinations()                      { return 0x0050; }
+      static constexpr unsigned int betweenDMRDestinations()               { return 0x0004; }
+      static constexpr unsigned int dmrCallTypes()                         { return 0x0070; }
+      static constexpr unsigned int betweenDMRCallTypes()                  { return 0x0001; }
+      static constexpr unsigned int roamingSupport()                       { return 0x0078; }
+      static constexpr unsigned int dmrTimeSlots()                         { return 0x0079; }
+      static constexpr unsigned int betweenDMRTimeSlots()                  { return 0x0001; }
+      static constexpr unsigned int dmrPrewaveDelay()                      { return 0x0081; }
+      /// @endcond
+    };
+  };
+
+  /** Reuse roaming channel bitmap from D878UV. */
+  typedef D878UVCodeplug::RoamingChannelBitmapElement RoamingChannelBitmapElement ;
+  /** Reuse roaming channel from D878UV. */
+  typedef D878UVCodeplug::RoamingChannelElement RoamingChannelElement;
+  /** Reuse roaming zone bitmap from D878UV. */
+  typedef D878UVCodeplug::RoamingZoneBitmapElement RoamingZoneBitmapElement;
+  /** Reuse roaming zone from D878UV. */
+  typedef D878UVCodeplug::RoamingZoneElement RoamingZoneElement;
+
 public:
   /** Hidden constructor. */
   explicit DMR6X2UVCodeplug(const QString &label, QObject *parent=nullptr);
@@ -918,12 +1137,36 @@ protected:
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 
+public:
+  /** Some limits for the codeplug. */
+  struct Limit : public D868UVCodeplug::Limit {
+    /// Maximum length of the FM APRS message
+    static constexpr unsigned int fmAPRSMessage()                 { return 60; }
+    /// Maximum number of roaming channels.
+    static constexpr unsigned int roamingChannels()               { return 250; }
+    /// Maximum number of roaming zones.
+    static constexpr unsigned int roamingZones()                  { return 64; }
+  };
+
 protected:
   /** Some internal used offsets within the codeplug. */
-  struct Offset {
+  struct Offset: public D868UVCodeplug::Offset {
     ///@cond DO_NOT_DOCUMENT
-    static constexpr unsigned int settings()          { return 0x02500000; }
-    static constexpr unsigned int settingsExtension() { return 0x02501400; }
+    static constexpr unsigned int roamingChannelBitmap()          { return 0x01042000; }
+    static constexpr unsigned int roamingChannels()               { return 0x01040000; }
+    static constexpr unsigned int roamingZoneBitmap()             { return 0x01042080; }
+    static constexpr unsigned int roamingZones()                  { return 0x01043000; }
+
+    static constexpr unsigned int fmAPRSMessage()                 { return 0x02501200; }
+    static constexpr unsigned int fmAPRSFrequencyNames()          { return 0x02502000; }
+    static constexpr unsigned int settingsExtension()             { return 0x02501400; }
+    /// @endcond
+  };
+
+  /** Some internal used sizes. */
+  struct Size: public D868UVCodeplug::Size {
+    ///@cond DO_NOT_DOCUMENT
+    static constexpr unsigned int fmAPRSMessage()                 { return 0x00000040; }
     /// @endcond
   };
 };
