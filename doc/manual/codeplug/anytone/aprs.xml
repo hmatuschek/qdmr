@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extAnytoneFMAPRS"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>FM APRS settings extension</title>
+</info>
+
+<para>
+  This extensions allows to specify some additional settings for the FM APRS System. As AnyTone 
+  devices allow only for one FM APRS system, these settings can be considered radio wide.
+</para>
+
+<example>
+  <title></title>
+  <programlisting><![CDATA[positioning:
+  ...
+  - aprs:
+    ...
+    anytone:
+      txDelay: 60 ms
+      preWaveDelay: 0
+      passAll: false
+      reportPosition: false
+      reportMicE: false
+      reportObject: false
+      reportItem: false
+      reportMessage: false
+      reportWeather: false
+      reportNMEA: false
+      reportStatus: false
+      reportOther: false
+      frequencies:
+        - id: af1
+          name: APRS US
+          frequency: 144.39 MHz
+]]></programlisting>
+</example>
+
+<para>
+  The <trademark>AnyTone</trademark> FM APRS extension is a mapping named <token>anytone</token>. It
+  contains the device specific settings for that FM APRS system. AnyTone devices only allow for a 
+  single FM APRS system.
+</para>
+
+
+<section>
+<info>
+  <title>FM APRS system attributes</title>
+</info>
+
+<variablelist>
+  <title>FM APRS system extension fields</title>
+  <varlistentry>
+    <term><token>txDelay</token></term>
+    <listitem>
+      <para>
+        A delay before the start of the transmission. Specified with a resolution of 20ms. The 
+        default value is 60ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>preWaveDelay</token></term>
+    <listitem>
+      <para>
+        A delay between the start of the carrier and the actual APRS transmission. Default 0ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>passAll</token></term>
+    <listitem>
+      <para>
+        Basically disables the CRC check on received APRS messages.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>reportPosition</token><token>reportMicE</token><token>reportObject</token>
+    <token>reportItem</token><token>reportMessage</token><token>reportWeather</token>
+    <token>reportNMEA</token><token>reportStatus</token><token>reportOther</token></term>
+    <listitem>
+      <para>
+        A bunch of flags indicating what is being reported (?!?).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>frequencies</token></term>
+    <listitem>
+      <para>
+        While AnyTone only allows for a single set of parameters for the FM APRS transmission and 
+        reception, it allows for several frequencies. The default frequency is specified by the 
+        revert channel of the FM APRS system. 
+      </para>
+      <para>
+        Seven additional frequencies might be specified through this list. Each entry is a mapping, 
+        specifying a unique ID for the frequency, a name and the actual frequency. The id can then 
+        be used to reference this FM APRS frequency in the AnyTone channel extension.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+</variablelist>
+</section>
+
+</section>

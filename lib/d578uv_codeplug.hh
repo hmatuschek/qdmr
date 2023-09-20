@@ -102,12 +102,13 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D578UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
+ *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings, see @c D878UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>

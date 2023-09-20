@@ -87,6 +87,7 @@ protected:
   QNetworkReply *_currentReply;
   QList<RepeaterBookEntry> _items;
   QHash<QString, QDateTime> _queries;
+  QRegularExpression _callsignPattern;
 };
 
 

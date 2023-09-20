@@ -83,6 +83,13 @@
         setting is only applicable to the <productname>AT-D578UV</productname> device.</para>
     </listitem>
   </varlistentry>  
+  <varlistentry>
+    <term><token>fmAPRSFrequency</token></term>
+    <listitem>
+      <para>Optional alternative FM APRS frequency specified in the AnyTone extension to the APRS
+      settings.</para>
+    </listitem>
+  </varlistentry>  
 </variablelist>
 </section>
 
