@@ -2649,7 +2649,7 @@
 <context>
     <name>RepeaterBookList</name>
     <message>
-        <location filename="../src/repeaterbookcompleter.cc" line="258"/>
+        <location filename="../src/repeaterbookcompleter.cc" line="260"/>
         <source>%1 (%2, %3, %4)</source>
         <translation type="unfinished"></translation>
     </message>

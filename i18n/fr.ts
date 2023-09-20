@@ -995,7 +995,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
@@ -1028,7 +1028,7 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
@@ -1061,7 +1061,7 @@
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
@@ -1126,7 +1126,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
@@ -1364,7 +1364,7 @@
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
@@ -2508,7 +2508,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
@@ -2649,7 +2649,7 @@
 <context>
     <name>RepeaterBookList</name>
     <message>
-        <location filename="../src/repeaterbookcompleter.cc" line="258"/>
+        <location filename="../src/repeaterbookcompleter.cc" line="260"/>
         <source>%1 (%2, %3, %4)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2832,7 +2832,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="32"/>
@@ -2954,7 +2954,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
@@ -3263,7 +3263,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="33"/>
@@ -3391,7 +3391,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basiques</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
