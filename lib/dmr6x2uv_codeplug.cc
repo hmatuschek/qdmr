@@ -1854,7 +1854,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  setFMFrequency(Frequency::fromHz(sys->revertChannel()->txFrequency()*1e6));
+  setFMFrequency(sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setManualTXInterval(Interval::fromSeconds(sys->period()));
@@ -1878,16 +1878,16 @@ DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
 bool
 DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(double(fmFrequency().inHz())/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(double(fmFrequency().inHz())/1e6);
-    ch->setTXFrequency(double(fmFrequency().inHz())/1e6);
+    ch->setRXFrequency(fmFrequency());
+    ch->setTXFrequency(fmFrequency());
     ch->setPower(power());
     ch->setTXTone(txTone());
-    logInfo() << "No matching APRS channel found for TX frequency " << double(fmFrequency().inHz())/1e6
+    logInfo() << "No matching APRS channel found for TX frequency " << fmFrequency().format()
               << "MHz, create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }

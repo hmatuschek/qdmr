@@ -2925,7 +2925,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
     return false;
   }
   names.setName(0, sys->name());
-  setFMFrequency(0, Frequency::fromHz(sys->revertChannel()->txFrequency()*1e6));
+  setFMFrequency(0, sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setFMChannelWidth(FMChannel::Bandwidth::Wide == sys->revertChannel()->bandwidth() ?
@@ -3015,13 +3015,13 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
 bool
 D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(double(fmFrequency(0).inHz())/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency(0));
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(double(fmFrequency(0).inHz())/1e6);
-    ch->setTXFrequency(double(fmFrequency(0).inHz())/1e6);
+    ch->setRXFrequency(fmFrequency(0));
+    ch->setTXFrequency(fmFrequency(0));
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(AnytoneFMAPRSSettingsExtension::Bandwidth::Wide == fmChannelWidth() ?
