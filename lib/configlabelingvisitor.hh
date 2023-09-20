@@ -14,7 +14,7 @@ protected:
   ConfigLabelingVisitor(ConfigItem::Context &context);
 
 public:
-  /** Lables the configuration and stores the labels in the given context. */
+  /** Labels the configuration and stores the labels in the given context. */
   static bool label(Config *config, ConfigItem::Context &context);
 
 protected:

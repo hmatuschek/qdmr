@@ -91,7 +91,7 @@
   The single most important options within the general settings is your DMR ID and your call sign. These 
   options are usually located under the label <guilabel>Radio Settings</guilabel> or 
   <guilabel>General Settings</guilabel><footnote><para>The actual name may vary from manufacturer
-    to manufactuer.</para></footnote>.
+    to manufacturer.</para></footnote>.
   Your DMR ID is entered in the field name <guilabel>Radio ID</guilabel>. Many radios support to 
   enter several DMR IDs. This feature is usually not used in ham radio. In fact you will only always
   need a single DMR ID even with several radios.

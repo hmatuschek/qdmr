@@ -68,7 +68,7 @@
  *    // The radio interface is common to all devices. So the remaining code is device independent.
  *    Radio *radio = Radio::detect(devices.first(), RadioInfo(), err);
  *    if (nullptr == radio) {
- *      std::cerr << "Opps:" << err.format();
+ *      std::cerr << "Oops:" << err.format();
  *      return -1;
  *    }
  *

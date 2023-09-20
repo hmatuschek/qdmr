@@ -95,7 +95,7 @@ protected:
   QString _name;
   /** Holds the name of the manufacturer. */
   QString _manufacturer;
-  /** Holds possible identical radios from other manufactuers. */
+  /** Holds possible identical radios from other manufacturers. */
   QList<RadioInfo> _alias;
   /** Holds some information about the interface to the radio. */
   USBDeviceInfo _interface;
