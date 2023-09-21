@@ -13,6 +13,7 @@ public:
 private slots:
   void testChannelClone();
   void testConfigClone();
+  void testConfigCopy();
 };
 
 #endif // COPYTEST_HH

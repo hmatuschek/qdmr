@@ -1,6 +1,8 @@
 #include "configcopyvisitor.hh"
 #include "configobject.hh"
 #include "configreference.hh"
+#include "channel.hh"
+#include "radioid.hh"
 
 
 /* ********************************************************************************************* *
@@ -261,7 +263,9 @@ ConfigCloneVisitor::takeResult(const ErrorStack &err) {
 FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject *> &map)
   : Visitor(), _map(map)
 {
-  // pass...
+  // Populate with default singleton instances.
+  map[SelectedChannel::get()] = SelectedChannel::get();
+  map[DefaultRadioID::get()]  = DefaultRadioID::get();
 }
 
 bool
@@ -271,13 +275,16 @@ FixReferencesVisistor::processProperty(ConfigItem *item, const QMetaProperty &pr
     return false;
 
   if (ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>()) {
-    if (! _map.contains(ref->as<ConfigObject>())) {
-      errMsg(err) << "Cannot fix refrence to object '" << ref->as<ConfigObject>()->name()
-                  << "' of type " << ref->as<ConfigObject>()->metaObject()->className()
+    if (ref->isNull())
+      return true;
+    ConfigObject *obj = ref->as<ConfigObject>();
+    if (! _map.contains(obj)) {
+      errMsg(err) << "Cannot fix refrence to object '" << obj->name()
+                  << "' of type " << obj->metaObject()->className()
                   << ": Not mapped/cloned yet.";
       return false;
     }
-    ref->set(_map[ref->as<ConfigObject>()]);
+    ref->set(_map[obj]);
     return true;
   }
 

@@ -12,6 +12,14 @@ qt5_wrap_cpp(copytest_MOC_SOURCES copytest.hh)
 add_executable(copytest copytest.cc ${copytest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(copytest ${LIBS} libdmrconf libdmrconfigtest)
 
+qt5_wrap_cpp(labeltest_MOC_SOURCES labeltest.hh)
+add_executable(labeltest labeltest.cc ${labeltest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(labeltest ${LIBS} libdmrconf libdmrconfigtest)
+
+qt5_wrap_cpp(trafotest_MOC_SOURCES trafotest.hh)
+add_executable(trafotest trafotest.cc ${trafotest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(trafotest ${LIBS} libdmrconf libdmrconfigtest)
+
 qt5_wrap_cpp(crc32test_MOC_SOURCES crc32test.hh)
 add_executable(crc32test crc32test.cc ${crc32test_MOC_SOURCES})
 target_link_libraries(crc32test ${LIBS} libdmrconf)
