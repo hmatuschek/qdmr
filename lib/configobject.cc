@@ -1445,7 +1445,7 @@ ConfigObjectList::take(ConfigObject *obj) {
 bool
 ConfigObjectList::del(ConfigObject *obj) {
   if (AbstractConfigObjectList::del(obj))
-    obj->deleteLater();
+    delete obj;
   return true;
 }
 

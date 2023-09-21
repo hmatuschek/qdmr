@@ -104,3 +104,60 @@ ZoneMergeVisitor::processItem(ConfigItem *item, const ErrorStack &err) {
 
   return Visitor::processItem(item);
 }
+
+
+/* ********************************************************************************************* *
+ * Implementation of ObjectFilterVisitor
+ * ********************************************************************************************* */
+ObjectFilterVisitor::ObjectFilterVisitor(const std::initializer_list<QMetaObject> &types)
+  : Visitor(), _filter(types)
+{
+  // pass...
+}
+
+bool
+ObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
+  if (! propIsInstance<ConfigItem>(prop))
+    return Visitor::processProperty(item, prop, err);
+
+  if (prop.read(item).isNull())
+    return Visitor::processProperty(item, prop, err);
+
+  if (! prop.isWritable())
+    return Visitor::processProperty(item, prop, err);
+
+  foreach (const QMetaObject &meta, _filter) {
+    ConfigItem *propItem = prop.read(item).value<ConfigItem*>();
+    if (propItem->metaObject()->inherits(&meta)) {
+      prop.write(item, QVariant::fromValue<ConfigItem *>(nullptr));
+      delete propItem;
+      return true;
+    }
+  }
+
+  return Visitor::processProperty(item, prop, err);
+}
+
+bool
+ObjectFilterVisitor::processList(AbstractConfigObjectList *list, const ErrorStack &err) {
+  if (qobject_cast<ConfigObjectRefList *>(list))
+    return Visitor::processList(list, err);
+
+  ConfigObjectList *objList = qobject_cast<ConfigObjectList *>(list);
+  if (nullptr == objList)
+    return Visitor::processList(list, err);;
+
+  QList<ConfigObject *> filtered;
+  for (int i=0; i<objList->count(); i++) {
+    foreach (const QMetaObject &meta, _filter) {
+      const char *classname = meta.className();
+      if (objList->get(i)->inherits(classname))
+        filtered.append(objList->get(i));
+    }
+  }
+
+  foreach (ConfigObject *item, filtered)
+    objList->del(item);
+
+  return Visitor::processList(list, err);
+}

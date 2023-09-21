@@ -5,33 +5,40 @@
 #include <iostream>
 #include <QTest>
 
+#include "configcopyvisitor.hh"
 
-ConfigTest::ConfigTest(QObject *parent) : QObject(parent)
+ConfigTest::ConfigTest(QObject *parent)
+  : UnitTestBase(parent)
 {
   // pass...
 }
 
 
 void
-ConfigTest::initTestCase() {
+ConfigTest::testImmediateRefInvalidation() {
   ErrorStack err;
-  if (! _config.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1").arg(err.format()).toStdString().c_str());
-  }
+  Config *copy = ConfigCopy::copy(&_basicConfig, err)->as<Config>();
+  if (nullptr == copy)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(_basicConfig.posSystems()->count(), 1);
+  QVERIFY(_basicConfig.channelList()->get(1));
+  QVERIFY(_basicConfig.channelList()->get(1)->is<DMRChannel>());
+  QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprsObj(),
+           _basicConfig.posSystems()->get(0)->as<GPSSystem>());
+
+  QVERIFY(copy->posSystems()->del(copy->posSystems()->get(0)));
+  QCOMPARE(copy->posSystems()->count(), 0);
+  QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprsObj(), nullptr);
 }
 
-void
-ConfigTest::cleanupTestCase() {
-  // clear codeplug
-  _config.clear();
-}
 
 void
 ConfigTest::testCloneChannelBasic() {
   // Check if a channel can be cloned
-  Channel *clone = _config.channelList()->channel(0)->clone()->as<Channel>();
+  Channel *clone = _basicConfig.channelList()->channel(0)->clone()->as<Channel>();
   // Check if channels are the same
-  QCOMPARE(clone->compare(*_config.channelList()->channel(0)), 0);
+  QCOMPARE(clone->compare(*_basicConfig.channelList()->channel(0)), 0);
 }
 
 void

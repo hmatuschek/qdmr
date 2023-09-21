@@ -8,6 +8,7 @@
 #define INTERMEDIATEREPRESENTATION_HH
 
 #include "visitor.hh"
+#include <QList>
 
 class Zone;
 
@@ -19,6 +20,7 @@ class Zone;
 class ZoneSplitVisitor: public Visitor
 {
 public:
+  /** Constructor. */
   explicit ZoneSplitVisitor();
 
   bool processItem(ConfigItem *item, const ErrorStack &err);
@@ -31,14 +33,31 @@ public:
 class ZoneMergeVisitor: public Visitor
 {
 public:
+  /** Constructor. */
   explicit ZoneMergeVisitor();
 
   bool processList(AbstractConfigObjectList *list, const ErrorStack &err);
   bool processItem(ConfigItem *item, const ErrorStack &err);
 
 protected:
+  /** The last zone visited, @c nullptr if the first zone is processed. */
   Zone *_lastZone;
+  /** Zones to be removed. */
   QList<Zone *> _mergedZones;
 };
+
+
+class ObjectFilterVisitor: public Visitor
+{
+public:
+  explicit ObjectFilterVisitor(const std::initializer_list<QMetaObject> &types);
+
+  bool processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err);
+  bool processList(AbstractConfigObjectList *list, const ErrorStack &err);
+
+protected:
+  QList<QMetaObject> _filter;
+};
+
 
 #endif // INTERMEDIATEREPRESENTATION_HH
