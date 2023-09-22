@@ -27,9 +27,19 @@ ConfigTest::testImmediateRefInvalidation() {
   QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprsObj(),
            _basicConfig.posSystems()->get(0)->as<GPSSystem>());
 
+  // Delete DMR APRS system and check if reference to it (channel 2) is removed as well.
   QVERIFY(copy->posSystems()->del(copy->posSystems()->get(0)));
   QCOMPARE(copy->posSystems()->count(), 0);
   QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprsObj(), nullptr);
+
+  QVERIFY(_basicConfig.channelList()->get(2));
+  QCOMPARE(_basicConfig.zones()->get(0)->as<Zone>()->B()->count(), 1);
+  QCOMPARE(_basicConfig.zones()->get(0)->as<Zone>()->B()->get(0),
+           _basicConfig.channelList()->get(2));
+
+  // Delete channel 3, check if zone 1, list B is empty
+  copy->channelList()->del(copy->channelList()->get(2));
+  QCOMPARE(copy->zones()->get(0)->as<Zone>()->B()->count(), 0);
 }
 
 

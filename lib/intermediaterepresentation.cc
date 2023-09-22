@@ -128,7 +128,8 @@ ObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop
 
   foreach (const QMetaObject &meta, _filter) {
     ConfigItem *propItem = prop.read(item).value<ConfigItem*>();
-    if (propItem->metaObject()->inherits(&meta)) {
+    const char *classname = meta.className();
+    if (propItem->inherits(classname)) {
       prop.write(item, QVariant::fromValue<ConfigItem *>(nullptr));
       delete propItem;
       return true;
