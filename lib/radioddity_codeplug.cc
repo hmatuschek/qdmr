@@ -8,6 +8,7 @@
 #include "zone.hh"
 #include "config.hh"
 #include "commercial_extension.hh"
+#include "intermediaterepresentation.hh"
 
 
 /* ********************************************************************************************* *
@@ -827,7 +828,7 @@ RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
 }
 
 bool
-RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx) const {
   if (! isValid()) {
     logWarn() << "Cannot link zone: Zone is invalid.";
     return false;
@@ -835,15 +836,13 @@ RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putI
 
   for (int i=0; (i<16) && hasMember(i); i++) {
     if (ctx.has<Channel>(member(i))) {
-      if (! putInB)
-        zone->A()->add(ctx.get<Channel>(member(i)));
-      else
-        zone->B()->add(ctx.get<Channel>(member(i)));
+      zone->A()->add(ctx.get<Channel>(member(i)));
     } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member(i) << " out of bounds.";
     }
   }
+
   return true;
 }
 
@@ -2668,6 +2667,25 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
   return true;
 }
 
+Config *
+RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process Radioddity codeplug.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zone for Radioddity codeplug.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
 bool
 RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
@@ -2738,6 +2756,7 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
   return true;
 }
 
+
 bool
 RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
@@ -2747,6 +2766,22 @@ RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
 
   return this->decodeElements(ctx, err);
+}
+
+bool
+RadioddityCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process Radioddy codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merg zones in decoded Radioddity codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 bool
