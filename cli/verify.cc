@@ -68,26 +68,89 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     return 0;
   }
 
+
   RadioLimitContext ctx;
   QString radio = parser.value("radio").toLower();
   if ("rd5r" == radio) {
-    RD5R radio; radio.limits().verifyConfig(&config, ctx);
+    RD5R radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx); delete intermediate;
   } else if (("uv390" == radio) || ("rt3s" == radio)) {
-    UV390 radio; radio.limits().verifyConfig(&config, ctx);
+    UV390 radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if (("md2017" == radio) || ("rt82" == radio)) {
-    MD2017 radio; radio.limits().verifyConfig(&config, ctx);
+    MD2017 radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("gd77" == radio) {
-    GD77 radio; radio.limits().verifyConfig(&config, ctx);
+    GD77 radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("opengd77" == radio) {
-    OpenGD77 radio; radio.limits().verifyConfig(&config, ctx);
+    OpenGD77 radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("d868uv" == radio) {
-    D868UV radio; radio.limits().verifyConfig(&config, ctx);
+    D868UV radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("d878uv" == radio) {
-    D878UV radio; radio.limits().verifyConfig(&config, ctx);
+    D878UV radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("d878uv2" == radio) {
-    D878UV2 radio; radio.limits().verifyConfig(&config, ctx);
+    D878UV2 radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else if ("d578uv" == radio) {
-    D578UV radio; radio.limits().verifyConfig(&config, ctx);
+    D578UV radio; ErrorStack err;
+    Config *intermediate = radio.codeplug().preprocess(&config, err);
+    if (nullptr == intermediate) {
+      logError() << "Cannot pre-process codeplug: " << err.format();
+      return -1;
+    }
+    radio.limits().verifyConfig(intermediate, ctx);
+    delete intermediate;
   } else {
     logError() << "Cannot verify code-plug against unknown radio '" << radio << "'.";
     return -1;

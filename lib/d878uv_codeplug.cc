@@ -2970,6 +2970,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 
 APRSSystem *
 D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
+  Q_UNUSED(err)
   QString name = QString("APRS %1").arg(destination());
   if (names.isValid() && (! names.name(0).isEmpty()))
     name = names.name(0);

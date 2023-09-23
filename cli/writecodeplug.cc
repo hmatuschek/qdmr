@@ -44,8 +44,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   RadioLimitContext ctx(parser.isSet("ignore-limits"));
 
+  Config *intermediate = radio->codeplug().preprocess(&config, err);
+
   bool verified = true;
-  radio->limits().verifyConfig(&config, ctx);
+  radio->limits().verifyConfig(intermediate, ctx);
 
   // Only print warnings
   for (int i=0; i<ctx.count(); i++) {
@@ -78,10 +80,12 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     flags.autoEnableRoaming = true;
 
   logDebug() << "Start upload to " << radio->name() << ".";
-  if (! radio->startUpload(&config, true, flags, err)) {
+  if (! radio->startUpload(intermediate, true, flags, err)) {
     logError() << "Codeplug upload error: " << err.format();
+    delete intermediate;
     return -1;
   }
+  delete intermediate;
 
   if (Radio::StatusError == radio->status()) {
     logError() << "Codeplug upload error: " << err.format();

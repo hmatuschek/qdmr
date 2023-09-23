@@ -508,9 +508,18 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
     }
     return false;
   }
+
+  ErrorStack err;
+  Config *intermediate = myRadio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    return false;
+  }
+
   Settings settings;
   RadioLimitContext ctx(settings.ignoreFrequencyLimits());
-  myRadio->limits().verifyConfig(_config, ctx);
+  myRadio->limits().verifyConfig(intermediate, ctx);
+
   bool verified = true;
   if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
        ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
@@ -522,6 +531,9 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
           nullptr, tr("Verification success"),
           tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
+
+  // Delete intermediate representation
+  delete intermediate;
 
   // If no radio was given -> close connection to radio again
   if (nullptr == radio)
@@ -562,7 +574,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -570,7 +582,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -591,8 +603,15 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
     _config->setModified(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
+    _config->clear();
   }
+
+  if (! radio->codeplug().postprocess(_config, err)) {
+    ErrorMessageView(err).exec();
+    _config->clear();
+  }
+
   _mainWindow->setEnabled(true);
 
   if (radio->wait(250))
@@ -626,13 +645,22 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   ErrorStack err;
-  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
+  Config *intermediate = radio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    progress->setVisible(false);
+    return;
+  }
+
+  if (radio->startUpload(intermediate, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
+
+  delete intermediate;
 }
 
 void
@@ -709,7 +737,7 @@ Application::uploadCallsignDB() {
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -718,7 +746,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
