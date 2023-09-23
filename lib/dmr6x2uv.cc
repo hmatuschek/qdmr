@@ -1,3 +1,5 @@
+#include "gpssystem.hh"
+#include "userdatabase.hh"
 #include "dmr6x2uv.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "dmr6x2uv_limits.hh"

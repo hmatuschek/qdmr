@@ -32,7 +32,7 @@ class RoamingChannel : public ConfigObject
 
 public:
   /** Default constructor for a roaming channel. */
-  explicit RoamingChannel(QObject *parent = nullptr);
+  Q_INVOKABLE explicit RoamingChannel(QObject *parent = nullptr);
   /** Copy constructor. */
   RoamingChannel(const RoamingChannel &other, QObject *parent=nullptr);
 

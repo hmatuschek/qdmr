@@ -23,7 +23,7 @@ class RoamingZone : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit RoamingZone(QObject *parent=nullptr);
+  Q_INVOKABLE explicit RoamingZone(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the roaming zone.

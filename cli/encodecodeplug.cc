@@ -109,31 +109,56 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  if ((RadioInfo::MD390 == radio) && (! encode<MD390Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::UV390 == radio) && (! encode<UV390Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::MD2017 == radio) && (! encode<MD2017Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::RD5R == radio) && (! encode<RD5RCodeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::GD77 == radio) && (! encode<GD77Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::OpenGD77 == radio) && (! encode<OpenGD77Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::OpenRTX == radio) && (! encode<OpenRTXCodeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::D868UVE == radio) && (! encode<D868UVCodeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::D878UV == radio) && (! encode<D878UVCodeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::D878UVII == radio) && (! encode<D878UV2Codeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::D578UV == radio) && (! encode<D578UVCodeplug>(config, flags, parser)))
-    return -1;
-  else if ((RadioInfo::DMR6X2UV == radio) &&  (! encode<DMR6X2UVCodeplug>(config, flags, parser)))
-    return -1;
-  else {
+  switch (radio) {
+  case RadioInfo::MD390:
+    if (! encode<MD390Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::UV390:
+    if (! encode<UV390Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::MD2017:
+    if (! encode<MD2017Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::RD5R:
+    if (! encode<RD5RCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::GD77:
+    if (! encode<GD77Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::OpenGD77:
+    if (! encode<OpenGD77Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::OpenRTX:
+    if (! encode<OpenRTXCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::D868UVE:
+    if (! encode<D868UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::D878UV:
+    if (! encode<D878UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::D878UVII:
+    if (! encode<D878UV2Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::D578UV:
+    if (! encode<D578UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DMR6X2UV:
+    if (! encode<DMR6X2UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  default:
     logError() << "Cannot encode codeplug: Unknown radio '" << parser.value("radio") << "'.";
     return -1;
   }

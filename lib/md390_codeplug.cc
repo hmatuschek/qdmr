@@ -1,4 +1,5 @@
 #include "md390_codeplug.hh"
+#include "config.hh"
 #include "logger.hh"
 
 

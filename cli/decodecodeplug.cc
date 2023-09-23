@@ -83,46 +83,73 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
   Config config;
 
-  if ((RadioInfo::MD390 == radio) && (! decode<MD390Codeplug, MD390FileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::UV390 == radio) && (! decode<UV390Codeplug, UV390FileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::MD2017 == radio) && (! decode<MD2017Codeplug, MD2017FileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::DM1701 == radio) && (! decode<DM1701Codeplug, DM1701FileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::RD5R == radio) && (! decode<RD5RCodeplug, RD5RFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::GD77 == radio) && (! decode<GD77Codeplug, GD77FileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::OpenGD77 == radio) && (! decode<OpenGD77Codeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::OpenRTX == radio) && (! decode<OpenRTXCodeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::D868UVE == radio) && (! decode<D868UVCodeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::D878UV == radio) && (! decode<D878UVCodeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::D878UVII == radio) && (! decode<D878UV2Codeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::D578UV == radio) && (! decode<D578UVCodeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else if ((RadioInfo::DMR6X2UV == radio) && (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err))) {
-    logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
-    return -1;
-  } else {
+  switch (radio) {
+  case RadioInfo::MD390:
+    if (! decode<MD390Codeplug, MD390FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::UV390:
+    if (! decode<UV390Codeplug, UV390FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::MD2017:
+    if (! decode<MD2017Codeplug, MD2017FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::DM1701:
+    if (! decode<DM1701Codeplug, DM1701FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::RD5R:
+    if (! decode<RD5RCodeplug, RD5RFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::GD77:
+    if (! decode<GD77Codeplug, GD77FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::OpenGD77:
+    if (! decode<OpenGD77Codeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::OpenRTX:
+    if (! decode<OpenRTXCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::D868UVE:
+    if (! decode<D868UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::D878UV:
+    if (! decode<D878UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::D878UVII:
+    if (! decode<D878UV2Codeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::D578UV:
+    if (! decode<D578UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::DMR6X2UV:
+    if (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  default:
     logError() << "Decoding not implemented for " << RadioInfo::byID(radio).name() << ".";
     return -1;
   }

@@ -1,5 +1,6 @@
 #include "uv390_codeplug.hh"
 #include "logger.hh"
+#include "config.hh"
 #include "tyt_extensions.hh"
 #include <QTimeZone>
 

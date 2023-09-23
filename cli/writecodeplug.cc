@@ -45,6 +45,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioLimitContext ctx(parser.isSet("ignore-limits"));
 
   Config *intermediate = radio->codeplug().preprocess(&config, err);
+  if (nullptr == intermediate) {
+    logError() << "Cannot pre-process codeplug: " << err.format();
+    return -1;
+  }
 
   bool verified = true;
   radio->limits().verifyConfig(intermediate, ctx);
@@ -65,6 +69,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   if (! verified) {
     logError() << "Cannot upload codeplug to device: Codeplug cannot be verified with radio.";
+    delete intermediate;
     return -1;
   }
 

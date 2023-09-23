@@ -1,5 +1,6 @@
 #include "d868uv.hh"
 
+#include "userdatabase.hh"
 #include "d868uv_codeplug.hh"
 #include "d868uv_callsigndb.hh"
 #include "d868uv_limits.hh"

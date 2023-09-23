@@ -57,7 +57,7 @@ ZoneMergeVisitor::processList(AbstractConfigObjectList *list, const ErrorStack &
   if (nullptr == qobject_cast<ZoneList *>(list))
     return Visitor::processList(list, err);
 
-  if (2 < list->count())
+  if (2 > list->count())
     return Visitor::processList(list, err);
 
   _mergedZones.clear();

@@ -81,11 +81,31 @@ channels:
       power: High
       timeout: 0
       vox: 0
+
+scanLists:
+  - id: scan1
+    name: KW
+    channels: [ch1, ch2, ch3]
+
 zones:
   - id: zone1
     name: Zu Hause
     A: [ch1, ch2, ch4]
     B: [ch3]
+
+roamingChannels:
+  - id: rc1
+    name: R DB0LDS
+    rxFrequency: 439.5625
+    txFrequency: 431.96249999999998
+    colorCode: 1
+
+roamingZones:
+  - id: roam1
+    name: Berlin/Brand
+    channels:
+      - rc1
+
 positioning:
   - dmr:
       id: aprs1

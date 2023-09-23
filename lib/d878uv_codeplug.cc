@@ -1,9 +1,10 @@
+#include "gpssystem.hh"
+#include "userdatabase.hh"
+#include "roamingchannel.hh"
 #include "d878uv_codeplug.hh"
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
-#include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
 #include "channel.hh"
@@ -3547,8 +3548,8 @@ D878UVCodeplug::allocateZones() {
 }
 
 bool
-D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! D868UVCodeplug::encodeZone(i, zone, isB, flags, ctx, err))
+D878UVCodeplug::encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, flags, ctx, err))
     return false;
 
   AnytoneZoneExtension *ext = zone->anytoneExtension();
@@ -3561,8 +3562,8 @@ D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Cont
 }
 
 bool
-D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
-  if (! D868UVCodeplug::decodeZone(i, zone, isB, ctx, err))
+D878UVCodeplug::decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, ctx, err))
     return false;
   AnytoneZoneExtension *ext = zone->anytoneExtension();
   if (nullptr == ext) {
@@ -3571,7 +3572,7 @@ D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const Erro
   }
 
   HiddenZoneBitmapElement bitmap(data(Offset::hiddenZoneBitmap()));
-  ext->enableHidden(bitmap.isEncoded(i) && (!isB));
+  ext->enableHidden(bitmap.isEncoded(i));
 
   return true;
 }

@@ -30,7 +30,7 @@ class ScanList : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit ScanList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit ScanList(QObject *parent=nullptr);
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 

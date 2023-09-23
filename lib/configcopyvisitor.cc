@@ -3,6 +3,7 @@
 #include "configreference.hh"
 #include "channel.hh"
 #include "radioid.hh"
+#include "roamingzone.hh"
 
 
 /* ********************************************************************************************* *
@@ -266,6 +267,7 @@ FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject 
   // Populate with default singleton instances.
   map[SelectedChannel::get()] = SelectedChannel::get();
   map[DefaultRadioID::get()]  = DefaultRadioID::get();
+  map[DefaultRoamingZone::get()] = DefaultRoamingZone::get();
 }
 
 bool
@@ -325,7 +327,7 @@ ConfigCopy::copy(ConfigItem *original, const ErrorStack &err) {
   }
   ConfigItem *clone = cloner.takeResult();
   FixReferencesVisistor fixer(map);
-  if (! fixer.processItem(clone)) {
+  if (! fixer.processItem(clone, err)) {
     errMsg(err) << "Cannot fix references in item of type "
                 << clone->metaObject()->className() << ".";
     delete clone;

@@ -2,12 +2,13 @@
 #define CODEPLUG_HH
 
 #include <QObject>
-#include "dfufile.hh"
-#include "userdatabase.hh"
 #include <QHash>
-#include "config.hh"
+#include "dfufile.hh"
 
-//class Config;
+//#include "userdatabase.hh"
+//#include "config.hh"
+
+class Config;
 class ConfigItem;
 
 
