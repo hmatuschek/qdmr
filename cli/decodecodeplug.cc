@@ -8,6 +8,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include "radioinfo.hh"
+#include "dummyfilereader.hh"
 #include "md390_codeplug.hh"
 #include "md390_filereader.hh"
 #include "uv390_codeplug.hh"
@@ -31,15 +32,39 @@
 #include "dr1801uv_codeplug.hh"
 #include "dr1801uv_filereader.hh"
 
+template <class Cpl, class Rdr>
+bool decode(Config &config, const QString &filename, QCommandLineParser &parser, const ErrorStack &err=ErrorStack()) {
+  Cpl codeplug;
+  if (parser.isSet("manufacturer")) {
+    if (! Rdr::read(filename, &codeplug, err)) {
+      errMsg(err) << "Cannot decode manufacturer codeplug file '" << filename << "'.";
+      return false;
+    }
+  } else if (! codeplug.read(filename, err)) {
+    errMsg(err) << "Cannot decode binary codeplug file '" << filename << "'.";
+    return false;
+  }
+  if (! codeplug.decode(&config, err)) {
+    errMsg(err) << "Cannot decode binary codeplug file '" << filename << "'.";
+    return false;
+  }
+  if (! codeplug.postprocess(&config, err)) {
+    logError() << "Cannot post-process binary codeplug file '" << filename << "'.";
+    return false;
+  }
 
-int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
+  return true;
+}
+
+
+int
+decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(app);
 
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
   QString filename = parser.positionalArguments().at(1);
-  QString errorMessage;
   ErrorStack err;
 
   if (! parser.isSet("radio")) {
@@ -59,252 +84,78 @@ int decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
   Config config;
 
-  if (RadioInfo::MD390 == radio) {
-    MD390Codeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! MD390FileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' :\n" << err.format();
+  switch (radio) {
+  case RadioInfo::MD390:
+    if (! decode<MD390Codeplug, MD390FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::UV390:
+    if (! decode<UV390Codeplug, UV390FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::UV390 == radio) {
-    UV390Codeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! UV390FileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "': " << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' :\n" << err.format();
+    } break;
+  case RadioInfo::MD2017:
+    if (! decode<MD2017Codeplug, MD2017FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::DM1701:
+    if (! decode<DM1701Codeplug, DM1701FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::MD2017 == radio) {
-    MD2017Codeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! MD2017FileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' :\n" << err.format();
+    } break;
+  case RadioInfo::RD5R:
+    if (! decode<RD5RCodeplug, RD5RFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::GD77:
+    if (! decode<GD77Codeplug, GD77FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::DM1701 == radio) {
-    DM1701Codeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! DM1701FileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' :\n" << err.format();
+    } break;
+  case RadioInfo::OpenGD77:
+    if (! decode<OpenGD77Codeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::OpenRTX:
+    if (! decode<OpenRTXCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::RD5R == radio) {
-    RD5RCodeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! RD5RFileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::D868UVE:
+    if (! decode<D868UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::D878UV:
+    if (! decode<D878UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::GD77 == radio) {
-    GD77Codeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! GD77FileReader::read(filename, &codeplug, errorMessage)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << errorMessage;
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::D878UVII:
+    if (! decode<D878UV2Codeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::D578UV:
+    if (! decode<D578UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-  } else if (RadioInfo::OpenGD77 == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
+    } break;
+  case RadioInfo::DMR6X2UV:
+    if (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    OpenGD77Codeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
+    } break;
+  case RadioInfo::DR1801UV:
+    if (! decode<DR1801UVCodeplug, DR1801UVFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::OpenRTX == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    OpenRTXCodeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::D868UVE == radio) {
-    D868UVCodeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '"
-                 << RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::D878UV == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    D878UVCodeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::D878UVII == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    D878UV2Codeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename <<
-                    "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::D578UV == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    D578UVCodeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::DMR6X2UV == radio) {
-    if (parser.isSet("manufacturer")) {
-      logError() << "Decoding of manufacturer codeplug is not implemented for radio '" <<
-                    RadioInfo::byID(radio).name() << "'.";
-      return -1;
-    }
-    DMR6X2UVCodeplug codeplug;
-    if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::DR1801UV == radio) {
-    DR1801UVCodeplug codeplug;
-    if (parser.isSet("manufacturer")) {
-      if (! DR1801UVFileReader::read(filename, &codeplug, err)) {
-        logError() << "Cannot decode manufacturer codeplug file '" << filename
-                   << "':\n" << err.format();
-        return -1;
-      }
-    } else if (! codeplug.read(filename, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "' :\n" << err.format();
-      return -1;
-    }
-    if (! codeplug.decode(&config, err)) {
-      logError() << "Cannot decode binary codeplug file '" << filename
-                 << "':\n" << err.format();
-      return -1;
-    }
-  } else {
+    } break;
+  default:
     logError() << "Decoding not implemented for " << RadioInfo::byID(radio).name() << ".";
     return -1;
   }

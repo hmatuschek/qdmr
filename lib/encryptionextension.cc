@@ -158,12 +158,12 @@ EncryptionKeys::EncryptionKeys(QObject *parent)
 }
 
 int
-EncryptionKeys::add(ConfigObject *obj, int row) {
+EncryptionKeys::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<EncryptionKey>())) {
     logError() << "Cannot add nullptr or non-encryption key objects to key list.";
     return -1;
   }
-  return ConfigObjectList::add(obj, row);
+  return ConfigObjectList::add(obj, row, unique);
 }
 
 ConfigItem *

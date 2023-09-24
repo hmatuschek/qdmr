@@ -1,7 +1,12 @@
 #ifndef DR1801UVCODEPLUG_HH
 #define DR1801UVCODEPLUG_HH
 
+#include "channel.hh"
 #include "codeplug.hh"
+#include "contact.hh"
+
+class Zone;
+
 
 /** Implements the binary codeplug representation of a BTECH DR-1801UV (a.k.a, BF-1801-A6).
  *

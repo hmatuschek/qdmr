@@ -20,7 +20,7 @@ Visitor::process(Config *config, const ErrorStack &err) {
 
 bool
 Visitor::processItem(ConfigItem *item, const ErrorStack &err) {
-  // Serialize all properties
+  // Process all properties
   const QMetaObject *meta = item->metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
@@ -72,8 +72,20 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
       return false;
     }
   } else if (QString("QString") == prop.typeName()) {
-    if (! this->processBool(item, prop, err)) {
+    if (! this->processString(item, prop, err)) {
       errMsg(err) << "While processing string '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
+  } else if (QString("Frequency") == prop.typeName()) {
+    if (! this->processFrequency(item, prop, err)) {
+      errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
+  } else if (QString("Interval") == prop.typeName()) {
+    if (! this->processFrequency(item, prop, err)) {
+      errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
@@ -90,7 +102,12 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
       return false;
     }
   } else if (propIsInstance<ConfigItem>(prop)) {
-    if (! this->processItem(prop.read(item).value<ConfigItem *>(), err)) {
+    ConfigItem *pitem = prop.read(item).value<ConfigItem *>();
+    // Some items, held as writeable properties might be null (e.g., extensions)
+    if (prop.isWritable() && (nullptr == pitem))
+      return true;
+    // Go for it
+    if (! this->processItem(pitem, err)) {
       errMsg(err) << "While processing item '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
@@ -150,6 +167,20 @@ Visitor::processDouble(ConfigItem *parent, const QMetaProperty &prop, const Erro
 
 bool
 Visitor::processString(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processFrequency(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processInterval(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
   Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
   // Does nothing, return true;
   return true;

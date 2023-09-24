@@ -241,7 +241,7 @@ public:
 
 public:
   /** Constructs a new empty analog channel. */
-  explicit FMChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit FMChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   FMChannel(const FMChannel &other, QObject *parent=nullptr);
 
@@ -390,7 +390,7 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  explicit DMRChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
@@ -548,7 +548,7 @@ public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;

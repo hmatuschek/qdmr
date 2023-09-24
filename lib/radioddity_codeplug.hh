@@ -432,7 +432,7 @@ public:
     virtual Zone *toZoneObj(Context &ctx) const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    virtual bool linkZoneObj(Zone *zone, Context &ctx) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -1309,9 +1309,10 @@ public:
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
-  /** Encodes the given generic configuration as a binary codeplug. */
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err) const;
   bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:

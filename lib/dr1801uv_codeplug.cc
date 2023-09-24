@@ -1,6 +1,10 @@
 #include "dr1801uv_codeplug.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include "zone.hh"
+#include "config.hh"
+
+#include <QRegularExpression>
 
 
 /* ******************************************************************************************** *

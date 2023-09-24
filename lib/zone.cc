@@ -115,9 +115,9 @@ ZoneList::zone(int idx) const {
 }
 
 int
-ZoneList::add(ConfigObject *obj, int row) {
+ZoneList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<Zone>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

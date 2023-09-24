@@ -3,6 +3,7 @@
 #include <QtEndian>
 #include "logger.hh"
 #include "roamingchannel.hh"
+#include "configcopyvisitor.hh"
 
 
 /* ********************************************************************************************* *
@@ -685,4 +686,15 @@ Codeplug::Codeplug(QObject *parent)
 
 Codeplug::~Codeplug() {
 	// pass...
+}
+
+Config *
+Codeplug::preprocess(Config *config, const ErrorStack &err) const {
+  return ConfigCopy::copy(config, err)->as<Config>();
+}
+
+bool
+Codeplug::postprocess(Config *config, const ErrorStack &err) const {
+  Q_UNUSED(config); Q_UNUSED(err);
+  return true;
 }
