@@ -1,3 +1,4 @@
+#include "userdatabase.hh"
 #include "d878uv2.hh"
 #include "config.hh"
 #include "logger.hh"

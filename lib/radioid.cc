@@ -194,12 +194,12 @@ RadioIDList::find(uint32_t id) const {
 }
 
 int
-RadioIDList::add(ConfigObject *obj, int row) {
+RadioIDList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<DMRRadioID>()))
     return -1;
 
   bool was_empty = (0 == count());
-  int idx = ConfigObjectList::add(obj, row);
+  int idx = ConfigObjectList::add(obj, row, unique);
   if (0 > idx)
     return idx;
   // automatically select first added ID as default

@@ -1,3 +1,6 @@
+#include "gpssystem.hh"
+#include "roamingchannel.hh"
+#include "config.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "utils.hh"
 #include "logger.hh"

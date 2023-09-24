@@ -18,6 +18,7 @@
 #include "dmr6x2uv.hh"
 
 #include "config.hh"
+#include "configcopyvisitor.hh"
 #include "logger.hh"
 
 #include <QSet>

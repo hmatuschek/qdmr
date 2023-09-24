@@ -1,5 +1,7 @@
 #include "md390_codeplug.hh"
+#include "config.hh"
 #include "logger.hh"
+#include "intermediaterepresentation.hh"
 
 
 #define NUM_CHANNELS                1000
@@ -168,6 +170,40 @@ MD390Codeplug::MD390Codeplug(QObject *parent)
   clear();
 }
 
+Config *
+MD390Codeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = TyTCodeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot prepare codeplug for MD-390.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zones in codeplug for MD-390.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+bool
+MD390Codeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! TyTCodeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process MD-390 codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merge zones from decoded MD-390 codeplug.";
+    return false;
+  }
+
+  return true;
+}
+
 bool
 MD390Codeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   logDebug() << "Decode MD390 codeplug, programmed with CPS version "
@@ -303,36 +339,19 @@ MD390Codeplug::clearZones() {
 
 bool
 MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0,z=0; i<NUM_ZONES; i++, z++) {
+  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
+
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     zone.clear();
-
-    if (z < config->zones()->count()) {
-      // handle A list
-      Zone *obj = config->zones()->zone(z);
-      bool needs_ext = obj->B()->count();
-      // set name
-      if (needs_ext)
-        zone.setName(obj->name() + " A");
-      else
-        zone.setName(obj->name());
-      // fill channels
-      for (int c=0; c<16; c++) {
-        if (c < obj->A()->count())
-          zone.setMemberIndex(c, ctx.index(obj->A()->get(c)));
-      }
-      // If there is a B list, add a zone more
-      if (needs_ext) {
-        i++;
-        ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
-        zone.clear();
-        zone.setName(obj->name() + " B");
-        for (int c=0; c<16; c++) {
-          if (c < obj->B()->count())
-            zone.setMemberIndex(c, ctx.index(obj->B()->get(c)));
-        }
-      }
+    if (! ctx.has<Zone>(i+1))
+      continue;
+    Zone *obj = ctx.get<Zone>(i+1);
+    zone.setName(obj->name());
+    // fill channels
+    for (int c=0; c<16; c++) {
+      if (c < obj->A()->count())
+        zone.setMemberIndex(c, ctx.index(obj->A()->get(c)));
     }
   }
 
@@ -342,20 +361,15 @@ MD390Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, con
 bool
 MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  Zone *last_zone = nullptr;
+
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       continue;
-    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
-        (zone.name().startsWith(last_zone->name()));
-    Zone *obj = last_zone;
-    if (! is_ext) {
-      last_zone = obj = new Zone(zone.name());
-      if (zone.name().endsWith(" A"))
-        obj->setName(zone.name().chopped(2));
-      config->zones()->add(obj); ctx.add(obj, i+1);
-    }
+    Zone *obj = new Zone(zone.name());
+    obj->setName(zone.name());
+    config->zones()->add(obj);
+    ctx.add(obj, i+1);
   }
 
   return true;
@@ -364,31 +378,21 @@ MD390Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) 
 bool
 MD390Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  Zone *last_zone = nullptr;
-  for (int i=0, z=0; i<NUM_ZONES; i++, z++) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       continue;
-    if (ctx.has<Zone>(i+1)) {
-      Zone *obj = last_zone = ctx.get<Zone>(i+1);
-      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
-        if (! ctx.has<Channel>(zone.memberIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->A()->add(ctx.get<Channel>(zone.memberIndex(i)));
+    if (! ctx.has<Zone>(i+1))
+      continue;
+
+    Zone *obj = ctx.get<Zone>(i+1);
+    for (int j=0; ((j<16) && zone.memberIndex(j)); j++) {
+      if (! ctx.has<Channel>(zone.memberIndex(j))) {
+        logWarn() << "Cannot link channel with index " << zone.memberIndex(j)
+                  << " channel not defined.";
+        continue;
       }
-    } else {
-      Zone *obj = last_zone; last_zone = nullptr;
-      for (int i=0; ((i<16) && zone.memberIndex(i)); i++) {
-        if (! ctx.has<Channel>(zone.memberIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.memberIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->B()->add(ctx.get<Channel>(zone.memberIndex(i)));
-      }
+      obj->A()->add(ctx.get<Channel>(zone.memberIndex(j)));
     }
   }
 

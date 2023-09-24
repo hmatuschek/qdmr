@@ -2,7 +2,9 @@
 #include "utils.hh"
 #include "logger.hh"
 #include "anytone_extension.hh"
+#include "config.hh"
 #include "melody.hh"
+#include "intermediaterepresentation.hh"
 #include <QTimeZone>
 #include <QRegularExpression>
 
@@ -4572,6 +4574,43 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   return true;
 }
+
+
+Config *
+AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+AnytoneCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool
 AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {

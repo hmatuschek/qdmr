@@ -24,7 +24,7 @@ public:
    * @param codeplug Specifies the codeplug object to store read codeplug.
    * @param errorMessage On error, contains an error message.
    * @returns @c true on success and @c false on error. */
-  static bool read(const QString &filename, MD390Codeplug *codeplug, QString &errorMessage);
+  static bool read(const QString &filename, MD390Codeplug *codeplug, const ErrorStack &err = ErrorStack());
 };
 
 #endif // MD390FILEREADER_HH
