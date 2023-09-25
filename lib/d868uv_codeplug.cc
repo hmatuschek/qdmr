@@ -1386,13 +1386,7 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   // Mark valid zones (set bits)
   ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
   unsigned int num_zones = std::min(Limit::numZones(), ctx.count<Zone>());
-  zone_bitmap.clear();
-  for (unsigned int i=0,z=0; i<num_zones; i++) {
-    zone_bitmap.setEncoded(z, true); z++;
-    if (0 != ctx.get<Zone>(i)->B()->count()) {
-      zone_bitmap.setEncoded(z, true); z++;
-    }
-  }
+  zone_bitmap.clear(); zone_bitmap.enableFirst(num_zones);
 
   // Mark group lists
   GroupListBitmapElement group_bitmap(data(Offset::groupListBitmap()));
@@ -1851,51 +1845,28 @@ D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &
   Q_UNUSED(flags); Q_UNUSED(err);
 
   // Encode zones
-  unsigned zidx = 0;
   for (unsigned int i=0; i<ctx.count<Zone>(); i++) {
     Zone *zone = ctx.get<Zone>(i);
     // Clear name and channel list
-    uint8_t  *name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
-    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
-    memset(name, 0, Size::zoneName());
+    uint8_t  *name     = (uint8_t *)data(Offset::zoneNames() + i*Offset::betweenZoneNames());
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels() + i*Offset::betweenZoneChannels());
+    encode_ascii(name, zone->name(), Limit::zoneNameLength(), 0);
     memset(channels, 0xff, Size::zoneChannels());
-    if (zone->B()->count())
-      encode_ascii(name, zone->name()+" A", Limit::zoneNameLength(), 0);
-    else
-      encode_ascii(name, zone->name(), Limit::zoneNameLength(), 0);
+
     // Handle list A
     for (int j=0; j<zone->A()->count(); j++) {
       channels[j] = qToLittleEndian(ctx.index(zone->A()->get(j)->as<Channel>()));
     }
 
-    if (! encodeZone(zidx, zone, false, flags, ctx, err))
+    if (! encodeZone(i, zone, flags, ctx, err))
       return false;
-    zidx++;
-
-    if (0 == zone->B()->count())
-      continue;
-
-    // Process list B if present
-    name     = (uint8_t *)data(Offset::zoneNames() + zidx*Offset::betweenZoneNames());
-    channels = (uint16_t *)data(Offset::zoneChannels() + zidx*Offset::betweenZoneChannels());
-    memset(name, 0, Size::zoneName());
-    memset(channels, 0xff, Size::zoneChannels());
-    encode_ascii(name, zone->name()+" B", Limit::zoneNameLength(), 0);
-    // Handle list B
-    for (int j=0; j<zone->B()->count(); j++) {
-      channels[j] = qToLittleEndian(ctx.index(zone->B()->get(j)->as<Channel>()));
-    }
-
-    if (! encodeZone(zidx, zone, true, flags, ctx, err))
-      return false;
-    zidx++;
   }
   return true;
 }
 
 bool
-D868UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(isB); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+D868UVCodeplug::encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   return true;
 }
 
@@ -1905,8 +1876,6 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
 
   // Create zones
   ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
     if (! zone_bitmap.isEncoded(i))
@@ -1915,40 +1884,20 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
     QString zonename = decode_ascii(
           data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
           Limit::zoneNameLength(), 0);
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // If enabled, create zone with name
-    if (! extend_last_zone) {
-      last_zone = new Zone(zonename);
-      if (! decodeZone(i, last_zone, false, ctx, err)) {
-        last_zone->deleteLater();
-        return false;
-      }
-      // add to config
-      logDebug() << "Store zone '" << zonename << "' at index " << i << ".";
-      ctx.config()->zones()->add(last_zone); ctx.add(last_zone, i);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-      if (! decodeZone(i, last_zone, true, ctx, err)) {
-        last_zone->deleteLater();
-        return false;
-      }
-      logDebug() << "Store merged zone '" << last_zonebasename << "' at index " << i << ".";
-      ctx.add(last_zone, i);
+    Zone *zone = new Zone(zonename);
+    if (! decodeZone(i, zone, ctx, err)) {
+      zone->deleteLater();
+      return false;
     }
+    // add to config
+    ctx.config()->zones()->add(zone); ctx.add(zone, i);
   }
   return true;
 }
 
 bool
-D868UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(isB); Q_UNUSED(ctx); Q_UNUSED(err)
+D868UVCodeplug::decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(i); Q_UNUSED(zone); Q_UNUSED(ctx); Q_UNUSED(err)
   return true;
 }
 
@@ -1958,33 +1907,14 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
 
   // Create zones
   ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   for (uint16_t i=0; i<Limit::numZones(); i++) {
     // Check if zone is enabled:
     if (! zone_bitmap.isEncoded(i))
       continue;
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = decode_ascii(
-          data(Offset::zoneNames()+i*Offset::betweenZoneNames()),
-          Limit::zoneNameLength(), 0);
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // If enabled, get zone
-    if (! extend_last_zone) {
-      last_zone = ctx.get<Zone>(i);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-    }
+    Zone *zone = ctx.get<Zone>(i);
 
     // link zone
-    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels()+i*Offset::betweenZoneChannels());
+    uint16_t *channels = (uint16_t *)data(Offset::zoneChannels() + i*Offset::betweenZoneChannels());
     for (uint8_t j=0; j<Limit::numChannelsPerZone(); j++, channels++) {
       // If not enabled -> continue
       if (0xffff == *channels)
@@ -1993,14 +1923,10 @@ D868UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
       uint16_t cidx = qFromLittleEndian(*channels);
       if (! ctx.has<Channel>(cidx))
         continue;
-      // If defined -> add channel to zone obj
-      if (extend_last_zone)
-        last_zone->B()->add(ctx.get<Channel>(cidx));
-      else
-        last_zone->A()->add(ctx.get<Channel>(cidx));
+      zone->A()->add(ctx.get<Channel>(cidx));
     }
 
-    if (! linkZone(i, last_zone, extend_last_zone, ctx, err))
+    if (! linkZone(i, zone, false, ctx, err))
       return false;
   }
   return true;

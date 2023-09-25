@@ -23,6 +23,35 @@
 #include "crc32.hh"
 
 
+template <class T>
+bool encode(Config &config, Codeplug::Flags flags, QCommandLineParser &parser) {
+  ErrorStack err;
+  T codeplug;
+
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
+    logError() << "Cannot pre-process codeplug: " << err.format();
+    return false;
+  }
+
+  if (! codeplug.encode(intermediate, flags, err)) {
+    logError() << "Cannot encode codeplug: " << err.format();
+    delete intermediate;
+    return false;
+  }
+  delete intermediate;
+
+  codeplug.image(0).sort();
+  if (! codeplug.write(parser.positionalArguments().at(2), err)) {
+    logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+               << "': " << err.format();
+    return false;
+  }
+
+  return true;
+}
+
+
 int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   Q_UNUSED(app);
 
@@ -80,128 +109,56 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  if (RadioInfo::MD390 == radio) {
-    MD390Codeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+  switch (radio) {
+  case RadioInfo::MD390:
+    if (! encode<MD390Codeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::UV390 == radio) {
-    UV390Codeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::UV390:
+    if (! encode<UV390Codeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::MD2017 == radio) {
-    MD2017Codeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::MD2017:
+    if (! encode<MD2017Codeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::RD5R == radio) {
-    RD5RCodeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::RD5R:
+    if (! encode<RD5RCodeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::GD77 == radio) {
-    GD77Codeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::GD77:
+    if (! encode<GD77Codeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::OpenGD77 == radio) {
-    OpenGD77Codeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::OpenGD77:
+    if (! encode<OpenGD77Codeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::OpenRTX == radio) {
-    OpenRTXCodeplug codeplug;
-    codeplug.encode(&config, flags, err);
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::OpenRTX:
+    if (! encode<OpenRTXCodeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::D868UVE == radio) {
-    D868UVCodeplug codeplug;
-    if(! codeplug.encode(&config, flags, err)) {
-      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::D868UVE:
+    if (! encode<D868UVCodeplug>(config, flags, parser))
       return -1;
-    }
-    codeplug.image(0).sort();
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::D878UV:
+    if (! encode<D878UVCodeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::D878UV == radio) {
-    D878UVCodeplug codeplug;
-    if (! codeplug.encode(&config, flags, err)) {
-      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::D878UVII:
+    if (! encode<D878UV2Codeplug>(config, flags, parser))
       return -1;
-    }
-    codeplug.image(0).sort();
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::D578UV:
+    if (! encode<D578UVCodeplug>(config, flags, parser))
       return -1;
-    }
-  } else if (RadioInfo::D878UVII == radio) {
-    D878UV2Codeplug codeplug;
-    if (! codeplug.encode(&config, flags, err)) {
-      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
+    break;
+  case RadioInfo::DMR6X2UV:
+    if (! encode<DMR6X2UVCodeplug>(config, flags, parser))
       return -1;
-    }
-    codeplug.image(0).sort();
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::D578UV == radio) {
-    D578UVCodeplug codeplug;
-    if (! codeplug.encode(&config, flags, err)) {
-      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
-      return -1;
-    }
-    codeplug.image(0).sort();
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
-      return -1;
-    }
-  } else if (RadioInfo::DMR6X2UV == radio) {
-    DMR6X2UVCodeplug codeplug;
-    if (! codeplug.encode(&config, flags, err)) {
-      logError() << "Cannot encode codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
-      return -1;
-    }
-    codeplug.image(0).sort();
-    if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-      logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
-                 << "': " << err.format();
-      return -1;
-    }
-  } else {
+    break;
+  default:
     logError() << "Cannot encode codeplug: Unknown radio '" << parser.value("radio") << "'.";
     return -1;
   }

@@ -37,7 +37,7 @@ class DMRRadioID : public RadioID
 
 public:
   /** Default constructor. */
-  explicit DMRRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRRadioID(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the ID.
@@ -133,7 +133,7 @@ class DTMFRadioID: public RadioID
 
 public:
   /** Default constructor. */
-  explicit DTMFRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DTMFRadioID(QObject *parent=nullptr);
 
   /** Constructor from name and number.
    * @param name Specifies the name of the DTMF radio ID.
@@ -178,7 +178,7 @@ public:
   /** Searches the DMR ID object associated with the given DMR ID. */
   DMRRadioID *find(uint32_t id) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Adds the given DMR ID. */
   virtual int addId(const QString &name, uint32_t id);

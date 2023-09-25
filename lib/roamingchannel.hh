@@ -32,7 +32,7 @@ class RoamingChannel : public ConfigObject
 
 public:
   /** Default constructor for a roaming channel. */
-  explicit RoamingChannel(QObject *parent = nullptr);
+  Q_INVOKABLE explicit RoamingChannel(QObject *parent = nullptr);
   /** Copy constructor. */
   RoamingChannel(const RoamingChannel &other, QObject *parent=nullptr);
 
@@ -106,7 +106,7 @@ public:
   /** Returns the roaming channel at the given index. */
   RoamingChannel *channel(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

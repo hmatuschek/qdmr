@@ -223,9 +223,9 @@ RoamingChannelList::channel(int idx) const {
 }
 
 int
-RoamingChannelList::add(ConfigObject *obj, int row) {
+RoamingChannelList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RoamingChannel>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

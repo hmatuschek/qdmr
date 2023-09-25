@@ -1,3 +1,4 @@
+#include "userdatabase.hh"
 #include "d868uv_callsigndb.hh"
 #include "utils.hh"
 #include <QtEndian>

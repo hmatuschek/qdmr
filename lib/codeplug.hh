@@ -2,12 +2,13 @@
 #define CODEPLUG_HH
 
 #include <QObject>
-#include "dfufile.hh"
-#include "userdatabase.hh"
 #include <QHash>
-#include "config.hh"
+#include "dfufile.hh"
 
-//class Config;
+//#include "userdatabase.hh"
+//#include "config.hh"
+
+class Config;
 class ConfigItem;
 
 
@@ -270,6 +271,13 @@ public:
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */
   virtual bool decode(Config *config, const ErrorStack &err=ErrorStack()) = 0;
+  /** Retruns a post-processed configuration of the decoded config. By default, the passed
+   * config is returned. */
+  virtual bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
+  /** Retruns a prepared configuration for this particular radio. All unsupported featrues are
+   *  removed from the copy. The default implementation only copies the config. */
+  virtual Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
   virtual bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack()) = 0;

@@ -335,10 +335,10 @@ ContactList::ContactList(QObject *parent)
 }
 
 int
-ContactList::add(ConfigObject *obj, int row) {
+ContactList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<Contact>()))
     return -1;
-  return ConfigObjectList::add(obj, row);
+  return ConfigObjectList::add(obj, row, unique);
 }
 
 Contact *

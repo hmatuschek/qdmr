@@ -1,3 +1,5 @@
+#include "gpssystem.hh"
+#include "userdatabase.hh"
 #include "d878uv2_callsigndb.hh"
 #include "utils.hh"
 #include <QtEndian>
