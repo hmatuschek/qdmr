@@ -5,8 +5,8 @@
 #include <QSet>
 
 class Channel;
-class DigitalChannel;
-class AnalogChannel;
+class DMRChannel;
+class FMChannel;
 class ScanList;
 class EncryptionKey;
 
@@ -56,6 +56,9 @@ public:
     return _object->is<Type>();
   }
 
+  /** Compares the references. */
+  int compare(const ConfigObjectReference &other) const;
+
 signals:
   /** Gets emitted if the reference is changed.
    * This signal is not emitted if the referenced object is modified. */
@@ -90,26 +93,26 @@ public:
 };
 
 
-/** Represents a reference to a digital contact.
+/** Represents a reference to a DMR contact.
  * @ingroup conf*/
-class DigitalContactReference: public ContactReference
+class DMRContactReference: public ContactReference
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit DigitalContactReference(QObject *parent=nullptr);
+  explicit DMRContactReference(QObject *parent=nullptr);
 };
 
 
-/** List of references to digital contacts. */
-class DigitalContactRefList: public ConfigObjectRefList
+/** List of references to DMR contacts. */
+class DMRContactRefList: public ConfigObjectRefList
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit DigitalContactRefList(QObject *parent=nullptr);
+  explicit DMRContactRefList(QObject *parent=nullptr);
 };
 
 
@@ -130,27 +133,27 @@ public:
 };
 
 
-/** Implements a reference to a digital channel.
+/** Implements a reference to a DMR channel.
  * @ingroup conf */
-class DigitalChannelReference: public ChannelReference
+class DMRChannelReference: public ChannelReference
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit DigitalChannelReference(QObject *parent=nullptr);
+  explicit DMRChannelReference(QObject *parent=nullptr);
 };
 
 
-/** Implements a reference to a analog channel.
+/** Implements a reference to a FM channel.
  * @ingroup conf */
-class AnalogChannelReference: public ChannelReference
+class FMChannelReference: public ChannelReference
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit AnalogChannelReference(QObject *parent=nullptr);
+  explicit FMChannelReference(QObject *parent=nullptr);
 };
 
 
@@ -170,15 +173,27 @@ public:
 };
 
 
-/** Represents a list of references to some digital channels.
+/** Represents a list of references to some DMR channels.
  * @ingroup config */
-class DigitalChannelRefList: public ChannelRefList
+class DMRChannelRefList: public ChannelRefList
 {
   Q_OBJECT
 
 public:
   /** Empty constructor. */
-  explicit DigitalChannelRefList(QObject *parent=nullptr);
+  explicit DMRChannelRefList(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of references to some roaming channels.
+ * @ingroup config */
+class RoamingChannelRefList: public ConfigObjectRefList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RoamingChannelRefList(QObject *parent=nullptr);
 };
 
 
@@ -233,12 +248,12 @@ public:
 
 /** Implements a reference to a radio ID.
  * @ingroup conf */
-class RadioIDReference: public ConfigObjectReference {
+class DMRRadioIDReference: public ConfigObjectReference {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit RadioIDReference(QObject *parent=nullptr);
+  explicit DMRRadioIDReference(QObject *parent=nullptr);
 };
 
 
@@ -272,6 +287,17 @@ class EncryptionKeyReference: public ConfigObjectReference {
 public:
   /** Constructor. */
   explicit EncryptionKeyReference(QObject *parent=nullptr);
+};
+
+
+/** Implements a reference to a zone.
+ * @ingroup conf */
+class ZoneReference: public ConfigObjectReference {
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit ZoneReference(QObject *parent=nullptr);
 };
 
 

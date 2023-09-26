@@ -2,21 +2,22 @@
 #define CONTACT_HH
 
 #include "configobject.hh"
-#include "anytone_extension.hh"
-#include "opengd77_extension.hh"
 #include <QVector>
 #include <QAbstractTableModel>
 
+#include "anytone_extension.hh"
+#include "opengd77_extension.hh"
 
 class Config;
 
 
-/** Represents the base-class for all contact types, Analog (DTMF) or Digital (DMR).
+/** Represents the base-class for all contact types, analog (DTMF) or digital (DMR, M17).
  *
  * @ingroup conf */
 class Contact: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "cont")
 
   /** If @c true and supported by radio, ring on call from this contact. */
   Q_PROPERTY(bool ring READ ring WRITE setRing)
@@ -67,9 +68,24 @@ protected:
 };
 
 
+/** Base class for all analog contacts.
+ * @ingroup conf */
+class AnalogContact: public Contact
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit AnalogContact(QObject *parent=nullptr);
+
+  /** Constructor. */
+  AnalogContact(const QString &name, bool rxTone, QObject *parent=nullptr);
+};
+
+
 /** Represents an analog contact, that is a DTMF number.
  * @ingroup conf */
-class DTMFContact: public Contact
+class DTMFContact: public AnalogContact
 {
 	Q_OBJECT
 
@@ -78,7 +94,7 @@ class DTMFContact: public Contact
 
 public:
   /** Default constructor. */
-  explicit DTMFContact(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DTMFContact(QObject *parent=nullptr);
   /** Constructs a DTMF (analog) contact.
    * @param name   Specifies the contact name.
    * @param number Specifies the DTMF number (0-9,A,B,C,D,*,#).
@@ -104,9 +120,24 @@ protected:
 };
 
 
-/** Represents a digital contact, that is a DMR number.
+/** Base class for all digital contacts.
  * @ingroup conf */
 class DigitalContact: public Contact
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit DigitalContact(QObject *parent=nullptr);
+
+  /** Hidden constructor. */
+  DigitalContact(const QString &name, bool ring, QObject *parent=nullptr);
+};
+
+
+/** Represents a digital contact, that is a DMR number.
+ * @ingroup conf */
+class DMRContact: public DigitalContact
 {
 	Q_OBJECT
 
@@ -130,14 +161,15 @@ public:
 
 public:
   /** Default constructor. */
-  explicit DigitalContact(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRContact(QObject *parent=nullptr);
+
   /** Constructs a DMR (digital) contact.
    * @param type   Specifies the call type (private, group, all-call).
    * @param name   Specifies the contact name.
    * @param number Specifies the DMR number for this contact.
    * @param ring Specifies whether the ring-tone is enabled for this contact.
    * @param parent Specifies the QObject parent. */
-  DigitalContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
+  DMRContact(Type type, const QString &name, unsigned number, bool ring=false, QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   void clear();
@@ -195,7 +227,7 @@ public:
   /** Constructs an empty contact list. */
 	explicit ContactList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Returns the number of digital contacts. */
 	int digitalCount() const;
@@ -205,16 +237,11 @@ public:
   /** Returns the contact at index @c idx. */
   Contact *contact(int idx) const;
   /** Returns the digital contact at index @c idx among digital contacts. */
-  DigitalContact *digitalContact(int idx) const;
+  DMRContact *digitalContact(int idx) const;
   /** Searches for a digital contact with the given number. */
-  DigitalContact *findDigitalContact(unsigned number) const;
+  DMRContact *findDigitalContact(unsigned number) const;
   /** Returns the DTMF contact at index @c idx among DTMF contacts. */
   DTMFContact *dtmfContact(int idx) const;
-
-  /** Returns the index of the given digital contact within digital contacts. */
-  int indexOfDigital(DigitalContact *contact) const;
-  /** Returns the index of the given DTMF contact within DTMF contacts. */
-  int indexOfDTMF(DTMFContact *contact) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

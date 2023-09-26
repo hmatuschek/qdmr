@@ -17,7 +17,7 @@
  *
  * The funny thing is, however, that there is a command that sets the memory read and write address,
  * although the DFU interface actually provides means to specify that address. Moreover, commands
- * and data are send and written to the same DFU interface number. Someone did not understood the
+ * and data are sent and written to the same DFU interface number. Someone did not understand the
  * DFU interface.
  *
  * @subsection Commands
@@ -59,35 +59,8 @@
  *  <tr><td>0x07</td>     <td>16</td>         <td>Unknown</td></tr>
  * </table>
  *
- * @subsubsection tytidsa Set address
- * The request written is
- * @code
- * +------+------+------+------+------+
- * | 0x21 | Address little endian     |
- * +------+------+------+------+------+
- * @endcode
- * There is no response read back. Before reading or writing memory, the address must be set using
- * this command. The start block for reading/writing this memory, is 2.
- *
- * @subsubsection tytife Erase
- * The request written is
- * @code
- * +------+------+------+------+------+
- * | 0x41 | Address little endian     |
- * +------+------+------+------+------+
- * @endcode
- * There is no response read. The erased page size appears to be 0x010000 bytes.
- *
- * @subsection tytifrw Read and write memory
- * Before writing memory, it must be erased.
- *
- * Before reading and writing memory, the address must be set.
- *
- * After this, the memory can be read/written by simply writing to consecutive blocks starting
- * with block 2.
- *
  * @ingroup tyt */
-class TyTInterface : public DFUDevice, public RadioInterface
+class TyTInterface : public DFUSEDevice, public RadioInterface
 {
   Q_OBJECT
 

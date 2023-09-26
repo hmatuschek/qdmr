@@ -17,7 +17,7 @@
  * Implementation of RXGroupList
  * ********************************************************************************************* */
 RXGroupList::RXGroupList(QObject *parent)
-  : ConfigObject("grp", parent), _contacts()
+  : ConfigObject(parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -25,7 +25,7 @@ RXGroupList::RXGroupList(QObject *parent)
 }
 
 RXGroupList::RXGroupList(const QString &name, QObject *parent)
-  : ConfigObject(name, "grp", parent), _contacts()
+  : ConfigObject(name, parent), _contacts()
 {
   connect(&_contacts, SIGNAL(elementModified(int)), this, SLOT(onModified()));
   connect(&_contacts, SIGNAL(elementRemoved(int)), this, SLOT(onModified()));
@@ -59,15 +59,15 @@ RXGroupList::clear() {
   emit modified(this);
 }
 
-DigitalContact *
+DMRContact *
 RXGroupList::contact(int idx) const {
   if (idx >= _contacts.count())
     return nullptr;
-  return _contacts.get(idx)->as<DigitalContact>();
+  return _contacts.get(idx)->as<DMRContact>();
 }
 
 int
-RXGroupList::addContact(DigitalContact *contact, int idx) {
+RXGroupList::addContact(DMRContact *contact, int idx) {
   return _contacts.add(contact, idx);
 }
 
@@ -76,12 +76,12 @@ RXGroupList::remContact(int idx) {
   return _contacts.del(_contacts.get(idx));
 }
 
-const DigitalContactRefList *
+const DMRContactRefList *
 RXGroupList::contacts() const {
   return &_contacts;
 }
 
-DigitalContactRefList *
+DMRContactRefList *
 RXGroupList::contacts() {
   return &_contacts;
 }
@@ -117,9 +117,9 @@ RXGroupLists::list(int idx) const {
 }
 
 int
-RXGroupLists::add(ConfigObject *obj, int row) {
+RXGroupLists::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RXGroupList>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

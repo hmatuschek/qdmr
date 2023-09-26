@@ -21,71 +21,71 @@
  * @ingroup util */
 class UserDatabase : public QAbstractTableModel
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	/** Represents the user information within the @c UserDatabase. */
-	class User {
-	public:
-		/** Empty constructor. */
-		User();
-		/** Constructs entry from JSON object. */
-		User(const QJsonObject &obj);
+  /** Represents the user information within the @c UserDatabase. */
+  class User {
+  public:
+    /** Empty constructor. */
+    User();
+    /** Constructs entry from JSON object. */
+    User(const QJsonObject &obj);
 
-		/** Returns @c true if the entry is valid. */
-		inline bool isValid() const { return 0 != id; }
+    /** Returns @c true if the entry is valid. */
+    inline bool isValid() const { return 0 != id; }
 
     /** Returns the "distance" between this user and the given ID. */
     unsigned distance(unsigned id) const;
 
-		/** The DMR ID of the user. */
-		unsigned id;
-		/** The callsign of the user. */
-		QString call;
-		/** The name of the user. */
-		QString name;
-		/** The surname of the user. */
-		QString surname;
+    /** The DMR ID of the user. */
+    unsigned id;
+    /** The callsign of the user. */
+    QString call;
+    /** The name of the user. */
+    QString name;
+    /** The surname of the user. */
+    QString surname;
     /** The city of the user. */
     QString city;
     /** The state of the user. */
     QString state;
-		/** The country of the user. */
-		QString country;
+    /** The country of the user. */
+    QString country;
     /** Some arbitrary comment or text. */
     QString comment;
-	};
+  };
 
 public:
-	/** Constructs the user-database.
-	 * The constructor will download the current user database if it was not downloaded yet or
-	 * if the downloaded version is older than @c updatePeriodDays days. */
-	explicit UserDatabase(unsigned updatePeriodDays=30, QObject *parent=nullptr);
+  /** Constructs the user-database.
+   * The constructor will download the current user database if it was not downloaded yet or
+   * if the downloaded version is older than @c updatePeriodDays days. */
+  explicit UserDatabase(unsigned updatePeriodDays=30, QObject *parent=nullptr);
 
   /** Returns the number of users. */
   qint64 count() const;
 
-	/** Loads all entries from the downloaded user database. */
-	bool load();
-	/** Loads all entries from the downloaded user database at the specified location. */
-	bool load(const QString &filename);
+  /** Loads all entries from the downloaded user database. */
+  bool load();
+  /** Loads all entries from the downloaded user database at the specified location. */
+  bool load(const QString &filename);
 
   /** Sorts users with respect to the distance to the given ID. */
   void sortUsers(unsigned id);
   /** Sorts users with respect to the minimum distance to the given IDs. */
   void sortUsers(const QSet<unsigned> &ids);
 
-	/** Returns the user with index @c idx. */
+  /** Returns the user with index @c idx. */
   const User &user(int idx) const;
 
-	/** Returns the age of the database in days. */
-	unsigned dbAge() const;
+  /** Returns the age of the database in days. */
+  unsigned dbAge() const;
 
-	/** Implements the QAbstractTableModel interface, returns the number of rows (number of entries). */
+  /** Implements the QAbstractTableModel interface, returns the number of rows (number of entries). */
   int rowCount(const QModelIndex &parent=QModelIndex()) const;
-	/** Implements the QAbstractTableModel interface, returns the number of columns. */
+  /** Implements the QAbstractTableModel interface, returns the number of columns. */
   int columnCount(const QModelIndex &parent=QModelIndex()) const;
-	/** Implements the QAbstractTableModel interface, return the entry data. */
+  /** Implements the QAbstractTableModel interface, return the entry data. */
   QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
 
 signals:
@@ -95,18 +95,18 @@ signals:
   void error(const QString &msg);
 
 public slots:
-	/** Starts the download of the user database. */
-	void download();
+  /** Starts the download of the user database. */
+  void download();
 
 private slots:
-	/** Gets called whenever the download is complete. */
-	void downloadFinished(QNetworkReply *reply);
+  /** Gets called whenever the download is complete. */
+  void downloadFinished(QNetworkReply *reply);
 
 private:
-	/** Holds all users sorted by their ID. */
-	QVector<User>         _user;
-	/** The network access used for downloading. */
-	QNetworkAccessManager _network;
+  /** Holds all users sorted by their ID. */
+  QVector<User>         _user;
+  /** The network access used for downloading. */
+  QNetworkAccessManager _network;
 };
 
 

@@ -1,9 +1,16 @@
 #include "anytone_codeplug.hh"
 #include "utils.hh"
 #include "logger.hh"
+#include "anytone_extension.hh"
+#include "config.hh"
+#include "melody.hh"
+#include "intermediaterepresentation.hh"
 #include <QTimeZone>
+#include <QRegularExpression>
 
 using namespace Signaling;
+
+#define CUSTOM_CTCSS_TONE 0x33
 
 Code _anytone_ctcss_num2code[52] = {
   SIGNALING_NONE, // 62.5 not supported
@@ -56,6 +63,118 @@ QVector<char> _anytone_bin_dtmf_tab = {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::BitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::BitmapElement::BitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::BitmapElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+AnytoneCodeplug::BitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return (_data[byte] & (1 << bit));
+}
+
+void
+AnytoneCodeplug::BitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] |= (1 << bit);
+  else
+    _data[byte] &= ~(1 << bit);
+}
+
+void
+AnytoneCodeplug::BitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0xff, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] |= (1<<i);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::InvertedBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::InvertedBitmapElement::InvertedBitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::InvertedBitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return 0 == (_data[byte] & (1 << bit));
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] &= ~(1 << bit);
+  else
+    _data[byte] |= (1 << bit);
+}
+
+void
+AnytoneCodeplug::InvertedBitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0x00, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] &= ~(1<<i);
+  }
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::InvertedBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::InvertedBytemapElement::InvertedBytemapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::InvertedBytemapElement::isEncoded(unsigned int idx) const {
+  if (idx >= _size)
+    return false;
+  return 0 == _data[idx];
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::setEncoded(unsigned int idx, bool enable) {
+  if (idx >= _size)
+    return;
+  _data[idx] = enable ? 0x00 : 0xff;
+}
+
+void
+AnytoneCodeplug::InvertedBytemapElement::enableFirst(unsigned int n) {
+  memset(_data, 0x00, n);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
@@ -65,7 +184,7 @@ AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Element(ptr, 0x0040)
+  : Element(ptr, ChannelElement::size())
 {
   // pass...
 }
@@ -80,7 +199,7 @@ AnytoneCodeplug::ChannelElement::clear() {
   setTXOffset(0);
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
-  setBandwidth(AnalogChannel::Bandwidth::Narrow);
+  setBandwidth(FMChannel::Bandwidth::Narrow);
   setRXTone(Signaling::SIGNALING_NONE);
   setTXTone(Signaling::SIGNALING_NONE);
   setBit(0x0008, 5, false); // Unused set to 0
@@ -163,17 +282,17 @@ AnytoneCodeplug::ChannelElement::setPower(Channel::Power power) {
   }
 }
 
-AnalogChannel::Bandwidth
+FMChannel::Bandwidth
 AnytoneCodeplug::ChannelElement::bandwidth() const {
   if (getBit(0x0008, 4))
-    return AnalogChannel::Bandwidth::Wide;
-  return AnalogChannel::Bandwidth::Narrow;
+    return FMChannel::Bandwidth::Wide;
+  return FMChannel::Bandwidth::Narrow;
 }
 void
-AnytoneCodeplug::ChannelElement::setBandwidth(AnalogChannel::Bandwidth bw) {
+AnytoneCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
   switch (bw) {
-  case AnalogChannel::Bandwidth::Narrow: setBit(0x0008, 4, false); break;
-  case AnalogChannel::Bandwidth::Wide: setBit(0x0008, 4, true); break;
+  case FMChannel::Bandwidth::Narrow: setBit(0x0008, 4, false); break;
+  case FMChannel::Bandwidth::Wide: setBit(0x0008, 4, true); break;
   }
 }
 
@@ -283,6 +402,10 @@ AnytoneCodeplug::ChannelElement::enableTalkaround(bool enable) {
   setBit(0x0009, 7, enable);
 }
 
+bool
+AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000a);
+}
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txCTCSS() const {
   return ctcss_num2code(getUInt8(0x000a));
@@ -290,6 +413,14 @@ AnytoneCodeplug::ChannelElement::txCTCSS() const {
 void
 AnytoneCodeplug::ChannelElement::setTXCTCSS(Code tone) {
   setUInt8(0x000a, ctcss_code2num(tone));
+}
+void
+AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
+  setUInt8(0x000a, CUSTOM_CTCSS_TONE);
+}
+bool
+AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(0x000b);
 }
 Signaling::Code
 AnytoneCodeplug::ChannelElement::rxCTCSS() const {
@@ -299,6 +430,11 @@ void
 AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
   setUInt8(0x000b, ctcss_code2num(tone));
 }
+void
+AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
+  setUInt8(0x000b, CUSTOM_CTCSS_TONE);
+}
+
 Signaling::Code
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
@@ -369,12 +505,12 @@ AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
   return setUInt8(0x0018, idx);
 }
 
-AnytoneAnalogChannelExtension::SquelchMode
+AnytoneFMChannelExtension::SquelchMode
 AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (AnytoneAnalogChannelExtension::SquelchMode)getUInt3(0x0019, 4);
+  return (AnytoneFMChannelExtension::SquelchMode)getUInt3(0x0019, 4);
 }
 void
-AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode mode) {
+AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) {
   setUInt3(0x0019, 4, (unsigned)mode);
 }
 
@@ -464,15 +600,15 @@ AnytoneCodeplug::ChannelElement::setColorCode(unsigned code) {
   setUInt8(0x0020, code);
 }
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 AnytoneCodeplug::ChannelElement::timeSlot() const {
   if (false == getBit(0x0021, 0))
-    return DigitalChannel::TimeSlot::TS1;
-  return DigitalChannel::TimeSlot::TS2;
+    return DMRChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS2;
 }
 void
-AnytoneCodeplug::ChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+AnytoneCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setBit(0x0021, 0, false);
   else
     setBit(0x0021, 0, true);
@@ -553,123 +689,68 @@ AnytoneCodeplug::ChannelElement::setName(const QString &name) {
   writeASCII(0x0023, name, 16, 0x00);
 }
 
-bool
-AnytoneCodeplug::ChannelElement::ranging() const {
-  return getBit(0x0034, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRanging(bool enable) {
-  setBit(0x0034, 0, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::throughMode() const {
-  return getBit(0x0034, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableThroughMode(bool enable) {
-  setBit(0x0034, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::dataACK() const {
-  return !getBit(0x0034, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableDataACK(bool enable) {
-  setBit(0x0034, 2, !enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(0x0035, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(0x0035, 0, enable);
-}
-unsigned
-AnytoneCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0036);
-}
-void
-AnytoneCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0036, idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(0x003a);
-}
-void
-AnytoneCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x003a, idx);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::multipleKeyEncryption() const {
-  return getBit(0x003b, 0);
-}
-void
-AnytoneCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
-  setBit(0x003b, 0, enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::randomKey() const {
-  return getBit(0x003b, 1);
-}
-void
-AnytoneCodeplug::ChannelElement::enableRandomKey(bool enable) {
-  setBit(0x003b, 1, enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::sms() const {
-  return !getBit(0x003b, 2);
-}
-void
-AnytoneCodeplug::ChannelElement::enableSMS(bool enable) {
-  setBit(0x003b, 0, !enable);
-}
-
 
 Channel *
 AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
+  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as analog channel.";
-    AnalogChannel *ach = new AnalogChannel();
+    FMChannel *ach = new FMChannel();
     switch(this->admit()) {
-    case Admit::Always: ach->setAdmit(AnalogChannel::Admit::Always); break;
-    case Admit::Busy: ach->setAdmit(AnalogChannel::Admit::Free); break;
-    case Admit::Tone: ach->setAdmit(AnalogChannel::Admit::Tone); break;
-    default: ach->setAdmit(AnalogChannel::Admit::Always); break;
+    case Admit::Always: ach->setAdmit(FMChannel::Admit::Always); break;
+    case Admit::Busy: ach->setAdmit(FMChannel::Admit::Free); break;
+    case Admit::Tone: ach->setAdmit(FMChannel::Admit::Tone); break;
+    default: ach->setAdmit(FMChannel::Admit::Always); break;
     }
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+
+    // Create extension
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    ach->setAnytoneChannelExtension(ext);
+    ext->enableReverseBurst(ctcssPhaseReversal());
+    ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
+    ext->enableTXCustomCTCSS(txCTCSSIsCustom());
+    ext->setCustomCTCSS(customCTCSSFrequency());
+    ext->setSquelchMode(squelchMode());
+
+    // done
     ch = ach;
   } else if ((Mode::Digital == mode()) || (Mode::MixedDigital == mode())) {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as digital channel.";
-    DigitalChannel *dch = new DigitalChannel();
+    DMRChannel *dch = new DMRChannel();
     switch (this->admit()) {
-    case Admit::Always: dch->setAdmit(DigitalChannel::Admit::Always); break;
-    case Admit::Free: dch->setAdmit(DigitalChannel::Admit::Free); break;
-    case Admit::ColorCode: dch->setAdmit(DigitalChannel::Admit::ColorCode); break;
-    case Admit::DifferentColorCode:
-      logWarn() << "Cannot decode admit cirit. 'different CC', use 'same CC' instead.";
-      dch->setAdmit(DigitalChannel::Admit::ColorCode);
+    case Admit::Always: dch->setAdmit(DMRChannel::Admit::Always); break;
+    case Admit::Free: dch->setAdmit(DMRChannel::Admit::Free); break;
+    case Admit::DifferentColorCode:dch->setAdmit(DMRChannel::Admit::ColorCode); break;
+    case Admit::SameColorCode:
+      logWarn() << "Cannot decode admit cirit. 'same CC', use 'different CC' instead.";
+      dch->setAdmit(DMRChannel::Admit::ColorCode);
       break;
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+
+    // Create extension
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    dch->setAnytoneChannelExtension(ext);
+    ext->enableCallConfirm(callConfirm());
+    ext->enableSMSConfirm(smsConfirm());
+    ext->enableSimplexTDMA(simplexTDMA());
+    ext->enableAdaptiveTDMA(adaptiveTDMA());
+    ext->enableLoneWorker(loneWorker());
+    // Done
     ch = dch;
   } else {
     logError() << "Cannot create channel '" << name()
@@ -678,14 +759,19 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   }
 
   ch->setName(name());
-  ch->setRXFrequency(rxFrequency()/1e6);
-  ch->setTXFrequency(txFrequency()/1e6);
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
 
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
+
+  // Apply common channel extension settings
+  if (nullptr != ch_ext) {
+    ch_ext->enableTalkaround(talkaround());
+  }
 
   return ch;
 }
@@ -694,27 +780,21 @@ bool
 AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (Mode::Digital == mode()) {
     // If channel is digital
-    DigitalChannel *dc = c->as<DigitalChannel>();
+    DMRChannel *dc = c->as<DMRChannel>();
     if (nullptr == dc)
       return false;
 
     // Check if default contact is set, in fact a valid contact index is mandatory.
-    if (! ctx.has<DigitalContact>(contactIndex())) {
+    if (! ctx.has<DMRContact>(contactIndex())) {
       logError() << "Cannot resolve contact index " << contactIndex() << " for channel '"
                  << c->name() << "'.";
       return false;
     }
-    dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
+    dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-
-    // Link to GPS system
-    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
-      logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
@@ -724,7 +804,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setRadioIdObj(rid);
   } else if (Mode::Analog == mode()) {
     // If channel is analog
-    AnalogChannel *ac = c->as<AnalogChannel>();
+    FMChannel *ac = c->as<FMChannel>();
     if (nullptr == ac)
       return false;
   }
@@ -746,8 +826,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency()*1e6);
-  setTXFrequency(c->txFrequency()*1e6);
+  setRXFrequency(c->rxFrequency().inHz());
+  setTXFrequency(c->txFrequency().inHz());
   // set power
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
@@ -761,33 +841,46 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     setScanListIndex(ctx.index(c->scanList()));
 
   // Dispatch by channel type
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<const AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *ac = c->as<const FMChannel>();
     setMode(Mode::Analog);
     // set admit criterion
     switch (ac->admit()) {
-    case AnalogChannel::Admit::Always: setAdmit(Admit::Always); break;
-    case AnalogChannel::Admit::Free: setAdmit(Admit::Busy); break;
-    case AnalogChannel::Admit::Tone: setAdmit(Admit::Tone); break;
+    case FMChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case FMChannel::Admit::Free: setAdmit(Admit::Busy); break;
+    case FMChannel::Admit::Tone: setAdmit(Admit::Tone); break;
     }
     // squelch mode
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     if (Signaling::SIGNALING_NONE != ac->rxTone())
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::SubTone);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::SubTone);
     else
-      setSquelchMode(AnytoneAnalogChannelExtension::SquelchMode::Carrier);
+      setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<const DigitalChannel>();
+    // Handle extension
+    if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply FM settings
+      enableCTCSSPhaseReversal(ext->reverseBurst());
+      setCustomCTCSSFrequency(ext->customCTCSS());
+      if (ext->rxCustomCTCSS())
+        enableRXCustomCTCSS();
+      if (ext->txCustomCTCSS())
+        enableTXCustomCTCSS();
+      setSquelchMode(ext->squelchMode());
+    }
+  } else if (c->is<DMRChannel>()) {
+    const DMRChannel *dc = c->as<const DMRChannel>();
     // pack digital channel config.
     setMode(Mode::Digital);
     // set admit criterion
     switch(dc->admit()) {
-    case DigitalChannel::Admit::Always: setAdmit(Admit::Always); break;
-    case DigitalChannel::Admit::Free: setAdmit(Admit::Free); break;
-    case DigitalChannel::Admit::ColorCode: setAdmit(Admit::ColorCode); break;
+    case DMRChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case DMRChannel::Admit::Free: setAdmit(Admit::Free); break;
+    case DMRChannel::Admit::ColorCode: setAdmit(Admit::DifferentColorCode); break;
     }
     // set color code
     setColorCode(dc->colorCode());
@@ -803,15 +896,6 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       clearGroupListIndex();
     else
       setGroupListIndex(ctx.index(dc->groupListObj()));
-    // Set GPS system index
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXDigitalAPRS(true);
-      enableRXAPRS(false);
-    } else {
-      enableTXDigitalAPRS(false);
-      enableRXAPRS(false);
-    }
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
       if (nullptr == ctx.config()->radioIDs()->defaultId()) {
@@ -823,9 +907,36 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     } else {
       setRadioIDIndex(ctx.index(dc->radioIdObj()));
     }
+    // Handle extension
+    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
+      // Apply common settings
+      enableTalkaround(ext->talkaround());
+      // Apply DMR settings
+      enableCallConfirm(ext->callConfirm());
+      enableSMSConfirm(ext->smsConfirm());
+      enableSimplexTDMA(ext->simplexTDMA());
+      enableAdaptiveTDMA(ext->adaptiveTDMA());
+      enableLoneWorker(ext->loneWorker());
+    }
   }
 
   return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ChannelBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ChannelBitmapElement::ChannelBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ChannelBitmapElement::ChannelBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ChannelBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -839,7 +950,7 @@ AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Element(ptr, 0x0064)
+  : Element(ptr, ContactElement::size())
 {
   // pass...
 }
@@ -858,21 +969,21 @@ AnytoneCodeplug::ContactElement::isValid() const {
   return !name().isEmpty();
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::ContactElement::type() const {
   switch (getUInt8(0x0000)) {
-  case 0: return DigitalContact::PrivateCall;
-  case 1: return DigitalContact::GroupCall;
-  case 2: return DigitalContact::AllCall;
+  case 0: return DMRContact::PrivateCall;
+  case 1: return DMRContact::GroupCall;
+  case 2: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::ContactElement::setType(DigitalContact::Type type) {
+AnytoneCodeplug::ContactElement::setType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0000, 0); break;
-  case DigitalContact::GroupCall: setUInt8(0x0000, 1); break;
-  case DigitalContact::AllCall: setUInt8(0x0000, 2); break;
+  case DMRContact::PrivateCall: setUInt8(0x0000, 0); break;
+  case DMRContact::GroupCall: setUInt8(0x0000, 1); break;
+  case DMRContact::AllCall: setUInt8(0x0000, 2); break;
   }
 }
 
@@ -896,19 +1007,32 @@ AnytoneCodeplug::ContactElement::setNumber(unsigned number) {
 
 AnytoneContactExtension::AlertType
 AnytoneCodeplug::ContactElement::alertType() const {
-  return (AnytoneContactExtension::AlertType) getUInt8(0x0027);
+  switch (getUInt8(0x0027)) {
+  case (uint8_t)AnytoneContactExtension::AlertType::None:
+    return AnytoneContactExtension::AlertType::None;
+  case (uint8_t)AnytoneContactExtension::AlertType::Ring:
+    return AnytoneContactExtension::AlertType::Ring;
+  case (uint8_t)AnytoneContactExtension::AlertType::Online:
+    return AnytoneContactExtension::AlertType::Online;
+  default:
+    break;
+  }
+  logWarn() << "Unknown value " << getUInt8(0x0027)
+            << " for alert type of AnyTone contact element. Maybe the codeplug implementation is"
+               " outdated. Consider reporting it at https://github.com/hmatuschek/qdmr.";
+  return AnytoneContactExtension::AlertType::None;
 }
 void
 AnytoneCodeplug::ContactElement::setAlertType(AnytoneContactExtension::AlertType type) {
   setUInt8(0x0027, (unsigned)type);
 }
 
-DigitalContact *
+DMRContact *
 AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx);
 
   // Common settings
-  DigitalContact *cont = new DigitalContact();
+  DMRContact *cont = new DMRContact();
   cont->setType(type());
   cont->setName(name());
   cont->setNumber(number());
@@ -923,7 +1047,7 @@ AnytoneCodeplug::ContactElement::toContactObj(Context &ctx) const {
 }
 
 bool
-AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, Context &ctx) {
+AnytoneCodeplug::ContactElement::fromContactObj(const DMRContact *contact, Context &ctx) {
   Q_UNUSED(ctx)
 
   clear();
@@ -943,6 +1067,22 @@ AnytoneCodeplug::ContactElement::fromContactObj(const DigitalContact *contact, C
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ContactBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ContactBitmapElement::ContactBitmapElement(uint8_t *ptr, size_t size)
+  : InvertedBitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ContactBitmapElement::ContactBitmapElement(uint8_t *ptr)
+  : InvertedBitmapElement(ptr, ContactBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::DTMFContactElement
  * ********************************************************************************************* */
 AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigned size)
@@ -952,7 +1092,7 @@ AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, unsigned s
 }
 
 AnytoneCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
-  : Element(ptr, 0x30)
+  : Element(ptr, DTMFContactElement::size())
 {
   // pass...
 }
@@ -969,9 +1109,9 @@ AnytoneCodeplug::DTMFContactElement::clear() {
 QString
 AnytoneCodeplug::DTMFContactElement::number() const {
   QString number;
-  int n = getUInt8(Offsets::DIGIT_COUNT);
+  int n = getUInt8(Offset::numDigits());
   for (int i=0; i<n; i++) {
-    uint8_t byte = _data[i/2];
+    uint8_t byte = _data[Offset::digits() + i/2];
     if (0 == (i%2))
       number.append(_anytone_bin_dtmf_tab[(byte>>4)&0xf]);
     else
@@ -983,23 +1123,24 @@ void
 AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
   if (! validDTMFNumber(number))
     return;
-  memset(_data+Offsets::DIGITS, 0, Offsets::DIGIT_COUNT);
-  setUInt8(Offsets::DIGIT_COUNT, number.length());
-  for (int i=0; i<number.length(); i++) {
+  memset(_data+Offset::digits(), 0, Limit::digitCount()/2);
+  unsigned int n = std::min((unsigned int)number.length(), Limit::digitCount());
+  setUInt8(Offset::digits(), n);
+  for (unsigned int i=0; i<n; i++) {
     if (0 == (i%2))
-      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
+      _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
     else
-      _data[i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<0);
+      _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<0);
   }
 }
 
 QString
 AnytoneCodeplug::DTMFContactElement::name() const {
-  return readASCII(Offsets::NAME, NAME_LEN, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 AnytoneCodeplug::DTMFContactElement::setName(const QString &name) {
-  writeASCII(Offsets::NAME, name, NAME_LEN, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 DTMFContact *
@@ -1016,6 +1157,22 @@ AnytoneCodeplug::DTMFContactElement::fromContact(const DTMFContact *contact) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFContactBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFContactBytemapElement::DTMFContactBytemapElement(uint8_t *ptr, size_t size)
+  : InvertedBytemapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFContactBytemapElement::DTMFContactBytemapElement(uint8_t *ptr)
+  : InvertedBytemapElement(ptr, DTMFContactBytemapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GroupListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
@@ -1025,7 +1182,7 @@ AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, 0x120)
+  : Element(ptr, GroupListElement::size())
 {
   // pass...
 }
@@ -1080,12 +1237,12 @@ AnytoneCodeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx)
     if (! hasMemberIndex(i))
       continue;
     // Missing contact ignore.
-    if (! ctx.has<DigitalContact>(memberIndex(i))) {
+    if (! ctx.has<DMRContact>(memberIndex(i))) {
       logWarn() << "Cannot link contact " << memberIndex(i) << " to group list '"
                 << this->name() << "': Invalid contact index. Ignored.";
       continue;
     }
-    lst->addContact(ctx.get<DigitalContact>(memberIndex(i)));
+    lst->addContact(ctx.get<DMRContact>(memberIndex(i)));
   }
   return true;
 }
@@ -1101,9 +1258,9 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   // set members
   for (uint8_t i=0; i<64; i++) {
     // Skip non-private-call entries
-    while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+    while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
       logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                << "' is not a private call. Skip entry.";
+                << "' is not a group call. Skip entry.";
       j++;
     }
 
@@ -1119,6 +1276,22 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::GroupListBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::GroupListBitmapElement::GroupListBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::GroupListBitmapElement::GroupListBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, GroupListBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ScanListElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
@@ -1128,7 +1301,7 @@ AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::ScanListElement::ScanListElement(uint8_t *ptr)
-  : Element(ptr, 0x0090)
+  : Element(ptr, ScanListElement::size())
 {
   // pass...
 }
@@ -1349,6 +1522,22 @@ AnytoneCodeplug::ScanListElement::fromScanListObj(ScanList *lst, Context &ctx) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ScanListBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ScanListBitmapElement::ScanListBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ScanListBitmapElement::ScanListBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ScanListBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::RadioIDElement
  * ********************************************************************************************* */
 AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr, unsigned size)
@@ -1358,7 +1547,7 @@ AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::RadioIDElement::RadioIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, RadioIDElement::size())
 {
   // pass...
 }
@@ -1398,25 +1587,18 @@ AnytoneCodeplug::RadioIDElement::fromRadioID(DMRRadioID *id) {
 
 
 /* ********************************************************************************************* *
- * Implementation of AnytoneCodeplug::GeneralSettingsElement::Melody
+ * Implementation of AnytoneCodeplug::RadioIDBitmapElement
  * ********************************************************************************************* */
-AnytoneCodeplug::GeneralSettingsElement::Melody::Melody()
+AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
 {
-  for (int i=0; i<5; i++)
-    notes[i] = Note{0,0};
+   // pass...
 }
 
-AnytoneCodeplug::GeneralSettingsElement::Melody::Melody(const Melody &other)
+AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, RadioIDBitmapElement::size())
 {
-  for (int i=0; i<5; i++)
-    notes[i] = other.notes[i];
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody &
-AnytoneCodeplug::GeneralSettingsElement::Melody::operator =(const Melody &other) {
-  for (int i=0; i<5; i++)
-    notes[i] = other.notes[i];
-  return *this;
+  // pass...
 }
 
 
@@ -1429,667 +1611,96 @@ AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, un
   // pass...
 }
 
-AnytoneCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x00d0)
-{
-  // pass...
-}
-
 void
 AnytoneCodeplug::GeneralSettingsElement::clear() {
   memset(_data, 0, _size);
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::keyTone() const {
-  return 0!=getUInt8(0x0000);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
-  setUInt8(0x0000, (enable ? 0x01 : 0x00));
-}
-
-bool
 AnytoneCodeplug::GeneralSettingsElement::displayFrequency() const {
-  return 0!=getUInt8(0x0001);
+  return 0!=getUInt8(Offset::displayMode());
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::enableDisplayFrequency(bool enable) {
-  setUInt8(0x0001, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::displayMode(), (enable ? 0x01 : 0x00));
 }
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::autoKeyLock() const {
-  return 0!=getUInt8(0x0002);
+  return 0!=getUInt8(Offset::autoKeyLock());
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::enableAutoKeyLock(bool enable) {
-  setUInt8(0x0002, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::autoKeyLock(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Interval
 AnytoneCodeplug::GeneralSettingsElement::autoShutdownDelay() const {
-  switch ((AutoShutdown) getUInt8(0x0003)) {
-  case AutoShutdown::Off: return 0;
-  case AutoShutdown::After10min: return 10;
-  case AutoShutdown::After30min: return 30;
-  case AutoShutdown::After60min: return 60;
-  case AutoShutdown::After120min: return 120;
+  switch ((AutoShutdown) getUInt8(Offset::autoShutDown())) {
+  case AutoShutdown::Off:         return Interval::fromMinutes(0);
+  case AutoShutdown::After10min:  return Interval::fromMinutes(10);
+  case AutoShutdown::After30min:  return Interval::fromMinutes(30);
+  case AutoShutdown::After60min:  return Interval::fromMinutes(60);
+  case AutoShutdown::After120min: return Interval::fromMinutes(120);
   }
-  return 0;
+  return Interval();
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(unsigned min) {
-  if (0 == min) {
-    setUInt8(0x0003, (unsigned)AutoShutdown::Off);
-  } else if (min <= 10) {
-    setUInt8(0x0003, (unsigned)AutoShutdown::After10min);
-  } else if (min <= 30) {
-    setUInt8(0x0003, (unsigned)AutoShutdown::After30min);
-  } else if (min <= 60) {
-    setUInt8(0x0003, (unsigned)AutoShutdown::After60min);
+AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(Interval intv) {
+  if (0 == intv.minutes()) {
+    setUInt8(Offset::autoShutDown(), (unsigned)AutoShutdown::Off);
+  } else if (intv.minutes() <= 10) {
+    setUInt8(Offset::autoShutDown(), (unsigned)AutoShutdown::After10min);
+  } else if (intv.minutes() <= 30) {
+    setUInt8(Offset::autoShutDown(), (unsigned)AutoShutdown::After30min);
+  } else if (intv.minutes() <= 60) {
+    setUInt8(Offset::autoShutDown(), (unsigned)AutoShutdown::After60min);
   } else {
-    setUInt8(0x0003, (unsigned)AutoShutdown::After120min);
+    setUInt8(Offset::autoShutDown(), (unsigned)AutoShutdown::After120min);
   }
 }
 
-AnytoneCodeplug::GeneralSettingsElement::BootDisplay
+AnytoneBootSettingsExtension::BootDisplay
 AnytoneCodeplug::GeneralSettingsElement::bootDisplay() const {
-  return (BootDisplay) getUInt8(0x0006);
+  return (AnytoneBootSettingsExtension::BootDisplay) getUInt8(Offset::bootDisplay());
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay mode) {
-  setUInt8(0x0006, (unsigned)mode);
+AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode) {
+  setUInt8(Offset::bootDisplay(), (unsigned)mode);
 }
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::bootPassword() const {
-  return getUInt8(0x0007);
+  return getUInt8(Offset::bootPassword());
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::enableBootPassword(bool enable) {
-  setUInt8(0x0006, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::bootPassword(), (enable ? 0x01 : 0x00));
 }
 
 unsigned
 AnytoneCodeplug::GeneralSettingsElement::squelchLevelA() const {
-  return getUInt8(0x0009);
+  return getUInt8(Offset::squelchLevelA());
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(unsigned level) {
-  setUInt8(0x0009, level);
+  setUInt8(Offset::squelchLevelA(), level);
 }
 unsigned AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
-  return getUInt8(0x000a);
+  return getUInt8(Offset::squelchLevelB());
 }
 void
 AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
-  setUInt8(0x000a, level);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::PowerSave
-AnytoneCodeplug::GeneralSettingsElement::powerSave() const {
-  return (PowerSave) getUInt8(0x000b);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setPowerSave(PowerSave mode) {
-  setUInt8(0x000b, (unsigned)mode);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::voxLevel() const {
-  return ((unsigned)getUInt8(0x000c))*3;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
-  setUInt8(0x000c, level/3);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::voxDelay() const {
-  return 100 + 500*((unsigned)getUInt8(0x000d));
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setVOXDelay(unsigned ms) {
-  if (ms < 100)
-    ms = 100;
-  setUInt8(0x000d, (ms-100)/500);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::VFOScanType
-AnytoneCodeplug::GeneralSettingsElement::vfoScanType() const {
-  return (VFOScanType) getUInt8(0x000e);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setVFOScanType(VFOScanType type) {
-  setUInt8(0x000e, (unsigned)type);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::micGain() const {
-  return (((unsigned)getUInt8(0x000f))*10)/4;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMICGain(unsigned gain) {
-  setUInt8(0x000f, (gain*4)/10);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Short() const {
-  return (KeyFunction)getUInt8(0x0010);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Short(KeyFunction func) {
-  setUInt8(0x0010, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Short() const {
-  return (KeyFunction)getUInt8(0x0011);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Short(KeyFunction func) {
-  setUInt8(0x0011, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Short() const {
-  return (KeyFunction)getUInt8(0x0012);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Short(KeyFunction func) {
-  setUInt8(0x0012, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::funcKey1Short() const {
-  return (KeyFunction)getUInt8(0x0013);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Short(KeyFunction func) {
-  setUInt8(0x0013, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::funcKey2Short() const {
-  return (KeyFunction)getUInt8(0x0014);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Short(KeyFunction func) {
-  setUInt8(0x0014, (unsigned)func);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::vfoModeA() const {
-  return getUInt8(0x0015);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableVFOModeA(bool enable) {
-  setUInt8(0x0015, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::vfoModeB() const {
-  return getUInt8(0x0016);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableVFOModeB(bool enable) {
-  setUInt8(0x0016, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::memoryZoneA() const {
-  return getUInt8(0x001f);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMemoryZoneA(unsigned zone) {
-  setUInt8(0x001f, zone);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::memoryZoneB() const {
-  return getUInt8(0x0020);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMemoryZoneB(unsigned zone) {
-  setUInt8(0x0020, zone);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::recording() const {
-  return getUInt8(0x0022);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
-  setUInt8(0x0022, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::brightness() const {
-  return (getUInt8(0x0026)*10)/4;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
-  setUInt8(0x0026, (level*4)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return 0 == backlightDuration();
-}
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::backlightDuration() const {
-  return 5*((unsigned)getUInt8(0x0027));
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setBacklightDuration(unsigned sec) {
-  setUInt8(0x0027, sec/5);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setBacklightDuration(0);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::gps() const {
-  return getUInt8(0x0028);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableGPS(bool enable) {
-  setUInt8(0x0028, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::smsAlert() const {
-  return getUInt8(0x0029);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableSMSAlert(bool enable) {
-  setUInt8(0x0029, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::activeChannelB() const {
-  return getUInt8(0x002c);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableActiveChannelB(bool enable) {
-  setUInt8(0x002c, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::subChannel() const {
-  return getUInt8(0x002d);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableSubChannel(bool enable) {
-  setUInt8(0x002d, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::callAlert() const {
-  return getUInt8(0x002f);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableCallAlert(bool enable) {
-  setUInt8(0x002f, (enable ? 0x01 : 0x00));
-}
-
-QTimeZone
-AnytoneCodeplug::GeneralSettingsElement::gpsTimeZone() const {
-  return QTimeZone((((int)getUInt8(0x0030))-12)*3600);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
-  int offset = zone.offsetFromUtc(QDateTime::currentDateTime());
-  setUInt8(0x0030, (12 + offset/3600));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::talkPermitDigital() const {
-  return getBit(0x0031, 0);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitDigital(bool enable) {
-  return setBit(0x0031, 0, enable);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::talkPermitAnalog() const {
-  return getBit(0x0031, 1);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableTalkPermitAnalog(bool enable) {
-  return setBit(0x0031, 1, enable);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::digitalResetTone() const {
-  return getUInt8(0x0032);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDigitalResetTone(bool enable) {
-  return setUInt8(0x0032, (enable ? 0x01 : 0x00));
-}
-
-AnytoneCodeplug::GeneralSettingsElement::VoxSource
-AnytoneCodeplug::GeneralSettingsElement::voxSource() const {
-  return (VoxSource)getUInt8(0x0033);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setVOXSource(VoxSource source) {
-  setUInt8(0x0033, (unsigned)source);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::idleChannelTone() const {
-  return getUInt8(0x0036);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableIdleChannelTone(bool enable) {
-  return setUInt8(0x0036, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::menuExitTime() const {
-  return 5 + 5*((unsigned) getUInt8(0x0037));
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMenuExitTime(unsigned sec) {
-  if (sec < 5)
-    sec = 5;
-  setUInt8(0x0037, (sec-5)/5);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::startupTone() const {
-  return getUInt8(0x0039);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableStartupTone(bool enable) {
-  return setUInt8(0x0039, (enable ? 0x01 : 0x00));
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::callEndPrompt() const {
-  return getUInt8(0x003a);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
-  return setUInt8(0x003a, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxVolume() const {
-  return (((unsigned)getUInt8(0x003b))*10)/8;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVolume(unsigned level) {
-  setUInt8(0x003b, (level*8)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::getGPSPosition() const {
-  return getUInt8(0x003f);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
-  return setUInt8(0x003f, (enable ? 0x01 : 0x00));
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey1Long() const {
-  return (KeyFunction)getUInt8(0x0041);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey1Long(KeyFunction func) {
-  setUInt8(0x0041, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey2Long() const {
-  return (KeyFunction)getUInt8(0x0042);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey2Long(KeyFunction func) {
-  setUInt8(0x0042, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::progFuncKey3Long() const {
-  return (KeyFunction)getUInt8(0x0043);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setProgFuncKey3Long(KeyFunction func) {
-  setUInt8(0x0043, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::funcKey1Long() const {
-  return (KeyFunction)getUInt8(0x0044);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey1Long(KeyFunction func) {
-  setUInt8(0x0044, (unsigned)func);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::KeyFunction
-AnytoneCodeplug::GeneralSettingsElement::funcKey2Long() const {
-  return (KeyFunction)getUInt8(0x0045);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setFuncKey2Long(KeyFunction func) {
-  setUInt8(0x0045, (unsigned)func);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::longPressDuration() const {
-  return (((unsigned)getUInt8(0x0046))+1)*1000;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setLongPressDuration(unsigned ms) {
-  if (ms < 1000)
-    ms = 1000;
-  setUInt8(0x0046, ms/1000-1);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
-  return getUInt8(0x0047);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(0x0047, (enable ? 0x01 : 0x01));
-}
-
-AnytoneCodeplug::GeneralSettingsElement::AutoRepDir
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterDirectionA() const {
-  return (AutoRepDir) getUInt8(0x0048);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterDirectionA(AutoRepDir dir) {
-  setUInt8(0x0048, (unsigned)dir);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::LastCallerDisplayMode
-AnytoneCodeplug::GeneralSettingsElement::lastCallerDisplayMode() const {
-  return (LastCallerDisplayMode)getUInt8(0x004d);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setLastCallerDisplayMode(LastCallerDisplayMode mode) {
-  setUInt8(0x004d, (unsigned)mode);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::displayClock() const {
-  return getUInt8(0x0051);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
-  setUInt8(0x0051, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxHeadphoneVolume() const {
-  return (((unsigned)getUInt8(0x0052))*10)/8;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(unsigned max) {
-  setUInt8(0x0052, (max*8)/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::enhanceAudio() const {
-  return getUInt8(0x0057);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableEnhancedAudio(bool enable) {
-  setUInt8(0x0057, (enable ? 0x01 : 0x00));
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyUHF() const {
-  return ((unsigned)getBCD8_be(0x0058))*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyUHF(unsigned hz) {
-  setBCD8_be(0x0058, hz/10);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyUHF() const {
-  return ((unsigned)getBCD8_be(0x005c))*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyUHF(unsigned hz) {
-  setBCD8_be(0x005c, hz/10);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::minVFOScanFrequencyVHF() const {
-  return ((unsigned)getBCD8_be(0x0060))*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMinVFOScanFrequencyVHF(unsigned hz) {
-  setBCD8_be(0x0060, hz/10);
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::maxVFOScanFrequencyVHF() const {
-  return ((unsigned)getBCD8_be(0x0064))*10;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setMaxVFOScanFrequencyVHF(unsigned hz) {
-  setBCD8_be(0x0064, hz/10);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexUHF() const {
-  return 0xff != autoRepeaterOffsetFrequencyIndexUHF();
-}
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexUHF() const {
-  return getUInt8(0x0068);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexUHF(unsigned idx) {
-  setUInt8(0x0068, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexUHF() {
-  setAutoRepeaterOffsetFrequenyIndexUHF(0xff);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::hasAutoRepeaterOffsetFrequencyIndexVHF() const {
-  return 0xff != autoRepeaterOffsetFrequencyIndexVHF();
-}
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::autoRepeaterOffsetFrequencyIndexVHF() const {
-  return getUInt8(0x0069);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setAutoRepeaterOffsetFrequenyIndexVHF(unsigned idx) {
-  setUInt8(0x0069, idx);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::clearAutoRepeaterOffsetFrequencyIndexVHF() {
-  setAutoRepeaterOffsetFrequenyIndexVHF(0xff);
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::callToneMelody() const {
-  Melody melody;
-  for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x0072+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x007c+2*i);
-  }
-  return melody;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x0072+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x007c+2*i, melody.notes[i].duration);
-  }
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::idleToneMelody() const {
-  Melody melody;
-  for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x0086+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x0090+2*i);
-  }
-  return melody;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x0086+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x0090+2*i, melody.notes[i].duration);
-  }
-}
-
-AnytoneCodeplug::GeneralSettingsElement::Melody
-AnytoneCodeplug::GeneralSettingsElement::resetToneMelody() const {
-  Melody melody;
-  for (int i=0; i<5; i++) {
-    melody.notes[i].frequency = getUInt16_le(0x009a+2*i);
-    melody.notes[i].duration  = getUInt16_le(0x00a4+2*i);
-  }
-  return melody;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody) {
-  for (int i=0; i<5; i++) {
-    setUInt16_le(0x009a+2*i, melody.notes[i].frequency);
-    setUInt16_le(0x00a4+2*i, melody.notes[i].duration);
-  }
-}
-
-unsigned
-AnytoneCodeplug::GeneralSettingsElement::recordingDelay() const {
-  return ((unsigned)getUInt8(0x00ae))*200;
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::setRecodringDelay(unsigned ms) {
-  setUInt8(0x00ae, ms/200);
-}
-
-bool
-AnytoneCodeplug::GeneralSettingsElement::displayCall() const {
-  return getUInt8(0x00af);
-}
-void
-AnytoneCodeplug::GeneralSettingsElement::enableDisplayCall(bool enable) {
-  setUInt8(0x00af, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::squelchLevelB(), level);
 }
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   // Set microphone gain
-  setMICGain(ctx.config()->settings()->micLevel());
+  // For the 868UV, this setting sets both, FM and DMR mic gain.
+  // For all other devices, there is an additional FM mic gain setting.
+  setDMRMicGain(ctx.config()->settings()->micLevel());
+
   // If auto-enable GPS is enabled
   if (flags.autoEnableGPS) {
     // Check if GPS is required -> enable
@@ -2102,8 +1713,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       enableGPS(false);
     }
   }
-  // Set default VOX sensitivity
-  setVOXLevel(ctx.config()->settings()->vox());
   // Set default squelch level
   if (0 == ctx.config()->settings()->squelch()) {
     setSquelchLevelA(0);
@@ -2116,17 +1725,391 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setSquelchLevelB(ctx.config()->settings()->squelch()/2);
   }
 
+  // Handle extensions
+  if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
+    setAutoShutdownDelay(ext->powerSaveSettings()->autoShutdown());
+    setVFOScanType(ext->vfoScanType());
+    enableVFOModeA(AnytoneSettingsExtension::VFOMode::VFO == ext->modeA());
+    enableVFOModeB(AnytoneSettingsExtension::VFOMode::VFO == ext->modeB());
+    if ((AnytoneSettingsExtension::VFOMode::VFO == ext->modeA()) || ext->zoneA()->isNull())
+      setMemoryZoneA(0);
+    else
+      setMemoryZoneA(ctx.index(ext->zoneA()->as<Zone>()));
+    if ((AnytoneSettingsExtension::VFOMode::VFO == ext->modeB()) || ext->zoneB()->isNull())
+      setMemoryZoneB(0);
+    else
+      setMemoryZoneB(ctx.index(ext->zoneB()->as<Zone>()));
+    enableActiveChannelB(AnytoneSettingsExtension::VFO::B == ext->selectedVFO());
+    enableSubChannel(ext->subChannelEnabled());
+    setMinVFOScanFrequencyUHF(ext->minVFOScanFrequencyUHF());
+    setMaxVFOScanFrequencyUHF(ext->maxVFOScanFrequencyUHF());
+    setMinVFOScanFrequencyVHF(ext->minVFOScanFrequencyVHF());
+    setMaxVFOScanFrequencyVHF(ext->maxVFOScanFrequencyVHF());
+
+    // Encode boot settings
+    setBootDisplay(ext->bootSettings()->bootDisplay());
+    enableBootPassword(ext->bootSettings()->bootPasswordEnabled());
+    enableDefaultChannel(
+          ext->bootSettings()->defaultChannelEnabled() &&
+          (! ext->bootSettings()->zoneA()->isNull()) &&
+          (! ext->bootSettings()->zoneB()->isNull()));
+
+    if (defaultChannel()) {
+      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelA()->isNull() ||
+          (! ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelA()->as<Channel>())))
+        setDefaultChannelAToVFO();
+      else
+        setDefaultChannelAIndex(
+              ctx.index(ext->bootSettings()->channelA()->as<Channel>()));
+
+      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      if (ext->bootSettings()->channelB()->isNull() ||
+          (! ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
+             ext->bootSettings()->channelB()->as<Channel>())))
+        setDefaultChannelBToVFO();
+      else
+        setDefaultChannelBIndex(ctx.index(ext->bootSettings()->channelB()->as<Channel>()));
+    }
+
+    // Encode key settings
+    setFuncKeyAShort(ext->keySettings()->funcKeyAShort());
+    setFuncKeyALong(ext->keySettings()->funcKeyALong());
+    setFuncKeyBShort(ext->keySettings()->funcKeyBShort());
+    setFuncKeyBLong(ext->keySettings()->funcKeyBLong());
+    setFuncKeyCShort(ext->keySettings()->funcKeyCShort());
+    setFuncKeyCLong(ext->keySettings()->funcKeyCLong());
+    setFuncKey1Short(ext->keySettings()->funcKey1Short());
+    setFuncKey1Long(ext->keySettings()->funcKey1Long());
+    setFuncKey2Short(ext->keySettings()->funcKey2Short());
+    setFuncKey2Long(ext->keySettings()->funcKey2Long());
+    setLongPressDuration(ext->keySettings()->longPressDuration());
+    enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
+
+    // Encode tone settings
+    enableKeyTone(ext->toneSettings()->keyToneEnabled());
+    enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
+    enableCallAlert(ext->toneSettings()->callAlertEnabled());
+    enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
+    enableFMTalkPermit(ext->toneSettings()->talkPermitAnalogEnabled());
+    enableDMRResetTone(ext->toneSettings()->digitalResetToneEnabled());
+    enableIdleChannelTone(ext->toneSettings()->dmrIdleChannelToneEnabled());
+    enableStartupTone(ext->toneSettings()->startupToneEnabled());
+    setCallToneMelody(*(ext->toneSettings()->callMelody()));
+    setIdleToneMelody(*(ext->toneSettings()->idleMelody()));
+    setResetToneMelody(*(ext->toneSettings()->resetMelody()));
+
+    // Encode display settings
+    enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
+    setBrightness(ext->displaySettings()->brightness());
+    enableCallEndPrompt(ext->displaySettings()->callEndPromptEnabled());
+    setLastCallerDisplayMode(ext->displaySettings()->lastCallerDisplay());
+    enableDisplayClock(ext->displaySettings()->showClockEnabled());
+    enableDisplayCall(ext->displaySettings()->showCallEnabled());
+    setCallDisplayColor(ext->displaySettings()->callColor());
+    enableVolumeChangePrompt(ext->displaySettings()->volumeChangePromptEnabled());
+
+    // Encode audio settings
+    enableRecording(ext->audioSettings()->recordingEnabled());
+    enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
+    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
+
+    // Encode menu settings
+    setMenuExitTime(ext->menuSettings()->duration());
+
+    // Encode auto-repeater settings
+    setAutoRepeaterDirectionA(ext->autoRepeaterSettings()->directionA());
+    setAutoRepeaterDirectionB(ext->autoRepeaterSettings()->directionB());
+    if (ext->autoRepeaterSettings()->vhfRef()->isNull())
+      clearAutoRepeaterOffsetFrequencyIndexVHF();
+    else
+      setAutoRepeaterOffsetFrequenyIndexVHF(
+            ctx.index(ext->autoRepeaterSettings()->vhfRef()->as<AnytoneAutoRepeaterOffset>()));
+    if (ext->autoRepeaterSettings()->uhfRef()->isNull())
+      clearAutoRepeaterOffsetFrequencyIndexUHF();
+    else
+      setAutoRepeaterOffsetFrequenyIndexUHF(
+            ctx.index(ext->autoRepeaterSettings()->uhfRef()->as<AnytoneAutoRepeaterOffset>()));
+    setAutoRepeaterMinFrequencyVHF(ext->autoRepeaterSettings()->vhfMin());
+    setAutoRepeaterMaxFrequencyVHF(ext->autoRepeaterSettings()->vhfMax());
+    setAutoRepeaterMinFrequencyUHF(ext->autoRepeaterSettings()->uhfMin());
+    setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
+
+    // Encode GPS Settings
+    setGPSTimeZone(ext->gpsSettings()->timeZone());
+    enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
+
+    // Encode other settings
+    enableKeepLastCaller(ext->keepLastCallerEnabled());
+  } else if (! flags.updateCodePlug) {
+    clearAutoRepeaterOffsetFrequencyIndexVHF();
+    clearAutoRepeaterOffsetFrequencyIndexUHF();
+  }
+
   return true;
 }
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // get microphone gain
-  ctx.config()->settings()->setMicLevel(micGain());
+  ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setVOX(voxLevel());
   ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+
+  // Set extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension())
+    ext = ctx.config()->settings()->anytoneExtension();
+  else
+    ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
+
+  ext->powerSaveSettings()->setAutoShutdown(autoShutdownDelay());
+  ext->setVFOScanType(vfoScanType());
+  ext->setModeA(vfoModeA() ? AnytoneSettingsExtension::VFOMode::VFO
+                           : AnytoneSettingsExtension::VFOMode::Memory);
+  ext->setModeB(vfoModeB() ? AnytoneSettingsExtension::VFOMode::VFO
+                           : AnytoneSettingsExtension::VFOMode::Memory);
+  if ((! vfoModeA()) && ctx.has<Zone>(memoryZoneA()))
+    ext->zoneA()->set(ctx.get<Zone>(memoryZoneA()));
+  if ((! vfoModeB()) && ctx.has<Zone>(memoryZoneB()))
+    ext->zoneB()->set(ctx.get<Zone>(memoryZoneB()));
+  ext->setSelectedVFO(activeChannelB() ? AnytoneSettingsExtension::VFO::B
+                                       : AnytoneSettingsExtension::VFO::A);
+  ext->enableSubChannel(subChannel());
+  ext->setMinVFOScanFrequencyUHF(this->minVFOScanFrequencyUHF());
+  ext->setMaxVFOScanFrequencyUHF(this->maxVFOScanFrequencyUHF());
+  ext->setMinVFOScanFrequencyVHF(this->minVFOScanFrequencyVHF());
+  ext->setMaxVFOScanFrequencyVHF(this->maxVFOScanFrequencyVHF());
+
+  // Store boot settings
+  ext->bootSettings()->setBootDisplay(bootDisplay());
+  ext->bootSettings()->enableBootPassword(bootPassword());
+  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
+
+  // Store key settings
+  ext->keySettings()->setFuncKey1Short(funcKeyAShort());
+  ext->keySettings()->setFuncKey1Long(funcKeyALong());
+  ext->keySettings()->setFuncKey2Short(funcKeyBShort());
+  ext->keySettings()->setFuncKey2Long(funcKeyBLong());
+  ext->keySettings()->setFuncKey3Short(funcKeyCShort());
+  ext->keySettings()->setFuncKey3Long(funcKeyCLong());
+  ext->keySettings()->setFuncKey1Short(funcKey1Short());
+  ext->keySettings()->setFuncKey1Long(funcKey1Long());
+  ext->keySettings()->setFuncKey2Short(funcKey2Short());
+  ext->keySettings()->setFuncKey2Long(funcKey2Long());
+  ext->keySettings()->setLongPressDuration(longPressDuration());
+  ext->keySettings()->enableAutoKeyLock(autoKeyLock());
+
+  // Store tone settings
+  ext->toneSettings()->enableKeyTone(this->keyToneEnabled());
+  ext->toneSettings()->enableSMSAlert(smsAlert());
+  ext->toneSettings()->enableCallAlert(callAlert());
+  ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
+  ext->toneSettings()->enableTalkPermitAnalog(this->fmTalkPermit());
+  ext->toneSettings()->enableDigitalResetTone(this->dmrResetTone());
+  ext->toneSettings()->enableDMRIdleChannelTone(this->idleChannelTone());
+  ext->toneSettings()->enableStartupTone(this->startupTone());
+  this->callToneMelody(*(ext->toneSettings()->callMelody()));
+  this->idleToneMelody(*(ext->toneSettings()->idleMelody()));
+  this->resetToneMelody(*(ext->toneSettings()->resetMelody()));
+
+  // Store display settings
+  ext->displaySettings()->enableDisplayFrequency(displayFrequency());
+  ext->displaySettings()->setBrightness(brightness());
+  ext->displaySettings()->enableVolumeChangePrompt(this->volumeChangePrompt());
+  ext->displaySettings()->enableCallEndPrompt(this->callEndPrompt());
+  ext->displaySettings()->setLastCallerDisplay(this->lastCallerDisplayMode());
+  ext->displaySettings()->enableShowClock(displayClock());
+  ext->displaySettings()->enableShowCall(displayCall());
+  ext->displaySettings()->setCallColor(this->callDisplayColor());
+
+  // Menu settings
+  ext->menuSettings()->setDuration(this->menuExitTime());
+
+  // Store audio settings
+  ext->audioSettings()->enableRecording(recording());
+  ext->audioSettings()->setMaxVolume(this->maxSpeakerVolume());
+  ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
+
+  // Store auto-repeater settings
+  ext->autoRepeaterSettings()->setDirectionA(this->autoRepeaterDirectionA());
+  ext->autoRepeaterSettings()->setDirectionB(autoRepeaterDirectionB());
+  ext->autoRepeaterSettings()->setVHFMin(this->autoRepeaterMinFrequencyVHF());
+  ext->autoRepeaterSettings()->setVHFMax(this->autoRepeaterMaxFrequencyVHF());
+  ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
+  ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
+
+  // Store GPS settings
+  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
+                                                          AnytoneGPSSettingsExtension::Units::Metric);
+  ext->gpsSettings()->setTimeZone(gpsTimeZone());
+
+  // Other settings
+  ext->enableKeepLastCaller(this->keepLastCaller());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
+  if (! settings->anytoneExtension())
+    return false;
+
+  AnytoneSettingsExtension *ext = settings->anytoneExtension();
+
+  // Link boot settings
+  if (this->defaultChannel()) {
+    if (! ctx.has<Zone>(this->defaultZoneIndexA())) {
+      errMsg(err) << "Cannot link default zone A. Zone index " << this->defaultZoneIndexA()
+                  << " not defined.";
+      return false;
+    }
+    ext->bootSettings()->zoneA()->set(ctx.get<Zone>(this->defaultZoneIndexA()));
+    if (this->defaultChannelAIsVFO()) {
+      // pass...
+    } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
+      errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
+                  << " not defined.";
+      return false;
+    } else {
+      ext->bootSettings()->channelA()->set(ctx.get<Channel>(this->defaultChannelAIndex()));
+    }
+
+    if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
+      errMsg(err) << "Cannot link default zone B. Zone index " << this->defaultZoneIndexB()
+                  << " not defined.";
+      return false;
+    }
+    ext->bootSettings()->zoneB()->set(ctx.get<Zone>(this->defaultZoneIndexB()));
+    if (this->defaultChannelBIsVFO()) {
+      // pass...
+    } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {
+      errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
+                  << " not defined.";
+      return false;
+    } else {
+      ext->bootSettings()->channelB()->set(ctx.get<Channel>(this->defaultChannelBIndex()));
+    }
+  }
+
+  // Link repeater offsets
+  if (this->hasAutoRepeaterOffsetFrequencyIndexVHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset for VHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->vhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
+  }
+
+  if (this->hasAutoRepeaterOffsetFrequencyIndexUHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset for UHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->uhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
+  }
+
+  // Link auto-repeater
+  if (hasAutoRepeaterOffsetFrequencyIndexVHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset frequency for VHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->vhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
+  }
+  if (hasAutoRepeaterOffsetFrequencyIndexUHF()) {
+    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
+      errMsg(err) << "Cannot link auto-repeater offset frequency for UHF, index "
+                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
+      return false;
+    }
+    ext->autoRepeaterSettings()->uhfRef()->set(
+          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
+  }
+
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ExtendedSettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (! flags.updateCodePlug)
+    this->clear();
+
+  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
+    // If there is no extension, done
+    return true;
+  }
+
+  // Get extension
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+
+  // Encode DMR settings
+  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
+  // Encode display settings
+  setChannelBNameColor(ext->displaySettings()->channelBNameColor());
+  setZoneANameColor(ext->displaySettings()->zoneNameColor());
+  setZoneBNameColor(ext->displaySettings()->zoneBNameColor());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Store DMR settings
+  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
+
+  // Store display settings
+  ext->displaySettings()->setChannelBNameColor(channelBNameColor());
+  ext->displaySettings()->setZoneNameColor(zoneANameColor());
+  ext->displaySettings()->setZoneBNameColor(zoneBNameColor());
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    errMsg(err) << "Cannot link config extension: not set.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2141,7 +2124,7 @@ AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::ZoneChannelListElement::ZoneChannelListElement(uint8_t *ptr)
-  : Element(ptr, 0x0400)
+  : Element(ptr, ZoneChannelListElement::size())
 {
   // pass...
 }
@@ -2189,6 +2172,22 @@ AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexB(unsigned n) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ZoneBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ZoneBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::BootSettingsElement
  * ********************************************************************************************* */
 AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned size)
@@ -2198,7 +2197,7 @@ AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, BootSettingsElement::size())
 {
   // pass...
 }
@@ -2227,11 +2226,13 @@ AnytoneCodeplug::BootSettingsElement::setIntroLine2(const QString &txt) {
 
 QString
 AnytoneCodeplug::BootSettingsElement::password() const {
-  return readASCII(0x0020, 16, 0x00);
+  return readASCII(0x0020, 8, 0x00);
 }
 void
 AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
-  writeASCII(0x0020, txt, 16, 0x00);
+  QRegularExpression pattern("[0-9]{0,8}");
+  if (pattern.match(txt).isValid())
+    writeASCII(0x0020, txt, 8, 0x00);
 }
 
 bool
@@ -2239,6 +2240,13 @@ AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ct
   Q_UNUSED(flags)
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
+
+  // Handle extensions
+  if (ctx.config()->settings()->anytoneExtension()) {
+    AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+    setPassword(ext->bootSettings()->bootPassword());
+  }
+
   return true;
 }
 
@@ -2246,6 +2254,15 @@ bool
 AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setIntroLine1(introLine1());
   ctx.config()->settings()->setIntroLine2(introLine2());
+
+  // Create/update extension
+  AnytoneSettingsExtension *ext = nullptr;
+  if (ctx.config()->settings()->anytoneExtension())
+    ext = ctx.config()->settings()->anytoneExtension();
+  else
+    ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
+  ext->bootSettings()->setBootPassword(password());
+
   return true;
 }
 
@@ -2260,7 +2277,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::DMRAPRSSettingsElement::DMRAPRSSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, DMRAPRSSettingsElement::size())
 {
   // pass...
 }
@@ -2409,21 +2426,21 @@ AnytoneCodeplug::DMRAPRSSettingsElement::setDestination(unsigned id) {
   setBCD8_be(0x001c, id);
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::DMRAPRSSettingsElement::callType() const {
   switch (getUInt8(0x0020)) {
-  case 0x00: return DigitalContact::PrivateCall;
-  case 0x01: return DigitalContact::GroupCall;
-  case 0x02: return DigitalContact::AllCall;
+  case 0x00: return DMRContact::PrivateCall;
+  case 0x01: return DMRContact::GroupCall;
+  case 0x02: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::DMRAPRSSettingsElement::setCallType(DigitalContact::Type type) {
+AnytoneCodeplug::DMRAPRSSettingsElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0020, 0x00); break;
-  case DigitalContact::GroupCall: setUInt8(0x0020, 0x01); break;
-  case DigitalContact::AllCall: setUInt8(0x0020, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(0x0020, 0x00); break;
+  case DMRContact::GroupCall: setUInt8(0x0020, 0x01); break;
+  case DMRContact::AllCall: setUInt8(0x0020, 0x02); break;
   }
 }
 
@@ -2431,17 +2448,17 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::timeSlotOverride() const {
   return 0 != getUInt8(0x0021);
 }
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 AnytoneCodeplug::DMRAPRSSettingsElement::timeslot() const {
   if (1 == getUInt8(0x0021))
-    return DigitalChannel::TimeSlot::TS1;
+    return DMRChannel::TimeSlot::TS1;
   else if (2 == getUInt8(0x0021))
-    return DigitalChannel::TimeSlot::TS2;
-  return DigitalChannel::TimeSlot::TS1;
+    return DMRChannel::TimeSlot::TS2;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+AnytoneCodeplug::DMRAPRSSettingsElement::overrideTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setUInt8(0x0021, 0x01);
   else
     setUInt8(0x0021, 0x02);
@@ -2469,7 +2486,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   disableTimeSlotOverride();
   if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
     setChannelSelected(0);
-  } else if (sys->revert()->is<DigitalChannel>()) {
+  } else if (sys->revert()->is<DMRChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
   } else {
     clearChannel(0);
@@ -2486,20 +2503,118 @@ AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
-  DigitalContact *cont = nullptr;
+  DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
   if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
-    cont = new DigitalContact(callType(), QString("GPS target"), destination());
+    cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
   ctx.get<GPSSystem>(i)->setContactObj(cont);
 
   // Check if there is a revert channel set
-  if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DigitalChannel>()) {
-    DigitalChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DigitalChannel>();
+  if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DMRChannel>()) {
+    DMRChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DMRChannel>();
     ctx.get<GPSSystem>(i)->setRevertChannel(ch);
   }
   return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMRAPRSMessageElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMRAPRSMessageElement::DMRAPRSMessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMRAPRSMessageElement::DMRAPRSMessageElement(uint8_t *ptr)
+  : Element(ptr, DMRAPRSMessageElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMRAPRSMessageElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::DMRAPRSMessageElement::message() const {
+  return readASCII(Offset::message(), Limit::length(), 0x00);
+}
+
+void
+AnytoneCodeplug::DMRAPRSMessageElement::setMessage(const QString &message) {
+  writeASCII(Offset::message(), message, Limit::length(), 0x00);
+}
+
+bool
+AnytoneCodeplug::DMRAPRSMessageElement::fromConfig(Codeplug::Flags flags, Context &ctx) {
+  Q_UNUSED(flags); Q_UNUSED(ctx)
+  return true;
+}
+
+bool
+AnytoneCodeplug::DMRAPRSMessageElement::updateConfig(Context &ctx) const {
+  Q_UNUSED(ctx)
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::RepeaterOffsetListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::RepeaterOffsetListElement::RepeaterOffsetListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::RepeaterOffsetListElement::RepeaterOffsetListElement(uint8_t *ptr)
+  : Element(ptr, RepeaterOffsetListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    clearOffset(i);
+}
+
+bool
+AnytoneCodeplug::RepeaterOffsetListElement::isSet(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0 != getUInt32_le(Offset::frequencies() + n * Offset::betweenFrequencies());
+}
+
+Frequency
+AnytoneCodeplug::RepeaterOffsetListElement::offset(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return Frequency::fromHz(0);
+
+  return Frequency::fromHz(
+        ((unsigned long long)getUInt32_le(Offset::frequencies()
+                                          + n * Offset::betweenFrequencies()))*10);
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::setOffset(unsigned int n, Frequency freq) {
+  if (n >= Limit::numEntries())
+    return;
+
+  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(), freq.inHz()/10);
+}
+
+void
+AnytoneCodeplug::RepeaterOffsetListElement::clearOffset(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt32_le(Offset::frequencies() + n*Offset::betweenFrequencies(), 0);
 }
 
 
@@ -2513,7 +2628,7 @@ AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr, unsigned s
 }
 
 AnytoneCodeplug::MessageListElement::MessageListElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, MessageListElement::size())
 {
   // pass...
 }
@@ -2570,7 +2685,7 @@ AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::MessageElement::MessageElement(uint8_t *ptr)
-  : Element(ptr, 0x0100)
+  : Element(ptr, MessageElement::size())
 {
   // pass...
 }
@@ -2591,6 +2706,22 @@ AnytoneCodeplug::MessageElement::setMessage(const QString &msg) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::MessageBytemapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::MessageBytemapElement::MessageBytemapElement(uint8_t *ptr, size_t size)
+  : InvertedBytemapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::MessageBytemapElement::MessageBytemapElement(uint8_t *ptr)
+  : InvertedBytemapElement(ptr, MessageBytemapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::AnalogQuickCallElement
  * ********************************************************************************************* */
 AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr, unsigned size)
@@ -2600,7 +2731,7 @@ AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::AnalogQuickCallElement::AnalogQuickCallElement(uint8_t *ptr)
-  : Element(ptr, 0x0002)
+  : Element(ptr, AnalogQuickCallElement::size())
 {
   // pass...
 }
@@ -2639,6 +2770,85 @@ AnytoneCodeplug::AnalogQuickCallElement::clearContactIndex() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::AnalogQuickCallsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::AnalogQuickCallsElement::AnalogQuickCallsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::AnalogQuickCallsElement::AnalogQuickCallsElement(uint8_t *ptr)
+  : Element(ptr, AnalogQuickCallsElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::AnalogQuickCallsElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    AnalogQuickCallElement(quickCall(i)).clear();
+}
+
+uint8_t *
+AnytoneCodeplug::AnalogQuickCallsElement::quickCall(unsigned int n) const {
+  n = std::min(Limit::numEntries(), n);
+  return _data + n*AnalogQuickCallElement::size();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::StatusMessagesElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::StatusMessagesElement::StatusMessagesElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::StatusMessagesElement::StatusMessagesElement(uint8_t *ptr)
+  : Element(ptr, StatusMessagesElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::StatusMessagesElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+QString
+AnytoneCodeplug::StatusMessagesElement::message(unsigned int n) const {
+  n = std::min(Limit::numMessages(), n);
+  return readASCII(Offset::messages()+n*Offset::betweenMessages(), Limit::messageLength(), 0x00);
+}
+
+void
+AnytoneCodeplug::StatusMessagesElement::setMessage(unsigned int n, const QString &msg) {
+  if (n >= Limit::numMessages())
+    return;
+  writeASCII(Offset::messages()+n*Offset::betweenMessages(), msg, Limit::messageLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::StatusMessageBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::StatusMessageBitmapElement::StatusMessageBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::StatusMessageBitmapElement::StatusMessageBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, StatusMessageBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::HotKeyElement
  * ********************************************************************************************* */
 AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr, unsigned size)
@@ -2648,7 +2858,7 @@ AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::HotKeyElement::HotKeyElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, HotKeyElement::size())
 {
   // pass...
 }
@@ -2732,6 +2942,35 @@ AnytoneCodeplug::HotKeyElement::clearMessageIndex() {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::HotKeySettingsElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr)
+  : Element(ptr, HotKeySettingsElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::HotKeySettingsElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++)
+    HotKeyElement(hotKeySetting(i)).clear();
+}
+
+uint8_t *
+AnytoneCodeplug::HotKeySettingsElement::hotKeySetting(unsigned int n) const {
+  n = std::min(Limit::numEntries(), n);
+  return _data + Offset::hotKeySettings() + n*Offset::betweenHotKeySettings();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::AlarmSettingElement::AnalogAlarm
  * ********************************************************************************************* */
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr, unsigned size)
@@ -2741,7 +2980,7 @@ AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr, uns
 }
 
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::AnalogAlarm(uint8_t *ptr)
-  : Element(ptr, 0x000a)
+  : Element(ptr, AlarmSettingElement::AnalogAlarm::size())
 {
   // pass...
 }
@@ -2851,7 +3090,7 @@ AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr, u
 }
 
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::DigitalAlarm(uint8_t *ptr)
-  : Element(ptr, 0x000c)
+  : Element(ptr, AlarmSettingElement::DigitalAlarm::size())
 {
   // pass...
 }
@@ -2982,7 +3221,7 @@ AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::AlarmSettingElement::AlarmSettingElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, AlarmSettingElement::size())
 {
   // pass...
 }
@@ -2995,11 +3234,11 @@ AnytoneCodeplug::AlarmSettingElement::clear() {
 
 uint8_t *
 AnytoneCodeplug::AlarmSettingElement::analog() const {
-  return _data + 0x0000;
+  return _data + Offset::analog();
 }
 uint8_t *
 AnytoneCodeplug::AlarmSettingElement::digital() const {
-  return _data + 0x000a;
+  return _data + Offset::digital();
 }
 
 
@@ -3013,7 +3252,7 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint
 }
 
 AnytoneCodeplug::DigitalAlarmExtensionElement::DigitalAlarmExtensionElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, DigitalAlarmExtensionElement::size())
 {
   // pass...
 }
@@ -3023,31 +3262,31 @@ AnytoneCodeplug::DigitalAlarmExtensionElement::clear() {
   memset(_data, 0x00, _size);
 }
 
-DigitalContact::Type
+DMRContact::Type
 AnytoneCodeplug::DigitalAlarmExtensionElement::callType() const {
-  switch (getUInt8(0x0000)) {
-  case 0x00: return DigitalContact::PrivateCall;
-  case 0x01: return DigitalContact::GroupCall;
-  case 0x02: return DigitalContact::AllCall;
+  switch (getUInt8(Offset::callType())) {
+  case 0x00: return DMRContact::PrivateCall;
+  case 0x01: return DMRContact::GroupCall;
+  case 0x02: return DMRContact::AllCall;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DigitalContact::Type type) {
+AnytoneCodeplug::DigitalAlarmExtensionElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::PrivateCall: setUInt8(0x0000, 0x00); break;
-  case DigitalContact::GroupCall: setUInt8(0x0000, 0x01); break;
-  case DigitalContact::AllCall: setUInt8(0x0000, 0x02); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::callType(), 0x00); break;
+  case DMRContact::GroupCall: setUInt8(Offset::callType(), 0x01); break;
+  case DMRContact::AllCall: setUInt8(Offset::callType(), 0x02); break;
   }
 }
 
 unsigned
 AnytoneCodeplug::DigitalAlarmExtensionElement::destination() const {
-  return getBCD8_be(0x0023);
+  return getBCD8_be(Offset::destination());
 }
 void
 AnytoneCodeplug::DigitalAlarmExtensionElement::setDestination(unsigned number) {
-  setBCD8_be(0x0023, number);
+  setBCD8_be(Offset::destination(), number);
 }
 
 
@@ -3061,7 +3300,7 @@ AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr, unsigned siz
 }
 
 AnytoneCodeplug::FiveToneIDElement::FiveToneIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, FiveToneIDElement::size())
 {
   // pass...
 }
@@ -3128,6 +3367,50 @@ AnytoneCodeplug::FiveToneIDElement::setName(const QString &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneIDBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneIDBitmapElement::FiveToneIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneIDBitmapElement::FiveToneIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, FiveToneIDBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneIDListElement::FiveToneIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneIDListElement::FiveToneIDListElement(uint8_t *ptr)
+  : Element(ptr, FiveToneIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneIDListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+uint8_t *
+AnytoneCodeplug::FiveToneIDListElement::member(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return nullptr;
+  return _data + n*FiveToneIDElement::size();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::FiveToneFunctionElement
  * ********************************************************************************************* */
 AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr, unsigned size)
@@ -3137,7 +3420,7 @@ AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr, 
 }
 
 AnytoneCodeplug::FiveToneFunctionElement::FiveToneFunctionElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, FiveToneFunctionElement::size())
 {
   // pass...
 }
@@ -3204,6 +3487,34 @@ AnytoneCodeplug::FiveToneFunctionElement::setName(const QString &name) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::FiveToneFunctionListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::FiveToneFunctionListElement::FiveToneFunctionListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::FiveToneFunctionListElement::FiveToneFunctionListElement(uint8_t *ptr)
+  : Element(ptr, FiveToneFunctionListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::FiveToneFunctionListElement::clear() {
+  memset(_data, 0, _size);
+}
+
+uint8_t *
+AnytoneCodeplug::FiveToneFunctionListElement::function(unsigned int n) const {
+  if (n >= Limit::numFunctions())
+    return nullptr;
+  return _data + n*FiveToneFunctionElement::size();
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::FiveToneSettingsElement
  * ********************************************************************************************* */
 AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr, unsigned size)
@@ -3213,7 +3524,7 @@ AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr, 
 }
 
 AnytoneCodeplug::FiveToneSettingsElement::FiveToneSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0080)
+  : Element(ptr, FiveToneSettingsElement::size())
 {
   // pass...
 }
@@ -3479,7 +3790,7 @@ AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr, unsigned size)
 }
 
 AnytoneCodeplug::TwoToneIDElement::TwoToneIDElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, TwoToneIDElement::size())
 {
   // pass...
 }
@@ -3491,29 +3802,45 @@ AnytoneCodeplug::TwoToneIDElement::clear() {
 
 double
 AnytoneCodeplug::TwoToneIDElement::firstTone() const {
-  return ((double)getUInt16_le(0x0000))/10;
+  return ((double)getUInt16_le(Offset::firstTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setFirstTone(double f) {
-  setUInt16_le(0x0000, f*10);
+  setUInt16_le(Offset::firstTone(), f*10);
 }
 
 double
 AnytoneCodeplug::TwoToneIDElement::secondTone() const {
-  return ((double)getUInt16_le(0x0002))/10;
+  return ((double)getUInt16_le(Offset::secondTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setSecondTone(double f) {
-  setUInt16_le(0x0002, f*10);
+  setUInt16_le(Offset::secondTone(), f*10);
 }
 
 QString
 AnytoneCodeplug::TwoToneIDElement::name() const {
-  return readASCII(0x0008, 7, 0x00);
+  return readASCII(Offset::name(), 7, 0x00);
 }
 void
 AnytoneCodeplug::TwoToneIDElement::setName(const QString &name) {
-  writeASCII(0x0008, name, 7, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneIDBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneIDBitmapElement::TwoToneIDBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneIDBitmapElement::TwoToneIDBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, TwoToneIDBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -3527,7 +3854,7 @@ AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::TwoToneFunctionElement::TwoToneFunctionElement(uint8_t *ptr)
-  : Element(ptr, 0x0020)
+  : Element(ptr, TwoToneFunctionElement::size())
 {
   // pass...
 }
@@ -3539,38 +3866,54 @@ AnytoneCodeplug::TwoToneFunctionElement::clear() {
 
 double
 AnytoneCodeplug::TwoToneFunctionElement::firstTone() const {
-  return ((double)getUInt16_le(0x0000))/10;
+  return ((double)getUInt16_le(Offset::firstTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setFirstTone(double f) {
-  setUInt16_le(0x0000, f*10);
+  setUInt16_le(Offset::firstTone(), f*10);
 }
 
 double
 AnytoneCodeplug::TwoToneFunctionElement::secondTone() const {
-  return ((double)getUInt16_le(0x0002))/10;
+  return ((double)getUInt16_le(Offset::secondTone()))/10;
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setSecondTone(double f) {
-  setUInt16_le(0x0002, f*10);
+  setUInt16_le(Offset::secondTone(), f*10);
 }
 
 AnytoneCodeplug::TwoToneFunctionElement::Response
 AnytoneCodeplug::TwoToneFunctionElement::response() const {
-  return (Response) getUInt8(0x0004);
+  return (Response) getUInt8(Offset::response());
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setResponse(Response resp) {
-  setUInt8(0x0004, (unsigned)resp);
+  setUInt8(Offset::response(), (unsigned)resp);
 }
 
 QString
 AnytoneCodeplug::TwoToneFunctionElement::name() const {
-  return readASCII(0x0005, 7, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 AnytoneCodeplug::TwoToneFunctionElement::setName(const QString &name) {
-  writeASCII(0x0005, name, 7, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::TwoToneFunctionBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::TwoToneFunctionBitmapElement::TwoToneFunctionBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::TwoToneFunctionBitmapElement::TwoToneFunctionBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, TwoToneFunctionBitmapElement::size())
+{
+  // pass...
 }
 
 
@@ -3584,7 +3927,7 @@ AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr, un
 }
 
 AnytoneCodeplug::TwoToneSettingsElement::TwoToneSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, TwoToneSettingsElement::size())
 {
   // pass...
 }
@@ -3659,7 +4002,7 @@ AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr, unsigned
 }
 
 AnytoneCodeplug::DTMFSettingsElement::DTMFSettingsElement(uint8_t *ptr)
-  : Element(ptr, 0x0050)
+  : Element(ptr, DTMFSettingsElement::size())
 {
   // pass...
 }
@@ -3852,6 +4195,242 @@ AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DTMFIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DTMFIDListElement::DTMFIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DTMFIDListElement::DTMFIDListElement(uint8_t *ptr)
+  : Element(ptr, DTMFIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::DTMFIDListElement::hasNumber(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0xff != getUInt8(n*Limit::numberLength());
+}
+
+QString
+AnytoneCodeplug::DTMFIDListElement::number(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return "";
+  uint8_t *num = _data + n*Limit::numberLength();
+  return decode_dtmf_bin(num, Limit::numberLength(), 0xff);
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::setNumber(unsigned int n, const QString &number) {
+  if (n >= Limit::numEntries())
+    return;
+  uint8_t *num = _data + n*Limit::numberLength();
+  encode_dtmf_bin(number, num, Limit::numberLength(), 0xff);
+}
+
+void
+AnytoneCodeplug::DTMFIDListElement::clearNumber(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  uint8_t *num = _data + n*Limit::numberLength();
+  memset(num, 0xff, Limit::numberLength());
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMChannelListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMChannelListElement::WFMChannelListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMChannelListElement::WFMChannelListElement(uint8_t *ptr)
+  : Element(ptr, WFMChannelListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+bool
+AnytoneCodeplug::WFMChannelListElement::hasChannel(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0 != getBCD8_le(n*Offset::betweenChannels());
+}
+
+Frequency
+AnytoneCodeplug::WFMChannelListElement::channel(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return Frequency();
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(n*Offset::betweenChannels()))*100);
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::setChannel(unsigned int n, Frequency freq) {
+  if (n >= Limit::numEntries())
+    return;
+  setBCD8_le(n*Offset::betweenChannels(), freq.inHz()/100);
+}
+
+void
+AnytoneCodeplug::WFMChannelListElement::clearChannel(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setBCD8_le(n*Offset::betweenChannels(), 0);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMChannelBitmapElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMChannelBitmapElement::WFMChannelBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMChannelBitmapElement::WFMChannelBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, WFMChannelBitmapElement::size())
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::WFMVFOElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::WFMVFOElement::WFMVFOElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::WFMVFOElement::WFMVFOElement(uint8_t *ptr)
+  : Element(ptr, WFMVFOElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::WFMVFOElement::clear() {
+  memset(_data, 0x00, _size);
+  setFrequency(Frequency::fromMHz(88));
+}
+
+Frequency
+AnytoneCodeplug::WFMVFOElement::frequency() const {
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(0))*100);
+}
+
+void
+AnytoneCodeplug::WFMVFOElement::setFrequency(Frequency freq) {
+  setBCD8_le(0, freq.inHz()/100);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMREncryptionKeyIDListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr)
+  : Element(ptr, DMREncryptionKeyIDListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+AnytoneCodeplug::DMREncryptionKeyIDListElement::hasID(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0xffff == getUInt16_be(n*Offset::betweenIDs());
+}
+
+uint16_t
+AnytoneCodeplug::DMREncryptionKeyIDListElement::id(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return 0xffff;
+  return getUInt16_be(n*Offset::betweenIDs());
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::setID(unsigned int n, uint16_t id) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt16_be(n*Offset::betweenIDs(), id);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyIDListElement::clearID(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt16_be(n*Offset::betweenIDs(), 0xffff);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::DMREncryptionKeyListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::DMREncryptionKeyListElement::DMREncryptionKeyListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::DMREncryptionKeyListElement::DMREncryptionKeyListElement(uint8_t *ptr)
+  : Element(ptr, DMREncryptionKeyListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::clear() {
+  memset(_data, 0x00, _size);
+  for (unsigned int i=0; i<Limit::numEntries(); i++) {
+    setKey(i, QByteArray::fromHex("FFFF"));
+  }
+}
+
+QByteArray
+AnytoneCodeplug::DMREncryptionKeyListElement::key(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return QByteArray();
+  return QByteArray::fromRawData((const char *)_data + Offset::keys() + n*Offset::betweenKeys(), 2);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::setKey(unsigned int n, const QByteArray &key) {
+  if ((n >= Limit::numEntries()) || (2 != key.size()))
+    return;
+  memcpy(_data + Offset::keys() + n*Offset::betweenKeys(), key.constData(), 2);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ContactMapElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr, unsigned size)
@@ -3861,7 +4440,7 @@ AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr, unsigned siz
 }
 
 AnytoneCodeplug::ContactMapElement::ContactMapElement(uint8_t *ptr)
-  : Element(ptr, 0x0008)
+  : Element(ptr, ContactMapElement::size())
 {
   // pass...
 }
@@ -3903,23 +4482,29 @@ AnytoneCodeplug::ContactMapElement::setIndex(unsigned idx) {
   setUInt32_le(0x0004, idx);
 }
 
-unsigned
-AnytoneCodeplug::ContactMapElement::size() {
-  return 0x0008;
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug
  * ********************************************************************************************* */
-AnytoneCodeplug::AnytoneCodeplug(QObject *parent)
-  : Codeplug(parent)
+AnytoneCodeplug::AnytoneCodeplug(const QString &label, QObject *parent)
+  : Codeplug(parent), _label(label)
 {
   // pass...
 }
 
 AnytoneCodeplug::~AnytoneCodeplug() {
   // pass...
+}
+
+void
+AnytoneCodeplug::clear() {
+  while (this->numImages())
+    remImage(0);
+
+  addImage(_label);
+
+  // Allocate bitmaps
+  this->allocateBitmaps();
 }
 
 bool
@@ -3934,8 +4519,8 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DigitalContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d); d++;
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
     }
@@ -3962,15 +4547,110 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     if (config->posSystems()->system(i)->is<GPSSystem>()) {
       ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d); d++;
     } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
+      auto *aprs = config->posSystems()->system(i)->as<APRSSystem>();
+      ctx.add(aprs, a); a++;
+      // Index FM APRS frequencies (referenced in channel extensions).
+      if (auto *ext = aprs->anytoneExtension()) {
+        for (int j=0; j<ext->frequencies()->count(); j++) {
+          // Index 0 = default, so index is 1-based
+          ctx.add(ext->frequencies()->get(j)->as<AnytoneAPRSFrequency>(), j+1);
+        }
+      }
     }
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i);
+  for (int i=0; i<config->roamingChannels()->count(); i++)
+    ctx.add(config->roamingChannels()->channel(i), i);
+
+  // Map auto-repeater offsets
+  if (config->settings()->anytoneExtension()) {
+    auto *autoRep = config->settings()->anytoneExtension()->autoRepeaterSettings();
+    for (int i=0; i<autoRep->offsets()->count(); i++)
+      ctx.add(autoRep->offsets()->get(i)->as<AnytoneAutoRepeaterOffset>(), i);
+  }
 
   return true;
 }
 
 
+Config *
+AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+AnytoneCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
+  Context ctx(config);
+  // Register table for auto-repeater offsets
+  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
+  // Register table for FM APRS frequencies
+  ctx.addTable(&AnytoneAPRSFrequency::staticMetaObject);
+
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode anytone codeplug.";
+    return false;
+  }
+
+  // If codeplug is generated from scratch -> clear and reallocate
+  if (! flags.updateCodePlug) {
+    // Clear codeplug
+    this->clear();
+    // Then allocate elements
+    this->allocateUpdated();
+  }
+
+  // First set bitmaps
+  this->setBitmaps(ctx);
+  // Allocate all memory elements representing the common config
+  this->allocateForEncoding();
+
+  // Then encode everything.
+  return this->encodeElements(flags, ctx, err);
+}
+
+bool
+AnytoneCodeplug::decode(Config *config, const ErrorStack &err) {
+  // Maps code-plug indices to objects
+  Context ctx(config);
+
+  // Register table for auto-repeater offsets
+  ctx.addTable(&AnytoneAutoRepeaterOffset::staticMetaObject);
+  // Register table for FM APRS frequencies
+  ctx.addTable(&AnytoneAPRSFrequency::staticMetaObject);
+
+  return this->decodeElements(ctx, err);
+}

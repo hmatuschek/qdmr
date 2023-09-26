@@ -2,12 +2,11 @@
 #define RADIOID_HH
 
 #include "configobject.hh"
-#include <QAbstractListModel>
 
 
 /** Abstract base class for all radio IDs.
  *
- * That is, DMR radio IDs as well as DTMF, ZVEI, 5-tone etc PTT-IDs.
+ * That is, DMR radio IDs as well as M17, DTMF, ZVEI, 5-tone etc PTT-IDs.
  *
  * @ingroup conf */
 class RadioID: public ConfigObject
@@ -17,9 +16,9 @@ class RadioID: public ConfigObject
 protected:
   /** Hidden default constructor.
    * Use one of the derived classes to instantiate radio IDs. */
-  explicit RadioID(const QString &idBase, QObject *parent=nullptr);
+  explicit RadioID(QObject *parent=nullptr);
   /** Hidden constructor with name. */
-  RadioID(const QString &name, const QString &idBase, QObject *parent=nullptr);
+  RadioID(const QString &name, QObject *parent=nullptr);
 };
 
 
@@ -31,13 +30,14 @@ protected:
 class DMRRadioID : public RadioID
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "id")
 
   /** The number of the radio ID. */
   Q_PROPERTY(unsigned number READ number WRITE setNumber)
 
 public:
   /** Default constructor. */
-  explicit DMRRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRRadioID(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the ID.
@@ -69,7 +69,7 @@ class DefaultRadioID: public DMRRadioID
   Q_OBJECT
 
 protected:
-  /** Contstructor. */
+  /** Constructor. */
   explicit DefaultRadioID(QObject *parent=nullptr);
 
 public:
@@ -89,13 +89,14 @@ private:
 class DTMFRadioID: public RadioID
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "dtmf")
 
   /** The DTMF number of the radio ID. */
   Q_PROPERTY(QString number READ number WRITE setNumber)
 
 public:
   /** Default constructor. */
-  explicit DTMFRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DTMFRadioID(QObject *parent=nullptr);
 
   /** Constructor from name and number.
    * @param name Specifies the name of the DTMF radio ID.
@@ -140,7 +141,7 @@ public:
   /** Searches the DMR ID object associated with the given DMR ID. */
   DMRRadioID *find(uint32_t id) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Adds the given DMR ID. */
   virtual int addId(const QString &name, uint32_t id);

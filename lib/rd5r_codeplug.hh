@@ -209,6 +209,18 @@ public:
   bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
   bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+
+protected:
+  /** Internal offsets between codeplug elements. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int timestamp()          { return 0x000088; }
+    static constexpr unsigned int settings()           { return 0x0000e0; }
+    static constexpr unsigned int buttons()            { return 0x000108; }
+    static constexpr unsigned int messages()           { return 0x000128; }
+    static constexpr unsigned int encryption()         { return 0x001370; }
+    /// @endcond
+  };
 };
 
 #endif // RD5R_CODEPLUG_HH

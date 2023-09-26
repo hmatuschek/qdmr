@@ -3,7 +3,7 @@
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
     _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr),
-    _radioddityExtension(nullptr)
+    _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
   // pass
 }
@@ -32,6 +32,8 @@ RadioSettings::clone() const {
 
 void
 RadioSettings::clear() {
+  ConfigItem::clear();
+
   _introLine1.clear();
   _introLine2.clear();
   _micLevel = 3;
@@ -40,9 +42,6 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
-
-  setTyTExtension(nullptr);
-  setRadioddityExtension(nullptr);
 }
 
 const QString &
@@ -174,6 +173,24 @@ RadioSettings::setRadioddityExtension(RadiodditySettingsExtension *ext) {
   if (_radioddityExtension) {
     _radioddityExtension->setParent(this);
     connect(_radioddityExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+AnytoneSettingsExtension *
+RadioSettings::anytoneExtension() const {
+  return _anytoneExtension;
+}
+void
+RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
+  if (_anytoneExtension) {
+    disconnect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _anytoneExtension->deleteLater();
+  }
+  _anytoneExtension = ext;
+  if (_anytoneExtension) {
+    _anytoneExtension->setParent(this);
+    connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
   }
   emit modified(this);
 }

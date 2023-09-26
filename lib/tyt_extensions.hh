@@ -13,6 +13,11 @@ class TyTChannelExtension: public ConfigExtension
 {
   Q_OBJECT
 
+  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82, DM-1701, RT84.")
+  Q_CLASSINFO("longDescription", "Device specific channel settings for TyT and Retevis devices."
+                                 "Including TyT MD-390, MD-UV390, MD-2017, Retevis RT8, RT3S and RT82"
+                                 " as well as Baofeng DM-1701.")
+
   /** The lone worker feature. */
   Q_PROPERTY(bool loneWorker READ loneWorker WRITE enableLoneWorker)
   /** The auto scan feature. */
@@ -49,11 +54,10 @@ class TyTChannelExtension: public ConfigExtension
   Q_PROPERTY(bool dcdm READ dcdm WRITE enableDCDM)
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
   Q_PROPERTY(bool dcdmLeader READ dcdmLeader WRITE enableDCDMLeader)
-
-  Q_CLASSINFO("description", "Settings for MD-390, RT8, MD-UV390, RT3S, MD-2017, RT82, DM-1701, RT84.")
-  Q_CLASSINFO("longDescription", "Device specific channel settings for TyT and Retevis devices."
-                                 "Including TyT MD-390, MD-UV390, MD-2017, Retevis RT8, RT3S and RT82"
-                                 " as well as Baofeng DM-1701.")
+  /** The squelch level for DMR channels. */
+  Q_PROPERTY(unsigned int dmrSquelch READ dmrSquelch WRITE setDMRSquelch)
+  Q_CLASSINFO("dmrSquelchDescription", "Sets the squelch level for DMR channels. "
+              "Only applicable for MD-UV390 and MD-2017")
 
 public:
   /** Possible reference frequency settings for RX & TX. */
@@ -150,6 +154,10 @@ public:
   bool dcdmLeader() const;
   /** Enables/disables this radio to be the leader on a DCDM simplex channel. */
   void enableDCDMLeader(bool enable);
+  /** Squelch level for DMR channels. */
+  unsigned int dmrSquelch() const;
+  /** Sets the squelch-level for DMR channels. */
+  void setDMRSquelch(unsigned int sq);
 
 public:
   /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
@@ -195,6 +203,8 @@ protected:
   bool _dcdm;
   /** Holds the DCDM-leader flag. */
   bool _dcdmLeader;
+  /** The squelch level [0-10] for DMR channels. */
+  unsigned int _dmrSquelch;
 };
 
 
@@ -690,7 +700,7 @@ class TyTSettingsExtension: public ConfigExtension
               "there is no activity on the current channel. However, the radio may need some time "
               "to wake up from this mode. Hence, the 'wakeupPreamble' need to be enabled by all "
               "radios in the network to provide this wake-up delay.")
-  /** If @c true, a wakeup preamble is send. */
+  /** If @c true, a wakeup preamble is sent. */
   Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
   Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
               "preamble before each call.")
@@ -805,7 +815,7 @@ public:
   /** Enables the power save mode. */
   void enablePowerSaveMode(bool enable);
 
-  /** Returns @c true if the wake-up preamble is send. */
+  /** Returns @c true if the wake-up preamble is sent. */
   bool wakeupPreamble() const;
   /** Enables transmission of wakeup preamble. */
   void enableWakeupPreamble(bool enable);
@@ -952,7 +962,7 @@ protected:
   bool _allTonesDisabled;
   /** If @c true, the power save mode is enabled. */
   bool _powerSaveMode;
-  /** If @c true, the wake-up preamble is send. */
+  /** If @c true, the wake-up preamble is sent. */
   bool _wakeupPreamble;
   /** If @c true the boot picture is enabled. */
   bool _bootPicture;

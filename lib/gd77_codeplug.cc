@@ -159,7 +159,7 @@ GD77Codeplug::ContactElement::markValid(bool valid) {
     setUInt8(0x0017, 0x00);
 }
 void
-GD77Codeplug::ContactElement::fromContactObj(const DigitalContact *obj, Context &ctx) {
+GD77Codeplug::ContactElement::fromContactObj(const DMRContact *obj, Context &ctx) {
   RadioddityCodeplug::ContactElement::fromContactObj(obj, ctx);
   markValid();
 }
@@ -465,36 +465,21 @@ GD77Codeplug::clearZones() {
 
 bool
 GD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
 
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
 
   // Pack Zones
-  bool pack_zone_a = true;
-  for (int i=0, j=0; i<NUM_ZONES; i++) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement z(bank.get(i));
-next:
-    if (j >= config->zones()->count()) {
+    if (! ctx.has<Zone>(i+1)) {
       bank.enable(i, false);
       continue;
     }
 
     // Construct from Zone obj
-    Zone *zone = config->zones()->zone(j);
-    if (pack_zone_a) {
-      pack_zone_a = false;
-      if (zone->A()->count())
-        z.fromZoneObjA(zone, ctx);
-      else
-        goto next;
-    } else {
-      pack_zone_a = true;
-      j++;
-      if (zone->B()->count())
-        z.fromZoneObjB(zone, ctx);
-      else
-        goto next;
-    }
+    Zone *zone = ctx.get<Zone>(i+1);
+    z.fromZoneObjA(zone, ctx);
     bank.enable(i, true);
   }
   return true;
@@ -504,33 +489,14 @@ bool
 GD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = z.toZoneObj(ctx);
-      config->zones()->add(last_zone);
-      ctx.add(last_zone, i+1);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-    }
+    Zone *zone = z.toZoneObj(ctx);
+    config->zones()->add(zone);
+    ctx.add(zone, i+1);
   }
   return true;
 }
@@ -539,29 +505,13 @@ bool
 GD77Codeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config);
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = ctx.get<Zone>(i+1);
-    }
-    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    Zone *zone = ctx.get<Zone>(i+1);
+    if (! z.linkZoneObj(zone, ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
@@ -600,7 +550,7 @@ GD77Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err
     if (!el.isValid())
       continue;
 
-    DigitalContact *cont = el.toContactObj(ctx);
+    DMRContact *cont = el.toContactObj(ctx);
     ctx.add(cont, i+1); config->contacts()->add(cont);
   }
   return true;
@@ -650,14 +600,14 @@ GD77Codeplug::clearGroupLists() {
 
 bool
 GD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
 
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (i >= config->rxGroupLists()->count())
       continue;
     GroupListElement el(bank.get(i));
-    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+    el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err);
     bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
   }
   return true;
@@ -665,14 +615,12 @@ GD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx,
 
 bool
 GD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    RXGroupList *list = el.toRXGroupListObj(ctx);
+    RXGroupList *list = el.toRXGroupListObj(ctx, err);
     config->rxGroupLists()->add(list); ctx.add(list, i+1);
   }
   return true;
@@ -689,7 +637,7 @@ GD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
     GroupListElement el(bank.get(i));
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }

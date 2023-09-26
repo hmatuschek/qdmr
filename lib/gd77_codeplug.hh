@@ -3,7 +3,6 @@
 
 #include "radioddity_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-77.
@@ -159,7 +158,7 @@ public:
 
     /** Marks the entry as valid/invalid. */
     virtual void markValid(bool valid=true);
-    void fromContactObj(const DigitalContact *obj, Context &ctx);
+    void fromContactObj(const DMRContact *obj, Context &ctx);
   };
 
   /** Represents an RX group list within the codeplug.

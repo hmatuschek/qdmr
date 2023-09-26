@@ -9,13 +9,13 @@
  * Implementation of PositioningSystem
  * ********************************************************************************************* */
 PositioningSystem::PositioningSystem(QObject *parent)
-  : ConfigObject("aprs", parent), _period(0)
+  : ConfigObject(parent), _period(0)
 {
   // pass...
 }
 
 PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
-  : ConfigObject(name, "aprs", parent), _period(period)
+  : ConfigObject(name, parent), _period(period)
 {
   // pass...
 }
@@ -90,8 +90,8 @@ GPSSystem::GPSSystem(QObject *parent)
   connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-GPSSystem::GPSSystem(const QString &name, DigitalContact *contact,
-                     DigitalChannel *revertChannel, unsigned period,
+GPSSystem::GPSSystem(const QString &name, DMRContact *contact,
+                     DMRChannel *revertChannel, unsigned period,
                      QObject *parent)
   : PositioningSystem(name, period, parent), _contact(), _revertChannel()
 {
@@ -125,27 +125,27 @@ GPSSystem::hasContact() const {
   return ! _contact.isNull();
 }
 
-DigitalContact *
+DMRContact *
 GPSSystem::contactObj() const {
-  return _contact.as<DigitalContact>();
+  return _contact.as<DMRContact>();
 }
 
 void
-GPSSystem::setContactObj(DigitalContact *contact) {
+GPSSystem::setContactObj(DMRContact *contact) {
   _contact.set(contact);
 }
 
 void
-GPSSystem::setContact(DigitalContactReference *contact) {
+GPSSystem::setContact(DMRContactReference *contact) {
   _contact.copy(contact);
 }
 
-const DigitalContactReference *
+const DMRContactReference *
 GPSSystem::contact() const {
   return &_contact;
 }
 
-DigitalContactReference *
+DMRContactReference *
 GPSSystem::contact() {
   return &_contact;
 }
@@ -155,28 +155,28 @@ GPSSystem::hasRevertChannel() const {
   return ! _revertChannel.isNull();
 }
 
-DigitalChannel *
+DMRChannel *
 GPSSystem::revertChannel() const {
-  return _revertChannel.as<DigitalChannel>();
+  return _revertChannel.as<DMRChannel>();
 }
 
 void
-GPSSystem::setRevertChannel(DigitalChannel *channel) {
+GPSSystem::setRevertChannel(DMRChannel *channel) {
   _revertChannel.set(channel);
 }
 
-const DigitalChannelReference*
+const DMRChannelReference*
 GPSSystem::revert() const {
   return &_revertChannel;
 }
 
-DigitalChannelReference*
+DMRChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
 }
 
 void
-GPSSystem::setRevert(DigitalChannelReference *channel) {
+GPSSystem::setRevert(DMRChannelReference *channel) {
   _revertChannel.copy(channel);
 }
 
@@ -195,17 +195,17 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(QObject *parent)
   : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
-    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message()
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(), _anytone(nullptr)
 {
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-APRSSystem::APRSSystem(const QString &name, AnalogChannel *channel, const QString &dest, unsigned destSSID,
+APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message), _anytone(nullptr)
 {
   // Set channel reference
   _channel.set(channel);
@@ -236,28 +236,28 @@ APRSSystem::clone() const {
   return sys;
 }
 
-AnalogChannel *
+FMChannel *
 APRSSystem::revertChannel() const {
-  return _channel.as<AnalogChannel>();
+  return _channel.as<FMChannel>();
 }
 
 void
-APRSSystem::setRevertChannel(AnalogChannel *channel) {
+APRSSystem::setRevertChannel(FMChannel *channel) {
   _channel.set(channel);
 }
 
-const AnalogChannelReference *
+const FMChannelReference *
 APRSSystem::revert() const {
   return &_channel;
 }
 
-AnalogChannelReference *
+FMChannelReference *
 APRSSystem::revert() {
   return &_channel;
 }
 
 void
-APRSSystem::setRevert(AnalogChannelReference *ref) {
+APRSSystem::setRevert(FMChannelReference *ref) {
   _channel.copy(ref);
 }
 
@@ -316,6 +316,23 @@ void
 APRSSystem::setMessage(const QString &msg) {
   _message = msg;
   emit modified(this);
+}
+
+AnytoneFMAPRSSettingsExtension *
+APRSSystem::anytoneExtension() const {
+  return _anytone;
+}
+void
+APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
+  if (_anytone) {
+    _anytone->deleteLater();
+    _anytone = nullptr;
+  }
+  if (ext) {
+    _anytone = ext;
+    ext->setParent(this);
+    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
 }
 
 YAML::Node
@@ -428,9 +445,9 @@ PositioningSystems::system(int idx) const {
 }
 
 int
-PositioningSystems::add(ConfigObject *obj, int row) {
+PositioningSystems::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<PositioningSystem>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

@@ -2,12 +2,13 @@
 #define CODEPLUG_HH
 
 #include <QObject>
-#include "dfufile.hh"
-#include "userdatabase.hh"
 #include <QHash>
-#include "config.hh"
+#include "dfufile.hh"
 
-//class Config;
+//#include "userdatabase.hh"
+//#include "config.hh"
+
+class Config;
 class ConfigItem;
 
 
@@ -16,7 +17,7 @@ class ConfigItem;
  * construction/parsing of the device specific binary configuration. */
 class Codeplug: public DFUFile
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Certain flags passed to CodePlug::encode to control the transfer and encoding of the
@@ -134,6 +135,15 @@ public:
     /** Stores a 32bit little-endian unsigned integer at the given byte-offset. */
     void setUInt32_le(unsigned offset, uint32_t value);
 
+    /** Reads a 64bit big-endian unsigned integer at the given byte-offset. */
+    uint64_t getUInt64_be(unsigned offset) const;
+    /** Reads a 64bit little-endian unsigned integer at the given byte-offset. */
+    uint64_t getUInt64_le(unsigned offset) const;
+    /** Stores a 64bit big-endian unsigned integer at the given byte-offset. */
+    void setUInt64_be(unsigned offset, uint64_t value);
+    /** Stores a 64bit little-endian unsigned integer at the given byte-offset. */
+    void setUInt64_le(unsigned offset, uint64_t value);
+
     /** Reads a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
     uint8_t getBCD2(unsigned offset) const;
     /** Stores a 2-digit (1-byte/8bit) BDC value in big-endian at the given byte-offset. */
@@ -202,6 +212,8 @@ public:
 
     /** Adds a table for the given type. */
     bool addTable(const QMetaObject *obj);
+    /** Returns @c true if a table is defined for the given type. */
+    bool hasTable(const QMetaObject *obj) const;
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -215,6 +227,12 @@ public:
       return nullptr != this->obj(&(T::staticMetaObject), idx)->template as<T>();
     }
 
+    /** Returns the number of elements for the specified type. */
+    template <class T>
+    unsigned int count() {
+      return getTable(&T::staticMetaObject).indices.size();
+    }
+
   protected:
     /** Internal used table type to associate objects and indices. */
     class Table {
@@ -226,8 +244,6 @@ public:
     };
 
   protected:
-    /** Returns @c true if a table is defined for the given type. */
-    bool hasTable(const QMetaObject *obj) const;
     /** Returns a reference to the table for the given type. */
     Table &getTable(const QMetaObject *obj);
 
@@ -240,11 +256,11 @@ public:
 
 protected:
   /** Hidden default constructor. */
-	explicit Codeplug(QObject *parent=nullptr);
+  explicit Codeplug(QObject *parent=nullptr);
 
 public:
   /** Destructor. */
-	virtual ~Codeplug();
+  virtual ~Codeplug();
 
   /** Indexes all elements of the codeplug.
    * This method must be implemented by any device or vendor specific codeplug to map config
@@ -255,6 +271,13 @@ public:
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */
   virtual bool decode(Config *config, const ErrorStack &err=ErrorStack()) = 0;
+  /** Retruns a post-processed configuration of the decoded config. By default, the passed
+   * config is returned. */
+  virtual bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
+  /** Retruns a prepared configuration for this particular radio. All unsupported featrues are
+   *  removed from the copy. The default implementation only copies the config. */
+  virtual Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
   virtual bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack()) = 0;

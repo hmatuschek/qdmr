@@ -3,6 +3,7 @@
 #include "d868uv.hh"
 #include "config.hh"
 #include "logger.hh"
+#include "configcopyvisitor.hh"
 
 #define RBSIZE 16
 #define WBSIZE 16
@@ -71,7 +72,8 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   if (StatusIdle != _task)
     return false;
 
-  if (! (_config = config))
+  // Cannot upload null-pointer
+  if (nullptr == (_config = config))
     return false;
 
   _task = StatusUpload;
@@ -264,11 +266,6 @@ AnytoneRadio::upload() {
     }
     emit uploadProgress(25+float(n*25)/_codeplug->image(0).numElements());
   }
-
-  // Update bitmaps for all elements representing the common Config
-  _codeplug->setBitmaps(_config);
-  // Allocate all memory elements representing the common config
-  _codeplug->allocateForEncoding();
 
   // Update binary codeplug from config
   if (! _codeplug->encode(_config, _codeplugFlags, _errorStack)) {

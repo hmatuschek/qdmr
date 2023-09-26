@@ -9,7 +9,7 @@
 
 
 TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : DFUDevice(descr, err, parent), RadioInterface()
+  : DFUSEDevice(descr, err, 16, parent), RadioInterface()
 {
   if (! DFUDevice::isOpen()) {
     errMsg(err) << "Cannot open TyTInterface.";
@@ -53,7 +53,7 @@ TyTInterface::TyTInterface(const USBDeviceDescriptor &descr, const ErrorStack &e
     close(); return;
   }
 
-  logDebug() << "Found device " << _ident.manufactuer() << " "<< _ident.name()
+  logDebug() << "Found device " << _ident.manufacturer() << " "<< _ident.name()
              << " at " << descr.description() << ".";
 }
 
@@ -77,12 +77,12 @@ TyTInterface::close() {
   if (isOpen()) {
     _ident = RadioInfo();
   }
-  DFUDevice::close();
+  DFUSEDevice::close();
 }
 
 bool
 TyTInterface::isOpen() const {
-  return DFUDevice::isOpen() && _ident.isValid();
+  return DFUSEDevice::isOpen() && _ident.isValid();
 }
 
 RadioInfo
@@ -138,7 +138,6 @@ TyTInterface::erase_block(uint32_t address, const ErrorStack &err)
 
   return 0;
 }
-
 
 const char *
 TyTInterface::identify(const ErrorStack &err)
@@ -241,7 +240,6 @@ TyTInterface::write_finish(const ErrorStack &err) {
 
 bool
 TyTInterface::reboot(const ErrorStack &err) {
-
   if (! _ctx)
     return false;
 

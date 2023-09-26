@@ -10,6 +10,6 @@
 Field details:
  - Action: Specifies the alarm action. 0=none, 1=TX and background, 2=TX and non-local alarm, 3=TX and local alarm
  - Channel select: If 0 use specified channel index else current channel.
- - Alarm repeat: Number of alarm repititions, 0=continuous.
+ - Alarm repeat: Number of alarm repetitions, 0=continuous.
  - Voice switch broadcast duration: Specifies the time in minutes +1. That is 0=1min, 1=2min, ...
  - Area switch broadcast duration: Specifies the time in minutes +1. That is 0=1min, 1=2min, ...

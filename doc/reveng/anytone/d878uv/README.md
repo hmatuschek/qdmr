@@ -20,7 +20,7 @@ Then fire up wireshark
 and start monitoring on the *usbmon* device.
 
   * Then start to upload a base code-plug to the device. Wireshark will capture everything that 
-    gets send to the device. 
+    gets sent to the device. 
   * Once the code-plug is written to the device, stop capturing in wireshark and  save the data 
     under a recognizable filename, e.g. *base.pcapng*. 
   * Change a single thing within the CPS, e.g., enable GPS. Remember, we are doing a differential 

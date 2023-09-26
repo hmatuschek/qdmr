@@ -1,5 +1,5 @@
 SRC = manual.xml $(shell find meta/ -name "*.*") $(shell find intro/ -name "*.*") $(shell find gui/ -name "*.*")\
-      $(shell find codeplug/ -name "*.*") $(shell find conf/ -name "*.*") $(shell find cli/ -name "*.*") 
+      $(shell find codeplug/ -name "*.*") $(shell find conf/ -name "*.*") $(shell find reveng/ -name "*.*") $(shell find cli/ -name "*.*") 
 
 all: images manual.pdf manual.epub html 
 
@@ -11,7 +11,7 @@ images:
 manual.pdf: manual.fo
 	fop -fo manual.fo -pdf manual.pdf
 manual.fo: manual_combined.xml manual_fo.debian.xsl
-	xsltproc -o manual.fo manual_fo.debian.xsl manual_combined.xml
+	saxon-xslt -o manual.fo manual_combined.xml manual_fo.debian.xsl xslthl.config="/usr/share/xslthl/highlighters/xslthl-config.xml"
 manual_combined.xml: $(SRC) 
 	xmllint --nonet --noent --xinclude manual.xml > manual_combined.xml
 

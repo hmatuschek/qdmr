@@ -94,7 +94,7 @@ ContactListView::onEditContact(unsigned row) {
   Application *app = qobject_cast<Application *>(QApplication::instance());
   Contact *contact = _config->contacts()->contact(row);
 
-  if (DigitalContact *digi = contact->as<DigitalContact>()) {
+  if (DMRContact *digi = contact->as<DMRContact>()) {
     DMRContactDialog dialog(digi, app->user(), app->talkgroup(), _config);
     if (QDialog::Accepted != dialog.exec())
       return;

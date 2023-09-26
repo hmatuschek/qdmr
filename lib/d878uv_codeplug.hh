@@ -5,14 +5,15 @@
 
 #include "d868uv_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
+#include "gpssystem.hh"
 
 class Channel;
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
+class RoamingChannel;
 
 
 /** Represents the device specific binary codeplug for Anytone AT-D878UV radios.
@@ -137,28 +138,26 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings,
- *    see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
+ *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings,
+ *    see @c D878UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
+ *  <tr><td>02501280</td> <td>000030</td> <td>APRS template text (optional settings).</td></tr>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>000100</td> <td>General settings,
+ *  <tr><td>02500000</td> <td>0000f0</td> <td>General settings,
  *    see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
  *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
  *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
  *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
  *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
- *  <tr><td>02501280</td> <td>000030</td> <td>General settings extension 1,
- *    see @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
- *  <tr><td>02501400</td> <td>000100</td> <td>General settings extension 2,
- *    see @c D878UVCodeplug::AnalogAPRSSettingsExtensionElement.</td></tr>
+ *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension,
+ *    see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
  *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
  *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
  *    Default 0x00000000, 0x00 padded.</td></tr>
@@ -222,12 +221,47 @@ class GPSSystem;
  *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
  *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
  *
+ *  <tr><th colspan="3">Unknown settings.</th></tr>
+ *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
+ *  <tr><td>024C1090</td> <td>000040</td> <td>Unknown, filled with 0xff.</td></tr>
+ *  <tr><td>02504000</td> <td>000400</td> <td>Unknown, filled with 0xff.</td></tr>
  * </table>
  *
  * @ingroup d878uv */
 class D878UVCodeplug : public D868UVCodeplug
 {
   Q_OBJECT
+
+protected:
+  /** Channel name and call-sign colors supported by the D878UV. */
+  struct NameColor {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      Orange=0, Red=1, Yellow=2, Green=3, Turquoise=4, Blue=5, White = 6
+    } CodedColor;
+  };
+
+  /** Text colors supported by the D878UV. */
+  struct TextColor {
+  public:
+    /** Maps code -> color. */
+    static AnytoneDisplaySettingsExtension::Color decode(uint8_t code);
+    /** Maps color -> code. */
+    static uint8_t encode(AnytoneDisplaySettingsExtension::Color color);
+
+  protected:
+    /** Encoding of the supported colors. */
+    typedef enum {
+      White=0, Black=1, Orange=2, Red=3, Yellow=4, Green=5, Turquoise=6, Blue=7
+    } CodedColor;
+  };
 
 public:
   /** Represents the actual channel encoded within the binary D878UV codeplug.
@@ -310,12 +344,33 @@ public:
     /** Sets the frequency correction in ???. */
     virtual void setFrequencyCorrection(int corr);
 
+    /** Returns the index of the FM APRS frequency [0,7]. */
+    virtual unsigned int fmAPRSFrequencyIndex() const;
+    /** Sets the FM APRS frequency index [0,7]. */
+    virtual void setFMAPRSFrequencyIndex(unsigned int idx);
+
     /** Constructs a Channel object from this element. */
     Channel *toChannelObj(Context &ctx) const;
     /** Links a previously created channel object. */
     bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Encodes the given channel object. */
     bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset : public D868UVCodeplug::ChannelElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int pttIDSetting()         { return 0x0019; }
+      static constexpr unsigned int roamingEnabled()       { return 0x0034; }
+      static constexpr unsigned int dataACK()              { return 0x0034; }
+      static constexpr unsigned int txDMRAPRS()            { return 0x0035; }
+      static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
+      static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
+      static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
+      static constexpr unsigned int frequenyCorrection()   { return 0x0039; }
+      static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
+      /// @endcond
+    };
   };
 
   /** Represents the general config of the radio within the D878UV binary codeplug.
@@ -323,17 +378,50 @@ public:
    * This class implements only the differences to the generic
    * @c AnytonCodeplug::GeneralSettingsElement.
    *
-   * Binary encoding of the general settings (size 0x0100 bytes):
+   * Binary encoding of the general settings (size 0x00f0 bytes):
    * @verbinclude d878uv_generalsettings.txt */
-  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public D868UVCodeplug::GeneralSettingsElement
   {
-  public:
-    /** Possible UI languages. */
-    enum class Language {
-      English = 0,                 ///< UI Language is english.
-      German  = 1                  ///< UI Language is german.
+  protected:
+    /** Device specific key functions. */
+    struct KeyFunction {
+    public:
+      /** Encodes key function. */
+      static uint8_t encode(AnytoneKeySettingsExtension::KeyFunction tone);
+      /** Decodes key function. */
+      static AnytoneKeySettingsExtension::KeyFunction decode(uint8_t code);
+
+    protected:
+      /** Device specific key functions. */
+      typedef enum {
+        Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+        Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
+        Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
+        Dial = 0x10, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
+        HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
+        WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
+        PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
+        ChannelType = 0x22, Roaming = 0x24, ChannelRanging = 0x25, MaxVolume = 0x26, Slot = 0x27,
+        APRSType = 0x28, Zone = 0x29, RoamingSet = 0x2a, APRSSet = 0x2b, Mute=0x2c,
+        CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
+        ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34
+      } KeyFunctionCode;
     };
 
+    /** Device specific time zones. */
+    struct TimeZone {
+    public:
+      /** Encodes time zone. */
+      static uint8_t encode(const QTimeZone& zone);
+      /** Decodes time zone. */
+      static QTimeZone decode(uint8_t code);
+
+    protected:
+      /** Vector of possible time-zones. */
+      static QVector<QTimeZone> _timeZones;
+    };
+
+  protected:
     /** Possible VFO frequency steps. */
     enum FreqStep {
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
@@ -346,16 +434,6 @@ public:
       FREQ_STEP_50kHz = 7               ///< 50kHz
     };
 
-    /** All possible STE types. */
-    enum class STEType {
-      Off = 0, Silent = 1, Deg120 = 2, Deg180 = 3, Deg240 = 4
-    };
-
-    /** All possible STE frequencies. */
-    enum class STEFrequency {
-      Off     = 0, Hz55_2  = 1, Hz259_2 = 2
-    };
-
     /** DTMF signalling durations. */
     enum DTMFDuration {
       DTMF_DUR_50ms = 0, DTMF_DUR_100ms = 1, DTMF_DUR_200ms = 2, DTMF_DUR_300ms = 3, DTMF_DUR_500ms = 4
@@ -366,19 +444,14 @@ public:
       Hz1000 = 0, Hz1450 = 1, Hz1750 = 2, Hz2100 = 3
     };
 
-    /** Possible monitor slot matches. */
-    enum class SlotMatch {
-      Off = 0, Single = 1, Both = 2
+    /** All possible STE (squelch tail eliminate) frequencies. */
+    enum class STEFrequency {
+      Off = 0, Hz55_2  = 1, Hz259_2 = 2
     };
 
-    /** Possible SMS formats. */
-    enum class SMSFormat {
-      M = 0, H = 1, DMR = 2,
-    };
-
-    /** Possible roaming start conditions. */
-    enum class RoamStart {
-      Periodic=0, OutOfRange=1
+    /** Possible background images. */
+    enum class BackgroundImage {
+      Default=0, Custom1=1, Custom2=2
     };
 
   protected:
@@ -389,6 +462,9 @@ public:
     /** Constructor. */
     GeneralSettingsElement(uint8_t *ptr);
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00f0; }
+
     /** Resets the general settings. */
     void clear();
 
@@ -398,41 +474,67 @@ public:
     virtual void setTransmitTimeout(unsigned tot);
 
     /** Returns the UI language. */
-    virtual Language language() const;
+    virtual AnytoneDisplaySettingsExtension::Language language() const;
     /** Sets the UI language. */
-    virtual void setLanguage(Language lang);
+    virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
+
+    QTimeZone gpsTimeZone() const;
+    void setGPSTimeZone(const QTimeZone &zone);
 
     /** Returns the VFO frequency step in kHz. */
-    virtual double vfoFrequencyStep() const;
+    virtual Frequency vfoFrequencyStep() const;
     /** Sets the VFO frequency step in kHz. */
-    virtual void setVFOFrequencyStep(double kHz);
+    virtual void setVFOFrequencyStep(Frequency kHz);
 
-    /** Returns the STE type. */
-    virtual STEType steType() const;
-    /** Sets the STE type. */
-    virtual void setSTEType(STEType type);
-    /** Returns the STE frequency setting. */
-    virtual STEFrequency steFrequency() const;
-    /** Sets the STE frequency setting. */
-    virtual void setSTEFrequency(STEFrequency freq);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+
+    /** Returns the STE (squelch tail eliminate) type. */
+    virtual AnytoneSettingsExtension::STEType steType() const;
+    /** Sets the STE (squelch tail eliminate) type. */
+    virtual void setSTEType(AnytoneSettingsExtension::STEType type);
+    /** Returns the STE (squelch tail eliminate) frequency setting in Hz.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual double steFrequency() const;
+    /** Sets the STE (squelch tail eliminate) frequency setting.
+     * A value of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
+    virtual void setSTEFrequency(double freq);
 
     /** Returns the group call hang time in seconds. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time in seconds. */
-    virtual void setGroupCallHangTime(unsigned sec);
+    virtual void setGroupCallHangTime(Interval sec);
     /** Returns the private call hang time in seconds. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time in seconds. */
-    virtual void setPrivateCallHangTime(unsigned sec);
+    virtual void setPrivateCallHangTime(Interval sec);
 
     /** Returns the pre-wave time in ms. */
-    virtual unsigned preWaveDelay() const;
+    virtual Interval preWaveDelay() const;
     /** Sets the pre-wave time in ms. */
-    virtual void setPreWaveDelay(unsigned ms);
+    virtual void setPreWaveDelay(Interval ms);
     /** Returns the wake head-period in ms. */
-    virtual unsigned wakeHeadPeriod() const;
+    virtual Interval wakeHeadPeriod() const;
     /** Sets the wake head-period in ms. */
-    virtual void setWakeHeadPeriod(unsigned ms);
+    virtual void setWakeHeadPeriod(Interval ms);
 
     /** Returns the wide-FM (broadcast) channel index. */
     virtual unsigned wfmChannelIndex() const;
@@ -459,9 +561,9 @@ public:
     virtual void enableWFMMonitor(bool enable);
 
     /** Returns the TBST frequency. */
-    virtual TBSTFrequency tbstFrequency() const;
+    virtual Frequency tbstFrequency() const;
     /** Sets the TBST frequency. */
-    virtual void setTBSTFrequency(TBSTFrequency freq);
+    virtual void setTBSTFrequency(Frequency freq);
 
     /** Returns @c true if the "pro mode" is enabled. */
     virtual bool proMode() const;
@@ -482,9 +584,9 @@ public:
     virtual void enableRemoteMonitor(bool enable);
 
     /** Returns the monitor slot match. */
-    virtual SlotMatch monitorSlotMatch() const;
+    virtual AnytoneDMRSettingsExtension::SlotMatch monitorSlotMatch() const;
     /** Sets the monitor slot match. */
-    virtual void setMonitorSlotMatch(SlotMatch match);
+    virtual void setMonitorSlotMatch(AnytoneDMRSettingsExtension::SlotMatch match);
     /** Returns @c true if the monitor matches color code. */
     virtual bool monitorColorCodeMatch() const;
     /** Enables/disables monitor color code match. */
@@ -499,23 +601,23 @@ public:
     virtual void enableMonitorTimeSlotHold(bool enable);
 
     /** Returns the "man down" delay in seconds. */
-    virtual unsigned manDownDelay() const;
+    virtual Interval manDownDelay() const;
     /** Sets the "man down" delay in seconds. */
-    virtual void setManDownDelay(unsigned sec);
+    virtual void setManDownDelay(Interval sec);
     /** Returns the analog call hold in seconds. */
-    virtual unsigned analogCallHold() const;
+    virtual unsigned fmCallHold() const;
     /** Sets the analog call hold in seconds. */
-    virtual void setAnalogCallHold(unsigned sec);
+    virtual void setFMCallHold(unsigned sec);
 
     /** Returns @c true if the GPS range reporting is enabled. */
-    virtual bool gpsRangReporting() const;
+    virtual bool gpsMessageEnabled() const;
     /** Enables/disables GPS range reporting. */
-    virtual void enableGPSRangeReporting(bool enable);
+    virtual void enableGPSMessage(bool enable);
 
     /** Returns @c true if the call channel is maintained. */
     virtual bool maintainCallChannel() const;
     /** Enables/disables maintaining the call channel. */
-    virtual void enableMaintainCalLChannel(bool enable);
+    virtual void enableMaintainCallChannel(bool enable);
 
     /** Returns the priority Zone A index. */
     virtual unsigned priorityZoneAIndex() const;
@@ -526,138 +628,137 @@ public:
     /** Sets the priority zone B index. */
     virtual void setPriorityZoneBIndex(unsigned idx);
 
+    /** Returns @c true if bluetooth is enabled. */
+    virtual bool bluetooth() const;
+    /** Enables/disables bluetooth. */
+    virtual void enableBluetooth(bool enable);
+
+    /** Returns @c true if the internal mic is additionally active when BT is active. */
+    virtual bool btAndInternalMic() const;
+    /** Enables/disables the internal mic when BT is active. */
+    virtual void enableBTAndInternalMic(bool enable);
+
+    /** Returns @c true if the internal speaker is additionally active when BT is active. */
+    virtual bool btAndInternalSpeaker() const;
+    /** Enables/disables the internal speaker when BT is active. */
+    virtual void enableBTAndInternalSpeaker(bool enable);
+
+    /** Returns @c true if the plug-in record tone is enabled. */
+    virtual bool pluginRecTone() const;
+    /** Enables/disables the plug-in record tone. */
+    virtual void enablePluginRecTone(bool enable);
+
     /** Returns the GPS ranging interval in seconds. */
-    virtual unsigned gpsRangingInterval() const;
+    virtual Interval gpsUpdatePeriod() const;
     /** Sets the GPS ranging interval in seconds. */
-    virtual void setGPSRangingInterval(unsigned sec);
+    virtual void setGPSUpdatePeriod(Interval sec);
+
+    /** Returns the bluetooth microphone gain [1,10]. */
+    virtual unsigned int btMicGain() const;
+    /** Sets the bluetooth microphone gain [1,10]. */
+    virtual void setBTMicGain(unsigned int gain);
+    /** Returns the bluetooth speaker gain [1,10]. */
+    virtual unsigned int btSpeakerGain() const;
+    /** Sets the bluetooth speaker gain [1,10]. */
+    virtual void setBTSpeakerGain(unsigned int gain);
 
     /** Returns @c true if the channel number is displayed. */
     virtual bool displayChannelNumber() const;
     /** Enables/disables display of channel number. */
     virtual void enableDisplayChannelNumber(bool enable);
-    /** Returns @c true if the contact is displayed. */
-    virtual bool displayContact() const;
-    /** Enables/disables display of contact. */
-    virtual void enableDisplayContact(bool enable);
+
+    bool showCurrentContact() const;
+    void enableShowCurrentContact(bool enable);
 
     /** Returns the auto roaming period in minutes. */
-    virtual unsigned autoRoamPeriod() const;
+    virtual Interval autoRoamPeriod() const;
     /** Sets the auto roaming period in minutes. */
-    virtual void setAutoRoamPeriod(unsigned min);
+    virtual void setAutoRoamPeriod(Interval min);
 
-    /** Returns @c true if the key-tone level is adjustable. */
-    virtual bool keyToneLevelAdjustable() const;
-    /** Returns the key-tone level (0=adjustable). */
-    virtual unsigned keyToneLevel() const;
-    /** Sets the key-tone level. */
-    virtual void setKeyToneLevel(unsigned level);
-    /** Sets the key-tone level adjustable. */
-    virtual void setKeyToneLevelAdjustable();
+    bool keyToneLevelAdjustable() const;
+    unsigned keyToneLevel() const;
+    void setKeyToneLevel(unsigned level);
+    void setKeyToneLevelAdjustable();
 
-    /** Returns the display color for callsigns. */
-    virtual Color callDisplayColor() const;
-    /** Sets the display color for callsigns. */
-    virtual void setCallDisplayColor(Color color);
+    AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
+    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
 
-    /** Returns @c true if the GPS units are imperical. */
-    virtual bool gpsUnitsImperial() const;
-    /** Enables/disables imperical GPS units. */
-    virtual void enableGPSUnitsImperial(bool enable);
+    bool gpsUnitsImperial() const;
+    void enableGPSUnitsImperial(bool enable);
 
-    /** Returns @c true if the knob is locked. */
-    virtual bool knobLock() const;
-    /** Enables/disables the knob lock. */
-    virtual void enableKnobLock(bool enable);
-    /** Returns @c true if the keypad is locked. */
-    virtual bool keypadLock() const;
-    /** Enables/disables the keypad lock. */
-    virtual void enableKeypadLock(bool enable);
-    /** Returns @c true if the sidekeys are locked. */
-    virtual bool sidekeysLock() const;
-    /** Enables/disables the sidekeys lock. */
-    virtual void enableSidekeysLock(bool enable);
-    /** Returns @c true if the "professional" key is locked. */
-    virtual bool keyLockForced() const;
-    /** Enables/disables the "professional" key lock. */
-    virtual void enableKeyLockForced(bool enable);
+    bool knobLock() const;
+    void enableKnobLock(bool enable);
+    bool keypadLock() const;
+    void enableKeypadLock(bool enable);
+    bool sidekeysLock() const;
+    void enableSidekeysLock(bool enable);
+    bool keyLockForced() const;
+    void enableKeyLockForced(bool enable);
 
     /** Returns the auto-roam delay in seconds. */
-    virtual unsigned autoRoamDelay() const;
+    virtual Interval autoRoamDelay() const;
     /** Sets the auto-roam delay in seconds. */
-    virtual void setAutoRoamDelay(unsigned sec);
+    virtual void setAutoRoamDelay(Interval sec);
 
     /** Returns the standby text color. */
-    virtual Color standbyTextColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color standbyTextColor() const;
     /** Sets the standby text color. */
-    virtual void setStandbyTextColor(Color color);
-    /** Returns the standby image color. */
-    virtual Color standbyImageColor() const;
-    /** Sets the standby image color. */
-    virtual void setStandbyImageColor(Color color);
+    virtual void setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color);
+    /** Returns the standby background image. */
+    virtual BackgroundImage standbyBackgroundImage() const;
+    /** Sets the standby background image. */
+    virtual void setStandbyBackgroundImage(D878UVCodeplug::GeneralSettingsElement::BackgroundImage img);
 
-    /** Returns @c true if the last heard is shown. */
-    virtual bool showLastHeard() const;
-    /** Enables/disables the knob lock. */
-    virtual void enableShowLastHeard(bool enable);
+    bool showLastHeard() const;
+    void enableShowLastHeard(bool enable);
 
     /** Returns the SMS format. */
-    virtual SMSFormat smsFormat() const;
+    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(SMSFormat fmt);
+    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMinFrequencyVHF() const;
+    virtual Frequency autoRepeaterMinFrequencyVHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyVHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMinFrequencyUHF() const;
+    virtual Frequency autoRepeaterMinFrequencyUHF() const;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual unsigned autoRepeaterMaxFrequencyUHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(unsigned Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
 
     /** Returns the auto-repeater direction for VFO B. */
-    virtual AutoRepDir autoRepeaterDirectionB() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AutoRepDir dir);
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** Returns @c true if a boot channel is set. */
-    virtual bool defaultChannel() const;
-    /** Enables/disables the boot channel. */
-    virtual void enableDefaultChannel(bool enable);
-    /** Returns the default zone index (0-based) for VFO A. */
-    virtual unsigned defaultZoneIndexA() const;
-    /** Sets the default zone (0-based) for VFO A. */
-    virtual void setDefaultZoneIndexA(unsigned idx);
-    /** Returns the default zone index (0-based) for VFO B. */
-    virtual unsigned defaultZoneIndexB() const;
-    /** Sets the default zone (0-based) for VFO B. */
-    virtual void setDefaultZoneIndexB(unsigned idx);
-    /** Returns @c true if the default channel for VFO A is VFO. */
-    virtual bool defaultChannelAIsVFO() const;
-    /** Returns the default channel index for VFO A.
-     * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelAIndex() const;
-    /** Sets the default channel index for VFO A. */
-    virtual void setDefaultChannelAIndex(unsigned idx);
-    /** Sets the default channel for VFO A to be VFO. */
-    virtual void setDefaultChannelAToVFO();
-    /** Returns @c true if the default channel for VFO B is VFO. */
-    virtual bool defaultChannelBIsVFO() const;
-    /** Returns the default channel index for VFO B.
-     * Must be within default zone. If 0xff, default channel is VFO. */
-    virtual unsigned defaultChannelBIndex() const;
-    /** Sets the default channel index for VFO B. */
-    virtual void setDefaultChannelBIndex(unsigned idx);
-    /** Sets the default channel for VFO B to be VFO. */
-    virtual void setDefaultChannelBToVFO();
+    /** If enabled, the FM ID is sent together with selected contact. */
+    virtual bool fmSendIDAndContact() const;
+    /** Enables/disables sending contact with FM ID. */
+    virtual void enableFMSendIDAndContact(bool enable);
+
+    bool defaultChannel() const;
+    void enableDefaultChannel(bool enable);
+    unsigned defaultZoneIndexA() const;
+    void setDefaultZoneIndexA(unsigned idx);
+    unsigned defaultZoneIndexB() const;
+    void setDefaultZoneIndexB(unsigned idx);
+    bool defaultChannelAIsVFO() const;
+    unsigned defaultChannelAIndex() const;
+    void setDefaultChannelAIndex(unsigned idx);
+    void setDefaultChannelAToVFO();
+    bool defaultChannelBIsVFO() const;
+    unsigned defaultChannelBIndex() const;
+    void setDefaultChannelBIndex(unsigned idx);
+    void setDefaultChannelBToVFO();
 
     /** Returns the default roaming zone index. */
     virtual unsigned defaultRoamingZoneIndex() const;
@@ -669,38 +770,36 @@ public:
     /** Enables/disables repeater range check. */
     virtual void enableRepeaterRangeCheck(bool enable);
     /** Returns the repeater range check period in seconds. */
-    virtual unsigned repeaterRangeCheckInterval() const;
+    virtual Interval repeaterRangeCheckInterval() const;
     /** Sets the repeater range check interval in seconds. */
-    virtual void setRepeaterRangeCheckInterval(unsigned sec);
+    virtual void setRepeaterRangeCheckInterval(Interval sec);
     /** Returns the number of repeater range checks. */
     virtual unsigned repeaterRangeCheckCount() const;
     /** Sets the number of repeater range checks. */
     virtual void setRepeaterRangeCheckCount(unsigned n);
 
     /** Returns the roaming start condition. */
-    virtual RoamStart roamingStartCondition() const;
+    virtual AnytoneRoamingSettingsExtension::RoamStart roamingStartCondition() const;
     /** Sets the roaming start condition. */
-    virtual void setRoamingStartCondition(RoamStart cond);
+    virtual void setRoamingStartCondition(AnytoneRoamingSettingsExtension::RoamStart cond);
 
     /** Returns the backlight duration during TX in seconds. */
-    virtual unsigned backlightTXDuration() const;
+    virtual Interval txBacklightDuration() const;
     /** Sets the backlight duration during TX in seconds. */
-    virtual void setBacklightTXDuration(unsigned sec);
+    virtual void setTXBacklightDuration(Interval sec);
 
     /** Returns @c true if the "separate display" is enabled. */
     virtual bool separateDisplay() const;
     /** Enables/disables "separate display. */
     virtual void enableSeparateDisplay(bool enable);
 
-    /** Returns @c true if keep caller is enabled. */
-    virtual bool keepCaller() const;
-    /** Enables/disables keep caller. */
-    virtual void enableKeepCaller(bool enable);
+    bool keepLastCaller() const;
+    void enableKeepLastCaller(bool enable);
 
     /** Returns the channel name color. */
-    virtual Color channelNameColor() const;
+    virtual AnytoneDisplaySettingsExtension::Color channelNameColor() const;
     /** Sets the channel name color. */
-    virtual void setChannelNameColor(Color color);
+    virtual void setChannelNameColor(AnytoneDisplaySettingsExtension::Color color);
 
     /** Returns @c true if repeater check notification is enabled. */
     virtual bool repeaterCheckNotification() const;
@@ -708,9 +807,9 @@ public:
     virtual void enableRepeaterCheckNotification(bool enable);
 
     /** Returns the backlight duration during RX in seconds. */
-    virtual unsigned backlightRXDuration() const;
+    Interval rxBacklightDuration() const;
     /** Sets the backlight duration during RX in seconds. */
-    virtual void setBacklightRXDuration(unsigned sec);
+    void setRXBacklightDuration(Interval sec);
 
     /** Returns @c true if roaming is enabled. */
     virtual bool roaming() const;
@@ -718,9 +817,9 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns the mute delay in minutes. */
-    virtual unsigned muteDelay() const;
+    virtual Interval muteDelay() const;
     /** Sets the mute delay in minutes. */
-    virtual void setMuteDelay(unsigned min);
+    virtual void setMuteDelay(Interval min);
 
     /** Returns the number of repeater check notifications. */
     virtual unsigned repeaterCheckNumNotifications() const;
@@ -736,85 +835,158 @@ public:
     /** Enables/disables boot reset. */
     virtual void enableBootReset(bool enable);
 
+    /** Returns @c true, if the bluetooth hold time is enabled. */
+    virtual bool btHoldTimeEnabled() const;
+    /** Returns @c true, if the bluetooth hold time is infinite. */
+    virtual bool btHoldTimeInfinite() const;
+    /** Returns the bluetooth hold time. */
+    virtual Interval btHoldTime() const;
+    /** Sets the bluethooth hold time (1-120s). */
+    virtual void setBTHoldTime(Interval interval);
+    /** Sets the bluethooth hold time to infinite. */
+    virtual void setBTHoldTimeInfinite();
+    /** Sets the bluethooth hold time to infinite. */
+    virtual void disableBTHoldTime();
+
+    /** Returns the bluetooth RX delay in ms. */
+    virtual Interval btRXDelay() const;
+    /** Sets the bluetooth RX delay in ms. */
+    virtual void setBTRXDelay(Interval delay);
+
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
-  };
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
 
-  /** Implements the GPS message settings (part of general settings).
-   *
-   * Memory layout of the encoded GPS message (size 0x0030 bytes):
-   * @verbinclude d878uv_gpsmessage.txt */
-  class GPSMessageElement: public Element
-  {
   protected:
-    /** Hidden constructor. */
-    GPSMessageElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    GPSMessageElement(uint8_t *ptr);
-
-    /** Resets the message. */
-    void clear();
-
-    /** Returns the GPS message. */
-    virtual QString message() const;
-    /** Sets the message. */
-    virtual void setMessage(const QString &message);
-
-    /** Encodes GPS message from config object. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
-    /** Updates config. */
-    virtual bool updateConfig(Context &ctx) const;
+    /** Some internal used offsets within the element. */
+    struct Offset: public D868UVCodeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int transmitTimeout()     { return 0x0004; }
+      static constexpr unsigned int language()            { return 0x0005; }
+      static constexpr unsigned int vfoFrequencyStep()    { return 0x0008; }
+      static constexpr unsigned int steType()             { return 0x0017; }
+      static constexpr unsigned int steFrequency()        { return 0x0018; }
+      static constexpr unsigned int groupCallHangTime()   { return 0x0019; }
+      static constexpr unsigned int privateCallHangTime() { return 0x001a; }
+      static constexpr unsigned int preWaveDelay()        { return 0x001b; }
+      static constexpr unsigned int wakeHeadPeriod()      { return 0x001c; }
+      static constexpr unsigned int wfmChannelIndex()     { return 0x001d; }
+      static constexpr unsigned int wfmVFOEnabled()       { return 0x001e; }
+      static constexpr unsigned int dtmfToneDuration()    { return 0x0023; }
+      static constexpr unsigned int manDown()             { return 0x0024; }
+      static constexpr unsigned int wfmMonitor()          { return 0x002b; }
+      static constexpr unsigned int tbstFrequency()       { return 0x002e; }
+      static constexpr unsigned int proMode()             { return 0x0034; }
+      static constexpr unsigned int filterOwnID()         { return 0x0038; }
+      static constexpr unsigned int remoteStunKill()      { return 0x003c; }
+      static constexpr unsigned int remoteMonitor()       { return 0x003e; }
+      static constexpr unsigned int monSlotMatch()        { return 0x0049; }
+      static constexpr unsigned int monColorCodeMatch()   { return 0x004a; }
+      static constexpr unsigned int monIDMatch()          { return 0x004b; }
+      static constexpr unsigned int monTimeSlotHold()     { return 0x004c; }
+      static constexpr unsigned int manDownDelay()        { return 0x004f; }
+      static constexpr unsigned int fmCallHold()          { return 0x0050; }
+      static constexpr unsigned int enableGPSMessage()    { return 0x0053; }
+      static constexpr unsigned int maintainCallChannel() { return 0x006e; }
+      static constexpr unsigned int priorityZoneA()       { return 0x006f; }
+      static constexpr unsigned int priorityZoneB()       { return 0x0070; }
+      static constexpr unsigned int bluetooth()           { return 0x00b1; }
+      static constexpr unsigned int btAndInternalMic()    { return 0x00b2; }
+      static constexpr unsigned int btAndInternalSpeaker(){ return 0x00b3; }
+      static constexpr unsigned int pluginRecTone()       { return 0x00b4; }
+      static constexpr unsigned int gpsRangingInterval()  { return 0x00b5; }
+      static constexpr unsigned int btMicGain()           { return 0x00b6; }
+      static constexpr unsigned int btSpeakerGain()       { return 0x00b7; }
+      static constexpr unsigned int showChannelNumber()   { return 0x00b8; }
+      static constexpr unsigned int showCurrentContact()  { return 0x00b9; }
+      static constexpr unsigned int autoRoamPeriod()      { return 0x00ba; }
+      static constexpr unsigned int keyToneLevel()        { return 0x00bb; }
+      static constexpr unsigned int callColor()           { return 0x00bc; }
+      static constexpr unsigned int gpsUnits()            { return 0x00bd; }
+      static constexpr unsigned int knobLock()            { return 0x00be; }
+      static constexpr unsigned int keypadLock()          { return 0x00be; }
+      static constexpr unsigned int sideKeyLock()         { return 0x00be; }
+      static constexpr unsigned int forceKeyLock()        { return 0x00be; }
+      static constexpr unsigned int autoRoamDelay()       { return 0x00bf; }
+      static constexpr unsigned int standbyTextColor()    { return 0x00c0; }
+      static constexpr unsigned int standbyBackground()   { return 0x00c1; }
+      static constexpr unsigned int showLastHeard()       { return 0x00c2; }
+      static constexpr unsigned int smsFormat()           { return 0x00c3; }
+      static constexpr unsigned int autoRepMinVHF()       { return 0x00c4; }
+      static constexpr unsigned int autoRepMaxVHF()       { return 0x00c8; }
+      static constexpr unsigned int autoRepMinUHF()       { return 0x00cc; }
+      static constexpr unsigned int autoRepMaxUHF()       { return 0x00d0; }
+      static constexpr unsigned int autoRepeaterDirB()    { return 0x00d4; }
+      static constexpr unsigned int fmSendIDAndContact()  { return 0x00d5; }
+      static constexpr unsigned int defaultChannels()     { return 0x00d7; }
+      static constexpr unsigned int defaultZoneA()        { return 0x00d8; }
+      static constexpr unsigned int defaultZoneB()        { return 0x00d9; }
+      static constexpr unsigned int defaultChannelA()     { return 0x00da; }
+      static constexpr unsigned int defaultChannelB()     { return 0x00db; }
+      static constexpr unsigned int defaultRoamingZone()  { return 0x00dc; }
+      static constexpr unsigned int repRangeCheck()       { return 0x00dd; }
+      static constexpr unsigned int rangeCheckInterval()  { return 0x00de; }
+      static constexpr unsigned int rangeCheckCount()     { return 0x00df; }
+      static constexpr unsigned int roamStartCondition()  { return 0x00e0; }
+      static constexpr unsigned int txBacklightDuration() { return 0x00e1; }
+      static constexpr unsigned int displaySeparator()    { return 0x00e2; }
+      static constexpr unsigned int keepLastCaller()      { return 0x00e3; }
+      static constexpr unsigned int channelNameColor()    { return 0x00e4; }
+      static constexpr unsigned int repCheckNotify()      { return 0x00e5; }
+      static constexpr unsigned int rxBacklightDuration() { return 0x00e6; }
+      static constexpr unsigned int roaming()             { return 0x00e7; }
+      static constexpr unsigned int muteDelay()           { return 0x00e9; }
+      static constexpr unsigned int repCheckNumNotify()   { return 0x00ea; }
+      static constexpr unsigned int bootGPSCheck()        { return 0x00eb; }
+      static constexpr unsigned int bootReset()           { return 0x00ec; }
+      static constexpr unsigned int btHoldTime()          { return 0x00ed; }
+      static constexpr unsigned int btRXDelay()           { return 0x00ee; }
+      /// @endcond
+    };
   };
 
   /** General settings extension element for the D878UV.
    *
-   * Memory representation of the encoded settings element (size 0x100 bytes):
+   * Memory representation of the encoded settings element (size 0x200 bytes):
    * @verbinclude d878uv_generalsettingsextension.txt */
-  class GeneralSettingsExtensionElement: public Element
+  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
-  public:
-    /** Talker alias display preference. */
-    enum class TalkerAliasDisplay {
-      Off = 0, Conctact = 1, Air = 2
-    };
-
-    /** Talker alias encoding. */
-    enum class TalkerAliasEncoding {
-      ISO8 = 0, ISO7 = 1, Unicode = 2,
-    };
-
-    /** Possible GPS modes. */
-    enum class GPSMode {
-      GPS=0, BDS=1, Both=2
-    };
-
   protected:
     /** Hidden Constructor. */
-    GeneralSettingsExtensionElement(uint8_t *ptr, unsigned size);
+    ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
     /** Constructor. */
-    explicit GeneralSettingsExtensionElement(uint8_t *ptr);
+    explicit ExtendedSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00000200; }
 
     /** Resets the settings. */
     void clear();
 
-    /** Returns @c true if talker alias is send. */
-    virtual bool sendTalkerAlias() const;
-    /** Enables/disables sending talker alias. */
-    virtual void enableSendTalkerAlias(bool enable);
+    bool sendTalkerAlias() const;
+    void enableSendTalkerAlias(bool enable);
 
-    /** Returns the talker alias display mode. */
-    virtual TalkerAliasDisplay talkerAliasDisplay() const;
-    /** Sets the talker alias display mode. */
-    virtual void setTalkerAliasDisplay(TalkerAliasDisplay mode);
+    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
-    /** Returns the talker alias encoding. */
-    virtual TalkerAliasEncoding talkerAliasEncoding() const;
-    /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
+    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+
+    /** Returns @c true if the BT PTT latch is enabled. */
+    virtual bool bluetoothPTTLatch() const;
+    /** Enables/disables bluetooth PTT latch. */
+    virtual void enableBluetoothPTTLatch(bool enable);
+
+    /** Returns @c true if the bluetooth PTT sleep delay is disabled (infinite). */
+    virtual bool infiniteBluetoothPTTSleepDelay() const;
+    /** Returns the bluetooth PTT sleep delay in minutes, 0=off. */
+    virtual Interval bluetoothPTTSleepDelay() const;
+    /** Sets the bluetooth PTT sleep delay in minutes. */
+    virtual void setBluetoothPTTSleepDelay(Interval delay);
+    /** Sets the bluetooth PTT sleep delay to infinite/disabled. */
+    virtual void setInfiniteBluetoothPTTSleepDelay();
 
     /** Returns @c true if the auto repeater UHF 2 offset index is set. */
     virtual bool hasAutoRepeaterUHF2OffsetIndex() const;
@@ -835,61 +1007,244 @@ public:
     virtual void clearAutoRepeaterVHF2OffsetIndex();
 
     /** Returns the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual unsigned autoRepeaterVHF2MinFrequency() const;
+    virtual Frequency autoRepeaterVHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MinFrequency(unsigned hz);
+    virtual void setAutoRepeaterVHF2MinFrequency(Frequency hz);
     /** Returns the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual unsigned autoRepeaterVHF2MaxFrequency() const;
+    virtual Frequency autoRepeaterVHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater VHF 2 band. */
-    virtual void setAutoRepeaterVHF2MaxFrequency(unsigned hz);
+    virtual void setAutoRepeaterVHF2MaxFrequency(Frequency hz);
     /** Returns the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual unsigned autoRepeaterUHF2MinFrequency() const;
+    virtual Frequency autoRepeaterUHF2MinFrequency() const;
     /** Sets the minimum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MinFrequency(unsigned hz);
+    virtual void setAutoRepeaterUHF2MinFrequency(Frequency hz);
     /** Returns the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual unsigned autoRepeaterUHF2MaxFrequency() const;
+    virtual Frequency autoRepeaterUHF2MaxFrequency() const;
     /** Sets the maximum frequency in Hz for the auto-repeater UHF 2 band. */
-    virtual void setAutoRepeaterUHF2MaxFrequency(unsigned hz);
+    virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
-    virtual GPSMode gpsMode() const;
+    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(GPSMode mode);
+    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+
+    /** Returns the STE (squelch tail elimination) duration. */
+    virtual Interval steDuration() const;
+    /** Sets the STE (squelch tail elimination) duration. */
+    virtual void setSTEDuration(Interval dur);
+
+    /** Returns @c true if the manual dialed group call hang time is infinite. */
+    virtual bool infiniteManDialGroupCallHangTime() const;
+    /** Returns the manual dial group call hang time. */
+    virtual Interval manDialGroupCallHangTime() const;
+    /** Sets the manual dial group call hang time. */
+    virtual void setManDialGroupCallHangTime(Interval dur);
+    /** Sets the manual dial group call hang time to infinite. */
+    virtual void setManDialGroupCallHangTimeInfinite();
+
+    /** Returns @c true if the manual dialed private call hang time is infinite. */
+    virtual bool infiniteManDialPrivateCallHangTime() const;
+    /** Returns the manual dial private call hang time. */
+    virtual Interval manDialPrivateCallHangTime() const;
+    /** Sets the manual dial private call hang time. */
+    virtual void setManDialPrivateCallHangTime(Interval dur);
+    /** Sets the manual dial private call hang time to infinite. */
+    virtual void setManDialPrivateCallHangTimeInfinite();
+
+    AnytoneDisplaySettingsExtension::Color channelBNameColor() const;
+    void setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color);
+
+    /** Returns the encryption mode. */
+    virtual AnytoneDMRSettingsExtension::EncryptionType encryption() const;
+    /** Sets the encryption mode. */
+    virtual void setEncryption(AnytoneDMRSettingsExtension::EncryptionType mode);
+
+    /** Returns @c true if the transmit timeout notification is enabled. */
+    virtual bool totNotification() const;
+    /** Enables/disables transmit timeout notification. */
+    virtual void enableTOTNotification(bool enable);
+
+    /** Returns @c true if the ATPC (Adaptiv Transmission Power Control) is enabled. */
+    virtual bool atpc() const;
+    /** Enables/disables the ATPC (Adaptiv Transmission Power Control). */
+    virtual void enableATPC(bool enable);
+
+    AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
+    void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color zoneBNameColor() const;
+    void setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color);
+
+    /** Returns @c true if the auto-shutdown timer is reset on a call. */
+    virtual bool resetAutoShutdownOnCall() const;
+    /** Enables/disables reset on call of the auto-shutdown timer. */
+    virtual void enableResetAutoShutdownOnCall(bool enable);
+
+    /** Returns @c true if the color code is shown. */
+    virtual bool showColorCode() const;
+    /** Enables/disables display of color code. */
+    virtual void enableShowColorCode(bool enable);
+    /** Returns @c true if the time slot is shown. */
+    virtual bool showTimeSlot() const;
+    /** Enables/disables display of time slot. */
+    virtual void enableShowTimeSlot(bool enable);
+    /** Returns @c true if the channel type is shown. */
+    virtual bool showChannelType() const;
+    /** Enables/disables display of channel type. */
+    virtual void enableShowChannelType(bool enable);
+
+    /** Returns @c true if the FM idle channel tone is enabled. */
+    virtual bool fmIdleTone() const;
+    /** Enables/disables FM idle channel tone. */
+    virtual void enableFMIdleTone(bool enable);
+
+    /** Returns the date format. */
+    virtual AnytoneDisplaySettingsExtension::DateFormat dateFormat() const;
+    /** Sets the date format. */
+    virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
+
+    /** Returns the FM Mic gain [1,10]. */
+    virtual unsigned int fmMicGain() const;
+    /** Sets the analog mic gain [1,10]. */
+    virtual void setFMMicGain(unsigned int gain);
+
+    /** Returns @c true if the GPS roaming is enabled. */
+    virtual bool gpsRoaming() const;
+    /** Enables/disables GPS roaming. */
+    virtual void enableGPSRoaming(bool enable);
+
+    /** Returns the call-end tone melody. */
+    virtual void callEndToneMelody(Melody &melody) const;
+    /** Sets the call-end tone melody. */
+    virtual void setCallEndToneMelody(const Melody &melody);
+    /** Returns the all-call tone melody. */
+    virtual void allCallToneMelody(Melody &melody) const;
+    /** Sets the all-call tone melody. */
+    virtual void setAllCallToneMelody(const Melody &melody);
 
     /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx);
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Link config from settings extension. */
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit {
+      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
+    };
+
+  protected:
+    /** Internal used offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
+      static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
+      static constexpr unsigned int talkerAliasEncoding()          { return 0x001f; }
+      static constexpr unsigned int btPTTLatch()                   { return 0x0020; }
+      static constexpr unsigned int autoRepeaterUHF2OffsetIndex()  { return 0x0022; }
+      static constexpr unsigned int autoRepeaterVHF2OffsetIndex()  { return 0x0023; }
+      static constexpr unsigned int autoRepeaterVHF2MinFrequency() { return 0x0024; }
+      static constexpr unsigned int autoRepeaterVHF2MaxFrequency() { return 0x0028; }
+      static constexpr unsigned int autoRepeaterUHF2MinFrequency() { return 0x002c; }
+      static constexpr unsigned int autoRepeaterUHF2MaxFrequency() { return 0x0030; }
+      static constexpr unsigned int btPTTSleepDelay()              { return 0x0034; }
+      static constexpr unsigned int gpsMode()                      { return 0x0035; }
+      static constexpr unsigned int steDuration()                  { return 0x0036; }
+      static constexpr unsigned int manGrpCallHangTime()           { return 0x0037; }
+      static constexpr unsigned int manPrivCallHangTime()          { return 0x0038; }
+      static constexpr unsigned int channelBNameColor()            { return 0x0039; }
+      static constexpr unsigned int encryptionType()               { return 0x003a; }
+      static constexpr unsigned int totNotification()              { return 0x003b; }
+      static constexpr unsigned int atpc()                         { return 0x003c; }
+      static constexpr unsigned int zoneANameColor()               { return 0x003d; }
+      static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
+      static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
+      static constexpr unsigned int displayColorCode()             { return 0x0040; }  // bit 2
+      static constexpr unsigned int displayTimeSlot()              { return 0x0040; }  // bit 1
+      static constexpr unsigned int displayChannelType()           { return 0x0040; }  // bit 0
+      static constexpr unsigned int fmIdleTone()                   { return 0x0041; }
+      static constexpr unsigned int dateFormat()                   { return 0x0042; }
+      static constexpr unsigned int analogMicGain()                { return 0x0043; }
+      static constexpr unsigned int gpsRoaming()                   { return 0x0044; }
+      static constexpr unsigned int callEndTones()                 { return 0x0046; }
+      static constexpr unsigned int callEndDurations()             { return 0x0050; }
+      static constexpr unsigned int allCallTones()                 { return 0x005a; }
+      static constexpr unsigned int allCallDurations()             { return 0x0064; }
+      /// @endcond
+    };
   };
 
-  /** Represents the APRS settings within the binary D878UV codeplug.
-   *
-   * Memory layout of APRS settings (size 0x0040 bytes):
-   * @verbinclude d878uv_aprssetting.txt
-   */
-  class AnalogAPRSSettingsElement: public Element
+
+  /** Implements some storage to hold the names for the FM APRS frequencies.
+   * @verbinclude d878uv_fm_aprs_frequency_names.txt */
+  class FMAPRSFrequencyNamesElement: public Element
   {
   protected:
     /** Hidden constructor. */
-    AnalogAPRSSettingsElement(uint8_t *ptr, unsigned size);
+    FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size);
 
   public:
     /** Constructor. */
-    explicit AnalogAPRSSettingsElement(uint8_t *ptr);
+    explicit FMAPRSFrequencyNamesElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
+
+    void clear();
+
+    /** Returns the n-th name. The 0-th name, is the name of the FM APRS system. */
+    virtual QString name(unsigned int n) const;
+    /** Sets the n-th name. The 0-th name, is the name of the FM APRS system. */
+    virtual void setName(unsigned int n, const QString &name);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenNames() { return 0x0010; }
+      /// @endcond
+    };
+  };
+
+
+  /** Represents the APRS settings within the binary D878UV codeplug.
+   *
+   * Memory layout of APRS settings (size 0x00f0 bytes):
+   * @verbinclude d878uv_aprssetting.txt
+   */
+  class APRSSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    APRSSettingsElement(uint8_t *ptr, unsigned size);
+
+    /** Possible settings for the FM APRS subtone type. */
+    enum class SignalingType {
+      Off=0, CTCSS=1, DCS=2
+    };
+
+  public:
+    /** Constructor. */
+    explicit APRSSettingsElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
 
     /** Resets the settings. */
     void clear();
     bool isValid() const;
 
-    /** Returns the transmit frequency in Hz. */
-    virtual unsigned frequency() const;
-    /** Sets the transmit frequency in Hz. */
-    virtual void setFrequency(unsigned hz);
-
     /** Returns the TX delay in ms. */
-    virtual unsigned txDelay() const;
+    virtual Interval fmTXDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setTXDelay(unsigned ms);
+    virtual void setFMTXDelay(Interval ms);
 
     /** Returns the sub tone settings. */
     virtual Signaling::Code txTone() const;
@@ -897,20 +1252,20 @@ public:
     virtual void setTXTone(Signaling::Code code);
 
     /** Returns the manual TX interval in seconds. */
-    virtual unsigned manualTXInterval() const;
+    virtual Interval manualTXInterval() const;
     /** Sets the manual TX interval in seconds. */
-    virtual void setManualTXInterval(unsigned sec);
+    virtual void setManualTXInterval(Interval sec);
 
     /** Returns @c true if the auto transmit is enabled. */
     virtual bool autoTX() const;
     /** Returns the auto TX interval in seconds. */
-    virtual unsigned autoTXInterval() const;
+    virtual Interval autoTXInterval() const;
     /** Sets the auto TX interval in seconds. */
-    virtual void setAutoTXInterval(unsigned sec);
+    virtual void setAutoTXInterval(Interval sec);
     /** Disables auto tx. */
     virtual void disableAutoTX();
 
-    /** Returns @c true if a fixed location is send. */
+    /** Returns @c true if a fixed location is sent. */
     virtual bool fixedLocationEnabled() const;
     /** Returns the fixed location send. */
     virtual QGeoCoordinate fixedLocation() const;
@@ -948,42 +1303,75 @@ public:
     virtual void setPower(Channel::Power power);
 
     /** Returns the pre-wave delay in ms. */
-    virtual unsigned preWaveDelay() const;
+    virtual Interval fmPreWaveDelay() const;
     /** Sets the pre-wave delay in ms. */
-    virtual void setPreWaveDelay(unsigned ms);
+    virtual void setFMPreWaveDelay(Interval ms);
 
-    /** Configures this APRS system from the given generic config. */
-    virtual bool fromAPRSSystem(const APRSSystem *sys, Context &ctx,
-                                const ErrorStack &err=ErrorStack());
-    /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toAPRSSystem();
-    /** Links the transmit channel within the generic APRS system based on the transmit frequency
-     * defined within this APRS system. */
-    virtual bool linkAPRSSystem(APRSSystem *sys, Context &ctx);
+    /** Returns @c true if the channel points to the current/selected channel. */
+    virtual bool dmrChannelIsSelected(unsigned n) const;
+    /** Returns the digital channel index for the n-th system. */
+    virtual unsigned dmrChannelIndex(unsigned n) const;
+    /** Sets the digital channel index for the n-th system. */
+    virtual void setDMRChannelIndex(unsigned n, unsigned idx);
+    /** Sets the channel to the current/selected channel. */
+    virtual void setDMRChannelSelected(unsigned n);
 
-  };
+    /** Returns the destination contact for the n-th system. */
+    virtual unsigned dmrDestination(unsigned n) const;
+    /** Sets the destination contact for the n-th system. */
+    virtual void setDMRDestination(unsigned n, unsigned idx);
 
-  /** Represents an extension to the APRS settings.
-   *
-   * Memory layout of APRS settings (0x60byte):
-   * @verbinclude d878uv_aprssettingext.txt */
-  class AnalogAPRSSettingsExtensionElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    AnalogAPRSSettingsExtensionElement(uint8_t *ptr, unsigned size);
+    /** Returns the call type for the n-th system. */
+    virtual DMRContact::Type dmrCallType(unsigned n) const;
+    /** Sets the call type for the n-th system. */
+    virtual void setDMRCallType(unsigned n, DMRContact::Type type);
 
-  public:
-    /** Constructor. */
-    AnalogAPRSSettingsExtensionElement(uint8_t *ptr);
+    /** Returns @c true if the n-th system overrides the channel time-slot. */
+    virtual bool dmrTimeSlotOverride(unsigned n);
+    /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
+    virtual DMRChannel::TimeSlot dmrTimeSlot(unsigned n) const;
+    /** Overrides the time slot of the n-th selected channel. */
+    virtual void setDMRTimeSlot(unsigned n, DMRChannel::TimeSlot ts);
+    /** Clears the time-slot override. */
+    virtual void clearDMRTimeSlotOverride(unsigned n);
 
-    /** Resets the settings. */
-    void clear();
+    /** Returns @c true if the roaming is enabled. */
+    virtual bool dmrRoaming() const;
+    /** Enables/disables roaming. */
+    virtual void enableDMRRoaming(bool enable);
 
-    /** Returns the fixed altitude in meter. */
-    virtual unsigned fixedAltitude() const;
-    /** Sets the fixed altitude in meter. */
-    virtual void setFixedAltitude(unsigned m);
+    /** Returns the the repeater activation delay in ms. */
+    virtual Interval dmrPreWaveDelay() const;
+    /** Sets the repeater activation delay in ms. */
+    virtual void setDMRPreWaveDelay(Interval ms);
+
+    /** Returns @c true if a received APRS message is shown indefinitely. */
+    virtual bool infiniteDisplayTime() const;
+    /** Returns the time, a received APRS message is shown. */
+    virtual Interval displayTime() const;
+    /** Sets the time, a received APRS is shown. */
+    virtual void setDisplayTime(Interval dur);
+    /** Sets the APRS display time to infinite. */
+    virtual void setDisplayTimeInifinite();
+
+    /** Returns the FM APRS channel width. */
+    virtual AnytoneFMAPRSSettingsExtension::Bandwidth fmChannelWidth() const;
+    /** Sets the FM APRS channel width. */
+    virtual void setFMChannelWidth(AnytoneFMAPRSSettingsExtension::Bandwidth width);
+
+    /** Retruns @c true if the CRC check on received FM APRS messages is disabled. */
+    virtual bool fmPassAll() const;
+    /** Enables/disables "pass all", that is the CRC check on FM APRS messages is disabled. */
+    virtual void enableFMPassAll(bool enable);
+
+    /** Retruns @c true if the n-th of 8 FM APRS frequencies is set. */
+    virtual bool fmFrequencySet(unsigned int n) const;
+    /** Returns the n-th of 8 FM APRS frequencies. */
+    virtual Frequency fmFrequency(unsigned int n) const;
+    /** Sets the n-th of 8 FM APRS frequencies. */
+    virtual void setFMFrequency(unsigned int n, Frequency f);
+    /** Clears the n-th of 8 FM APRS frequencies. */
+    virtual void clearFMFrequency(unsigned int n);
 
     /** Returns @c true if the report position flag is set. */
     virtual bool reportPosition() const;
@@ -1021,6 +1409,125 @@ public:
     virtual bool reportOther() const;
     /** Enables/disables report other flag. */
     virtual void enableReportOther(bool enable);
+
+    /** Configures this APRS system from the given generic config. */
+    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+                                  FMAPRSFrequencyNamesElement &names,
+                                  const ErrorStack &err=ErrorStack());
+    /** Constructs a generic APRS system configuration from this APRS system. */
+    virtual APRSSystem *toFMAPRSSystem(
+        Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err=ErrorStack());
+    /** Links the transmit channel within the generic APRS system based on the transmit frequency
+     * defined within this APRS system. */
+    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+
+    /** Constructs all GPS system from the generic configuration. */
+    virtual bool fromDMRAPRSSystems(Context &ctx);
+    /** Encodes the given GPS system. */
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
+    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    /** Links the specified generic GPS system. */
+    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+
+  public:
+    /** Some static limits for this element. */
+    struct Limit {
+      /// Maximum length of call signs.
+      static constexpr unsigned int callLength()                           { return 0x0006; }
+      /// Maximum length of the repeater path string.
+      static constexpr unsigned int pathLength()                           { return 0x0020; }
+      /// Maximum number of DMR APRS systems.
+      static constexpr unsigned int dmrSystems()                           { return 0x0008; }
+      /// Maximum number of FM APRS frequencies.
+      static constexpr unsigned int fmFrequencies()                        { return 0x0008; }
+    };
+
+  protected:
+    /** Internal used offsets within the codeplug element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int fmTXDelay()                            { return 0x0005; }
+      static constexpr unsigned int fmSigType()                            { return 0x0006; }
+      static constexpr unsigned int fmCTCSS()                              { return 0x0007; }
+      static constexpr unsigned int fmDCS()                                { return 0x0008; }
+      static constexpr unsigned int manualTXInterval()                     { return 0x000a; }
+      static constexpr unsigned int autoTXInterval()                       { return 0x000b; }
+      static constexpr unsigned int fmTXMonitor()                          { return 0x000c; }
+      static constexpr unsigned int fixedLocation()                        { return 0x000d; }
+      static constexpr unsigned int fixedLatDeg()                          { return 0x000e; }
+      static constexpr unsigned int fixedLatMin()                          { return 0x000f; }
+      static constexpr unsigned int fixedLatSec()                          { return 0x0010; }
+      static constexpr unsigned int fixedLatSouth()                        { return 0x0011; }
+      static constexpr unsigned int fixedLonDeg()                          { return 0x0012; }
+      static constexpr unsigned int fixedLonMin()                          { return 0x0013; }
+      static constexpr unsigned int fixedLonSec()                          { return 0x0014; }
+      static constexpr unsigned int fixedLonWest()                         { return 0x0015; }
+      static constexpr unsigned int destinationCall()                      { return 0x0016; }
+      static constexpr unsigned int destinationSSID()                      { return 0x001c; }
+      static constexpr unsigned int sourceCall()                           { return 0x001d; }
+      static constexpr unsigned int sourceSSID()                           { return 0x0023; }
+      static constexpr unsigned int path()                                 { return 0x0024; }
+      static constexpr unsigned int symbolTable()                          { return 0x0039; }
+      static constexpr unsigned int symbol()                               { return 0x003a; }
+      static constexpr unsigned int fmPower()                              { return 0x003b; }
+      static constexpr unsigned int fmPrewaveDelay()                       { return 0x003c; }
+      static constexpr unsigned int dmrChannelIndices()                    { return 0x0040; }
+      static constexpr unsigned int betweenDMRChannelIndices()             { return 0x0002; }
+      static constexpr unsigned int dmrDestinations()                      { return 0x0050; }
+      static constexpr unsigned int betweenDMRDestinations()               { return 0x0004; }
+      static constexpr unsigned int dmrCallTypes()                         { return 0x0070; }
+      static constexpr unsigned int betweenDMRCallTypes()                  { return 0x0001; }
+      static constexpr unsigned int roamingSupport()                       { return 0x0078; }
+      static constexpr unsigned int dmrTimeSlots()                         { return 0x0079; }
+      static constexpr unsigned int betweenDMRTimeSlots()                  { return 0x0001; }
+      static constexpr unsigned int dmrPrewaveDelay()                      { return 0x0081; }
+      static constexpr unsigned int displayInterval()                      { return 0x0082; }
+      static constexpr unsigned int fixedHeight()                          { return 0x00a6; }
+      static constexpr unsigned int reportPosition()                       { return 0x00a8; }
+      static constexpr unsigned int reportMicE()                           { return 0x00a8; }
+      static constexpr unsigned int reportObject()                         { return 0x00a8; }
+      static constexpr unsigned int reportItem()                           { return 0x00a8; }
+      static constexpr unsigned int reportMessage()                        { return 0x00a8; }
+      static constexpr unsigned int reportWeather()                        { return 0x00a8; }
+      static constexpr unsigned int reportNMEA()                           { return 0x00a8; }
+      static constexpr unsigned int reportStatus()                         { return 0x00a8; }
+      static constexpr unsigned int reportOther()                          { return 0x00a9; }
+      static constexpr unsigned int fmWidth()                              { return 0x00aa; }
+      static constexpr unsigned int passAll()                              { return 0x00ab; }
+      static constexpr unsigned int fmFrequencies()                        { return 0x00ac; }
+      static constexpr unsigned int betweenFMFrequencies()                 { return 0x0004; }
+
+      /// @endcond
+    };
+  };
+
+  /** Represents an (analog/FM) APRS message. */
+  class AnalogAPRSMessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    AnalogAPRSMessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AnalogAPRSMessageElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    /** Returns the message. */
+    virtual QString message() const;
+    /** Sets the message. */
+    virtual void setMessage(const QString &msg);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int length() { return 60; }    ///< Maximum message length.
+    };
   };
 
   /** Represents an analog APRS RX entry.
@@ -1037,6 +1544,9 @@ public:
     /** Constructor. */
     AnalogAPRSRXEntryElement(uint8_t *ptr);
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0008; }
+
     /** Resets the entry. */
     void clear();
     /** Returns @c true if the APRS RX entry is valid. */
@@ -1050,71 +1560,6 @@ public:
     virtual void setCall(const QString &call, unsigned ssid);
   };
 
-  /** Represents the 8 DMR-APRS systems within the binary codeplug.
-   *
-   * Memory layout of encoded DMR-APRS systems (size 0x0060 bytes):
-   * @verbinclude d878uv_dmraprssystems.txt */
-  class DMRAPRSSystemsElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    DMRAPRSSystemsElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    DMRAPRSSystemsElement(uint8_t *ptr);
-
-    /** Resets the systems. */
-    void clear();
-
-    /** Returns @c true if the channel points to the current/selected channel. */
-    virtual bool channelIsSelected(unsigned n) const;
-    /** Returns the digital channel index for the n-th system. */
-    virtual unsigned channelIndex(unsigned n) const;
-    /** Sets the digital channel index for the n-th system. */
-    virtual void setChannelIndex(unsigned n, unsigned idx);
-    /** Sets the channel to the current/selected channel. */
-    virtual void setChannelSelected(unsigned n);
-
-    /** Returns the destination contact for the n-th system. */
-    virtual unsigned destination(unsigned n) const;
-    /** Sets the destination contact for the n-th system. */
-    virtual void setDestination(unsigned n, unsigned idx);
-
-    /** Returns the call type for the n-th system. */
-    virtual DigitalContact::Type callType(unsigned n) const;
-    /** Sets the call type for the n-th system. */
-    virtual void setCallType(unsigned n, DigitalContact::Type type);
-
-    /** Returns @c true if the n-th system overrides the channel time-slot. */
-    virtual bool timeSlotOverride(unsigned n);
-    /** Returns the time slot if overridden (only valid if @c timeSlot returns true). */
-    virtual DigitalChannel::TimeSlot timeSlot(unsigned n) const;
-    /** Overrides the time slot of the n-th selected channel. */
-    virtual void setTimeSlot(unsigned n, DigitalChannel::TimeSlot ts);
-    /** Clears the time-slot override. */
-    virtual void clearTimeSlotOverride(unsigned n);
-
-    /** Returns @c true if the roaming is enabled. */
-    virtual bool roaming() const;
-    /** Enables/disables roaming. */
-    virtual void enableRoaming(bool enable);
-
-    /** Returns the the repeater activation delay in ms. */
-    virtual unsigned repeaterActivationDelay() const;
-    /** Sets the repeater activation delay in ms. */
-    virtual void setRepeaterActivationDelay(unsigned ms);
-
-    /** Constructs all GPS system from the generic configuration. */
-    virtual bool fromGPSSystems(Context &ctx);
-    /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
-    /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    virtual GPSSystem *toGPSSystemObj(int idx) const;
-    /** Links the specified generic GPS system. */
-    virtual bool linkGPSSystem(int idx, GPSSystem *sys, Context &ctx) const;
-  };
-
   /** Implements the binary representation of a roaming channel within the codeplug.
    *
    * Memory layout of roaming channel (size 0x0020 bytes):
@@ -1126,16 +1571,6 @@ public:
     RoamingChannelElement(uint8_t *ptr, unsigned size);
 
   protected:
-    /** Address offsets within the element. */
-    enum Offsets {
-      RXFrequency = 0x0000,
-      TXFrequency = 0x0004,
-      ColorCode   = 0x0008,
-      TimeSlot    = 0x0009,
-      Name        = 0x000a,
-      NameLength  = 16
-    };
-
     /** Special values for the color code. */
     enum ColorCodeValue {
       Disabled = 16
@@ -1150,6 +1585,9 @@ public:
   public:
     /** Constructor. */
     RoamingChannelElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Resets the roaming channel. */
     void clear();
@@ -1173,9 +1611,9 @@ public:
     virtual void disableColorCode();
 
     /** Returns the time slot. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Sets the time slot. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
 
     /** Returns the name of the channel. */
     virtual QString name() const;
@@ -1183,9 +1621,43 @@ public:
     virtual void setName(const QString &name);
 
     /** Constructs a roaming channel from the given digital channel. */
-    virtual bool fromChannel(const DigitalChannel *ch);
-    /** Constructs/Searches a matching DigitalChannel for this roaming channel. */
-    virtual DigitalChannel *toChannel(Context &ctx);
+    virtual bool fromChannel(const RoamingChannel *ch);
+    /** Constructs a @c RoamingChannel instance for this roaming channel. */
+    virtual RoamingChannel *toChannel(Context &ctx);
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int rxFrequency() { return 0x0000; }
+      static constexpr unsigned int txFrequency() { return 0x0004; }
+      static constexpr unsigned int colorCode()   { return 0x0008; }
+      static constexpr unsigned int timeSlot()    { return 0x0009; }
+      static constexpr unsigned int name()        { return 0x000a; }
+      /// @endcond
+    };
+  };
+
+
+  /** Represents the bitmap, indicating which roaming channel is valid. */
+  class RoamingChannelBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingChannelBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RoamingChannelBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
   /** Represents a roaming zone within the binary codeplug.
@@ -1201,6 +1673,9 @@ public:
   public:
     /** Constructor. */
     RoamingZoneElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
 
     /** Clears the roaming zone. */
     void clear();
@@ -1220,11 +1695,43 @@ public:
     virtual void setName(const QString &name);
 
     /** Assembles a binary representation of the given RoamingZone instance.*/
-    virtual bool fromRoamingZone(RoamingZone *zone, const QHash<DigitalChannel *, unsigned> &map);
+    virtual bool fromRoamingZone(RoamingZone *zone, Context& ctx, const ErrorStack &err=ErrorStack());
     /** Constructs a @c RoamingZone instance from this configuration. */
-    virtual RoamingZone *toRoamingZone() const;
+    virtual RoamingZone *toRoamingZone(Context& ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the given RoamingZone. */
-    virtual bool linkRoamingZone(RoamingZone *zone, const QHash<unsigned, DigitalChannel *> &map);
+    virtual bool linkRoamingZone(RoamingZone *zone, Context& ctx, const ErrorStack& err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int nameLength() { return 16; }          ///< Maximum name length.
+      static constexpr unsigned int numMembers() { return 64; }          ///< Maximum number of roaming channel in zone.
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()        { return 0x0000; }
+      static constexpr unsigned int betweenMembers() { return 0x0001; }
+      static constexpr unsigned int name()           { return 0x0040; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which roaming zone is valid. */
+  class RoamingZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    RoamingZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    RoamingZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
   };
 
   /** Represents an AES encryption key.
@@ -1241,6 +1748,9 @@ public:
     /** Constructor. */
     AESEncryptionKeyElement(uint8_t *ptr);
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
     /** Resets the key. */
     void clear();
 
@@ -1256,6 +1766,21 @@ public:
     virtual QByteArray key() const;
     /** Sets the key. */
     virtual void setKey(const QByteArray &key);
+  };
+
+  /** Encodes the bitmap, indicating which zone is hidden. */
+  class HiddenZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
   };
 
   /** Encodes some information about the radio and firmware.
@@ -1352,26 +1877,21 @@ public:
     virtual QString maintainerNote() const;
   };
 
+protected:
+  /** Hidden constructor. */
+  explicit D878UVCodeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
-  /** Clears and resets the complete codeplug to some default values. */
-  void clear();
-
-  /** Sets all bitmaps for the given config. */
-  void setBitmaps(Config *config);
-
-  /** Allocate all code-plug elements that must be downloaded for decoding. All code-plug elements
-   * with the radio that are not represented within the common Config are omitted. */
+protected:
+  bool allocateBitmaps();
+  void setBitmaps(Context &ctx);
   void allocateForDecoding();
-  /** Allocate all code-plug elements that must be written back to the device to maintain a working
-   * codeplug. These elements might be updated during encoding. */
   void allocateUpdated();
-  /** Allocate all code-plug elements that are defined through the common Config. */
   void allocateForEncoding();
 
-protected:
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
 
@@ -1381,12 +1901,13 @@ protected:
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   virtual void allocateZones();
-  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGPSSystems();
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1401,6 +1922,33 @@ protected:
   virtual bool createRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some limits. */
+  struct Limit: public D868UVCodeplug::Limit {
+    static constexpr unsigned int analogAPRSRXEntries() { return 32; }   ///< Maximum number of analog APRS RX entries.
+    static constexpr unsigned int roamingChannels()     { return 250; }  ///< Maximum number of roaming channels.
+    static constexpr unsigned int roamingZones()        { return 64; }   ///< Maximum number of roaming zones.
+    static constexpr unsigned int aesKeys()             { return 256; }  ///< Maximum number of AES keys.
+  };
+
+protected:
+  /** Internal offsets within the codeplug. */
+  struct Offset: public D868UVCodeplug::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int settingsExtension()           { return 0x02501400; }
+    static constexpr unsigned int aprsSettings()                { return 0x02501000; }
+    static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
+    static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
+    static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
+    static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
+    static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
+    static constexpr unsigned int roamingChannels()             { return 0x01040000; }
+    static constexpr unsigned int roamingZoneBitmap()           { return 0x01042080; }
+    static constexpr unsigned int roamingZones()                { return 0x01043000; }
+    static constexpr unsigned int aesKeys()                     { return 0x024C4000; }
+    /// @endcond
+  };
 };
 
 #endif // D878UVCODEPLUG_HH

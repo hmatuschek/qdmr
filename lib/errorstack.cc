@@ -96,7 +96,7 @@ ErrorStack::Stack::format(const QString &indent) const {
   QString res;
   if (isEmpty())
     return res;
-  res += message(0).format();
+  res += indent + message(0).format();
   for (unsigned i=1; i<count(); i++)
     res += QString("\n%1%2").arg(indent).arg(message(i).format());
   return res;

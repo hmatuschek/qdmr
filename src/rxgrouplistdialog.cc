@@ -70,8 +70,8 @@ RXGroupListDialog::onAddGroup() {
   if (QDialog::Accepted != dialog.exec())
     return;
 
-  QList<DigitalContact *> contacts = dialog.contacts();
-  foreach (DigitalContact *contact, contacts) {
+  QList<DMRContact *> contacts = dialog.contacts();
+  foreach (DMRContact *contact, contacts) {
     if (0 <= _myGroupList->contacts()->indexOf(contact))
       continue;
     _myGroupList->addContact(contact);
@@ -88,11 +88,11 @@ RXGroupListDialog::onRemGroup() {
   QPair<int,int> selection = contactListView->selection();
   // collect all selected group lists
   // need to collect them first as rows change when deleting
-  QList<DigitalContact *> lists;
+  QList<DMRContact *> lists;
   for (int row=selection.first; row<=selection.second; row++)
     lists.push_back(_myGroupList->contact(row));
   // remove list
-  foreach (DigitalContact *cont, lists)
+  foreach (DMRContact *cont, lists)
     _myGroupList->contacts()->del(cont);
 }
 

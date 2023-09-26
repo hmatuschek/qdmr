@@ -7,6 +7,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include "radioinfo.hh"
+#include "dm1701_callsigndb.hh"
 #include "uv390_callsigndb.hh"
 #include "md2017_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
@@ -23,7 +24,12 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
 
   UserDatabase userdb;
-  if (0 == userdb.count()) {
+  if (parser.isSet("database")) {
+    if (! userdb.load(parser.value("database"))) {
+      logError() << "Cannot load user-db from '" << parser.value("database") << "'.";
+      return -1;
+    }
+  } else if (0 == userdb.count()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
     QEventLoop loop;
@@ -104,6 +110,17 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     }
   } else if (RadioInfo::MD2017 == radio) {
     MD2017CallsignDB db;
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
+  } else if (RadioInfo::DM1701 == radio) {
+    DM1701CallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;

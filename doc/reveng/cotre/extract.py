@@ -5,6 +5,9 @@ import struct
 import sys
 import binascii
 
+dev_addr = 6
+
+
 def hexDump(s):
   h = " ".join(map("{:02x}".format, s))
   t = ""
@@ -17,7 +20,7 @@ def hexDump(s):
   return( h + " | " + t)
 
 def isFromHost(p):
-    return ("host" == p.usb.src) 
+    return ("host" == p.usb.src) and ((None==dev_addr) or (dev_addr == int(p.usb.device_address))) 
 
 def isToHost(p):
     return ("host" == p.usb.dest) 

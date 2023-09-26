@@ -7,7 +7,7 @@
 #include "contact.hh"
 #include "radioddity_extensions.hh"
 
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
@@ -174,9 +174,9 @@ public:
     virtual void enablePrivacy(bool enable);
 
     /** Returns the time slot of the channel. */
-    virtual DigitalChannel::TimeSlot timeSlot() const;
+    virtual DMRChannel::TimeSlot timeSlot() const;
     /** Sets the time slot of the channel. */
-    virtual void setTimeSlot(DigitalChannel::TimeSlot ts);
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
 
     /** Returns @c true if the dual-capacity direct mode is enabled. */
     virtual bool dualCapacityDirectMode() const;
@@ -188,9 +188,9 @@ public:
     virtual void enableNonSTEFrequency(bool enable);
 
     /** Returns the bandwidth. */
-    virtual AnalogChannel::Bandwidth bandwidth() const;
+    virtual FMChannel::Bandwidth bandwidth() const;
     /** Sets the bandwidth. */
-    virtual void setBandwidth(AnalogChannel::Bandwidth bw);
+    virtual void setBandwidth(FMChannel::Bandwidth bw);
 
     /** Returns @c true if RX only is enabled. */
     virtual bool rxOnly() const;
@@ -334,9 +334,9 @@ public:
     virtual void setNumber(unsigned id);
 
     /** Returns the call type. */
-    virtual DigitalContact::Type type() const;
+    virtual DMRContact::Type type() const;
     /** Sets the call type. */
-    virtual void setType(DigitalContact::Type type);
+    virtual void setType(DMRContact::Type type);
 
     /** Returns @c true if the ring tone is enabled for this contact. */
     virtual bool ring() const;
@@ -349,9 +349,9 @@ public:
     virtual void setRingStyle(unsigned style);
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DigitalContact *toContactObj(Context &ctx) const;
+    virtual DMRContact *toContactObj(Context &ctx) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DigitalContact *obj, Context &ctx);
+    virtual void fromContactObj(const DMRContact *obj, Context &ctx);
   };
 
   /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
@@ -432,7 +432,7 @@ public:
     virtual Zone *toZoneObj(Context &ctx) const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    virtual bool linkZoneObj(Zone *zone, Context &ctx) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -503,11 +503,11 @@ public:
     virtual void clearMember(unsigned n);
 
     /** Constructs a @c RXGroupList object from the codeplug representation. */
-    virtual RXGroupList *toRXGroupListObj(Context &ctx);
+    virtual RXGroupList *toRXGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const;
+    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
-    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx);
+    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Implements a base class of group list memory banks for all Radioddity codeplugs.
@@ -1309,9 +1309,10 @@ public:
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
-  /** Encodes the given generic configuration as a binary codeplug. */
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err) const;
   bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:

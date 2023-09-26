@@ -7,13 +7,16 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+
+#include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
+#include "anytone_extension.hh"
 #include "commercial_extension.hh"
 
 class Config;
 class RXGroupList;
-class DigitalContact;
+class DMRContact;
 class ScanList;
 class APRSSystem;
 class PositioningSystem;
@@ -29,12 +32,12 @@ class DMRRadioID;
  * @ingroup conf */
 class Channel: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
 
-  /** The receive frequency of the channel. */
-  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
-  /** The transmit frequency of the channel. */
-  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** The receive frequency of the channel in Hz. */
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  /** The transmit frequency of the channel in Hz. */
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
@@ -49,8 +52,9 @@ class Channel: public ConfigObject
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
   Q_PROPERTY(TyTChannelExtension* tyt READ tytChannelExtension WRITE setTyTChannelExtension)
-  /** The commercial channel extension. */
-  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
+
+  /** Specifies the prefix for every ID assigned to every channel during serialization. */
+  Q_CLASSINFO("IdPrefix", "ch")
 
 public:
   /** Possible power settings. */
@@ -74,14 +78,14 @@ public:
   bool copy(const ConfigItem &other);
   void clear();
 
-  /** Returns the RX frequency of the channel in MHz. */
-  double rxFrequency() const;
-  /** (Re-)Sets the RX frequency of the channel in MHz. */
-  bool setRXFrequency(double freq);
-  /** Returns the TX frequency of the channel in MHz. */
-  double txFrequency() const;
-  /** (Re-)Sets the TX frequency of the channel in MHz. */
-  bool setTXFrequency(double freq);
+  /** Returns the RX frequency of the channel in Hz. */
+  Frequency rxFrequency() const;
+  /** (Re-)Sets the RX frequency of the channel in Hz. */
+  bool setRXFrequency(Frequency freq);
+  /** Returns the TX frequency of the channel in Hz. */
+  Frequency txFrequency() const;
+  /** (Re-)Sets the TX frequency of the channel in Hz. */
+  bool setTXFrequency(Frequency freq);
 
   /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
@@ -144,11 +148,6 @@ public:
   /** Sets the TyT channel extension. */
   void setTyTChannelExtension(TyTChannelExtension *ext);
 
-  /** Returns the extension for commercial features. */
-  CommercialChannelExtension *commercialExtension() const;
-  /** Sets the commercial channel extension. */
-  void setCommercialExtension(CommercialChannelExtension *ext);
-
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err=ErrorStack());
@@ -161,10 +160,10 @@ protected slots:
   void onReferenceModified();
 
 protected:
-  /** The RX frequency in MHz. */
-  double _rxFreq;
-  /** The TX frequency in MHz. */
-  double _txFreq;
+  /** The RX frequency in Hz. */
+  Frequency _rxFreq;
+  /** The TX frequency in Hz. */
+  Frequency _txFreq;
   /** If @c true, the channel uses the global power setting. */
   bool _defaultPower;
   /** The transmit power setting. */
@@ -181,18 +180,33 @@ protected:
   OpenGD77ChannelExtension *_openGD77ChannelExtension;
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
-  /** Owns the commercial channel extension. */
-  CommercialChannelExtension *_commercialExtension;
 };
 
 
-/** Extension to the @c Channel class to implement an analog channel.
- *
- * This class implements all the properties specific to an analog channel. That is, the admit
- * criterion, squelch, RX and TX tones and bandwidth settings.
+/** Base class for all analog channels.
  *
  * @ingroup conf */
 class AnalogChannel: public Channel
+{
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit AnalogChannel(QObject *parent=nullptr);
+
+public:
+  /** Copy constructor. */
+  AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
+};
+
+
+/** Extension to the @c AnalogChannel class to implement an analog FM channel.
+ *
+ * This class implements all the properties specific to an FM channel. That is, the admit
+ * criterion, squelch, RX and TX tones and bandwidth settings.
+ *
+ * @ingroup conf */
+class FMChannel: public AnalogChannel
 {
   Q_OBJECT
 
@@ -204,6 +218,10 @@ class AnalogChannel: public Channel
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
   Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
+
+  /** The AnyTone FM channel extension. */
+  Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
+
 
 public:
   /** Admit criteria of analog channel. */
@@ -223,9 +241,9 @@ public:
 
 public:
   /** Constructs a new empty analog channel. */
-  explicit AnalogChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit FMChannel(QObject *parent=nullptr);
   /** Copy constructor. */
-  AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
+  FMChannel(const FMChannel &other, QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
@@ -274,6 +292,12 @@ public:
   /** Sets the APRS system. */
   void setAPRSSystem(APRSSystem *sys);
 
+  /** Returns the FM channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneFMChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone FM channel extension. */
+  void setAnytoneChannelExtension(AnytoneFMChannelExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -294,18 +318,37 @@ protected:
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
   APRSSystemReference _aprsSystem;
+
+  /** Owns the AnyTone FM channel extension. */
+  AnytoneFMChannelExtension *_anytoneExtension;
 };
 
 
-
-/** Extension to the @c Channel class to implement an digital (DMR) channel.
- *
- * That is, the admit criterion, color code, time slot, RX group list and TX contact.
+/** Base class of all digital channels.
  *
  * @ingroup conf */
 class DigitalChannel: public Channel
 {
-	Q_OBJECT
+  Q_OBJECT
+
+protected:
+  /** Hidden constructor. */
+  explicit DigitalChannel(QObject *parent=nullptr);
+
+public:
+  /** Copy constructor. */
+  DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
+};
+
+
+/** Extension to the @c DigitalChannel class to implement an DMR channel.
+ *
+ * That is, the admit criterion, color code, time slot, RX group list and TX contact.
+ *
+ * @ingroup conf */
+class DMRChannel: public DigitalChannel
+{
+  Q_OBJECT
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
@@ -314,15 +357,20 @@ class DigitalChannel: public Channel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(RadioIDReference* radioId READ radioId WRITE setRadioId)
+  Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
   Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
   /** The tx contact. */
-  Q_PROPERTY(DigitalContactReference* contact READ contact WRITE setContact)
+  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
   Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
+
+  /** The commercial channel extension. */
+  Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
+  /** The AnyTone DMR channel extension. */
+  Q_PROPERTY(AnytoneDMRChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
 public:
   /** Possible admit criteria of digital channels. */
@@ -342,9 +390,9 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  DigitalChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
-  DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
+  DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   void clear();
@@ -376,15 +424,15 @@ public:
   bool setGroupListObj(RXGroupList *rxg);
 
   /** Returns a reference to the transmit contact. */
-  const DigitalContactReference *contact() const;
+  const DMRContactReference *contact() const;
   /** Returns a reference to the transmit contact. */
-  DigitalContactReference *contact();
+  DMRContactReference *contact();
   /** Sets the reference to the transmit contact. */
-  void setContact(DigitalContactReference *ref);
+  void setContact(DMRContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
-  DigitalContact *txContactObj() const;
+  DMRContact *txContactObj() const;
   /** (Re-) Sets the default TX contact for this channel. */
-  bool setTXContactObj(DigitalContact *c);
+  bool setTXContactObj(DMRContact *c);
 
   /** Returns a reference to the positioning system. */
   const PositioningSystemReference *aprs() const;
@@ -409,15 +457,26 @@ public:
   bool setRoamingZone(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const RadioIDReference *radioId() const;
+  const DMRRadioIDReference *radioId() const;
   /** Returns the reference to the radio ID. */
-  RadioIDReference *radioId();
+  DMRRadioIDReference *radioId();
   /** Sets the reference to the radio ID. */
-  void setRadioId(RadioIDReference *ref);
+  void setRadioId(DMRRadioIDReference *ref);
   /** Returns the radio ID associated with this channel. */
   DMRRadioID *radioIdObj() const;
   /** Associates the given radio ID with this channel. */
   bool setRadioIdObj(DMRRadioID *id);
+
+  /** Returns the extension for commercial features. */
+  CommercialChannelExtension *commercialExtension() const;
+  /** Sets the commercial channel extension. */
+  void setCommercialExtension(CommercialChannelExtension *ext);
+
+  /** Returns the DMR channel extension for AnyTone devices.
+   * If this extension is not set, returns @c nullptr. */
+  AnytoneDMRChannelExtension *anytoneChannelExtension() const;
+  /** Sets the AnyTone DMR channel extension. */
+  void setAnytoneChannelExtension(AnytoneDMRChannelExtension *ext);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -432,13 +491,18 @@ protected:
   /** The RX group list for this channel. */
   GroupListReference _rxGroup;
   /** The default TX contact. */
-  DigitalContactReference _txContact;
+  DMRContactReference _txContact;
   /** The GPS system. */
   PositioningSystemReference _posSystem;
   /** Roaming zone for the channel. */
   RoamingZoneReference _roaming;
   /** Radio ID to use on this channel. */
-  RadioIDReference _radioId;
+  DMRRadioIDReference _radioId;
+
+  /** Owns the commercial channel extension. */
+  CommercialChannelExtension *_commercialExtension;
+  /** Owns the AnyTone DMR channel extension. */
+  AnytoneDMRChannelExtension *_anytoneExtension;
 };
 
 
@@ -478,20 +542,20 @@ protected:
  * @ingroup conf */
 class ChannelList: public ConfigObjectList
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
   /** Finds a digital channel with the given frequencies, time slot and color code. */
-  DigitalChannel *findDigitalChannel(double rx, double tx, DigitalChannel::TimeSlot ts, unsigned cc) const;
+  DMRChannel *findDMRChannel(Frequency rx, Frequency tx, DMRChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequency. */
-  AnalogChannel *findAnalogChannelByTxFreq(double freq) const;
+  FMChannel *findFMChannelByTxFreq(Frequency freq) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

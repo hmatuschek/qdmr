@@ -9,6 +9,7 @@
 class EncryptionKey: public ConfigObject
 {
   Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "key")
 
   /** The key representation as a hex string. */
   Q_PROPERTY(QString key READ toHex WRITE fromHex)
@@ -50,7 +51,7 @@ class DMREncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-   Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
@@ -77,7 +78,7 @@ class AESEncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   virtual void fromHex(const QString &hex);
@@ -105,7 +106,7 @@ public:
   /** Empty constructor. */
   explicit EncryptionKeys(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };

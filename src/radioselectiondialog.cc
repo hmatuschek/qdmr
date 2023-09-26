@@ -9,7 +9,7 @@ RadioSelectionDialog::RadioSelectionDialog(const USBDeviceDescriptor &device, QW
 
   _radios = RadioInfo::allRadios(device);
   foreach (RadioInfo info, _radios) {
-    ui->radios->addItem(QString("%1 %2").arg(info.manufactuer(), info.name()));
+    ui->radios->addItem(QString("%1 %2").arg(info.manufacturer(), info.name()));
   }
 
   if (!_radios.isEmpty())

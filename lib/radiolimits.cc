@@ -354,7 +354,17 @@ RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitUInt
+ * Implementation of RadioLimitDMRId
+ * ********************************************************************************************* */
+RadioLimitDMRId::RadioLimitDMRId(QObject *parent)
+  : RadioLimitUInt(1, 16777215, -1, parent)
+{
+  // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitEnum
  * ********************************************************************************************* */
 RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent)
   : RadioLimitValue(parent), _values(values)
@@ -388,27 +398,6 @@ RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitFrequencies::FrequencyRange
- * ********************************************************************************************* */
-RadioLimitFrequencies::FrequencyRange::FrequencyRange(double lower, double upper)
-  : min(lower), max(upper)
-{
-  // pass...
-}
-
-RadioLimitFrequencies::FrequencyRange::FrequencyRange(const std::pair<double, double> &limit)
-  : min(limit.first), max(limit.second)
-{
-  // pass..
-}
-
-bool
-RadioLimitFrequencies::FrequencyRange::contains(double f) const {
-  return (f >= min) && (f <= max);
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of RadioLimitFrequencies
  * ********************************************************************************************* */
 RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
@@ -421,20 +410,19 @@ RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, bool warnO
   : RadioLimitValue(parent), _frequencyRanges(), _warnOnly(warnOnly)
 {
   for (auto range=ranges.begin(); range!=ranges.end(); range++) {
-    _frequencyRanges.append(FrequencyRange(range->first, range->second));
+    _frequencyRanges.append({range->first, range->second});
   }
 }
 
 bool
 RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Double != prop.type()) {
+  if (qMetaTypeId<Frequency>() != prop.userType()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
-    msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
+    msg << "Cannot check property " << prop.name() << ": Expected frequency.";
     return false;
   }
 
-  double value = prop.read(item).toDouble();
-
+  Frequency value = prop.read(item).value<Frequency>();
   foreach (const FrequencyRange &range, _frequencyRanges) {
     if (range.contains(value))
       return true;
@@ -442,13 +430,13 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
 
   if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size()) || _warnOnly) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "Frequency " << value << "MHz is outside of allowed frequency ranges or "
+    msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges or "
         << "range cannot be determined.";
     return true;
   }
 
   auto &msg = context.newMessage(RadioLimitIssue::Critical);
-  msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
+  msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges.";
   return false;
 }
 
@@ -470,7 +458,7 @@ RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(const RangeList &ra
 
 bool
 RadioLimitTransmitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Double != prop.type()) {
+  if (qMetaTypeId<Frequency>() != prop.userType()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
     return false;
@@ -626,7 +614,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
-        << QStringList::fromSet(_types).join(", ") << ".";
+        << QStringList(_types.begin(), _types.end()).join(", ") << ".";
 
     return true;
   }
@@ -634,7 +622,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if (! validType(ref->as<ConfigObject>()->metaObject())) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Property '" << prop.name() << "' must refer to an instances of "
-        << QStringList::fromSet(_types).join(", ") << ".";
+        << QStringList(_types.begin(), _types.end()).join(", ") << ".";
     return false;
   }
 
@@ -816,7 +804,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
     if (! validType(plist->get(i)->metaObject())) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
-          << "Must be one of " << QStringList::fromSet(_types).join(", ") << ".";
+          << "Must be one of " << QStringList(_types.begin(), _types.end()).join(", ") << ".";
       return false;
     }
   }
@@ -873,13 +861,13 @@ RadioLimitGroupCallRefList::verify(const ConfigItem *item, const QMetaProperty &
   }
 
   for (int i=0; i<plist->count(); i++) {
-    if (! plist->get(i)->is<DigitalContact>()) {
+    if (! plist->get(i)->is<DMRContact>()) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Reference to " << plist->get(i)->metaObject()->className() << " is not allowed here. "
           << "Must be DigtialContact.";
       return false;
     }
-    if (DigitalContact::GroupCall != plist->get(i)->as<DigitalContact>()->type()) {
+    if (DMRContact::GroupCall != plist->get(i)->as<DMRContact>()->type()) {
       auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "Expected reference to a group call digital contact.";
       return false;

@@ -11,44 +11,139 @@
 <para>
   Roaming is a feature that allows DMR radios to select an alternative repeater once you leave 
   the range of the currently selected one. To do that, you have to specify so-called 
-  <glossterm>Roaming zone</glossterm>s. Within these zones, you collect all repeaters that provide 
-  access to a particular talk group. When roaming is enabled, the radio will check periodically 
+  <glossterm>roaming zone</glossterm>s. Within these zones, you collect all repeaters that provide 
+  access to a particular talk group. When roaming is enabled, the radio will check periodically,
   whether the current repeater is still reachable. If not, the strongest repeater from the 
   selected roaming zone will then be selected instead. 
 </para>
 
 <para>
-  The <guilabel>Roaming</guilabel> tab collects all defined roaming zones. 
-</para>
-
-<screenshot>
-  <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-roamingzones.png" width="13cm" align="center"/></imageobject>
-    <textobject>Screen-shot of the list of roaming zones.</textobject>
-  </mediaobject>
- <title>List of roaming zones.</title>
-</screenshot>
-
-<para>
-  Double-clicking on the roaming zone or clicking on the <guibutton>Add Roaming Zone</guibutton> 
-  button will open the <guilabel>Roaming Zone Editor</guilabel>.
-</para>
-
-<screenshot>
-  <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-edit-roamingzone.png" width="5cm" align="center"/></imageobject>
-    <textobject>Screen-shot of the edit-roaming-zone dialog.</textobject>
-  </mediaobject>
- <title>The roaming-zone editing dialog.</title>
-</screenshot>
-
-<para>
-  Here you can edit the name of the roaming zone as well as adding the channels that are part of this zone.
+  In order to stay connected to a particular talk group, not the entire channel settings must be 
+  changed. But only those properties, that are specific to the repeater we change to. These are 
+  the RX and TX frequencies, color codes and sometimes the time-slot. The latter is necessary, as 
+  those repeaters may be located in other regions. Usually &#x2014; at least for Brandmeister 
+  repeaters &#x2014; the time slot 2 is reserved for regional communication while time slot 1 is 
+  intended for inter-regional communication. So you may need to override the time-slot of the active
+  channel, whenever you roam outside of the region associated with the talk group. Some talk groups,
+  however, are over-regional anyway. For example, the world-wide talk group 91. Here, the time slot 
+  will always be TS 1 and thus does not need to be overridden. 
 </para>
 
 <para>
-  If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
-  <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
-  the device specific settings for the roaming zone. 
+  As only some properties of the current DMR channel needs to be overridden, there are special 
+  channels called <glossterm>roaming channels</glossterm> that contain only those settings, that
+  are changed during roaming. 
 </para>
+
+
+<section>
+  <info><title>Roaming Channels</title></info>
+
+  <para>
+    The <guilabel>Roaming Channels</guilabel> tab collects all defined roaming channels. 
+  </para>
+
+  <screenshot>
+    <mediaobject>
+      <imageobject><imagedata fileref="fig/qdmr-roaming-channels.png" width="13cm" align="center"/></imageobject>
+      <textobject>Screen-shot of the list of roaming channels.</textobject>
+    </mediaobject>
+  <title>List of roaming channels.</title>
+  </screenshot>
+
+  <para> 
+    Each roaming channel has a name, for easy reference in the roaming zones. This should be the call
+    of the repeater. Additionally, each roaming channel has a transmit (TX) and receive (RX) frequency
+    overriding the TX and RX frequencies of the current channel on roaming.
+  </para>
+
+  <para>
+    There are two optional settings, that may override the time slot (<guilabel>TS</guilabel>) and 
+    color code (<guilabel>CC</guilabel>) of the current channel. If <guilabel>[Selected]</guilabel> 
+    is show, the time slot and color code of the current channel is used instead during roaming.
+  </para>
+</section>
+
+<section>
+  <info><title>Roaming Zones</title></info>
+
+  <para>
+    The <guilabel>Roaming Zones</guilabel> tab collects all defined roaming zones. 
+  </para>
+
+  <screenshot>
+    <mediaobject>
+      <imageobject><imagedata fileref="fig/qdmr-roamingzones.png" width="13cm" align="center"/></imageobject>
+      <textobject>Screen-shot of the list of roaming zones.</textobject>
+    </mediaobject>
+    <title>List of roaming zones.</title>
+  </screenshot>
+
+  <para>
+    There are two ways to create a new roaming zone. The easiest way is to generate a zone and the 
+    associated roaming channels automatically. Click on <guibutton>Generate roaming zone</guibutton>, 
+    to generate a roaming zone automatically or <guibutton>Add Roaming Zone</guibutton> to assemble one 
+    manually.
+  </para>
+
+  <section>
+    <info><title>Creating a Roaming Zone</title></info>
+    <para> 
+      When generating a roaming zone automatically, a dialog will you to select a talk group or several
+      talk groups to create a roaming zone for. That is, the talk group you want to stay connected to 
+      in case of losing contact to the repeater.
+    </para>
+
+    <screenshot>
+      <mediaobject>
+        <imageobject><imagedata fileref="fig/qdmr-generate-roaming-zone.png" width="5cm" align="center"/></imageobject>
+        <textobject>Screen-shot of the talk-group-selection dialog when generating a roaming zone automatically.</textobject>
+      </mediaobject>
+    <title>Selecting talk groups to generate a roaming zone.</title>
+    </screenshot>
+
+    <para>
+      Once a talk group is selected, a roaming channel created for each DMR channel, which has the 
+      selected talk group as its transmit contact. These newly created channels are then collected 
+      into a new roaming zone. The roaming zone editing dialog is then opened, allowing you to edit 
+      the newly created zone. 
+    </para>
+
+    <para>
+      Alternatively, you may create a roaming zone manually. Simply click the 
+      <guibutton>Add Roaming Zone</guibutton> button and the roaming zone editing dialog will open. 
+      There you can add roaming channels manually.
+    </para>
+  </section> 
+
+  <section>
+    <info><title>Editing Roaming Zones</title></info>
+    <para>
+      Double-clicking on the roaming zone or clicking on the <guibutton>Add Roaming Zone</guibutton> 
+      button will open the <guilabel>Roaming Zone Editor</guilabel>.
+    </para>
+
+    <screenshot>
+      <mediaobject>
+        <imageobject><imagedata fileref="fig/qdmr-edit-roamingzone.png" width="5cm" align="center"/></imageobject>
+        <textobject>Screen-shot of the edit-roaming-zone dialog.</textobject>
+      </mediaobject>
+      <title>The roaming-zone editing dialog.</title>
+    </screenshot>
+
+    <para>
+      Here you can edit the name of the roaming zone as well as adding the roaming channels that 
+      are part of this zone. However, you may also add DMR channels to this zone by clicking on the 
+      <guibutton>Add DMR Channel</guibutton> button. This will not add DMR channel directly to the 
+      roaming zone, but will create a new roaming channel from this DMR channel.
+    </para>
+
+    <para>
+      If <guilabel>Show Commercial Features</guilabel> is enabled in the settings dialog (see 
+      <xref linkend="guiSettingsDialog"/>), a tab bar is shown at the top. There you can also access
+      the device specific settings for the roaming zone. 
+    </para>
+  </section>
+</section>
+
 </section>

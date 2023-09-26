@@ -2,18 +2,19 @@
 #define SCANLIST_HH
 
 #include "configobject.hh"
-#include <QAbstractListModel>
+#include "configreference.hh"
+
+#include "tyt_extensions.hh"
 
 class Channel;
-#include "configreference.hh"
-#include "tyt_extensions.hh"
 
 
 /** Generic representation of a scan list.
  * @ingroup conf */
 class ScanList : public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "scan")
 
   /** The primary channel. */
   Q_PROPERTY(ChannelReference* primary READ primary)
@@ -29,7 +30,7 @@ class ScanList : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit ScanList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit ScanList(QObject *parent=nullptr);
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
@@ -118,7 +119,7 @@ public:
   /** Returns the scanlist at the given index. */
 	ScanList *scanlist(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

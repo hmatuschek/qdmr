@@ -1,11 +1,10 @@
 #ifndef ZONE_HH
 #define ZONE_HH
 
-#include "configobject.hh"
-#include <QAbstractListModel>
 #include <QVector>
-
+#include "configobject.hh"
 #include "configreference.hh"
+
 #include "anytone_extension.hh"
 
 class Config;
@@ -14,7 +13,8 @@ class Config;
  * @ingroup conf */
 class Zone : public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "zone")
 
   /** The A channels. */
   Q_PROPERTY(ChannelRefList* A READ A)
@@ -26,7 +26,7 @@ class Zone : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit Zone(QObject *parent=nullptr);
+  Q_INVOKABLE explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
   Zone(const QString &name, QObject *parent = nullptr);
 
@@ -46,6 +46,9 @@ public:
   const ChannelRefList *B() const;
   /** Returns the list of channels for VFO B in this zone. */
   ChannelRefList* B();
+
+  /** Returns @c true, if the zone contains the given channel. */
+  bool contains(Channel *obj) const;
 
   /** Returns the AnyTone extension. */
   AnytoneZoneExtension *anytoneExtension() const;
@@ -79,7 +82,7 @@ public:
   /** Returns the zone at the given index. */
 	Zone *zone(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

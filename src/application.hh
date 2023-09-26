@@ -10,6 +10,7 @@
 #include "radio.hh"
 
 class QMainWindow;
+class QTranslator;
 class RepeaterBookList;
 class UserDatabase;
 class TalkGroupDatabase;
@@ -21,6 +22,7 @@ class ChannelListView;
 class ZoneListView;
 class ScanListsView;
 class PositioningSystemListView;
+class RoamingChannelListView;
 class RoamingZoneListView;
 class ExtensionView;
 
@@ -81,6 +83,7 @@ private slots:
 protected:
   Config *_config;
   QMainWindow *_mainWindow;
+  QTranslator *_translator;
 
   GeneralSettingsView *_generalSettings;
   RadioIDListView *_radioIdTab;
@@ -90,6 +93,7 @@ protected:
   ZoneListView *_zoneList;
   ScanListsView *_scanLists;
   PositioningSystemListView *_posSysList;
+  RoamingChannelListView *_roamingChannelList;
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 

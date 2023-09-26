@@ -106,7 +106,7 @@ public:
 
 protected:
   /** Allocates required space for index and @c n call-signs. */
-  virtual void alloate(unsigned n);
+  virtual void allocate(unsigned n);
 
   /** Clears the call-sign DB index. */
   virtual void clearIndex();

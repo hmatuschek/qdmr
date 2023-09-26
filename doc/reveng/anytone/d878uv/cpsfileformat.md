@@ -97,11 +97,11 @@ Each channel is encoded in a variable size binary blob as
 | Field  | Description |
 |---|---|
 | ChIdx | Specifies the channel index in little endian, 0-based. |
-| RX frequency | RX frequency in 10Hz, littel endian. |
+| RX frequency | RX frequency in 10Hz, little endian. |
 | RPT | Repeater type, 0=simplex, 1=positive, 2=negative |
 | TX offset | TX offset frequency in 10Hz, little endian. Sign determined by RPT field. |
 | TPY | Channel type, 1=digital, 0=analog, ... |
-| PWR | Power setting 0=low, 1=mid, 2=heigh, 3=turbo. |
+| PWR | Power setting 0=low, 1=mid, 2=high, 3=turbo. |
 | BWD | Analog band width 0=12.5kHz, 1=25kHz. |
 | RXO | RX only flag. |
 | CAC | Call confirm flag. |

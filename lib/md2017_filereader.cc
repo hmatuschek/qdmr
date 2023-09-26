@@ -10,31 +10,31 @@
 #define SEGMENT1_SIZE        0x00090000
 
 bool
-MD2017FileReader::read(const QString &filename, MD2017Codeplug *codeplug, QString &errorMessage)
+MD2017FileReader::read(const QString &filename, MD2017Codeplug *codeplug, const ErrorStack &err)
 {
   // Check file properties
   QFileInfo info(filename);
   if (! info.exists()) {
-    errorMessage = QObject::tr("Cannot open file '%1': File does not exisist.").arg(filename);
+    errMsg(err) << "Cannot open file '" << filename << "': File does not exisist.";
     return false;
   }
   if (852533 != info.size()) {
-    errorMessage = QObject::tr("Cannot read codeplug file '%1': File size is not 852533 bytes.").arg(filename);
+    errMsg(err) << "Cannot read codeplug file '" << filename << "': File size is not 852533 bytes.";
     return false;
   }
 
   // Open file
   QFile file(filename);
   if (! file.open(QFile::ReadOnly)) {
-    errorMessage = QObject::tr("Cannot open file '%1': %2").arg(filename, file.errorString());
+    errMsg(err) << "Cannot open file '" << filename << "': " << file.errorString() << ".";
     return false;
   }
 
   // Read file content
 
   if (! file.seek(SEGMENT0_FILE_ADDR)) {
-    errorMessage = QObject::tr("Cannot read codeplug file '%1': Cannot seek within file: %2")
-        .arg(filename, file.errorString());
+    errMsg(err) << "Cannot read codeplug file '" << filename
+                << "': Cannot seek within file: " << file.errorString() << ".";
     file.close();
     return false;
   }
@@ -43,8 +43,8 @@ MD2017FileReader::read(const QString &filename, MD2017Codeplug *codeplug, QStrin
   while (0 < n) {
     int nread = file.read(ptr, n);
     if (0 > nread) {
-      errorMessage = QObject::tr("Cannot read codeplug file '%1': %2")
-          .arg(filename,file.errorString());
+      errMsg(err) << "Cannot read codeplug file '" << filename
+                  << "': " << file.errorString() << ".";
       file.close();
       return false;
     }
@@ -53,8 +53,8 @@ MD2017FileReader::read(const QString &filename, MD2017Codeplug *codeplug, QStrin
   }
 
   if (! file.seek(SEGMENT1_FILE_ADDR)) {
-    errorMessage = QObject::tr("Cannot read codeplug file '%1': Cannot seek within file: %2")
-        .arg(filename, file.errorString());
+    errMsg(err) << "Cannot read codeplug file '" << filename
+                << "': Cannot seek within file: " << file.errorString() << ".";
     file.close();
     return false;
   }
@@ -63,8 +63,8 @@ MD2017FileReader::read(const QString &filename, MD2017Codeplug *codeplug, QStrin
   while (0 < n) {
     int nread = file.read(ptr, n);
     if (0 > nread) {
-      errorMessage = QObject::tr("Cannot read codeplug file '%1': %2")
-          .arg(filename,file.errorString());
+      errMsg(err) << "Cannot read codeplug file '" << filename
+                  << "': " << file.errorString() << ".";
       file.close();
       return false;
     }

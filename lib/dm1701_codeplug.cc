@@ -1,6 +1,6 @@
 #include "dm1701_codeplug.hh"
-#include "codeplugcontext.hh"
 #include "logger.hh"
+#include "config.hh"
 #include <QTimeZone>
 
 
@@ -119,8 +119,8 @@ DM1701Codeplug::ChannelElement::setPower(Channel::Power pwr) {
 }
 
 Channel *
-DM1701Codeplug::ChannelElement::toChannelObj() const {
-  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj();
+DM1701Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
+  Channel *ch = TyTCodeplug::ChannelElement::toChannelObj(err);
   if (nullptr == ch)
     return ch;
 
@@ -131,6 +131,7 @@ DM1701Codeplug::ChannelElement::toChannelObj() const {
     ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
     ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
   }
+
   return ch;
 }
 
@@ -596,7 +597,7 @@ DM1701Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
-      break;
+      continue;
     if (Channel *obj = chan.toChannelObj()) {
       config->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -612,7 +613,7 @@ DM1701Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
-      break;
+      continue;
     if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
@@ -647,8 +648,8 @@ DM1701Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &e
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
-      break;
-    if (DigitalContact *obj = cont.toContactObj()) {
+      continue;
+    if (DMRContact *obj = cont.toContactObj()) {
       config->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid contact at index " << i << ".";
@@ -689,7 +690,7 @@ DM1701Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
-      break;
+      continue;
     if (Zone *obj = zone.toZoneObj()) {
       config->zones()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -706,7 +707,7 @@ DM1701Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
-      break;
+      continue;
     if (! zone.linkZone(ctx.get<Zone>(i+1), ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
@@ -745,7 +746,7 @@ DM1701Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack 
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
-      break;
+      continue;
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
       config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -761,7 +762,7 @@ DM1701Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
-      break;
+      continue;
     if (! glist.linkGroupListObj(ctx.get<RXGroupList>(i+1), ctx)) {
       errMsg(err) << "Cannot link group list at index " << i << ".";
       return false;
@@ -796,7 +797,7 @@ DM1701Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
-      break;
+      continue;
     if (ScanList *obj = scan.toScanListObj(ctx)) {
       config->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
@@ -812,8 +813,7 @@ DM1701Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
-      break;
-
+      continue;
     if (! scan.linkScanListObj(ctx.get<ScanList>(i+1), ctx)) {
       errMsg(err) << "Cannot link scan list at index" << i << ".";
       return false;

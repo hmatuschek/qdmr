@@ -10,7 +10,7 @@
 #include "contact.hh"
 
 class Config;
-class DigitalContact;
+class DMRContact;
 class RXGroupList;
 class Zone;
 class PositioningSystem;
@@ -25,10 +25,10 @@ class CSVLexer: public QObject
 
 public:
   /** The token. */
-  typedef struct {
+  struct Token {
   public:
     /** Possible token types. */
-    typedef enum {
+    enum TokenType {
       T_KEYWORD,         ///< A Keyword/Identifier.
       T_APRSCALL,        ///< A APRS call of form CALL-SSID.
       T_STRING,          ///< A quoted string.
@@ -46,7 +46,7 @@ public:
 
       T_END_OF_STREAM,   ///< Indicates the end-of-input.
       T_ERROR            ///< Indicates a lexer error.
-    } TokenType;
+    };
 
     /// The token type.
     TokenType type;
@@ -56,17 +56,17 @@ public:
     qint64 line;
     /// Column number.
     qint64 column;
-  } Token;
+  };
 
   /// Current state of lexer.
-  typedef struct {
+  struct State {
     /// The current stream offset.
     qint64 offset;
     /// The current line count.
     qint64 line;
     /// The current column number.
     qint64 column;
-  } State;
+  };
 
 public:
   /** Constructs a lexer for the given stream. */
@@ -133,19 +133,19 @@ public:
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a digital contact has been parsed. */
-  virtual bool handleDigitalContact(qint64 idx, const QString &name, DigitalContact::Type type, qint64 id,
+  virtual bool handleDigitalContact(qint64 idx, const QString &name, DMRContact::Type type, qint64 id,
                                     bool rxTone, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once an RX group list has been parsed. */
   virtual bool handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
                                qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a digital channel has been parsed. */
   virtual bool handleDigitalChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-      qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
+      qint64 tot, bool ro, DMRChannel::Admit admit, qint64 color, DMRChannel::TimeSlot slot,
       qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a analog channel has been parsed. */
   virtual bool handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
-      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
-      AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
+      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+      FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a zone list has been parsed. */
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);
@@ -270,18 +270,18 @@ public:
   virtual bool handleDTMFContact(qint64 idx, const QString &name, const QString &num, bool rxTone,
                                  qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalContact(
-      qint64 idx, const QString &name, DigitalContact::Type type, qint64 id, bool rxTone,
+      qint64 idx, const QString &name, DMRContact::Type type, qint64 id, bool rxTone,
       qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleGroupList(qint64 idx, const QString &name, const QList<qint64> &contacts,
                                qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleDigitalChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-      qint64 tot, bool ro, DigitalChannel::Admit admit, qint64 color, DigitalChannel::TimeSlot slot,
+      qint64 tot, bool ro, DMRChannel::Admit admit, qint64 color, DMRChannel::TimeSlot slot,
       qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleAnalogChannel(
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
-      qint64 tot, bool ro, AnalogChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
-      AnalogChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
+      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+      FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleGPSSystem(qint64 idx, const QString &name, qint64 contactIdx, qint64 period,
@@ -303,7 +303,7 @@ protected:
   /** Index <-> Channel map. */
 	QMap<int, Channel *> _channels;
   /** Index <-> Digital contact map. */
-  QMap<int, DigitalContact *> _digital_contacts;
+  QMap<int, DMRContact *> _digital_contacts;
   /** Index <-> RX group list map. */
   QMap<int, RXGroupList *> _rxgroups;
   /** Index <-> Zone map. */

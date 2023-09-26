@@ -60,7 +60,7 @@ public:
     virtual void enableCompressedUDPHeader(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj() const;
+    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };
@@ -93,6 +93,9 @@ public:
 public:
   /** Empty constructor. */
   explicit MD390Codeplug(QObject *parent=nullptr);
+
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+  bool postprocess(Config *config, const ErrorStack &err) const;
 
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 

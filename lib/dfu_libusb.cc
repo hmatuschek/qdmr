@@ -107,6 +107,7 @@ DFUDevice::DFUDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, QO
     libusb_unref_device(dev);
     libusb_exit(_ctx);
     _ctx = nullptr;
+    return;
   }
 
 
@@ -282,12 +283,12 @@ DFUDevice::abort(const ErrorStack &err)
 
 
 int
-DFUDevice::wait_idle()
+DFUDevice::wait_idle(const ErrorStack &err)
 {
   int state, error;
 
   for (;;) {
-    if (0 > (error = get_state(state)))
+    if (0 > (error = get_state(state, err)))
       return 1;
 
     switch (state) {
@@ -295,11 +296,11 @@ DFUDevice::wait_idle()
         return 0;
 
       case appIDLE:
-        error = detach(1000);
+        error = detach(1000, err);
         break;
 
       case dfuERROR:
-        error = clear_status();
+        error = clear_status(err);
         break;
 
       case appDETACH:
@@ -309,7 +310,7 @@ DFUDevice::wait_idle()
         continue;
 
       default:
-        error = abort();
+        error = abort(err);
         break;
     }
 
@@ -319,3 +320,118 @@ DFUDevice::wait_idle()
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of DFUSEDevice
+ * ********************************************************************************************* */
+DFUSEDevice::DFUSEDevice(const USBDeviceDescriptor &descr, const ErrorStack &err, uint16_t blocksize, QObject *parent)
+  : DFUDevice(descr, err, parent), _blocksize(blocksize)
+{
+  // pass...
+}
+
+void
+DFUSEDevice::close() {
+  leaveDFU();
+  DFUDevice::close();
+}
+
+uint16_t
+DFUSEDevice::blocksize() const {
+  return _blocksize;
+}
+
+bool
+DFUSEDevice::setAddress(uint32_t address, const ErrorStack &err) {
+  uint8_t cmd[5] ={
+    0x21, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
+  };
+
+  if (int error = download(0, cmd, 5, err)) {
+    errMsg(err) << "Cannot set address to " << QString::number(address, 16) << ".";
+    return error;
+  }
+
+  if (wait_idle(err)) {
+    errMsg(err) << "Set address command failed.";
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::readBlock(unsigned block, uint8_t *data, const ErrorStack &err) {
+  return 0 == upload(block+2, data, _blocksize, err);
+}
+
+bool
+DFUSEDevice::writeBlock(unsigned block, const uint8_t *data, const ErrorStack &err) {
+  if (download(block+2, (uint8_t *)data, _blocksize, err)) {
+    return false;
+  }
+
+  if (wait_idle(err)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool
+DFUSEDevice::erasePage(uint32_t address, const ErrorStack &err) {
+  uint8_t cmd[5] ={
+    0x41, (uint8_t)address, (uint8_t)(address >> 8), (uint8_t)(address >> 16), (uint8_t)(address >> 24)
+  };
+
+  if (int error = download(0, cmd, 5, err)) {
+    errMsg(err) << "Cannot erase page at address " << QString::number(address, 16) << ".";
+    return error;
+  }
+
+  if (wait_idle(err)) {
+    errMsg(err) << "Erase page command failed.";
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::eraseAll(const ErrorStack &err) {
+  uint8_t cmd[1] ={0x41};
+
+  if (int error = download(0, cmd, 1, err)) {
+    errMsg(err) << "Cannot erase entire memory.";
+    return error;
+  }
+
+  if (wait_idle(err)) {
+    errMsg(err) << "Erase memory command failed.";
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::releaseReadLock(const ErrorStack &err) {
+  uint8_t cmd[1] ={0x92};
+
+  if (int error = download(0, cmd, 1, err)) {
+    errMsg(err) << "Cannot unlock memory.";
+    return error;
+  }
+
+  if (wait_idle(err)) {
+    errMsg(err) << "Unlock memory command failed.";
+    return false;
+  }
+  return true;
+}
+
+bool
+DFUSEDevice::leaveDFU(const ErrorStack &err) {
+  if (int error = download(0, nullptr, 0)) {
+    errMsg(err) << "Cannot leave DFU mode.";
+    return error;
+  }
+
+  return true;
+}

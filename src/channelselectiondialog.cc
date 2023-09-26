@@ -48,7 +48,7 @@ MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool 
   }
   for (int i=0; i<lst->count(); i++) {
     Channel *channel = lst->channel(i);
-    if (digitalOnly && channel->is<AnalogChannel>())
+    if (digitalOnly && channel->is<FMChannel>())
       continue;
     QListWidgetItem *item = new QListWidgetItem(channel->name());
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);

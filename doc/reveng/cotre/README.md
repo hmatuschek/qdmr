@@ -18,7 +18,7 @@ Requests and responses appear to share the same packet format. Please note, that
 The checksum appears to be a simple XOR of all payload bytes.
 
 ### Example
-The very first request send to the device when reading is 
+The very first request sent to the device when reading is 
 ```
  ad 00 07 ff 04 03 00 00 00 01 f9
 ```

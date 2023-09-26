@@ -1,7 +1,6 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "config.hh"
-#include "anytone_extension.hh"
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -16,7 +15,7 @@
  * Implementation of Zone
  * ********************************************************************************************* */
 Zone::Zone(QObject *parent)
-  : ConfigObject("zone", parent), _A(), _B(), _anytone(nullptr)
+  : ConfigObject(parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -25,7 +24,7 @@ Zone::Zone(QObject *parent)
 }
 
 Zone::Zone(const QString &name, QObject *parent)
-  : ConfigObject(name, "zone", parent), _A(), _B(), _anytone(nullptr)
+  : ConfigObject(name, parent), _A(), _B(), _anytone(nullptr)
 {
   connect(&_A, SIGNAL(elementAdded(int)), this, SIGNAL(modified()));
   connect(&_A, SIGNAL(elementRemoved(int)), this, SIGNAL(modified()));
@@ -74,6 +73,11 @@ Zone::B() {
   return &_B;
 }
 
+bool
+Zone::contains(Channel *obj) const {
+  return _A.has(obj) || _B.has(obj);
+}
+
 AnytoneZoneExtension *
 Zone::anytoneExtension() const {
   return _anytone;
@@ -111,9 +115,9 @@ ZoneList::zone(int idx) const {
 }
 
 int
-ZoneList::add(ConfigObject *obj, int row) {
+ZoneList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<Zone>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

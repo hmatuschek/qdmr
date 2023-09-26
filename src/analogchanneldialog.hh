@@ -12,9 +12,9 @@ class AnalogChannelDialog: public QDialog, private Ui::AnalogChannelDialog
 
 public:
   AnalogChannelDialog(Config *config, QWidget *parent=nullptr);
-  AnalogChannelDialog(Config *config, AnalogChannel *channel, QWidget *parent=nullptr);
+  AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
 
-  AnalogChannel *channel();
+  FMChannel *channel();
 
 protected:
   void construct();
@@ -25,11 +25,12 @@ protected slots:
   void onTimeoutDefaultToggled(bool checked);
   void onSquelchDefaultToggled(bool checked);
   void onVOXDefaultToggled(bool checked);
+  void onHideChannelHint();
 
 protected:
   Config *_config;
-  AnalogChannel *_myChannel;
-  AnalogChannel *_channel;
+  FMChannel *_myChannel;
+  FMChannel *_channel;
 };
 
 

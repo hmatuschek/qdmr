@@ -7,6 +7,8 @@
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "config.hh"
+#include "commercial_extension.hh"
+#include "intermediaterepresentation.hh"
 
 
 /* ********************************************************************************************* *
@@ -264,13 +266,13 @@ RadioddityCodeplug::ChannelElement::enablePrivacy(bool enable) {
   setBit(0x00031, 4, enable);
 }
 
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 RadioddityCodeplug::ChannelElement::timeSlot() const {
-  return (getBit(0x0031, 6) ? DigitalChannel::TimeSlot::TS2 : DigitalChannel::TimeSlot::TS1);
+  return (getBit(0x0031, 6) ? DMRChannel::TimeSlot::TS2 : DMRChannel::TimeSlot::TS1);
 }
 void
-RadioddityCodeplug::ChannelElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
-  setBit(0x0031, 6, DigitalChannel::TimeSlot::TS2 == ts);
+RadioddityCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  setBit(0x0031, 6, DMRChannel::TimeSlot::TS2 == ts);
 }
 
 bool
@@ -290,13 +292,13 @@ RadioddityCodeplug::ChannelElement::enableNonSTEFrequency(bool enable) {
   setBit(0x0032, 5, enable);
 }
 
-AnalogChannel::Bandwidth
+FMChannel::Bandwidth
 RadioddityCodeplug::ChannelElement::bandwidth() const {
-  return (getBit(0x0033, 1) ? AnalogChannel::Bandwidth::Wide : AnalogChannel::Bandwidth::Narrow);
+  return (getBit(0x0033, 1) ? FMChannel::Bandwidth::Wide : FMChannel::Bandwidth::Narrow);
 }
 void
-RadioddityCodeplug::ChannelElement::setBandwidth(AnalogChannel::Bandwidth bw) {
-  setBit(0x0033, 1, AnalogChannel::Bandwidth::Wide == bw);
+RadioddityCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
+  setBit(0x0033, 1, FMChannel::Bandwidth::Wide == bw);
 }
 
 bool
@@ -348,23 +350,23 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
   Q_UNUSED(ctx)
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
-    AnalogChannel *ach = new AnalogChannel(); ch = ach;
+    FMChannel *ach = new FMChannel(); ch = ach;
     switch (admitCriterion()) {
-    case ADMIT_ALWAYS: ach->setAdmit(AnalogChannel::Admit::Always); break;
-    case ADMIT_CH_FREE: ach->setAdmit(AnalogChannel::Admit::Free); break;
-    default: ach->setAdmit(AnalogChannel::Admit::Always); break;
+    case ADMIT_ALWAYS: ach->setAdmit(FMChannel::Admit::Always); break;
+    case ADMIT_CH_FREE: ach->setAdmit(FMChannel::Admit::Free); break;
+    default: ach->setAdmit(FMChannel::Admit::Always); break;
     }
     ach->setBandwidth(bandwidth());
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
     ach->setSquelchDefault(); // There is no per-channel squelch setting
   } else {
-    DigitalChannel *dch = new DigitalChannel(); ch = dch;
+    DMRChannel *dch = new DMRChannel(); ch = dch;
     switch (admitCriterion()) {
-    case ADMIT_ALWAYS: dch->setAdmit(DigitalChannel::Admit::Always); break;
-    case ADMIT_CH_FREE: dch->setAdmit(DigitalChannel::Admit::Free); break;
-    case ADMIT_COLOR: dch->setAdmit(DigitalChannel::Admit::ColorCode); break;
-    default: dch->setAdmit(DigitalChannel::Admit::Always); break;
+    case ADMIT_ALWAYS: dch->setAdmit(DMRChannel::Admit::Always); break;
+    case ADMIT_CH_FREE: dch->setAdmit(DMRChannel::Admit::Free); break;
+    case ADMIT_COLOR: dch->setAdmit(DMRChannel::Admit::ColorCode); break;
+    default: dch->setAdmit(DMRChannel::Admit::Always); break;
     }
     dch->setTimeSlot(timeSlot());
     dch->setColorCode(txColorCode());
@@ -372,8 +374,8 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx) const {
 
   // Apply common settings
   ch->setName(name());
-  ch->setRXFrequency(double(rxFrequency())/1e6);
-  ch->setTXFrequency(double(txFrequency())/1e6);
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
@@ -391,12 +393,12 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) con
   if (hasScanList() && ctx.has<ScanList>(scanListIndex()))
     c->setScanList(ctx.get<ScanList>(scanListIndex()));
   // Link digital channel
-  if (c->is<DigitalChannel>()) {
-    DigitalChannel *dc = c->as<DigitalChannel>();
+  if (c->is<DMRChannel>()) {
+    DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
-    if (hasContact() && ctx.has<DigitalContact>(contactIndex()))
-      dc->setTXContactObj(ctx.get<DigitalContact>(contactIndex()));
+    if (hasContact() && ctx.has<DMRContact>(contactIndex()))
+      dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
   }
   return true;
 
@@ -407,8 +409,8 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   clear();
 
   setName(c->name());
-  setRXFrequency(c->rxFrequency()*1e6);
-  setTXFrequency(c->txFrequency()*1e6);
+  setRXFrequency(c->rxFrequency().inHz());
+  setTXFrequency(c->txFrequency().inHz());
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
   else
@@ -426,25 +428,25 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   if (c->scanList())
     setScanListIndex(ctx.index(c->scanList()));
 
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<const AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *ac = c->as<const FMChannel>();
     setMode(MODE_ANALOG);
     switch (ac->admit()) {
-    case AnalogChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
-    case AnalogChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
+    case FMChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
+    case FMChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
     default: setAdmitCriterion(ADMIT_ALWAYS);
     }
     setBandwidth(ac->bandwidth());
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // no per channel squelch setting
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<const DigitalChannel>();
+  } else if (c->is<DMRChannel>()) {
+    const DMRChannel *dc = c->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
     switch (dc->admit()) {
-    case DigitalChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
-    case DigitalChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
-    case DigitalChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR); break;
+    case DMRChannel::Admit::Always: setAdmitCriterion(ADMIT_ALWAYS); break;
+    case DMRChannel::Admit::Free: setAdmitCriterion(ADMIT_CH_FREE); break;
+    case DMRChannel::Admit::ColorCode: setAdmitCriterion(ADMIT_COLOR); break;
     }
     setTimeSlot(dc->timeSlot());
     setRXColorCode(dc->colorCode());
@@ -607,7 +609,7 @@ void
 RadioddityCodeplug::ContactElement::clear() {
   setName("");
   setNumber(0);
-  setType(DigitalContact::GroupCall);
+  setType(DMRContact::GroupCall);
   enableRing(0);
   setRingStyle(0);
   setUInt8(0x017, 0x00);
@@ -636,22 +638,22 @@ RadioddityCodeplug::ContactElement::setNumber(unsigned id) {
   setBCD8_be(0x0010, id);
 }
 
-DigitalContact::Type
+DMRContact::Type
 RadioddityCodeplug::ContactElement::type() const {
   switch (getUInt8(0x0014)) {
-  case 0: return DigitalContact::GroupCall;
-  case 1: return DigitalContact::PrivateCall;
-  case 2: return DigitalContact::AllCall;
+  case 0: return DMRContact::GroupCall;
+  case 1: return DMRContact::PrivateCall;
+  case 2: return DMRContact::AllCall;
   default: break;
   }
-  return DigitalContact::PrivateCall;
+  return DMRContact::PrivateCall;
 }
 void
-RadioddityCodeplug::ContactElement::setType(DigitalContact::Type type) {
+RadioddityCodeplug::ContactElement::setType(DMRContact::Type type) {
   switch (type) {
-  case DigitalContact::GroupCall: setUInt8(0x0014, 0); break;
-  case DigitalContact::PrivateCall: setUInt8(0x0014, 1); break;
-  case DigitalContact::AllCall: setUInt8(0x0014, 2); break;
+  case DMRContact::GroupCall: setUInt8(0x0014, 0); break;
+  case DMRContact::PrivateCall: setUInt8(0x0014, 1); break;
+  case DMRContact::AllCall: setUInt8(0x0014, 2); break;
   }
 }
 
@@ -677,16 +679,16 @@ RadioddityCodeplug::ContactElement::setRingStyle(unsigned style) {
   setUInt8(0x0016, style);
 }
 
-DigitalContact *
+DMRContact *
 RadioddityCodeplug::ContactElement::toContactObj(Context &ctx) const {
   Q_UNUSED(ctx)
   if (! isValid())
     return nullptr;
-  return new DigitalContact(type(), name(), number(), ring());
+  return new DMRContact(type(), name(), number(), ring());
 }
 
 void
-RadioddityCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx) {
+RadioddityCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx) {
   Q_UNUSED(ctx)
   setName(cont->name());
   setNumber(cont->number());
@@ -826,7 +828,7 @@ RadioddityCodeplug::ZoneElement::toZoneObj(Context &ctx) const {
 }
 
 bool
-RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx) const {
   if (! isValid()) {
     logWarn() << "Cannot link zone: Zone is invalid.";
     return false;
@@ -834,15 +836,13 @@ RadioddityCodeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putI
 
   for (int i=0; (i<16) && hasMember(i); i++) {
     if (ctx.has<Channel>(member(i))) {
-      if (! putInB)
-        zone->A()->add(ctx.get<Channel>(member(i)));
-      else
-        zone->B()->add(ctx.get<Channel>(member(i)));
+      zone->A()->add(ctx.get<Channel>(member(i)));
     } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member(i) << " out of bounds.";
     }
   }
+
   return true;
 }
 
@@ -952,7 +952,7 @@ RadioddityCodeplug::GroupListElement::setName(const QString &name) {
 
 bool
 RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
-  return 0!=member(n);
+  return 0 != member(n);
 }
 unsigned
 RadioddityCodeplug::GroupListElement::member(unsigned n) const {
@@ -960,7 +960,7 @@ RadioddityCodeplug::GroupListElement::member(unsigned n) const {
 }
 void
 RadioddityCodeplug::GroupListElement::setMember(unsigned n, unsigned idx) {
-  return setUInt16_le(0x0010+2*n, idx);
+  return setUInt16_le(0x0010 + 2*n, idx);
 }
 void
 RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
@@ -968,19 +968,19 @@ RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
 }
 
 RXGroupList *
-RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx) {
-  Q_UNUSED(ctx)
+RadioddityCodeplug::GroupListElement::toRXGroupListObj(Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   return new RXGroupList(name());
 }
 
 bool
-RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx) const {
+RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack& err) const {
   for (int i=0; (i<16) && (i<ncnt); i++) {
-    if (ctx.has<DigitalContact>(member(i))) {
-      lst->addContact(ctx.get<DigitalContact>(member(i)));
+    if (ctx.has<DMRContact>(member(i))) {
+      lst->addContact(ctx.get<DMRContact>(member(i)));
     } else {
-      logError() << "Cannot link group list '" << lst->name()
-                << "': Member index " << member(i) << " does not refer to a digital contact.";
+      errMsg(err) << "Cannot link group list '" << lst->name()
+                  << "': Member index " << member(i) << " does not refer to a digital contact.";
       return false;
     }
   }
@@ -988,16 +988,17 @@ RadioddityCodeplug::GroupListElement::linkRXGroupListObj(int ncnt, RXGroupList *
 }
 
 void
-RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+RadioddityCodeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(err)
   setName(lst->name());
   int j = 0;
   // Iterate over all 15 entries in the codeplug
   for (int i=0; i<15; i++) {
     if (lst->count() > j) {
-      // Skip non-private-call entries
-      while((lst->count() > j) && (DigitalContact::PrivateCall != lst->contact(j)->type())) {
+      // Skip non-group-call entries
+      while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
         logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
-                  << "' is not a private call. Skip entry.";
+                  << "' is not a group call. Skip entry.";
         j++;
       }
       setMember(i, ctx.index(lst->contact(j))); j++;
@@ -2627,8 +2628,8 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DigitalContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DigitalContact>(), d+1); d++;
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
     }
@@ -2660,11 +2661,30 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
   }
 
   // Map roaming
-  for (int i=0; i<config->roaming()->count(); i++)
-    ctx.add(config->roaming()->zone(i), i+1);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i+1);
 
   return true;
 }
+
+Config *
+RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process Radioddity codeplug.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zone for Radioddity codeplug.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
 
 bool
 RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
@@ -2676,8 +2696,10 @@ RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack 
 
   // Create index<->object table.
   Context ctx(config);
-  if (! index(config, ctx, err))
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot index configuration objects.";
     return false;
+  }
 
   return this->encodeElements(flags, ctx);
 }
@@ -2734,6 +2756,7 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
   return true;
 }
 
+
 bool
 RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
@@ -2743,6 +2766,22 @@ RadioddityCodeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
 
   return this->decodeElements(ctx, err);
+}
+
+bool
+RadioddityCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process Radioddy codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merg zones in decoded Radioddity codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 bool

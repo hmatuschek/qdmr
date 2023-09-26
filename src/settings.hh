@@ -65,8 +65,14 @@ public:
   bool showExtensions() const;
   void setShowExtensions(bool show);
 
+  bool hideChannelNote() const;
+  void setHideChannelNote(bool hide);
+
   bool hideGSPNote() const;
   void setHideGPSNote(bool hide);
+
+  bool hideRoamingChannelNote() const;
+  void setHideRoamingChannelNote(bool hide);
 
   bool hideRoamingNote() const;
   void setHideRoamingNote(bool hide);

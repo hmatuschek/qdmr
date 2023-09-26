@@ -181,8 +181,8 @@ OpenGD77Codeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (nullptr == ch)
     return nullptr;
 
-  if (ch->is<AnalogChannel>()) {
-    AnalogChannel *ac = ch->as<AnalogChannel>();
+  if (ch->is<FMChannel>()) {
+    FMChannel *ac = ch->as<FMChannel>();
     if (squelchIsDefault())
       ac->setSquelchDefault();
     else
@@ -206,8 +206,8 @@ OpenGD77Codeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
   if (! GD77Codeplug::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
-  if (c->is<DigitalChannel>()) {
-    DigitalChannel *dc = c->as<DigitalChannel>();
+  if (c->is<DMRChannel>()) {
+    DMRChannel *dc = c->as<DMRChannel>();
     // Link radio ID
     if (hasRadioId()) {
       DMRRadioID *id = ctx.config()->radioIDs()->find(radioId());
@@ -230,14 +230,14 @@ OpenGD77Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
   if (! GD77Codeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
-  if (c->is<AnalogChannel>()) {
-    const AnalogChannel *ac = c->as<AnalogChannel>();
+  if (c->is<FMChannel>()) {
+    const FMChannel *ac = c->as<FMChannel>();
     if (ac->defaultSquelch())
       setSquelchDefault();
     else
       setSquelch(ac->squelch());
-  } else if (c->is<DigitalChannel>()) {
-    const DigitalChannel *dc = c->as<DigitalChannel>();
+  } else if (c->is<DMRChannel>()) {
+    const DMRChannel *dc = c->as<DMRChannel>();
     // Encode radio ID
     if (DefaultRadioID::get() == dc->radioIdObj()) {
       clearRadioId();
@@ -312,7 +312,7 @@ OpenGD77Codeplug::ZoneElement::clear() {
 }
 
 bool
-OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB) const {
+OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx) const {
   if (! isValid()) {
     logWarn() << "Cannot link zone: Zone is invalid.";
     return false;
@@ -320,10 +320,7 @@ OpenGD77Codeplug::ZoneElement::linkZoneObj(Zone *zone, Context &ctx, bool putInB
 
   for (int i=0; (i<80) && hasMember(i); i++) {
     if (ctx.has<Channel>(member(i))) {
-      if (! putInB)
-        zone->A()->add(ctx.get<Channel>(member(i)));
-      else
-        zone->B()->add(ctx.get<Channel>(member(i)));
+      zone->A()->add(ctx.get<Channel>(member(i)));
     } else {
       logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
                 << member(i) << " out of bounds.";
@@ -409,18 +406,18 @@ bool
 OpenGD77Codeplug::ContactElement::overridesTimeSlot() const {
   return TimeSlotOverride::None != (TimeSlotOverride)getUInt8(Offset::TimeSlotOverride);
 }
-DigitalChannel::TimeSlot
+DMRChannel::TimeSlot
 OpenGD77Codeplug::ContactElement::timeSlot() const {
   switch ((TimeSlotOverride)getUInt8(Offset::TimeSlotOverride)) {
-  case TimeSlotOverride::TS1: return DigitalChannel::TimeSlot::TS1;
-  case TimeSlotOverride::TS2: return DigitalChannel::TimeSlot::TS2;
+  case TimeSlotOverride::TS1: return DMRChannel::TimeSlot::TS1;
+  case TimeSlotOverride::TS2: return DMRChannel::TimeSlot::TS2;
   default: break;
   }
-  return DigitalChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS1;
 }
 void
-OpenGD77Codeplug::ContactElement::setTimeSlot(DigitalChannel::TimeSlot ts) {
-  if (DigitalChannel::TimeSlot::TS1 == ts)
+OpenGD77Codeplug::ContactElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
     setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS1);
   else
     setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::TS2);
@@ -430,15 +427,15 @@ OpenGD77Codeplug::ContactElement::disableTimeSlotOverride() {
   setUInt8(Offset::TimeSlotOverride, (unsigned)TimeSlotOverride::None);
 }
 
-DigitalContact *
+DMRContact *
 OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
-  DigitalContact *c = GD77Codeplug::ContactElement::toContactObj(ctx);
+  DMRContact *c = GD77Codeplug::ContactElement::toContactObj(ctx);
   if (nullptr == c)
     return nullptr;
 
   OpenGD77ContactExtension *ext = new OpenGD77ContactExtension(c);
   if (overridesTimeSlot()) {
-    if (DigitalChannel::TimeSlot::TS1 == timeSlot())
+    if (DMRChannel::TimeSlot::TS1 == timeSlot())
       ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::TS1);
     else
       ext->setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::TS2);
@@ -451,15 +448,15 @@ OpenGD77Codeplug::ContactElement::toContactObj(Context &ctx) const {
 }
 
 void
-OpenGD77Codeplug::ContactElement::fromContactObj(const DigitalContact *c, Context &ctx) {
+OpenGD77Codeplug::ContactElement::fromContactObj(const DMRContact *c, Context &ctx) {
   GD77Codeplug::ContactElement::fromContactObj(c, ctx);
 
   if(const OpenGD77ContactExtension *ext = c->openGD77ContactExtension()) {
     if (OpenGD77ContactExtension::TimeSlotOverride::None != ext->timeSlotOverride()) {
       if (OpenGD77ContactExtension::TimeSlotOverride::TS1 == ext->timeSlotOverride())
-        setTimeSlot(DigitalChannel::TimeSlot::TS1);
+        setTimeSlot(DMRChannel::TimeSlot::TS1);
       else
-        setTimeSlot(DigitalChannel::TimeSlot::TS2);
+        setTimeSlot(DMRChannel::TimeSlot::TS2);
     } else {
       disableTimeSlotOverride();
     }
@@ -483,11 +480,15 @@ OpenGD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
 }
 
 void
-OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx) {
+OpenGD77Codeplug::GroupListElement::fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack& err) {
+  Q_UNUSED(err)
   setName(lst->name());
   // Iterate over all 32 entries in the codeplug
   for (int i=0; i<32; i++) {
     if (lst->count() > i) {
+      /*logDebug() << "Store member '" << lst->contact(i)->name()
+                 << "' at index " << ctx.index(lst->contact(i))
+                 << " in group list '" << lst->name() << "'.";*/
       setMember(i, ctx.index(lst->contact(i)));
     } else {
       // Clear entry.
@@ -596,7 +597,7 @@ OpenGD77Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack 
     ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE, IMAGE_CONTACTS));
     if (! el.isValid())
       continue;
-    DigitalContact *cont = el.toContactObj(ctx);
+    DMRContact *cont = el.toContactObj(ctx);
     ctx.add(cont, i+1); config->contacts()->add(cont);
   }
   return true;
@@ -760,36 +761,21 @@ OpenGD77Codeplug::clearZones() {
 
 bool
 OpenGD77Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
 
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
 
   // Pack Zones
-  bool pack_zone_a = true;
-  for (int i=0, j=0; i<NUM_ZONES; i++) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement z(bank.get(i));
-next:
-    if (j >= config->zones()->count()) {
+    if (! ctx.has<Zone>(i+1)) {
       bank.enable(i, false);
       continue;
     }
 
     // Construct from Zone obj
-    Zone *zone = config->zones()->zone(j);
-    if (pack_zone_a) {
-      pack_zone_a = false;
-      if (zone->A()->count())
-        z.fromZoneObjA(zone, ctx);
-      else
-        goto next;
-    } else {
-      pack_zone_a = true;
-      j++;
-      if (zone->B()->count())
-        z.fromZoneObjB(zone, ctx);
-      else
-        goto next;
-    }
+    Zone *zone = ctx.get<Zone>(i+1);
+    z.fromZoneObjA(zone, ctx);
     bank.enable(i, true);
   }
   return true;
@@ -799,34 +785,17 @@ bool
 OpenGD77Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
+
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = z.toZoneObj(ctx);
-      config->zones()->add(last_zone);
-      ctx.add(last_zone, i+1);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-    }
+    Zone *zone = z.toZoneObj(ctx);
+    config->zones()->add(zone);
+    ctx.add(zone, i+1);
   }
+
   return true;
 }
 
@@ -834,29 +803,14 @@ bool
 OpenGD77Codeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK, IMAGE_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
+
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = ctx.get<Zone>(i+1);
-    }
-    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    Zone *zone = ctx.get<Zone>(i+1);
+    if (! z.linkZoneObj(zone, ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
@@ -874,13 +828,13 @@ OpenGD77Codeplug::clearGroupLists() {
 
 bool
 OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags);
 
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK)); bank.clear();
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     GroupListElement el(bank.get(i));
     if (i < config->rxGroupLists()->count()) {
-      el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx);
+      el.fromRXGroupListObj(config->rxGroupLists()->list(i), ctx, err);
       bank.setContactCount(i, config->rxGroupLists()->list(i)->count());
     }
   }
@@ -889,14 +843,12 @@ OpenGD77Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &
 
 bool
 OpenGD77Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   GroupListBankElement bank(data(ADDR_GROUP_LIST_BANK, IMAGE_GROUP_LIST_BANK));
   for (int i=0; i<NUM_GROUP_LISTS; i++) {
     if (! bank.isEnabled(i))
       continue;
     GroupListElement el(bank.get(i));
-    RXGroupList *list = el.toRXGroupListObj(ctx);
+    RXGroupList *list = el.toRXGroupListObj(ctx, err);
     config->rxGroupLists()->add(list); ctx.add(list, i+1);
   }
   return true;
@@ -913,7 +865,7 @@ OpenGD77Codeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack 
     GroupListElement el(bank.get(i));
     /*logDebug() << "Link " << bank.contactCount(i) << " members of group list '"
                << ctx.get<RXGroupList>(i+1)->name() << "'.";*/
-    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx)) {
+    if (! el.linkRXGroupListObj(bank.contactCount(i), ctx.get<RXGroupList>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i+1)->name() << "'.";
       return false;
     }

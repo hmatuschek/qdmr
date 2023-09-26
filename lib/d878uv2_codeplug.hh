@@ -5,10 +5,9 @@
 
 #include "d878uv_codeplug.hh"
 #include "signaling.hh"
-#include "codeplugcontext.hh"
 
 class Channel;
-class DigitalContact;
+class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
@@ -198,12 +197,25 @@ class D878UV2Codeplug : public D878UVCodeplug
 {
   Q_OBJECT
 
+protected:
+  /** Hidden constructor. */
+  explicit D878UV2Codeplug(const QString &label, QObject *parent = nullptr);
+
 public:
   /** Empty constructor. */
   explicit D878UV2Codeplug(QObject *parent = nullptr);
 
+protected:
   void allocateContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Internal used offsets within the codeplug. */
+  struct Offset: public D878UVCodeplug::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int contactIdTable()       { return 0x04800000; }
+    /// @endcond
+  };
 };
 
 #endif // D878UVCODEPLUG_HH

@@ -44,3 +44,14 @@ Codeplug &
 DM1701::codeplug() {
   return _codeplug;
 }
+
+const CallsignDB *
+DM1701::callsignDB() const {
+  return &_callsigndb;
+}
+
+CallsignDB *
+DM1701::callsignDB() {
+  return &_callsigndb;
+}
+

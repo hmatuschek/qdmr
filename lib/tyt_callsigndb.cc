@@ -4,7 +4,7 @@
 #include "utils.hh"
 
 
-#define MAX_CALLSIGNS                122197  // Maximum number of callsings in DB
+#define MAX_CALLSIGNS              122197LL  // Maximum number of callsings in DB
 
 #define ADDR_CALLSIGN_INDEX      0x00200000  // Start of callsign database
 #define NUM_INDEX_ENTRIES              4096
@@ -122,10 +122,17 @@ TyTCallsignDB::EntryElement::set(const UserDatabase::User &user) {
 
   // Set name
   QString name = user.name;
-  if (! user.surname.isEmpty())
+  if ((! user.surname.isEmpty()) && (100 >= name.length() + 1 + user.surname.size()))
     name += " " + user.surname;
-  if (! user.country.isEmpty())
+  if ((! user.city.isEmpty()) && (100 >= name.length() + 2 + user.city.size()))
+    name += ", " + user.city;
+  if ((! user.state.isEmpty()) && (100 >= name.length() + 2 + user.state.size()))
+    name += ", " + user.state;
+  if ((! user.country.isEmpty()) && (100 >= name.length() + 2 + user.country.size()))
     name += ", " + user.country;
+  if ((! user.comment.isEmpty()) && (100 >= name.length() + 2 + user.comment.size()))
+    name += ". " + user.comment;
+
   encode_ascii(_data + 0x0014, name, 100);
 }
 
@@ -149,10 +156,10 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorS
   Q_UNUSED(err)
 
   // Allocate space for callsign db
-  size_t n = db->count();
+  size_t n = std::min(MAX_CALLSIGNS, db->count());
   if (selection.hasCountLimit())
     n = std::min(n, selection.countLimit());
-  alloate(n);
+  allocate(n);
 
   // Clear DB index
   clearIndex();
@@ -186,7 +193,7 @@ TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorS
 }
 
 void
-TyTCallsignDB::alloate(unsigned n) {
+TyTCallsignDB::allocate(unsigned n) {
   n = std::min(n, unsigned(MAX_CALLSIGNS));
   qint64 size = align_size(0x0003 + INDEX_ENTRY_SIZE*NUM_INDEX_ENTRIES + CALLSIGN_ENTRY_SIZE*n, 1024);
 

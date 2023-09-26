@@ -1,6 +1,7 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
+#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -213,12 +214,7 @@ ChannelListWrapper::ChannelListWrapper(ChannelList *list, QObject *parent)
 int
 ChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 20;
-}
-
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
+  return 21;
 }
 
 QVariant
@@ -233,17 +229,17 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     const QPalette &palette = qobject_cast<QWidget *>(QObject::parent())->palette();
     QColor active   = palette.color(QPalette::Active, QPalette::Text);
     QColor inactive = palette.color(QPalette::Inactive, QPalette::Text);
-    bool isDigital = dynamic_cast<ChannelList *>(_list)->channel(index.row())->is<DigitalChannel>();
+    bool isDigital = dynamic_cast<ChannelList *>(_list)->channel(index.row())->is<DMRChannel>();
     switch(index.column()) {
-    case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+    case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
       return active;
-    case 9: case 10: case 11: case 12: case 13:
+    case 11: case 12: case 13: case 14:
       return (isDigital ? active : inactive);
-    case 14:
-      return active;
     case 15:
+      return active;
+    case 16:
       return (isDigital ? active : inactive);
-    case 16: case 17: case 18: case 19:
+    case 17: case 18: case 19: case 20:
       return (isDigital ? inactive : active);
     }
   }
@@ -255,19 +251,16 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   switch (index.column()) {
   case 0:
-    if (channel->is<AnalogChannel>())
-      return tr("Analog");
+    if (channel->is<FMChannel>())
+      return tr("FM");
     else
-      return tr("Digital");
+      return tr("DMR");
   case 1:
     return channel->name();
   case 2:
-    return formatFrequency(channel->rxFrequency());
+    return channel->rxFrequency().format(Frequency::Format::MHz);
   case 3:
-    if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
-    else
-      return formatFrequency(channel->txFrequency());
+    return channel->txFrequency().format(Frequency::Format::MHz);
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
@@ -278,6 +271,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     case Channel::Power::Low: return tr("Low"); break;
     case Channel::Power::Min: return tr("Min"); break;
     }
+    break;
   case 5:
     if (channel->defaultTimeout())
       return tr("[Default]");
@@ -287,17 +281,17 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
       switch (digi->admit()) {
-      case DigitalChannel::Admit::Always: return tr("Always"); break;
-      case DigitalChannel::Admit::Free: return tr("Free"); break;
-      case DigitalChannel::Admit::ColorCode: return tr("Color"); break;
+      case DMRChannel::Admit::Always: return tr("Always"); break;
+      case DMRChannel::Admit::Free: return tr("Free"); break;
+      case DMRChannel::Admit::ColorCode: return tr("Color"); break;
       }
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
       switch (analog->admit()) {
-      case AnalogChannel::Admit::Always: return tr("Always"); break;
-      case AnalogChannel::Admit::Free: return tr("Free"); break;
-      case AnalogChannel::Admit::Tone: return tr("Tone"); break;
+      case FMChannel::Admit::Always: return tr("Always"); break;
+      case FMChannel::Admit::Free: return tr("Free"); break;
+      case FMChannel::Admit::Tone: return tr("Tone"); break;
       }
     }
     break;
@@ -307,78 +301,87 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     } else {
       return tr("-");
     }
-  case 9:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return digi->colorCode();
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
+  case 9: { // Collect zones, the channel is a member of
+      QStringList zones;
+      for(int i=0;i<channel->config()->zones()->count(); i++) {
+        Zone *zone = channel->config()->zones()->zone(i);
+        if (zone->contains(channel))
+          zones.append(zone->name());
+      }
+      return zones.join(", ");
+    } break;
   case 10:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      return (DigitalChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
-    } else if (channel->is<AnalogChannel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      return digi->colorCode();
+    } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
   case 11:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      return (DMRChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
+    } else if (channel->is<FMChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 12:
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
       if (digi->groupListObj()) {
         return digi->groupListObj()->name();
       } else {
         return tr("-");
       }
-    } else if (channel->is<AnalogChannel>()) {
-      return tr("[None]");
-    }
-    break;
-  case 12:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if (digi->txContactObj())
-        return digi->txContactObj()->name();
-      else
-        return tr("-");
-    } else if (channel->is<AnalogChannel>()) {
+    } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
   case 13:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
-      if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
-        return tr("[Default]");
-      return digi->radioIdObj()->name();
-    } else if (channel->is<AnalogChannel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      if (digi->txContactObj())
+        return digi->txContactObj()->name();
+      else
+        return tr("-");
+    } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
   case 14:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
+        return tr("[Default]");
+      return digi->radioIdObj()->name();
+    } else if (channel->is<FMChannel>()) {
+      return tr("[None]");
+    }
+    break;
+  case 15:
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
       if (digi->aprsObj())
         return digi->aprsObj()->name();
       else
         return tr("-");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (analog->aprsSystem())
         return analog->aprsSystem()->name();
       else
         return tr("-");
     }
     break;
-  case 15:
-    if (DigitalChannel *digi = channel->as<DigitalChannel>()) {
+  case 16:
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
       if (nullptr == digi->roamingZone())
         return tr("-");
       else if (DefaultRoamingZone::get() == digi->roamingZone())
         return tr("[Default]");
       return digi->roamingZone()->name();
-    } else if (channel->is<AnalogChannel>()) {
+    } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
-  case 16:
-    if (channel->is<DigitalChannel>()) {
+  case 17:
+    if (channel->is<DMRChannel>()) {
       return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (analog->defaultSquelch())
         return tr("[Default]");
       if (analog->squelchDisabled())
@@ -387,31 +390,31 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return analog->squelch();
     }
     break;
-  case 17:
-    if (channel->is<DigitalChannel>()) {
+  case 18:
+    if (channel->is<DMRChannel>()) {
       return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (Signaling::SIGNALING_NONE == analog->rxTone()) {
         return tr("Off");
       } else
         return Signaling::codeLabel(analog->rxTone());
     }
     break;
-  case 18:
-    if (channel->is<DigitalChannel>()) {
+  case 19:
+    if (channel->is<DMRChannel>()) {
       return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (Signaling::SIGNALING_NONE == analog->txTone()) {
         return tr("Off");
       } else
         return Signaling::codeLabel(analog->txTone());
     }
     break;
-  case 19:
-    if (channel->is<DigitalChannel>()) {
+  case 20:
+    if (channel->is<DMRChannel>()) {
       return tr("[None]");
-    } else if (AnalogChannel *analog = channel->as<AnalogChannel>()) {
-      if (AnalogChannel::Bandwidth::Wide == analog->bandwidth()) {
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
+      if (FMChannel::Bandwidth::Wide == analog->bandwidth()) {
         return tr("Wide");
       } else
         return tr("Narrow");
@@ -439,17 +442,18 @@ ChannelListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 6: return tr("Rx Only");
   case 7: return tr("Admit");
   case 8: return tr("Scanlist");
-  case 9: return tr("CC");
-  case 10: return tr("TS");
-  case 11: return tr("RX Group List");
-  case 12: return tr("TX Contact");
-  case 13: return tr("DMR ID");
-  case 14: return tr("GPS/APRS");
-  case 15: return tr("Roaming");
-  case 16: return tr("Squelch");
-  case 17: return tr("Rx Tone");
-  case 18: return tr("Tx Tone");
-  case 19: return tr("Bandwidth");
+  case 9: return tr("Zones");
+  case 10: return tr("CC");
+  case 11: return tr("TS");
+  case 12: return tr("RX Group List");
+  case 13: return tr("TX Contact");
+  case 14: return tr("DMR ID");
+  case 15: return tr("GPS/APRS");
+  case 16: return tr("Roaming");
+  case 17: return tr("Squelch");
+  case 18: return tr("Rx Tone");
+  case 19: return tr("Tx Tone");
+  case 20: return tr("Bandwidth");
     default:
       break;
   }
@@ -481,6 +485,89 @@ ChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int 
 }
 
 
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelListWrapper
+ * ********************************************************************************************* */
+RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, QObject *parent)
+  : GenericTableWrapper(list, parent)
+{
+  // pass...
+}
+
+int
+RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
+  Q_UNUSED(index);
+  return 5;
+}
+
+QVariant
+RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+
+  RoamingChannel *ch = _list->get(index.row())->as<RoamingChannel>();
+
+  // Dispatch by column
+  switch (index.column()) {
+  case 0: return ch->name();
+  case 1: return ch->rxFrequency().format(Frequency::Format::MHz);
+  case 2: return ch->txFrequency().format(Frequency::Format::MHz);
+  case 3:
+    if (ch->colorCodeOverridden())
+      return ch->colorCode();
+    return tr("[Selected]");
+  case 4:
+    if (ch->timeSlotOverridden()) {
+      switch(ch->timeSlot()) {
+      case DMRChannel::TimeSlot::TS1: return 1;
+      case DMRChannel::TimeSlot::TS2: return 2;
+      }
+    }
+    return tr("[Selected]");
+  default: break;
+  }
+
+  return QVariant();
+}
+
+QVariant
+RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  switch (section) {
+  case 0: return tr("Name");
+  case 1: return tr("RX Frequency");
+  case 2: return tr("TX Frequency");
+  case 3: return tr("CC");
+  case 4: return tr("TS");
+  default: break;
+  }
+  return QVariant();
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RoamingChannelRefListWrapper
+ * ********************************************************************************************* */
+RoamingChannelRefListWrapper::RoamingChannelRefListWrapper(RoamingChannelRefList *list, QObject *parent)
+  : GenericListWrapper(list, parent)
+{
+  // pass...
+}
+
+QVariant
+RoamingChannelRefListWrapper::data(const QModelIndex &index, int role) const {
+  if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row() >= _list->count()))
+    return QVariant();
+  return _list->get(index.row())->as<RoamingChannel>()->name();
+}
+
+QVariant
+RoamingChannelRefListWrapper::headerData(int section, Qt::Orientation orientation, int role) const {
+  if ((0!=section) || (Qt::Horizontal!=orientation) || (Qt::DisplayRole!=role))
+    return QVariant();
+  return tr("Roaming Channel");
+}
 
 
 /* ********************************************************************************************* *
@@ -519,15 +606,16 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
         default:
           return QVariant();
       }
-    } else if (contact->is<DigitalContact>()) {
-      DigitalContact *digi = contact->as<DigitalContact>();
+    } else if (contact->is<DMRContact>()) {
+      DMRContact *digi = contact->as<DMRContact>();
       switch (index.column()) {
         case 0:
           switch (digi->type()) {
-            case DigitalContact::PrivateCall: return tr("Private Call");
-            case DigitalContact::GroupCall: return tr("Group Call");
-            case DigitalContact::AllCall: return tr("All Call");
+            case DMRContact::PrivateCall: return tr("Private Call");
+            case DMRContact::GroupCall: return tr("Group Call");
+            case DMRContact::AllCall: return tr("All Call");
           }
+        break;
         case 1:
           return digi->name();
         case 2:
@@ -628,6 +716,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
+    break;
   case 3:
     return sys->period();
   case 4:
@@ -638,6 +727,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     } else if (sys->is<APRSSystem>())
       return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
                 sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
+    break;
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");
@@ -730,7 +820,7 @@ QVariant
 GroupListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) || (! index.isValid()) || (index.row()>=_list->count()))
     return QVariant();
-  return _list->get(index.row())->as<DigitalContact>()->name();
+  return _list->get(index.row())->as<DMRContact>()->name();
 }
 
 QVariant

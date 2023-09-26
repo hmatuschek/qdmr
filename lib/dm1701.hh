@@ -4,7 +4,8 @@
  * \image html dm1701.png "DM-1701" width=200px
  * \image latex dm1701.png "DM-1701" width=200px
  *
- * The Baofeng DM-1701 and the identical Retevis RT84.
+ * The Baofeng DM-1701 and the identical Retevis RT84. This implementation supports CPS version 1.5
+ * and firmware version 2.3.
  *
  * Features:
  *   - VHF/UHF, 136-174 MHz and 400-480 MHz
@@ -24,7 +25,7 @@
 #include "tyt_codeplug.hh"
 #include "tyt_callsigndb.hh"
 #include "dm1701_codeplug.hh"
-#include "uv390_callsigndb.hh"
+#include "dm1701_callsigndb.hh"
 
 
 /** Implements an USB interface to the  Baofeng DM-1701 and Retevis RT84 VHF/UHF 5W DMR (Tier I&II) radios.
@@ -46,6 +47,8 @@ public:
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
+  const CallsignDB *callsignDB() const;
+  CallsignDB *callsignDB();
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */
@@ -53,9 +56,11 @@ public:
 
 protected:
   /** The device identifier. */
-	QString _name;
+  QString _name;
   /** The actual binary codeplug representation. */
   DM1701Codeplug _codeplug;
+  /** The callsign DB object. */
+  DM1701CallsignDB _callsigndb;
 
 private:
   /** Holds the singleton instance of the radio limits. */

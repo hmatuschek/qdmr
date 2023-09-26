@@ -7,6 +7,7 @@
 
 #define USB_VID 0x15a2
 #define USB_PID 0x0073
+#define MAX_RETRY 10
 
 static const unsigned char CMD_PRG[]   = "\2PROGRA";
 static const unsigned char CMD_PRG2[]  = "M\2";
@@ -198,6 +199,7 @@ RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, in
   }
 
   // send data
+  unsigned int count=0;
   for (int n=0; n<nbytes; n+=32) {
     cmd[0] = CMD_WRITE[0];
     cmd[1] = (addr + n) >> 8;
@@ -210,6 +212,13 @@ RadioddityInterface::write(uint32_t bank, uint32_t addr, unsigned char *data, in
       errMsg(err) << "Cannot write block: Wrong acknowledge " << (int)ack
                   << ", expected " << (int)CMD_ACK[0] << ".";
       n-=32;
+
+      if ((++count) > MAX_RETRY) {
+        errMsg(err) << "Maximum retry count reached. Abort.";
+        return false;
+      }
+    } else {
+      count = 0;
     }
   }
 

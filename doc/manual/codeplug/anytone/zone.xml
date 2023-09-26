@@ -11,7 +11,7 @@
 </info>
 
 <para>
-  This extensions allows to specify some zone attributes for AnyTone devices. 
+  This extensions allows to specify some zone attributes for <trademark>AnyTone</trademark> devices. 
 </para>
 
 <example>
@@ -27,7 +27,7 @@
 </example>
 
 <para>
-  The AnyTone zone extension is a mapping named <token>anytone</token>. It contains the 
+  The <trademark>AnyTone</trademark> zone extension is a mapping named <token>anytone</token>. It contains the 
   device specific settings for that zone.
 </para>
 

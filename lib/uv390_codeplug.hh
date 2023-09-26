@@ -105,7 +105,7 @@ public:
     virtual void enableDCDMLeader(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj() const;
+    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
   };

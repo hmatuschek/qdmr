@@ -1,6 +1,9 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "logger.hh"
+#include "frequency.hh"
+#include "interval.hh"
+#include "commercial_extension.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
@@ -161,7 +164,9 @@ ConfigItem::copy(const ConfigItem &other) {
     // true if the property is a basic type
     bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
                          (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
-                         (QVariant::Double==prop.type()) ||(QVariant::String==prop.type()));
+                         (QVariant::Double==prop.type()) || (QVariant::String==prop.type()) ||
+                         (QString("Frequency")==prop.typeName()) ||
+                         (QString("Interval")==prop.typeName()) );
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
@@ -229,6 +234,109 @@ ConfigItem::copy(const ConfigItem &other) {
   return true;
 }
 
+int
+ConfigItem::compare(const ConfigItem &other) const {
+  // Check if other has the same type
+  if (strcmp(other.metaObject()->className(), metaObject()->className()))
+    return strcmp(metaObject()->className(), other.metaObject()->className());
+
+  // Compare by properties
+  const QMetaObject *meta = metaObject();
+  for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
+    // This property
+    QMetaProperty prop = meta->property(p);
+    // the same property over at other
+    QMetaProperty oprop = other.metaObject()->property(p);
+
+    // Should never happen
+    if (! prop.isValid())
+      continue;
+
+    // Handle comparison of basic types
+    if ((prop.isEnumType()) || (QVariant::Bool == prop.type()) || (QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+      int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
+      if (a<b)
+        return -1;
+      if (a>b)
+        return 1;
+      continue;
+    }
+
+    if (QVariant::Double == prop.type()) {
+      double a=prop.read(this).toDouble(), b=oprop.read(&other).toDouble();
+      if (a<b)
+        return -1;
+      if (a>b)
+        return 1;
+      continue;
+    }
+
+    if (QVariant::String == prop.type()) {
+      int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
+      if (cmp)
+        return cmp;
+      continue;
+    }
+
+    if (QString("Frequency") == prop.typeName()) {
+      Frequency a = prop.read(this).value<Frequency>(), b = oprop.read(&other).value<Frequency>();
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
+      continue;
+    }
+
+    if (QString("Interval") == prop.typeName()) {
+      Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
+      continue;
+    }
+
+    if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+      int cmp = ref->compare(*oprop.read(&other).value<ConfigObjectReference*>());
+      if (cmp)
+        return cmp;
+      continue;
+    }
+
+    if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
+      int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectList*>());
+      if (cmp)
+        return cmp;
+      continue;
+    }
+
+    if (propIsInstance<ConfigObjectRefList>(prop)) {
+      ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>();
+      int cmp = lst->compare(*oprop.read(&other).value<ConfigObjectRefList*>());
+      if (cmp)
+        return cmp;
+      continue;
+    }
+
+    if (propIsInstance<ConfigItem>(prop)) {
+      // If the owned item is writeable -> clone if set in other
+      if (prop.read(this).isNull() && !oprop.read(&other).isNull())
+        return -1;
+      if (!prop.read(this).isNull() && oprop.read(&other).isNull())
+        return 1;
+      if (prop.read(this).isNull() && oprop.read(&other).isNull())
+        continue;
+      int cmp = prop.read(this).value<ConfigItem*>()->compare(*oprop.read(&other).value<ConfigItem*>());
+      if (cmp)
+        return cmp;
+      continue;
+    }
+  }
+
+  return 0;
+}
+
+
 bool
 ConfigItem::label(ConfigObject::Context &context, const ErrorStack &err) {
   // Label properties owning config objects, that is of type ConfigObject or ConfigObjectList
@@ -265,7 +373,7 @@ void
 ConfigItem::clear() {
   emit beginClear();
 
-  // Delete or clear all object owned by properites, that is ConfigObjectList and ConfigObject
+  // Delete or clear all object owned by properties, that is ConfigObjectList and ConfigObject
   const QMetaObject *meta = metaObject();
   for (int p=QObject::staticMetaObject.propertyCount(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
@@ -303,7 +411,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       if (nullptr == key) {
         errMsg(err) << "Cannot map value " << value.toUInt()
                     << " to enum " << e.name()
-                    << ". Ignore attribute but this points to an incompatibility in some codeplug. "
+                    << ". Ignore attribute '" << prop.name()
+                    << "' but this points to an incompatibility in some codeplug. "
                     << "Consider reporting it to https://github.com/hmatuschek/qdmr/issues.";
         continue;
       }
@@ -318,6 +427,10 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).toDouble();
     } else if (QString("QString") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
+    } else if (QString("Frequency") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Frequency>();
+    } else if (QString("Interval") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Interval>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
@@ -507,6 +620,31 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
+    } else if (QString("Frequency") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected frequency.";
+        return false;
+      }
+      Frequency f = node[prop.name()].as<Frequency>();
+      prop.write(this, QVariant::fromValue(f));
+    } else if (QString("Interval") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected interval.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;
@@ -519,8 +657,8 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       // check type
       if (! node[prop.name()].IsMap()) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
-                    << ": Cannot parse " << prop.name() << " of " << meta->className()
-                    << ": Expected instance of '"
+                    << ": Cannot parse '" << prop.name() << "' of '" << meta->className()
+                    << "': Expected instance of '"
                     << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
         return false;
       }
@@ -860,14 +998,14 @@ ConfigItem::longDescription(const QMetaProperty &prop) const {
 /* ********************************************************************************************* *
  * Implementation of ConfigObject
  * ********************************************************************************************* */
-ConfigObject::ConfigObject(const QString &idBase, QObject *parent)
-  : ConfigItem(parent), _idBase(idBase), _name()
+ConfigObject::ConfigObject(QObject *parent)
+  : ConfigItem(parent), _name()
 {
   // pass...
 }
 
-ConfigObject::ConfigObject(const QString &name, const QString &idBase, QObject *parent)
-  : ConfigItem(parent), _idBase(idBase), _name(name)
+ConfigObject::ConfigObject(const QString &name, QObject *parent)
+  : ConfigItem(parent), _name(name)
 {
   // pass...
 }
@@ -885,16 +1023,18 @@ ConfigObject::setName(const QString &name) {
   emit modified(this);
 }
 
+QString
+ConfigObject::idPrefix() const {
+  return findIdPrefix(this->metaObject());
+}
+
 bool
 ConfigObject::label(ConfigObject::Context &context, const ErrorStack &err) {
-  // With empty ID base, skip labeling.
-  if (_idBase.isEmpty())
-    return true;
-
   unsigned n=1;
-  QString id=QString("%1%2").arg(_idBase).arg(n);
+  QString prefix = this->idPrefix();
+  QString id=QString("%1%2").arg(prefix).arg(n);
   while (context.contains(id)) {
-    id=QString("%1%2").arg(_idBase).arg(++n);
+    id=QString("%1%2").arg(prefix).arg(++n);
   }
 
   if (! context.add(id, this)) {
@@ -933,6 +1073,18 @@ ConfigObject::populate(YAML::Node &node, const Context &context, const ErrorStac
   if (context.contains(this))
     node["id"] = context.getId(this).toStdString();
   return ConfigItem::populate(node, context, err);
+}
+
+QString
+ConfigObject::findIdPrefix(const QMetaObject *meta) {
+  for (int i=meta->classInfoOffset(); i<meta->classInfoCount(); i++) {
+    if (0 == strcmp("IdPrefix", meta->classInfo(i).name())) {
+      return meta->classInfo(i).value();
+    }
+  }
+  if (meta->superClass())
+    return findIdPrefix(meta->superClass());
+  return "";
 }
 
 
@@ -1006,16 +1158,23 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
   }
 }
 
-ConfigObject *AbstractConfigObjectList::get(int idx) const {
+bool
+AbstractConfigObjectList::has(ConfigObject *obj) const {
+  return 0 <= indexOf(obj);
+}
+
+ConfigObject *
+AbstractConfigObjectList::get(int idx) const {
   return _items.value(idx, nullptr);
 }
 
-int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
+int
+AbstractConfigObjectList::add(ConfigObject *obj, int row, bool unique) {
   // Ignore nullptr
   if (nullptr == obj)
     return -1;
   // If already in list -> ignore
-  if (0 <= indexOf(obj))
+  if (unique && (0 <= indexOf(obj)))
     return -1;
   if (-1 == row)
     row = _items.size();
@@ -1037,6 +1196,49 @@ int AbstractConfigObjectList::add(ConfigObject *obj, int row) {
   connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
   connect(obj, SIGNAL(modified(ConfigItem*)), this, SLOT(onElementModified(ConfigItem*)));
   emit elementAdded(row);
+  return row;
+}
+
+int
+AbstractConfigObjectList::replace(ConfigObject *obj, int row, bool unique) {
+  // Ignore nullptr
+  if (nullptr == obj)
+    return -1;
+  // Check index
+  if (row >= count())
+    return -1;
+  // Check if self-replacement
+  if (row == indexOf(obj))
+    return indexOf(obj);
+  // If already in list -> ignore
+  if (unique && (0 <= indexOf(obj)))
+    return -1;
+  // Check type
+  bool matchesType = false;
+  foreach (const QMetaObject &type, _elementTypes) {
+    if (obj->inherits(type.className())) {
+      matchesType = true;
+      break;
+    }
+  }
+  if (! matchesType) {
+    logError() << "Cannot add element of type " << obj->metaObject()->className()
+               << " to list, expected instances of " << classNames().join(", ");
+    return -1;
+  }
+
+  // Remove present element
+  ConfigObject *oldobj = _items.at(row);
+  _items.remove(row, 1);
+  emit elementRemoved(row);
+  disconnect(oldobj, nullptr, this, nullptr);
+
+  _items.insert(row, obj);
+  // connect to object
+  connect(obj, SIGNAL(destroyed(QObject*)), this, SLOT(onElementDeleted(QObject*)));
+  connect(obj, SIGNAL(modified(ConfigItem*)), this, SLOT(onElementModified(ConfigItem*)));
+  emit elementAdded(row);
+
   return row;
 }
 
@@ -1227,8 +1429,8 @@ ConfigObjectList::link(const YAML::Node &node, const ConfigItem::Context &ctx, c
   return true;
 }
 
-int ConfigObjectList::add(ConfigObject *obj, int row) {
-  if (0 <= (row = AbstractConfigObjectList::add(obj, row)))
+int ConfigObjectList::add(ConfigObject *obj, int row, bool unique) {
+  if (0 <= (row = AbstractConfigObjectList::add(obj, row, unique)))
     obj->setParent(this);
   return row;
 }
@@ -1243,7 +1445,7 @@ ConfigObjectList::take(ConfigObject *obj) {
 bool
 ConfigObjectList::del(ConfigObject *obj) {
   if (AbstractConfigObjectList::del(obj))
-    obj->deleteLater();
+    delete obj;
   return true;
 }
 
@@ -1264,6 +1466,19 @@ ConfigObjectList::copy(const AbstractConfigObjectList &other) {
   return true;
 }
 
+int
+ConfigObjectList::compare(const ConfigObjectList &other) const {
+  if (count() < other.count())
+    return -1;
+  if (count() > other.count())
+    return 1;
+  for (int i=0; i<count(); i++) {
+    int cmp = this->get(i)->compare(*other.get(i));
+    if (cmp) return cmp;
+  }
+
+  return 0;
+}
 
 /* ********************************************************************************************* *
  * Implementation of ConfigObjectRefList
@@ -1298,5 +1513,16 @@ ConfigObjectRefList::serialize(const ConfigItem::Context &context, const ErrorSt
     list.push_back(context.getId(obj).toStdString());
   }
   return list;
+}
+
+int
+ConfigObjectRefList::compare(const ConfigObjectRefList &other) const {
+  if (count() < other.count()) return -1;
+  if (count() > other.count()) return 1;
+  for (int i=0; i<count(); i++) {
+    int cmp = get(i)->compare(*other.get(i));
+    if (cmp) return cmp;
+  }
+  return 0;
 }
 

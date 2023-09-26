@@ -34,6 +34,23 @@ public:
   /** Tries to encode as many entries of the given user-database. */
   bool encode(UserDatabase *db, const Selection &selection=Selection(),
               const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some limits of the call-sign DB. */
+  struct Limit : public D868UVCallsignDB::Limit {
+    /// Specifies the max number of entries in the call-sign DB. */
+    static constexpr unsigned int entries() { return 500000; }
+  };
+
+protected:
+  /** Some internal offsets within the call-sign DB. */
+  struct Offset : public D868UVCallsignDB::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int callsigns()            { return 0x05500000; }
+    static constexpr unsigned int limits()               { return 0x04840000; }
+
+    /// @endcond
+  };
 };
 
 #endif // D868UVCALLSIGNDB_HH

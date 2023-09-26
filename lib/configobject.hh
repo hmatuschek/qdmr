@@ -100,10 +100,21 @@ protected:
   explicit ConfigItem(QObject *parent = nullptr);
 
 public:
-  /** Copies the given item into this. */
+  /** Copies the given item into this one.
+   * @returns @c true if copying was successful and false otherwise. The two items must be of the
+   *          same type (obviously). */
   virtual bool copy(const ConfigItem &other);
+
   /** Clones this item. */
   virtual ConfigItem *clone() const = 0;
+
+  /** Compares the items.
+   *
+   * This method returns 0 if the two items are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two items are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigItem &other) const;
 
 public:
   /** Recursively labels the config object.
@@ -191,17 +202,18 @@ class ConfigObject: public ConfigItem
   /** The name of the object. */
   Q_PROPERTY(QString name READ name WRITE setName)
 
+  /** Specifies the prefix for every ID assigned to every object during serialization. */
+  Q_CLASSINFO("IdPrefix", "obj")
+
 protected:
   /** Hidden constructor.
-   * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
    * @param parent Specifies the QObject parent. */
-  ConfigObject(const QString &idBase="id", QObject *parent = nullptr);
+  ConfigObject(QObject *parent = nullptr);
 
   /** Hidden constructor.
    * @param name Name of the object.
-   * @param idBase Prefix for all generated IDs. If empty, no ID gets generated.
    * @param parent Specifies the QObject parent. */
-  ConfigObject(const QString &name, const QString &idBase="id", QObject *parent = nullptr);
+  ConfigObject(const QString &name, QObject *parent = nullptr);
 
 public:
   /** Returns the name of the object. */
@@ -210,16 +222,18 @@ public:
   virtual void setName(const QString &name);
 
 public:
+  /** Returns the ID prefix for this object. */
+  QString idPrefix() const;
   bool label(Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
+  /** Helper to find the @c IdPrefix class info in the class hierarchy. */
+  static QString findIdPrefix(const QMetaObject* meta);
+
 protected:
-  /** Holds the base string to derive an ID from. All objects need some ID to be referenced within
-   * a codeplug file. */
-  QString _idBase;
   /** Holds the name of the object. */
   QString _name;
 };
@@ -230,7 +244,7 @@ protected:
  * properties. */
 class ConfigExtension : public ConfigItem
 {
-Q_OBJECT
+  Q_OBJECT
 
 protected:
   /** Hidden constructor. */
@@ -272,10 +286,14 @@ public:
   /** Searches the config tree to find all instances of the given type names. */
   virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
 
+  /** Returns @c true, if the list contains the given object. */
+  virtual bool has(ConfigObject *obj) const;
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
   /** Adds an element to the list. */
-  virtual int add(ConfigObject *obj, int row=-1);
+  virtual int add(ConfigObject *obj, int row=-1, bool unique=true);
+  /** Replaces an element in the list. */
+  virtual int replace(ConfigObject *obj, int row, bool unique=true);
   /** Removes an element from the list. */
   virtual bool take(ConfigObject *obj);
   /** Removes an element from the list (and deletes it if owned). */
@@ -332,11 +350,19 @@ protected:
   ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
   void clear();
   bool copy(const AbstractConfigObjectList &other);
+
+  /** Compares the object lists.
+   *
+   * This method returns 0 if the two lists are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two lists are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigObjectList &other) const;
 
   /** Allocates a member objects for the given YAML node. */
   virtual ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
@@ -367,6 +393,14 @@ protected:
 public:
   bool label(ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
   YAML::Node serialize(const ConfigItem::Context &context, const ErrorStack &err=ErrorStack());
+
+  /** Compares the object ref lists.
+   *
+   * This method returns 0 if the two lists are equivalent and -1, 1 otherwise. The established
+   * order is somewhat arbitrary.
+   *
+   * @returns 0 if the two lists are equivalent, -1 or 1 otherwise.*/
+  virtual int compare(const ConfigObjectRefList &other) const;
 };
 
 

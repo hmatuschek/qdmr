@@ -67,7 +67,7 @@ protected:
   /** Internal used function to abort the current operation. */
   int abort(const ErrorStack &err=ErrorStack());
   /** Internal used function to busy-wait for a response from the device. */
-  int wait_idle();
+  int wait_idle(const ErrorStack &err=ErrorStack());
 
 protected:
   /** USB context. */
@@ -77,5 +77,49 @@ protected:
   /** Device status. */
 	status_t _status;
 };
+
+
+/** Implements the ST MCU extensions for the DFU protocol, aka DfuSe.
+ * This class implements the extensions to the DFU protocaol used by ST for their MCUs. This is
+ * also known as DfuSe.
+ *
+ * @ingroup rif */
+class DFUSEDevice: public DFUDevice
+{
+public:
+  /** Constructor, also connects to the specified VID/PID device found first. The @c blocksize
+   * specifies the blocksize for every read and write operation. */
+  DFUSEDevice(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), uint16_t blocksize=32, QObject *parent=nullptr);
+
+  /** Closes the connection. */
+  void close();
+
+  /** Returns the blocksize in bytes. */
+  uint16_t blocksize() const;
+
+  /** Sets the read/write reference address. By default this is @c 0x08000000 (flash program
+   * memory address on ST devices). */
+  bool setAddress(uint32_t address, const ErrorStack &err=ErrorStack());
+  /** Reads a block of data from the device. The address is computed as base address +
+   * block*blocksize, where the base address is set using the @c setAddress method. */
+  bool readBlock(unsigned block, uint8_t *data, const ErrorStack &err=ErrorStack());
+  /** Writes a block of data to the device. The address is computed as base address +
+   * block*blocksize, where the base address is set using the @c setAddress method. */
+  bool writeBlock(unsigned block, const uint8_t *data, const ErrorStack &err=ErrorStack());
+  /** Erases an entire page of memory at the specified address. A page is usually 0x10000 bytes
+   * large. */
+  bool erasePage(uint32_t address, const ErrorStack &err=ErrorStack());
+  /** Erases the entire memory. Not reconmended. */
+  bool eraseAll(const ErrorStack &err=ErrorStack());
+  /** Releases the read lock. This usually also erases the entire memory. Not reconmended. */
+  bool releaseReadLock(const ErrorStack &err=ErrorStack());
+  /** Leaves the DFU mode, may boot into the application code. */
+  bool leaveDFU(const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Holds the block size in bytes. */
+  uint16_t _blocksize;
+};
+
 
 #endif // DFU_LIBUSB_HH

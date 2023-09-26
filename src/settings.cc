@@ -197,6 +197,15 @@ Settings::setShowExtensions(bool show) {
 }
 
 bool
+Settings::hideChannelNote() const {
+  return value("hideChannelNote", false).toBool();
+}
+void
+Settings::setHideChannelNote(bool hide) {
+  setValue("hideChannelNote", hide);
+}
+
+bool
 Settings::hideGSPNote() const {
   return value("hideGPSNote", false).toBool();
 }
@@ -204,6 +213,16 @@ Settings::hideGSPNote() const {
 void
 Settings::setHideGPSNote(bool hide) {
   setValue("hideGPSNote", hide);
+}
+
+bool
+Settings::hideRoamingChannelNote() const {
+  return value("hideRoamingChannelNote", false).toBool();
+}
+
+void
+Settings::setHideRoamingChannelNote(bool hide) {
+  setValue("hideRoamingChannelNote", hide);
 }
 
 bool

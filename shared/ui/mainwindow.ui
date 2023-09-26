@@ -52,10 +52,10 @@
     <item>
      <widget class="QTabWidget" name="tabs">
       <property name="accessibleName">
-       <string>Tablist</string>
+       <string notr="true">Tablist</string>
       </property>
       <property name="accessibleDescription">
-       <string>There are 6 tabs providing general settings, contact, Rx group, channel zone and scan lists.</string>
+       <string notr="true">There are several tabs providing general settings, contact, Rx group, channel, zone and scan lists.</string>
       </property>
       <property name="currentIndex">
        <number>-1</number>
@@ -120,7 +120,7 @@
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string notr="true">toolBar</string>
    </property>
    <property name="accessibleName">
     <string>Toolbar</string>

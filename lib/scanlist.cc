@@ -15,23 +15,23 @@
  * Implementation of ScanList
  * ********************************************************************************************* */
 ScanList::ScanList(QObject *parent)
-  : ConfigObject("scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
+  : ConfigObject(parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
-  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "channels", "!selected", SelectedChannel::get());
 }
 
 ScanList::ScanList(const QString &name, QObject *parent)
-  : ConfigObject(name, "scan", parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
+  : ConfigObject(name, parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
-  Context::setTag(metaObject()->className(), "primary", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "secondary", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "revert", "!selected", SelectedChannel::get());
-  Context::setTag(metaObject()->className(), "channels", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "primary", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "secondary", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "channels", "!selected", SelectedChannel::get());
 }
 
 ScanList &
@@ -204,9 +204,9 @@ ScanLists::scanlist(int idx) const {
 }
 
 int
-ScanLists::add(ConfigObject *obj, int row) {
+ScanLists::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<ScanList>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

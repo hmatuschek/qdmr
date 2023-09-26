@@ -68,6 +68,26 @@ public:
   /** Reuse TyT MD-UV390 menu settings element. */
   typedef UV390Codeplug::MenuSettingsElement MenuSettingsElement;
 
+  /** Contact element for MD2017 codeplugs.
+   *
+   * This class implements the same memory layout as the base TyTCodeplug::ContactElement. It just
+   * overrides the @c isValid method.
+   *
+   * Memory layout of encoded contact:
+   * @verbinclude tyt_contact.txt */
+  class ContactElement: public TyTCodeplug::ContactElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ContactElement(uint8_t *ptr);
+
+    bool isValid() const;
+  };
+
 public:
   /** Constructor. */
   explicit MD2017Codeplug(QObject *parent = nullptr);

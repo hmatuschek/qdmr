@@ -65,19 +65,19 @@
           <para>
             This option allows to set a Qt style for the application. This can
             be used to alter the style of the widgets. So call 
-            <cmd>qdmr -style=windows</cmd> if you fancy.
+            <userinput>qdmr -style=windows</userinput> if you fancy.
           </para>
           <para>
             However, this option is of real use if you want to use a dark 
             theme. By installing a dark Qt theme like kvantum-dark and starting
             qdmr by passing this theme to the style option. That is
           </para>
-          <para>
+          <screen>
             qdmr -style=kvantum-dark
-          </para>
+          </screen>
           <para>
             You may set the Qt style for all Qt applications using the 
-            <env>QT_STYLE_OVERRIDE</env> environment variable.
+            <varname>QT_STYLE_OVERRIDE</varname> environment variable.
           </para>
         </listitem>
       </varlistentry>
@@ -95,10 +95,11 @@
   <refsect1>
     <title>Logging</title>
     <para>
-      Qdmr writes a lot of debug and error messages to <io>stderr</io>. This 
-      can be used to inspect some issues during reading/writing the a codeplug 
-      to the device. There is also a log file containing these messages usually
-      at <file>~/.local/share/DM3MAT/qdmr/qdmr.log</file>.
+      Qdmr writes a lot of debug and error messages to 
+      <varname>stderr</varname>. This can be used to inspect some issues during
+      reading/writing the a codeplug to the device. There is also a log file 
+      containing these messages usually at 
+      <filename>~/.local/share/DM3MAT/qdmr/qdmr.log</filename>.
     </para>
   </refsect1>
 
@@ -107,7 +108,7 @@
     <para>
       This program is still under development and may contain bugs that
       may cause harm to the radios and may even destroy them. Hence you may
-      use this software on your own risk. I you want to have guaranties,
+      use this software on your own risk. If you want to have guaranties,
       consider using the CPS (code-plug programming software) supplied with
       your radio.
     </para>
@@ -121,7 +122,7 @@
       Writing a single application supporting several radios of different 
       manufacturers is a hard task. To this end, there are plenty of bugs to be
       expected. If you stumble across one of them, consider opening an issue at
-      <xlink href="https://github.com/hmatuschek/qdmr/issues"/>.
+      <ulink url="https://github.com/hmatuschek/qdmr/issues"/>.
     </para>
   </refsect1>
 </refentry>

@@ -34,6 +34,9 @@
 #include <QMetaType>
 #include <QSet>
 
+#include "frequency.hh"
+#include "ranges.hh"
+
 // Forward declaration
 class Config;
 class ConfigItem;
@@ -304,6 +307,20 @@ protected:
 };
 
 
+/** Represents a DMR ID.
+ *  That is an uint between 1 and 16777215 without any default value.
+ * @ingroup limits */
+class RadioLimitDMRId: public RadioLimitUInt
+{
+  Q_OBJECT
+
+public:
+  /** Constructor.
+   * @param parent Specifies the QObject parent. */
+  explicit RadioLimitDMRId(QObject *parent=nullptr);
+};
+
+
 /** Represents a limit for a set of enum values.
  * @ingroup limits */
 class RadioLimitEnum: public RadioLimitValue
@@ -330,19 +347,7 @@ class RadioLimitFrequencies: public RadioLimitValue
 
 public:
   /** Typedef for the initializer list. */
-  typedef std::initializer_list<std::pair<double, double>> RangeList;
-public:
-  /** Represents a single frequency range. */
-  struct FrequencyRange {
-    double min; ///< Lower frequency limit.
-    double max; ///< Upper frequency limit.
-    /** Constructs a frequency range from limits. */
-    FrequencyRange(double lower, double upper);
-    /** Constructs a frequency range from limits. */
-    FrequencyRange(const std::pair<double, double> &limit);
-    /** Returns @c true if @c f is inside this limit. */
-    bool contains(double f) const;
-  };
+  typedef std::initializer_list<std::pair<Frequency, Frequency>> RangeList;
 
 public:
   /** Empty constructor. */
@@ -362,7 +367,7 @@ protected:
 
 /** Specialization for transmit frequency limits.
  * The verification is only performed if the channel is not "RX Only".
- * @ingroup limits. */
+ * @ingroup limits */
 class RadioLimitTransmitFrequencies: public RadioLimitFrequencies
 {
   Q_OBJECT
@@ -632,7 +637,7 @@ class RadioLimitGroupCallRefList: public RadioLimitElement
   Q_OBJECT
 
 public:
-  /** Costructor
+  /** Constructor
    * @param minSize Specifies the minimum size of the list. If -1, no check is performed.
    * @param maxSize Specifies the maximum size of the list. If -1, no check is performed.
    * @param parent  Specifies the QObject parent. */

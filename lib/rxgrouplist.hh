@@ -2,25 +2,25 @@
 #define RXGROUPLIST_HH
 
 #include <QObject>
-#include <QAbstractListModel>
 #include "configreference.hh"
 
 class Config;
-class DigitalContact;
+class DMRContact;
 
 
 /** Generic representation of a RX group list.
  * @ingroup conf */
 class RXGroupList: public ConfigObject
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_CLASSINFO("IdPrefix", "grp")
 
   /** The list of contacts. */
-  Q_PROPERTY(DigitalContactRefList* contacts READ contacts)
+  Q_PROPERTY(DMRContactRefList* contacts READ contacts)
 
 public:
   /** Default constructor. */
-  explicit RXGroupList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit RXGroupList(QObject *parent=nullptr);
   /** Constructor.
    * @param name Specifies the name of the group list.
    * @param parent @c QObject parent instance. */
@@ -36,18 +36,18 @@ public:
   void clear();
 
   /** Returns the contact at the given list index. */
-	DigitalContact *contact(int idx) const;
+	DMRContact *contact(int idx) const;
   /** Adds a contact to the list. */
-  int addContact(DigitalContact *contact, int idx=-1);
+  int addContact(DMRContact *contact, int idx=-1);
   /** Removes the given contact from the list. */
-	bool remContact(DigitalContact *contact);
+	bool remContact(DMRContact *contact);
   /** Removes the contact from the list at the given position. */
 	bool remContact(int idx);
 
   /** Returns the contact list. */
-  const DigitalContactRefList *contacts() const;
+  const DMRContactRefList *contacts() const;
   /** Returns the contact list. */
-  DigitalContactRefList *contacts();
+  DMRContactRefList *contacts();
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -58,7 +58,7 @@ protected slots:
 
 protected:
   /** The list of contacts. */
-  DigitalContactRefList _contacts;
+  DMRContactRefList _contacts;
 };
 
 
@@ -75,7 +75,7 @@ public:
   /** Returns the group list at the given index. */
 	RXGroupList *list(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

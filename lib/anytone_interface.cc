@@ -144,7 +144,7 @@ AnytoneInterface::identifier(const ErrorStack &err) {
   if ("D868UVE" == _info.name) {
     return RadioInfo::byID(RadioInfo::D868UVE);
   } else if ("D6X2UV" == _info.name) {
-    return RadioInfo::byID(RadioInfo::DMR6X2);
+    return RadioInfo::byID(RadioInfo::DMR6X2UV);
   } else if ("D878UV" == _info.name) {
     return RadioInfo::byID(RadioInfo::D878UV);
   } else if ("D878UV2" == _info.name) {
@@ -153,7 +153,8 @@ AnytoneInterface::identifier(const ErrorStack &err) {
     return RadioInfo::byID(RadioInfo::D578UV);
   }
 
-  errMsg(err) << "Unsupported AnyTone radio '" << _info.name << "'.";
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
   return RadioInfo();
 }
 

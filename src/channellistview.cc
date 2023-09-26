@@ -75,9 +75,9 @@ ChannelListView::onCloneChannel() {
     return;
 
   // Dispatch by type
-  if (channel->is<AnalogChannel>()) {
+  if (channel->is<FMChannel>()) {
     // clone channel
-    AnalogChannel *clone = new AnalogChannel(*(channel->as<AnalogChannel>()));
+    FMChannel *clone = new FMChannel(*(channel->as<FMChannel>()));
     // open editor
     AnalogChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
@@ -91,7 +91,7 @@ ChannelListView::onCloneChannel() {
     _config->channelList()->add(clone, row+1);
   } else {
     // clone channel
-    DigitalChannel *clone = new DigitalChannel(*(channel->as<DigitalChannel>()));
+    DMRChannel *clone = new DMRChannel(*(channel->as<DMRChannel>()));
     // open editor
     DigitalChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
@@ -143,13 +143,13 @@ ChannelListView::onEditChannel(unsigned row) {
   Channel *channel = _config->channelList()->channel(row);
   if (! channel)
     return;
-  if (channel->is<AnalogChannel>()) {
-    AnalogChannelDialog dialog(_config, channel->as<AnalogChannel>());
+  if (channel->is<FMChannel>()) {
+    AnalogChannelDialog dialog(_config, channel->as<FMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();
   } else {
-    DigitalChannelDialog dialog(_config, channel->as<DigitalChannel>());
+    DigitalChannelDialog dialog(_config, channel->as<DMRChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();
