@@ -3,8 +3,10 @@
 #include "anytone_interface.hh"
 #include "radioddity_interface.hh"
 #include "tyt_interface.hh"
+#include "gd73_interface.hh"
 
 #include "rd5r.hh"
+#include "gd73.hh"
 #include "gd77.hh"
 #include "md390.hh"
 #include "uv390.hh"
@@ -139,6 +141,23 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     hid->deleteLater();
+    return nullptr;
+  } else if (C7000Device::interfaceInfo() == descr) {
+    GD73Interface *gdif = new GD73Interface(descr, err);
+    if (gdif->isOpen()) {
+      RadioInfo id = gdif->identifier();
+      if ((id.isValid() && (RadioInfo::GD73 == id.id())) ||
+          (force.isValid() && (RadioInfo::GD73 == force.id()))) {
+        return new GD73(gdif);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      }
+      gdif->close();
+      gdif->deleteLater();
+      return nullptr;
+    }
+    gdif->deleteLater();
     return nullptr;
   }
   return nullptr;

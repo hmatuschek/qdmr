@@ -2,6 +2,7 @@
 
 #include "opengd77.hh"
 #include "openrtx.hh"
+#include "gd73.hh"
 #include "gd77.hh"
 #include "rd5r.hh"
 #include "md390.hh"
@@ -44,6 +45,7 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::OpenGD77, OpenGD77::defaultRadioInfo()},
   {RadioInfo::OpenRTX,  OpenRTX::defaultRadioInfo()},
   {RadioInfo::RD5R,     RD5R::defaultRadioInfo()},
+  {RadioInfo::GD73,     GD73::defaultRadioInfo()},
   {RadioInfo::GD77,     GD77::defaultRadioInfo()},
   {RadioInfo::MD390,    MD390::defaultRadioInfo()},
   {RadioInfo::UV390,    UV390::defaultRadioInfo()},

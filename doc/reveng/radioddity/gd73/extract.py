@@ -53,12 +53,29 @@ def getData(p):
   return binascii.a2b_hex(p["USB.CAPDATA_RAW"].value)
 
 
+class Packet:
+  def __init__(self, data:bytes):
+    self._flag, self._cmd, self._sub, self._pcrc, size = struct.unpack("<xBBBHH", data[:8])
+    self._payload = bytes()
+    if size: self._payload = data[8:(8+size)]
+    self._crc = 0xffff
+    for i in range(len(data)//2):
+      v = struct.unpack("<H", data[(2*i):(2*(i+1))])[0]
+      if v > self._crc: self._crc += 0xffff;
+      self._crc -= v    
+    if len(data)%2:
+      v = struct.unpack("B", data[-1:])[0]
+      if v > self._crc: self._crc +=0xffff;
+      self._crc -= v;
+    
+
+  def __repr__(self):
+    if 0 == len(self._payload):
+      return "Packet flag={:02x}, cmd={:02x}, sub={:02x}, crc={:04x}.".format(self._flag, self._cmd, self._sub, self._crc)
+    return "Packet flag={:02x}, cmd={:02x}, sub={:02x}, crc={:04x}\n{}".format(self._flag, self._cmd, self._sub, self._crc, hexDump(self._payload, " "))
+
 cap = pyshark.FileCapture(sys.argv[1], include_raw=True, use_json=True)
 nextaddr = 0
 for p in cap:
   if isDataPacket(p):
-    if isFromHost(p):
-      print(hexDump(getData(p),"> "))
-    elif isFromDevice(p): 
-      print(hexDump(getData(p),"< "))
-      print()
+    print(Packet(getData(p)))

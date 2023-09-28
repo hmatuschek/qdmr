@@ -43,6 +43,23 @@
 | n:n+m  |       | Additional bytes observed on the *write* and *enter prog mode* responses. |
 
 ### CRC
-Some sort of sum on 16bit integers over at least CMD, SUB, Size and payload.
+The CRC is computed over the entire packet, including start and end bytes. For the computation, 
+the packet is interpreted as a sequence of little-endian unsigned 16-bit integer. If the packet 
+does not align with 16bits, it gets 0-padded to a multiple of 16bit. 
+
+Let `v[i]` the i-th of `N` unsigned 16bit integer formed by the 0-padded packet, the CRC is then 
+computed as
+```
+uint32_t crc = 0xffff;
+for (int i=0; i<N; i++) {
+  if (crc < v[i])
+    crc += 0xffff;
+  crc -= v[i];
+}
+```
+To check the CRC, the resulting value of `crc` must be 0, to compute the CRC, just set the CRC field
+to 0, compute the CRC over the entire packet and then set the field within the packet to the value 
+of the result.
+
 
 ## Enter program mode
