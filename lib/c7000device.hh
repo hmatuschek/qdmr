@@ -6,19 +6,30 @@
 #include "errorstack.hh"
 #include "radiointerface.hh"
 
+/** Base class for all C7000 based radios. This class implements the basic communication protocol
+ * to these devices.
+ * @ingroup rif */
 class C7000Device : public QObject
 {
   Q_OBJECT
 
 public:
+  /** Request/response packet. */
   struct Packet {
   public:
+    /** Default constructor. */
     Packet();
+    /** Copy constructor. */
     Packet(const Packet &other)  = default ;
+    /** Constructs a request/response from commands and payload. */
     Packet(uint8_t command, uint8_t sub, uint8_t flags=0x0f, const QByteArray &payload=QByteArray());
+    /** Constructs a request/response from the given encoded packet. */
     Packet(const QByteArray &buffer);
 
+    /** Assignment. */
     Packet &operator =(const Packet &other) = default;
+
+    /** Returns @c true, if the packet is valid. */
     bool isValid() const;
 
     uint8_t flags() const;
@@ -29,6 +40,7 @@ public:
     const QByteArray &encoded() const;
 
   protected:
+    /** Holds the encoded packet. */
     QByteArray _encoded;
   };
 
@@ -59,6 +71,7 @@ public:
   static QList<USBDeviceDescriptor> detect();
 
 protected:
+  /** Sends the given request to the device and receives the response. */
   bool sendRecv(const Packet &request, Packet &response, const ErrorStack &err=ErrorStack());
 
 protected:
