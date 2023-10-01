@@ -2,6 +2,8 @@
 #define GD73CODEPLUG_HH
 
 #include "codeplug.hh"
+#include "interval.hh"
+#include "ranges.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
@@ -26,15 +28,15 @@
  *  <tr><td>0x21911</td> <td>0x2191f</td> <td>0x000e</td>  <td>DMR settings, see
  *    @c GD73Codeplug::DMRSettingsElement</td></tr>
  *  <tr><td>0x2191f</td> <td>0x2196f</td> <td>0x0050</td>  <td>16 encryption keys, see
- *    @c GD73Codeplig::EncryptionKeyBank</td></tr>
+ *    @c GD73Codeplug::EncryptionKeyBankElement</td></tr>
  *  <tr><td>0x2196f</td> <td>0x21e80</td> <td>0x0511</td>  <td>Message bank, see
  *    @c GD73Codeplug::MessageBankElement</td></tr>
  *  <tr><td>0x21e80</td> <td>0x21e94</td> <td>0x0014</td>  <td>4 DTMF systems, see
  *    @c GD73Codeplug::DTMFSystemBankElement</td></tr>
- *  <tr><td>0x21e94</td> <td>0x21f24</td> <td>0x0090</td>  <td>16 DTMF codes, see
- *    @c GD73Codeplug::DTMFCodeBankElement</td></tr>
+ *  <tr><td>0x21e94</td> <td>0x21f24</td> <td>0x0090</td>  <td>16 DTMF numbers, see
+ *    @c GD73Codeplug::DTMFNumberBankElement</td></tr>
  *  <tr><td>0x21f24</td>  <td>0x21fc4</td> <td>0x00a0</td>  <td>32 DTMF PTT settings, see
- *    @c GD73Codeplug::DTMFPTTSettingsBank</td></tr>
+ *    @c GD73Codeplug::DTMFPTTSettingBankElement</td></tr>
  *  <tr><td>0x21fc4</td>  <td>0x22014</td> <td>0x0050</td>  <td>Unused, filled with 0x00</td></tr>
  * </table>
  *
@@ -281,6 +283,29 @@ public:
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()                                  { return 0x0000; }
+      static constexpr unsigned int bandwidth()                             { return 0x0020; }
+      static constexpr unsigned int scanList()                              { return 0x0021; }
+      static constexpr unsigned int channelType()                           { return 0x0022; }
+      static constexpr unsigned int talkaround()                            { return 0x0023; }
+      static constexpr unsigned int rxOnly()                                { return 0x0024; }
+      static constexpr unsigned int scanAutoStart()                         { return 0x0026; }
+      static constexpr unsigned int rxFrequency()                           { return 0x0027; }
+      static constexpr unsigned int txFrequency()                           { return 0x002b; }
+      static constexpr unsigned int dtmfPTTSettingsIndex()                  { return 0x002f; }
+      static constexpr unsigned int power()                                 { return 0x0030; }
+      static constexpr unsigned int admid()                                 { return 0x0031; }
+      static constexpr unsigned int rxToneMode()                            { return 0x0034; }
+      static constexpr unsigned int rxCTCSS()                               { return 0x0035; }
+      static constexpr unsigned int rxDCS()                                 { return 0x0036; }
+      static constexpr unsigned int txToneMode()                            { return 0x0037; }
+      static constexpr unsigned int txCTCSS()                               { return 0x0038; }
+      static constexpr unsigned int txDCS()                                 { return 0x0039; }
+      static constexpr unsigned int timeslot()                              { return 0x003c; }
+      static constexpr unsigned int colorcode()                             { return 0x003d; }
+      static constexpr unsigned int groupListIndex()                        { return 0x003e; }
+      static constexpr unsigned int contactIndex()                          { return 0x0040; }
+      static constexpr unsigned int emergencySystemIndex()                  { return 0x0042; }
+      static constexpr unsigned int encryptionKeyIndex()                    { return 0x0044; }
       /// @endcond
     };
   };
@@ -361,6 +386,8 @@ public:
 
   /** Implements the contact bank within the codeplug.
    *
+   * See @c GD73Codeplug::ContactElement for contact encoding.
+   *
    * Memory representation of the contact bank (size 9c02h bytes):
    * @verbinclude gd73_contact_bank.txt */
   class ContactBankElement: public Element
@@ -390,6 +417,221 @@ public:
       static constexpr unsigned int contactCount()                          { return 0x0000; }
       static constexpr unsigned int contacts()                              { return 0x0804; }
       static constexpr unsigned int betweenContacts()                       { return ContactElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Encodes a group list.
+   *
+   * Memory representation of the group list (size 0053h bytes):
+   * @verbinclude gd73_group_list_element.txt */
+  class GroupListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0053; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength()                          { return 8; }
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount()                         { return 33; }
+    };
+
+  protected:
+    /** Some internal offsets within the group list. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()                                  { return 0x0000; }
+      static constexpr unsigned int memberCount()                           { return 0x0010; }
+      static constexpr unsigned int members()                               { return 0x0011; }
+      static constexpr unsigned int betweenMembers()                        { return 0x0002; }
+      /// @endcond
+    };
+  };
+
+
+  /** Encodes the bank of group lists.
+   *
+   * See @c GD73Codeplug::GroupListElement for group list encoding.
+   *
+   * Memory representation of group list bank (size 510fh bytes):
+   * @verbinclude gd73_group_list_bank.txt */
+  class GroupListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x510f; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount()                         { return 250; }
+    };
+
+  protected:
+    /** Some internal offsets within the group list bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int memberCount()                           { return 0x0000; }
+      static constexpr unsigned int members()                               { return 0x0001; }
+      static constexpr unsigned int betweenMembers()                        { return GroupListElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a scan list.
+   *
+   * Memory representation of the scan list (size 005fh bytes):
+   * @verbinclude gd73_scan_list_element.txt */
+  class ScanListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x005f; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength()                          { return 8; }
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount()                         { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets within the scan list bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()                                  { return 0x0000; }
+      static constexpr unsigned int memberCount()                           { return 0x0010; }
+      static constexpr unsigned int members()                               { return 0x0011; }
+      static constexpr unsigned int betweenMembers()                        { return 0x0002; }
+      static constexpr unsigned int priChannel1Mode()                       { return 0x0051; }
+      static constexpr unsigned int priChannel2Mode()                       { return 0x0052; }
+      static constexpr unsigned int priChannel1Zone()                       { return 0x0053; }
+      static constexpr unsigned int priChannel2Zone()                       { return 0x0054; }
+      static constexpr unsigned int priChannel1Channel()                    { return 0x0055; }
+      static constexpr unsigned int priChannel2Channel()                    { return 0x0057; }
+      static constexpr unsigned int txChannelMode()                         { return 0x0059; }
+      static constexpr unsigned int txChannelZone()                         { return 0x005a; }
+      static constexpr unsigned int txChannelChannel()                      { return 0x005b; }
+      static constexpr unsigned int holdTime()                              { return 0x005d; }
+      static constexpr unsigned int txHoldTime()                            { return 0x005e; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the bank of scan lists.
+   *
+   * See @c GD73Codeplug::ScanListElement for the encoding of the single scan lists.
+   *
+   * Memory representation of the scan list bank (size 0601h bytes):
+   * @verbinclude gd73_scan_list_bank.txt */
+  class ScanListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ScanListBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ScanListBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x601; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount()                           { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the scan list bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int memberCount()                           { return 0x0000; }
+      static constexpr unsigned int members()                               { return 0x0011; }
+      static constexpr unsigned int betweenMembers()                        { return ScanListElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the DMR settings element.
+   *
+   * Memory representation of the settings (size 000eh bytes):
+   * @verbinclude gd73_dmr_settings_element.txt */
+  class DMRSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DMRSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DMRSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x000e; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The range of call hang times. */
+      static constexpr TimeRange callHangTime() { return TimeRange{
+          Interval::fromSeconds(1), Interval::fromSeconds(90)
+        }; }
+      /** The range of active wait times. */
+      static constexpr TimeRange activeWaitTime() { return TimeRange{
+          Interval::fromMilliseconds(120), Interval::fromMilliseconds(600)
+        }; }
+      /** The range of active retries. */
+      static constexpr IntRange activeRetires() { return IntRange{ 1, 10}; }
+      /** The maximum number of TX preambles. */
+      static constexpr unsigned int txPreambles() { return 63; }
+    };
+
+  protected:
+    /** Some internal offsets within the scan list bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int callHangTime()                          { return 0x0000; }
+      static constexpr unsigned int activeWaitTime()                        { return 0x0001; }
+      static constexpr unsigned int activeRetries()                         { return 0x0002; }
+      static constexpr unsigned int txPreambles()                           { return 0x0003; }
+      static constexpr unsigned int decodeDisableRadio()                    { return 0x0004; }
+      static constexpr unsigned int decodeCheckRadio()                      { return 0x0005; }
+      static constexpr unsigned int decodeEnableRadio()                     { return 0x0006; }
       /// @endcond
     };
   };
@@ -458,6 +700,283 @@ public:
     };
   };
 
+
+  /** Implements a message.
+   * Memory representation (size 0051h bytes):
+   * @verbinclude gd73_message_element.txt */
+  class MessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x051; }
+
+
+  protected:
+    /** Internal used offsets within the bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int size()        { return 0x0000; }
+      static constexpr unsigned int text()        { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the message bank element.
+   *
+   * See @c GD73Codeplug::MessageElement for encoding of the single messages.
+   *
+   * Memory representation of the bank (size 0511h bytes):
+   * @verbinclude gd73_message_bank.txt */
+  class MessageBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x511; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount()                           { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the message bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int memberCount()                           { return 0x0000; }
+      static constexpr unsigned int members()                               { return 0x0001; }
+      static constexpr unsigned int betweenMembers()                        { return MessageElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a single DTMF system.
+   * Memory representation of the system (size 0005h bytes):
+   * @verbinclude gd73_dtmf_system_element.txt */
+  class DTMFSystemElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFSystemElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFSystemElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x005; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum preamble duration in ms. */
+      static constexpr Interval preambleDuration() { return Interval::fromMilliseconds(1000); }
+      /** Range for tone duration. */
+      static constexpr TimeRange toneDuration() { return TimeRange{
+          Interval::fromMilliseconds(30), Interval::fromMilliseconds(1900)
+        }; }
+      /** Range for pause duration. */
+      static constexpr TimeRange pauseDuration() { return TimeRange{
+          Interval::fromMilliseconds(30), Interval::fromMilliseconds(1900)
+        }; }
+      /** Rang of dead time. */
+      static constexpr TimeRange deadTime() { return TimeRange{
+          Interval::fromMilliseconds(200), Interval::fromSeconds(33)
+        }; }
+    };
+
+  protected:
+    /** Internal used offsets within the bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int sidetone()                              { return 0x0000; }
+      static constexpr unsigned int preambleDuration()                      { return 0x0001; }
+      static constexpr unsigned int toneDuration()                          { return 0x0002; }
+      static constexpr unsigned int pauseDuration()                         { return 0x0003; }
+      static constexpr unsigned int deadTime()                              { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the bank of 4 DTMF systems.
+   * @c GD73Codeplug::DTMFSystemElement for encoding of each system. */
+  class DTMFSystemBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFSystemBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFSystemBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0014; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The number of members. */
+      static constexpr unsigned int memberCount()                           { return 4; }
+    };
+
+  protected:
+    /** Some internal offsets within the message bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()                               { return 0x0000; }
+      static constexpr unsigned int betweenMembers()                        { return DTMFSystemElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a single DTMF number.
+   * Memory representation of the DTMF number (size 000ah bytes):
+   * @verbinclude gd73_dtmf_code_element.txt */
+  class DTMFNumberElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFNumberElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFNumberElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x000a; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** Maximum number of digita. */
+      static constexpr unsigned int digits() { return 16; }
+    };
+
+  protected:
+    /** Internal used offsets within the bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int count()                                 { return 0x0000; }
+      static constexpr unsigned int digits()                                { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the bank of 16 DTMF numbers.
+   * @c GD73Codeplug::DTMFNumberElement for encoding of each system. */
+  class DTMFNumberBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFNumberBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFNumberBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The number of members. */
+      static constexpr unsigned int memberCount()                           { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the number bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()                               { return 0x0000; }
+      static constexpr unsigned int betweenMembers()                        { return DTMFNumberElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a single DTMF PTT setting.
+   * Memory representation of the DTMF PTT setting (size 0005h bytes):
+   * @verbinclude gd73_dtmf_ptt_settings.txt */
+  class DTMFPTTSettingElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFPTTSettingElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFPTTSettingElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0005; }
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int systemIndex()                           { return 0x0000; }
+      static constexpr unsigned int pttIDType()                             { return 0x0001; }
+      static constexpr unsigned int pttIDMode()                             { return 0x0002; }
+      static constexpr unsigned int connectIDIndex()                        { return 0x0003; }
+      static constexpr unsigned int disconnectIDIndex()                     { return 0x0004; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the bank of 32 DTMF PTT settings.
+   * @c GD73Codeplug::DTMFPTTSettingElement for encoding of each element. */
+  class DTMFPTTSettingBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFPTTSettingBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFPTTSettingBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00a0; }
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The number of members. */
+      static constexpr unsigned int memberCount()                           { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets within the number bank. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()                               { return 0x0000; }
+      static constexpr unsigned int betweenMembers()                        { return DTMFPTTSettingElement::size(); }
+      /// @endcond
+    };
+  };
 
 public:
   /** Default constructor. */
