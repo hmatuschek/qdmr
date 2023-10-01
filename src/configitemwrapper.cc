@@ -497,7 +497,7 @@ RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, Q
 int
 RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 5;
+  return 6;
 }
 
 QVariant
@@ -524,6 +524,16 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
       }
     }
     return tr("[Selected]");
+  case 5: {
+      QStringList zones;
+      for(int i=0;i<ch->config()->roamingZones()->count(); i++) {
+        RoamingZone *zone = ch->config()->roamingZones()->zone(i);
+        if (zone->contains(ch))
+          zones.append(zone->name());
+      }
+      return zones.join(", ");
+    } break;
+
   default: break;
   }
 
@@ -540,6 +550,7 @@ RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, 
   case 2: return tr("TX Frequency");
   case 3: return tr("CC");
   case 4: return tr("TS");
+  case 5: return tr("Zones");
   default: break;
   }
   return QVariant();
