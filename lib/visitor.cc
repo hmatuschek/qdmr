@@ -84,7 +84,7 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
       return false;
     }
   } else if (QString("Interval") == prop.typeName()) {
-    if (! this->processFrequency(item, prop, err)) {
+    if (! this->processInterval(item, prop, err)) {
       errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;

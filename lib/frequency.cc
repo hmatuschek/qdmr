@@ -56,14 +56,13 @@ Frequency::parse(const QString &value) {
   if (! match.isValid())
     return false;
 
-  bool isFloat = match.capturedLength(2);
   bool hasUnit = match.capturedLength(3);
   QString unit = match.captured(3);
   QString decimals = match.captured(2);
   QString leading = match.captured(1);
   _frequency = leading.toUInt();
 
-  if (("Hz" == unit) || (!isFloat && !hasUnit))
+  if ("Hz" == unit)
     return true;
 
   if ("kHz" == unit) {
@@ -76,7 +75,7 @@ Frequency::parse(const QString &value) {
     // Rounding to proper Hz
     if ((decimals.size()>3) && (decimals[3].digitValue()>=5))
       _frequency+=1;
-  } else if (("MHz"==unit) || (isFloat && !hasUnit)) {
+  } else if (("MHz"==unit) || (!hasUnit)) {
     _frequency *= 1000000ULL;
     unsigned long long factor = 100000ULL;
     for (int i=0; i<std::min(6, decimals.size()); i++) {
