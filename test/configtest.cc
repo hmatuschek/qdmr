@@ -15,6 +15,12 @@ ConfigTest::ConfigTest(QObject *parent)
 
 
 void
+ConfigTest::initTestCase() {
+  UnitTestBase::initTestCase();
+
+}
+
+void
 ConfigTest::testImmediateRefInvalidation() {
   ErrorStack err;
   Config *copy = ConfigCopy::copy(&_basicConfig, err)->as<Config>();
@@ -49,6 +55,23 @@ ConfigTest::testCloneChannelBasic() {
   Channel *clone = _basicConfig.channelList()->channel(0)->clone()->as<Channel>();
   // Check if channels are the same
   QCOMPARE(clone->compare(*_basicConfig.channelList()->channel(0)), 0);
+}
+
+void
+ConfigTest::testMultipleRadioIDs() {
+  ErrorStack err;
+  Config multipleRadioIds;
+  if (! multipleRadioIds.readYAML(":/data/anytone_audio_settings_extension.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config::Context ctx;
+  YAML::Node node = multipleRadioIds.serialize(ctx, err);
+  if (node.IsNull()) {
+    QFAIL(QString("Cannot serialize codeplug: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
