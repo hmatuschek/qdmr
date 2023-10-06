@@ -29,7 +29,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
   /** The default transmit timeout */
   Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
-
+  /** The default DMR radio ID. */
+  Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
   /** The settings extension for TyT devices. */
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
   /** The settings extension for Radioddity devices. */
@@ -95,6 +96,9 @@ public:
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
+  /** Retruns a reference to the default DMR radio Id. */
+  DMRRadioIDReference *defaultIdRef() const;
+
   /** Returns the TyT device specific radio settings. */
   TyTSettingsExtension *tytExtension() const;
   /** Sets the TyT device specific radio settings. */
@@ -131,6 +135,8 @@ protected:
   unsigned _vox;
   /** Holds the global transmit timeout. */
   unsigned _transmitTimeOut;
+  /** Reference to the default DMR radio ID. */
+  DMRRadioIDReference *_defaultId;
   /** Device specific settings extension for TyT devices. */
   TyTSettingsExtension *_tytExtension;
   /** Device specific settings extension for Radioddity devices. */

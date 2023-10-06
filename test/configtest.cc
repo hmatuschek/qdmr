@@ -67,6 +67,11 @@ ConfigTest::testMultipleRadioIDs() {
   }
 
   Config::Context ctx;
+  if (! multipleRadioIds.label(ctx, err)) {
+    QFAIL(QString("Cannot label codeplug: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
   YAML::Node node = multipleRadioIds.serialize(ctx, err);
   if (node.IsNull()) {
     QFAIL(QString("Cannot serialize codeplug: %1")

@@ -2,7 +2,8 @@
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0), _tytExtension(nullptr),
+    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0),
+    _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
     _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
   // pass
@@ -139,6 +140,11 @@ RadioSettings::setTOT(unsigned sec) {
 void
 RadioSettings::disableTOT() {
   setTOT(0);
+}
+
+DMRRadioIDReference *
+RadioSettings::defaultIdRef() const {
+  return _defaultId;
 }
 
 TyTSettingsExtension *
