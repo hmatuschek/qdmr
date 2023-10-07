@@ -21,6 +21,7 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"opengd77", RadioInfo::OpenGD77},
   {"openrtx",  RadioInfo::OpenRTX},
   {"rd5r",     RadioInfo::RD5R},
+  {"gd73",     RadioInfo::GD73},
   {"gd77",     RadioInfo::GD77},
   {"md380",    RadioInfo::MD380},
   {"md390",    RadioInfo::MD390},
