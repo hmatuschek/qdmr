@@ -4,6 +4,8 @@
 #include "codeplug.hh"
 #include "interval.hh"
 #include "ranges.hh"
+#include "contact.hh"
+#include "rxgrouplist.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
@@ -63,6 +65,27 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0061; }
 
+    /** Returns the frequency range, supported by the radio. */
+    FrequencyRange frequencyRange() const;
+    /** Overrides the frequency range settings. */
+    void setFrequencyRange(const FrequencyRange &range);
+
+    /** Returns the timestamp of the last programming. */
+    QDateTime timestamp() const;
+    /** Sets the timestamp of the last programming. */
+    void setTimestamp(const QDateTime &timestamp);
+
+    /** Returns the serial number as a string. */
+    QString serial() const;
+    /** Returns the model name. */
+    QString modelName() const;
+    /** Returns the device id. */
+    QString deviceID() const;
+    /** Returns the model number as a string. */
+    QString modelNumber() const;
+    /** Returns the software version as a string. */
+    QString softwareVersion() const;
+
   public:
     /** Some limits. */
     struct Limit {
@@ -106,6 +129,12 @@ public:
    * @verbinclude gd73_one_touch_element.txt */
   class OneTouchSettingElement: public Element
   {
+  public:
+    /** Possible one-touch actions. */
+    enum class Action {
+      Call = 0, Message = 1
+    };
+
   protected:
     /** Hidden constructor. */
     OneTouchSettingElement(uint8_t *ptr, size_t size);
@@ -116,6 +145,16 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0005; }
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contact()                               { return 0x0001; }
+      static constexpr unsigned int action()                                { return 0x0003; }
+      static constexpr unsigned int message()                               { return 0x0001; }
+      /// @endcond
+    };
   };
 
 
@@ -126,6 +165,23 @@ public:
    */
   class SettingsElement: public Element
   {
+  public:
+    /** Possible channel display modes. */
+    enum class ChannelDisplayMode {
+      Name = 0, Frequency = 1
+    };
+    /** Possible boot display modes. */
+    enum class BootDisplayMode {
+      Off = 0, Text = 1, Image = 2, Both = 3
+    };
+    /** Possible programmable key function. */
+    enum class KeyFunction {
+      None=0, RadioEnable=1, RadioCheck=2, RadioDisable=3, PowerLevel=4,
+      Monitor=5, EmergencyOn=6, EmergencyOff=7, ZoneSwitch=8, ToggleScan=9, ToggleVOX=10,
+      OneTouch1=11, OneTouch2=12, OneTouch3=13, OneTouch4=14, OneTouch5=15, ToggleTalkaround=16,
+      LoneWorker=17, TBST=18, CallSwell=19
+    };
+
   protected:
     /** Hidden constructor. */
     SettingsElement(uint8_t *ptr, size_t size);
@@ -136,6 +192,179 @@ public:
 
     /** Returns the size of the settings element. */
     static constexpr unsigned int size() { return 0x0084; }
+
+    /** Returns the radio name. */
+    QString name() const;
+    /** Sets the radio name. */
+    void setName(const QString &name);
+
+    /** Returns the radio ID. */
+    unsigned int dmrID() const;
+    /** Sets the radio ID. */
+    void setDMRID(unsigned int id);
+
+    /** Returns the VOX level [0,10]. */
+    unsigned int vox() const;
+    /** Sets the VOX level [0,10]. */
+    void setVOX(unsigned int level);
+
+    /** Returns the squelch level [0,10]. */
+    unsigned int squelch() const;
+    /** Sets the squelch level [0,10]. */
+    void setSquelch(unsigned int level);
+
+    /** Returns @c true, if a transmit time-out is set. */
+    bool totIsSet() const;
+    /** Returns the transmit time-out. */
+    Interval tot() const;
+    /** Sets the transmit time-out. */
+    void setTOT(const Interval &interval);
+    /** Disables transmit time-out. */
+    void clearTOT();
+
+    /** Returns @c true if the TX interrupt is enabled. */
+    bool txInterruptedEnabled() const;
+    /** Enables/disables the TX interrupt. */
+    void enableTXInterrupt(bool enable);
+
+    /** Returns @c true if power save is enabled. */
+    bool powerSaveEnabled() const;
+    /** Enables/disables power save. */
+    void enablePowerSave(bool enable);
+    /** Returns the power-save time-out. */
+    Interval powerSaveTimeout() const;
+    /** Sets the power-save time-out. */
+    void setPowerSaveTimeout(const Interval &interval);
+
+    /** Returns @c true, if the read lock is enabled. */
+    bool readLockEnabled() const;
+    /** Enables/disables read lock. */
+    void enableReadLock(bool enable);
+    /** Returns the read-lock pin (1-6 digits as ASCII). */
+    QString readLockPin() const;
+    /** Sets the read-lock pin (1-6 digits as ASCII). */
+    void setReadLockPin(const QString &pin);
+
+    /** Returns @c true, if the write lock is enabled. */
+    bool writeLockEnabled() const;
+    /** Enables/disables write lock. */
+    void enableWriteLock(bool enable);
+    /** Returns the write-lock pin (1-6 digits as ASCII). */
+    QString writeLockPin() const;
+    /** Sets the write-lock pin (1-6 digits as ASCII). */
+    void setWriteLockPin(const QString &pin);
+
+    /** Returns the channel display mode. */
+    ChannelDisplayMode channelDisplayMode() const;
+    /** Sets the channel display mode. */
+    void setChannelDisplayMode(ChannelDisplayMode mode);
+
+    /** Returns the DMR microphone gain [1,10]. */
+    unsigned int dmrMicGain() const;
+    /** Sets the DMR microphone gain [1,10]. */
+    void setDMRMicGain(unsigned int gain);
+    /** Returns the FM microphone gain [1,10]. */
+    unsigned int fmMicGain() const;
+    /** Sets the FM microphone gain [1,10]. */
+    void setFMMicGain(unsigned int gain);
+
+    /** Returns the lone-worker response time-out. */
+    Interval loneWorkerResponseTimeout() const;
+    /** Sets the lone-worker response time-out. */
+    void setLoneWorkerResponseTimeout(const Interval &interval);
+    /** Returns the lone-worker remind period. */
+    Interval loneWorkerRemindPeriod() const;
+    /** Sets the lone-worker remind period. */
+    void setLoneWorkerRemindPeriod(const Interval &interval);
+
+    /** Returns the boot display mode. */
+    BootDisplayMode bootDisplayMode() const;
+    /** Sets the boot display mode. */
+    void setBootDisplayMode(BootDisplayMode mode);
+    /** Returns the first line of the boot text. */
+    QString bootTextLine1() const;
+    /** Sets the first line of the boot text. */
+    void setBootTextLine1(const QString &line);
+    /** Returns the second line of the boot text. */
+    QString bootTextLine2() const;
+    /** Sets the second line of the boot text. */
+    void setBootTextLine2(const QString &line);
+
+    /** Returns @c true if the key tones are enabled. */
+    bool keyToneEnabled() const;
+    /** Enables/disables the key tones. */
+    void enableKeyTone(bool enable);
+    /** Returns the key-tone volume [0-13]. */
+    unsigned int keyToneVolume() const;
+    /** Sets the key-tone volume. */
+    void setKeyToneVolume(unsigned int vol);
+    /** Returns @c true if the low-battery warn tone is enabled. */
+    bool lowBatteryToneEnabled() const;
+    /** Enables/disables the low-battery warn tone. */
+    void enableLowBatteryTone(bool enable);
+    /** Returns the low-battery warn-tone volume [0-13]. */
+    unsigned int lowBatteryToneVolume() const;
+    /** Sets the low-battery warn-tone volume. */
+    void setLowBatteryToneVolume(unsigned int vol);
+
+    /** Returns the long-press duration. */
+    Interval longPressDuration() const;
+    /** Sets the long-press duration. */
+    void setLongPressDuration(const Interval &interval);
+    /** Long-press function of programmable key 1. */
+    KeyFunction keyFunctionLongPressP1() const;
+    /** Sets the long-press function of the programmable key 1. */
+    void setKeyFunctionLongPressP1(KeyFunction function);
+    /** Short-press function of programmable key 1. */
+    KeyFunction keyFunctionShortPressP1() const;
+    /** Sets the short-press function of the programmable key 1. */
+    void setKeyFunctionShortPressP1(KeyFunction function);
+    /** Long-press function of programmable key 2. */
+    KeyFunction keyFunctionLongPressP2() const;
+    /** Sets the long-press function of the programmable key 2. */
+    void setKeyFunctionLongPressP2(KeyFunction function);
+    /** Short-press function of programmable key 2. */
+    KeyFunction keyFunctionShortPressP2() const;
+    /** Sets the short-press function of the programmable key 2. */
+    void setKeyFunctionShortPressP2(KeyFunction function);
+    /** Returns the n-th one-touch setting. */
+    OneTouchSettingElement oneTouch(unsigned int n);
+
+    /** Updates the given config. */
+    bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits of the settings. */
+    struct Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int name() { return 16; }
+      /** Transmit time-out range. */
+      static constexpr TimeRange tot() {
+        return TimeRange{Interval::fromSeconds(20), Interval::fromSeconds(500)};
+      }
+      /** Power-save timeout. */
+      static constexpr TimeRange powerSaveTimeout() {
+        return TimeRange{Interval::fromSeconds(10), Interval::fromSeconds(60)};
+      }
+      /** Maximum read/write lock pin size. */
+      static constexpr unsigned int pin() { return 6; }
+      /** Lone-worker response time-out range. */
+      static constexpr TimeRange loneWorkerResponse() {
+        return TimeRange{Interval::fromMinutes(1), Interval::fromMinutes(480)};
+      }
+      /** Lone-worker remind period range. */
+      static constexpr TimeRange loneWorkerRemindPeriod() {
+        return TimeRange{Interval::fromSeconds(10), Interval::fromSeconds(200)};
+      }
+      /** Maximum length of the boot text lines. */
+      static constexpr unsigned int bootTextLine() { return 16; }
+      /** Value range for tone-volumes. */
+      static constexpr IntRange toneVolume() { return IntRange{0,13}; }
+      /** Long-press duration range. */
+      static constexpr TimeRange longPressDuration() {
+        return TimeRange{Interval::fromSeconds(0), Interval::fromSeconds(31)};
+      }
+    };
 
   protected:
     /** Internal offsets within the element. */
@@ -365,6 +594,24 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x025; }
 
+    /** Returns the name of the contact. */
+    QString name() const;
+    /** Sets the name of the contact. */
+    void setName(const QString &name);
+
+    /** Returns the contact type. */
+    DMRContact::Type type() const;
+    /** Sets the contact type. */
+    void setType(DMRContact::Type type);
+
+    /** Returns the DMR ID. */
+    unsigned int id() const;
+    /** Sets the DMR ID. */
+    void setID(unsigned int id);
+
+    /** Decodes the contact. */
+    DMRContact *toContact(Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits. */
     struct Limit {
@@ -403,6 +650,9 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x9c02; }
 
+    /** Adds all encoded contacts, also updates the context */
+    bool createContacts(Context &ctx, const ErrorStack &err);
+
   public:
     /** Some limits. */
     struct Limit {
@@ -438,6 +688,16 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0053; }
+
+    /** Returns the name of the group list. */
+    QString name() const;
+    /** Sets the name of the group list. */
+    void setName(const QString &name);
+
+    /** Decodes the group list. */
+    RXGroupList *toGroupList(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the given RX group list. */
+    bool linkGroupList(RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -479,6 +739,11 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x510f; }
+
+    /** Create all encoded group lists, also update context. */
+    bool createGroupLists(Context &ctx, const ErrorStack &err);
+    /** Link all decoded group lists. */
+    bool linkGroupLists(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits. */
@@ -987,11 +1252,61 @@ public:
   bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack());
 
 protected:
+  /** Decodes the time-stamp field. */
+  virtual bool decodeTimestamp(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Creates messages. */
+  virtual bool createMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Decodes the settings fields (generic & DMR). */
+  virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Creates contacts. */
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Creates DTMF contacts. */
+  virtual bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Create group lists. */
+  virtual bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link group lists. */
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Create encryption keys. */
+  virtual bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Create channels. */
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link channels. */
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Create zones. */
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link zones. */
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Create scan lists. */
+  virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link zones. */
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
   /** Internal used offsets within the codeplug. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int timestamp()                               { return 0x00000; }
     static constexpr unsigned int settings()                                { return 0x00061; }
-    static constexpr unsigned int zoneBank()                                { return 0x0010b; }
+    static constexpr unsigned int zones()                                   { return 0x0010b; }
+    static constexpr unsigned int channels()                                { return 0x00d4c; }
+    static constexpr unsigned int contacts()                                { return 0x125ff; }
+    static constexpr unsigned int groupLists()                              { return 0x1c201; }
+    static constexpr unsigned int scanLists()                               { return 0x21310; }
+    static constexpr unsigned int dmrSettings()                             { return 0x21911; }
+    static constexpr unsigned int encryptionKeys()                          { return 0x2191f; }
+    static constexpr unsigned int messages()                                { return 0x2196f; }
+    static constexpr unsigned int dtmfSystems()                             { return 0x21e80; }
+    static constexpr unsigned int dtmfNumbers()                             { return 0x21e94; }
+    static constexpr unsigned int dtmfPTTSettings()                         { return 0x21f24; }
     /// @endcond
   };
 };

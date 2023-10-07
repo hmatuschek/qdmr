@@ -1,8 +1,8 @@
 /** @defgroup gd73 Radioddity GD-73
  * Device specific classes for Radioddity GD-73A and GD-73E.
  *
- * \image html gd73.jpg "GD-73" width=200px
- * \image latex gd73.jpg "GD-73" width=200px
+ * \image html gd73.webp "GD-73" width=200px
+ * \image latex gd73.webp "GD-73" width=200px
  *
  * @ingroup radioddity */
 
