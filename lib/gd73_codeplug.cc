@@ -1156,6 +1156,273 @@ GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::ScanListBankElement
+ * ********************************************************************************************* */
+GD73Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::ScanListBankElement::ScanListBankElement(uint8_t *ptr)
+  : Element(ptr, ScanListBankElement::size())
+{
+  // pass...
+}
+
+bool
+GD73Codeplug::ScanListBankElement::createScanLists(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  for (unsigned int i=0; i<count; i++) {
+    ScanListElement lst(_data + Offset::members() + i*Offset::betweenMembers());
+    ScanList *lstObj = lst.toScanList(ctx, err);
+    if (nullptr == lstObj) {
+      errMsg(err) << "Cannot decode scan list at index " << i << ".";
+      return false;
+    }
+    ctx.config()->scanlists()->add(lstObj);
+    ctx.add(lstObj, i);
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::ScanListBankElement::linkScanLists(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  for (unsigned int i=0; i<count; i++) {
+    ScanListElement lst(_data + Offset::members() + i*Offset::betweenMembers());
+    ScanList *lstObj = ctx.get<ScanList>(i);
+    if (! lst.linkScanList(lstObj, ctx, err)) {
+      errMsg(err) << "Cannot link scan list at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::ScanListElement
+ * ********************************************************************************************* */
+GD73Codeplug::ScanListElement::ScanListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::ScanListElement::ScanListElement(uint8_t *ptr)
+  : Element(ptr, ScanListElement::size())
+{
+  // pass...
+}
+
+QString
+GD73Codeplug::ScanListElement::name() const {
+  return readUnicode(Offset::name(), Limit::nameLength(), 0x0000);
+}
+void
+GD73Codeplug::ScanListElement::setName(const QString &name) {
+  writeUnicode(Offset::name(), name, Limit::nameLength(), 0x0000);
+}
+
+GD73Codeplug::ScanListElement::ChannelMode
+GD73Codeplug::ScanListElement::primaryChannelMode() const {
+  return (ChannelMode)getUInt8(Offset::priChannel1Mode());
+}
+void
+GD73Codeplug::ScanListElement::setPrimaryChannelMode(ChannelMode mode) {
+  setUInt8(Offset::priChannel1Mode(), (unsigned int)mode);
+}
+bool
+GD73Codeplug::ScanListElement::hasPrimaryZoneIndex() const {
+  return 0 != getUInt8(Offset::priChannel1Zone());
+}
+unsigned int
+GD73Codeplug::ScanListElement::primaryZoneIndex() const {
+  return getUInt8(Offset::priChannel1Zone())-1;
+}
+void
+GD73Codeplug::ScanListElement::setPrimaryZoneIndex(unsigned int idx) {
+  setUInt8(Offset::priChannel1Zone(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearPrimaryZoneIndex() {
+  setUInt8(Offset::priChannel1Zone(), 0);
+}
+bool
+GD73Codeplug::ScanListElement::hasPrimaryChannelIndex() const {
+  return 0 != getUInt8(Offset::priChannel1Channel());
+}
+unsigned int
+GD73Codeplug::ScanListElement::primaryChannelIndex() const {
+  return getUInt8(Offset::priChannel1Channel())-1;
+}
+void
+GD73Codeplug::ScanListElement::setPrimaryChannelIndex(unsigned int idx) {
+  setUInt8(Offset::priChannel1Channel(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearPrimaryChannelIndex() {
+  setUInt8(Offset::priChannel1Channel(), 0);
+}
+
+GD73Codeplug::ScanListElement::ChannelMode
+GD73Codeplug::ScanListElement::secondaryChannelMode() const {
+  return (ChannelMode)getUInt8(Offset::priChannel2Mode());
+}
+void
+GD73Codeplug::ScanListElement::setSecondaryChannelMode(ChannelMode mode) {
+  setUInt8(Offset::priChannel2Mode(), (unsigned int)mode);
+}
+bool
+GD73Codeplug::ScanListElement::hasSecondaryZoneIndex() const {
+  return 0 != getUInt8(Offset::priChannel2Zone());
+}
+unsigned int
+GD73Codeplug::ScanListElement::secondaryZoneIndex() const {
+  return getUInt8(Offset::priChannel2Zone())-1;
+}
+void
+GD73Codeplug::ScanListElement::setSecondaryZoneIndex(unsigned int idx) {
+  setUInt8(Offset::priChannel2Zone(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearSecondaryZoneIndex() {
+  setUInt8(Offset::priChannel2Zone(), 0);
+}
+bool
+GD73Codeplug::ScanListElement::hasSecondaryChannelIndex() const {
+  return 0 != getUInt8(Offset::priChannel2Channel());
+}
+unsigned int
+GD73Codeplug::ScanListElement::secondaryChannelIndex() const {
+  return getUInt8(Offset::priChannel2Channel())-1;
+}
+void
+GD73Codeplug::ScanListElement::setSecondaryChannelIndex(unsigned int idx) {
+  setUInt8(Offset::priChannel2Channel(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearSecondaryChannelIndex() {
+  setUInt8(Offset::priChannel2Channel(), 0);
+}
+
+GD73Codeplug::ScanListElement::ChannelMode
+GD73Codeplug::ScanListElement::revertChannelMode() const {
+  return (ChannelMode)getUInt8(Offset::txChannelMode());
+}
+void
+GD73Codeplug::ScanListElement::setRevertChannelMode(ChannelMode mode) {
+  setUInt8(Offset::txChannelMode(), (unsigned int)mode);
+}
+bool
+GD73Codeplug::ScanListElement::hasRevertZoneIndex() const {
+  return 0 != getUInt8(Offset::txChannelZone());
+}
+unsigned int
+GD73Codeplug::ScanListElement::revertZoneIndex() const {
+  return getUInt8(Offset::txChannelZone())-1;
+}
+void
+GD73Codeplug::ScanListElement::setRevertZoneIndex(unsigned int idx) {
+  setUInt8(Offset::txChannelZone(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearRevertZoneIndex() {
+  setUInt8(Offset::txChannelZone(), 0);
+}
+bool
+GD73Codeplug::ScanListElement::hasRevertChannelIndex() const {
+  return 0 != getUInt8(Offset::txChannelChannel());
+}
+unsigned
+GD73Codeplug::ScanListElement::revertChannelIndex() const {
+  return getUInt8(Offset::txChannelChannel())-1;
+}
+void
+GD73Codeplug::ScanListElement::setRevertChannelIndex(unsigned int idx) {
+  setUInt8(Offset::txChannelChannel(), idx+1);
+}
+void
+GD73Codeplug::ScanListElement::clearRevertChannelIndex() {
+  setUInt8(Offset::txChannelChannel(), 0);
+}
+
+Interval
+GD73Codeplug::ScanListElement::rxHoldTime() const {
+  return Interval::fromMilliseconds(500*getUInt8(Offset::holdTime()));
+}
+void
+GD73Codeplug::ScanListElement::setRXHoldTime(const Interval &interval) {
+  setUInt8(Offset::holdTime(), Limit::holdTime().map(interval).milliseconds()/500);
+}
+
+Interval
+GD73Codeplug::ScanListElement::txHoldTime() const {
+  return Interval::fromMilliseconds(500*getUInt8(Offset::txHoldTime()));
+}
+void
+GD73Codeplug::ScanListElement::setTXHoldTime(const Interval &interval) {
+  setUInt8(Offset::txHoldTime(), Limit::holdTime().map(interval).milliseconds()/500);
+}
+
+ScanList *
+GD73Codeplug::ScanListElement::toScanList(Context &ctx, const ErrorStack &err) {
+  return new ScanList(name());
+}
+bool
+GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  if ((ChannelMode::Fixed == primaryChannelMode()) && hasPrimaryChannelIndex()) {
+    if (! ctx.has<Channel>(primaryChannelIndex())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Cannot resolve primary channel index " << primaryChannelIndex() << ".";
+      return false;
+    }
+    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+  } else if (ChannelMode::Selected == primaryChannelMode()) {
+    lst->setPrimaryChannel(SelectedChannel::get());
+  }
+
+  if ((ChannelMode::Fixed == secondaryChannelMode()) && hasSecondaryChannelIndex()) {
+    if (! ctx.has<Channel>(secondaryChannelIndex())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Cannot resolve secondary channel index " << secondaryChannelIndex() << ".";
+      return false;
+    }
+    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+  } else if (ChannelMode::Selected == secondaryChannelMode()) {
+    lst->setSecondaryChannel(SelectedChannel::get());
+  }
+
+  if ((ChannelMode::Fixed == revertChannelMode()) && hasRevertChannelIndex()) {
+    if (! ctx.has<Channel>(revertChannelIndex())) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Cannot resolve revert channel index " << revertChannelIndex() << ".";
+      return false;
+    }
+    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+  } else if (ChannelMode::Selected == revertChannelMode()) {
+    lst->setRevertChannel(SelectedChannel::get());
+  }
+
+  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  for (unsigned int i=0; i<count; i++) {
+    unsigned int index = getUInt16_le(Offset::members() + i*Offset::betweenMembers());
+    if (0 == index)
+      continue;
+    if (! ctx.has<Channel>(index-1)) {
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Cannot resolve member index" << index-1 << ".";
+      return false;
+    }
+    lst->addChannel(ctx.get<Channel>(index-1));
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug
  * ********************************************************************************************* */
 GD73Codeplug::GD73Codeplug(QObject *parent)
@@ -1367,12 +1634,18 @@ GD73Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::createScanLists(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! ScanListBankElement(data(Offset::scanLists())).createScanLists(ctx, err)) {
+    errMsg(err) << "Cannot create scan-lists.";
+    return false;
+  }
   return true;
 }
 
 bool
 GD73Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! ScanListBankElement(data(Offset::scanLists())).linkScanLists(ctx, err)) {
+    errMsg(err) << "Cannot link scan-lists.";
+    return false;
+  }
   return true;
 }

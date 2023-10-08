@@ -935,6 +935,12 @@ public:
    * @verbinclude gd73_scan_list_element.txt */
   class ScanListElement: public Element
   {
+  public:
+    /** Possible priority/revert channel modes. */
+    enum class ChannelMode {
+      None=0, Fixed=1, Selected=2
+    };
+
   protected:
     /** Hidden constructor. */
     ScanListElement(uint8_t *ptr, size_t size);
@@ -946,6 +952,88 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x005f; }
 
+    /** Returns the name of the scan list. */
+    QString name() const;
+    /** Sets the name of the scan list. */
+    void setName(const QString &name);
+
+    /** Returns the primary channel mode. */
+    ChannelMode primaryChannelMode() const;
+    /** Sets the primary channel mode. */
+    void setPrimaryChannelMode(ChannelMode mode);
+    /** Returns @c true, if a primary zone is set. */
+    bool hasPrimaryZoneIndex() const;
+    /** Returns the primary zone index. */
+    unsigned int primaryZoneIndex() const;
+    /** Sets the primary zone index. */
+    void setPrimaryZoneIndex(unsigned int idx);
+    /** Clears the primary zone index. */
+    void clearPrimaryZoneIndex();
+    /** Returns @c true, if a primary channel is set. */
+    bool hasPrimaryChannelIndex() const;
+    /** Returns the primary channel index. */
+    unsigned int primaryChannelIndex() const;
+    /** Sets the primary channel index. */
+    void setPrimaryChannelIndex(unsigned int idx);
+    /** Clears the primary channel index. */
+    void clearPrimaryChannelIndex();
+
+    /** Returns the secondary channel mode. */
+    ChannelMode secondaryChannelMode() const;
+    /** Sets the secondary channel mode. */
+    void setSecondaryChannelMode(ChannelMode mode);
+    /** Returns @c true, if a secondary zone is set. */
+    bool hasSecondaryZoneIndex() const;
+    /** Returns the secondary zone index. */
+    unsigned int secondaryZoneIndex() const;
+    /** Sets the secondary zone index. */
+    void setSecondaryZoneIndex(unsigned int idx);
+    /** Clears the secondary zone index. */
+    void clearSecondaryZoneIndex();
+    /** Returns @c true, if a secondary channel is set. */
+    bool hasSecondaryChannelIndex() const;
+    /** Returns the secondary channel index. */
+    unsigned int secondaryChannelIndex() const;
+    /** Sets the secondary channel index. */
+    void setSecondaryChannelIndex(unsigned int idx);
+    /** Clears the secondary channel index. */
+    void clearSecondaryChannelIndex();
+
+    /** Returns the revert channel mode. */
+    ChannelMode revertChannelMode() const;
+    /** Sets the revert channel mode. */
+    void setRevertChannelMode(ChannelMode mode);
+    /** Returns @c true, if a revert zone is set. */
+    bool hasRevertZoneIndex() const;
+    /** Returns the revert zone index. */
+    unsigned int revertZoneIndex() const;
+    /** Sets the revert zone index. */
+    void setRevertZoneIndex(unsigned int idx);
+    /** Clears the revert zone index. */
+    void clearRevertZoneIndex();
+    /** Returns @c true, if a revert channel is set. */
+    bool hasRevertChannelIndex() const;
+    /** Returns the revert channel index. */
+    unsigned int revertChannelIndex() const;
+    /** Sets the revert channel index. */
+    void setRevertChannelIndex(unsigned int idx);
+    /** Clears the revert channel index. */
+    void clearRevertChannelIndex();
+
+    /** Returns the RX hold time. */
+    Interval rxHoldTime() const;
+    /** Sets the RX hold time. */
+    void setRXHoldTime(const Interval &interval);
+    /** Returns the TX hold time. */
+    Interval txHoldTime() const;
+    /** Sets the TX hold time. */
+    void setTXHoldTime(const Interval &interval);
+
+    /** Constructs a ScanList from this elemet. */
+    ScanList *toScanList(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links a decoded scan list. */
+    bool linkScanList(ScanList *lst, Context&ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits. */
     struct Limit {
@@ -953,6 +1041,10 @@ public:
       static constexpr unsigned int nameLength()                          { return 8; }
       /** The maximum number of members. */
       static constexpr unsigned int memberCount()                         { return 32; }
+      /** The range of hold times. */
+      static TimeRange holdTime() {
+        return TimeRange{Interval::fromSeconds(0), Interval::fromSeconds(10)};
+      }
     };
 
   protected:
@@ -997,6 +1089,11 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x601; }
+
+    /** Creates all encoded scan lists, also updates context. */
+    bool createScanLists(Context &ctx, const ErrorStack &err);
+    /** Links all decoded scan lists. */
+    bool linkScanLists(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits. */
