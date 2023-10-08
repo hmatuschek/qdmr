@@ -6,6 +6,8 @@
 #include "ranges.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
+#include "channel.hh"
+#include "zone.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
@@ -423,6 +425,16 @@ public:
     /** Returns the size of the zone element. */
     static constexpr unsigned int size() { return 0x0031; }
 
+    /** Returns the name of the zone. */
+    QString name() const;
+    /** Sets the name of the zone. */
+    void setName(const QString &name);
+
+    /** Decodes the zone element. */
+    Zone *toZone(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the decoded zone */
+    bool linkZone(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits for the element. */
     struct Limit {
@@ -437,8 +449,8 @@ public:
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()                                  { return 0x0000; }
-      static constexpr unsigned int channeCount()                           { return 0x0020; }
-      static constexpr unsigned int channelIndices()                        { return 0x0021; }
+      static constexpr unsigned int channeCount()                           { return 0x0010; }
+      static constexpr unsigned int channelIndices()                        { return 0x0011; }
       static constexpr unsigned int betweenChannelIndices()                 { return 0x0002; }
       /// @endcond
     };
@@ -463,6 +475,11 @@ public:
 
     /** Returns the size of the zone bank element. */
     static constexpr unsigned int size() { return 0x0c41; }
+
+    /** Creates all encoded zones, also updates the context. */
+    bool createZones(Context &ctx, const ErrorStack &err);
+    /** Links all decoded zones. */
+    bool linkZones(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits for the zone bank. */
@@ -494,11 +511,153 @@ public:
     ChannelElement(uint8_t *ptr, size_t size);
 
   public:
+    /** Possible channel types. */
+    enum class Type {
+      FM = 0, DMR = 1
+    };
+    /** Possible admit criteria. */
+    enum class Admit {
+      Always = 0, CC_CTCSS = 1, Free=2
+    };
+
+  public:
     /** Constructor. */
     ChannelElement(uint8_t *ptr);
 
     /** Returns the size of the channel element. */
     static constexpr unsigned int size() { return 0x0046; }
+
+    /** Returns the name of the channel. */
+    QString name() const;
+    /** Sets the channel name. */
+    void setName(const QString &name);
+
+    /** Returns the bandwidth of the channel. */
+    FMChannel::Bandwidth bandwidth() const;
+    /** Sets the bandwidth. */
+    void setBandwidth(FMChannel::Bandwidth bandwidth);
+
+    /** Returns @c true, if a scan list index is set. */
+    bool hasScanListIndex() const;
+    /** Returns the index of the scan list. */
+    unsigned int scanListIndex() const;
+    /** Sets the scan list index. */
+    void setScanListIndex(unsigned int idx);
+    /** Clears the scan list index. */
+    void clearScanListIndex();
+
+    /** Returns the channel type. */
+    Type type() const;
+    /** Sets the channel type. */
+    void setType(Type type);
+
+    /** Returns @c true if talkaround is enabled. */
+    bool talkaroundEnabled() const;
+    /** Enable/disable talkaround. */
+    void enableTalkaround(bool enable);
+
+    /** Returns @c true if RX only is enabled. */
+    bool rxOnly() const;
+    /** Enables/disables RX only. */
+    void enableRXOnly(bool enable);
+
+    /** Returns @c true if scan auto-start is enabled. */
+    bool scanAutoStartEnabled() const;
+    /** Enables/disables scan auto-start. */
+    void enableScanAutoStart(bool enable);
+
+    /** Returns the RX frequency. */
+    Frequency rxFrequency() const;
+    /** Sets the RX frequency. */
+    void setRXFrequency(const Frequency &f);
+    /** Returns the TX frequency. */
+    Frequency txFrequency() const;
+    /** Sets the TX frequency. */
+    void setTXFrequency(const Frequency &f);
+
+    /** Returns @c true if channel has DTMF PTT settings index. */
+    bool hasDTMFPTTSettingsIndex() const;
+    /** Returns the DTMF PTT settings index. */
+    unsigned int dtmfPTTSettingsIndex() const;
+    /** Sets the DTMF PTT settings index. */
+    void setDTMFPTTSettingsIndex(unsigned int idx);
+    /** Resets the DTMF PTT settings index. */
+    void clearDTMFPTTSettingsIndex();
+
+
+    /** Returns the power setting. */
+    Channel::Power power() const;
+    /** Sets the power. */
+    void setPower(Channel::Power power);
+
+    /** Returns the admit criterion. */
+    Admit admit() const;
+    /** Sets the admit criterion. */
+    void setAdmit(Admit admit);
+
+    /** Returns the RX tone. */
+    Signaling::Code rxTone() const;
+    /** Sets the RX tone. */
+    void setRXTone(Signaling::Code code);
+    /** Returns the TX tone. */
+    Signaling::Code txTone() const;
+    /** Sets the TX tone. */
+    void setTXTone(Signaling::Code code);
+
+    /** Returns the time slot. */
+    DMRChannel::TimeSlot timeSlot() const;
+    /** Sets the time slot. */
+    void setTimeSlot(DMRChannel::TimeSlot ts);
+
+    /** Returns the color code. */
+    unsigned int colorCode() const;
+    /** Sets the color code. */
+    void setColorCode(unsigned int cc);
+
+    /** Returns @c true, if group list matches current TX contact. */
+    bool groupListMatchesContact() const;
+    /** Returns @c true, if no group list match is needed (monitor). */
+    bool groupListAllMatch() const;
+    /** Returns the group list index. */
+    unsigned int groupListIndex() const;
+    /** Sets the group list index. */
+    void setGroupListIndex(unsigned int idx);
+    /** Enables, that no group list match is needed (monitor). */
+    void setGroupListAllMatch();
+    /** Enables, that the group list matches the current TX contact. */
+    void setGroupListMatchesContact();
+
+    /** Returns @c true, if the transmit contact is set. */
+    bool hasTXContact() const;
+    /** Returns the tx contact index. */
+    unsigned int txContactIndex() const;
+    /** Sets the transmit contact index. */
+    void setTXContactIndex(unsigned int idx);
+    /** Clears the transmit contact index. */
+    void clearTXContactIndex();
+
+    /** Returns @c true if an emergency system index is set. */
+    bool hasEmergencySystemIndex() const;
+    /** Returns the emergency system index. */
+    unsigned int emergencySystemIndex() const;
+    /** Sets the emergency system index. */
+    void setEmergencySystemIndex(unsigned int idx);
+    /** Clears the emergency system index. */
+    void clearEmergencySystemIndex();
+
+    /** Returns @c true if an encryption key index is set. */
+    bool hasEncryptionKeyIndex() const;
+    /** Returns the encryption key index. */
+    unsigned int encryptionKeyIndex() const;
+    /** Sets the encryption key index. */
+    void setEncryptionKeyIndex(unsigned int idx);
+    /** Clears the encryption key index. */
+    void clearEncryptionKeyIndex();
+
+    /** Decodes the channel. */
+    Channel *toChannel(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links decoded channel. */
+    bool linkChannel(Channel *ch, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the channel. */
@@ -559,18 +718,24 @@ public:
     /** Returns the size of the channel bank. */
     static constexpr unsigned int size() { return 0x11802; }
 
+    /** Creates the encoded channels, also updates context. */
+    bool createChannels(Context &ctx, const ErrorStack &err);
+    /** Link all decoded channels. */
+    bool linkChannels(Context &ctx, const ErrorStack &err);
+
   public:
     /** Some limits for the channel bank. */
     struct Limit {
       /** Maximum number of channels. */
       static constexpr unsigned int channelCount()                          { return 1024; }
     };
+
   protected:
     /** Internal offsets within the bank. */
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int channelCount()                          { return 0x0000; }
-      static constexpr unsigned int channels()                              { return 0x0001; }
+      static constexpr unsigned int channels()                              { return 0x0002; }
       static constexpr unsigned int betweenChannels()                       { return ChannelElement::size(); }
       /// @endcond
     };
@@ -665,7 +830,7 @@ public:
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int contactCount()                          { return 0x0000; }
-      static constexpr unsigned int contacts()                              { return 0x0804; }
+      static constexpr unsigned int contacts()                              { return 0x0802; }
       static constexpr unsigned int betweenContacts()                       { return ContactElement::size(); }
       /// @endcond
     };
