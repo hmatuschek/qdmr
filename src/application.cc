@@ -660,7 +660,7 @@ Application::uploadCodeplug() {
     progress->setVisible(false);
   }
 
-  delete intermediate;
+  //delete intermediate;
 }
 
 void

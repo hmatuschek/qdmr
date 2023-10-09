@@ -88,6 +88,8 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
     _dev->moveToThread(this);
+  //_config->moveToThread(this);
+
   start();
 
   return true;
