@@ -6,6 +6,8 @@
 
 class GD73Interface: public C7000Device, public RadioInterface
 {
+  Q_OBJECT
+
 public:
   /** Constructs a new interface to GD73A/E radios. If a matching device was found, @c isOpen
    * returns @c true. */

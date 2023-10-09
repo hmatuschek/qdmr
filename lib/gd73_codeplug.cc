@@ -396,7 +396,7 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   // Create radio ID
   DMRRadioID *radioID = new DMRRadioID(name(), dmrID());
   ctx.config()->radioIDs()->add(radioID);
-  ctx.config()->radioIDs()->setDefaultId(0);
+  ctx.config()->settings()->setDefaultId(radioID);
   ctx.add(radioID, 0);
 
   // Apply settings
@@ -994,6 +994,8 @@ GD73Codeplug::ChannelElement::clearEncryptionKeyIndex() {
 
 Channel *
 GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+
   Channel *ch = nullptr;
 
   if (Type::FM == type()) {
@@ -1368,8 +1370,10 @@ GD73Codeplug::ScanListElement::setTXHoldTime(const Interval &interval) {
 
 ScanList *
 GD73Codeplug::ScanListElement::toScanList(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   return new ScanList(name());
 }
+
 bool
 GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const ErrorStack &err) {
   if ((ChannelMode::Fixed == primaryChannelMode()) && hasPrimaryChannelIndex()) {
