@@ -1,4 +1,5 @@
 #include "radiosettings.hh"
+#include "radioid.hh"
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
@@ -145,6 +146,16 @@ RadioSettings::disableTOT() {
 DMRRadioIDReference *
 RadioSettings::defaultIdRef() const {
   return _defaultId;
+}
+DMRRadioID *
+RadioSettings::defaultId() const {
+  if (_defaultId->isNull())
+    return nullptr;
+  return _defaultId->as<DMRRadioID>();
+}
+void
+RadioSettings::setDefaultId(DMRRadioID *id) {
+  _defaultId->set(id);
 }
 
 TyTSettingsExtension *

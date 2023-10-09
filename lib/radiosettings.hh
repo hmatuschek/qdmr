@@ -98,6 +98,10 @@ public:
 
   /** Retruns a reference to the default DMR radio Id. */
   DMRRadioIDReference *defaultIdRef() const;
+  /** Returns the default DMR ID or nullptr, if non is set. */
+  DMRRadioID *defaultId() const;
+  /** Sets the default DMR ID. */
+  void setDefaultId(DMRRadioID *id);
 
   /** Returns the TyT device specific radio settings. */
   TyTSettingsExtension *tytExtension() const;

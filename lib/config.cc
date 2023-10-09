@@ -406,11 +406,12 @@ bool
 Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   // radio IDs must be linked before settings, as they may refer to the default DMR ID
 
-  if (! _radioIDs->link(node["radioIDs"], ctx, err))
+  if (node["radioIDs"] && (! _radioIDs->link(node["radioIDs"], ctx, err)))
     return false;
 
-  if (! _settings->link(node["settings"], ctx, err))
-    return false;
+  if (node["settings"])
+    if (!_settings->link(node["settings"], ctx, err))
+      return false;
 
   if (node["contacts"] && (! _contacts->link(node["contacts"], ctx, err)))
     return false;

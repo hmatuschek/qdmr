@@ -1,6 +1,8 @@
 #include "radioid.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include "config.hh"
+#include "radiosettings.hh"
 
 
 /* ********************************************************************************************* *
@@ -192,7 +194,11 @@ RadioIDList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<DMRRadioID>()))
     return -1;
 
-  return ConfigObjectList::add(obj, row, unique);
+  int idx = ConfigObjectList::add(obj, row, unique);
+  if (parent() && obj->is<DMRRadioID>() && qobject_cast<Config*>(parent())->settings()->defaultIdRef()->isNull())
+    qobject_cast<Config*>(parent())->settings()->setDefaultId(obj->as<DMRRadioID>());
+
+  return idx;
 }
 
 int
