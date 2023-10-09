@@ -1700,9 +1700,9 @@ RadioddityCodeplug::GeneralSettingsElement::clearProgPassword() {
 
 bool
 RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Context &ctx) {
-  if (conf->radioIDs()->defaultId()) {
-    setName(conf->radioIDs()->defaultId()->name());
-    setRadioID(conf->radioIDs()->defaultId()->number());
+  if (! conf->settings()->defaultIdRef()->isNull()) {
+    setName(conf->settings()->defaultIdRef()->as<DMRRadioID>()->name());
+    setRadioID(conf->settings()->defaultIdRef()->as<DMRRadioID>()->number());
   } else if (conf->radioIDs()->count()) {
     setName(conf->radioIDs()->getId(0)->name());
     setRadioID(conf->radioIDs()->getId(0)->number());
@@ -1756,12 +1756,12 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
 bool
 RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &ctx) {
   Q_UNUSED(ctx)
-  if (! conf->radioIDs()->defaultId()) {
+  if (conf->settings()->defaultIdRef()->isNull()) {
     int idx = conf->radioIDs()->add(new DMRRadioID(name(), radioID()));
-    conf->radioIDs()->setDefaultId(idx);
+    conf->settings()->defaultIdRef()->set(conf->radioIDs()->getId(idx));
   } else {
-    conf->radioIDs()->defaultId()->setName(name());
-    conf->radioIDs()->defaultId()->setNumber(radioID());
+    conf->settings()->defaultIdRef()->as<DMRRadioID>()->setName(name());
+    conf->settings()->defaultIdRef()->as<DMRRadioID>()->setNumber(radioID());
   }
   conf->settings()->setVOX(voxSensitivity());
   // There is no global squelch settings either, so set it to 1
@@ -2689,7 +2689,7 @@ RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
 bool
 RadioddityCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
-  if (nullptr == config->radioIDs()->defaultId()) {
+  if (config->settings()->defaultIdRef()->isNull()) {
     errMsg(err) << "No default radio ID specified.";
     return false;
   }
