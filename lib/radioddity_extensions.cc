@@ -4,16 +4,19 @@
  * Implementation of RadiodditySettingsExtension
  * ********************************************************************************************* */
 RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
-  : ConfigExtension(parent), _preambleDuration(360), _monitorType(MonitorType::Silent),
-    _lowBatteryWarnInterval(30), _callAlertDuration(120), _loneWorkerResponseTime(1),
-    _loneWorkerReminderPeriod(10), _groupCallHangTime(3000), _privateCallHangTime(3000),
+  : ConfigExtension(parent), _preambleDuration(Interval::fromMilliseconds(360)),
+    _monitorType(MonitorType::Silent), _lowBatteryWarnInterval(Interval::fromSeconds(30)),
+    _callAlertDuration(Interval::fromSeconds(120)),
+    _loneWorkerResponseTime(Interval::fromMinutes(1)),
+    _loneWorkerReminderPeriod(Interval::fromSeconds(10)),
+    _groupCallHangTime(Interval::fromMilliseconds(3000)),
+    _privateCallHangTime(Interval::fromMilliseconds(3000)),
     _downChannelModeVFO(false), _upChannelModeVFO(false), _resetTone(false),
     _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
     _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
     _disableAllTones(false), _powerSaveMode(true), _wakeupPreamble(true), _disableAllLEDs(false),
     _quickKeyOverrideInhibited(false), _txExitTone(false), _txOnActiveChannel(true),
-    _animation(false), _scanMode(ScanMode::Time), _repeaterEndDelay(0), _repeaterSTE(0),
-    _progPasswd()
+    _animation(false), _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _progPasswd()
 {
   // pass...
 }
@@ -28,12 +31,12 @@ RadiodditySettingsExtension::clone() const {
   return ext;
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::preambleDuration() const {
   return _preambleDuration;
 }
 void
-RadiodditySettingsExtension::setPreambleDuration(unsigned ms) {
+RadiodditySettingsExtension::setPreambleDuration(Interval ms) {
   if (_preambleDuration == ms)
     return;
   _preambleDuration = ms;
@@ -52,72 +55,72 @@ RadiodditySettingsExtension::setMonitorType(MonitorType type) {
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::lowBatteryWarnInterval() const {
   return _lowBatteryWarnInterval;
 }
 void
-RadiodditySettingsExtension::setLowBatteryWarnInterval(unsigned sec) {
+RadiodditySettingsExtension::setLowBatteryWarnInterval(Interval sec) {
   if (_lowBatteryWarnInterval == sec)
     return;
   _lowBatteryWarnInterval = sec;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::callAlertDuration() const {
   return _callAlertDuration;
 }
 void
-RadiodditySettingsExtension::setCallAlertDuration(unsigned sec) {
+RadiodditySettingsExtension::setCallAlertDuration(Interval sec) {
   if (_callAlertDuration == sec)
     return;
   _callAlertDuration = sec;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::loneWorkerResponseTime() const {
   return _loneWorkerResponseTime;
 }
 void
-RadiodditySettingsExtension::setLoneWorkerResponseTime(unsigned min) {
+RadiodditySettingsExtension::setLoneWorkerResponseTime(Interval min) {
   if (_loneWorkerResponseTime == min)
     return;
   _loneWorkerResponseTime = min;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::loneWorkerReminderPeriod() const {
   return _loneWorkerReminderPeriod;
 }
 void
-RadiodditySettingsExtension::setLoneWorkerReminderPeriod(unsigned sec) {
+RadiodditySettingsExtension::setLoneWorkerReminderPeriod(Interval sec) {
   if (_loneWorkerReminderPeriod == sec)
     return;
   _loneWorkerReminderPeriod = sec;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::groupCallHangTime() const {
   return _groupCallHangTime;
 }
 void
-RadiodditySettingsExtension::setGroupCallHangTime(unsigned ms) {
+RadiodditySettingsExtension::setGroupCallHangTime(Interval ms) {
   if (_groupCallHangTime == ms)
     return;
   _groupCallHangTime = ms;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::privateCallHangTime() const {
   return _privateCallHangTime;
 }
 void
-RadiodditySettingsExtension::setPrivateCallHangTime(unsigned ms) {
+RadiodditySettingsExtension::setPrivateCallHangTime(Interval ms) {
   if (_privateCallHangTime == ms)
     return;
   _privateCallHangTime = ms;
@@ -340,24 +343,24 @@ RadiodditySettingsExtension::setScanMode(ScanMode mode) {
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::repeaterEndDelay() const {
   return _repeaterEndDelay;
 }
 void
-RadiodditySettingsExtension::setRepeaterEndDelay(unsigned delay) {
+RadiodditySettingsExtension::setRepeaterEndDelay(Interval delay) {
   if (_repeaterEndDelay == delay)
     return;
   _repeaterEndDelay = delay;
   emit modified(this);
 }
 
-unsigned
+Interval
 RadiodditySettingsExtension::repeaterSTE() const {
   return _repeaterSTE;
 }
 void
-RadiodditySettingsExtension::setRepeaterSTE(unsigned ste) {
+RadiodditySettingsExtension::setRepeaterSTE(Interval ste) {
   if (_repeaterSTE == ste)
     return;
   _repeaterSTE = ste;

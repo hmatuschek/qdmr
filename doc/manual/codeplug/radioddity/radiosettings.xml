@@ -21,14 +21,14 @@
   <programlisting><![CDATA[settings:
   [...]
   radioddity:
-    preambleDuration: 360
+    preambleDuration: 360ms
     monitorType: Open
-    lowBatteryWarnInterval: 30
-    callAlertDuration: 120
-    loneWorkerResponseTime: 1
-    loneWorkerReminderPeriod: 10
-    groupCallHangTime: 3000
-    privateCallHangTime: 3000
+    lowBatteryWarnInterval: 30s
+    callAlertDuration: 120s
+    loneWorkerResponseTime: 1min
+    loneWorkerReminderPeriod: 10s
+    groupCallHangTime: 3000ms
+    privateCallHangTime: 3000ms
     downChannelModeVFO: false
     upChannelModeVFO: false
     resetTone: false
@@ -47,8 +47,8 @@
     txOnActiveChannel: false
     animation: false
     scanMode: Time
-    repeaterEndDelay: 0
-    repeaterSTE: 0
+    repeaterEndDelay: 0s
+    repeaterSTE: 0s
     progPassword: ""
 ]]></programlisting>
 </example>
