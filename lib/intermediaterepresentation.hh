@@ -47,15 +47,20 @@ protected:
 };
 
 
+/** Fitlers instance by meta object.
+ * This visitor can be used to remove elements from the abstract codeplug, not supported by the
+ * target device. */
 class ObjectFilterVisitor: public Visitor
 {
 public:
+  /** Constructor from initializer list of Qt meta objects. */
   explicit ObjectFilterVisitor(const std::initializer_list<QMetaObject> &types);
 
   bool processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err);
   bool processList(AbstractConfigObjectList *list, const ErrorStack &err);
 
 protected:
+  /** The list of filtered types. */
   QList<QMetaObject> _filter;
 };
 

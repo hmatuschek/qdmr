@@ -798,7 +798,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
-    if (rid == ctx.config()->radioIDs()->defaultId())
+    if (rid == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>())
       dc->setRadioIdObj(DefaultRadioID::get());
     else
       dc->setRadioIdObj(rid);
@@ -898,11 +898,11 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setGroupListIndex(ctx.index(dc->groupListObj()));
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
-      if (nullptr == ctx.config()->radioIDs()->defaultId()) {
+      if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {
         logWarn() << "No default radio ID set: using index 0.";
         setRadioIDIndex(0);
       } else {
-        setRadioIDIndex(ctx.index(ctx.config()->radioIDs()->defaultId()));
+        setRadioIDIndex(ctx.index(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()));
       }
     } else {
       setRadioIDIndex(ctx.index(dc->radioIdObj()));
