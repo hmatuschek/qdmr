@@ -1,6 +1,8 @@
 #include "radioid.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include "config.hh"
+#include "radiosettings.hh"
 
 
 /* ********************************************************************************************* *
@@ -161,14 +163,13 @@ DTMFRadioID::setNumber(const QString &number) {
  * Implementation of RadioIDList
  * ********************************************************************************************* */
 RadioIDList::RadioIDList(QObject *parent)
-  : ConfigObjectList(DMRRadioID::staticMetaObject, parent), _default(nullptr)
+  : ConfigObjectList(DMRRadioID::staticMetaObject, parent)
 {
   // pass...
 }
 
 void
 RadioIDList::clear() {
-  setDefaultId(-1);
   ConfigObjectList::clear();
 }
 
@@ -177,11 +178,6 @@ RadioIDList::getId(int idx) const {
   if (ConfigItem *obj = get(idx))
     return obj->as<DMRRadioID>();
   return nullptr;
-}
-
-DMRRadioID *
-RadioIDList::defaultId() const {
-  return _default;
 }
 
 DMRRadioID *
@@ -198,42 +194,16 @@ RadioIDList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<DMRRadioID>()))
     return -1;
 
-  bool was_empty = (0 == count());
   int idx = ConfigObjectList::add(obj, row, unique);
-  if (0 > idx)
-    return idx;
-  // automatically select first added ID as default
-  if (was_empty && (nullptr == _default)) {
-    logDebug() << "Automatically set default radio id to " << obj->as<DMRRadioID>()->name() << ".";
-    setDefaultId(idx);
-  }
+  if (parent() && obj->is<DMRRadioID>() && qobject_cast<Config*>(parent())->settings()->defaultIdRef()->isNull())
+    qobject_cast<Config*>(parent())->settings()->setDefaultId(obj->as<DMRRadioID>());
+
   return idx;
 }
 
 int
 RadioIDList::addId(const QString &name, uint32_t id) {
   return add(new DMRRadioID(name, id, this));
-}
-
-bool
-RadioIDList::setDefaultId(int idx) {
-  if (_default) {
-    disconnect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
-    if (0 <= indexOf(_default))
-      emit elementModified(indexOf(_default));
-  }
-
-  if (0 > idx) {
-    _default = nullptr;
-    return true;
-  }
-
-  _default = getId(idx);
-  if (nullptr == _default)
-    return false;
-  connect(_default, SIGNAL(destroyed(QObject*)), this, SLOT(onDefaultIdDeleted()));
-  emit elementModified(idx);
-  return true;
 }
 
 bool
@@ -266,7 +236,3 @@ RadioIDList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
   return nullptr;
 }
 
-void
-RadioIDList::onDefaultIdDeleted() {
-  _default = nullptr;
-}

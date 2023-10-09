@@ -14,9 +14,14 @@ public:
   explicit ConfigTest(QObject *parent = nullptr);
 
 private slots:
+  void initTestCase();
+
   void testImmediateRefInvalidation();
 
   void testCloneChannelBasic();
+
+  /** Regression test for issue #388. */
+  void testMultipleRadioIDs();
 
   void testMelodyLilypond();
   void testMelodyEncoding();
