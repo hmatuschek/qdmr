@@ -659,8 +659,6 @@ Application::uploadCodeplug() {
     ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
-
-  //delete intermediate;
 }
 
 void
