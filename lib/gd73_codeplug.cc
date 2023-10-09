@@ -1475,11 +1475,6 @@ GD73Codeplug::decode(Config *config, const ErrorStack &err) {
     return false;
   }
 
-  if (! createContacts(ctx, err)) {
-    errMsg(err) << "Cannot decode codeplug.";
-    return false;
-  }
-
   if (! createGroupLists(ctx, err)) {
     errMsg(err) << "Cannot decode codeplug.";
     return false;
