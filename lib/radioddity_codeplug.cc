@@ -1716,14 +1716,14 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
 
   // Handle Radioddity extension
   if (RadiodditySettingsExtension *ext = conf->settings()->radioddityExtension()) {
-    setPreambleDuration(ext->preambleDuration());
+    setPreambleDuration(ext->preambleDuration().milliseconds());
     setMonitorType(ext->monitorType());
-    setLowBatteryWarnInterval(ext->lowBatteryWarnInterval());
-    setCallAlertDuration(ext->callAlertDuration());
-    setLoneWorkerResponsePeriod(ext->loneWorkerResponseTime());
-    setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod());
-    setGroupCallHangTime(ext->groupCallHangTime());
-    setPrivateCallHangTime(ext->privateCallHangTime());
+    setLowBatteryWarnInterval(ext->lowBatteryWarnInterval().seconds());
+    setCallAlertDuration(ext->callAlertDuration().seconds());
+    setLoneWorkerResponsePeriod(ext->loneWorkerResponseTime().minutes());
+    setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod().seconds());
+    setGroupCallHangTime(ext->groupCallHangTime().milliseconds());
+    setPrivateCallHangTime(ext->privateCallHangTime().milliseconds());
     enableDownChannelModeVFO(ext->downChannelModeVFO());
     enableUpChannelModeVFO(ext->upChannelModeVFO());
     enableResetTone(ext->resetTone());
@@ -1742,8 +1742,8 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
     enableTXOnActiveChannel(ext->txOnActiveChannel());
     enableAnimation(ext->animation());
     setScanMode(ext->scanMode());
-    setRepeaterEndDelay(ext->repeaterEndDelay());
-    setRepeaterSTE(ext->repeaterSTE());
+    setRepeaterEndDelay(ext->repeaterEndDelay().seconds());
+    setRepeaterSTE(ext->repeaterSTE().seconds());
     if (ext->progPassword().isEmpty())
       clearProgPassword();
     else
@@ -1774,14 +1774,14 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
     conf->settings()->setRadioddityExtension(ext);
   }
   // Update settings extension
-  ext->setPreambleDuration(preambleDuration());
+  ext->setPreambleDuration(Interval::fromMilliseconds(preambleDuration()));
   ext->setMonitorType(monitorType());
-  ext->setLowBatteryWarnInterval(lowBatteryWarnInterval());
-  ext->setCallAlertDuration(callAlertDuration());
-  ext->setLoneWorkerResponseTime(loneWorkerResponsePeriod());
-  ext->setLoneWorkerReminderPeriod(loneWorkerReminderPeriod());
-  ext->setGroupCallHangTime(groupCallHangTime());
-  ext->setPrivateCallHangTime(privateCallHangTime());
+  ext->setLowBatteryWarnInterval(Interval::fromSeconds(lowBatteryWarnInterval()));
+  ext->setCallAlertDuration(Interval::fromSeconds(callAlertDuration()));
+  ext->setLoneWorkerResponseTime(Interval::fromMinutes(loneWorkerResponsePeriod()));
+  ext->setLoneWorkerReminderPeriod(Interval::fromSeconds(loneWorkerReminderPeriod()));
+  ext->setGroupCallHangTime(Interval::fromMilliseconds(groupCallHangTime()));
+  ext->setPrivateCallHangTime(Interval::fromMilliseconds(privateCallHangTime()));
   ext->enableDownChannelModeVFO(downChannelModeVFO());
   ext->enableUpChannelModeVFO(upChannelModeVFO());
   ext->enableResetTone(resetTone());
@@ -1800,8 +1800,8 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
   ext->enableTXOnActiveChannel(txOnActiveChannel());
   ext->enableAnimation(animation());
   ext->setScanMode(scanMode());
-  ext->setRepeaterEndDelay(repeaterEndDelay());
-  ext->setRepeaterSTE(repeaterSTE());
+  ext->setRepeaterEndDelay(Interval::fromSeconds(repeaterEndDelay()));
+  ext->setRepeaterSTE(Interval::fromSeconds(repeaterSTE()));
   if (hasProgPassword())
     ext->setProgPassword(progPassword());
   else
