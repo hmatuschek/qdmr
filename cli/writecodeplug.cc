@@ -87,10 +87,8 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(intermediate, true, flags, err)) {
     logError() << "Codeplug upload error: " << err.format();
-    delete intermediate;
     return -1;
   }
-  delete intermediate;
 
   if (Radio::StatusError == radio->status()) {
     logError() << "Codeplug upload error: " << err.format();

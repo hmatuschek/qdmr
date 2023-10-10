@@ -21,7 +21,7 @@ ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop,
   if (prop.isEnumType() || (QString("bool") == prop.typeName())
       || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
       || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
-      || (QString("Frequency") == prop.typeName())) {
+      || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())) {
     if (! Visitor::processProperty(item, prop, err))
       return false;
     // Get clone

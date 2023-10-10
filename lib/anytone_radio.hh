@@ -78,7 +78,7 @@ protected:
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
   Codeplug::Flags _codeplugFlags;
-  /** The generic configuration. */
+  /** Owns the generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */
   UserDatabase *_userDB;

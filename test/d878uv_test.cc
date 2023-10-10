@@ -149,10 +149,18 @@ D878UVTest::testHangTime() {
   // Encode
   D878UVCodeplug codeplug;
   Codeplug::Flags flags; flags.updateCodePlug=false;
-  if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
+    QFAIL(QString("Cannot prepare codeplug for AnyTone AT-D878UVE: %1")
           .arg(err.format()).toStdString().c_str());
   }
+
+  if (! codeplug.encode(intermediate, flags, err)) {
+    delete intermediate;
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  delete intermediate;
 
   // Decode
   Config comp_config;

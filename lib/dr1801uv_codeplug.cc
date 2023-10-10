@@ -1603,8 +1603,8 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   Q_UNUSED(err);
 
   // Store radio ID
-  int idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
-  config->radioIDs()->setDefaultId(idx);
+  config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
+  config->settings()->setDefaultId(config->radioIDs()->getId(0));
 
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
@@ -1619,7 +1619,7 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
 bool
 DR1801UVCodeplug::SettingsElement::fromConfig(Config *config, const ErrorStack &err) {
   // Store radio ID
-  DMRRadioID *id = config->radioIDs()->defaultId();
+  DMRRadioID *id = config->settings()->defaultId();
   if (nullptr == id) {
     errMsg(err) << "Cannot encode radio ID and name. No default DMR radio ID.";
     return false;
@@ -3170,7 +3170,7 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // There can only be one DMR radio ID
-  ctx.add(config->radioIDs()->defaultId(), 0);
+  ctx.add(config->settings()->defaultId(), 0);
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {
