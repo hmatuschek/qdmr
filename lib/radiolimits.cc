@@ -817,7 +817,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   if ((0 <= _maxSize) && (_maxSize < plist->count())) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "List '" << prop.name() << "' takes at most " << _minSize
+    msg << "List '" << prop.name() << "' takes at most " << _maxSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
