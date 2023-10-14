@@ -44,6 +44,14 @@ RoamingZone::clear() {
   _channel.clear();
 }
 
+bool
+RoamingZone::contains(const RoamingChannel *ch) const {
+  for (int i=0; i<count(); i++)
+    if (ch == channel(i))
+      return true;
+  return false;
+}
+
 RoamingChannel*
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
