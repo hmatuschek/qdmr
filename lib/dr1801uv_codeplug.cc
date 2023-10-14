@@ -3,6 +3,7 @@
 #include "utils.hh"
 #include "zone.hh"
 #include "config.hh"
+#include "intermediaterepresentation.hh"
 
 #include <QRegularExpression>
 
@@ -3161,6 +3162,42 @@ DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
 {
   addImage("BTECH DR-1801UV Codeplug");
   image(0).addElement(0, Offset::size());
+}
+
+Config *
+DR1801UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *copy = Codeplug::preprocess(config, err);
+  if (nullptr == copy) {
+    errMsg(err) << "Cannot pre-process DR1801A6 codeplug.";
+    return nullptr;
+  }
+
+  // Split dual-zones into two.
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(copy, err)) {
+    errMsg(err) << "Cannot pre-process DR1801A6 codeplug.";
+    delete copy;
+    return nullptr;
+  }
+
+  return copy;
+}
+
+bool
+DR1801UVCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process DR1801A6 codeplug.";
+    return false;
+  }
+
+  // Merge splitted zones into one.
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot post-process DR1801A6 codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 bool

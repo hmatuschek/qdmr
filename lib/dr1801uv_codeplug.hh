@@ -2368,6 +2368,9 @@ public:
   /** Default constructor. */
   explicit DR1801UVCodeplug(QObject *parent = nullptr);
 
+  Config * preprocess(Config *config, const ErrorStack &err) const;
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
   bool encode(Config *config, const Flags &flags, const ErrorStack &err=ErrorStack());
   bool decode(Config *config, const ErrorStack &err=ErrorStack());

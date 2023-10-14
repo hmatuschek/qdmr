@@ -453,7 +453,7 @@ DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
     return false;
   }
 
-  if (((rcode&0x7fff) != CODEPLUG_WRITTEN) || (! response.isSuccessful())) {
+  if (((rcode & 0x7fff) != CODEPLUG_WRITTEN) || (! response.isSuccessful())) {
     errMsg(err) << "Cannot complete codeplug write.";
     return false;
   }
