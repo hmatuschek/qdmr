@@ -458,6 +458,10 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   else
     setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
 
+  setUInt8(0x0024, 0x01);   // < Unknown byte at 0x0024
+  //setUInt8(0x003c, 0x01);
+  //setUInt8(0x003e, 0x01);
+
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext)

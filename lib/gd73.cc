@@ -196,6 +196,9 @@ GD73::upload() {
 
   unsigned bcount = 0;
   if (_codeplugFlags.updateCodePlug) {
+    if (! _dev->read_start(0,0,_errorStack))
+      return false;
+
     // If codeplug gets updated, download codeplug from device first:
     for (int n=0; n<codeplug().image(0).numElements(); n++) {
       int b0 = codeplug().image(0).element(n).address()/BSIZE;
@@ -210,6 +213,8 @@ GD73::upload() {
         emit uploadProgress(float(bcount*50)/btot);
       }
     }
+
+    _dev->read_finish(_errorStack);
   }
 
   // Encode config into codeplug
@@ -217,6 +222,9 @@ GD73::upload() {
     errMsg(_errorStack) << "Codeplug upload failed.";
     return false;
   }
+
+  if (! _dev->write_start(0, 0, _errorStack))
+    return false;
 
   // then, upload modified codeplug
   bcount = 0;
@@ -234,6 +242,8 @@ GD73::upload() {
       emit uploadProgress(50+float(bcount*50)/btot);
     }
   }
+
+  _dev->write_finish(_errorStack);
 
   return true;
 }

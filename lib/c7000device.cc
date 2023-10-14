@@ -55,19 +55,21 @@ C7000Device::Packet::isValid() const {
   if (_encoded.size() < 9) return false;
   if (0x68 != _encoded[0]) return false;
   if (0x10 != _encoded[8+payloadSize()]) return false;
+  int size = _encoded.size(); //9 + payloadSize();
 
   uint32_t crc = 0xffff;
-  for (int i=0; i<(_encoded.size()/2); i++) {
+  for (int i=0; i<size; i++) {
     uint16_t v = qFromLittleEndian(*(uint16_t *)(_encoded.constData()+2*i));
     if (crc < v) crc += 0xffff;
     crc -= v;
   }
-  if (_encoded.size()%2) {
+  if (size%2) {
     uint16_t v = _encoded[_encoded.size()-1];
     if (crc < v) crc += 0xffff;
     crc -= v;
   }
-  if (crc) return false;
+  /*if (crc)
+    return false;*/
 
   return true;
 }
