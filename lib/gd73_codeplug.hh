@@ -1131,6 +1131,41 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x000e; }
 
+    /** Returns the call hang time (private & group). */
+    Interval callHangTime() const;
+    /** Sets the call hang time (private & group). */
+    void setCallHangTime(const Interval &intv);
+
+    /** Returns the active wait time. */
+    Interval activeWaitTime() const;
+    /** Sets the active wait time. */
+    void setActiveWaitTime(const Interval &interval);
+    /** Retruns the number of active reties. */
+    unsigned int activeRetries() const;
+    /** Sets the number of active retries. */
+    void setActiveRetries(unsigned int count);
+
+    /** Retruns the number of TX preambles. */
+    unsigned int txPreambles() const;
+    /** Sets the number of TX preambles. */
+    void setTXPreambles(unsigned int count);
+
+    /** Returns @c true, if decoding of 'disable radio' is enabled. */
+    bool decodeDisableRadioEnabled() const;
+    /** Enables/disables decoding of 'disable radio'. */
+    void enableDecodeDisableRadio(bool enable);
+    /** Returns @c true, if decoding of 'radio check' is enabled. */
+    bool decodeRadioCheckEnabled() const;
+    /** Enables/disables decoding of 'radio check'. */
+    void enableDecodeRadioCheck(bool enable);
+    /** Returns @c true, if decoding of 'enable radio' is enabled. */
+    bool decodeEnableRadioEnabled() const;
+    /** Enables/disables decoding of 'enable radio'. */
+    void enableDecodeEnsableRadio(bool enable);
+
+    /** Updates the radio settings within the config. */
+    bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits. */
     struct Limit {
@@ -1145,7 +1180,7 @@ public:
       /** The range of active retries. */
       static constexpr IntRange activeRetires() { return IntRange{ 1, 10}; }
       /** The maximum number of TX preambles. */
-      static constexpr unsigned int txPreambles() { return 63; }
+      static constexpr IntRange txPreambles() { return IntRange{ 0, 63}; }
     };
 
   protected:

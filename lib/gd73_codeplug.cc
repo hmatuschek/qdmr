@@ -410,6 +410,14 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   else
     ctx.config()->settings()->setTOT(tot().seconds());
 
+  // Get/add radioddity settings extension
+  RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
+  if (! ext)
+    ctx.config()->settings()->setRadioddityExtension(ext = new RadiodditySettingsExtension());
+
+  ext->setLoneWorkerResponseTime(loneWorkerResponseTimeout());
+  ext->setLoneWorkerReminderPeriod(loneWorkerRemindPeriod());
+
   return true;
 }
 
@@ -427,6 +435,95 @@ GD73Codeplug::OneTouchSettingElement::OneTouchSettingElement(uint8_t *ptr)
   : Element(ptr, OneTouchSettingElement::size())
 {
   // pass...
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::DMRSettingsElement
+ * ********************************************************************************************* */
+GD73Codeplug::DMRSettingsElement::DMRSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::DMRSettingsElement::DMRSettingsElement(uint8_t *ptr)
+  : Element(ptr, DMRSettingsElement::size())
+{
+  // pass...
+}
+
+Interval
+GD73Codeplug::DMRSettingsElement::callHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::callHangTime())+1);
+}
+void
+GD73Codeplug::DMRSettingsElement::setCallHangTime(const Interval &intv) {
+  setUInt8(Offset::callHangTime(), Limit::callHangTime().map(intv).seconds()-1);
+}
+Interval
+GD73Codeplug::DMRSettingsElement::activeWaitTime() const {
+  return Interval::fromMilliseconds(120 + ((unsigned int)getUInt8(Offset::activeWaitTime()))*5);
+}
+void
+GD73Codeplug::DMRSettingsElement::setActiveWaitTime(const Interval &intv) {
+  setUInt8(Offset::activeWaitTime(), (Limit::activeWaitTime().map(intv).milliseconds()-120)/5);
+}
+
+unsigned int
+GD73Codeplug::DMRSettingsElement::activeRetries() const {
+  return getUInt8(Offset::activeRetries());
+}
+void
+GD73Codeplug::DMRSettingsElement::setActiveRetries(unsigned int count) {
+  setUInt8(Offset::activeRetries(), Limit::activeRetires().map(count));
+}
+
+unsigned int
+GD73Codeplug::DMRSettingsElement::txPreambles() const {
+  return getUInt8(Offset::txPreambles());
+}
+void
+GD73Codeplug::DMRSettingsElement::setTXPreambles(unsigned int count) {
+  setUInt8(Offset::txPreambles(), Limit::txPreambles().map(count));
+}
+
+bool
+GD73Codeplug::DMRSettingsElement::decodeDisableRadioEnabled() const {
+  return 0x00 != getUInt8(Offset::decodeDisableRadio());
+}
+void
+GD73Codeplug::DMRSettingsElement::enableDecodeDisableRadio(bool enable) {
+  setUInt8(Offset::decodeDisableRadio(), enable ? 0x01 : 0x00);
+}
+bool
+GD73Codeplug::DMRSettingsElement::decodeRadioCheckEnabled() const {
+  return 0x00 != getUInt8(Offset::decodeCheckRadio());
+}
+void
+GD73Codeplug::DMRSettingsElement::enableDecodeRadioCheck(bool enable) {
+  setUInt8(Offset::decodeCheckRadio(), enable ? 0x01 : 0x00);
+}
+bool
+GD73Codeplug::DMRSettingsElement::decodeEnableRadioEnabled() const {
+  return 0x00 != getUInt8(Offset::decodeEnableRadio());
+}
+void
+GD73Codeplug::DMRSettingsElement::enableDecodeEnableRadio(bool enable) {
+  setUInt8(Offset::decodeEnableRadio(), enable ? 0x01 : 0x00);
+}
+
+bool
+GD73Codeplug::DMRSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (nullptr == ctx.config()->settings()->radioddityExtension()) {
+    ctx.config()->settings()->setRadioddityExtension(new RadiodditySettingsExtension());
+  }
+  auto ext = ctx.config()->settings()->radioddityExtension();
+
+  ext->setPrivateCallHangTime(callHangTime());
+  ext->setGroupCallHangTime(callHangTime());
 }
 
 
@@ -1550,6 +1647,11 @@ GD73Codeplug::decodeSettings(Context &ctx, const ErrorStack &err) {
   SettingsElement settings(data(Offset::settings()));
   if (! settings.updateConfig(ctx, err)) {
     errMsg(err) << "Cannot decode settings element.";
+    return false;
+  }
+  DMRSettingsElement dmrSettings(data(Offset::dmrSettings()));
+  if (! dmrSettings.updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot decode DMR settings element.";
     return false;
   }
   return true;
