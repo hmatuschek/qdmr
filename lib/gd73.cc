@@ -1,5 +1,5 @@
 #include "gd73.hh"
-#include "gd77_limits.hh"
+#include "gd73_limits.hh"
 
 #include "logger.hh"
 #include "config.hh"
@@ -25,7 +25,7 @@ GD73::name() const {
 const RadioLimits &
 GD73::limits() const {
   if (nullptr == _limits)
-    _limits = new GD77Limits();
+    _limits = new GD73Limits();
   return *_limits;
 }
 
