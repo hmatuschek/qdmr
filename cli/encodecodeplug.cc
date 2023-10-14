@@ -9,6 +9,7 @@
 #include "config.hh"
 #include "radioinfo.hh"
 #include "rd5r_codeplug.hh"
+#include "gd73_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
 #include "openrtx_codeplug.hh"
@@ -124,6 +125,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::RD5R:
     if (! encode<RD5RCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::GD73:
+    if (! encode<GD73Codeplug>(config, flags, parser))
       return -1;
     break;
   case RadioInfo::GD77:

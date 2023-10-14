@@ -334,6 +334,8 @@ public:
 
     /** Updates the given config. */
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the settings from the given config */
+    bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits of the settings. */
@@ -434,6 +436,8 @@ public:
     Zone *toZone(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the decoded zone */
     bool linkZone(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the given zone. */
+    bool encode(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the element. */
@@ -480,6 +484,8 @@ public:
     bool createZones(Context &ctx, const ErrorStack &err);
     /** Links all decoded zones. */
     bool linkZones(Context &ctx, const ErrorStack &err);
+    /** Encodess all zones. */
+    bool encode(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits for the zone bank. */
@@ -658,6 +664,8 @@ public:
     Channel *toChannel(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links decoded channel. */
     bool linkChannel(Channel *ch, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the given channel. */
+    bool encode(Channel *ch, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the channel. */
@@ -722,6 +730,8 @@ public:
     bool createChannels(Context &ctx, const ErrorStack &err);
     /** Link all decoded channels. */
     bool linkChannels(Context &ctx, const ErrorStack &err);
+    /** Encodes all indexed channels. */
+    bool encode(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits for the channel bank. */
@@ -776,6 +786,8 @@ public:
 
     /** Decodes the contact. */
     DMRContact *toContact(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the given contact. */
+    bool encode(const DMRContact *contact, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -817,6 +829,8 @@ public:
 
     /** Adds all encoded contacts, also updates the context */
     bool createContacts(Context &ctx, const ErrorStack &err);
+    /** Encodes all defined contacts. */
+    bool encode(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits. */
@@ -863,6 +877,8 @@ public:
     RXGroupList *toGroupList(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given RX group list. */
     bool linkGroupList(RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the group list. */
+    bool encode(RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -909,6 +925,8 @@ public:
     bool createGroupLists(Context &ctx, const ErrorStack &err);
     /** Link all decoded group lists. */
     bool linkGroupLists(Context &ctx, const ErrorStack &err);
+    /** Encode group lists. */
+    bool encode(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits. */
@@ -1033,6 +1051,8 @@ public:
     ScanList *toScanList(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links a decoded scan list. */
     bool linkScanList(ScanList *lst, Context&ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the scan list. */
+    bool encode(ScanList *lst, Context&ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1094,6 +1114,8 @@ public:
     bool createScanLists(Context &ctx, const ErrorStack &err);
     /** Links all decoded scan lists. */
     bool linkScanLists(Context &ctx, const ErrorStack &err);
+    /** Encodes all scan lists. */
+    bool encode(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits. */
@@ -1163,8 +1185,10 @@ public:
     /** Enables/disables decoding of 'enable radio'. */
     void enableDecodeEnableRadio(bool enable);
 
-    /** Updates the radio settings within the config. */
+    /** Updates the settings within the config. */
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the settings from the given config */
+    bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1544,6 +1568,9 @@ public:
   /** Default constructor. */
   explicit GD73Codeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+  bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
   bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack());
@@ -1551,15 +1578,21 @@ public:
 protected:
   /** Decodes the time-stamp field. */
   virtual bool decodeTimestamp(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encodes the time-stamp field. */
+  virtual bool encodeTimestamp(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Creates messages. */
   virtual bool createMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decodes the settings fields (generic & DMR). */
   virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode settings fields (generic & DMR settings). */
+  virtual bool encodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Creates contacts. */
   virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode contacts. */
+  virtual bool encodeContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Creates DTMF contacts. */
   virtual bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1568,6 +1601,8 @@ protected:
   virtual bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link group lists. */
   virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode group lists. */
+  virtual bool encodeGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Create encryption keys. */
   virtual bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1576,16 +1611,22 @@ protected:
   virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link channels. */
   virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode channels. */
+  virtual bool encodeChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Create zones. */
   virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
   virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode zones. */
+  virtual bool encodeZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Create scan lists. */
   virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
   virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode zones. */
+  virtual bool encodeScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Internal used offsets within the codeplug. */

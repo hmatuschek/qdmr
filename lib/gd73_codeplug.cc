@@ -1,5 +1,7 @@
 #include "gd73_codeplug.hh"
 #include "config.hh"
+#include "intermediaterepresentation.hh"
+
 
 QVector<Signaling::Code> _ctcss_codes = {
   Signaling::SIGNALING_NONE, Signaling::CTCSS_67_0Hz, Signaling::SIGNALING_NONE,
@@ -56,6 +58,17 @@ GD73Codeplug::InformationElement::frequencyRange() const {
   }
   return FrequencyRange();
 }
+
+void
+GD73Codeplug::InformationElement::setFrequencyRange(const FrequencyRange &range) {
+  if ((Frequency::fromMHz(446.0)<=range.lower) && (range.upper <=Frequency::fromMHz(446.995)))
+    setUInt8(Offset::frequencyRange(), 0x01);
+  else if ((range.lower>=Frequency::fromMHz(406.1)) && (range.upper <=Frequency::fromMHz(470.0)))
+    setUInt8(Offset::frequencyRange(), 0x00);
+  else
+    setUInt8(Offset::frequencyRange(), 0x02);
+}
+
 
 QDateTime
 GD73Codeplug::InformationElement::timestamp() const {
@@ -421,6 +434,40 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   return true;
 }
 
+bool
+GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Get default radio ID
+  if (nullptr == ctx.config()->settings()->defaultId()) {
+    errMsg(err) << "Cannot encode default radio DMR ID, none is set.";
+    return false;
+  }
+
+  setDMRID(ctx.config()->settings()->defaultId()->number());
+  setName(ctx.config()->settings()->defaultId()->name());
+
+  // Apply settings
+  setBootTextLine1(ctx.config()->settings()->introLine1());
+  setBootTextLine2(ctx.config()->settings()->introLine2());
+  setDMRMicGain(ctx.config()->settings()->micLevel());
+  setSquelch(ctx.config()->settings()->squelch());
+  setVOX(ctx.config()->settings()->vox());
+  if (ctx.config()->settings()->totDisabled())
+    clearTOT();
+  else
+    setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
+
+  // Get/add radioddity settings extension
+  RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
+  if (nullptr == ext)
+    return true;
+  setLoneWorkerResponseTimeout(ext->loneWorkerResponseTime());
+  setLoneWorkerRemindPeriod(ext->loneWorkerReminderPeriod());
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug::OneTouchSettingElement
@@ -528,6 +575,19 @@ GD73Codeplug::DMRSettingsElement::updateConfig(Context &ctx, const ErrorStack &e
   return true;
 }
 
+bool
+GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (nullptr == ctx.config()->settings()->radioddityExtension())
+    return true;
+  auto ext = ctx.config()->settings()->radioddityExtension();
+
+  setCallHangTime(std::max(ext->privateCallHangTime(), ext->groupCallHangTime()));
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ContactBankElement
@@ -546,7 +606,7 @@ GD73Codeplug::ContactBankElement::ContactBankElement(uint8_t *ptr)
 
 bool
 GD73Codeplug::ContactBankElement::createContacts(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::contactCount()), Limit::contactCount());
+  unsigned int count = std::min((unsigned int)getUInt16_le(Offset::contactCount()), Limit::contactCount());
   for (unsigned int i=0; i<count; i++) {
     ContactElement contact(_data + Offset::contacts() + i*Offset::betweenContacts());
     DMRContact *contactObj = contact.toContact(ctx, err);
@@ -557,6 +617,29 @@ GD73Codeplug::ContactBankElement::createContacts(Context &ctx, const ErrorStack 
     ctx.config()->contacts()->add(contactObj);
     ctx.add(contactObj, i);
   }
+  return true;
+}
+
+bool
+GD73Codeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min(ctx.count<DMRContact>(), Limit::contactCount());
+  setUInt16_le(Offset::contactCount(), count);
+
+  for (unsigned int i=0; i<count; i++) {
+    ContactElement contact(_data + Offset::contacts() + i*Offset::betweenContacts());
+    if (! ctx.has<DMRContact>(i)) {
+      errMsg(err) << "Contact at index " << i << " not indexed.";
+      errMsg(err) << "Cannot encode contact bank.";
+      return false;
+    }
+    DMRContact *contactObj = ctx.get<DMRContact>(i);
+    if (! contact.encode(contactObj, ctx, err)) {
+      errMsg(err) << "Cannot encode contact at index " << i << ".";
+      errMsg(err) << "Cannot encode contact bank.";
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -618,6 +701,15 @@ GD73Codeplug::ContactElement::toContact(Context &ctx, const ErrorStack &err) {
   return new DMRContact(type(), name(), id());
 }
 
+bool
+GD73Codeplug::ContactElement::encode(const DMRContact *contact, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  setType(contact->type());
+  setName(contact->name());
+  setID(contact->number());
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug::GroupListBankElement
@@ -652,7 +744,7 @@ GD73Codeplug::GroupListBankElement::createGroupLists(Context &ctx, const ErrorSt
 
 bool
 GD73Codeplug::GroupListBankElement::linkGroupLists(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  unsigned int count = std::min(ctx.count<RXGroupList>(), Limit::memberCount());
   for (unsigned int i=0; i<count; i++) {
     GroupListElement gl(_data+Offset::members() + i*Offset::betweenMembers());
     RXGroupList *glObj = ctx.get<RXGroupList>(i);
@@ -661,6 +753,25 @@ GD73Codeplug::GroupListBankElement::linkGroupLists(Context &ctx, const ErrorStac
       return false;
     }
   }
+  return true;
+}
+
+bool
+GD73Codeplug::GroupListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min(ctx.count<RXGroupList>(), Limit::memberCount());
+  setUInt8(Offset::memberCount(), count);
+  for (unsigned int i=0; i<count; i++) {
+    GroupListElement gl(_data+Offset::members() + i*Offset::betweenMembers());
+    if (! ctx.has<RXGroupList>(i)) {
+      errMsg(err) << "Group list at index " << i << " is not indexed.";
+      return false;
+    }
+    if (!gl.encode(ctx.get<RXGroupList>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode group list at index " << i << ".";
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -711,6 +822,23 @@ GD73Codeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx, co
   return true;
 }
 
+bool
+GD73Codeplug::GroupListElement::encode(RXGroupList *lst, Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min((unsigned int)lst->count(), Limit::memberCount());
+  setName(lst->name());
+  setUInt8(Offset::memberCount(), count);
+
+  for (unsigned int i=0; i<count; i++) {
+    if (0 > ctx.index(lst->contact(i))) {
+      errMsg(err) << "Cannot resolve index of contact '" << lst->contact(i)->name() << "'.";
+      return false;
+    }
+    setUInt16_le(Offset::members() + i*Offset::betweenMembers(), ctx.index(lst->contact(i))+1);
+  }
+
+  return true;
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ChannelBankElement
@@ -745,12 +873,27 @@ GD73Codeplug::ChannelBankElement::createChannels(Context &ctx, const ErrorStack 
 
 bool
 GD73Codeplug::ChannelBankElement::linkChannels(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::channelCount()), Limit::channelCount());
+  unsigned int count = std::min(ctx.count<Channel>(), Limit::channelCount());
   for (unsigned int i=0; i<count; i++) {
     ChannelElement ch(_data + Offset::channels() + i*Offset::betweenChannels());
     Channel *chObj = ctx.get<Channel>(i);
     if (! ch.linkChannel(chObj, ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::ChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min(ctx.count<Channel>(), Limit::channelCount());
+  setUInt16_le(Offset::channelCount(), count);
+  for (unsigned int i=0; i<count; i++) {
+    ChannelElement ch(_data + Offset::channels() + i*Offset::betweenChannels());
+    Channel *chObj = ctx.get<Channel>(i);
+    if (! ch.encode(chObj, ctx, err)) {
+      errMsg(err) << "Cannot encode channel at index " << i << ".";
       return false;
     }
   }
@@ -1163,6 +1306,49 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
 }
 
 
+bool
+GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Encode common stuff
+  setName(ch->name());
+  setRXFrequency(ch->rxFrequency());
+  setTXFrequency(ch->txFrequency());
+  enableRXOnly(ch->rxOnly());
+  if (! ch->scanListRef()->isNull())
+    setScanListIndex(ctx.index(ch->scanList()));
+
+  // Dispatch by type
+  if (ch->is<DMRChannel>()) {
+    DMRChannel *dmr = ch->as<DMRChannel>();
+    setType(ChannelElement::Type::DMR);
+    if (! dmr->contact()->isNull())
+      setTXContactIndex(ctx.index(dmr->txContactObj()));
+    if (dmr->groupList()->isNull())
+      setGroupListAllMatch();
+    else
+      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    switch (dmr->admit()) {
+    case DMRChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case DMRChannel::Admit::ColorCode: setAdmit(Admit::CC_CTCSS); break;
+    case DMRChannel::Admit::Free: setAdmit(Admit::Free); break;
+    }
+    setColorCode(dmr->colorCode());
+    setTimeSlot(dmr->timeSlot());
+  } else if (ch->is<FMChannel>()) {
+    FMChannel *fm = ch->as<FMChannel>();
+    switch (fm->admit()) {
+    case FMChannel::Admit::Always: setAdmit(Admit::Always); break;
+    case FMChannel::Admit::Tone: setAdmit(Admit::CC_CTCSS); break;
+    case FMChannel::Admit::Free: setAdmit(Admit::Free); break;
+    }
+    setBandwidth(fm->bandwidth());
+  }
+
+  return true;
+}
+
+
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ZoneBankElement
  * ********************************************************************************************* */
@@ -1196,12 +1382,27 @@ GD73Codeplug::ZoneBankElement::createZones(Context &ctx, const ErrorStack &err) 
 
 bool
 GD73Codeplug::ZoneBankElement::linkZones(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::zoneCount()), Limit::zoneCount());
+  unsigned int count = std::min(ctx.count<Zone>(), Limit::zoneCount());
   for (unsigned int i=0; i<count; i++) {
     ZoneElement zone(_data+Offset::zones() + i*Offset::betweenZones());
     Zone *zoneObj = ctx.get<Zone>(i);
     if (! zone.linkZone(zoneObj, ctx, err)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::ZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min(ctx.count<Zone>(), Limit::zoneCount());
+  setUInt8(Offset::zoneCount(), count);
+  for (unsigned int i=0; i<count; i++) {
+    ZoneElement zone(_data+Offset::zones() + i*Offset::betweenZones());
+    Zone *zoneObj = ctx.get<Zone>(i);
+    if (! zone.encode(zoneObj, ctx, err)) {
+      errMsg(err) << "Cannot encode zone at index " << i << ".";
       return false;
     }
   }
@@ -1238,6 +1439,7 @@ GD73Codeplug::ZoneElement::toZone(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
   return new Zone(name());
 }
+
 bool
 GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &err) {
   unsigned int count = std::min((unsigned int)getUInt8(Offset::channeCount()), Limit::channelCount());
@@ -1252,6 +1454,25 @@ GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &
     }
     zone->A()->add(ctx.get<Channel>(index-1));
   }
+  return true;
+}
+
+bool
+GD73Codeplug::ZoneElement::encode(Zone *zone, Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min((unsigned int)zone->A()->count(), Limit::channelCount());
+  setUInt8(Offset::channeCount(), count);
+  setName(zone->name());
+
+  for (unsigned int i=0; i<count; i++) {
+    if (0 > ctx.index(zone->A()->get(i)->as<Channel>())) {
+      errMsg(err) << "Cannot find index for channel " << zone->A()->get(i)->name()
+                  << " in zone " << zone->name() << ".";
+      return false;
+    }
+    setUInt16_le(Offset::channelIndices() + i*Offset::betweenChannelIndices(),
+                 ctx.index(zone->A()->get(i)->as<Channel>())+1);
+  }
+
   return true;
 }
 
@@ -1289,12 +1510,27 @@ GD73Codeplug::ScanListBankElement::createScanLists(Context &ctx, const ErrorStac
 
 bool
 GD73Codeplug::ScanListBankElement::linkScanLists(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  unsigned int count = std::min(ctx.count<ScanList>(), Limit::memberCount());
   for (unsigned int i=0; i<count; i++) {
     ScanListElement lst(_data + Offset::members() + i*Offset::betweenMembers());
     ScanList *lstObj = ctx.get<ScanList>(i);
     if (! lst.linkScanList(lstObj, ctx, err)) {
       errMsg(err) << "Cannot link scan list at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::ScanListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  unsigned int count = std::min(ctx.count<ScanList>(), Limit::memberCount());
+  setUInt8(Offset::memberCount(), count);
+  for (unsigned int i=0; i<count; i++) {
+    ScanListElement lst(_data + Offset::members() + i*Offset::betweenMembers());
+    ScanList *lstObj = ctx.get<ScanList>(i);
+    if (! lst.encode(lstObj, ctx, err)) {
+      errMsg(err) << "Cannot encode scan list at index " << i << ".";
       return false;
     }
   }
@@ -1524,6 +1760,47 @@ GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const E
   return true;
 }
 
+bool
+GD73Codeplug::ScanListElement::encode(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(lst->name());
+
+  if (! lst->primary()->isNull()) {
+    if (SelectedChannel::get() == lst->primaryChannel()) {
+      setPrimaryChannelMode(ChannelMode::Selected);
+    } else {
+      setPrimaryChannelMode(ChannelMode::Fixed);
+      setPrimaryChannelIndex(ctx.index(lst->primaryChannel()));
+    }
+  }
+
+  if (! lst->secondary()->isNull()) {
+    if (SelectedChannel::get() == lst->secondaryChannel()) {
+      setSecondaryChannelMode(ChannelMode::Selected);
+    } else {
+      setSecondaryChannelMode(ChannelMode::Fixed);
+      setSecondaryChannelIndex(ctx.index(lst->secondaryChannel()));
+    }
+  }
+
+  if (! lst->revert()->isNull()) {
+    if (SelectedChannel::get() == lst->revertChannel()) {
+      setRevertChannelMode(ChannelMode::Selected);
+    } else {
+      setRevertChannelMode(ChannelMode::Fixed);
+      setRevertChannelIndex(ctx.index(lst->revertChannel()));
+    }
+  }
+
+  unsigned int count = std::min((unsigned int)lst->count(), Limit::memberCount());
+  setUInt8(Offset::memberCount(), count);
+
+  for (unsigned int i=0; i<count; i++) {
+    setUInt16_le(Offset::members() + i*Offset::betweenMembers(), ctx.index(lst->channel(i))+1);
+  }
+
+  return true;
+}
 
 /* ********************************************************************************************* *
  * Implementation of GD73Codeplug
@@ -1535,14 +1812,132 @@ GD73Codeplug::GD73Codeplug(QObject *parent)
   image(0).addElement(0x000000, 0x22014);
 }
 
+Config *
+GD73Codeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *copy = Codeplug::preprocess(config, err);
+  if (nullptr == copy) {
+    errMsg(err) << "Cannot pre-process codeplug for GD73A/E.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(copy, err)) {
+    errMsg(err) << "Cannot pre-process codeplug for GD73A/E.";
+    return nullptr;
+  }
+
+  return copy;
+}
+
+bool
+GD73Codeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for GD73A/E.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for GD73A/E.";
+    return false;
+  }
+
+  return true;
+}
+
+
 bool
 GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
-  return false;
+  // There must be a default DMR radio ID.
+  if (nullptr == ctx.config()->settings()->defaultId()) {
+    errMsg(err) << "No default DMR radio ID specified.";
+    errMsg(err) << "Cannot index codplug for encoding for the Radioddity GD73.";
+    return false;
+  }
+
+  // Map radio IDs
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
+    ctx.add(ctx.config()->radioIDs()->getId(i), i);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+    if (ctx.config()->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(ctx.config()->contacts()->contact(i)->as<DMRContact>(), d); d++;
+    } else if (ctx.config()->contacts()->contact(i)->is<DTMFContact>()) {
+      ctx.add(ctx.config()->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(ctx.config()->rxGroupLists()->list(i), i);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++) {
+    if (ctx.config()->channelList()->get(i)->is<DMRChannel>() ||
+        ctx.config()->channelList()->get(i)->is<FMChannel>())
+      ctx.add(ctx.config()->channelList()->channel(i), i);
+  }
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i);
+
+  return true;
+
 }
 
 bool
 GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  return false;
+  Q_UNUSED(flags);
+
+  Context ctx(config);
+
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeTimestamp(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeSettings(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeContacts(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeChannels(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeZones(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeScanLists(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  return true;
 }
 
 bool
@@ -1636,6 +2031,16 @@ GD73Codeplug::decodeTimestamp(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
+bool
+GD73Codeplug::encodeTimestamp(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+
+  InformationElement info(data(Offset::timestamp()));
+  info.setTimestamp(QDateTime::currentDateTimeUtc());
+  info.setFrequencyRange(FrequencyRange {Frequency::fromMHz(400.0), Frequency::fromMHz(470.0)});
+  return true;
+}
+
 
 bool
 GD73Codeplug::createMessages(Context &ctx, const ErrorStack &err) {
@@ -1660,6 +2065,21 @@ GD73Codeplug::decodeSettings(Context &ctx, const ErrorStack &err) {
 }
 
 bool
+GD73Codeplug::encodeSettings(Context &ctx, const ErrorStack &err) {
+  SettingsElement settings(data(Offset::settings()));
+  if (! settings.encode(ctx, err)) {
+    errMsg(err) << "Cannot encode settings element.";
+    return false;
+  }
+  DMRSettingsElement dmrSettings(data(Offset::dmrSettings()));
+  if (! dmrSettings.encode(ctx, err)) {
+    errMsg(err) << "Cannot encode DMR settings element.";
+    return false;
+  }
+  return true;
+}
+
+bool
 GD73Codeplug::createContacts(Context &ctx, const ErrorStack &err) {
   ContactBankElement bank(data(Offset::contacts()));
   if (! bank.createContacts(ctx, err)) {
@@ -1668,6 +2088,17 @@ GD73Codeplug::createContacts(Context &ctx, const ErrorStack &err) {
   }
   return true;
 }
+
+bool
+GD73Codeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
+  ContactBankElement bank(data(Offset::contacts()));
+  if (! bank.encode(ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+  return true;
+}
+
 
 bool
 GD73Codeplug::createDTMFContacts(Context &ctx, const ErrorStack &err) {
@@ -1688,6 +2119,15 @@ bool
 GD73Codeplug::linkGroupLists(Context &ctx, const ErrorStack &err) {
   if (! GroupListBankElement(data(Offset::groupLists())).linkGroupLists(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
+    return false;
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::encodeGroupLists(Context &ctx, const ErrorStack &err) {
+  if (! GroupListBankElement(data(Offset::groupLists())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
     return false;
   }
   return true;
@@ -1718,6 +2158,15 @@ GD73Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 }
 
 bool
+GD73Codeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
+  if (! ChannelBankElement(data(Offset::channels())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode channels.";
+    return false;
+  }
+  return true;
+}
+
+bool
 GD73Codeplug::createZones(Context &ctx, const ErrorStack &err) {
   if (! ZoneBankElement(data(Offset::zones())).createZones(ctx, err)) {
     errMsg(err) << "Cannot create zones.";
@@ -1736,6 +2185,15 @@ GD73Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
 }
 
 bool
+GD73Codeplug::encodeZones(Context &ctx, const ErrorStack &err) {
+  if (! ZoneBankElement(data(Offset::zones())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+  return true;
+}
+
+bool
 GD73Codeplug::createScanLists(Context &ctx, const ErrorStack &err) {
   if (! ScanListBankElement(data(Offset::scanLists())).createScanLists(ctx, err)) {
     errMsg(err) << "Cannot create scan-lists.";
@@ -1748,6 +2206,15 @@ bool
 GD73Codeplug::linkScanLists(Context &ctx, const ErrorStack &err) {
   if (! ScanListBankElement(data(Offset::scanLists())).linkScanLists(ctx, err)) {
     errMsg(err) << "Cannot link scan-lists.";
+    return false;
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::encodeScanLists(Context &ctx, const ErrorStack &err) {
+  if (! ScanListBankElement(data(Offset::scanLists())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode scan-lists.";
     return false;
   }
   return true;
