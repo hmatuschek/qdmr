@@ -524,6 +524,8 @@ GD73Codeplug::DMRSettingsElement::updateConfig(Context &ctx, const ErrorStack &e
 
   ext->setPrivateCallHangTime(callHangTime());
   ext->setGroupCallHangTime(callHangTime());
+
+  return true;
 }
 
 

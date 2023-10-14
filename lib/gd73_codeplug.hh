@@ -1161,7 +1161,7 @@ public:
     /** Returns @c true, if decoding of 'enable radio' is enabled. */
     bool decodeEnableRadioEnabled() const;
     /** Enables/disables decoding of 'enable radio'. */
-    void enableDecodeEnsableRadio(bool enable);
+    void enableDecodeEnableRadio(bool enable);
 
     /** Updates the radio settings within the config. */
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
