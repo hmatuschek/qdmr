@@ -1,7 +1,7 @@
-#ifndef GD77FILEREADER_HH
-#define GD77FILEREADER_HH
+#ifndef GD73FILEREADER_HH
+#define GD73FILEREADER_HH
 
-#include "gd77_codeplug.hh"
+#include "gd73_codeplug.hh"
 
 /** Methods to read manufacturer codeplug files.
  *
@@ -12,12 +12,11 @@
  *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th></tr>
- *  <tr><td>0x00080</td> <td>0x07c00</td>  <td>0x07b80</td></tr>
- *  <tr><td>0x08000</td> <td>0x1e300</td>  <td>0x16300</td></tr>
+ *  <tr><td>0x00000</td> <td>0x22149</td>  <td>0x22149</td></tr>
  * </table>
  *
- * @ingroup gd77 */
-class GD77FileReader
+ * @ingroup gd73 */
+class GD73FileReader
 {
 public:
   /** Reads manufacturer codeplug file into given codeplug object.
@@ -25,7 +24,7 @@ public:
    * @param codeplug Specifies the codeplug object to store read codeplug.
    * @param err The error stack.
    * @returns @c true on success and @c false on error. */
-  static bool read(const QString &filename, GD77Codeplug *codeplug, const ErrorStack &err=ErrorStack());
+  static bool read(const QString &filename, GD73Codeplug *codeplug, const ErrorStack &err=ErrorStack());
 };
 
-#endif // GD77FILEREADER_HH
+#endif // GD73FILEREADER_HH
