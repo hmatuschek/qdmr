@@ -1814,6 +1814,67 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::ButtonSettingsElement
  * ********************************************************************************************* */
+uint8_t
+RadioddityCodeplug::ButtonSettingsElement::KeyFunction::encode(RadioddityButtonSettingsExtension::Function func) {
+  switch (func) {
+  case RadioddityButtonSettingsExtension::Function::None: return None;
+  case RadioddityButtonSettingsExtension::Function::ToggleAllAlertTones: return ToggleAllAlertTones;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOn: return EmergencyOn;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOff: return EmergencyOff;
+  case RadioddityButtonSettingsExtension::Function::ToggleMonitor: return ToggleMonitor;
+  case RadioddityButtonSettingsExtension::Function::RadioDisable: return NuiaceDelete;
+  case RadioddityButtonSettingsExtension::Function::OneTouch1: return OneTouch1;
+  case RadioddityButtonSettingsExtension::Function::OneTouch2: return OneTouch2;
+  case RadioddityButtonSettingsExtension::Function::OneTouch3: return OneTouch3;
+  case RadioddityButtonSettingsExtension::Function::OneTouch4: return OneTouch4;
+  case RadioddityButtonSettingsExtension::Function::OneTouch5: return OneTouch5;
+  case RadioddityButtonSettingsExtension::Function::OneTouch6: return OneTouch6;
+  case RadioddityButtonSettingsExtension::Function::ToggleTalkaround: return ToggleRepeatTalkaround;
+  case RadioddityButtonSettingsExtension::Function::ToggleScan: return ToggleScan;
+  case RadioddityButtonSettingsExtension::Function::ToggleEncryption: return TogglePrivacy;
+  case RadioddityButtonSettingsExtension::Function::ToggleVox: return ToggleVox;
+  case RadioddityButtonSettingsExtension::Function::ZoneSelect: return ZoneSelect;
+  case RadioddityButtonSettingsExtension::Function::BatteryIndicator: return BatteryIndicator;
+  case RadioddityButtonSettingsExtension::Function::ToggleLoneWorker: return ToggleLoneWorker;
+  case RadioddityButtonSettingsExtension::Function::PhoneExit: return PhoneExit;
+  case RadioddityButtonSettingsExtension::Function::ToggleFlashLight: return ToggleFlashLight;
+  case RadioddityButtonSettingsExtension::Function::ToggleFMRadio: return ToggleFMRadio;
+  default: break;
+  }
+  return Action::None;
+}
+
+RadioddityButtonSettingsExtension::Function
+RadioddityCodeplug::ButtonSettingsElement::KeyFunction::decode(uint8_t action) {
+  switch ((Action) action) {
+  case None: return RadioddityButtonSettingsExtension::Function::None;
+  case ToggleAllAlertTones: return RadioddityButtonSettingsExtension::Function::ToggleAllAlertTones;
+  case EmergencyOn: return RadioddityButtonSettingsExtension::Function::EmergencyOn;
+  case EmergencyOff: return RadioddityButtonSettingsExtension::Function::EmergencyOff;
+  case ToggleMonitor: return RadioddityButtonSettingsExtension::Function::ToggleMonitor;
+  case NuiaceDelete: return RadioddityButtonSettingsExtension::Function::RadioDisable;
+  case OneTouch1: return RadioddityButtonSettingsExtension::Function::OneTouch1;
+  case OneTouch2: return RadioddityButtonSettingsExtension::Function::OneTouch2;
+  case OneTouch3: return RadioddityButtonSettingsExtension::Function::OneTouch3;
+  case OneTouch4: return RadioddityButtonSettingsExtension::Function::OneTouch4;
+  case OneTouch5: return RadioddityButtonSettingsExtension::Function::OneTouch5;
+  case OneTouch6: return RadioddityButtonSettingsExtension::Function::OneTouch6;
+  case ToggleRepeatTalkaround: return RadioddityButtonSettingsExtension::Function::ToggleTalkaround;
+  case ToggleScan: return RadioddityButtonSettingsExtension::Function::ToggleScan;
+  case TogglePrivacy: return RadioddityButtonSettingsExtension::Function::ToggleEncryption;
+  case ToggleVox: return RadioddityButtonSettingsExtension::Function::ToggleVox;
+  case ZoneSelect: return RadioddityButtonSettingsExtension::Function::ZoneSelect;
+  case BatteryIndicator: return RadioddityButtonSettingsExtension::Function::BatteryIndicator;
+  case ToggleLoneWorker: return RadioddityButtonSettingsExtension::Function::ToggleLoneWorker;
+  case PhoneExit: return RadioddityButtonSettingsExtension::Function::PhoneExit;
+  case ToggleFlashLight: return RadioddityButtonSettingsExtension::Function::ToggleFlashLight;
+  case ToggleFMRadio: return RadioddityButtonSettingsExtension::Function::ToggleFMRadio;
+  }
+
+  return RadioddityButtonSettingsExtension::Function::None;
+}
+
+
 RadioddityCodeplug::ButtonSettingsElement::ButtonSettingsElement(uint8_t *ptr, unsigned size)
   : Element(ptr, size)
 {
@@ -1833,109 +1894,147 @@ RadioddityCodeplug::ButtonSettingsElement::~ButtonSettingsElement() {
 void
 RadioddityCodeplug::ButtonSettingsElement::clear() {
   setUInt8(0x0000, 0x01);
-  setLongPressDuration(1500);
-  setSK1ShortPress(Action::ZoneSelect);
-  setSK1LongPress(Action::ToggleFMRadio);
-  setSK2ShortPress(Action::ToggleMonitor);
-  setSK2LongPress(Action::ToggleFlashLight);
-  setTKShortPress(Action::BatteryIndicator);
-  setTKLongPress(Action::ToggleVox);
+  setLongPressDuration(Interval::fromMilliseconds(1500));
+  setSK1ShortPress(RadioddityButtonSettingsExtension::Function::ZoneSelect);
+  setSK1LongPress(RadioddityButtonSettingsExtension::Function::ToggleFMRadio);
+  setSK2ShortPress(RadioddityButtonSettingsExtension::Function::ToggleMonitor);
+  setSK2LongPress(RadioddityButtonSettingsExtension::Function::ToggleFlashLight);
+  setTKShortPress(RadioddityButtonSettingsExtension::Function::BatteryIndicator);
+  setTKLongPress(RadioddityButtonSettingsExtension::Function::ToggleVox);
   memset(_data+0x0008, 0xff, 6*4);
 }
 
-unsigned
+Interval
 RadioddityCodeplug::ButtonSettingsElement::longPressDuration() const {
-  return unsigned(getUInt8(0x0001))*250;
+  return Interval::fromMilliseconds(getUInt8(Offset::longPressDuration())*250);
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setLongPressDuration(unsigned ms) {
-  setUInt8(0x0001, ms/250);
+RadioddityCodeplug::ButtonSettingsElement::setLongPressDuration(Interval ms) {
+  setUInt8(Offset::longPressDuration(), ms.milliseconds()/250);
 }
 
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::sk1ShortPress() const {
-  return (Action) getUInt8(0x0002);
+  return KeyFunction::decode(getUInt8(Offset::sk1ShortPress()));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setSK1ShortPress(Action action) {
-  setUInt8(0x0002, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setSK1ShortPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::sk1ShortPress(), KeyFunction::encode(action));
 }
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::sk1LongPress() const {
-  return (Action) getUInt8(0x0003);
+  return KeyFunction::decode(getUInt8(0x0003));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setSK1LongPress(Action action) {
-  setUInt8(0x0003, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setSK1LongPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::sk1LongPress(), KeyFunction::encode(action));
 }
 
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::sk2ShortPress() const {
-  return (Action) getUInt8(0x0004);
+  return KeyFunction::decode(getUInt8(Offset::sk2ShortPress()));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setSK2ShortPress(Action action) {
-  setUInt8(0x0004, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setSK2ShortPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::sk2ShortPress(), KeyFunction::encode(action));
 }
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::sk2LongPress() const {
-  return (Action) getUInt8(0x0005);
+  return KeyFunction::decode(getUInt8(Offset::sk2LongPress()));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setSK2LongPress(Action action) {
-  setUInt8(0x0005, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setSK2LongPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::sk2LongPress(), KeyFunction::encode(action));
 }
 
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::tkShortPress() const {
-  return (Action) getUInt8(0x0006);
+  return KeyFunction::decode(getUInt8(Offset::tkShortPress()));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setTKShortPress(Action action) {
-  setUInt8(0x0006, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setTKShortPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::tkShortPress(), KeyFunction::encode(action));
 }
-RadioddityCodeplug::ButtonSettingsElement::Action
+RadioddityButtonSettingsExtension::Function
 RadioddityCodeplug::ButtonSettingsElement::tkLongPress() const {
-  return (Action) getUInt8(0x0007);
+  return KeyFunction::decode(getUInt8(Offset::tkLongPress()));
 }
 void
-RadioddityCodeplug::ButtonSettingsElement::setTKLongPress(Action action) {
-  setUInt8(0x0007, (unsigned)action);
+RadioddityCodeplug::ButtonSettingsElement::setTKLongPress(RadioddityButtonSettingsExtension::Function action) {
+  setUInt8(Offset::tkLongPress(), KeyFunction::encode(action));
 }
 
 RadioddityCodeplug::ButtonSettingsElement::OneTouchAction
 RadioddityCodeplug::ButtonSettingsElement::oneTouchAction(unsigned n) const {
-  return OneTouchAction(getUInt8(0x0008 + n*4 + 0));
+  return OneTouchAction(getUInt8(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 0));
 }
 unsigned
 RadioddityCodeplug::ButtonSettingsElement::oneTouchContact(unsigned n) const {
-  return getUInt16_be(0x0008 + n*4 + 1);
+  return getUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 1);
 }
 unsigned
 RadioddityCodeplug::ButtonSettingsElement::oneTouchMessage(unsigned n) const {
-  return getUInt16_be(0x0008 + n*4 + 3);
+  return getUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 3);
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::disableOneTouch(unsigned n) {
-  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::None);
+  setUInt8(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 0, (unsigned)OneTouchAction::None);
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalCall(unsigned n, unsigned index) {
-  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::DigitalCall);
-  setUInt16_be(0x0008 + n*4 + 1, index);
-  setUInt16_be(0x0008 + n*4 + 3, 0);
+  setUInt8(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 0, (unsigned)OneTouchAction::DigitalCall);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 1, index);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 3, 0);
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setOneTouchDigitalMessage(unsigned n, unsigned index) {
-  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::DigitalMessage);
-  setUInt16_be(0x0008 + n*4 + 1, 0);
-  setUInt16_be(0x0008 + n*4 + 3, index);
+  setUInt8(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 0, (unsigned)OneTouchAction::DigitalMessage);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 1, 0);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 3, index);
 }
 void
 RadioddityCodeplug::ButtonSettingsElement::setOneTouchAnalogCall(unsigned n) {
-  setUInt8(0x0008 + n*4 + 0, (unsigned)OneTouchAction::AnalogCall);
-  setUInt16_be(0x0008 + n*4 + 1, 0);
-  setUInt16_be(0x0008 + n*4 + 3, 0);
+  setUInt8(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 0, (unsigned)OneTouchAction::AnalogCall);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 1, 0);
+  setUInt16_be(Offset::oneTouchActions() + n*Offset::betweenOneTouchActions() + 3, 0);
+}
+
+bool
+RadioddityCodeplug::ButtonSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  if (! ctx.config()->settings()->radioddityExtension())
+    return true;
+  RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
+
+  setLongPressDuration(ext->buttons()->longPressDuration());
+  setSK1ShortPress(ext->buttons()->funcKey1Short());
+  setSK1LongPress(ext->buttons()->funcKey1Long());
+  setSK2ShortPress(ext->buttons()->funcKey2Short());
+  setSK2LongPress(ext->buttons()->funcKey2Long());
+  setTKShortPress(ext->buttons()->funcKey3Short());
+  setTKLongPress(ext->buttons()->funcKey3Long());
+
+  return true;
+}
+
+bool
+RadioddityCodeplug::ButtonSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  if (! ctx.config()->settings()->radioddityExtension())
+    ctx.config()->settings()->setRadioddityExtension(new RadiodditySettingsExtension());
+  RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
+
+  ext->buttons()->setLongPressDuration(longPressDuration());
+  ext->buttons()->setFuncKey1Short(sk1ShortPress());
+  ext->buttons()->setFuncKey1Long(sk1LongPress());
+  ext->buttons()->setFuncKey2Short(sk2ShortPress());
+  ext->buttons()->setFuncKey2Long(sk2LongPress());
+  ext->buttons()->setFuncKey3Short(tkShortPress());
+  ext->buttons()->setFuncKey3Long(tkLongPress());
+
+  return true;
 }
 
 
@@ -2712,6 +2811,11 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
     return false;
   }
 
+  if (! this->encodeButtonSettings(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode button settings.";
+    return false;
+  }
+
   // Define Contacts
   if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
     errMsg(err) << "Cannot encode contacts.";
@@ -2788,6 +2892,11 @@ bool
 RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   if (! this->decodeGeneralSettings(ctx.config(), ctx, err)) {
     errMsg(err) << "Cannot decode general settings.";
+    return false;
+  }
+
+  if (! this->decodeButtonSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode button settings.";
     return false;
   }
 

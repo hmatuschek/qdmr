@@ -1,6 +1,110 @@
 #include "radioddity_extensions.hh"
 
 /* ********************************************************************************************* *
+ * Implementation of RadioddityButtonSettingsExtension
+ * ********************************************************************************************* */
+RadioddityButtonSettingsExtension::RadioddityButtonSettingsExtension(QObject *parent)
+  : ConfigExtension(parent), _longPressDuration(Interval::fromMilliseconds(1000)),
+    _funcKey1Short(Function::ZoneSelect), _funcKey1Long(Function::ToggleFMRadio),
+    _funcKey2Short(Function::ToggleMonitor), _funcKey2Long(Function::ToggleFlashLight),
+    _funcKey3Short(Function::BatteryIndicator), _funcKey3Long(Function::ToggleVox)
+{
+  // pass...
+}
+
+ConfigItem *
+RadioddityButtonSettingsExtension::clone() const {
+  ConfigItem *clone = new RadioddityButtonSettingsExtension();
+  if (! clone->copy(*this)) {
+    delete clone;
+    return nullptr;
+  }
+  return clone;
+}
+
+Interval
+RadioddityButtonSettingsExtension::longPressDuration() const {
+  return _longPressDuration;
+}
+void
+RadioddityButtonSettingsExtension::setLongPressDuration(Interval interval) {
+  if (interval == _longPressDuration)
+    return;
+  _longPressDuration = interval;
+  emit modified(this);
+}
+
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey1Short() const {
+  return _funcKey1Short;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey1Short(Function func) {
+  if (func == _funcKey1Short)
+    return;
+  _funcKey1Short = func;
+  emit modified(this);
+}
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey1Long() const {
+  return _funcKey1Long;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey1Long(Function func) {
+  if (func == _funcKey1Long)
+    return;
+  _funcKey1Long = func;
+  emit modified(this);
+}
+
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey2Short() const {
+  return _funcKey2Short;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey2Short(Function func) {
+  if (func == _funcKey2Short)
+    return;
+  _funcKey2Short = func;
+  emit modified(this);
+}
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey2Long() const {
+  return _funcKey2Long;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey2Long(Function func) {
+  if (func == _funcKey2Long)
+    return;
+  _funcKey2Long = func;
+  emit modified(this);
+}
+
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey3Short() const {
+  return _funcKey3Short;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey3Short(Function func) {
+  if (func == _funcKey3Short)
+    return;
+  _funcKey3Short = func;
+  emit modified(this);
+}
+RadioddityButtonSettingsExtension::Function
+RadioddityButtonSettingsExtension::funcKey3Long() const {
+  return _funcKey3Long;
+}
+void
+RadioddityButtonSettingsExtension::setFuncKey3Long(Function func) {
+  if (func == _funcKey3Long)
+    return;
+  _funcKey3Long = func;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadiodditySettingsExtension
  * ********************************************************************************************* */
 RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
@@ -16,7 +120,8 @@ RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
     _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
     _disableAllTones(false), _powerSaveMode(true), _wakeupPreamble(true), _disableAllLEDs(false),
     _quickKeyOverrideInhibited(false), _txExitTone(false), _txOnActiveChannel(true),
-    _animation(false), _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _progPasswd()
+    _animation(false), _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _progPasswd(),
+    _buttonSettings(new RadioddityButtonSettingsExtension(this))
 {
   // pass...
 }
@@ -378,4 +483,10 @@ RadiodditySettingsExtension::setProgPassword(const QString &pwd) {
   _progPasswd = pwd;
   emit modified(this);
 }
+
+RadioddityButtonSettingsExtension *
+RadiodditySettingsExtension::buttons() const {
+  return _buttonSettings;
+}
+
 

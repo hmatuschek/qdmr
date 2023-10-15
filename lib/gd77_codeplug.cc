@@ -6,7 +6,6 @@
 #include <QDateTime>
 
 #define ADDR_SETTINGS             0x0000e0
-#define ADDR_BUTTONS              0x000108
 #define ADDR_MESSAGE_BANK         0x000128
 
 #define ADDR_ENCRYPTION           0x001370
@@ -284,7 +283,16 @@ GD77Codeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorSta
 
 void
 GD77Codeplug::clearButtonSettings() {
-  ButtonSettingsElement(data(ADDR_BUTTONS)).clear();
+  ButtonSettingsElement(data(Offset::buttonSettings())).clear();
+}
+bool
+GD77Codeplug::encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+  return ButtonSettingsElement(data(Offset::buttonSettings())).encode(ctx, err);
+}
+bool
+GD77Codeplug::decodeButtonSettings(Context &ctx, const ErrorStack &err) {
+  return ButtonSettingsElement(data(Offset::buttonSettings())).decode(ctx, err);
 }
 
 void

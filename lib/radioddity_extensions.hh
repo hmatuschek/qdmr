@@ -5,6 +5,93 @@
 #include "interval.hh"
 
 
+/** Represents the button settings extension for all radioddity devices.
+ * @ingroup radioddity */
+class RadioddityButtonSettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The long-press duration. */
+  Q_PROPERTY(Interval longPressDuration READ longPressDuration WRITE setLongPressDuration)
+  /** The short-press action for the programmable function key 1 (SK1, P1). */
+  Q_PROPERTY(Function funcKey1Short READ funcKey1Short WRITE setFuncKey1Short)
+  /** The long-press action for the programmable function key 1 (SK1, P1). */
+  Q_PROPERTY(Function funcKey1Long READ funcKey1Long WRITE setFuncKey1Long)
+  /** The short-press action for the programmable function key 2 (SK2, P2). */
+  Q_PROPERTY(Function funcKey2Short READ funcKey2Short WRITE setFuncKey2Short)
+  /** The long-press action for the programmable function key 2 (SK2, P2). */
+  Q_PROPERTY(Function funcKey2Long READ funcKey2Long WRITE setFuncKey2Long)
+  /** The short-press action for the programmable function key 3 (TK). */
+  Q_PROPERTY(Function funcKey3Short READ funcKey3Short WRITE setFuncKey3Short)
+  /** The long-press action for the programmable function key 3 (TK). */
+  Q_PROPERTY(Function funcKey3Long READ funcKey3Long WRITE setFuncKey3Long)
+
+public:
+  /** Possible function key actions. Not all functions are present on all devices. */
+  enum class Function {
+    None, ToggleAllAlertTones, EmergencyOn, EmergencyOff, ToggleMonitor, OneTouch1,
+    OneTouch2, OneTouch3, OneTouch4, OneTouch5, OneTouch6, ToggleTalkaround, ToggleScan,
+    ToggleEncryption, ToggleVox, ZoneSelect, BatteryIndicator, ToggleLoneWorker, PhoneExit,
+    ToggleFlashLight, ToggleFMRadio, RadioEnable, RadioCheck, RadioDisable, PowerLevel, TBST,
+    CallSwell
+  };
+  Q_ENUM(Function)
+
+public:
+  Q_INVOKABLE explicit RadioddityButtonSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the long-press duration, usually specified in ms. */
+  Interval longPressDuration() const;
+  /** Sets the long-press duration, usually specified in ms. */
+  void setLongPressDuration(Interval interval);
+
+  /** Returns the short-press function of the progammable function key 1 (SK1, P1). */
+  Function funcKey1Short() const;
+  /** Sets the short-press function of the progammable function key 1 (SK1, P1). */
+  void setFuncKey1Short(Function func);
+  /** Returns the long-press function of the progammable function key 1 (SK1, P1). */
+  Function funcKey1Long() const;
+  /** Sets the long-press function of the progammable function key 1 (SK1, P1). */
+  void setFuncKey1Long(Function func);
+
+  /** Returns the short-press function of the progammable function key 2 (SK2, P2). */
+  Function funcKey2Short() const;
+  /** Sets the short-press function of the progammable function key 2 (SK2, P2). */
+  void setFuncKey2Short(Function func);
+  /** Returns the long-press function of the progammable function key 2 (SK2, P2). */
+  Function funcKey2Long() const;
+  /** Sets the long-press function of the progammable function key 2 (SK2, P2). */
+  void setFuncKey2Long(Function func);
+
+  /** Returns the short-press function of the progammable function key 3 (TK). */
+  Function funcKey3Short() const;
+  /** Sets the short-press function of the progammable function key 3 (TK). */
+  void setFuncKey3Short(Function func);
+  /** Returns the long-press function of the progammable function key 3 (TK). */
+  Function funcKey3Long() const;
+  /** Sets the long-press function of the progammable function key 3 (TK). */
+  void setFuncKey3Long(Function func);
+
+protected:
+  /** The long-press duration. */
+  Interval _longPressDuration;
+  /** The short-press action for the programmable function key 1 (SK1, P1). */
+  Function _funcKey1Short;
+  /** The long-press action for the programmable function key 1 (SK1, P1). */
+  Function _funcKey1Long;
+  /** The short-press action for the programmable function key 2 (SK2, P2). */
+  Function _funcKey2Short;
+  /** The long-press action for the programmable function key 2 (SK2, P2). */
+  Function _funcKey2Long;
+  /** The short-press action for the programmable function key 3 (TK). */
+  Function _funcKey3Short;
+  /** The long-press action for the programmable function key 3 (TK). */
+  Function _funcKey3Long;
+};
+
+
 /** Represents the general settings extension for Radioddity devices.
  * @ingroup radioddity */
 class RadiodditySettingsExtension: public ConfigExtension
@@ -77,6 +164,9 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
   /** The programming password, disabled if empty. */
   Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
+
+  /** The button settings. */
+  Q_PROPERTY(RadioddityButtonSettingsExtension *buttons READ buttons)
 
 public:
   /** Possible monitor types. */
@@ -247,6 +337,9 @@ public:
   /** Sets the programming password. */
   void setProgPassword(const QString &pwd);
 
+  /** Returns a weak reference to the button settings. */
+  RadioddityButtonSettingsExtension *buttons() const;
+
 protected:
   /** Holds the preamble duration in ms. */
   Interval _preambleDuration;
@@ -306,6 +399,8 @@ protected:
   Interval _repeaterSTE;
   /** Holds the programming password, disabled if empty. */
   QString _progPasswd;
+  /** Button settings. */
+  RadioddityButtonSettingsExtension *_buttonSettings;
 };
 
 #endif // RADIODDITYEXTENSIONS_HH

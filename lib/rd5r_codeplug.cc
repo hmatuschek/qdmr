@@ -268,6 +268,15 @@ void
 RD5RCodeplug::clearButtonSettings() {
   ButtonSettingsElement(data(Offset::buttons())).clear();
 }
+bool
+RD5RCodeplug::encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+  return ButtonSettingsElement(data(Offset::buttons())).encode(ctx, err);
+}
+bool
+RD5RCodeplug::decodeButtonSettings(Context &ctx, const ErrorStack &err) {
+  return ButtonSettingsElement(data(Offset::buttons())).decode(ctx, err);
+}
 
 void
 RD5RCodeplug::clearMessages() {

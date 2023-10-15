@@ -117,6 +117,65 @@ GD73Codeplug::InformationElement::softwareVersion() const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::SettingsElement::KeyFunction
+ * ********************************************************************************************* */
+uint8_t
+GD73Codeplug::SettingsElement::KeyFunction::encode(RadioddityButtonSettingsExtension::Function func) {
+  switch (func) {
+  case RadioddityButtonSettingsExtension::Function::None: return None;
+  case RadioddityButtonSettingsExtension::Function::RadioEnable: return RadioEnable;
+  case RadioddityButtonSettingsExtension::Function::RadioCheck: return RadioCheck;
+  case RadioddityButtonSettingsExtension::Function::RadioDisable: return RadioDisable;
+  case RadioddityButtonSettingsExtension::Function::PowerLevel: return PowerLevel;
+  case RadioddityButtonSettingsExtension::Function::ToggleMonitor: return Monitor;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOn: return EmergencyOn;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOff: return EmergencyOff;
+  case RadioddityButtonSettingsExtension::Function::ZoneSelect: return ZoneSwitch;
+  case RadioddityButtonSettingsExtension::Function::ToggleScan: return ToggleScan;
+  case RadioddityButtonSettingsExtension::Function::ToggleVox: return ToggleVOX;
+  case RadioddityButtonSettingsExtension::Function::OneTouch1: return OneTouch1;
+  case RadioddityButtonSettingsExtension::Function::OneTouch2: return OneTouch2;
+  case RadioddityButtonSettingsExtension::Function::OneTouch3: return OneTouch3;
+  case RadioddityButtonSettingsExtension::Function::OneTouch4: return OneTouch4;
+  case RadioddityButtonSettingsExtension::Function::OneTouch5: return OneTouch5;
+  case RadioddityButtonSettingsExtension::Function::ToggleTalkaround: return ToggleTalkaround;
+  case RadioddityButtonSettingsExtension::Function::ToggleLoneWorker: return LoneWorker;
+  case RadioddityButtonSettingsExtension::Function::TBST: return TBST;
+  case RadioddityButtonSettingsExtension::Function::CallSwell: return CallSwell;
+  default: break;
+  }
+  return None;
+}
+
+RadioddityButtonSettingsExtension::Function
+GD73Codeplug::SettingsElement::KeyFunction::decode(uint8_t code) {
+  switch((Code) code) {
+  case None: return RadioddityButtonSettingsExtension::Function::None;
+  case RadioEnable: return RadioddityButtonSettingsExtension::Function::RadioEnable;
+  case RadioCheck: return RadioddityButtonSettingsExtension::Function::RadioCheck;
+  case RadioDisable: return RadioddityButtonSettingsExtension::Function::RadioDisable;
+  case PowerLevel: return RadioddityButtonSettingsExtension::Function::PowerLevel;
+  case Monitor: return RadioddityButtonSettingsExtension::Function::ToggleMonitor;
+  case EmergencyOn: return RadioddityButtonSettingsExtension::Function::EmergencyOn;
+  case EmergencyOff: return RadioddityButtonSettingsExtension::Function::EmergencyOff;
+  case ZoneSwitch: return RadioddityButtonSettingsExtension::Function::ZoneSelect;
+  case ToggleScan: return RadioddityButtonSettingsExtension::Function::ToggleScan;
+  case ToggleVOX: return RadioddityButtonSettingsExtension::Function::ToggleVox;
+  case OneTouch1: return RadioddityButtonSettingsExtension::Function::OneTouch1;
+  case OneTouch2: return RadioddityButtonSettingsExtension::Function::OneTouch2;
+  case OneTouch3: return RadioddityButtonSettingsExtension::Function::OneTouch3;
+  case OneTouch4: return RadioddityButtonSettingsExtension::Function::OneTouch4;
+  case OneTouch5: return RadioddityButtonSettingsExtension::Function::OneTouch5;
+  case ToggleTalkaround: return RadioddityButtonSettingsExtension::Function::ToggleTalkaround;
+  case LoneWorker: return RadioddityButtonSettingsExtension::Function::ToggleLoneWorker;
+  case TBST: return RadioddityButtonSettingsExtension::Function::TBST;
+  case CallSwell: return RadioddityButtonSettingsExtension::Function::CallSwell;
+  default: break;
+  }
+  return RadioddityButtonSettingsExtension::Function::None;
+}
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug::SettingsElement
  * ********************************************************************************************* */
 GD73Codeplug::SettingsElement::SettingsElement(uint8_t *ptr, size_t size)
@@ -364,37 +423,37 @@ GD73Codeplug::SettingsElement::setLongPressDuration(const Interval &interval) {
   Interval intv = Limit::longPressDuration().map(interval);
   setUInt8(Offset::longPressDuration(), intv.milliseconds()/500);
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionLongPressP1() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey1LongPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1LongPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionLongPressP1(KeyFunction function) {
-  setUInt8(Offset::progFuncKey1LongPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionLongPressP1(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey1LongPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionShortPressP1() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey1ShortPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1ShortPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionShortPressP1(KeyFunction function) {
-  setUInt8(Offset::progFuncKey1ShortPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionShortPressP1(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey1ShortPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionLongPressP2() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey2LongPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2LongPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionLongPressP2(KeyFunction function) {
-  setUInt8(Offset::progFuncKey2LongPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionLongPressP2(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey2LongPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionShortPressP2() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey2ShortPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2ShortPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionShortPressP2(KeyFunction function) {
-  setUInt8(Offset::progFuncKey2ShortPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionShortPressP2(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey2ShortPress(), KeyFunction::encode(function));
 }
 GD73Codeplug::OneTouchSettingElement
 GD73Codeplug::SettingsElement::oneTouch(unsigned int n) {
@@ -468,6 +527,12 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
     return true;
   setLoneWorkerResponseTimeout(ext->loneWorkerResponseTime());
   setLoneWorkerRemindPeriod(ext->loneWorkerReminderPeriod());
+
+  setLongPressDuration(ext->buttons()->longPressDuration());
+  setKeyFunctionShortPressP1(ext->buttons()->funcKey1Short());
+  setKeyFunctionLongPressP1(ext->buttons()->funcKey1Long());
+  setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
+  setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
 
   return true;
 }
