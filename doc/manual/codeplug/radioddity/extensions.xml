@@ -16,7 +16,8 @@
 
 <para>
   These extensions are applicable to <trademark>Radioddity</trademark> 
-  <productname>GD77</productname> and Baofeng/Radioddity <productname>RD-5R</productname> radios.
+  <productname>GD77</productname>, <productname>GD73</productname> and Baofeng/Radioddity 
+  <productname>RD-5R</productname> radios.
 </para>
 
 <xi:include href="radiosettings.xml"/>

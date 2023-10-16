@@ -525,6 +525,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext)
     return true;
+
   setLoneWorkerResponseTimeout(ext->loneWorkerResponseTime());
   setLoneWorkerRemindPeriod(ext->loneWorkerReminderPeriod());
 
@@ -533,6 +534,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setKeyFunctionLongPressP1(ext->buttons()->funcKey1Long());
   setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
   setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
+
 
   return true;
 }
