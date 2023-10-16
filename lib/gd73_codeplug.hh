@@ -190,6 +190,10 @@ public:
         LoneWorker=17, TBST=18, CallSwell=19
       };
     };
+    /** Possible languages. */
+    enum class Language {
+      Chinese=0, English=1
+    };
 
   protected:
     /** Hidden constructor. */
@@ -211,6 +215,11 @@ public:
     unsigned int dmrID() const;
     /** Sets the radio ID. */
     void setDMRID(unsigned int id);
+
+    /** Retruns the menu language. */
+    Language language() const;
+    /** Sets the menu language. */
+    void setLanguage(Language lang);
 
     /** Returns the VOX level [0,10]. */
     unsigned int vox() const;
@@ -383,6 +392,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()                                  { return 0x0000; }
       static constexpr unsigned int dmrId()                                 { return 0x0020; }
+      static constexpr unsigned int language()                              { return 0x0024; }
       static constexpr unsigned int voxLevel()                              { return 0x0026; }
       static constexpr unsigned int squelchLevel()                          { return 0x0027; }
       static constexpr unsigned int tot()                                   { return 0x0028; }

@@ -6,8 +6,8 @@
 
 
 /** Represents the button settings extension for all radioddity devices.
- * @ingroup radioddity */
-class RadioddityButtonSettingsExtension: public ConfigExtension
+ * This object is part of the RadiodditySettingsExtension instance. */
+class RadioddityButtonSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
@@ -38,7 +38,7 @@ public:
   Q_ENUM(Function)
 
 public:
-  Q_INVOKABLE explicit RadioddityButtonSettingsExtension(QObject *parent=nullptr);
+  explicit RadioddityButtonSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
 
@@ -92,32 +92,23 @@ protected:
 };
 
 
-/** Represents the general settings extension for Radioddity devices.
- * @ingroup radioddity */
-class RadiodditySettingsExtension: public ConfigExtension
+/** Tone settings for Radioddity devices. */
+class RadioddityToneSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** The preamble duration in ms. */
-  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
-  /** The monitor type. */
-  Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
+  /** If @c true, the low battery warning is enabled. (GD-73 only) */
+  Q_PROPERTY(bool lowBatteryWarn READ lowBatteryWarn WRITE enableLowBatteryWarn)
   /** The low-battery warn interval in seconds. */
   Q_PROPERTY(Interval lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
+  /** Returns the low-battery warning volume [1,10]. (GD-73 only)*/
+  Q_PROPERTY(bool lowBatteryWarnVolume READ lowBatteryWarnVolume WRITE setLowBatteryWarnVolume)
+  /** If @c true, the key tones are enabled. */
+  Q_PROPERTY(bool keyTone READ keyTone WRITE enableKeyTone)
+  /** Returns the key-tone volume. */
+  Q_PROPERTY(bool keyToneVolume READ keyToneVolume WRITE setKeyToneVolume)
   /** The call-alert duration in seconds. */
   Q_PROPERTY(Interval callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
-  /** The lone-worker response time in minutes. */
-  Q_PROPERTY(Interval loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
-  /** The lonw-worker reminder period in seconds. */
-  Q_PROPERTY(Interval loneWorkerReminderPeriod READ loneWorkerReminderPeriod WRITE setLoneWorkerReminderPeriod)
-  /** The group-call hang-time in ms. */
-  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
-  /** The private-call hang-time in ms. */
-  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
-  /** If @c true the down-channel mode is VFO. */
-  Q_PROPERTY(bool downChannelModeVFO READ downChannelModeVFO WRITE enableDownChannelModeVFO)
-  /** If @c true the up-channel mode is VFO. */
-  Q_PROPERTY(bool upChannelModeVFO READ upChannelModeVFO WRITE enableUpChannelModeVFO)
   /** If @c true the reset tone is enabled. */
   Q_PROPERTY(bool resetTone READ resetTone WRITE enableResetTone)
   /** @c true, the unknown number tone is enabled. */
@@ -134,48 +125,12 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
   /** If @c true, all tones are disabled. */
   Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
-  /** If @c true, the power save mode is enabled. */
-  Q_PROPERTY(bool powerSaveMode READ powerSaveMode WRITE enablePowerSaveMode)
-  Q_CLASSINFO("powerSaveModeDescription", "Puts the radio into sleep-mode when idle.")
-  Q_CLASSINFO("powerSaveModeLongDescription",
-              "When enabled, the radio enters a sleep mode when idle. That is, when on receive and "
-              "there is no activity on the current channel. However, the radio may need some time "
-              "to wake up from this mode. Hence, the 'wakeupPreamble' need to be enabled by all "
-              "radios in the network to provide this wake-up delay.")
-  /** If @c true, a wakeup preamble is sent. */
-  Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
-  Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
-              "preamble before each call.")
-  /** If @c true, all LEDs are disabled. */
-  Q_PROPERTY(bool allLEDsDisabled READ allLEDsDisabled WRITE disableAllLEDs)
-  /** If @c true, the quick-key override is inhibited. */
-  Q_PROPERTY(bool quickKeyOverrideInhibited READ quickKeyOverrideInhibited WRITE inhibitQuickKeyOverride)
   /** If @c true, the TX exit tone is enabled. */
   Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
-  /** If @c true, the radio will transmit on the active channel when double-wait is enabled. */
-  Q_PROPERTY(bool txOnActiveChannel READ txOnActiveChannel WRITE enableTXOnActiveChannel)
-  /** If @c true, the boot animation is enabled. */
-  Q_PROPERTY(bool animation READ animation WRITE enableAnimation)
-  /** The scan mode. */
-  Q_PROPERTY(ScanMode scanMode READ scanMode WRITE setScanMode)
-  /** The repeater end delay in seconds. */
-  Q_PROPERTY(Interval repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
-  /** The repeater STE in seconds. */
-  Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
-  /** The programming password, disabled if empty. */
-  Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
-
-  /** The button settings. */
-  Q_PROPERTY(RadioddityButtonSettingsExtension *buttons READ buttons)
+  /** Sets the FM mic gain (GD-73 only). */
+  Q_PROPERTY(unsigned int fmMicGain READ fmMicGain WRITE setFMMicGain);
 
 public:
-  /** Possible monitor types. */
-  enum class MonitorType {
-    Open = 0,            ///< Monitoring by opening the squelch.
-    Silent = 1           ///< Silent monitoring.
-  };
-  Q_ENUM(MonitorType)
-
   /** Possible ARTS tone settings. */
   enum class ARTSTone {
     Disabled = 0,        ///< ARTS tone is disabled.
@@ -184,66 +139,38 @@ public:
   };
   Q_ENUM(ARTSTone)
 
-  /** Possible scan modes. */
-  enum class ScanMode {
-    Time    = 0,
-    Carrier = 1,
-    Search  = 2
-  };
-  Q_ENUM(ScanMode)
-
 public:
   /** Default constructor. */
-  Q_INVOKABLE explicit RadiodditySettingsExtension(QObject *parent=nullptr);
+  explicit RadioddityToneSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
 
-  /** Returns the preamble duration in ms. */
-  Interval preambleDuration() const;
-  /** Sets the preamble duration in ms. */
-  void setPreambleDuration(Interval ms);
-
-  /** Returns the monitor type. */
-  MonitorType monitorType() const;
-  /** Sets the monitor type. */
-  void setMonitorType(MonitorType type);
-
+  /** Returns @c true if a low battery charge is indicated by a warning. */
+  bool lowBatteryWarn() const;
+  /** Enables/disables low-battery warning. */
+  void enableLowBatteryWarn(bool enable);
   /** Returns the low-battery warn interval in seconds. */
   Interval lowBatteryWarnInterval() const;
   /** Sets the low-battery warn interval in seconds. */
   void setLowBatteryWarnInterval(Interval sec);
+  /** Returns the volume of the low-battery warning tone [1,10]. */
+  unsigned int lowBatteryWarnVolume() const;
+  /** Sets the volume of the low-battery warning tone [1,10]. */
+  void setLowBatteryWarnVolume(unsigned int);
+
+  /** Retruns @c true, if the key tones are enabled. */
+  bool keyTone() const;
+  /** Enables/disables key tones. */
+  void enableKeyTone(bool enable);
+  /** Retruns the key-tone volume. */
+  unsigned int keyToneVolume() const;
+  /** Sets the key-tone volume. */
+  void setKeyToneVolume(unsigned int volume);
 
   /** Returns the call-alert duration in seconds. */
   Interval callAlertDuration() const;
   /** Sets the call-allert duration in seconds. */
   void setCallAlertDuration(Interval sec);
-
-  /** Returns the lone-worker response time in minutes. */
-  Interval loneWorkerResponseTime() const;
-  /** Sets the lone-worker response time in minutes. */
-  void setLoneWorkerResponseTime(Interval min);
-  /** Returns the lone-worker reminder period in seconds. */
-  Interval loneWorkerReminderPeriod() const;
-  /** Sets the lone-worker reminder period in seconds. */
-  void setLoneWorkerReminderPeriod(Interval sec);
-
-  /** Returns the group call hang time in ms. */
-  Interval groupCallHangTime() const;
-  /** Sets the group call hang time in ms. */
-  void setGroupCallHangTime(Interval ms);
-  /** Returns the private call hang time in ms. */
-  Interval privateCallHangTime() const;
-  /** Sets the private call hang time in ms. */
-  void setPrivateCallHangTime(Interval ms);
-
-  /** Returns @c true if the down-channel mode is VFO. */
-  bool downChannelModeVFO() const;
-  /** Enables/disables down-channel mode is VFO. */
-  void enableDownChannelModeVFO(bool enable);
-  /** Returns @c true if the up-channel mode is VFO. */
-  bool upChannelModeVFO() const;
-  /** Enables/disables up-channel mode is VFO. */
-  void enableUpChannelModeVFO(bool enable);
 
   /** Returns @c true if the reset tone is enabled. */
   bool resetTone() const;
@@ -284,6 +211,168 @@ public:
   /** Disables/enables all tones. */
   void disableAllTones(bool disable);
 
+  /** Returns @c true if the TX exit tone is enabled. */
+  bool txExitTone() const;
+  /** Enables/disables TX exit tone. */
+  void enableTXExitTone(bool enable);
+
+  /** Returns the FM mic gain [1,10]. */
+  unsigned int fmMicGain() const;
+  /** Sets the FM mic gain [1,10]. */
+  void setFMMicGain(unsigned int gain);
+
+protected:
+  /** If @c true, a low-battery charge is indicated by a warning. */
+  bool _lowBatteryWarn;
+  /** Holds the low-battery warn interval in seconds. */
+  Interval _lowBatteryWarnInterval;
+  /** Holds the volume of the low-battery warning tone. */
+  unsigned int _lowBatteryWarnVolume;
+  /** Holds the call alert duration in seconds. */
+  Interval _callAlertDuration;
+  /** If @c true the reset tone is enabled. */
+  bool _resetTone;
+  /** If @c true, the unknown number tone is enabled. */
+  bool _unknownNumberTone;
+  /** Holds the ARTS tone mode. */
+  ARTSTone _artsToneMode;
+  /** If @c true, the talk permit tone is enabled for digital channels. */
+  bool _digitalTalkPermitTone;
+  /** If @c true, the talk permit tone is enabled for analog channels. */
+  bool _analogTalkPermitTone;
+  /** If @c true, the self-test tone is enabled. */
+  bool _selftestTone;
+  /** If @c true, the channel free indication tone is enabled. */
+  bool _channelFreeIndicationTone;
+  /** If @c true, all tones are disabled. */
+  bool _disableAllTones;
+  /** If @c true, the TX exit tone is enabled. */
+  bool _txExitTone;
+  /** If @c true, the key-tones are enabled. */
+  bool _keyTone;
+  /** Holds the key-tone volume [1,10]. */
+  unsigned int _keyToneVolume;
+  /** The FM mic gain. */
+  unsigned int _fmMicGain;
+};
+
+
+/** Represents the general settings extension for Radioddity devices.
+ * @ingroup radioddity */
+class RadiodditySettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The preamble duration in ms. */
+  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
+  /** The monitor type. */
+  Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
+  /** The lone-worker response time in minutes. */
+  Q_PROPERTY(Interval loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
+  /** The lonw-worker reminder period in seconds. */
+  Q_PROPERTY(Interval loneWorkerReminderPeriod READ loneWorkerReminderPeriod WRITE setLoneWorkerReminderPeriod)
+  /** The group-call hang-time in ms. */
+  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+  /** The private-call hang-time in ms. */
+  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+  /** If @c true the down-channel mode is VFO. */
+  Q_PROPERTY(bool downChannelModeVFO READ downChannelModeVFO WRITE enableDownChannelModeVFO)
+  /** If @c true the up-channel mode is VFO. */
+  Q_PROPERTY(bool upChannelModeVFO READ upChannelModeVFO WRITE enableUpChannelModeVFO)
+  /** If @c true, the power save mode is enabled. */
+  Q_PROPERTY(bool powerSaveMode READ powerSaveMode WRITE enablePowerSaveMode)
+  Q_CLASSINFO("powerSaveModeDescription", "Puts the radio into sleep-mode when idle.")
+  Q_CLASSINFO("powerSaveModeLongDescription",
+              "When enabled, the radio enters a sleep mode when idle. That is, when on receive and "
+              "there is no activity on the current channel. However, the radio may need some time "
+              "to wake up from this mode. Hence, the 'wakeupPreamble' need to be enabled by all "
+              "radios in the network to provide this wake-up delay.")
+  /** If @c true, a wakeup preamble is sent. */
+  Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
+  Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
+              "preamble before each call.")
+  /** If @c true, all LEDs are disabled. */
+  Q_PROPERTY(bool allLEDsDisabled READ allLEDsDisabled WRITE disableAllLEDs)
+  /** If @c true, the quick-key override is inhibited. */
+  Q_PROPERTY(bool quickKeyOverrideInhibited READ quickKeyOverrideInhibited WRITE inhibitQuickKeyOverride)
+  /** If @c true, the radio will transmit on the active channel when double-wait is enabled. */
+  Q_PROPERTY(bool txOnActiveChannel READ txOnActiveChannel WRITE enableTXOnActiveChannel)
+  /** If @c true, the boot animation is enabled. */
+  Q_PROPERTY(bool animation READ animation WRITE enableAnimation)
+  /** The scan mode. */
+  Q_PROPERTY(ScanMode scanMode READ scanMode WRITE setScanMode)
+  /** The repeater end delay in seconds. */
+  Q_PROPERTY(Interval repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
+  /** The repeater STE in seconds. */
+  Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
+  /** The programming password, disabled if empty. */
+  Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
+
+  /** The button settings. */
+  Q_PROPERTY(RadioddityButtonSettingsExtension *buttons READ buttons)
+  /** The tone settings. */
+  Q_PROPERTY(RadioddityToneSettingsExtension *tone READ tone)
+
+public:
+  /** Possible monitor types. */
+  enum class MonitorType {
+    Open = 0,            ///< Monitoring by opening the squelch.
+    Silent = 1           ///< Silent monitoring.
+  };
+  Q_ENUM(MonitorType)
+
+  /** Possible scan modes. */
+  enum class ScanMode {
+    Time    = 0,
+    Carrier = 1,
+    Search  = 2
+  };
+  Q_ENUM(ScanMode)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit RadiodditySettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the preamble duration in ms. */
+  Interval preambleDuration() const;
+  /** Sets the preamble duration in ms. */
+  void setPreambleDuration(Interval ms);
+
+  /** Returns the monitor type. */
+  MonitorType monitorType() const;
+  /** Sets the monitor type. */
+  void setMonitorType(MonitorType type);
+
+  /** Returns the lone-worker response time in minutes. */
+  Interval loneWorkerResponseTime() const;
+  /** Sets the lone-worker response time in minutes. */
+  void setLoneWorkerResponseTime(Interval min);
+  /** Returns the lone-worker reminder period in seconds. */
+  Interval loneWorkerReminderPeriod() const;
+  /** Sets the lone-worker reminder period in seconds. */
+  void setLoneWorkerReminderPeriod(Interval sec);
+
+  /** Returns the group call hang time in ms. */
+  Interval groupCallHangTime() const;
+  /** Sets the group call hang time in ms. */
+  void setGroupCallHangTime(Interval ms);
+  /** Returns the private call hang time in ms. */
+  Interval privateCallHangTime() const;
+  /** Sets the private call hang time in ms. */
+  void setPrivateCallHangTime(Interval ms);
+
+  /** Returns @c true if the down-channel mode is VFO. */
+  bool downChannelModeVFO() const;
+  /** Enables/disables down-channel mode is VFO. */
+  void enableDownChannelModeVFO(bool enable);
+  /** Returns @c true if the up-channel mode is VFO. */
+  bool upChannelModeVFO() const;
+  /** Enables/disables up-channel mode is VFO. */
+  void enableUpChannelModeVFO(bool enable);
+
+
   /** Returns @c true if the power save mode is enabled. */
   bool powerSaveMode() const;
   /** Enables the power save mode. */
@@ -302,11 +391,6 @@ public:
   bool quickKeyOverrideInhibited() const;
   /** Inhibits quick-key override. */
   void inhibitQuickKeyOverride(bool inhibit);
-
-  /** Returns @c true if the TX exit tone is enabled. */
-  bool txExitTone() const;
-  /** Enables/disables TX exit tone. */
-  void enableTXExitTone(bool enable);
 
   /** Returns @c true if the radio transmits on the active channel on double monitor. */
   bool txOnActiveChannel() const;
@@ -339,16 +423,14 @@ public:
 
   /** Returns a weak reference to the button settings. */
   RadioddityButtonSettingsExtension *buttons() const;
+  /** Returns a weak reference to the tone settings. */
+  RadioddityToneSettingsExtension *tone() const;
 
 protected:
   /** Holds the preamble duration in ms. */
   Interval _preambleDuration;
   /** Holds the monitor type. */
   MonitorType _monitorType;
-  /** Holds the low-battery warn interval in seconds. */
-  Interval _lowBatteryWarnInterval;
-  /** Holds the call alert duration in seconds. */
-  Interval _callAlertDuration;
   /** Holds the lone-worker response time in minutes. */
   Interval _loneWorkerResponseTime;
   /** Holds the lone-worker reminder period in seconds. */
@@ -361,22 +443,6 @@ protected:
   bool _downChannelModeVFO;
   /** If @c true the up-channel mode is VFO. */
   bool _upChannelModeVFO;
-  /** If @c true the reset tone is enabled. */
-  bool _resetTone;
-  /** If @c true, the unknown number tone is enabled. */
-  bool _unknownNumberTone;
-  /** Holds the ARTS tone mode. */
-  ARTSTone _artsToneMode;
-  /** If @c true, the talk permit tone is enabled for digital channels. */
-  bool _digitalTalkPermitTone;
-  /** If @c true, the talk permit tone is enabled for analog channels. */
-  bool _analogTalkPermitTone;
-  /** If @c true, the self-test tone is enabled. */
-  bool _selftestTone;
-  /** If @c true, the channel free indication tone is enabled. */
-  bool _channelFreeIndicationTone;
-  /** If @c true, all tones are disabled. */
-  bool _disableAllTones;
   /** If @c true, the power save mode is enabled. */
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */
@@ -385,8 +451,6 @@ protected:
   bool _disableAllLEDs;
   /** If @c true, the quick-key override is inhibited. */
   bool _quickKeyOverrideInhibited;
-  /** If @c true, the TX exit tone is enabled. */
-  bool _txExitTone;
   /** If @c true, the radio will transmit on the active channel when double-wait is enabled. */
   bool _txOnActiveChannel;
   /** If @c true, the boot animation is enabled. */
@@ -401,6 +465,8 @@ protected:
   QString _progPasswd;
   /** Button settings. */
   RadioddityButtonSettingsExtension *_buttonSettings;
+  /** Tone settings. */
+  RadioddityToneSettingsExtension *_toneSettings;
 };
 
 #endif // RADIODDITYEXTENSIONS_HH

@@ -705,7 +705,7 @@ public:
     /** Use monitor type from extension. */
     typedef RadiodditySettingsExtension::MonitorType MonitorType;
     /** Use ARTS tone mode from extension. */
-    typedef RadiodditySettingsExtension::ARTSTone ARTSTone;
+    typedef RadioddityToneSettingsExtension::ARTSTone ARTSTone;
     /** Use scan mode from extension. */
     typedef RadiodditySettingsExtension::ScanMode ScanMode;
 

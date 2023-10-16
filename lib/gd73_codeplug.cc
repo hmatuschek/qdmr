@@ -208,6 +208,15 @@ GD73Codeplug::SettingsElement::setDMRID(unsigned int id) {
   setUInt32_le(Offset::dmrId(), id);
 }
 
+GD73Codeplug::SettingsElement::Language
+GD73Codeplug::SettingsElement::language() const {
+  return (Language)getUInt8(Offset::language());
+}
+void
+GD73Codeplug::SettingsElement::setLanguage(Language lang) {
+  setUInt8(Offset::language(), (unsigned int)lang);
+}
+
 unsigned int
 GD73Codeplug::SettingsElement::vox() const {
   return getUInt8(Offset::voxLevel())*10/4;
@@ -484,11 +493,23 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
-  if (! ext)
+  if (nullptr == ext)
     ctx.config()->settings()->setRadioddityExtension(ext = new RadiodditySettingsExtension());
 
   ext->setLoneWorkerResponseTime(loneWorkerResponseTimeout());
   ext->setLoneWorkerReminderPeriod(loneWorkerRemindPeriod());
+
+  ext->buttons()->setLongPressDuration(longPressDuration());
+  ext->buttons()->setFuncKey1Short(keyFunctionShortPressP1());
+  ext->buttons()->setFuncKey1Long(keyFunctionLongPressP1());
+  ext->buttons()->setFuncKey2Short(keyFunctionShortPressP2());
+  ext->buttons()->setFuncKey2Long(keyFunctionLongPressP2());
+
+  ext->tone()->setFMMicGain(fmMicGain());
+  ext->tone()->enableKeyTone(keyToneEnabled());
+  ext->tone()->setKeyToneVolume(keyToneVolume());
+  ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
+  ext->tone()->setLowBatteryWarnVolume(lowBatteryToneVolume());
 
   return true;
 }
@@ -510,6 +531,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setBootTextLine1(ctx.config()->settings()->introLine1());
   setBootTextLine2(ctx.config()->settings()->introLine2());
   setDMRMicGain(ctx.config()->settings()->micLevel());
+  setFMMicGain(ctx.config()->settings()->micLevel());
   setSquelch(ctx.config()->settings()->squelch());
   setVOX(ctx.config()->settings()->vox());
   if (ctx.config()->settings()->totDisabled())
@@ -517,7 +539,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   else
     setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
 
-  setUInt8(0x0024, 0x01);   // < Unknown byte at 0x0024
+  setLanguage(Language::English);
   //setUInt8(0x003c, 0x01);
   //setUInt8(0x003e, 0x01);
 
@@ -535,6 +557,11 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
   setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
 
+  setFMMicGain(ext->tone()->fmMicGain());
+  enableKeyTone(ext->tone()->keyTone());
+  setKeyToneVolume(ext->tone()->keyToneVolume());
+  enableLowBatteryTone(ext->tone()->lowBatteryWarn());
+  setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
 
   return true;
 }
