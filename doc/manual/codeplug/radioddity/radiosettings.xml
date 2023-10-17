@@ -18,5 +18,6 @@
 
 <xi:include href="generalradiosettings.xml"/>
 <xi:include href="radiobuttonsettings.xml"/>
-
+<xi:include href="radiotonesettings.xml"/>
+<xi:include href="radiobootsettings.xml"/>
 </section>

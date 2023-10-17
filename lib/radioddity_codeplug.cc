@@ -1740,14 +1740,14 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(const Config *conf, Conte
     inhibitQuickKeyOverride(ext->quickKeyOverrideInhibited());
     enableTXExitTone(ext->tone()->txExitTone());
     enableTXOnActiveChannel(ext->txOnActiveChannel());
-    enableAnimation(ext->animation());
+    enableAnimation(RadioddityBootSettingsExtension::DisplayMode::Image == ext->boot()->display());
     setScanMode(ext->scanMode());
     setRepeaterEndDelay(ext->repeaterEndDelay().seconds());
     setRepeaterSTE(ext->repeaterSTE().seconds());
-    if (ext->progPassword().isEmpty())
+    if (ext->boot()->progPassword().isEmpty())
       clearProgPassword();
     else
-      setProgPassword(ext->progPassword());
+      setProgPassword(ext->boot()->progPassword());
   }
 
   return true;
@@ -1798,14 +1798,15 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Config *conf, Context &
   ext->inhibitQuickKeyOverride(quickKeyOverrideInhibited());
   ext->tone()->enableTXExitTone(txExitTone());
   ext->enableTXOnActiveChannel(txOnActiveChannel());
-  ext->enableAnimation(animation());
+  ext->boot()->setDisplay(animation() ? RadioddityBootSettingsExtension::DisplayMode::Image:
+                                            RadioddityBootSettingsExtension::DisplayMode::Text);
   ext->setScanMode(scanMode());
   ext->setRepeaterEndDelay(Interval::fromSeconds(repeaterEndDelay()));
   ext->setRepeaterSTE(Interval::fromSeconds(repeaterSTE()));
   if (hasProgPassword())
-    ext->setProgPassword(progPassword());
+    ext->boot()->setProgPassword(progPassword());
   else
-    ext->setProgPassword("");
+    ext->boot()->setProgPassword("");
 
   return true;
 }

@@ -511,6 +511,20 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
   ext->tone()->setLowBatteryWarnVolume(lowBatteryToneVolume());
 
+  switch (bootDisplayMode()) {
+  case BootDisplayMode::Off:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::None);
+    break;
+  case BootDisplayMode::Text:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Text);
+    break;
+  case BootDisplayMode::Image:
+  case BootDisplayMode::Both:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Image);
+    break;
+  }
+
+
   return true;
 }
 

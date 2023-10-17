@@ -324,6 +324,63 @@ RadioddityToneSettingsExtension::setFMMicGain(unsigned int gain) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioddityBootSettingsExtension
+ * ********************************************************************************************* */
+RadioddityBootSettingsExtension::RadioddityBootSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _displayMode(DisplayMode::Text), _bootPasswd(), _progPasswd()
+{
+  // pass...
+}
+
+ConfigItem *
+RadioddityBootSettingsExtension::clone() const {
+  auto *ext = new RadioddityBootSettingsExtension();
+  if (! ext->copy(*this)) {
+    ext->deleteLater();
+    return nullptr;
+  }
+  return ext;
+}
+
+RadioddityBootSettingsExtension::DisplayMode
+RadioddityBootSettingsExtension::display() const {
+  return _displayMode;
+}
+void
+RadioddityBootSettingsExtension::setDisplay(DisplayMode mode) {
+  if (_displayMode == mode)
+    return;
+  _displayMode = mode;
+  emit modified(this);
+}
+
+
+const QString &
+RadioddityBootSettingsExtension::bootPassword() const {
+  return _bootPasswd;
+}
+void
+RadioddityBootSettingsExtension::setBootPassword(const QString &pwd) {
+  if (_bootPasswd == pwd)
+    return;
+  _bootPasswd = pwd;
+  emit modified(this);
+}
+
+const QString &
+RadioddityBootSettingsExtension::progPassword() const {
+  return _progPasswd;
+}
+void
+RadioddityBootSettingsExtension::setProgPassword(const QString &pwd) {
+  if (_progPasswd == pwd)
+    return;
+  _progPasswd = pwd;
+  emit modified(this);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadiodditySettingsExtension
  * ********************************************************************************************* */
 RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
@@ -334,10 +391,11 @@ RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
     _groupCallHangTime(Interval::fromMilliseconds(3000)),
     _privateCallHangTime(Interval::fromMilliseconds(3000)), _downChannelModeVFO(false),
     _upChannelModeVFO(false), _powerSaveMode(true), _wakeupPreamble(true), _disableAllLEDs(false),
-    _quickKeyOverrideInhibited(false), _txOnActiveChannel(true), _animation(false),
-    _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _progPasswd(),
+    _quickKeyOverrideInhibited(false), _txOnActiveChannel(true),
+    _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(),
     _buttonSettings(new RadioddityButtonSettingsExtension(this)),
-    _toneSettings(new RadioddityToneSettingsExtension(this))
+    _toneSettings(new RadioddityToneSettingsExtension(this)),
+    _bootSettings(new RadioddityBootSettingsExtension(this))
 {
   // pass...
 }
@@ -508,18 +566,6 @@ RadiodditySettingsExtension::enableTXOnActiveChannel(bool enable) {
   emit modified(this);
 }
 
-bool
-RadiodditySettingsExtension::animation() const {
-  return _animation;
-}
-void
-RadiodditySettingsExtension::enableAnimation(bool enable) {
-  if (_animation == enable)
-    return;
-  _animation = enable;
-  emit modified(this);
-}
-
 RadiodditySettingsExtension::ScanMode
 RadiodditySettingsExtension::scanMode() const {
   return _scanMode;
@@ -556,18 +602,6 @@ RadiodditySettingsExtension::setRepeaterSTE(Interval ste) {
   emit modified(this);
 }
 
-const QString &
-RadiodditySettingsExtension::progPassword() const {
-  return _progPasswd;
-}
-void
-RadiodditySettingsExtension::setProgPassword(const QString &pwd) {
-  if (_progPasswd == pwd)
-    return;
-  _progPasswd = pwd;
-  emit modified(this);
-}
-
 RadioddityButtonSettingsExtension *
 RadiodditySettingsExtension::buttons() const {
   return _buttonSettings;
@@ -578,3 +612,7 @@ RadiodditySettingsExtension::tone() const {
   return _toneSettings;
 }
 
+RadioddityBootSettingsExtension *
+RadiodditySettingsExtension::boot() const {
+  return _bootSettings;
+}

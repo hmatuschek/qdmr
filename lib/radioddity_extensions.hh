@@ -256,6 +256,56 @@ protected:
   unsigned int _fmMicGain;
 };
 
+/** Represents the boot settings for Radioddity devices.
+ * This settings extension is part of the RadiodditySettingsExtension. */
+class RadioddityBootSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  /** The boot display mode. */
+  Q_PROPERTY(DisplayMode display READ display WRITE setDisplay)
+  /** The programming password, disabled if empty. */
+  Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
+  /** The programming password, disabled if empty. */
+  Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
+
+public:
+  /** Possible boot display modes. */
+  enum class DisplayMode {
+    None, Text, Image
+  };
+  Q_ENUM(DisplayMode)
+
+public:
+  /** Default constructor. */
+  explicit RadioddityBootSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the boot display mode. */
+  DisplayMode display() const;
+  /** Sets the boot display mode. */
+  void setDisplay(DisplayMode mode);
+
+  /** Returns the boot password. */
+  const QString &bootPassword() const;
+  /** Sets the boot password. */
+  void setBootPassword(const QString &pwd);
+
+  /** Returns the programming password. */
+  const QString &progPassword() const;
+  /** Sets the programming password. */
+  void setProgPassword(const QString &pwd);
+
+protected:
+  /** The boot display mode. */
+  DisplayMode _displayMode;
+  /** Holds the boot password, disabled if empty. */
+  QString _bootPasswd;
+  /** Holds the programming password, disabled if empty. */
+  QString _progPasswd;
+};
+
 
 /** Represents the general settings extension for Radioddity devices.
  * @ingroup radioddity */
@@ -263,8 +313,6 @@ class RadiodditySettingsExtension: public ConfigExtension
 {
   Q_OBJECT
 
-  /** The preamble duration in ms. */
-  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
   /** The monitor type. */
   Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
   /** The lone-worker response time in minutes. */
@@ -289,6 +337,8 @@ class RadiodditySettingsExtension: public ConfigExtension
               "radios in the network to provide this wake-up delay.")
   /** If @c true, a wakeup preamble is sent. */
   Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
+  /** The preamble duration in ms. */
+  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
   Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
               "preamble before each call.")
   /** If @c true, all LEDs are disabled. */
@@ -297,21 +347,19 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(bool quickKeyOverrideInhibited READ quickKeyOverrideInhibited WRITE inhibitQuickKeyOverride)
   /** If @c true, the radio will transmit on the active channel when double-wait is enabled. */
   Q_PROPERTY(bool txOnActiveChannel READ txOnActiveChannel WRITE enableTXOnActiveChannel)
-  /** If @c true, the boot animation is enabled. */
-  Q_PROPERTY(bool animation READ animation WRITE enableAnimation)
   /** The scan mode. */
   Q_PROPERTY(ScanMode scanMode READ scanMode WRITE setScanMode)
   /** The repeater end delay in seconds. */
   Q_PROPERTY(Interval repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
   /** The repeater STE in seconds. */
   Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
-  /** The programming password, disabled if empty. */
-  Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
 
   /** The button settings. */
   Q_PROPERTY(RadioddityButtonSettingsExtension *buttons READ buttons)
   /** The tone settings. */
   Q_PROPERTY(RadioddityToneSettingsExtension *tone READ tone)
+  /** The boot settings. */
+  Q_PROPERTY(RadioddityBootSettingsExtension *boot READ boot)
 
 public:
   /** Possible monitor types. */
@@ -397,11 +445,6 @@ public:
   /** Enables/disables transmission on active channel on double monitor. */
   void enableTXOnActiveChannel(bool enable);
 
-  /** Returns @c true if animation is enabled. */
-  bool animation() const;
-  /** Enables/disables animation. */
-  void enableAnimation(bool enable);
-
   /** Returns the scan mode. */
   ScanMode scanMode() const;
   /** Sets the scan mode. */
@@ -416,15 +459,12 @@ public:
   /** Sets the repeater STE in seconds. */
   void setRepeaterSTE(Interval ste);
 
-  /** Returns the programming password. */
-  const QString &progPassword() const;
-  /** Sets the programming password. */
-  void setProgPassword(const QString &pwd);
-
   /** Returns a weak reference to the button settings. */
   RadioddityButtonSettingsExtension *buttons() const;
   /** Returns a weak reference to the tone settings. */
   RadioddityToneSettingsExtension *tone() const;
+  /** Returns a weak reference to the boot settings. */
+  RadioddityBootSettingsExtension *boot() const;
 
 protected:
   /** Holds the preamble duration in ms. */
@@ -453,20 +493,18 @@ protected:
   bool _quickKeyOverrideInhibited;
   /** If @c true, the radio will transmit on the active channel when double-wait is enabled. */
   bool _txOnActiveChannel;
-  /** If @c true, the boot animation is enabled. */
-  bool _animation;
   /** Holds the scan mode. */
   ScanMode _scanMode;
   /** Holds the repeater end delay in seconds. */
   Interval _repeaterEndDelay;
   /** Holds the repeater STE in seconds. */
   Interval _repeaterSTE;
-  /** Holds the programming password, disabled if empty. */
-  QString _progPasswd;
   /** Button settings. */
   RadioddityButtonSettingsExtension *_buttonSettings;
   /** Tone settings. */
   RadioddityToneSettingsExtension *_toneSettings;
+  /** Boot settings. */
+  RadioddityBootSettingsExtension *_bootSettings;
 };
 
 #endif // RADIODDITYEXTENSIONS_HH
