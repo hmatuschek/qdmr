@@ -163,7 +163,7 @@ public:
 
   /** Implements the radio settings.
    *
-   * Memory representation within the binary codeplug (size: ????h):
+   * Memory representation within the binary codeplug (size: 00aah):
    * @verbinclude gd73_settings_element.txt.
    */
   class SettingsElement: public Element
@@ -204,7 +204,7 @@ public:
     SettingsElement(uint8_t *ptr);
 
     /** Returns the size of the settings element. */
-    static constexpr unsigned int size() { return 0x0084; }
+    static constexpr unsigned int size() { return 0x00aa; }
 
     /** Returns the radio name. */
     QString name() const;
