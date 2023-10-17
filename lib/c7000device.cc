@@ -287,6 +287,7 @@ C7000Device::sendRecv(const Packet &request, Packet &response, const ErrorStack 
   }
   QObject().thread()->usleep(1000);
 
+  unsigned int retry_count = 0;
 retry_receive:
   ret = libusb_bulk_transfer(_dev, 0x81, buffer, 64, &bytes_received, 1000);
   if (ret) {
@@ -294,8 +295,13 @@ retry_receive:
     return false;
   }
 
-  if (0x68 != buffer[0])
+  if (0x68 != buffer[0]) {
+    if ((++retry_count) > 10) {
+      errMsg(err) << "Cannot receive response from device: Retry count of 10 exceeded.";
+      return false;
+    }
     goto retry_receive;
+  }
 
   response = Packet(QByteArray((const char *)buffer, bytes_received));
   if (! response.isValid()) {

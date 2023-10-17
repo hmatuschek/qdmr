@@ -87,7 +87,7 @@ GD73Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, con
     return false;
   }
 
-  logDebug() << "Read " << nbytes << "bytes from address " << Qt::hex << addr << "h.";
+  //logDebug() << "Read " << nbytes << "bytes from address " << Qt::hex << addr << "h.";
 
   uint16_t seqNum = addr/BLOCK_SIZE;
   if (uint16_t(_lastSequence+1) != seqNum) {
