@@ -384,15 +384,16 @@ RadioddityBootSettingsExtension::setProgPassword(const QString &pwd) {
  * Implementation of RadiodditySettingsExtension
  * ********************************************************************************************* */
 RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
-  : ConfigExtension(parent), _preambleDuration(Interval::fromMilliseconds(360)),
-    _monitorType(MonitorType::Silent),
+  : ConfigExtension(parent), _monitorType(MonitorType::Silent),
     _loneWorkerResponseTime(Interval::fromMinutes(1)),
     _loneWorkerReminderPeriod(Interval::fromSeconds(10)),
     _groupCallHangTime(Interval::fromMilliseconds(3000)),
     _privateCallHangTime(Interval::fromMilliseconds(3000)), _downChannelModeVFO(false),
-    _upChannelModeVFO(false), _powerSaveMode(true), _wakeupPreamble(true), _disableAllLEDs(false),
-    _quickKeyOverrideInhibited(false), _txOnActiveChannel(true),
-    _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(),
+    _upChannelModeVFO(false), _powerSaveMode(true), _wakeupPreamble(true),
+    _preambleDuration(Interval::fromMilliseconds(360)), _powerSaveDelay(Interval::fromSeconds(10)),
+    _disableAllLEDs(false), _quickKeyOverrideInhibited(false), _txOnActiveChannel(true),
+    _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _txInterrupt(false),
+    _language(Language::English),
     _buttonSettings(new RadioddityButtonSettingsExtension(this)),
     _toneSettings(new RadioddityToneSettingsExtension(this)),
     _bootSettings(new RadioddityBootSettingsExtension(this))
@@ -408,18 +409,6 @@ RadiodditySettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
-}
-
-Interval
-RadiodditySettingsExtension::preambleDuration() const {
-  return _preambleDuration;
-}
-void
-RadiodditySettingsExtension::setPreambleDuration(Interval ms) {
-  if (_preambleDuration == ms)
-    return;
-  _preambleDuration = ms;
-  emit modified(this);
 }
 
 RadiodditySettingsExtension::MonitorType
@@ -530,6 +519,30 @@ RadiodditySettingsExtension::enableWakeupPreamble(bool enable) {
   emit modified(this);
 }
 
+Interval
+RadiodditySettingsExtension::preambleDuration() const {
+  return _preambleDuration;
+}
+void
+RadiodditySettingsExtension::setPreambleDuration(Interval ms) {
+  if (_preambleDuration == ms)
+    return;
+  _preambleDuration = ms;
+  emit modified(this);
+}
+
+Interval
+RadiodditySettingsExtension::powerSaveDelay() const {
+  return _powerSaveDelay;
+}
+void
+RadiodditySettingsExtension::setPowerSaveDelay(Interval interv) {
+  if (interv == _powerSaveDelay)
+    return;
+  _powerSaveDelay = interv;
+  emit modified(this);
+}
+
 bool
 RadiodditySettingsExtension::allLEDsDisabled() const {
   return _disableAllLEDs;
@@ -599,6 +612,30 @@ RadiodditySettingsExtension::setRepeaterSTE(Interval ste) {
   if (_repeaterSTE == ste)
     return;
   _repeaterSTE = ste;
+  emit modified(this);
+}
+
+bool
+RadiodditySettingsExtension::txInterrupt() const {
+  return _txInterrupt;
+}
+void
+RadiodditySettingsExtension::enableTXInterrupt(bool enable) {
+  if (enable == _txInterrupt)
+    return;
+  _txInterrupt = enable;
+  emit modified(this);
+}
+
+RadiodditySettingsExtension::Language
+RadiodditySettingsExtension::language() const {
+  return _language;
+}
+void
+RadiodditySettingsExtension::setLanguage(Language lang) {
+  if (lang == _language)
+    return;
+  _language = lang;
   emit modified(this);
 }
 

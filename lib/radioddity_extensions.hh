@@ -341,6 +341,8 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
   Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
               "preamble before each call.")
+  /** The delay, before the idle radio enters power save mode (if enabled). */
+  Q_PROPERTY(Interval powerSaveDelay READ powerSaveDelay WRITE setPowerSaveDelay)
   /** If @c true, all LEDs are disabled. */
   Q_PROPERTY(bool allLEDsDisabled READ allLEDsDisabled WRITE disableAllLEDs)
   /** If @c true, the quick-key override is inhibited. */
@@ -353,6 +355,10 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(Interval repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
   /** The repeater STE in seconds. */
   Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
+  /** Returns @c true, if the TX interrupt is enabled. */
+  Q_PROPERTY(bool txInterrupt READ txInterrupt WRITE enableTXInterrupt)
+  /** UI language. */
+  Q_PROPERTY(Language language READ language WRITE setLanguage)
 
   /** The button settings. */
   Q_PROPERTY(RadioddityButtonSettingsExtension *buttons READ buttons)
@@ -377,16 +383,17 @@ public:
   };
   Q_ENUM(ScanMode)
 
+  /** Possible UI languages. */
+  enum class Language {
+    Chinese, English
+  };
+  Q_ENUM(Language)
+
 public:
   /** Default constructor. */
   Q_INVOKABLE explicit RadiodditySettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns the preamble duration in ms. */
-  Interval preambleDuration() const;
-  /** Sets the preamble duration in ms. */
-  void setPreambleDuration(Interval ms);
 
   /** Returns the monitor type. */
   MonitorType monitorType() const;
@@ -420,7 +427,6 @@ public:
   /** Enables/disables up-channel mode is VFO. */
   void enableUpChannelModeVFO(bool enable);
 
-
   /** Returns @c true if the power save mode is enabled. */
   bool powerSaveMode() const;
   /** Enables the power save mode. */
@@ -429,6 +435,14 @@ public:
   bool wakeupPreamble() const;
   /** Enables transmission of wakeup preamble. */
   void enableWakeupPreamble(bool enable);
+  /** Returns the preamble duration in ms. */
+  Interval preambleDuration() const;
+  /** Sets the preamble duration in ms. */
+  void setPreambleDuration(Interval ms);
+  /** Returns the delay, before an idle radio enters power save mode. */
+  Interval powerSaveDelay() const;
+  /** Sets the delay before an idle radio enters power save mode. */
+  void setPowerSaveDelay(Interval interv);
 
   /** Returns @c true if all LEDs are disabled. */
   bool allLEDsDisabled() const;
@@ -459,6 +473,16 @@ public:
   /** Sets the repeater STE in seconds. */
   void setRepeaterSTE(Interval ste);
 
+  /** Returns @c true if the TX iterrupt is enabled. */
+  bool txInterrupt() const;
+  /** Enables TX iterrupt. */
+  void enableTXInterrupt(bool enable);
+
+  /** Returns the UI language. */
+  Language language() const;
+  /** Sets the language. */
+  void setLanguage(Language lang);
+
   /** Returns a weak reference to the button settings. */
   RadioddityButtonSettingsExtension *buttons() const;
   /** Returns a weak reference to the tone settings. */
@@ -467,8 +491,6 @@ public:
   RadioddityBootSettingsExtension *boot() const;
 
 protected:
-  /** Holds the preamble duration in ms. */
-  Interval _preambleDuration;
   /** Holds the monitor type. */
   MonitorType _monitorType;
   /** Holds the lone-worker response time in minutes. */
@@ -487,6 +509,10 @@ protected:
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */
   bool _wakeupPreamble;
+  /** Holds the preamble duration in ms. */
+  Interval _preambleDuration;
+  /** Delay before an idle radio enters the power save mode. */
+  Interval _powerSaveDelay;
   /** If @c true, all LEDs are disabled. */
   bool _disableAllLEDs;
   /** If @c true, the quick-key override is inhibited. */
@@ -499,6 +525,10 @@ protected:
   Interval _repeaterEndDelay;
   /** Holds the repeater STE in seconds. */
   Interval _repeaterSTE;
+  /** If @c true, TX interrupt is enabled. */
+  bool _txInterrupt;
+  /** UI language. */
+  Language _language;
   /** Button settings. */
   RadioddityButtonSettingsExtension *_buttonSettings;
   /** Tone settings. */

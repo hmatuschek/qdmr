@@ -499,6 +499,15 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ext->setLoneWorkerResponseTime(loneWorkerResponseTimeout());
   ext->setLoneWorkerReminderPeriod(loneWorkerRemindPeriod());
 
+  ext->enableTXInterrupt(txInterruptedEnabled());
+  switch(language()) {
+  case Language::Chinese: ext->setLanguage(RadiodditySettingsExtension::Language::Chinese); break;
+  case Language::English: ext->setLanguage(RadiodditySettingsExtension::Language::English); break;
+  }
+
+  ext->enablePowerSaveMode(powerSaveEnabled());
+  ext->setPowerSaveDelay(powerSaveTimeout());
+
   ext->buttons()->setLongPressDuration(longPressDuration());
   ext->buttons()->setFuncKey1Short(keyFunctionShortPressP1());
   ext->buttons()->setFuncKey1Long(keyFunctionLongPressP1());
@@ -562,8 +571,8 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
     setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
 
   setLanguage(Language::English);
-  //setUInt8(0x003c, 0x01);
-  //setUInt8(0x003e, 0x01);
+  setUInt8(0x003c, 0x01);
+  setUInt8(0x003e, 0x01);
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -572,6 +581,15 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
   setLoneWorkerResponseTimeout(ext->loneWorkerResponseTime());
   setLoneWorkerRemindPeriod(ext->loneWorkerReminderPeriod());
+
+  enableTXInterrupt(ext->txInterrupt());
+  switch(ext->language()) {
+  case RadiodditySettingsExtension::Language::Chinese: setLanguage(Language::Chinese); break;
+  case RadiodditySettingsExtension::Language::English: setLanguage(Language::English); break;
+  }
+
+  enablePowerSave(ext->powerSaveMode());
+  setPowerSaveTimeout(ext->powerSaveDelay());
 
   setLongPressDuration(ext->buttons()->longPressDuration());
   setKeyFunctionShortPressP1(ext->buttons()->funcKey1Short());
