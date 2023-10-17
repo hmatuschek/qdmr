@@ -8,6 +8,10 @@ GD73Interface::GD73Interface(const USBDeviceDescriptor &descriptor, const ErrorS
   : C7000Device(descriptor, err, parent), RadioInterface()
 {
   Packet request, response;
+  if (nullptr == _dev) {
+    errMsg(err) << "Cannot initialize GD73 interface: C7000 interface not open.";
+    return;
+  }
 
   request = Packet(0x01, 0x04);
   if (! sendRecv(request, response, err)) {
