@@ -524,6 +524,14 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
     break;
   }
 
+  if (readLockEnabled())
+    ext->boot()->setBootPassword(readLockPin());
+  else
+    ext->boot()->setBootPassword("");
+  if (writeLockEnabled())
+    ext->boot()->setProgPassword(writeLockPin());
+  else
+    ext->boot()->setProgPassword("");
 
   return true;
 }
@@ -576,6 +584,19 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setKeyToneVolume(ext->tone()->keyToneVolume());
   enableLowBatteryTone(ext->tone()->lowBatteryWarn());
   setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
+
+  if (! ext->boot()->bootPassword().isEmpty()) {
+    setReadLockPin(ext->boot()->bootPassword());
+    enableReadLock(true);
+  } else {
+    enableReadLock(false);
+  }
+  if (! ext->boot()->progPassword().isEmpty()) {
+    setWriteLockPin(ext->boot()->bootPassword());
+    enableWriteLock(true);
+  } else {
+    enableWriteLock(false);
+  }
 
   return true;
 }
