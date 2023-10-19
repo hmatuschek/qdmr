@@ -20,13 +20,13 @@
  * @ingroup gd73 */
 class GD73 : public Radio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	/** Do not construct this class directly, rather use @c Radio::detect. */
+  /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit GD73(GD73Interface *device=nullptr, QObject *parent=nullptr);
 
-	const QString &name() const;
+  const QString &name() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

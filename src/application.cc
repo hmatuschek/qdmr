@@ -485,7 +485,7 @@ void
 Application::detectRadio() {
   if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
-    radio->deleteLater();
+    delete radio;
   } else {
     QMessageBox::information(nullptr, tr("No radio found"),
                              tr("No matching device was found."));
