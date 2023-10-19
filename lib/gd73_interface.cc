@@ -8,12 +8,17 @@ GD73Interface::GD73Interface(const USBDeviceDescriptor &descriptor, const ErrorS
   : C7000Device(descriptor, err, parent), RadioInterface()
 {
   Packet request, response;
+  if (nullptr == _dev) {
+    errMsg(err) << "Cannot initialize GD73 interface: C7000 interface not open.";
+    return;
+  }
 
   request = Packet(0x01, 0x04);
   if (! sendRecv(request, response, err)) {
     errMsg(err) << "Cannot enter programming mode.";
     C7000Device::close();
   }
+  logDebug() << "Entered prog mode. Response: " << response.payload().toHex() << ".";
 }
 
 bool
@@ -83,7 +88,7 @@ GD73Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, con
     return false;
   }
 
-  logDebug() << "Read " << nbytes << "bytes from address " << Qt::hex << addr << "h.";
+  //logDebug() << "Read " << nbytes << "bytes from address " << Qt::hex << addr << "h.";
 
   uint16_t seqNum = addr/BLOCK_SIZE;
   if (uint16_t(_lastSequence+1) != seqNum) {

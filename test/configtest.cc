@@ -4,13 +4,15 @@
 #include "melody.hh"
 #include <iostream>
 #include <QTest>
+#include "logger.hh"
+#include <iostream>
 
 #include "configcopyvisitor.hh"
 
 ConfigTest::ConfigTest(QObject *parent)
-  : UnitTestBase(parent)
+  : UnitTestBase(parent), _stderr(stderr)
 {
-  // pass...
+  Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
 }
 
 
@@ -18,6 +20,11 @@ void
 ConfigTest::initTestCase() {
   UnitTestBase::initTestCase();
 
+  ErrorStack err;
+  if (! _ctcssCopyTest.readYAML(":/data/ctcss_copy_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
@@ -55,6 +62,27 @@ ConfigTest::testCloneChannelBasic() {
   Channel *clone = _basicConfig.channelList()->channel(0)->clone()->as<Channel>();
   // Check if channels are the same
   QCOMPARE(clone->compare(*_basicConfig.channelList()->channel(0)), 0);
+}
+
+void
+ConfigTest::testCloneChannelCTCSS() {
+  // Check if a channel can be cloned
+  QHash<ConfigObject*, ConfigObject*> table;
+  ConfigCloneVisitor visitor(table);
+  ErrorStack err;
+  if (! visitor.processItem(_ctcssCopyTest.channelList()->channel(0)))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  Channel *clone = visitor.takeResult(err)->as<Channel>();
+  if (nullptr == clone)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  // Check if channels are the same
+  QCOMPARE(clone->compare(*_ctcssCopyTest.channelList()->channel(0)), 0);
+  QCOMPARE(clone->as<FMChannel>()->txTone(),
+           _ctcssCopyTest.channelList()->channel(0)->as<FMChannel>()->txTone());
+  QCOMPARE(clone->as<FMChannel>()->rxTone(),
+           _ctcssCopyTest.channelList()->channel(0)->as<FMChannel>()->rxTone());
 }
 
 void

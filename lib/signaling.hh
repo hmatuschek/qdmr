@@ -2,16 +2,20 @@
 #define SIGNALING_HH
 
 #include <QString>
+#include <QObject>
 
 /** Contains the enum and utility functions to deal with analog signaling like
  * CTCSS and DCS.
  * @ingroup conf */
-namespace Signaling
+class Signaling: public QObject
 {
+  Q_OBJECT
+
+public:
   /** This huge enum lists all possible RX/TX tones that can be associated with analog channels.
    * That is, all valid CTCSS tones and DSC numbers (both normal @c DCS_*N and inverted @c DCS_*I).
    * If @c SIGNALING_NONE is selected, no RX/TX tone is used. */
-  typedef enum {
+  enum Code {
     SIGNALING_NONE = 0,
     CTCSS_67_0Hz,  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
     CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
@@ -44,37 +48,38 @@ namespace Signaling
     DCS_516I, DCS_523I, DCS_526I, DCS_532I, DCS_546I, DCS_565I, DCS_606I, DCS_612I, DCS_624I,
     DCS_627I, DCS_631I, DCS_632I, DCS_654I, DCS_662I, DCS_664I, DCS_703I, DCS_712I, DCS_723I,
     DCS_731I, DCS_732I, DCS_734I, DCS_743I, DCS_754I
-  } Code;
+  };
+  Q_ENUM(Code)
 
   /** Returns @c true if the given Signaling::Code enum entry refers to a CTCSS frequency. */
-  bool isCTCSS(Code code);
+  static bool isCTCSS(Code code);
   /** Returns @c true if the given frequency is a valid CTCSS frequency. */
-  bool isCTCSSFrequency(float freq);
+  static bool isCTCSSFrequency(float freq);
   /** Maps CTCSS enum to CTCSS frequency.
    * Returns @c 0.0 if no valid CTCSS enum element is given (e.g., @c SIGNALING_NONE or one of the
    * DCS enum elements). */
-  float toCTCSSFrequency(Code code);
+  static float toCTCSSFrequency(Code code);
   /** Maps a CTCSS frequency to the corresponding Signaling::Code enum element.
    * Returns @c SIGNALING_NONE if an invalid CTCSS frequency is given. */
-  Code fromCTCSSFrequency(float freq);
+  static Code fromCTCSSFrequency(float freq);
 
   /** Returns @c true if a valid DCS code number is given. */
-  bool isDCSNumber(uint16_t num);
+  static bool isDCSNumber(uint16_t num);
   /** Returns @c true if the given DCS code is not inverted. */
-  bool isDCSNormal(Code code);
+  static bool isDCSNormal(Code code);
   /** Returns @c true if the given DCS code is inverted. */
-  bool isDCSInverted(Code code);
+  static bool isDCSInverted(Code code);
   /** Maps a DCS Signaling::Code to the corresponding DCS number. */
-  uint16_t toDCSNumber(Code code);
+  static uint16_t toDCSNumber(Code code);
   /** Maps a DCS number to the corresponding DCS Signaling::Code enum element.
    * The @c inverted parameter specifies whether an inverted code is used.
    * Returns SIGNALING_NONE if an invalid DCS number is given. */
-  Code fromDCSNumber(uint16_t num, bool inverted);
+  static Code fromDCSNumber(uint16_t num, bool inverted);
 
   /** Maps a Signaling::Code enum element to its text label. */
-  QString codeLabel(Code code);
+  static QString codeLabel(Code code);
   /** Represents the given signaling code as a string as used in config files. */
-  QString configString(Code code);
-}
+  static QString configString(Code code);
+};
 
 #endif // SIGNALING_HH

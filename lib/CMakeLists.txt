@@ -9,8 +9,9 @@ ELSE (APPLE)
 ENDIF(APPLE)
 
 SET(libdmrconf_SOURCES
-    utils.cc crc32.cc signaling.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
+    utils.cc crc32.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
     ranges.cc dummyfilereader.cc
+    signaling.cc
     radio.cc ${hid_SOURCES} dfu_libusb.cc usbserial.cc radioinfo.cc usbdevice.cc radiolimits.cc
     csvreader.cc dfufile.cc userdatabase.cc logger.cc
     melody.cc
@@ -37,6 +38,7 @@ SET(libdmrconf_SOURCES
     d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
     dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc)
 SET(libdmrconf_MOC_HEADERS
+    signaling.hh
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh
     melody.hh
@@ -64,7 +66,7 @@ SET(libdmrconf_MOC_HEADERS
 SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh gd73_filereader.hh
     md390_filereader.hh dummyfilereader.hh
-    utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
+    utils.hh crc32.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
     visitor.hh configlabelingvisitor.hh configcopyvisitor.hh intermediaterepresentation.hh )
 
 
