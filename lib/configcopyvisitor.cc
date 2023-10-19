@@ -4,7 +4,7 @@
 #include "channel.hh"
 #include "radioid.hh"
 #include "roamingzone.hh"
-
+#include "logger.hh"
 
 /* ********************************************************************************************* *
  * Implementation of ConfigCloneVisitor
@@ -22,8 +22,15 @@ ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop,
       || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
       || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
       || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())) {
+    if ((! prop.isReadable()) && (!prop.isWritable())) {
+      logDebug() << "Skip property " << prop.name()
+                 << " of item " << item->metaObject()->className() << ": Not readable or writable.";
+      return true;
+    }
+
     if (! Visitor::processProperty(item, prop, err))
       return false;
+
     // Get clone
     ConfigItem *clone = qobject_cast<ConfigItem*>(_stack.back());
     if (nullptr == clone) {

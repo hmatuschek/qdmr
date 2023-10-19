@@ -19,6 +19,7 @@ private slots:
   void testImmediateRefInvalidation();
 
   void testCloneChannelBasic();
+  void testCloneChannelCTCSS();
 
   /** Regression test for issue #388. */
   void testMultipleRadioIDs();
@@ -26,6 +27,10 @@ private slots:
   void testMelodyLilypond();
   void testMelodyEncoding();
   void testMelodyDecoding();
+
+protected:
+  QTextStream _stderr;
+  Config _ctcssCopyTest;
 };
 
 #endif // CONFIGTEST_HH
