@@ -14,7 +14,8 @@ GD73::GD73(GD73Interface *device, QObject *parent)
   : Radio(parent), _name("Radioddity GD-73"), _dev(device), _codeplugFlags(), _config(nullptr),
     _codeplug()
 {
-  // pass...
+  if (_dev)
+    _dev->setParent(this);
 }
 
 const QString &

@@ -19,7 +19,6 @@ GD73Interface::GD73Interface(const USBDeviceDescriptor &descriptor, const ErrorS
     C7000Device::close();
   }
   logDebug() << "Entered prog mode. Response: " << response.payload().toHex() << ".";
-
 }
 
 bool

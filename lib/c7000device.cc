@@ -259,6 +259,7 @@ C7000Device::isOpen() const {
 
 void
 C7000Device::close() {
+  logDebug() << "Close C7000 interface.";
   if (nullptr != _dev) {
     libusb_release_interface(_dev, 0);
     libusb_close(_dev);
