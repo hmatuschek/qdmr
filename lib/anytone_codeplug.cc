@@ -8,37 +8,36 @@
 #include <QTimeZone>
 #include <QRegularExpression>
 
-using namespace Signaling;
-
 #define CUSTOM_CTCSS_TONE 0x33
 
-Code _anytone_ctcss_num2code[52] = {
-  SIGNALING_NONE, // 62.5 not supported
-  CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
-  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
-  CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
-  CTCSS_103_5Hz, CTCSS_107_2Hz, CTCSS_110_9Hz, CTCSS_114_8Hz, CTCSS_118_8Hz, CTCSS_123_0Hz,
-  CTCSS_127_3Hz, CTCSS_131_8Hz, CTCSS_136_5Hz, CTCSS_141_3Hz, CTCSS_146_2Hz, CTCSS_151_4Hz,
-  CTCSS_156_7Hz,
-  SIGNALING_NONE, // 159.8 not supported
-  CTCSS_162_2Hz,
-  SIGNALING_NONE, // 165.5 not supported
-  CTCSS_167_9Hz,
-  SIGNALING_NONE, // 171.3 not supported
-  CTCSS_173_8Hz,
-  SIGNALING_NONE, // 177.3 not supported
-  CTCSS_179_9Hz,
-  SIGNALING_NONE, // 183.5 not supported
-  CTCSS_186_2Hz,
-  SIGNALING_NONE, // 189.9 not supported
-  CTCSS_192_8Hz,
-  SIGNALING_NONE, SIGNALING_NONE, // 196.6 & 199.5 not supported
-  CTCSS_203_5Hz,
-  SIGNALING_NONE, // 206.5 not supported
-  CTCSS_210_7Hz, CTCSS_218_1Hz, CTCSS_225_7Hz,
-  SIGNALING_NONE, // 229.1 not supported
-  CTCSS_233_6Hz, CTCSS_241_8Hz, CTCSS_250_3Hz,
-  SIGNALING_NONE, SIGNALING_NONE // 254.1 and custom CTCSS not supported.
+Signaling::Code
+_anytone_ctcss_num2code[52] = {
+  Signaling::SIGNALING_NONE, // 62.5 not supported
+  Signaling::CTCSS_67_0Hz,  Signaling::SIGNALING_NONE, // 69.3 not supported
+  Signaling::CTCSS_71_9Hz,  Signaling::CTCSS_74_4Hz,  Signaling::CTCSS_77_0Hz,  Signaling::CTCSS_79_7Hz,  Signaling::CTCSS_82_5Hz,
+  Signaling::CTCSS_85_4Hz,  Signaling::CTCSS_88_5Hz,  Signaling::CTCSS_91_5Hz,  Signaling::CTCSS_94_8Hz,  Signaling::CTCSS_97_4Hz,  Signaling::CTCSS_100_0Hz,
+  Signaling::CTCSS_103_5Hz, Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz, Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz,
+  Signaling::CTCSS_127_3Hz, Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz, Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz,
+  Signaling::CTCSS_156_7Hz,
+  Signaling::SIGNALING_NONE, // 159.8 not supported
+  Signaling::CTCSS_162_2Hz,
+  Signaling::SIGNALING_NONE, // 165.5 not supported
+  Signaling::CTCSS_167_9Hz,
+  Signaling::SIGNALING_NONE, // 171.3 not supported
+  Signaling::CTCSS_173_8Hz,
+  Signaling::SIGNALING_NONE, // 177.3 not supported
+  Signaling::CTCSS_179_9Hz,
+  Signaling::SIGNALING_NONE, // 183.5 not supported
+  Signaling::CTCSS_186_2Hz,
+  Signaling::SIGNALING_NONE, // 189.9 not supported
+  Signaling::CTCSS_192_8Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, // 196.6 & 199.5 not supported
+  Signaling::CTCSS_203_5Hz,
+  Signaling::SIGNALING_NONE, // 206.5 not supported
+  Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz, Signaling::CTCSS_225_7Hz,
+  Signaling::SIGNALING_NONE, // 229.1 not supported
+  Signaling::CTCSS_233_6Hz, Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE // 254.1 and custom CTCSS not supported.
 };
 
 inline uint8_t
@@ -325,7 +324,7 @@ AnytoneCodeplug::ChannelElement::rxTone() const {
   return Signaling::SIGNALING_NONE;
 }
 void
-AnytoneCodeplug::ChannelElement::setRXTone(Code code) {
+AnytoneCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
   if (Signaling::SIGNALING_NONE == code) {
     setRXSignalingMode(SignalingMode::None);
   } else if (Signaling::isCTCSS(code)) {
@@ -357,7 +356,7 @@ AnytoneCodeplug::ChannelElement::txTone() const {
   return Signaling::SIGNALING_NONE;
 }
 void
-AnytoneCodeplug::ChannelElement::setTXTone(Code code) {
+AnytoneCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
   if (Signaling::SIGNALING_NONE == code) {
     setTXSignalingMode(SignalingMode::None);
   } else if (Signaling::isCTCSS(code)) {
@@ -411,7 +410,7 @@ AnytoneCodeplug::ChannelElement::txCTCSS() const {
   return ctcss_num2code(getUInt8(0x000a));
 }
 void
-AnytoneCodeplug::ChannelElement::setTXCTCSS(Code tone) {
+AnytoneCodeplug::ChannelElement::setTXCTCSS(Signaling::Code tone) {
   setUInt8(0x000a, ctcss_code2num(tone));
 }
 void
@@ -427,7 +426,7 @@ AnytoneCodeplug::ChannelElement::rxCTCSS() const {
   return ctcss_num2code(getUInt8(0x000b));
 }
 void
-AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
+AnytoneCodeplug::ChannelElement::setRXCTCSS(Signaling::Code tone) {
   setUInt8(0x000b, ctcss_code2num(tone));
 }
 void
@@ -443,7 +442,7 @@ AnytoneCodeplug::ChannelElement::txDCS() const {
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
-AnytoneCodeplug::ChannelElement::setTXDCS(Code code) {
+AnytoneCodeplug::ChannelElement::setTXDCS(Signaling::Code code) {
   if (Signaling::isDCSNormal(code))
     setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
@@ -460,7 +459,7 @@ AnytoneCodeplug::ChannelElement::rxDCS() const {
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
-AnytoneCodeplug::ChannelElement::setRXDCS(Code code) {
+AnytoneCodeplug::ChannelElement::setRXDCS(Signaling::Code code) {
   if (Signaling::isDCSNormal(code))
     setUInt16_le(0x000e, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
