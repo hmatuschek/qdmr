@@ -4,8 +4,10 @@
 #include "radioddity_interface.hh"
 #include "tyt_interface.hh"
 #include "dr1801uv_interface.hh"
+#include "gd73_interface.hh"
 
 #include "rd5r.hh"
+#include "gd73.hh"
 #include "gd77.hh"
 #include "md390.hh"
 #include "uv390.hh"
@@ -84,7 +86,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     anytone->deleteLater();
-    return nullptr;
   } else if (OpenGD77Interface::interfaceInfo() == descr) {
     OpenGD77Interface *ogd77 = new OpenGD77Interface(descr, err);
     if (ogd77->isOpen()) {
@@ -100,7 +101,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     ogd77->deleteLater();
-    return nullptr;
   } else if (TyTInterface::interfaceInfo() == descr) {
     TyTInterface *dfu = new TyTInterface(descr, err);
     if (dfu->isOpen()) {
@@ -123,7 +123,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     dfu->deleteLater();
-    return nullptr;
   } else if (RadioddityInterface::interfaceInfo() == descr) {
     RadioddityInterface *hid = new RadioddityInterface(descr, err);
     if (hid->isOpen()) {
@@ -144,7 +143,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     hid->deleteLater();
-    return nullptr;
   } else if (DR1801UVInterface::interfaceInfo() == descr) {
     DR1801UVInterface *dif = new DR1801UVInterface(descr, err);
     if (dif->isOpen()) {
@@ -163,7 +161,22 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     dif->deleteLater();
-    return nullptr;
+  } else if (C7000Device::interfaceInfo() == descr) {
+    GD73Interface *gdif = new GD73Interface(descr, err);
+    if (gdif->isOpen()) {
+      RadioInfo id = gdif->identifier();
+      if ((id.isValid() && (RadioInfo::GD73 == id.id())) ||
+          (force.isValid() && (RadioInfo::GD73 == force.id()))) {
+        return new GD73(gdif);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      }
+      gdif->close();
+      gdif->deleteLater();
+      return nullptr;
+    }
+    gdif->deleteLater();
   }
   return nullptr;
 }

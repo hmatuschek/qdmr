@@ -1,3 +1,6 @@
+# Radioddity RD-73
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1206", ATTRS{idProduct}=="0227", MODE="660", GROUP="dialout"
+
 # TYT MD-UV380
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="660", GROUP="dialout"
 

@@ -10,6 +10,8 @@
 #include "opengd77_interface.hh"
 #include "tyt_interface.hh"
 #include "dr1801uv_interface.hh"
+#include "c7000device.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of USBDeviceHandle
@@ -123,6 +125,9 @@ USBDeviceInfo::description() const {
   case Class::HID:
     stream << "HID " << QString::number(_vid,16) << ":" << QString::number(_pid,16);
     break;
+  case Class::C7K:
+    stream << "C7000 " << QString::number(_vid,16) << ":" << QString::number(_pid,16);
+    break;
   }
   return res;
 }
@@ -189,6 +194,7 @@ USBDeviceDescriptor::isValid() const {
     return validSerial();
   case Class::DFU:
   case Class::HID:
+  case Class::C7K:
     return validRawUSB();
   }
   return false;
@@ -268,6 +274,9 @@ USBDeviceDescriptor::description() const {
   } else if (USBDeviceInfo::Class::HID == _class) {
     USBDeviceHandle addr = _device.value<USBDeviceHandle>();
     return QString("USB HID: bus %1, device %2").arg(addr.bus).arg(addr.device);
+  } else if (USBDeviceInfo::Class::C7K == _class) {
+    USBDeviceHandle addr = _device.value<USBDeviceHandle>();
+    return QString("USB C7000 HT: bus %1, device %2").arg(addr.bus).arg(addr.device);
   }
   return "Invalid";
 }
@@ -284,6 +293,7 @@ USBDeviceDescriptor::deviceHandle() const {
     break;
   case Class::DFU:
   case Class::HID:
+  case Class::C7K:
     return QString("%1:%2").arg(_device.value<USBDeviceHandle>().bus)
         .arg(_device.value<USBDeviceHandle>().device);
   case Class::Serial:
@@ -301,6 +311,7 @@ USBDeviceDescriptor::detect() {
   res.append(RadioddityInterface::detect());
   res.append(TyTInterface::detect());
   res.append(DR1801UVInterface::detect());
+  res.append(C7000Device::detect());
   return res;
 }
 

@@ -21,6 +21,8 @@
 #include "rd5r_filereader.hh"
 #include "gd77_codeplug.hh"
 #include "gd77_filereader.hh"
+#include "gd73_codeplug.hh"
+#include "gd73_filereader.hh"
 #include "opengd77_codeplug.hh"
 #include "openrtx_codeplug.hh"
 #include "anytone_filereader.hh"
@@ -107,6 +109,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::RD5R:
     if (! decode<RD5RCodeplug, RD5RFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::GD73:
+    if (! decode<GD73Codeplug, GD73FileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
     } break;

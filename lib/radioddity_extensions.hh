@@ -2,6 +2,8 @@
 #define RADIODDITYEXTENSIONS_HH
 
 #include "configobject.hh"
+#include "interval.hh"
+
 
 /** Represents the general settings extension for Radioddity devices.
  * @ingroup radioddity */
@@ -10,21 +12,21 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_OBJECT
 
   /** The preamble duration in ms. */
-  Q_PROPERTY(unsigned preambleDuration READ preambleDuration WRITE setPreambleDuration)
+  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
   /** The monitor type. */
   Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
   /** The low-battery warn interval in seconds. */
-  Q_PROPERTY(unsigned lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
+  Q_PROPERTY(Interval lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
   /** The call-alert duration in seconds. */
-  Q_PROPERTY(unsigned callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
+  Q_PROPERTY(Interval callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
   /** The lone-worker response time in minutes. */
-  Q_PROPERTY(unsigned loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
+  Q_PROPERTY(Interval loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
   /** The lonw-worker reminder period in seconds. */
-  Q_PROPERTY(unsigned loneWorkerReminderPeriod READ loneWorkerReminderPeriod WRITE setLoneWorkerReminderPeriod)
+  Q_PROPERTY(Interval loneWorkerReminderPeriod READ loneWorkerReminderPeriod WRITE setLoneWorkerReminderPeriod)
   /** The group-call hang-time in ms. */
-  Q_PROPERTY(unsigned groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
+  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
   /** The private-call hang-time in ms. */
-  Q_PROPERTY(unsigned privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
+  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
   /** If @c true the down-channel mode is VFO. */
   Q_PROPERTY(bool downChannelModeVFO READ downChannelModeVFO WRITE enableDownChannelModeVFO)
   /** If @c true the up-channel mode is VFO. */
@@ -70,9 +72,9 @@ class RadiodditySettingsExtension: public ConfigExtension
   /** The scan mode. */
   Q_PROPERTY(ScanMode scanMode READ scanMode WRITE setScanMode)
   /** The repeater end delay in seconds. */
-  Q_PROPERTY(unsigned repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
+  Q_PROPERTY(Interval repeaterEndDelay READ repeaterEndDelay WRITE setRepeaterEndDelay)
   /** The repeater STE in seconds. */
-  Q_PROPERTY(unsigned repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
+  Q_PROPERTY(Interval repeaterSTE READ repeaterSTE WRITE setRepeaterSTE)
   /** The programming password, disabled if empty. */
   Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
 
@@ -107,9 +109,9 @@ public:
   ConfigItem *clone() const;
 
   /** Returns the preamble duration in ms. */
-  unsigned preambleDuration() const;
+  Interval preambleDuration() const;
   /** Sets the preamble duration in ms. */
-  void setPreambleDuration(unsigned ms);
+  void setPreambleDuration(Interval ms);
 
   /** Returns the monitor type. */
   MonitorType monitorType() const;
@@ -117,32 +119,32 @@ public:
   void setMonitorType(MonitorType type);
 
   /** Returns the low-battery warn interval in seconds. */
-  unsigned lowBatteryWarnInterval() const;
+  Interval lowBatteryWarnInterval() const;
   /** Sets the low-battery warn interval in seconds. */
-  void setLowBatteryWarnInterval(unsigned sec);
+  void setLowBatteryWarnInterval(Interval sec);
 
   /** Returns the call-alert duration in seconds. */
-  unsigned callAlertDuration() const;
+  Interval callAlertDuration() const;
   /** Sets the call-allert duration in seconds. */
-  void setCallAlertDuration(unsigned sec);
+  void setCallAlertDuration(Interval sec);
 
   /** Returns the lone-worker response time in minutes. */
-  unsigned loneWorkerResponseTime() const;
+  Interval loneWorkerResponseTime() const;
   /** Sets the lone-worker response time in minutes. */
-  void setLoneWorkerResponseTime(unsigned min);
+  void setLoneWorkerResponseTime(Interval min);
   /** Returns the lone-worker reminder period in seconds. */
-  unsigned loneWorkerReminderPeriod() const;
+  Interval loneWorkerReminderPeriod() const;
   /** Sets the lone-worker reminder period in seconds. */
-  void setLoneWorkerReminderPeriod(unsigned sec);
+  void setLoneWorkerReminderPeriod(Interval sec);
 
   /** Returns the group call hang time in ms. */
-  unsigned groupCallHangTime() const;
+  Interval groupCallHangTime() const;
   /** Sets the group call hang time in ms. */
-  void setGroupCallHangTime(unsigned ms);
+  void setGroupCallHangTime(Interval ms);
   /** Returns the private call hang time in ms. */
-  unsigned privateCallHangTime() const;
+  Interval privateCallHangTime() const;
   /** Sets the private call hang time in ms. */
-  void setPrivateCallHangTime(unsigned ms);
+  void setPrivateCallHangTime(Interval ms);
 
   /** Returns @c true if the down-channel mode is VFO. */
   bool downChannelModeVFO() const;
@@ -232,13 +234,13 @@ public:
   void setScanMode(ScanMode mode);
 
   /** Returns the repeater end delay in seconds. */
-  unsigned repeaterEndDelay() const;
+  Interval repeaterEndDelay() const;
   /** Sets the repeater end delay in seconds. */
-  void setRepeaterEndDelay(unsigned delay);
+  void setRepeaterEndDelay(Interval delay);
   /** Returns the repeater STE in seconds. */
-  unsigned repeaterSTE() const;
+  Interval repeaterSTE() const;
   /** Sets the repeater STE in seconds. */
-  void setRepeaterSTE(unsigned ste);
+  void setRepeaterSTE(Interval ste);
 
   /** Returns the programming password. */
   const QString &progPassword() const;
@@ -247,21 +249,21 @@ public:
 
 protected:
   /** Holds the preamble duration in ms. */
-  unsigned _preambleDuration;
+  Interval _preambleDuration;
   /** Holds the monitor type. */
   MonitorType _monitorType;
   /** Holds the low-battery warn interval in seconds. */
-  unsigned _lowBatteryWarnInterval;
+  Interval _lowBatteryWarnInterval;
   /** Holds the call alert duration in seconds. */
-  unsigned _callAlertDuration;
+  Interval _callAlertDuration;
   /** Holds the lone-worker response time in minutes. */
-  unsigned _loneWorkerResponseTime;
+  Interval _loneWorkerResponseTime;
   /** Holds the lone-worker reminder period in seconds. */
-  unsigned _loneWorkerReminderPeriod;
+  Interval _loneWorkerReminderPeriod;
   /** The group-call hang-time in ms. */
-  unsigned _groupCallHangTime;
+  Interval _groupCallHangTime;
   /** The private-call hang-time in ms. */
-  unsigned _privateCallHangTime;
+  Interval _privateCallHangTime;
   /** If @c true down-channel mode is VFO. */
   bool _downChannelModeVFO;
   /** If @c true the up-channel mode is VFO. */
@@ -299,9 +301,9 @@ protected:
   /** Holds the scan mode. */
   ScanMode _scanMode;
   /** Holds the repeater end delay in seconds. */
-  unsigned _repeaterEndDelay;
+  Interval _repeaterEndDelay;
   /** Holds the repeater STE in seconds. */
-  unsigned _repeaterSTE;
+  Interval _repeaterSTE;
   /** Holds the programming password, disabled if empty. */
   QString _progPasswd;
 };

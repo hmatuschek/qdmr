@@ -22,6 +22,7 @@ public:
     OpenRTX,
     // Radioddity devices
     RD5R,
+    GD73,
     GD77,
     // TyT devices
     MD390, MD380 = MD390, RT8 = MD390,
