@@ -603,6 +603,15 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   enableLowBatteryTone(ext->tone()->lowBatteryWarn());
   setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
 
+  switch(ext->boot()->display()) {
+  case RadioddityBootSettingsExtension::DisplayMode::None:
+    setBootDisplayMode(BootDisplayMode::Off); break;
+  case RadioddityBootSettingsExtension::DisplayMode::Text:
+    setBootDisplayMode(BootDisplayMode::Text); break;
+  case RadioddityBootSettingsExtension::DisplayMode::Image:
+    setBootDisplayMode(BootDisplayMode::Image); break;
+  }
+
   if (! ext->boot()->bootPassword().isEmpty()) {
     setReadLockPin(ext->boot()->bootPassword());
     enableReadLock(true);
