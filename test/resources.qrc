@@ -8,5 +8,6 @@
         <file>data/anytone_call_hangtime.yaml</file>
         <file>data/multiple_radio_ids.yaml</file>
         <file>data/ctcss_copy_test.yaml</file>
+        <file>data/anytone_key_function.yaml</file>
     </qresource>
 </RCC>
