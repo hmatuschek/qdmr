@@ -1887,12 +1887,12 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
 
   // Store key settings
-  ext->keySettings()->setFuncKey1Short(funcKeyAShort());
-  ext->keySettings()->setFuncKey1Long(funcKeyALong());
-  ext->keySettings()->setFuncKey2Short(funcKeyBShort());
-  ext->keySettings()->setFuncKey2Long(funcKeyBLong());
-  ext->keySettings()->setFuncKey3Short(funcKeyCShort());
-  ext->keySettings()->setFuncKey3Long(funcKeyCLong());
+  ext->keySettings()->setFuncKeyAShort(funcKeyAShort());
+  ext->keySettings()->setFuncKeyALong(funcKeyALong());
+  ext->keySettings()->setFuncKeyBShort(funcKeyBShort());
+  ext->keySettings()->setFuncKeyBLong(funcKeyBLong());
+  ext->keySettings()->setFuncKeyCShort(funcKeyCShort());
+  ext->keySettings()->setFuncKeyCLong(funcKeyCLong());
   ext->keySettings()->setFuncKey1Short(funcKey1Short());
   ext->keySettings()->setFuncKey1Long(funcKey1Long());
   ext->keySettings()->setFuncKey2Short(funcKey2Short());
