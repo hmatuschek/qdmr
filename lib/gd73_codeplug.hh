@@ -8,6 +8,7 @@
 #include "rxgrouplist.hh"
 #include "channel.hh"
 #include "zone.hh"
+#include "radioddity_extensions.hh"
 
 
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
@@ -162,7 +163,7 @@ public:
 
   /** Implements the radio settings.
    *
-   * Memory representation within the binary codeplug (size: ????h):
+   * Memory representation within the binary codeplug (size: 00aah):
    * @verbinclude gd73_settings_element.txt.
    */
   class SettingsElement: public Element
@@ -177,11 +178,21 @@ public:
       Off = 0, Text = 1, Image = 2, Both = 3
     };
     /** Possible programmable key function. */
-    enum class KeyFunction {
-      None=0, RadioEnable=1, RadioCheck=2, RadioDisable=3, PowerLevel=4,
-      Monitor=5, EmergencyOn=6, EmergencyOff=7, ZoneSwitch=8, ToggleScan=9, ToggleVOX=10,
-      OneTouch1=11, OneTouch2=12, OneTouch3=13, OneTouch4=14, OneTouch5=15, ToggleTalkaround=16,
-      LoneWorker=17, TBST=18, CallSwell=19
+    struct KeyFunction {
+    public:
+      static uint8_t encode(RadioddityButtonSettingsExtension::Function func);
+      static RadioddityButtonSettingsExtension::Function decode(uint8_t code);
+    protected:
+      enum Code {
+        None=0, RadioEnable=1, RadioCheck=2, RadioDisable=3, PowerLevel=4,
+        Monitor=5, EmergencyOn=6, EmergencyOff=7, ZoneSwitch=8, ToggleScan=9, ToggleVOX=10,
+        OneTouch1=11, OneTouch2=12, OneTouch3=13, OneTouch4=14, OneTouch5=15, ToggleTalkaround=16,
+        LoneWorker=17, TBST=18, CallSwell=19
+      };
+    };
+    /** Possible languages. */
+    enum class Language {
+      Chinese=0, English=1
     };
 
   protected:
@@ -193,7 +204,7 @@ public:
     SettingsElement(uint8_t *ptr);
 
     /** Returns the size of the settings element. */
-    static constexpr unsigned int size() { return 0x0084; }
+    static constexpr unsigned int size() { return 0x00aa; }
 
     /** Returns the radio name. */
     QString name() const;
@@ -204,6 +215,11 @@ public:
     unsigned int dmrID() const;
     /** Sets the radio ID. */
     void setDMRID(unsigned int id);
+
+    /** Retruns the menu language. */
+    Language language() const;
+    /** Sets the menu language. */
+    void setLanguage(Language lang);
 
     /** Returns the VOX level [0,10]. */
     unsigned int vox() const;
@@ -314,21 +330,21 @@ public:
     /** Sets the long-press duration. */
     void setLongPressDuration(const Interval &interval);
     /** Long-press function of programmable key 1. */
-    KeyFunction keyFunctionLongPressP1() const;
+    RadioddityButtonSettingsExtension::Function keyFunctionLongPressP1() const;
     /** Sets the long-press function of the programmable key 1. */
-    void setKeyFunctionLongPressP1(KeyFunction function);
+    void setKeyFunctionLongPressP1(RadioddityButtonSettingsExtension::Function function);
     /** Short-press function of programmable key 1. */
-    KeyFunction keyFunctionShortPressP1() const;
+    RadioddityButtonSettingsExtension::Function keyFunctionShortPressP1() const;
     /** Sets the short-press function of the programmable key 1. */
-    void setKeyFunctionShortPressP1(KeyFunction function);
+    void setKeyFunctionShortPressP1(RadioddityButtonSettingsExtension::Function function);
     /** Long-press function of programmable key 2. */
-    KeyFunction keyFunctionLongPressP2() const;
+    RadioddityButtonSettingsExtension::Function keyFunctionLongPressP2() const;
     /** Sets the long-press function of the programmable key 2. */
-    void setKeyFunctionLongPressP2(KeyFunction function);
+    void setKeyFunctionLongPressP2(RadioddityButtonSettingsExtension::Function function);
     /** Short-press function of programmable key 2. */
-    KeyFunction keyFunctionShortPressP2() const;
+    RadioddityButtonSettingsExtension::Function keyFunctionShortPressP2() const;
     /** Sets the short-press function of the programmable key 2. */
-    void setKeyFunctionShortPressP2(KeyFunction function);
+    void setKeyFunctionShortPressP2(RadioddityButtonSettingsExtension::Function function);
     /** Returns the n-th one-touch setting. */
     OneTouchSettingElement oneTouch(unsigned int n);
 
@@ -376,6 +392,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()                                  { return 0x0000; }
       static constexpr unsigned int dmrId()                                 { return 0x0020; }
+      static constexpr unsigned int language()                              { return 0x0024; }
       static constexpr unsigned int voxLevel()                              { return 0x0026; }
       static constexpr unsigned int squelchLevel()                          { return 0x0027; }
       static constexpr unsigned int tot()                                   { return 0x0028; }

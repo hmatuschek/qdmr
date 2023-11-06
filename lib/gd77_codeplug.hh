@@ -245,6 +245,9 @@ public:
   bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
+  bool encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
   void clearMessages();
 
   void clearScanLists();
@@ -288,6 +291,14 @@ public:
   bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
   bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+
+protected:
+  /** Internal used offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int buttonSettings()                          { return 0x000108; }
+    /// @endcond
+  };
 };
 
 #endif // GD77_CODEPLUG_HH
