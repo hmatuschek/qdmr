@@ -117,6 +117,65 @@ GD73Codeplug::InformationElement::softwareVersion() const {
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::SettingsElement::KeyFunction
+ * ********************************************************************************************* */
+uint8_t
+GD73Codeplug::SettingsElement::KeyFunction::encode(RadioddityButtonSettingsExtension::Function func) {
+  switch (func) {
+  case RadioddityButtonSettingsExtension::Function::None: return None;
+  case RadioddityButtonSettingsExtension::Function::RadioEnable: return RadioEnable;
+  case RadioddityButtonSettingsExtension::Function::RadioCheck: return RadioCheck;
+  case RadioddityButtonSettingsExtension::Function::RadioDisable: return RadioDisable;
+  case RadioddityButtonSettingsExtension::Function::PowerLevel: return PowerLevel;
+  case RadioddityButtonSettingsExtension::Function::ToggleMonitor: return Monitor;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOn: return EmergencyOn;
+  case RadioddityButtonSettingsExtension::Function::EmergencyOff: return EmergencyOff;
+  case RadioddityButtonSettingsExtension::Function::ZoneSelect: return ZoneSwitch;
+  case RadioddityButtonSettingsExtension::Function::ToggleScan: return ToggleScan;
+  case RadioddityButtonSettingsExtension::Function::ToggleVox: return ToggleVOX;
+  case RadioddityButtonSettingsExtension::Function::OneTouch1: return OneTouch1;
+  case RadioddityButtonSettingsExtension::Function::OneTouch2: return OneTouch2;
+  case RadioddityButtonSettingsExtension::Function::OneTouch3: return OneTouch3;
+  case RadioddityButtonSettingsExtension::Function::OneTouch4: return OneTouch4;
+  case RadioddityButtonSettingsExtension::Function::OneTouch5: return OneTouch5;
+  case RadioddityButtonSettingsExtension::Function::ToggleTalkaround: return ToggleTalkaround;
+  case RadioddityButtonSettingsExtension::Function::ToggleLoneWorker: return LoneWorker;
+  case RadioddityButtonSettingsExtension::Function::TBST: return TBST;
+  case RadioddityButtonSettingsExtension::Function::CallSwell: return CallSwell;
+  default: break;
+  }
+  return None;
+}
+
+RadioddityButtonSettingsExtension::Function
+GD73Codeplug::SettingsElement::KeyFunction::decode(uint8_t code) {
+  switch((Code) code) {
+  case None: return RadioddityButtonSettingsExtension::Function::None;
+  case RadioEnable: return RadioddityButtonSettingsExtension::Function::RadioEnable;
+  case RadioCheck: return RadioddityButtonSettingsExtension::Function::RadioCheck;
+  case RadioDisable: return RadioddityButtonSettingsExtension::Function::RadioDisable;
+  case PowerLevel: return RadioddityButtonSettingsExtension::Function::PowerLevel;
+  case Monitor: return RadioddityButtonSettingsExtension::Function::ToggleMonitor;
+  case EmergencyOn: return RadioddityButtonSettingsExtension::Function::EmergencyOn;
+  case EmergencyOff: return RadioddityButtonSettingsExtension::Function::EmergencyOff;
+  case ZoneSwitch: return RadioddityButtonSettingsExtension::Function::ZoneSelect;
+  case ToggleScan: return RadioddityButtonSettingsExtension::Function::ToggleScan;
+  case ToggleVOX: return RadioddityButtonSettingsExtension::Function::ToggleVox;
+  case OneTouch1: return RadioddityButtonSettingsExtension::Function::OneTouch1;
+  case OneTouch2: return RadioddityButtonSettingsExtension::Function::OneTouch2;
+  case OneTouch3: return RadioddityButtonSettingsExtension::Function::OneTouch3;
+  case OneTouch4: return RadioddityButtonSettingsExtension::Function::OneTouch4;
+  case OneTouch5: return RadioddityButtonSettingsExtension::Function::OneTouch5;
+  case ToggleTalkaround: return RadioddityButtonSettingsExtension::Function::ToggleTalkaround;
+  case LoneWorker: return RadioddityButtonSettingsExtension::Function::ToggleLoneWorker;
+  case TBST: return RadioddityButtonSettingsExtension::Function::TBST;
+  case CallSwell: return RadioddityButtonSettingsExtension::Function::CallSwell;
+  default: break;
+  }
+  return RadioddityButtonSettingsExtension::Function::None;
+}
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug::SettingsElement
  * ********************************************************************************************* */
 GD73Codeplug::SettingsElement::SettingsElement(uint8_t *ptr, size_t size)
@@ -147,6 +206,15 @@ GD73Codeplug::SettingsElement::dmrID() const {
 void
 GD73Codeplug::SettingsElement::setDMRID(unsigned int id) {
   setUInt32_le(Offset::dmrId(), id);
+}
+
+GD73Codeplug::SettingsElement::Language
+GD73Codeplug::SettingsElement::language() const {
+  return (Language)getUInt8(Offset::language());
+}
+void
+GD73Codeplug::SettingsElement::setLanguage(Language lang) {
+  setUInt8(Offset::language(), (unsigned int)lang);
 }
 
 unsigned int
@@ -364,37 +432,37 @@ GD73Codeplug::SettingsElement::setLongPressDuration(const Interval &interval) {
   Interval intv = Limit::longPressDuration().map(interval);
   setUInt8(Offset::longPressDuration(), intv.milliseconds()/500);
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionLongPressP1() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey1LongPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1LongPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionLongPressP1(KeyFunction function) {
-  setUInt8(Offset::progFuncKey1LongPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionLongPressP1(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey1LongPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionShortPressP1() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey1ShortPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey1ShortPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionShortPressP1(KeyFunction function) {
-  setUInt8(Offset::progFuncKey1ShortPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionShortPressP1(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey1ShortPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionLongPressP2() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey2LongPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2LongPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionLongPressP2(KeyFunction function) {
-  setUInt8(Offset::progFuncKey2LongPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionLongPressP2(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey2LongPress(), KeyFunction::encode(function));
 }
-GD73Codeplug::SettingsElement::KeyFunction
+RadioddityButtonSettingsExtension::Function
 GD73Codeplug::SettingsElement::keyFunctionShortPressP2() const {
-  return (KeyFunction)getUInt8(Offset::progFuncKey2ShortPress());
+  return KeyFunction::decode(getUInt8(Offset::progFuncKey2ShortPress()));
 }
 void
-GD73Codeplug::SettingsElement::setKeyFunctionShortPressP2(KeyFunction function) {
-  setUInt8(Offset::progFuncKey2ShortPress(), (unsigned int)function);
+GD73Codeplug::SettingsElement::setKeyFunctionShortPressP2(RadioddityButtonSettingsExtension::Function function) {
+  setUInt8(Offset::progFuncKey2ShortPress(), KeyFunction::encode(function));
 }
 GD73Codeplug::OneTouchSettingElement
 GD73Codeplug::SettingsElement::oneTouch(unsigned int n) {
@@ -425,11 +493,54 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
-  if (! ext)
+  if (nullptr == ext)
     ctx.config()->settings()->setRadioddityExtension(ext = new RadiodditySettingsExtension());
 
   ext->setLoneWorkerResponseTime(loneWorkerResponseTimeout());
   ext->setLoneWorkerReminderPeriod(loneWorkerRemindPeriod());
+
+  ext->enableTXInterrupt(txInterruptedEnabled());
+  switch(language()) {
+  case Language::Chinese: ext->setLanguage(RadiodditySettingsExtension::Language::Chinese); break;
+  case Language::English: ext->setLanguage(RadiodditySettingsExtension::Language::English); break;
+  }
+
+  ext->enablePowerSaveMode(powerSaveEnabled());
+  ext->setPowerSaveDelay(powerSaveTimeout());
+
+  ext->buttons()->setLongPressDuration(longPressDuration());
+  ext->buttons()->setFuncKey1Short(keyFunctionShortPressP1());
+  ext->buttons()->setFuncKey1Long(keyFunctionLongPressP1());
+  ext->buttons()->setFuncKey2Short(keyFunctionShortPressP2());
+  ext->buttons()->setFuncKey2Long(keyFunctionLongPressP2());
+
+  ext->tone()->setFMMicGain(fmMicGain());
+  ext->tone()->enableKeyTone(keyToneEnabled());
+  ext->tone()->setKeyToneVolume(keyToneVolume());
+  ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
+  ext->tone()->setLowBatteryWarnVolume(lowBatteryToneVolume());
+
+  switch (bootDisplayMode()) {
+  case BootDisplayMode::Off:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::None);
+    break;
+  case BootDisplayMode::Text:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Text);
+    break;
+  case BootDisplayMode::Image:
+  case BootDisplayMode::Both:
+    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Image);
+    break;
+  }
+
+  if (readLockEnabled())
+    ext->boot()->setBootPassword(readLockPin());
+  else
+    ext->boot()->setBootPassword("");
+  if (writeLockEnabled())
+    ext->boot()->setProgPassword(writeLockPin());
+  else
+    ext->boot()->setProgPassword("");
 
   return true;
 }
@@ -451,6 +562,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setBootTextLine1(ctx.config()->settings()->introLine1());
   setBootTextLine2(ctx.config()->settings()->introLine2());
   setDMRMicGain(ctx.config()->settings()->micLevel());
+  setFMMicGain(ctx.config()->settings()->micLevel());
   setSquelch(ctx.config()->settings()->squelch());
   setVOX(ctx.config()->settings()->vox());
   if (ctx.config()->settings()->totDisabled())
@@ -458,16 +570,60 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   else
     setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
 
-  setUInt8(0x0024, 0x01);   // < Unknown byte at 0x0024
-  //setUInt8(0x003c, 0x01);
-  //setUInt8(0x003e, 0x01);
+  setLanguage(Language::English);
+  setUInt8(0x003c, 0x01);
+  setUInt8(0x003e, 0x01);
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext)
     return true;
+
   setLoneWorkerResponseTimeout(ext->loneWorkerResponseTime());
   setLoneWorkerRemindPeriod(ext->loneWorkerReminderPeriod());
+
+  enableTXInterrupt(ext->txInterrupt());
+  switch(ext->language()) {
+  case RadiodditySettingsExtension::Language::Chinese: setLanguage(Language::Chinese); break;
+  case RadiodditySettingsExtension::Language::English: setLanguage(Language::English); break;
+  }
+
+  enablePowerSave(ext->powerSaveMode());
+  setPowerSaveTimeout(ext->powerSaveDelay());
+
+  setLongPressDuration(ext->buttons()->longPressDuration());
+  setKeyFunctionShortPressP1(ext->buttons()->funcKey1Short());
+  setKeyFunctionLongPressP1(ext->buttons()->funcKey1Long());
+  setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
+  setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
+
+  setFMMicGain(ext->tone()->fmMicGain());
+  enableKeyTone(ext->tone()->keyTone());
+  setKeyToneVolume(ext->tone()->keyToneVolume());
+  enableLowBatteryTone(ext->tone()->lowBatteryWarn());
+  setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
+
+  switch(ext->boot()->display()) {
+  case RadioddityBootSettingsExtension::DisplayMode::None:
+    setBootDisplayMode(BootDisplayMode::Off); break;
+  case RadioddityBootSettingsExtension::DisplayMode::Text:
+    setBootDisplayMode(BootDisplayMode::Text); break;
+  case RadioddityBootSettingsExtension::DisplayMode::Image:
+    setBootDisplayMode(BootDisplayMode::Image); break;
+  }
+
+  if (! ext->boot()->bootPassword().isEmpty()) {
+    setReadLockPin(ext->boot()->bootPassword());
+    enableReadLock(true);
+  } else {
+    enableReadLock(false);
+  }
+  if (! ext->boot()->progPassword().isEmpty()) {
+    setWriteLockPin(ext->boot()->bootPassword());
+    enableWriteLock(true);
+  } else {
+    enableWriteLock(false);
+  }
 
   return true;
 }
