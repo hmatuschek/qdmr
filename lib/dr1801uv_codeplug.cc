@@ -931,7 +931,7 @@ DR1801UVCodeplug::GroupListElement::index() const {
 }
 void
 DR1801UVCodeplug::GroupListElement::setIndex(unsigned int index) {
-  setUInt16_le(Offset::index(), index-1);
+  setUInt16_le(Offset::index(), index+1);
 }
 
 unsigned int
