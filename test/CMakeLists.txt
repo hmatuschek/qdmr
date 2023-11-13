@@ -87,6 +87,10 @@ qt5_wrap_cpp(dm1701_MOC_SOURCES dm1701_test.hh)
 add_executable(dm1701_test dm1701_test.cc ${dm1701_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(dm1701_test ${LIBS} libdmrconf libdmrconfigtest)
 
+qt5_wrap_cpp(dr1801_MOC_SOURCES dr1801_test.hh)
+add_executable(dr1801_test dr1801_test.cc ${dr1801_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(dr1801_test ${LIBS} libdmrconf libdmrconfigtest)
+
 
 add_test(NAME Config    COMMAND configtest)
 add_test(NAME CRC32     COMMAND crc32test)
@@ -108,4 +112,5 @@ add_test(NAME D578UV    COMMAND d578uv_test)
 
 add_test(NAME DMR6X2UV  COMMAND dmr6x2uv_test)
 add_test(NAME DM1701    COMMAND dm1701_test)
+add_test(NAME DR1801    COMMAND dr1801_test)
 
