@@ -14,7 +14,7 @@ public:
 private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-  void testChannelFrequency();
+  void testBasicConfigReencoding();
 };
 
 #endif // DR1801TEST_HH

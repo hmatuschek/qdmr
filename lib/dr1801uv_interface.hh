@@ -52,7 +52,7 @@ protected:
     /** Speed for reading the codeplug. */
     ReadSpeed = QSerialPort::Baud115200,
     /** Speed for writing the codeplug. */
-    WriteSpeed = QSerialPort::Baud9600
+    WriteSpeed = QSerialPort::Baud115200
   };
 
   /** Implemented commands. */

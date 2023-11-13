@@ -227,6 +227,7 @@ DR1801UVInterface::writeCodeplug(
   if (progress)
     progress(0, total);
 
+  logDebug() << "Write codeplug...";
   while (bytesToTransfer) {
     uint32_t n = std::min(256U, bytesToTransfer);
     if (! QSerialPort::write((char*)codeplug.data(offset), n)) {
@@ -247,6 +248,7 @@ DR1801UVInterface::writeCodeplug(
       progress(offset, total);
   }
 
+  logDebug() << "Receive write-ACK.";
   if (! receiveWriteACK(err)) {
     errMsg(err) << "Cannot finish write operation properly. Partial write?";
     return false;
@@ -427,7 +429,7 @@ DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
-  QThread::msleep(250);
+  QThread::msleep(1000);
 
   _state = WRITE_THROUGH;
   return true;
@@ -441,7 +443,7 @@ DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
-  QThread::msleep(250);
+  QThread::msleep(1000);
   _state = IDLE;
 
   // Wait for device response
