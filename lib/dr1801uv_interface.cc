@@ -159,20 +159,20 @@ DR1801UVInterface::readCodeplug(
   unsigned int offset = 0;
   while (bytesToTransfer) {
     unsigned n = std::min(256U, bytesToTransfer);
-    while (n > bytesAvailable()) {
-      if (! waitForReadyRead(2000)) {
-        errMsg(err) << QSerialPort::errorString();
-        errMsg(err) << "Cannot read from device '" << portName() << "'.";
-        _state = ERROR;
-        return false;
-      }
+    if ((0 == bytesAvailable()) && (!waitForReadyRead(2000))) {
+      errMsg(err) << QSerialPort::errorString();
+      errMsg(err) << "Cannot read from device '" << portName() << "'.";
+      _state = ERROR;
+      return false;
     }
-    if (! QSerialPort::read((char*)codeplug.image(0).data(offset), n)) {
+    int m = QSerialPort::read((char*)codeplug.image(0).data(offset), n);
+    if (0 >= m) {
       errMsg(err) << QSerialPort::errorString();
       errMsg(err) << "Cannot read codeplug from device.";
       _state = ERROR;
       return false;
     }
+    offset += m; bytesToTransfer -= m;
     if (progress)
       progress(offset, total);
   }
@@ -401,7 +401,7 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
-  QThread::msleep(250);
+  QThread::msleep(1000);
 
   return true;
 }
@@ -463,11 +463,7 @@ DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
 
 bool
 DR1801UVInterface::startReading(const ErrorStack &err) {
-  uint8_t cmd[6] = {0xaa, 0x06, (START_READ_DATA>>8), START_READ_DATA&0xff, 0x06, 0xbb};
-
-  logDebug() << "Send "  << QByteArray((const char *)cmd, 6).toHex() << ".";
-  if (6 != QSerialPort::write((const char *)cmd, 6)) {
-    errMsg(err) << QSerialPort::errorString();
+  if (! send(START_READ_DATA, 0, 0, err)) {
     errMsg(err) << "Cannot initalize codeplug read.";
     return false;
   }
