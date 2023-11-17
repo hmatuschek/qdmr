@@ -21,10 +21,10 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install Dependencies
-      run: emerge dev-cpp/yaml-cpp dev-qt/designer:5 dev-qt/qttest:5 \
+      run: "emerge dev-cpp/yaml-cpp dev-qt/designer:5 dev-qt/qttest:5 \
         dev-qt/qtwidgets:5 dev-qt/qtgui:5 dev-qt/qtcore:5 dev-qt/qtnetwork:5 \
 	dev-qt/qtpositioning:5 dev-qt/qtserialport:5 virtual/libusb:1 \
-        dev-qt/linguist-tools:5
+        dev-qt/linguist-tools:5"
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
