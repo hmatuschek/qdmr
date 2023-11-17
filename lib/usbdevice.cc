@@ -9,6 +9,7 @@
 #include "radioddity_interface.hh"
 #include "opengd77_interface.hh"
 #include "tyt_interface.hh"
+#include "dr1801uv_interface.hh"
 #include "c7000device.hh"
 
 
@@ -309,6 +310,7 @@ USBDeviceDescriptor::detect() {
   res.append(OpenGD77Interface::detect());
   res.append(RadioddityInterface::detect());
   res.append(TyTInterface::detect());
+  res.append(DR1801UVInterface::detect());
   res.append(C7000Device::detect());
   return res;
 }

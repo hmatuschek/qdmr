@@ -40,12 +40,47 @@ public:
     Flags();
   };
 
-  /** Represents the abstract base class of all codeplug elements. That is a memory region within
-   * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provides some helper methods to access specific members of the element.
+  /** Represents the abstract base class of all codeplug elements.
+   *
+   * That is a memory region within the codeplug that encodes a specific element. E.g., channels,
+   * contacts, zones, etc. This class provides some helper methods to access specific members of
+   * the element.
+   *
    * @since 0.9.0 */
   class Element
   {
+  protected:
+    /** Base class for Offsets. */
+    struct Offset {
+      /** Some type to specify a bit offset. That is the byte-offset and bit of that byte. */
+      struct BitOffset {
+        /** The byte offset. */
+        const unsigned int byte;
+        /** The bit within the byte. */
+        const unsigned int bit;
+      };
+    };
+
+  public:
+    /** Base class for Limits. */
+    struct Limit {
+      /** Holds a range of values [min, max]. */
+      template <class T> struct Range {
+        /// Lower bound.
+        const T min;
+        /// Upper bound.
+        const T max;
+        /// Limits the value to the range.
+        inline T limit(const T &value) const {
+          return std::min(max, std::max(min, value));
+        }
+        /// Checks if value is in range
+        inline bool in(const T &value) const {
+          return (value <= max) && (value >= min);
+        }
+      };
+    };
+
   protected:
     /** Hidden constructor.
      * @param ptr Specifies the pointer to the element within the codeplug.
@@ -58,6 +93,9 @@ public:
     /** Destructor. */
     virtual ~Element();
 
+    /** Copy assignment. */
+    Element &operator=(const Element &other);
+
     /** Returns @c true if the pointer is not null. */
     virtual bool isValid() const;
     /** Abstract method to reset the element within the codeplug. Any device specific element
@@ -68,7 +106,11 @@ public:
     bool fill(uint8_t value, unsigned offset=0, int size=-1);
 
     /** Reads a specific bit at the given byte-offset. */
+    bool getBit(const Offset::BitOffset &offset) const;
+    /** Reads a specific bit at the given byte-offset. */
     bool getBit(unsigned offset, unsigned bit) const;
+    /** Sets a specific bit at the given byte-offset. */
+    void setBit(const Offset::BitOffset &offset, bool value=true);
     /** Sets a specific bit at the given byte-offset. */
     void setBit(unsigned offset, unsigned bit, bool value=true);
     /** Clears a specific bit at the given byte-offset. */

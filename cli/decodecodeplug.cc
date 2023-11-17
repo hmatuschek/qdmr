@@ -31,6 +31,8 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dr1801uv_codeplug.hh"
+#include "dr1801uv_filereader.hh"
 
 template <class Cpl, class Rdr>
 bool decode(Config &config, const QString &filename, QCommandLineParser &parser, const ErrorStack &err=ErrorStack()) {
@@ -65,7 +67,6 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
 
   QString filename = parser.positionalArguments().at(1);
-  QString errorMessage;
   ErrorStack err;
 
   if (! parser.isSet("radio")) {
@@ -153,6 +154,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::DMR6X2UV:
     if (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::DR1801UV:
+    if (! decode<DR1801UVCodeplug, DR1801UVFileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
     } break;

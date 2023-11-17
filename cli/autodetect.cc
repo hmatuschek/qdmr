@@ -44,9 +44,10 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     errMsg(err) << "No matching USB devices are found. Check connection?";
     return nullptr;
   }
-  logDebug() << "Found " << interfaces.count() << " device(s):";
+
+  logInfo() << "Found " << interfaces.count() << " device(s):";
   foreach (USBDeviceDescriptor d, interfaces) {
-    logDebug() << "  " << d.description() << ".";
+    logInfo() << "  " << d.description() << ".";
   }
 
   USBDeviceDescriptor device;

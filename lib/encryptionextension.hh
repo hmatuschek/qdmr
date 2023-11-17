@@ -22,7 +22,7 @@ public:
   void clear();
 
   /** Creates a key from the given hex-string. */
-  virtual void fromHex(const QString &hex);
+  virtual bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
   /** Converts a key to a hex string. */
   virtual QString toHex() const;
 
@@ -54,7 +54,7 @@ public:
   Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-  virtual void fromHex(const QString &hex);
+  bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -81,7 +81,7 @@ public:
   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-  virtual void fromHex(const QString &hex);
+  bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
