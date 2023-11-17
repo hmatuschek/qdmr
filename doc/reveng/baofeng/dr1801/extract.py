@@ -56,5 +56,5 @@ for p in cap:
       print(hexDump(getData(p), "< "))
     else:
       print(hexDump(getData(p), "> "))
-      print(p)
+      #print(p)
         

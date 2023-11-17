@@ -48,6 +48,9 @@ protected:
   /** Internal used method to receive a response. */
   bool receive(uint16_t &command, uint8_t *response, uint8_t &rlen, const ErrorStack &err=ErrorStack());
 
+  /** Reads exactly @c n bytes or timeouts. */
+  bool read(uint8_t *data, qint64 n, unsigned int timeout_ms, const ErrorStack &err=ErrorStack());
+
 protected:
   /** Holds the state of the interface. */
   State _state;

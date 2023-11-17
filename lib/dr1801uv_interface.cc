@@ -159,20 +159,12 @@ DR1801UVInterface::readCodeplug(
   unsigned int offset = 0;
   while (bytesToTransfer) {
     unsigned n = std::min(256U, bytesToTransfer);
-    if ((0 == bytesAvailable()) && (!waitForReadyRead(2000))) {
-      errMsg(err) << QSerialPort::errorString();
+    if (! AuctusA6Interface::read(codeplug.image(0).data(offset), n, 2000, err)) {
       errMsg(err) << "Cannot read from device '" << portName() << "'.";
       _state = ERROR;
       return false;
     }
-    int m = QSerialPort::read((char*)codeplug.image(0).data(offset), n);
-    if (0 >= m) {
-      errMsg(err) << QSerialPort::errorString();
-      errMsg(err) << "Cannot read codeplug from device.";
-      _state = ERROR;
-      return false;
-    }
-    offset += m; bytesToTransfer -= m;
+    offset += n; bytesToTransfer -= n;
     if (progress)
       progress(offset, total);
   }
@@ -219,6 +211,7 @@ DR1801UVInterface::writeCodeplug(
   for (unsigned int i=0; i<bytesToTransfer/2; i++) {
     crc ^= *((const uint16_t*)codeplug.image(0).data(offset +2*i));
   }
+
   if (! prepareWriting(bytesToTransfer, DR1801UVInterface::WriteSpeed, crc, err) ) {
     errMsg(err) << "Cannot initialize codeplug write.";
     return false;
@@ -229,7 +222,7 @@ DR1801UVInterface::writeCodeplug(
 
   logDebug() << "Write codeplug...";
   while (bytesToTransfer) {
-    uint32_t n = std::min(256U, bytesToTransfer);
+    uint32_t n = std::min(200U, bytesToTransfer);
     if (! QSerialPort::write((char*)codeplug.data(offset), n)) {
       errMsg(err) << "Cannot write codeplug to device.";
       return false;
@@ -243,6 +236,12 @@ DR1801UVInterface::writeCodeplug(
         return false;
       }
     }
+
+    if (bytesAvailable()) {
+      logDebug() << "Oops";
+      logDebug() << "Unexpected data " << readAll().toHex() << ".";
+    }
+
     offset += n; bytesToTransfer -= n;
     if (progress)
       progress(offset, total);
@@ -437,17 +436,8 @@ DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc
 
 bool
 DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
-  // Set the baud-rate back to 9600
-  logDebug() << "Reset baudrate to " << DefaultSpeed;
-  if (! this->setBaudRate(DefaultSpeed)) {
-    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
-    return false;
-  }
-  QThread::msleep(1000);
-  _state = IDLE;
-
   // Wait for device response
-  uint16_t rcode;
+  uint16_t rcode = CODEPLUG_WRITTEN;
   CodeplugWriteResponse response;
   uint8_t size = sizeof(CodeplugWriteResponse);
   if (! receive(rcode, (uint8_t*) &response, size, err)) {
@@ -459,6 +449,15 @@ DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
     errMsg(err) << "Cannot complete codeplug write.";
     return false;
   }
+
+  // Set the baud-rate back to default speed
+  logDebug() << "Reset baudrate to " << DefaultSpeed;
+  if (! this->setBaudRate(DefaultSpeed)) {
+    errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
+    return false;
+  }
+  QThread::msleep(1000);
+  _state = IDLE;
 
   return true;
 }

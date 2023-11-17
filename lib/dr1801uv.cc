@@ -166,6 +166,7 @@ DR1801UV::upload() {
 
   // Encode config into codeplug
   _codeplug.encode(_config, _codeplugFlags);
+  _codeplug.data(0x304)[0] = 0;
 
   // Write codeplug back to the device
   if (! _device->writeCodeplug(_codeplug, [this](unsigned int n, unsigned int total) {

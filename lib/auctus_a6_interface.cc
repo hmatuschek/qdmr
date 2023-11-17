@@ -107,20 +107,14 @@ AuctusA6Interface::receive(uint16_t &command,
                            uint8_t *response, uint8_t &rlen, const ErrorStack &err)
 {
   uint8_t buffer[255];
-  // wait for start-of-packet and length bytes
+
+  // read start-of-packet and length bytes
   uint8_t total_length = 2;
-  while (total_length > bytesAvailable()) {
-    if (! waitForReadyRead(TIMEOUT)) {
-      errMsg(err) << "QSerialPort: " << errorString();
-      errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
-      return false;
-    }
-  }
-  // read start-of-packet and length
-  if (2 != QSerialPort::read((char *)buffer, 2)) {
-    errMsg(err) << "QSerialPort: " << errorString();
+  if (! read(buffer, total_length, TIMEOUT, err)) {
+    errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
     return false;
   }
+
   // check start of packet
   if (0xaa != buffer[0]) {
     errMsg(err) << "Unexpected start-of-packet byte: Expected aah, got "
@@ -135,19 +129,12 @@ AuctusA6Interface::receive(uint16_t &command,
                 << QString::number(total_length, 16) << "h.";
     return false;
   }
-  // wait for remaining packet
-  while ((total_length-2) > bytesAvailable()) {
-    if (! waitForReadyRead(TIMEOUT)) {
-      errMsg(err) << "QSerialPort: " << errorString();
-      errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
-      return false;
-    }
-  }
   // read remaining packet
-  if ((total_length-2) != QSerialPort::read((char *)(buffer+2), total_length-2)) {
-    errMsg(err) << "QSerialPort: " << errorString();
+  if (! read(buffer+2, total_length-2, TIMEOUT, err)) {
+    errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
     return false;
   }
+
   logDebug() << "Got response " << QByteArray((const char *)buffer, total_length).toHex() << ".";
 
   // unpack command
@@ -177,3 +164,26 @@ AuctusA6Interface::receive(uint16_t &command,
   return true;
 }
 
+bool
+AuctusA6Interface::read(uint8_t *data, qint64 n, unsigned int timeout_ms, const ErrorStack &err)
+{
+  while (n > 0) {
+    if (0 == bytesAvailable()) {
+      if (! waitForReadyRead(timeout_ms)) {
+        errMsg(err) << "QSerialPort: " << errorString();
+        return false;
+      }
+    }
+
+    qint64 k = QSerialPort::read((char *)data, std::min(n, bytesAvailable()));
+    if (0 > k) {
+      errMsg(err) << "QSerialPort: " << errorString();
+      return false;
+    }
+
+    n -= k;
+    data += k;
+  }
+
+  return true;
+}
