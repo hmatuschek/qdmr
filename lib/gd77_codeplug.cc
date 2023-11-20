@@ -42,9 +42,8 @@
 #define ADDR_CONTACTS             0x017620
 #define CONTACT_SIZE              0x000018
 
-#define NUM_GROUP_LISTS                 76
+#define NUM_GROUP_LISTS                 64
 #define ADDR_GROUP_LIST_BANK      0x01d620
-#define GROUPLIST_SIZE            0x000050
 #define GROUP_LIST_BANK_SIZE      0x001840
 
 
@@ -223,7 +222,7 @@ GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned size)
 }
 
 GD77Codeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : RadioddityCodeplug::GroupListElement(ptr, 0x0050)
+  : RadioddityCodeplug::GroupListElement(ptr, size())
 {
   // pass...
 }
@@ -239,14 +238,14 @@ GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, unsigned 
 }
 
 GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
-  : RadioddityCodeplug::GroupListBankElement(ptr, 0x1840)
+  : RadioddityCodeplug::GroupListBankElement(ptr, size())
 {
   // pass...
 }
 
 uint8_t *
 GD77Codeplug::GroupListBankElement::get(unsigned n) const {
-  return _data + 0x80 + n*GROUPLIST_SIZE;
+  return _data + Offset::groupLists() + n*GroupListElement::size();
 }
 
 
@@ -258,7 +257,7 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 {
   addImage("Radioddity GD77 Codeplug");
   image(0).addElement(0x00080, 0x07b80);
-  image(0).addElement(0x08000, 0x16300);
+  image(0).addElement(0x08000, 0x16b00);
 }
 
 void

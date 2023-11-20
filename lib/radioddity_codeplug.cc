@@ -927,7 +927,7 @@ RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, unsigned si
 }
 
 RadioddityCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
-  : Element(ptr, 0x0030)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -939,29 +939,31 @@ RadioddityCodeplug::GroupListElement::~GroupListElement() {
 void
 RadioddityCodeplug::GroupListElement::clear() {
   setName("");
-  memset(_data+0x0010, 0, 2*16);
+  memset(_data+Offset::members(), 0, Offset::betweenMembers()*Limit::memberCount());
 }
 
 QString
 RadioddityCodeplug::GroupListElement::name() const {
-  return readASCII(0x0000, 16, 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
 }
 void
 RadioddityCodeplug::GroupListElement::setName(const QString &name) {
-  writeASCII(0x0000, name, 16, 0xff);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
 bool
 RadioddityCodeplug::GroupListElement::hasMember(unsigned n) const {
+  if (n >= Limit::memberCount())
+    return false;
   return 0 != member(n);
 }
 unsigned
 RadioddityCodeplug::GroupListElement::member(unsigned n) const {
-  return getUInt16_le(0x0010 + 2*n);
+  return getUInt16_le(Offset::members() + n*Offset::betweenMembers());
 }
 void
 RadioddityCodeplug::GroupListElement::setMember(unsigned n, unsigned idx) {
-  return setUInt16_le(0x0010 + 2*n, idx);
+  return setUInt16_le(Offset::members() + n*Offset::betweenMembers(), idx);
 }
 void
 RadioddityCodeplug::GroupListElement::clearMember(unsigned n) {
@@ -1021,7 +1023,7 @@ RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, uns
 }
 
 RadioddityCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
-  : Element(ptr, 0x0c80)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -1054,7 +1056,7 @@ RadioddityCodeplug::GroupListBankElement::disable(unsigned n) {
 
 uint8_t *
 RadioddityCodeplug::GroupListBankElement::get(unsigned n) const {
-  return _data + 0x80 + n*0x30;
+  return _data + Offset::groupLists() + n*GroupListElement::size();
 }
 
 
