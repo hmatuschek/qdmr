@@ -486,6 +486,9 @@ public:
     /** Destructor. */
     virtual ~GroupListElement();
 
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
     /** Resets the group list. */
     void clear();
 
@@ -510,6 +513,25 @@ public:
     virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
     virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the group list. */
+    struct Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** Maximum member count. */
+      static constexpr unsigned int memberCount() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()           { return 0x0000; }
+      static constexpr unsigned int members()        { return 0x0010; }
+      static constexpr unsigned int betweenMembers() { return 0x0002; }
+      /// @endcond
+    };
   };
 
   /** Implements a base class of group list memory banks for all Radioddity codeplugs.
@@ -529,6 +551,9 @@ public:
     /** Destructor. */
     virtual ~GroupListBankElement();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0c80; }
+
     /** Resets the bank. */
     void clear();
 
@@ -544,6 +569,23 @@ public:
 
     /** Returns a pointer to the n-th group list. */
     virtual uint8_t *get(unsigned n) const;
+
+  public:
+    /** Some limits for the group list bank. */
+    struct Limit {
+      /** Maximum number of members. */
+      static constexpr unsigned int memberCount() { return 64; }
+    };
+
+  protected:
+    /** Internal used offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contactCount() { return 0x0000; }
+      static constexpr unsigned int betweenContactCounts() { return 0x0000; }
+      static constexpr unsigned int groupLists() { return 0x0080; }
+      /// @endcond
+    };
   };
 
   /** Implements the base class for scan lists of all Radioddity codeplugs.
