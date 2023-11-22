@@ -2,10 +2,9 @@
 #define D578UVTEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class D578UVTest : public QObject
+class D578UVTest : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,14 +12,9 @@ public:
   explicit D578UVTest(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
-protected:
-  Config _basicConfig;
+  void testChannelFrequency();
 };
 
 #endif // D578UVTEST_HH

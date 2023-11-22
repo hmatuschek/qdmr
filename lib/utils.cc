@@ -3,6 +3,8 @@
 #include <QVector>
 #include <QHash>
 #include <cmath>
+#include <QRegularExpression>
+#include <yaml-cpp/yaml.h>
 
 // Maps APRS icon number to code-char
 static QVector<char> aprsIconCodeTable{
@@ -375,11 +377,6 @@ validDMRNumber(const QString &text) {
 bool
 validDTMFNumber(const QString &text) {
   return QRegExp("^[0-9a-dA-D\\*#]+$").exactMatch(text);
-}
-
-QString
-format_frequency(double MHz) {
-  return QString::number(MHz, 'f', 5);
 }
 
 QString

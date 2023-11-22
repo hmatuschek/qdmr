@@ -1,11 +1,13 @@
+#include "gpssystem.hh"
+#include "userdatabase.hh"
+#include "roamingchannel.hh"
 #include "d578uv_codeplug.hh"
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
-#include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
+#include "roamingchannel.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -1576,8 +1578,11 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   // Handle D578UV specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
-  if (nullptr == ext) // <- if extension is not set
+  if (nullptr == ext) { // <- if extension is not set
+    setPriorityZoneAIndex(0xff);
+    setPriorityZoneBIndex(0xff);
     return true;
+  }
 
   // Encode boot settings
   if (ext->bootSettings()->priorityZoneA()->isNull())

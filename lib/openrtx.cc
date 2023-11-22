@@ -84,10 +84,14 @@ OpenRTX::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags
     return false;
   }
 
+  if (_config)
+    delete _config;
+
   if (! (_config = config)) {
     errMsg(err) << "Cannot upload to radio, no config given.";
     return false;
   }
+  _config->setParent(this);
 
   _task = StatusUpload;
   if (blocking) {

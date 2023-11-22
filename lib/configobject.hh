@@ -291,7 +291,9 @@ public:
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
   /** Adds an element to the list. */
-  virtual int add(ConfigObject *obj, int row=-1);
+  virtual int add(ConfigObject *obj, int row=-1, bool unique=true);
+  /** Replaces an element in the list. */
+  virtual int replace(ConfigObject *obj, int row, bool unique=true);
   /** Removes an element from the list. */
   virtual bool take(ConfigObject *obj);
   /** Removes an element from the list (and deletes it if owned). */
@@ -348,7 +350,7 @@ protected:
   ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
   void clear();

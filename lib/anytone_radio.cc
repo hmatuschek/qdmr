@@ -3,6 +3,7 @@
 #include "d868uv.hh"
 #include "config.hh"
 #include "logger.hh"
+#include "configcopyvisitor.hh"
 
 #define RBSIZE 16
 #define WBSIZE 16
@@ -71,8 +72,13 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   if (StatusIdle != _task)
     return false;
 
-  if (! (_config = config))
+  if (_config)
+    delete _config;
+
+  // Cannot upload null-pointer
+  if (nullptr == (_config = config))
     return false;
+  _config->setParent(this);
 
   _task = StatusUpload;
   _codeplugFlags = flags;
@@ -86,6 +92,8 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
     _dev->moveToThread(this);
+  _config->moveToThread(this);
+
   start();
 
   return true;

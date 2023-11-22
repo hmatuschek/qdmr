@@ -151,7 +151,7 @@ public:
 
     /** Clears the zone. */
     void clear();
-    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    bool linkZoneObj(Zone *zone, Context &ctx) const;
     void fromZoneObjA(const Zone *zone, Context &ctx);
     void fromZoneObjB(const Zone *zone, Context &ctx);
   };

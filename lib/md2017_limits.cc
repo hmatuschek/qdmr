@@ -69,8 +69,10 @@ MD2017Limits::MD2017Limits(QObject *parent)
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -93,8 +95,10 @@ MD2017Limits::MD2017Limits(QObject *parent)
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::Mid),

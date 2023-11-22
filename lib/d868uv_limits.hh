@@ -11,8 +11,8 @@ class D868UVLimits: public AnytoneLimits
 
 public:
   /** Constructor. */
-  D868UVLimits(const std::initializer_list<std::pair<double, double>> &rxFreqRanges,
-               const std::initializer_list<std::pair<double, double>> &txFreqRanges,
+  D868UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
+               const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
                const QString &hardwareRevision, QObject *parent=nullptr);
 };
 

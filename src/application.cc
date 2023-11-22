@@ -485,7 +485,7 @@ void
 Application::detectRadio() {
   if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
-    radio->deleteLater();
+    delete radio;
   } else {
     QMessageBox::information(nullptr, tr("No radio found"),
                              tr("No matching device was found."));
@@ -508,9 +508,18 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
     }
     return false;
   }
+
+  ErrorStack err;
+  Config *intermediate = myRadio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    return false;
+  }
+
   Settings settings;
   RadioLimitContext ctx(settings.ignoreFrequencyLimits());
-  myRadio->limits().verifyConfig(_config, ctx);
+  myRadio->limits().verifyConfig(intermediate, ctx);
+
   bool verified = true;
   if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
        ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
@@ -522,6 +531,9 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
           nullptr, tr("Verification success"),
           tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
+
+  // Delete intermediate representation
+  delete intermediate;
 
   // If no radio was given -> close connection to radio again
   if (nullptr == radio)
@@ -562,7 +574,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -570,7 +582,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -591,8 +603,15 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
     _config->setModified(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
+    _config->clear();
   }
+
+  if (! radio->codeplug().postprocess(_config, err)) {
+    ErrorMessageView(err).exec();
+    _config->clear();
+  }
+
   _mainWindow->setEnabled(true);
 
   if (radio->wait(250))
@@ -626,11 +645,18 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   ErrorStack err;
-  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
+  Config *intermediate = radio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    progress->setVisible(false);
+    return;
+  }
+
+  if (radio->startUpload(intermediate, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -668,7 +694,7 @@ Application::uploadCallsignDB() {
   // this is part of the "auto-selection" of calls-signs for upload
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
-    if (nullptr == _config->radioIDs()->defaultId()) {
+    if (nullptr == _config->settings()->defaultId()) {
       QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
                             tr("QDMR selects the call-signs to be written based on the default DMR "
                                "ID of the radio. No default ID set."));
@@ -676,7 +702,7 @@ Application::uploadCallsignDB() {
       return;
     }
     // Sort w.r.t users DMR ID
-    unsigned id = _config->radioIDs()->defaultId()->number();
+    unsigned id = _config->settings()->defaultId()->number();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
     _users->sortUsers(id);
   } else {
@@ -709,7 +735,7 @@ Application::uploadCallsignDB() {
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -718,7 +744,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 

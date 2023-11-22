@@ -16,13 +16,15 @@ EncryptionKey::clear() {
   _key.clear();
 }
 
-void
-EncryptionKey::fromHex(const QString &hex) {
+bool
+EncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
+  Q_UNUSED(err);
   QByteArray newKey = QByteArray::fromHex(hex.toLocal8Bit());
   if (_key == newKey)
-    return;
+    return true;
   _key = newKey;
   emit modified(this);
+  return true;
 }
 
 QString
@@ -55,13 +57,13 @@ DMREncryptionKey::clone() const {
   return key;
 }
 
-void
-DMREncryptionKey::fromHex(const QString &hex) {
+bool
+DMREncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
   if (4 != hex.size()) {
-    logError() << "Cannot set DMR ecryption key to '" << hex << "': Not a 16bit key.";
-    return;
+    errMsg(err) << "Cannot set DMR ecryption key to '" << hex << "': Not a 16bit key.";
+    return false;
   }
-  EncryptionKey::fromHex(hex);
+  return EncryptionKey::fromHex(hex);
 }
 
 YAML::Node
@@ -110,13 +112,13 @@ AESEncryptionKey::clone() const {
   return key;
 }
 
-void
-AESEncryptionKey::fromHex(const QString &hex) {
+bool
+AESEncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
   if (32 != hex.size()) {
-    logError() << "Cannot set AES ecryption key to '" << hex << "': Not a 16bit key.";
-    return;
+    errMsg(err) << "Cannot set AES ecryption key to '" << hex << "': Not a 16bit key.";
+    return false;
   }
-  EncryptionKey::fromHex(hex);
+  return EncryptionKey::fromHex(hex);
 }
 
 YAML::Node
@@ -156,12 +158,12 @@ EncryptionKeys::EncryptionKeys(QObject *parent)
 }
 
 int
-EncryptionKeys::add(ConfigObject *obj, int row) {
+EncryptionKeys::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<EncryptionKey>())) {
     logError() << "Cannot add nullptr or non-encryption key objects to key list.";
     return -1;
   }
-  return ConfigObjectList::add(obj, row);
+  return ConfigObjectList::add(obj, row, unique);
 }
 
 ConfigItem *

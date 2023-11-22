@@ -46,8 +46,12 @@ RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flag
   if (StatusIdle != _task)
     return false;
 
+  if (_config)
+    delete _config;
+
   if (! (_config = config))
     return false;
+  _config->setParent(this);
 
   _task = StatusUpload;
   _codeplugFlags = flags;

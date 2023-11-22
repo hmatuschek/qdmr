@@ -5,6 +5,7 @@
 
 #include "d868uv_codeplug.hh"
 #include "signaling.hh"
+#include "gpssystem.hh"
 
 class Channel;
 class DMRContact;
@@ -12,6 +13,7 @@ class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
+class RoamingChannel;
 
 
 /** Represents the device specific binary codeplug for Anytone AT-D878UV radios.
@@ -1899,8 +1901,8 @@ protected:
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   virtual void allocateZones();
-  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());

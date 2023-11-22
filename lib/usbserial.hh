@@ -28,9 +28,12 @@ protected:
   /** Constructs an opens new serial interface to the devices identified by the given vendor and
    * product IDs.
    * @param descriptor Specifies the device to open.
+   * @param rate Specifies the transferrate in baud.
    * @param err The error stack, messages are put onto.
    * @param parent Specifies the parent object. */
-  explicit USBSerial(const USBDeviceDescriptor &descriptor, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+  explicit USBSerial(const USBDeviceDescriptor &descriptor,
+                     QSerialPort::BaudRate rate=QSerialPort::Baud115200,
+                     const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 public:
   /** Destructor. */
@@ -50,6 +53,12 @@ protected slots:
   void onError(QSerialPort::SerialPortError error_t);
   /** Callback when closing interface. */
   void onClose();
+  /** Signaling callback. */
+  void signalingChanged();
+
+protected:
+  /** Serializes the pinout singals. */
+  QString formatPinoutSignals();
 };
 
 #endif // USBSERIAL_HH

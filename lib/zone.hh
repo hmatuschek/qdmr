@@ -26,7 +26,7 @@ class Zone : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit Zone(QObject *parent=nullptr);
+  Q_INVOKABLE explicit Zone(QObject *parent=nullptr);
   /** Constructs an empty Zone with the given name. */
   Zone(const QString &name, QObject *parent = nullptr);
 
@@ -82,7 +82,7 @@ public:
   /** Returns the zone at the given index. */
 	Zone *zone(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

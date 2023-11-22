@@ -12,11 +12,11 @@
 #include "radioinfo.hh"
 #include "radiointerface.hh"
 #include "codeplug.hh"
+#include "userdatabase.hh"
 #include "callsigndb.hh"
 #include "errorstack.hh"
+#include "config.hh"
 
-class Config;
-class UserDatabase;
 class RadioLimits;
 
 

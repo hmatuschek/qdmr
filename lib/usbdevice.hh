@@ -125,7 +125,8 @@ public:
     None,       ///< Class for invalid interface info.
     Serial,     ///< Serial port interface class.
     DFU,        ///< DFU interface class.
-    HID         ///< HID (human-interface device) interface class.
+    HID,        ///< HID (human-interface device) interface class.
+    C7K         ///< Raw USB access to C7000 devices.
   };
 
 public:

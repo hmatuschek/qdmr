@@ -35,8 +35,8 @@ RadioIDListView::~RadioIDListView() {
 
 void
 RadioIDListView::onConfigModified() {
-  if (_config->radioIDs()->defaultId()) {
-    ui->defaultID->setCurrentIndex(_config->radioIDs()->indexOf(_config->radioIDs()->defaultId()));
+  if (_config->settings()->defaultId()) {
+    ui->defaultID->setCurrentIndex(_config->radioIDs()->indexOf(_config->settings()->defaultId()));
   } else {
     ui->defaultID->setCurrentIndex(-1);
   }
@@ -101,7 +101,7 @@ void
 RadioIDListView::onDefaultIDSelected(int idx) {
   if ((idx < 0) || (idx >= _config->radioIDs()->count()))
     return;
-  _config->radioIDs()->setDefaultId(idx);
+  _config->settings()->setDefaultId(_config->radioIDs()->getId(idx));
 }
 
 void

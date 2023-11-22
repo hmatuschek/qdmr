@@ -34,6 +34,9 @@
 #include <QMetaType>
 #include <QSet>
 
+#include "frequency.hh"
+#include "ranges.hh"
+
 // Forward declaration
 class Config;
 class ConfigItem;
@@ -344,19 +347,7 @@ class RadioLimitFrequencies: public RadioLimitValue
 
 public:
   /** Typedef for the initializer list. */
-  typedef std::initializer_list<std::pair<double, double>> RangeList;
-public:
-  /** Represents a single frequency range. */
-  struct FrequencyRange {
-    double min; ///< Lower frequency limit.
-    double max; ///< Upper frequency limit.
-    /** Constructs a frequency range from limits. */
-    FrequencyRange(double lower, double upper);
-    /** Constructs a frequency range from limits. */
-    FrequencyRange(const std::pair<double, double> &limit);
-    /** Returns @c true if @c f is inside this limit. */
-    bool contains(double f) const;
-  };
+  typedef std::initializer_list<std::pair<Frequency, Frequency>> RangeList;
 
 public:
   /** Empty constructor. */

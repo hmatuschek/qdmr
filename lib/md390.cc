@@ -55,16 +55,16 @@ MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
              << "MHz from " << channelCount << " channels.";
 
   if ((137<=range.first) && (174>=range.second)) {
-    _limits = new MD390Limits({{136., 174.}}, this);
+    _limits = new MD390Limits({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)}}, this);
     _name += "V";
   } else if ((350<=range.first) && (400>=range.second)) {
-    _limits = new MD390Limits({{350., 400.}}, this);
+    _limits = new MD390Limits({{Frequency::fromMHz(350.), Frequency::fromMHz(400.)}}, this);
     _name += "U";
   } else if ((400<=range.first) && (450>=range.second)) {
-    _limits = new MD390Limits({{400., 480.}}, this);
+    _limits = new MD390Limits({{Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, this);
     _name += "U";
   } else if ((450<=range.first) && (520>=range.second)) {
-    _limits = new MD390Limits({{450., 520.}}, this);
+    _limits = new MD390Limits({{Frequency::fromMHz(450.), Frequency::fromMHz(520.)}}, this);
     _name += "U";
   } else {
     // Invalid frequency range, needs "Ignore frequency limits" in settings to write any codeplug.

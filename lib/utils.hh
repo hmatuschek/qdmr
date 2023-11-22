@@ -75,9 +75,6 @@ bool validDMRNumber(const QString &text);
 /** Validates a DTMF number. */
 bool validDTMFNumber(const QString &text);
 
-/** Formats a frequency in MHz passed as double. */
-QString format_frequency(double MHz);
-
 QString aprsicon2config(APRSSystem::Icon icon);
 QString aprsicon2name(APRSSystem::Icon icon);
 APRSSystem::Icon name2aprsicon(const QString &name);

@@ -9,8 +9,8 @@
 #include "roamingzone.hh"
 
 
-D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<double, double> > &rxFreqRanges,
-                           const std::initializer_list<std::pair<double, double> > &txFreqRanges,
+D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
+                           const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
                            const QString &hardwareRevision, QObject *parent)
   : AnytoneLimits(hardwareRevision, "V100", true, parent)
 {

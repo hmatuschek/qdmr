@@ -2,10 +2,9 @@
 #define GD77TEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class GD77Test : public QObject
+class GD77Test : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,14 +12,9 @@ public:
   explicit GD77Test(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
-protected:
-  Config _basicConfig;
+  void testChannelFrequency();
 };
 
 #endif // GD77TEST_HH

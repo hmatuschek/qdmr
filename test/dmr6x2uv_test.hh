@@ -2,10 +2,9 @@
 #define DMR6X2UVTEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class DMR6X2UVTest : public QObject
+class DMR6X2UVTest : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,14 +12,9 @@ public:
   explicit DMR6X2UVTest(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
-protected:
-  Config _basicConfig;
+  void testChannelFrequency();
 };
 
 #endif // DMR6X2UVTEST_HH

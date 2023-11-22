@@ -2,6 +2,7 @@
 #define D868UVCALLSIGNDB_HH
 
 #include "callsigndb.hh"
+#include "userdatabase.hh"
 #include "d868uv_codeplug.hh"
 
 /** Represents and encodes the binary format for the call-sign database within a AnyTone AT-D868UV

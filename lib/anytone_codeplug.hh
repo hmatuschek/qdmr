@@ -2,7 +2,12 @@
 #define ANYTONECODEPLUG_HH
 
 #include "codeplug.hh"
-#include "anytone_extension.hh"
+#include <QGeoCoordinate>
+#include "channel.hh"
+#include "contact.hh"
+
+class RadioSettings;
+
 
 /** Base class interface for all Anytone radio codeplugs.
  *
@@ -2944,8 +2949,11 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
   bool encode(Config *config, const Flags &flags, const ErrorStack &err);
+
   bool decode(Config *config, const ErrorStack &err);
+  bool postprocess(Config *config, const ErrorStack &err) const;
 
 protected:
   virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;

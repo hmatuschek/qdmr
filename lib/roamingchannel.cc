@@ -1,11 +1,13 @@
 #include "roamingchannel.hh"
+#include "utils.hh"
 
 /* ********************************************************************************************* *
  * Implementation of RoamingChannel
  * ********************************************************************************************* */
 RoamingChannel::RoamingChannel(QObject *parent)
-  : ConfigObject(parent), _rxFrequency(0), _txFrequency(0), _overrideColorCode(false),
-    _colorCode(0), _overrideTimeSlot(false), _timeSlot(DMRChannel::TimeSlot::TS1)
+  : ConfigObject(parent), _rxFrequency(Frequency::fromHz(0)), _txFrequency(Frequency::fromHz(0)),
+    _overrideColorCode(false), _colorCode(0), _overrideTimeSlot(false),
+    _timeSlot(DMRChannel::TimeSlot::TS1)
 {
   // pass...
 }
@@ -19,7 +21,7 @@ RoamingChannel::RoamingChannel(const RoamingChannel &other, QObject *parent)
 void
 RoamingChannel::clear() {
   ConfigObject::clear();
-  _rxFrequency = _txFrequency = 0;
+  _rxFrequency = _txFrequency = Frequency::fromHz(0);
   _overrideColorCode = false; _colorCode = 0;
   _overrideTimeSlot = false; _timeSlot = DMRChannel::TimeSlot::TS1;
 }
@@ -34,24 +36,24 @@ RoamingChannel::clone() const {
   return c;
 }
 
-double
+Frequency
 RoamingChannel::rxFrequency() const {
   return _rxFrequency;
 }
 void
-RoamingChannel::setRXFrequency(double f) {
+RoamingChannel::setRXFrequency(Frequency f) {
   if (f == _rxFrequency)
     return;
   _rxFrequency = f;
   emit modified(this);
 }
 
-double
+Frequency
 RoamingChannel::txFrequency() const {
   return _txFrequency;
 }
 void
-RoamingChannel::setTXFrequency(double f) {
+RoamingChannel::setTXFrequency(Frequency f) {
   if (f == _txFrequency)
     return;
   _txFrequency = f;
@@ -129,6 +131,15 @@ RoamingChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &er
   if (! ConfigObject::parse(node, ctx, err))
     return false;
 
+  setRXFrequency(node["rxFrequency"].as<Frequency>());
+
+  if (node["txFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse roaming channel. No txFrequency specified.";
+    return false;
+  }
+  setTXFrequency(node["txFrequency"].as<Frequency>());
+
   if (! node["timeSlot"]) {
     this->overrideTimeSlot(false);
   } else {
@@ -178,6 +189,10 @@ RoamingChannel::populate(YAML::Node &node, const Context &context, const ErrorSt
   if (! ConfigObject::populate(node, context, err))
     return false;
 
+  // Serialize frequency in MHz
+  node["rxFrequency"] = _rxFrequency;
+  node["txFrequency"] = _txFrequency;
+
   if (timeSlotOverridden()) {
     QMetaEnum e = QMetaEnum::fromType<DMRChannel::TimeSlot>();
     node["timeSlot"] = e.valueToKey((int)timeSlot());
@@ -208,9 +223,9 @@ RoamingChannelList::channel(int idx) const {
 }
 
 int
-RoamingChannelList::add(ConfigObject *obj, int row) {
+RoamingChannelList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RoamingChannel>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

@@ -57,6 +57,11 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
       logError() << "Cannot decode codeplug: " << err.format();
       return -1;
     }
+    // post-process decoded codeplug
+    if (! radio->codeplug().postprocess(&config, err)) {
+      logError() << "Cannot post-process codeplug: " << err.format();
+      return -1;
+    }
 
     // try to write YAML file
     QFile file(filename);

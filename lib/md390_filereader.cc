@@ -7,31 +7,31 @@
 #define SEGMENT0_SIZE        0x0003e000
 
 bool
-MD390FileReader::read(const QString &filename, MD390Codeplug *codeplug, QString &errorMessage)
+MD390FileReader::read(const QString &filename, MD390Codeplug *codeplug, const ErrorStack &err)
 {
   // Check file properties
   QFileInfo info(filename);
   if (! info.exists()) {
-    errorMessage = QObject::tr("Cannot open file '%1': File does not exisist.").arg(filename);
+    errMsg(err) << "Cannot open file '" << filename << "': File does not exisist.";
     return false;
   }
   if (262709 != info.size()) {
-    errorMessage = QObject::tr("Cannot read codeplug file '%1': File size is not 262709 bytes.").arg(filename);
+    errMsg(err) << "Cannot read codeplug file '" << filename << "': File size is not 262709 bytes.";
     return false;
   }
 
   // Open file
   QFile file(filename);
   if (! file.open(QFile::ReadOnly)) {
-    errorMessage = QObject::tr("Cannot open file '%1': %2").arg(filename, file.errorString());
+    errMsg(err) << "Cannot open file '" << filename << "': " << file.errorString() << ".";
     return false;
   }
 
   // Read file content
 
   if (! file.seek(SEGMENT0_FILE_ADDR)) {
-    errorMessage = QObject::tr("Cannot read codeplug file '%1': Cannot seek within file: %2")
-        .arg(filename, file.errorString());
+    errMsg(err) << "Cannot read codeplug file '" << filename
+                << "': Cannot seek within file: " << file.errorString() << ".";
     file.close();
     return false;
   }
@@ -40,8 +40,8 @@ MD390FileReader::read(const QString &filename, MD390Codeplug *codeplug, QString 
   while (0 < n) {
     int nread = file.read(ptr, n);
     if (0 > nread) {
-      errorMessage = QObject::tr("Cannot read codeplug file '%1': %2")
-          .arg(filename,file.errorString());
+      errMsg(err)  << "Cannot read codeplug file '" << filename
+                   << "': " << file.errorString() << ".";
       file.close();
       return false;
     }

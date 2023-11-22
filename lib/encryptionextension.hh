@@ -22,7 +22,7 @@ public:
   void clear();
 
   /** Creates a key from the given hex-string. */
-  virtual void fromHex(const QString &hex);
+  virtual bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
   /** Converts a key to a hex string. */
   virtual QString toHex() const;
 
@@ -51,10 +51,10 @@ class DMREncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-  explicit Q_INVOKABLE DMREncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-  virtual void fromHex(const QString &hex);
+  bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -81,7 +81,7 @@ public:
   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-  virtual void fromHex(const QString &hex);
+  bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -106,7 +106,7 @@ public:
   /** Empty constructor. */
   explicit EncryptionKeys(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };

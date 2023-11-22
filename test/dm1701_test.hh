@@ -2,10 +2,9 @@
 #define DM1701TEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class DM1701Test : public QObject
+class DM1701Test : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,14 +12,9 @@ public:
   explicit DM1701Test(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
-protected:
-  Config _basicConfig;
+  void testChannelFrequency();
 };
 
 #endif // DM1701TEST_HH

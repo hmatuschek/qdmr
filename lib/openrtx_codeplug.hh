@@ -170,13 +170,13 @@ public:
     virtual void setPower(float dBm);
 
     /** Returns the RX frequency in MHz. */
-    virtual double rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency in MHz. */
-    virtual void setRXFrequency(double MHz);
+    virtual void setRXFrequency(Frequency MHz);
     /** Returns the TX frequency in MHz. */
-    virtual double txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency in MHz. */
-    virtual void setTXFrequency(double MHz);
+    virtual void setTXFrequency(Frequency MHz);
 
     /** Retrusn @c true if the scan list is set. */
     virtual bool hasScanListIndex() const;

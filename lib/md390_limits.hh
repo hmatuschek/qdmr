@@ -11,7 +11,7 @@ class MD390Limits: public RadioLimits
 
 public:
   /** Constructor from frequency ranges. */
-  MD390Limits(const std::initializer_list<std::pair<double,double>> &freqRanges, QObject *parent=nullptr);
+  MD390Limits(const std::initializer_list<std::pair<Frequency, Frequency> > &freqRanges, QObject *parent=nullptr);
 };
 
 #endif // MD390LIMITS_HH

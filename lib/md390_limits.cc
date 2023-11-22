@@ -10,7 +10,7 @@
 #include "roamingzone.hh"
 
 
-MD390Limits::MD390Limits(const std::initializer_list<std::pair<double,double>> &freqRanges, QObject *parent)
+MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequency>> &freqRanges, QObject *parent)
   : RadioLimits(true, parent)
 {
   // Define limits for call-sign DB

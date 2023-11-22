@@ -1,3 +1,4 @@
+#include "userdatabase.hh"
 #include "d868uv_callsigndb.hh"
 #include "utils.hh"
 #include <QtEndian>
@@ -125,7 +126,7 @@ D868UVCallsignDB::LimitsElement::setEndOfDB(unsigned addr) {
 }
 void
 D868UVCallsignDB::LimitsElement::setTotalSize(unsigned size) {
-  setEndOfDB(Offset::callsigns() + size);
+  setEndOfDB(D868UVCallsignDB::Offset::callsigns() + size);
 }
 
 unsigned

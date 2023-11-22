@@ -91,10 +91,14 @@ OpenGD77::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
     return false;
   }
 
+  if (_config)
+    delete _config;
+
   if (! (_config = config)) {
     logError() << "Cannot upload to radio, no config given.";
     return false;
   }
+  _config->setParent(this);
 
   _task = StatusUpload;
   _errorStack = err;

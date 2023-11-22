@@ -20,6 +20,7 @@ class AnytoneAPRSFrequency: public ConfigObject
 
   Q_CLASSINFO("frequencyDecription",
               "Transmit-frequency.")
+
   /** The frequency. */
   Q_PROPERTY(Frequency frequency READ frequency WRITE setFrequency)
 

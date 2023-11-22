@@ -60,7 +60,8 @@ ConfigObjectReference::set(ConfigObject *object) {
 
   _object = object;
   if (_object)
-    connect(_object, SIGNAL(destroyed(QObject*)), this, SLOT(onReferenceDeleted(QObject*)));
+    connect(_object, &QObject::destroyed,
+            this, &ConfigObjectReference::onReferenceDeleted, Qt::DirectConnection);
 
   emit modified();
   return true;

@@ -9,16 +9,14 @@
  * @ingroup conf */
 class ConfigLabelingVisitor: protected Visitor
 {
-protected:
-  /** Hidden constructor. Use the static method @c label to label the configuration. */
+public:
+  /** Use the static method @c label to label the configuration. */
   ConfigLabelingVisitor(ConfigItem::Context &context);
 
-public:
+  bool processItem(ConfigItem *item, const ErrorStack &err=ErrorStack());
+
   /** Labels the configuration and stores the labels in the given context. */
   static bool label(Config *config, ConfigItem::Context &context);
-
-protected:
-  bool processItem(ConfigItem *item, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds a weak reference to the parser/serializer context.

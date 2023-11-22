@@ -1,9 +1,10 @@
+#include "gpssystem.hh"
+#include "userdatabase.hh"
+#include "roamingchannel.hh"
 #include "d878uv_codeplug.hh"
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
-#include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
 #include "channel.hh"
@@ -428,8 +429,8 @@ D878UVCodeplug::RoamingChannelElement::setName(const QString &name) {
 bool
 D878UVCodeplug::RoamingChannelElement::fromChannel(const RoamingChannel* ch) {
   setName(ch->name());
-  setRXFrequency(ch->rxFrequency()*1e6);
-  setTXFrequency(ch->txFrequency()*1e6);
+  setRXFrequency(ch->rxFrequency().inHz());
+  setTXFrequency(ch->txFrequency().inHz());
   if (ch->colorCodeOverridden())
     setColorCode(ch->colorCode());
   else
@@ -442,8 +443,8 @@ RoamingChannel *
 D878UVCodeplug::RoamingChannelElement::toChannel(Context &ctx) {
   RoamingChannel *roam = new RoamingChannel();
   roam->setName(name());
-  roam->setRXFrequency(rxFrequency()/1e6);
-  roam->setTXFrequency(txFrequency()/1e6);
+  roam->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  roam->setTXFrequency(Frequency::fromHz(txFrequency()));
   if (hasColorCode())
     roam->setColorCode(colorCode());
   else
@@ -2925,7 +2926,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
     return false;
   }
   names.setName(0, sys->name());
-  setFMFrequency(0, Frequency::fromHz(sys->revertChannel()->txFrequency()*1e6));
+  setFMFrequency(0, sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
   setFMChannelWidth(FMChannel::Bandwidth::Wide == sys->revertChannel()->bandwidth() ?
@@ -2970,6 +2971,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 
 APRSSystem *
 D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
+  Q_UNUSED(err)
   QString name = QString("APRS %1").arg(destination());
   if (names.isValid() && (! names.name(0).isEmpty()))
     name = names.name(0);
@@ -3015,13 +3017,13 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
 bool
 D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(double(fmFrequency(0).inHz())/1e6);
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency(0));
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
     ch->setName("APRS Channel");
-    ch->setRXFrequency(double(fmFrequency(0).inHz())/1e6);
-    ch->setTXFrequency(double(fmFrequency(0).inHz())/1e6);
+    ch->setRXFrequency(fmFrequency(0));
+    ch->setTXFrequency(fmFrequency(0));
     ch->setPower(power());
     ch->setTXTone(txTone());
     ch->setBandwidth(AnytoneFMAPRSSettingsExtension::Bandwidth::Wide == fmChannelWidth() ?
@@ -3546,8 +3548,8 @@ D878UVCodeplug::allocateZones() {
 }
 
 bool
-D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! D868UVCodeplug::encodeZone(i, zone, isB, flags, ctx, err))
+D878UVCodeplug::encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, flags, ctx, err))
     return false;
 
   AnytoneZoneExtension *ext = zone->anytoneExtension();
@@ -3560,8 +3562,8 @@ D878UVCodeplug::encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Cont
 }
 
 bool
-D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err) {
-  if (! D868UVCodeplug::decodeZone(i, zone, isB, ctx, err))
+D878UVCodeplug::decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, ctx, err))
     return false;
   AnytoneZoneExtension *ext = zone->anytoneExtension();
   if (nullptr == ext) {
@@ -3570,7 +3572,7 @@ D878UVCodeplug::decodeZone(int i, Zone *zone, bool isB, Context &ctx, const Erro
   }
 
   HiddenZoneBitmapElement bitmap(data(Offset::hiddenZoneBitmap()));
-  ext->enableHidden(bitmap.isEncoded(i) && (!isB));
+  ext->enableHidden(bitmap.isEncoded(i));
 
   return true;
 }

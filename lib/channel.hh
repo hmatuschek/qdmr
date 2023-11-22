@@ -34,10 +34,10 @@ class Channel: public ConfigObject
 {
   Q_OBJECT
 
-  /** The receive frequency of the channel. */
-  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
-  /** The transmit frequency of the channel. */
-  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** The receive frequency of the channel in Hz. */
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  /** The transmit frequency of the channel in Hz. */
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
@@ -78,14 +78,14 @@ public:
   bool copy(const ConfigItem &other);
   void clear();
 
-  /** Returns the RX frequency of the channel in MHz. */
-  double rxFrequency() const;
-  /** (Re-)Sets the RX frequency of the channel in MHz. */
-  bool setRXFrequency(double freq);
-  /** Returns the TX frequency of the channel in MHz. */
-  double txFrequency() const;
-  /** (Re-)Sets the TX frequency of the channel in MHz. */
-  bool setTXFrequency(double freq);
+  /** Returns the RX frequency of the channel in Hz. */
+  Frequency rxFrequency() const;
+  /** (Re-)Sets the RX frequency of the channel in Hz. */
+  bool setRXFrequency(Frequency freq);
+  /** Returns the TX frequency of the channel in Hz. */
+  Frequency txFrequency() const;
+  /** (Re-)Sets the TX frequency of the channel in Hz. */
+  bool setTXFrequency(Frequency freq);
 
   /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;
@@ -160,10 +160,10 @@ protected slots:
   void onReferenceModified();
 
 protected:
-  /** The RX frequency in MHz. */
-  double _rxFreq;
-  /** The TX frequency in MHz. */
-  double _txFreq;
+  /** The RX frequency in Hz. */
+  Frequency _rxFreq;
+  /** The TX frequency in Hz. */
+  Frequency _txFreq;
   /** If @c true, the channel uses the global power setting. */
   bool _defaultPower;
   /** The transmit power setting. */
@@ -214,6 +214,10 @@ class FMChannel: public AnalogChannel
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
   /** The squelch level of the channel [1-10]. */
   Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
+  /** The RX tone (CTCSS/DSC). */
+  Q_PROPERTY(Signaling::Code rxTone READ rxTone WRITE setRXTone SCRIPTABLE false)
+  /** The TX tone (CTCSS/DSC). */
+  Q_PROPERTY(Signaling::Code txTone READ txTone WRITE setTXTone SCRIPTABLE false)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
@@ -241,7 +245,7 @@ public:
 
 public:
   /** Constructs a new empty analog channel. */
-  explicit FMChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit FMChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   FMChannel(const FMChannel &other, QObject *parent=nullptr);
 
@@ -250,9 +254,9 @@ public:
   void clear();
 
   /** Returns the admit criterion for the analog channel. */
-	Admit admit() const;
+  Admit admit() const;
   /** (Re-)Sets the admit criterion for the analog channel. */
-	void setAdmit(Admit admit);
+  void setAdmit(Admit admit);
 
   /** Returns @c true if the global default squelch level is used. */
   bool defaultSquelch() const;
@@ -277,9 +281,9 @@ public:
   bool setTXTone(Signaling::Code code);
 
   /** Returns the bandwidth of the analog channel. */
-	Bandwidth bandwidth() const;
+  Bandwidth bandwidth() const;
   /** (Re-)Sets the bandwidth of the analog channel. */
-	bool setBandwidth(Bandwidth bw);
+  bool setBandwidth(Bandwidth bw);
 
   /** Returns the reference to the APRS system. */
   const APRSSystemReference *aprs() const;
@@ -390,7 +394,7 @@ public:
 
 public:
   /** Constructs a new empty digital (DMR) channel. */
-  explicit DMRChannel(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRChannel(QObject *parent=nullptr);
   /** Copy constructor. */
   DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
@@ -548,14 +552,14 @@ public:
   /** Constructs an empty channel list. */
 	explicit ChannelList(QObject *parent=nullptr);
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Gets the channel at the specified index. */
   Channel *channel(int idx) const;
   /** Finds a digital channel with the given frequencies, time slot and color code. */
-  DMRChannel *findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsigned cc) const;
+  DMRChannel *findDMRChannel(Frequency rx, Frequency tx, DMRChannel::TimeSlot ts, unsigned cc) const;
   /** Finds an analog channel with the given frequency. */
-  FMChannel *findFMChannelByTxFreq(double freq) const;
+  FMChannel *findFMChannelByTxFreq(Frequency freq) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

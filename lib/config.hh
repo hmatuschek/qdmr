@@ -97,7 +97,7 @@ class Config : public ConfigItem
 
 public:
   /** Constructs an empty configuration. */
-  explicit Config(QObject *parent = nullptr);
+  Q_INVOKABLE explicit Config(QObject *parent = nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;

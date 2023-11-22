@@ -48,8 +48,12 @@ TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
   if (StatusIdle != _task)
     return false;
 
+  if (_config)
+    delete _config;
+
   if (! (_config = config))
     return false;
+  _config->setParent(this);
 
   _task = StatusUpload;
   _errorStack = err;

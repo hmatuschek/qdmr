@@ -196,24 +196,24 @@ OpenRTXCodeplug::ChannelElement::setPower(float dBm) {
 }
 
 
-double
+Frequency
 OpenRTXCodeplug::ChannelElement::rxFrequency() const {
-  return ((double)getUInt32_le(OffsetRXFrequency))/1e6;
+  return Frequency::fromHz(getUInt32_le(OffsetRXFrequency));
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setRXFrequency(double MHz) {
-  setUInt32_le(OffsetRXFrequency, (uint32_t)(MHz*1e6));
+OpenRTXCodeplug::ChannelElement::setRXFrequency(Frequency MHz) {
+  setUInt32_le(OffsetRXFrequency, MHz.inHz());
 }
 
-double
+Frequency
 OpenRTXCodeplug::ChannelElement::txFrequency() const {
-  return ((double)getUInt32_le(OffsetTXFrequency))/1e6;
+  return Frequency::fromHz(getUInt32_le(OffsetTXFrequency));
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setTXFrequency(double MHz) {
-  setUInt32_le(OffsetTXFrequency, (uint32_t)(MHz*1e6));
+OpenRTXCodeplug::ChannelElement::setTXFrequency(Frequency MHz) {
+  setUInt32_le(OffsetTXFrequency, MHz.inHz());
 }
 
 
@@ -975,7 +975,7 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 bool
 OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
-  if (nullptr == config->radioIDs()->defaultId()) {
+  if (nullptr == config->settings()->defaultIdRef()) {
     errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
     return false;
   }
@@ -992,7 +992,7 @@ bool
 OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
   HeaderElement header(data(0));
   header.clear();
-  header.setAuthor(ctx.config()->radioIDs()->defaultId()->name());
+  header.setAuthor(ctx.config()->settings()->defaultId()->name());
   header.setDescription("Encoded by qdmr v" VERSION_STRING);
 
   // Define Contacts

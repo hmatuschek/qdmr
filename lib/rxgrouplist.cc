@@ -117,9 +117,9 @@ RXGroupLists::list(int idx) const {
 }
 
 int
-RXGroupLists::add(ConfigObject *obj, int row) {
+RXGroupLists::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RXGroupList>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 
