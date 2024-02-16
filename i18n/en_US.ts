@@ -2339,8 +2339,8 @@
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
-        <source>Pane large</source>
-        <translation>Pane large</translation>
+        <source>Plane large</source>
+        <translation>Plane large</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="67"/>

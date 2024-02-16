@@ -63,7 +63,7 @@ static QVector<QPair<APRSSystem::Icon, QString>> aprsIconTable{
   {APRSSystem::Icon::Jogger, QObject::tr("Jogger")},
   {APRSSystem::Icon::Triangle, QObject::tr("Triangle")},
   {APRSSystem::Icon::PBBS, QObject::tr("PBBS")},
-  {APRSSystem::Icon::LargePlane, QObject::tr("Pane large")},
+  {APRSSystem::Icon::LargePlane, QObject::tr("Plane large")},
   {APRSSystem::Icon::WXStation, QObject::tr("Weather station")},
   {APRSSystem::Icon::DishAntenna, QObject::tr("Dish antenna")},
   {APRSSystem::Icon::Ambulance, QObject::tr("Ambulance")},
