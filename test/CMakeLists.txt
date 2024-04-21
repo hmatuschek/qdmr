@@ -9,7 +9,7 @@ add_executable(crc32test crc32test.cc ${crc32test_MOC_SOURCES})
 target_link_libraries(crc32test ${LIBS} libdmrconf)
 
 qt5_wrap_cpp(utilstest_MOC_SOURCES utilstest.hh)
-add_executable(utilstest utilstest.cc ${utilstest_MOC_SOURCES})
+add_executable(utilstest utilstest.cc ${utilstest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(utilstest ${LIBS} libdmrconf)
 
 

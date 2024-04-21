@@ -3,10 +3,18 @@
 #include <QTest>
 #include "utils.hh"
 #include "frequency.hh"
+#include "chirpformat.hh"
+#include "config.hh"
 
-UtilsTest::UtilsTest(QObject *parent) : QObject(parent)
+
+UtilsTest::UtilsTest(QObject *parent)
+  : QObject{parent}
 {
   // pass...
+}
+
+void
+UtilsTest::initTestCase() {
 }
 
 void
@@ -85,6 +93,32 @@ UtilsTest::testFrequencyParser() {
 
   QCOMPARE(Frequency::fromString("100").inHz(), 100ULL);
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
+}
+
+void
+UtilsTest::testChirpReader() {
+
+  QFile file(":/data/chirp_simple.csv");
+  if (! file.open(QIODevice::ReadOnly)) {
+    QFAIL("Cannot open CHRIP file.");
+  }
+
+  QTextStream stream(&file);
+  Config config;
+  ErrorStack err;
+
+  if (! ChirpReader::read(stream, &config, err)) {
+    QFAIL(QString("Cannot read codeplug file:\n%1").arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->count(), 3);
+  QCOMPARE(config.channelList()->channel(0)->name(), "KD8BMI");
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(), 147.075000);
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(), 147.675000);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::CTCSS_103_5Hz);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::SIGNALING_NONE);
+  QCOMPARE(config.channelList()->channel(1)->rxFrequency(), 146.760000);
+  QCOMPARE(config.channelList()->channel(1)->txFrequency(), 146.160000);
 }
 
 

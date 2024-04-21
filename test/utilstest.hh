@@ -10,6 +10,7 @@ public:
   explicit UtilsTest(QObject *parent = nullptr);
 
 private slots:
+  void initTestCase();
   void testDecodeUnicode();
   void testEncodeUnicode();
   void testDecodeASCII();
@@ -19,6 +20,7 @@ private slots:
   void testDecodeDMRID_bcd();
   void testEncodeDMRID_bcd();
   void testFrequencyParser();
+  void testChirpReader();
 };
 
 #endif // UTILSTEST_HH
