@@ -17,8 +17,8 @@ QSet<QString> const ChirpFormat::_mandatoryHeaders = {
 
 QSet<QString> const ChirpFormat::_knownHeaders = {
   "Location", "Name", "Frequency", "Duplex", "Offset", "Mode"
-  "Tone", "rToneFreq", "cToneFreq", "DtcsCode", "DtcsPolarity", "TStep", "Skip",
-  "Comment", "URCALL", "RPT1CALL", "RPT2CALL"
+  "Tone", "rToneFreq", "cToneFreq", "DtcsCode", "DtcsPolarity", "RxDtcsCode", "CrossMode",
+  "TStep", "Skip", "Power", "Comment", "URCALL", "RPT1CALL", "RPT2CALL", "DVCODE"
 };
 
 QHash<QString, ChirpFormat::Duplex> const ChirpFormat::_duplexCodes = {
@@ -45,6 +45,17 @@ QHash<QString, ChirpFormat::ToneMode> const ChirpFormat::_toneModeCodes = {
   {"Cross", ChirpFormat::ToneMode::Cross},
 };
 
+QHash<QString, ChirpFormat::CrossMode> const ChirpFormat::_crossModes = {
+  {"", ChirpFormat::CrossMode::ToneNone},
+  {"->Tone", ChirpFormat::CrossMode::NoneTone},
+  {"->DTCS", ChirpFormat::CrossMode::NoneDTCS},
+  {"Tone->", ChirpFormat::CrossMode::ToneNone},
+  {"Tone->Tone", ChirpFormat::CrossMode::ToneTone},
+  {"Tone->DTCS", ChirpFormat::CrossMode::ToneDTCS},
+  {"DTCS->", ChirpFormat::CrossMode::DTCSNone},
+  {"DTCS->Tone", ChirpFormat::CrossMode::DTCSTone},
+  {"DTCS->DTCS", ChirpFormat::CrossMode::DTCSDTCS},
+};
 
 
 /* ********************************************************************************************* *
@@ -104,6 +115,8 @@ ChirpReader::read(QTextStream &stream, Config *config, const ErrorStack &err) {
 
 bool
 ChirpReader::readLine(QTextStream &stream, QStringList &list, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   list.clear();
   if (stream.atEnd())
     return true;
@@ -143,8 +156,9 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
   Duplex duplex = Duplex::None;
   Mode mode = Mode::FM;
   ToneMode toneMode = ToneMode::None;
-  double rxTone = 67.0, txTone = 67.0;
-  int dctsCode = 000;
+  CrossMode crossMode;
+  double txTone = 67.0, rxTone = 67.0;
+  int txDTCSCode = 000, rxDTCSCode = 000;
   Polarity txPol = Polarity::Normal, rxPol = Polarity::Normal;
 
   for (int i=1; i<header.size(); i++) {
@@ -156,7 +170,7 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
         errMsg(err) << "Cannot parse frequency '" << line.at(i) << "': Malformed frequency.";
         return false;
       }
-    } else if ("Offset" == header.at(i)) {
+    } else if (("Offset" == header.at(i)) && (! line.at(i).isEmpty())) {
       txFrequency = Frequency::fromMHz(line.at(i).toDouble(&ok));
       if (! ok) {
         errMsg(err) << "Cannot parse offset frequency '" << line.at(i) << "': Malformed frequency.";
@@ -171,26 +185,35 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
     } else if ("Tone" == header.at(i)) {
       if (! processToneMode(line.at(i), toneMode, err))
         return false;
-    } else if ("rToneFreq" == header.at(i)) {
-      rxTone = line.at(i).toDouble(&ok);
-      if (! ok) {
-        errMsg(err) << "Cannot parse RX CTCSS tone frequency '" << line.at(i) << "'.";
-        return false;
-      }
-    } else if ("cToneFreq" == header.at(i)) {
+    } else if (("rToneFreq" == header.at(i)) && (! line.at(i).isEmpty())) {
       txTone = line.at(i).toDouble(&ok);
       if (! ok) {
         errMsg(err) << "Cannot parse TX CTCSS tone frequency '" << line.at(i) << "'.";
         return false;
       }
-    } else if ("DtcsCode" == line.at(i)) {
-      dctsCode = line.at(i).toUInt(&ok);
+    } else if (("cToneFreq" == header.at(i)) && (! line.at(i).isEmpty())) {
+      rxTone = line.at(i).toDouble(&ok);
       if (! ok) {
-        errMsg(err) << "Cannot decode DCS code '" << line.at(i) <<"': invalid format.";
+        errMsg(err) << "Cannot parse RX CTCSS tone frequency '" << line.at(i) << "'.";
         return false;
       }
-    } else if ("DtcsPolarity" == line.at(i)) {
+    } else if (("DtcsCode" == header.at(i)) && (! line.at(i).isEmpty())) {
+      txDTCSCode = line.at(i).toUInt(&ok);
+      if (! ok) {
+        errMsg(err) << "Cannot decode TX DCS code '" << line.at(i) <<"': invalid format.";
+        return false;
+      }
+    } else if (("RxDtcsCode" == header.at(i)) && (! line.at(i).isEmpty())) {
+      rxDTCSCode = line.at(i).toUInt(&ok);
+      if (! ok) {
+        errMsg(err) << "Cannot decode RX DCS code '" << line.at(i) <<"': invalid format.";
+        return false;
+      }
+    } else if ("DtcsPolarity" == header.at(i)) {
       if (! processPolarity(line.at(i), txPol, rxPol, err))
+        return false;
+    } else if ("CrossMode" == header.at(i)) {
+      if (! processCrossMode(line.at(i), crossMode, err))
         return false;
     }
   }
@@ -236,12 +259,44 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
       fm->setRXTone(Signaling::fromCTCSSFrequency(txTone));
       break;
     case ToneMode::DTCS:
-      fm->setTXTone(Signaling::fromDCSNumber(dctsCode, Polarity::Reversed == txPol));
-      fm->setRXTone(Signaling::fromDCSNumber(dctsCode, Polarity::Reversed == rxPol));
+      fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
+      fm->setRXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
       break;
     case ToneMode::Cross:
-      errMsg(err) << "'CrossMode' not yet implemented.";
-      return false;
+      switch (crossMode) {
+      case CrossMode::NoneTone:
+        fm->setTXTone(Signaling::SIGNALING_NONE);
+        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        break;
+      case CrossMode::NoneDTCS:
+        fm->setTXTone(Signaling::SIGNALING_NONE);
+        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        break;
+      case CrossMode::ToneNone:
+        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
+        fm->setRXTone(Signaling::SIGNALING_NONE);
+        break;
+      case CrossMode::ToneTone:
+        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
+        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        break;
+      case CrossMode::ToneDTCS:
+        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
+        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        break;
+      case CrossMode::DTCSNone:
+        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(Signaling::SIGNALING_NONE);
+        break;
+      case CrossMode::DTCSTone:
+        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        break;
+      case CrossMode::DTCSDTCS:
+        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        break;
+      }
     }
 
     config->channelList()->add(fm);
@@ -313,8 +368,124 @@ ChirpReader::processPolarity(const QString &code, Polarity &txPol, Polarity &rxP
   return true;
 }
 
+bool
+ChirpReader::processCrossMode(const QString &code, CrossMode &crossMode, const ErrorStack &err) {
+  if (! _crossModes.contains(code.simplified())) {
+    errMsg(err) << "Cannot decode cross-mode '" << code << "': unknown mode.";
+    return false;
+  }
+  crossMode = _crossModes[code.simplified()];
+  return true;
+}
+
 
 
 /* ********************************************************************************************* *
  * Implementation of ChirpWriter
  * ********************************************************************************************* */
+bool
+ChirpWriter::write(QTextStream &stream, Config *config, const ErrorStack &err) {
+  if (! writeHeader(stream, err)) {
+    errMsg(err) << "Cannot write CHIRP CSV file.";
+    return false;
+  }
+
+  for (int i=0; i<config->channelList()->count(); i++) {
+    if (! config->channelList()->channel(i)->is<FMChannel>())
+      continue;
+    if (! writeChannel(stream, i, config->channelList()->channel(i)->as<FMChannel>(), err)) {
+      errMsg(err) << "Cannot encode FM channel '" << config->channelList()->channel(i)->name()
+                  << "'.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+ChirpWriter::writeHeader(QTextStream &stream, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  stream << "Location" << "," << "Name" << "," << "Frequency" << "," << "Duplex" << ","
+         << "Offset" << "," << "Tone" << "," << "rToneFreq" << "," << "cToneFreq" << ","
+         << "DtcsCode" << "," << "DtcsPolarity" << "," << "Mode" << "\n";
+
+  return true;
+}
+
+bool
+ChirpWriter::writeChannel(QTextStream &stream, int i, FMChannel *channel, const ErrorStack &err) {
+  stream << i << "," << '"' << channel->name() << '"';
+
+  if (! encodeFrequency(stream, channel, err)) {
+    errMsg(err) << "Cannot encode frequencies of channel '" << channel->name() << "'.";
+    return false;
+  }
+
+  if (! encodeSubTone(stream, channel, err)) {
+    errMsg(err) << "Cannot encode sub-tone setting for channel '" << channel->name() << "'.";
+    return false;
+  }
+
+  if (! encodeBandwidth(stream, channel, err)) {
+    errMsg(err) << "Cannot encode sub-tone setting for channel '" << channel->name() << "'.";
+    return false;
+  }
+  stream << "\n";
+
+  return true;
+}
+
+bool
+ChirpWriter::encodeFrequency(QTextStream &stream, FMChannel *channel, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  stream << "," << channel->rxFrequency();
+
+  if (channel->rxOnly())
+    stream << "," << "Off" << "," << 0.0;
+  else if (channel->rxFrequency() == channel->txFrequency())
+    stream << "," << "" << "," << 0.0;
+  else if (channel->rxFrequency() > channel->txFrequency())
+    stream << "," << "-" << "," << channel->rxFrequency()-channel->txFrequency();
+  else
+    stream << "," << "+" << "," << channel->txFrequency()-channel->rxFrequency();
+
+  return true;
+}
+
+bool
+ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  if (Signaling::SIGNALING_NONE == channel->txTone())
+    stream << "," << "" << "," << 65.0 << "," << 65.0 << "," << "023" << "," << "NN";
+  else if (Signaling::isCTCSS(channel->txTone()) && (Signaling::SIGNALING_NONE == channel->rxTone()))
+    stream << "," << "Tone" << "," << 65.0 << "," << Signaling::toCTCSSFrequency(channel->txTone())
+           << "," << "023" << "," << "NN";
+  else if (Signaling::isCTCSS(channel->txTone()) && (channel->txTone() == channel->rxTone()))
+    stream << "," << "TSQL" << "," << 65.0 << "," << Signaling::toCTCSSFrequency(channel->txTone())
+           << "," << "023" << "," << "NN";
+  else if (Signaling::isDCSNumber(channel->txTone()))
+    stream << "," << "DTCS" << "," << 65.0 << "," << 65.0 << "," <<
+           Signaling::toDCSNumber(channel->txTone()) << ","
+           << (Signaling::isDCSNumber(channel->txTone()) && Signaling::isDCSInverted(channel->txTone()) ? 'I' : 'N')
+           << (Signaling::isDCSNumber(channel->rxTone()) && Signaling::isDCSInverted(channel->rxTone()) ? 'I' : 'N');
+  else
+    stream << "," << "" << "," << 65.0 << "," << 65.0 << "," << "023" << "," << "NN";
+
+  return true;
+}
+
+bool
+ChirpWriter::encodeBandwidth(QTextStream &stream, FMChannel *channel, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  if (FMChannel::Bandwidth::Narrow == channel->bandwidth())
+    stream << "," << "NFM";
+  else
+    stream << "," << "FM";
+
+  return true;
+}

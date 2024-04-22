@@ -20,7 +20,9 @@ private slots:
   void testDecodeDMRID_bcd();
   void testEncodeDMRID_bcd();
   void testFrequencyParser();
-  void testChirpReader();
+  void testChirpReaderBasic();
+  void testChirpReaderCross();
+  void testChirpWriter();
 };
 
 #endif // UTILSTEST_HH

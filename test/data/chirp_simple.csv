@@ -1,4 +1,4 @@
-Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,Mode,TStep,Skip,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE
-0,KD8BMI,147.075000,+,0.600000,Tone,103.5,103.5,023,NN,FM,5.00,,,,,,
-1,W8CUL,146.760000,-,0.600000,Tone,103.5,103.5,023,NN,FM,5.00,,,,,,
-2,W8MWA,145.430000,-,0.600000,Tone,103.5,103.5,023,NN,FM,5.00,,,,,,
+Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE
+0,KD8BMI,147.075000,+,0.600000,Cross,67.0,77.0,023,NN,023,Tone->Tone,FM,5.00,,50W,,,,,
+1,W8CUL,146.760000,-,0.600000,Tone,103.5,103.5,023,NN,023,Tone->Tone,FM,5.00,,50W,,,,,
+2,W8MWA,145.430000,-,0.600000,Tone,103.5,103.5,023,NN,023,Tone->Tone,FM,5.00,,50W,,,,,
