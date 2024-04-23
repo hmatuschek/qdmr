@@ -1,0 +1,5 @@
+Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE
+0,DB0SP,144.600000,+,0.600000,DTCS,88.5,88.5,023,NN,023,Tone->Tone,FM,5.00,,50W,,,,,
+1,DB0SP,144.600000,+,0.600000,DTCS,88.5,88.5,023,NR,023,Tone->Tone,FM,5.00,,50W,,,,,
+2,DB0SP,144.600000,+,0.600000,DTCS,88.5,88.5,023,RN,023,Tone->Tone,FM,5.00,,50W,,,,,
+3,DB0SP,144.600000,+,0.600000,DTCS,88.5,88.5,023,RR,023,Tone->Tone,FM,5.00,,50W,,,,,

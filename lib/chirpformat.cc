@@ -41,7 +41,9 @@ QHash<QString, ChirpFormat::ToneMode> const ChirpFormat::_toneModeCodes = {
   {"", ChirpFormat::ToneMode::None},
   {"Tone", ChirpFormat::ToneMode::Tone},
   {"TSQL", ChirpFormat::ToneMode::TSQL},
+  {"TSQL-R", ChirpFormat::ToneMode::TSQL_R},
   {"DTCS", ChirpFormat::ToneMode::DTCS},
+  {"DTCS-R", ChirpFormat::ToneMode::DTCS_R},
   {"Cross", ChirpFormat::ToneMode::Cross},
 };
 
@@ -253,15 +255,22 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
     case ToneMode::None: break;
     case ToneMode::Tone:
       fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
+      fm->setRXTone(Signaling::SIGNALING_NONE);
       break;
     case ToneMode::TSQL:
-      fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
-      fm->setRXTone(Signaling::fromCTCSSFrequency(txTone));
+      fm->setTXTone(Signaling::fromCTCSSFrequency(rxTone));
+      fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
       break;
+    case ToneMode::TSQL_R:
+      errMsg(err) << "Reversed CTCSS not supported.";
+      return false;
     case ToneMode::DTCS:
       fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
-      fm->setRXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
+      fm->setRXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == rxPol));
       break;
+    case ToneMode::DTCS_R:
+      errMsg(err) << "Reversed DCS not supported.";
+      return false;
     case ToneMode::Cross:
       switch (crossMode) {
       case CrossMode::NoneTone:

@@ -9,5 +9,7 @@
         <file>data/anytone_key_function.yaml</file>
         <file>data/chirp_simple.csv</file>
         <file>data/chirp_cross.csv</file>
+        <file>data/chirp_ctcss.csv</file>
+        <file>data/chirp_dcs.csv</file>
     </qresource>
 </RCC>

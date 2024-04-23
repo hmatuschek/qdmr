@@ -31,7 +31,7 @@ protected:
   };
 
   enum class ToneMode {
-    None, Tone, TSQL, DTCS, Cross
+    None, Tone, TSQL, TSQL_R, DTCS, DTCS_R, Cross
   };
 
   enum class Polarity {

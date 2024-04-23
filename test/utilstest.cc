@@ -115,11 +115,71 @@ UtilsTest::testChirpReaderBasic() {
   QCOMPARE(config.channelList()->channel(0)->name(), "KD8BMI");
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(), 147.075000);
   QCOMPARE(config.channelList()->channel(0)->txFrequency(), 147.675000);
-  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::CTCSS_67_0Hz);
-  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::CTCSS_77_0Hz);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::CTCSS_103_5Hz);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::SIGNALING_NONE);
   QCOMPARE(config.channelList()->channel(1)->rxFrequency(), 146.760000);
   QCOMPARE(config.channelList()->channel(1)->txFrequency(), 146.160000);
 }
+
+
+void
+UtilsTest::testChirpReaderCTCSS() {
+
+  QFile file(":/data/chirp_ctcss.csv");
+  if (! file.open(QIODevice::ReadOnly)) {
+    QFAIL("Cannot open CHRIP file.");
+  }
+
+  QTextStream stream(&file);
+  Config config;
+  ErrorStack err;
+
+  if (! ChirpReader::read(stream, &config, err)) {
+    QFAIL(QString("Cannot read codeplug file:\n%1").arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->count(), 3);
+
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::SIGNALING_NONE);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::SIGNALING_NONE);
+
+  QCOMPARE(config.channelList()->channel(1)->as<FMChannel>()->txTone(), Signaling::CTCSS_67_0Hz);
+  QCOMPARE(config.channelList()->channel(1)->as<FMChannel>()->rxTone(), Signaling::SIGNALING_NONE);
+
+  QCOMPARE(config.channelList()->channel(2)->as<FMChannel>()->txTone(), Signaling::CTCSS_77_0Hz);
+  QCOMPARE(config.channelList()->channel(2)->as<FMChannel>()->rxTone(), Signaling::CTCSS_77_0Hz);
+}
+
+
+void
+UtilsTest::testChirpReaderDCS() {
+
+  QFile file(":/data/chirp_dcs.csv");
+  if (! file.open(QIODevice::ReadOnly)) {
+    QFAIL("Cannot open CHRIP file.");
+  }
+
+  QTextStream stream(&file);
+  Config config;
+  ErrorStack err;
+
+  if (! ChirpReader::read(stream, &config, err)) {
+    QFAIL(QString("Cannot read codeplug file:\n%1").arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::DCS_023N);
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::DCS_023N);
+
+  QCOMPARE(config.channelList()->channel(1)->as<FMChannel>()->txTone(), Signaling::DCS_023N);
+  QCOMPARE(config.channelList()->channel(1)->as<FMChannel>()->rxTone(), Signaling::DCS_023I);
+
+  QCOMPARE(config.channelList()->channel(2)->as<FMChannel>()->txTone(), Signaling::DCS_023I);
+  QCOMPARE(config.channelList()->channel(2)->as<FMChannel>()->rxTone(), Signaling::DCS_023N);
+
+  QCOMPARE(config.channelList()->channel(3)->as<FMChannel>()->txTone(), Signaling::DCS_023I);
+  QCOMPARE(config.channelList()->channel(3)->as<FMChannel>()->rxTone(), Signaling::DCS_023I);
+}
+
 
 void
 UtilsTest::testChirpReaderCross() {
@@ -163,6 +223,7 @@ UtilsTest::testChirpReaderCross() {
   QCOMPARE(config.channelList()->channel(7)->as<FMChannel>()->txTone(), Signaling::DCS_023N);
   QCOMPARE(config.channelList()->channel(7)->as<FMChannel>()->rxTone(), Signaling::DCS_032N);
 }
+
 
 void
 UtilsTest::testChirpWriter() {
