@@ -182,8 +182,8 @@ UtilsTest::testChirpReaderDCS() {
 
 
 void
-UtilsTest::testChirpReaderCross() {
-
+UtilsTest::testChirpReaderCross()
+{
   QFile file(":/data/chirp_cross.csv");
   if (! file.open(QIODevice::ReadOnly)) {
     QFAIL("Cannot open CHRIP file.");
@@ -227,7 +227,56 @@ UtilsTest::testChirpReaderCross() {
 
 void
 UtilsTest::testChirpWriter() {
+  Config orig;
 
+  FMChannel *fm0 = new FMChannel();
+  fm0->setName("DB0SP"); fm0->setRXFrequency(145.6); fm0->setTXFrequency(145.0);
+  orig.channelList()->add(fm0);
+
+  FMChannel *fm1 = new FMChannel();
+  fm1->setName("DB0SP"); fm1->setRXFrequency(145.6); fm1->setTXFrequency(145.0);
+  fm1->setTXTone(Signaling::CTCSS_67_0Hz);
+  orig.channelList()->add(fm1);
+
+  FMChannel *fm2 = new FMChannel();
+  fm2->setName("DB0SP"); fm2->setRXFrequency(145.6); fm2->setTXFrequency(145.0);
+  fm2->setTXTone(Signaling::CTCSS_67_0Hz);
+  fm2->setRXTone(Signaling::CTCSS_67_0Hz);
+  orig.channelList()->add(fm2);
+
+  FMChannel *fm3 = new FMChannel();
+  fm3->setName("DB0SP"); fm3->setRXFrequency(145.6); fm3->setTXFrequency(145.0);
+  fm3->setTXTone(Signaling::CTCSS_67_0Hz);
+  fm3->setRXTone(Signaling::CTCSS_77_0Hz);
+  orig.channelList()->add(fm3);
+
+
+  QString csv;
+  QTextStream stream(&csv);
+  ErrorStack err;
+  if (! ChirpWriter::write(stream, &orig, err))
+    QFAIL(QString("Cannot serialize codeplug:\n%1").arg(err.format()).toStdString().c_str());
+
+  Config parsed;
+  if (! ChirpReader::read(stream, &parsed, err))
+    QFAIL(QString("Cannot parse CHIRP CSV:\n%1").arg(err.format()).toStdString().c_str());
+
+
+  QCOMPARE(parsed.channelList()->count(), orig.channelList()->count());
+  QCOMPARE(parsed.channelList()->channel(0)->name(), orig.channelList()->channel(0)->name());
+  QCOMPARE(parsed.channelList()->channel(0)->rxFrequency(), orig.channelList()->channel(0)->rxFrequency());
+  QCOMPARE(parsed.channelList()->channel(0)->txFrequency(), orig.channelList()->channel(0)->txFrequency());
+
+  FMChannel *pfm1 = parsed.channelList()->channel(1)->as<FMChannel>();
+  QCOMPARE(pfm1->txTone(), fm1->txTone());
+
+  FMChannel *pfm2 = parsed.channelList()->channel(2)->as<FMChannel>();
+  QCOMPARE(pfm2->txTone(), fm2->txTone());
+  QCOMPARE(pfm2->rxTone(), fm2->rxTone());
+
+  FMChannel *pfm3 = parsed.channelList()->channel(3)->as<FMChannel>();
+  QCOMPARE(pfm3->txTone(), fm3->txTone());
+  QCOMPARE(pfm3->rxTone(), fm3->rxTone());
 }
 
 QTEST_GUILESS_MAIN(UtilsTest)

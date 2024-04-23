@@ -417,8 +417,10 @@ ChirpWriter::writeHeader(QTextStream &stream, const ErrorStack &err) {
   Q_UNUSED(err)
 
   stream << "Location" << "," << "Name" << "," << "Frequency" << "," << "Duplex" << ","
-         << "Offset" << "," << "Tone" << "," << "rToneFreq" << "," << "cToneFreq" << ","
-         << "DtcsCode" << "," << "DtcsPolarity" << "," << "Mode" << "\n";
+         << "Offset" << ","
+         << "Tone" << "," << "rToneFreq" << "," << "cToneFreq" << ","
+         << "DtcsCode" << "," "RxDtcsCode" << "," << "DtcsPolarity" << "," << "CrossMode" << ","
+         << "Mode" << "\n";
 
   return true;
 }
@@ -469,20 +471,22 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
   Q_UNUSED(err)
 
   if (Signaling::SIGNALING_NONE == channel->txTone())
-    stream << "," << "" << "," << 65.0 << "," << 65.0 << "," << "023" << "," << "NN";
+    stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
+           << "023" << "," << "023" << "," << "NN" << "," << "" ;
   else if (Signaling::isCTCSS(channel->txTone()) && (Signaling::SIGNALING_NONE == channel->rxTone()))
-    stream << "," << "Tone" << "," << 65.0 << "," << Signaling::toCTCSSFrequency(channel->txTone())
-           << "," << "023" << "," << "NN";
+    stream << "," << "Tone" << "," << Signaling::toCTCSSFrequency(channel->txTone()) << "," << 67.0 << ","
+           << "023" << "," << "023" << "," << "NN" << "," << "";
   else if (Signaling::isCTCSS(channel->txTone()) && (channel->txTone() == channel->rxTone()))
-    stream << "," << "TSQL" << "," << 65.0 << "," << Signaling::toCTCSSFrequency(channel->txTone())
-           << "," << "023" << "," << "NN";
+    stream << "," << "TSQL" << "," << 67.0 << "," << Signaling::toCTCSSFrequency(channel->txTone()) << ","
+           << "023" << "," << "023" << "," << "NN" << "," << "";
   else if (Signaling::isDCSNumber(channel->txTone()))
-    stream << "," << "DTCS" << "," << 65.0 << "," << 65.0 << "," <<
-           Signaling::toDCSNumber(channel->txTone()) << ","
+    stream << "," << "DTCS" << "," << 67.0 << "," << 67.0 << ","
+           << Signaling::toDCSNumber(channel->txTone()) << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
            << (Signaling::isDCSNumber(channel->txTone()) && Signaling::isDCSInverted(channel->txTone()) ? 'I' : 'N')
            << (Signaling::isDCSNumber(channel->rxTone()) && Signaling::isDCSInverted(channel->rxTone()) ? 'I' : 'N');
   else
-    stream << "," << "" << "," << 65.0 << "," << 65.0 << "," << "023" << "," << "NN";
+    stream << "," << "" << "," << 65.0 << "," << 65.0 << ","
+           << "023" << "," << "023" << "," << "NN" << "," << "" ;
 
   return true;
 }
