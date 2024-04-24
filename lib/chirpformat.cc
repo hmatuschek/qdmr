@@ -470,23 +470,61 @@ bool
 ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorStack &err) {
   Q_UNUSED(err)
 
+  // Serializes ", Tone, rToneFreq, cToneFreq, DtcsCode, RxDtcsCode, Polarity, CrossMode"
+
   if (Signaling::SIGNALING_NONE == channel->txTone())
     stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
-           << "023" << "," << "023" << "," << "NN" << "," << "" ;
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "" ;
   else if (Signaling::isCTCSS(channel->txTone()) && (Signaling::SIGNALING_NONE == channel->rxTone()))
     stream << "," << "Tone" << "," << Signaling::toCTCSSFrequency(channel->txTone()) << "," << 67.0 << ","
-           << "023" << "," << "023" << "," << "NN" << "," << "";
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "";
   else if (Signaling::isCTCSS(channel->txTone()) && (channel->txTone() == channel->rxTone()))
     stream << "," << "TSQL" << "," << 67.0 << "," << Signaling::toCTCSSFrequency(channel->txTone()) << ","
-           << "023" << "," << "023" << "," << "NN" << "," << "";
-  else if (Signaling::isDCSNumber(channel->txTone()))
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "";
+  else if ((Signaling::SIGNALING_NONE == channel->txTone()) && Signaling::isCTCSS(channel->rxTone()))
+    stream << "," << "Cross" << "," << 67.0 << ","
+           << Signaling::toCTCSSFrequency(channel->rxTone()) << ","
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "->Tone";
+  else if ((Signaling::SIGNALING_NONE == channel->txTone()) && Signaling::isDCS(channel->rxTone()))
+    stream << "," << "Cross" << "," << 67.0 << "," << 67.0 << ","
+           << "023" << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
+           << (Signaling::isDCSNormal(channel->rxTone()) ? "NN" : "NR") << ","
+           << "->DTCS";
+  else if (Signaling::isCTCSS(channel->txTone()) && Signaling::isCTCSS(channel->rxTone()) && (channel->txTone() != channel->rxTone()))
+    stream << "," << "Cross" << "," << Signaling::toCTCSSFrequency(channel->txTone()) << ","
+           << Signaling::toCTCSSFrequency(channel->rxTone()) << ","
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "Tone->Tone";
+  else if (Signaling::isCTCSS(channel->txTone()) && Signaling::isDCS(channel->rxTone()))
+    stream << "," << "Cross" << "," << Signaling::toCTCSSFrequency(channel->txTone()) << "," << 67.0 << ","
+           << "023" << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
+           << (Signaling::isDCSNormal(channel->rxTone()) ? "NN" : "NR") << ","
+           << "Tone->DTCS";
+  else if (Signaling::isDCS(channel->txTone()) && Signaling::isCTCSS(channel->rxTone()))
+    stream << "," << "Cross" << "," << 67.0 << "," << Signaling::toCTCSSFrequency(channel->rxTone()) << ","
+           << Signaling::toDCSNumber(channel->txTone()) << "," << "023" << ","
+           << (Signaling::isDCSNormal(channel->txTone()) ? "NN" : "RN") << ","
+           << "DTCS->Tone";
+  else if (Signaling::isDCS(channel->txTone()) && (Signaling::toDCSNumber(channel->txTone()) == Signaling::toDCSNumber(channel->rxTone())))
     stream << "," << "DTCS" << "," << 67.0 << "," << 67.0 << ","
            << Signaling::toDCSNumber(channel->txTone()) << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
-           << (Signaling::isDCSNumber(channel->txTone()) && Signaling::isDCSInverted(channel->txTone()) ? 'I' : 'N')
-           << (Signaling::isDCSNumber(channel->rxTone()) && Signaling::isDCSInverted(channel->rxTone()) ? 'I' : 'N');
+           << (Signaling::isDCSInverted(channel->txTone()) ? 'R' : 'N')
+           << (Signaling::isDCSInverted(channel->rxTone()) ? 'R' : 'N') << ","
+           << "";
+  else if (Signaling::isDCS(channel->txTone()) && Signaling::isDCS(channel->rxTone()))
+    stream << "," << "Cross" << "," << 67.0 << "," << 67.0 << ","
+           << Signaling::toDCSNumber(channel->txTone()) << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
+           << (Signaling::isDCSInverted(channel->txTone()) ? 'R' : 'N')
+           << (Signaling::isDCSInverted(channel->rxTone()) ? 'R' : 'N') << ","
+           << "DTCS->DTCS";
   else
     stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
-           << "023" << "," << "023" << "," << "NN" << "," << "" ;
+           << "023" << "," << "023" << "," << "NN" << ","
+           << "" ;
 
   return true;
 }

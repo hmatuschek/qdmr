@@ -64,6 +64,8 @@ namespace Signaling
   bool isDCSNormal(Code code);
   /** Returns @c true if the given DCS code is inverted. */
   bool isDCSInverted(Code code);
+  /** Returns @c true if the given code is a DSC code (inverted or not). */
+  bool isDCS(Code code);
   /** Maps a DCS Signaling::Code to the corresponding DCS number. */
   uint16_t toDCSNumber(Code code);
   /** Maps a DCS number to the corresponding DCS Signaling::Code enum element.
