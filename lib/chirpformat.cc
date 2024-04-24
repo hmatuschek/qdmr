@@ -48,7 +48,6 @@ QHash<QString, ChirpFormat::ToneMode> const ChirpFormat::_toneModeCodes = {
 };
 
 QHash<QString, ChirpFormat::CrossMode> const ChirpFormat::_crossModes = {
-  {"", ChirpFormat::CrossMode::ToneNone},
   {"->Tone", ChirpFormat::CrossMode::NoneTone},
   {"->DTCS", ChirpFormat::CrossMode::NoneDTCS},
   {"Tone->", ChirpFormat::CrossMode::ToneNone},
@@ -273,10 +272,6 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
       return false;
     case ToneMode::Cross:
       switch (crossMode) {
-      case CrossMode::NoneTone:
-        fm->setTXTone(Signaling::SIGNALING_NONE);
-        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
-        break;
       case CrossMode::NoneDTCS:
         fm->setTXTone(Signaling::SIGNALING_NONE);
         fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
@@ -399,14 +394,15 @@ ChirpWriter::write(QTextStream &stream, Config *config, const ErrorStack &err) {
     return false;
   }
 
-  for (int i=0; i<config->channelList()->count(); i++) {
+  for (int i=0, j=0; i<config->channelList()->count(); i++) {
     if (! config->channelList()->channel(i)->is<FMChannel>())
       continue;
-    if (! writeChannel(stream, i, config->channelList()->channel(i)->as<FMChannel>(), err)) {
+    if (! writeChannel(stream, j, config->channelList()->channel(i)->as<FMChannel>(), err)) {
       errMsg(err) << "Cannot encode FM channel '" << config->channelList()->channel(i)->name()
                   << "'.";
       return false;
     }
+    j++;
   }
 
   return true;
@@ -475,15 +471,15 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
   if (Signaling::SIGNALING_NONE == channel->txTone())
     stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
            << "023" << "," << "023" << "," << "NN" << ","
-           << "" ;
+           << "Tone->Tone" ;
   else if (Signaling::isCTCSS(channel->txTone()) && (Signaling::SIGNALING_NONE == channel->rxTone()))
     stream << "," << "Tone" << "," << Signaling::toCTCSSFrequency(channel->txTone()) << "," << 67.0 << ","
            << "023" << "," << "023" << "," << "NN" << ","
-           << "";
+           << "Tone->Tone";
   else if (Signaling::isCTCSS(channel->txTone()) && (channel->txTone() == channel->rxTone()))
     stream << "," << "TSQL" << "," << 67.0 << "," << Signaling::toCTCSSFrequency(channel->txTone()) << ","
            << "023" << "," << "023" << "," << "NN" << ","
-           << "";
+           << "Tone->Tone";
   else if ((Signaling::SIGNALING_NONE == channel->txTone()) && Signaling::isCTCSS(channel->rxTone()))
     stream << "," << "Cross" << "," << 67.0 << ","
            << Signaling::toCTCSSFrequency(channel->rxTone()) << ","
@@ -514,7 +510,7 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
            << Signaling::toDCSNumber(channel->txTone()) << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
            << (Signaling::isDCSInverted(channel->txTone()) ? 'R' : 'N')
            << (Signaling::isDCSInverted(channel->rxTone()) ? 'R' : 'N') << ","
-           << "";
+           << "Tone->Tone";
   else if (Signaling::isDCS(channel->txTone()) && Signaling::isDCS(channel->rxTone()))
     stream << "," << "Cross" << "," << 67.0 << "," << 67.0 << ","
            << Signaling::toDCSNumber(channel->txTone()) << "," << Signaling::toDCSNumber(channel->rxTone()) << ","
@@ -524,7 +520,7 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
   else
     stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
            << "023" << "," << "023" << "," << "NN" << ","
-           << "" ;
+           << "Tone->Tone" ;
 
   return true;
 }
