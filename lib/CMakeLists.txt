@@ -16,6 +16,7 @@ SET(libdmrconf_SOURCES
     csvreader.cc dfufile.cc userdatabase.cc logger.cc
     melody.cc
     visitor.cc configlabelingvisitor.cc configcopyvisitor.cc intermediaterepresentation.cc
+    configmergevisitor.cc
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
     channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc roamingzone.cc roamingchannel.cc
     callsigndb.cc talkgroupdatabase.cc radioid.cc encryptionextension.cc commercial_extension.cc
@@ -74,7 +75,8 @@ SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
     md390_filereader.hh dr1801uv_filereader.hh dummyfilereader.hh
     utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
     chirpformat.hh
-    visitor.hh configlabelingvisitor.hh configcopyvisitor.hh intermediaterepresentation.hh)
+    visitor.hh configlabelingvisitor.hh configcopyvisitor.hh intermediaterepresentation.hh
+    configmergevisitor.hh)
 
 
 
