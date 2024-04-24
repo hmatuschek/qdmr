@@ -12,6 +12,10 @@ qt5_wrap_cpp(utilstest_MOC_SOURCES utilstest.hh)
 add_executable(utilstest utilstest.cc ${utilstest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(utilstest ${LIBS} libdmrconf)
 
+qt5_wrap_cpp(chirptest_MOC_SOURCES chirptest.hh)
+add_executable(chirptest chirptest.cc ${chirptest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(chirptest ${LIBS} libdmrconf)
+
 
 # Unit tests for Radioddity devices
 qt5_wrap_cpp(rd5r_MOC_SOURCES rd5r_test.hh)

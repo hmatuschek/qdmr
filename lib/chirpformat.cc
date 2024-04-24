@@ -485,7 +485,7 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
            << (Signaling::isDCSNumber(channel->txTone()) && Signaling::isDCSInverted(channel->txTone()) ? 'I' : 'N')
            << (Signaling::isDCSNumber(channel->rxTone()) && Signaling::isDCSInverted(channel->rxTone()) ? 'I' : 'N');
   else
-    stream << "," << "" << "," << 65.0 << "," << 65.0 << ","
+    stream << "," << "" << "," << 67.0 << "," << 67.0 << ","
            << "023" << "," << "023" << "," << "NN" << "," << "" ;
 
   return true;
