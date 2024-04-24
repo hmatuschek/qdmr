@@ -181,6 +181,11 @@ Signaling::isDCSInverted(Code code) {
   return ((DCS_023I <= code) && (DCS_754I >= code));
 }
 
+bool
+Signaling::isDCS(Code code) {
+  return isDCSInverted(code) || isDCSNormal(code);
+}
+
 uint16_t
 Signaling::toDCSNumber(Code code) {
   if ((DCS_023N <= code) && (DCS_754N >= code) && DCS_N_code2num.contains(code))

@@ -10,6 +10,7 @@ public:
   explicit UtilsTest(QObject *parent = nullptr);
 
 private slots:
+  void initTestCase();
   void testDecodeUnicode();
   void testEncodeUnicode();
   void testDecodeASCII();

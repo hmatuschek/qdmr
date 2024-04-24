@@ -40,6 +40,8 @@
 #include "extensionview.hh"
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
+#include "chirpformat.hh"
+
 
 inline QStringList getLanguages() {
   QStringList languages = {QLocale::system().name()};
@@ -199,6 +201,7 @@ Application::createMainWindow() {
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
+  QAction *exportCP = _mainWindow->findChild<QAction*>("actionExportToCHIRP");
 
   QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
   QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
@@ -217,6 +220,7 @@ Application::createMainWindow() {
   connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
+  connect(exportCP, SIGNAL(triggered()), this, SLOT(exportCodeplugToChirp()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
@@ -412,6 +416,41 @@ Application::saveCodeplug() {
     QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
                           tr("Cannot save codeplug to file '%1'.").arg(filename));
   }
+
+  file.flush();
+  file.close();
+
+  settings.setLastDirectoryDir(info.absoluteDir());
+}
+
+
+void
+Application::exportCodeplugToChirp() {
+  if (! _mainWindow)
+    return;
+
+  Settings settings;
+  QString filename = QFileDialog::getSaveFileName(
+        nullptr, tr("Export codeplug"), settings.lastDirectory().absolutePath(),
+        tr("CHIRP CSV Files (*.csv)"));
+
+  if (filename.isEmpty())
+    return;
+
+
+  QFile file(filename);
+  if (! file.open(QIODevice::WriteOnly)) {
+    QMessageBox::critical(nullptr, tr("Cannot open file"),
+                          tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(file.errorString()));
+    return;
+  }
+
+  QTextStream stream(&file);
+  QFileInfo info(filename);
+  ErrorStack err;
+  if (! ChirpWriter::write(stream, _config, err))
+    QMessageBox::critical(nullptr, tr("Cannot export codeplug"),
+                          tr("Cannot export codeplug to file '%1':\n%2").arg(filename).arg(err.format()));
 
   file.flush();
   file.close();
