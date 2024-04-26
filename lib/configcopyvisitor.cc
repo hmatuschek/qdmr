@@ -268,8 +268,8 @@ ConfigCloneVisitor::takeResult(const ErrorStack &err) {
 /* ********************************************************************************************* *
  * Implementation of FixReferencesVisitor
  * ********************************************************************************************* */
-FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject *> &map)
-  : Visitor(), _map(map)
+FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject *> &map, bool keepUnknown)
+  : Visitor(), _map(map), _keepUnknown(keepUnknown)
 {
   // Populate with default singleton instances.
   map[SelectedChannel::get()] = SelectedChannel::get();
@@ -287,7 +287,7 @@ FixReferencesVisistor::processProperty(ConfigItem *item, const QMetaProperty &pr
     if (ref->isNull())
       return true;
     ConfigObject *obj = ref->as<ConfigObject>();
-    if (! _map.contains(obj)) {
+    if ((! _keepUnknown) && (! _map.contains(obj))) {
       errMsg(err) << "Cannot fix refrence to object '" << obj->name()
                   << "' of type " << obj->metaObject()->className()
                   << ": Not mapped/cloned yet.";

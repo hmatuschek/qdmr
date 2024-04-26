@@ -44,7 +44,7 @@ public:
    *        merged into.
    * @param itemStrategy Specifies the item merge strategy.
    * @param setStrategy Specifies the set merge strategy. */
-  ConfigMergeVisitor(Config *destination, QHash<ConfigItem *, ConfigItem *> &translation,
+  ConfigMergeVisitor(Config *destination, QHash<ConfigObject *, ConfigObject *> &translation,
                      ItemStrategy itemStrategy=ItemStrategy::Ignore,
                      SetStrategy setStrategy=SetStrategy::Ignore);
 
@@ -72,12 +72,26 @@ protected:
   /** The destination configuration. */
   Config *_destination;
   /** Translation table for fixing references. */
-  QHash<ConfigItem *, ConfigItem *> &_translation;
+  QHash<ConfigObject *, ConfigObject *> &_translation;
   /** The item merge strategy. */
   ItemStrategy _itemStrategy;
   /** The set merge strategy. */
   SetStrategy _setStrategy;
 };
 
+
+class ConfigMerge
+{
+public:
+  static bool mergeInto(Config *destination, Config *source,
+                        ConfigMergeVisitor::ItemStrategy itemStrategy=ConfigMergeVisitor::ItemStrategy::Ignore,
+                        ConfigMergeVisitor::SetStrategy setStrategy=ConfigMergeVisitor::SetStrategy::Ignore,
+                        const ErrorStack &err = ErrorStack());
+
+  static Config *merge(Config *destination, Config *source,
+                       ConfigMergeVisitor::ItemStrategy itemStrategy=ConfigMergeVisitor::ItemStrategy::Ignore,
+                       ConfigMergeVisitor::SetStrategy setStrategy=ConfigMergeVisitor::SetStrategy::Ignore,
+                       const ErrorStack &err = ErrorStack());
+};
 
 #endif // CONFIGMERGEVISITOR_HH

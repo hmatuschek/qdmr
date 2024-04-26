@@ -6,8 +6,10 @@
 #include "channel.hh"
 
 
-ConfigMergeVisitor::ConfigMergeVisitor(
-    Config* destination, QHash<ConfigItem *, ConfigItem *> &translation,
+/* ********************************************************************************************* *
+ * Implementation of ConfigMergeVisitor
+ * ********************************************************************************************* */
+ConfigMergeVisitor::ConfigMergeVisitor(Config* destination, QHash<ConfigObject*, ConfigObject*>& translation,
     ItemStrategy itemStrategy, SetStrategy setStrategy)
   : Visitor(), _destination(destination), _translation(translation),
     _itemStrategy(itemStrategy), _setStrategy(setStrategy)
@@ -22,7 +24,7 @@ ConfigMergeVisitor::processItem(ConfigItem *item, const ErrorStack &err) {
   // Dispatch by type
   if (item->is<RadioID>())
     return processRadioID(item->as<RadioID>(), err);
-  else if (item->is<Channel>())
+  else if (item->is<Contact>())
     return processContact(item->as<Contact>(), err);
   else if (item->is<RXGroupList>())
     return processGroupList(item->as<RXGroupList>(), err);
@@ -319,4 +321,51 @@ ConfigMergeVisitor::mergeList(ConfigObjectRefList *present, ConfigObjectRefList 
   }
 
   return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of ConfigMerge
+ * ********************************************************************************************* */
+bool
+ConfigMerge::mergeInto(Config *destination, Config *source,
+                       ConfigMergeVisitor::ItemStrategy itemStrategy,
+                       ConfigMergeVisitor::SetStrategy setStrategy,
+                       const ErrorStack &err)
+{
+  QHash<ConfigObject *, ConfigObject *> referenceTable;
+  ConfigMergeVisitor mergeVisitor(destination, referenceTable, itemStrategy, setStrategy);
+  if (! mergeVisitor.process(source, err)) {
+    errMsg(err) << "Cannot merge configurations.";
+    return false;
+  }
+
+  FixReferencesVisistor linkVisitor(referenceTable, true);
+  if (! linkVisitor.process(destination, err)) {
+    errMsg(err) << "Cannot fix references in merged configuration.";
+    return false;
+  }
+
+  return true;
+}
+
+
+Config *
+ConfigMerge::merge(Config *destination, Config *source,
+                   ConfigMergeVisitor::ItemStrategy itemStrategy,
+                   ConfigMergeVisitor::SetStrategy setStrategy,
+                   const ErrorStack &err)
+{
+  Config *copy = ConfigCopy::copy(destination, err)->as<Config>();
+  if (nullptr == copy) {
+    errMsg(err) << "Cannot merge configurations.";
+    return nullptr;
+  }
+
+  if (! mergeInto(copy, source, itemStrategy, setStrategy, err)) {
+    delete copy;
+    return nullptr;
+  }
+
+  return copy;
 }
