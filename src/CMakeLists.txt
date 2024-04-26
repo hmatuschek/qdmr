@@ -1,7 +1,7 @@
 SET(qdmr_SOURCES main.cc
   configitemwrapper.cc
   application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
-	analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
+  analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
   ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc
@@ -11,11 +11,12 @@ SET(qdmr_SOURCES main.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
   deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
+  configmergedialog.cc
   repeaterbookcompleter.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
-	analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
+  analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
   ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
   aprssystemdialog.hh releasenotes.hh searchpopup.hh
@@ -26,6 +27,7 @@ SET(qdmr_MOC_HEADERS
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
   deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
+  configmergedialog.hh
   repeaterbookcompleter.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
@@ -36,7 +38,8 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   generalsettingsview.ui radioidlistview.ui contactlistview.ui grouplistsview.ui channellistview.ui
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
-  deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui)
+  deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui
+  configmergedialog.ui)
 
 set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})

@@ -41,6 +41,8 @@
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
 #include "chirpformat.hh"
+#include "configmergedialog.hh"
+#include "configmergevisitor.hh"
 
 
 inline QStringList getLanguages() {
@@ -202,6 +204,7 @@ Application::createMainWindow() {
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
   QAction *exportCP = _mainWindow->findChild<QAction*>("actionExportToCHIRP");
+  QAction *importCP = _mainWindow->findChild<QAction*>("actionImport");
 
   QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
   QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
@@ -221,6 +224,7 @@ Application::createMainWindow() {
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
   connect(exportCP, SIGNAL(triggered()), this, SLOT(exportCodeplugToChirp()));
+  connect(importCP, SIGNAL(triggered()), this, SLOT(importCodeplug()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
@@ -458,6 +462,64 @@ Application::exportCodeplugToChirp() {
   settings.setLastDirectoryDir(info.absoluteDir());
 }
 
+
+void
+Application::importCodeplug() {
+  if (! _mainWindow)
+    return;
+
+  Settings settings;
+  QString filename = QFileDialog::getOpenFileName(
+        nullptr, tr("Import codeplug"), settings.lastDirectory().absolutePath(),
+        tr("CHIRP CSV Files (*.csv);;YAML Files (*.yaml,*.yml)"));
+
+  if (filename.isEmpty())
+    return;
+
+
+
+  Config merging;
+  ErrorStack err;
+
+  if (filename.endsWith(".csv")) {
+    QFile file(filename);
+    if (! file.open(QIODevice::ReadOnly)) {
+      QMessageBox::critical(nullptr, tr("Cannot open file"),
+                            tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
+      return;
+    }
+
+    QTextStream stream(&file);
+    if (! ChirpReader::read(stream, &merging, err)) {
+      QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                            tr("Cannot import codeplug from '%1': %2")
+                            .arg(filename).arg(err.format()));
+      return;
+    }
+  } else if (filename.endsWith("*.yaml") || filename.endsWith("*.yml")) {
+    if (! merging.readYAML(filename, err)) {
+      QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                            tr("Cannot import codeplug from '%1': %2")
+                            .arg(filename).arg(err.format()));
+      return;
+    }
+  }
+
+  ConfigMergeDialog mergeDialog;
+
+  if (QDialog::Accepted != mergeDialog.exec())
+    return;
+
+  if (! ConfigMerge::mergeInto(_config, &merging, mergeDialog.itemStrategy(),
+                               mergeDialog.setStrategy(), err)) {
+    QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                          tr("Cannot import codeplug from '%1': %2")
+                          .arg(filename).arg(err.format()));
+    return;
+  }
+
+  _config->setModified(true);
+}
 
 void
 Application::quitApplication() {
