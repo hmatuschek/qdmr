@@ -1,6 +1,7 @@
 #include "configmergedialog.hh"
 #include "ui_configmergedialog.h"
 #include "configmergevisitor.hh"
+#include "settings.hh"
 
 
 ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
@@ -14,11 +15,26 @@ ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
   ui->itemStrategy->setItemData(2, QVariant((uint) ConfigMergeVisitor::ItemStrategy::Duplicate));
 
   ui->setStrategy->setItemData(0, QVariant((uint) ConfigMergeVisitor::SetStrategy::Ignore));
-  ui->setStrategy->setItemData(0, QVariant((uint) ConfigMergeVisitor::SetStrategy::Override));
-  ui->setStrategy->setItemData(0, QVariant((uint) ConfigMergeVisitor::SetStrategy::Duplicate));
-  ui->setStrategy->setItemData(0, QVariant((uint) ConfigMergeVisitor::SetStrategy::Merge));
+  ui->setStrategy->setItemData(1, QVariant((uint) ConfigMergeVisitor::SetStrategy::Override));
+  ui->setStrategy->setItemData(2, QVariant((uint) ConfigMergeVisitor::SetStrategy::Duplicate));
+  ui->setStrategy->setItemData(3, QVariant((uint) ConfigMergeVisitor::SetStrategy::Merge));
+
+  Settings settings;
+  switch (settings.configMergeItemStrategy()) {
+  case ConfigMergeVisitor::ItemStrategy::Ignore: ui->itemStrategy->setCurrentIndex(0); break;
+  case ConfigMergeVisitor::ItemStrategy::Override: ui->itemStrategy->setCurrentIndex(1); break;
+  case ConfigMergeVisitor::ItemStrategy::Duplicate: ui->itemStrategy->setCurrentIndex(2); break;
+  }
+
+  switch (settings.configMergeSetStrategy()) {
+  case ConfigMergeVisitor::SetStrategy::Ignore: ui->setStrategy->setCurrentIndex(0); break;
+  case ConfigMergeVisitor::SetStrategy::Override: ui->setStrategy->setCurrentIndex(1); break;
+  case ConfigMergeVisitor::SetStrategy::Duplicate: ui->setStrategy->setCurrentIndex(2); break;
+  case ConfigMergeVisitor::SetStrategy::Merge: ui->setStrategy->setCurrentIndex(3); break;
+  }
 
   onItemStrategySelected(ui->itemStrategy->currentIndex());
+  onSetStrategySelected(ui->itemStrategy->currentIndex());
 
   connect(ui->itemStrategy, SIGNAL(currentIndexChanged(int)),
           this, SLOT(onItemStrategySelected(int)));
@@ -44,7 +60,11 @@ ConfigMergeDialog::setStrategy() const {
 
 void
 ConfigMergeDialog::onItemStrategySelected(int index) {
-  switch ((ConfigMergeVisitor::ItemStrategy)ui->itemStrategy->itemData(index).toUInt()) {
+  ConfigMergeVisitor::ItemStrategy strategy =
+      (ConfigMergeVisitor::ItemStrategy)ui->itemStrategy->itemData(index).toUInt();
+  Settings().setConfigMergeItemStrategy(strategy);
+
+  switch (strategy) {
   case ConfigMergeVisitor::ItemStrategy::Ignore:
     ui->itemStrategyLabel->setText(tr("Ignores any duplicate item."));
     break;
@@ -59,18 +79,21 @@ ConfigMergeDialog::onItemStrategySelected(int index) {
 
 void
 ConfigMergeDialog::onSetStrategySelected(int index) {
-  switch ((ConfigMergeVisitor::SetStrategy)ui->setStrategy->itemData(index).toUInt()) {
+  ConfigMergeVisitor::SetStrategy strategy =
+      (ConfigMergeVisitor::SetStrategy)ui->setStrategy->itemData(index).toUInt();
+  Settings().setConfigMergeSetStrategy(strategy);
+  switch (strategy) {
   case ConfigMergeVisitor::SetStrategy::Ignore:
-    ui->itemStrategyLabel->setText(tr("Ignores any duplicate set."));
+    ui->setStrategyLabel->setText(tr("Ignores any duplicate set."));
     break;
   case ConfigMergeVisitor::SetStrategy::Override:
-    ui->itemStrategyLabel->setText(tr("Replaces any duplicate set with the imported one."));
+    ui->setStrategyLabel->setText(tr("Replaces any duplicate set with the imported one."));
     break;
   case ConfigMergeVisitor::SetStrategy::Duplicate:
-    ui->itemStrategyLabel->setText(tr("Imports any duplicate set with a modified name."));
+    ui->setStrategyLabel->setText(tr("Imports any duplicate set with a modified name."));
     break;
   case ConfigMergeVisitor::SetStrategy::Merge:
-    ui->itemStrategyLabel->setText(tr("Merges duplicate sets."));
+    ui->setStrategyLabel->setText(tr("Merges duplicate sets."));
     break;
   }
 }

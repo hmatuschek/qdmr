@@ -10,6 +10,7 @@
 #include "ui_settingsdialog.h"
 
 #include "codeplug.hh"
+#include "configmergevisitor.hh"
 
 
 class Settings : public QSettings
@@ -82,6 +83,12 @@ public:
 
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
+
+  ConfigMergeVisitor::ItemStrategy configMergeItemStrategy() const;
+  void setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy);
+
+  ConfigMergeVisitor::SetStrategy configMergeSetStrategy() const;
+  void setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy);
 
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);

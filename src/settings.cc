@@ -254,6 +254,26 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+ConfigMergeVisitor::ItemStrategy
+Settings::configMergeItemStrategy() const {
+  return (ConfigMergeVisitor::ItemStrategy)value(
+        "configMergeItemStrategy", (uint) ConfigMergeVisitor::ItemStrategy::Duplicate).toUInt();
+}
+void
+Settings::setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy) {
+  setValue("configMergeItemStrategy", (uint)strategy);
+}
+
+ConfigMergeVisitor::SetStrategy
+Settings::configMergeSetStrategy() const {
+  return (ConfigMergeVisitor::SetStrategy)value(
+        "configMergeSetStrategy", (uint) ConfigMergeVisitor::SetStrategy::Merge).toUInt();
+}
+void
+Settings::setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy) {
+  setValue("configMergeSetStrategy", (uint)strategy);
+}
+
 QByteArray
 Settings::mainWindowState() const {
   return value("mainWindowState", QByteArray()).toByteArray();

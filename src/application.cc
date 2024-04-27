@@ -476,12 +476,11 @@ Application::importCodeplug() {
   if (filename.isEmpty())
     return;
 
-
-
   Config merging;
   ErrorStack err;
 
   if (filename.endsWith(".csv")) {
+    // import CHIRP CSV file
     QFile file(filename);
     if (! file.open(QIODevice::ReadOnly)) {
       QMessageBox::critical(nullptr, tr("Cannot open file"),
@@ -497,6 +496,7 @@ Application::importCodeplug() {
       return;
     }
   } else if (filename.endsWith("*.yaml") || filename.endsWith("*.yml")) {
+    // import QDMR YAML codeplug
     if (! merging.readYAML(filename, err)) {
       QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
                             tr("Cannot import codeplug from '%1': %2")
@@ -506,7 +506,6 @@ Application::importCodeplug() {
   }
 
   ConfigMergeDialog mergeDialog;
-
   if (QDialog::Accepted != mergeDialog.exec())
     return;
 

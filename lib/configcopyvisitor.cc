@@ -308,7 +308,7 @@ FixReferencesVisistor::processList(AbstractConfigObjectList *list, const ErrorSt
   if (ConfigObjectRefList *rlist = dynamic_cast<ConfigObjectRefList*>(list)) {
     // Resolve all references.
     for (int i=0; i<rlist->count(); i++) {
-      if (! _map.contains(rlist->get(i))) {
+      if ((! _keepUnknown) && (! _map.contains(rlist->get(i)))) {
         errMsg(err) << "Cannot fix refrence to object '" << rlist->get(i)->name()
                     << "' of type " << rlist->get(i)->metaObject()->className()
                     << ": Not mapped/cloned yet.";
