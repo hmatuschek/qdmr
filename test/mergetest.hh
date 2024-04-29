@@ -13,6 +13,7 @@ public:
 private slots:
   void testMergeRadioIds();
   void testMergeContacts();
+  void testMergeGroupLists();
 };
 
 #endif // MERGETEST_HH
