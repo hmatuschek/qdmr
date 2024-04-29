@@ -471,7 +471,7 @@ Application::importCodeplug() {
   Settings settings;
   QString filename = QFileDialog::getOpenFileName(
         nullptr, tr("Import codeplug"), settings.lastDirectory().absolutePath(),
-        tr("CHIRP CSV Files (*.csv);;YAML Files (*.yaml,*.yml)"));
+        tr("CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)"));
 
   if (filename.isEmpty())
     return;
