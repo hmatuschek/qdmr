@@ -34,10 +34,12 @@ ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
   }
 
   onItemStrategySelected(ui->itemStrategy->currentIndex());
-  onSetStrategySelected(ui->itemStrategy->currentIndex());
+  onSetStrategySelected(ui->setStrategy->currentIndex());
 
   connect(ui->itemStrategy, SIGNAL(currentIndexChanged(int)),
           this, SLOT(onItemStrategySelected(int)));
+  connect(ui->setStrategy, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(onSetStrategySelected(int)));
   connect(ui->buttonBox, SIGNAL(accepted()), SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 }
