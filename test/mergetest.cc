@@ -126,6 +126,7 @@ MergeTest::testMergeContacts() {
   QCOMPARE(merged->contacts()->get(3)->as<DMRContact>()->number(), 2345);
 }
 
+
 void
 MergeTest::testMergeGroupLists() {
   Config *base = new Config(), *merging = new Config();

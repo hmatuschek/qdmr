@@ -495,7 +495,7 @@ Application::importCodeplug() {
                             .arg(filename).arg(err.format()));
       return;
     }
-  } else if (filename.endsWith("*.yaml") || filename.endsWith("*.yml")) {
+  } else if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
     // import QDMR YAML codeplug
     if (! merging.readYAML(filename, err)) {
       QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
@@ -503,17 +503,24 @@ Application::importCodeplug() {
                             .arg(filename).arg(err.format()));
       return;
     }
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                          tr("Do not know, how to handle file '%1'.")
+                          .arg(filename));
+    return;
   }
 
   ConfigMergeDialog mergeDialog;
   if (QDialog::Accepted != mergeDialog.exec())
     return;
 
+  logDebug() << "Merging codeplugs ...";
   if (! ConfigMerge::mergeInto(_config, &merging, mergeDialog.itemStrategy(),
                                mergeDialog.setStrategy(), err)) {
     QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
                           tr("Cannot import codeplug from '%1': %2")
                           .arg(filename).arg(err.format()));
+    _config->setModified(true);
     return;
   }
 

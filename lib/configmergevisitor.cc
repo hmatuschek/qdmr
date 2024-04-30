@@ -4,6 +4,7 @@
 #include "configreference.hh"
 #include "config.hh"
 #include "channel.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -257,6 +258,7 @@ ConfigMergeVisitor::addObject(AbstractConfigObjectList *list, ConfigObject *pres
     return false;
 
   }
+  logDebug() << "Add object '" << merging->name() << "'.";
 
   list->add(newObject);
   _translation[merging] = newObject;
@@ -269,6 +271,7 @@ bool
 ConfigMergeVisitor::ignoreObject(AbstractConfigObjectList *list, ConfigObject *present, ConfigObject *merging, const ErrorStack &err) {
   Q_UNUSED(list); Q_UNUSED(err)
 
+  logDebug() << "Ignore object '" << merging->name() << "'.";
   _translation[merging] = present;
 
   return true;
@@ -282,6 +285,7 @@ ConfigMergeVisitor::replaceObject(AbstractConfigObjectList *list, ConfigObject *
     errMsg(err) << "Cannot copy item '" << merging->name() << "'.";
     return false;
   }
+  logDebug() << "Replace object '" << present->name() << "'.";
 
   list->replace(newObject, list->indexOf(present));
   _translation[merging] = newObject;
@@ -300,6 +304,7 @@ ConfigMergeVisitor::duplicateObject(AbstractConfigObjectList *list, ConfigObject
     errMsg(err) << "Cannot copy item '" << merging->name() << "'.";
     return false;
   }
+  logDebug() << "Copy object '" << merging->name() << "'.";
 
   newItem->setName(newItem->name()+" (copy)");
   list->add(newItem);
