@@ -14,6 +14,8 @@ private slots:
   void testMergeRadioIds();
   void testMergeContacts();
   void testMergeGroupLists();
+  void testMergeChannels();
+  void testMergeZones();
 };
 
 #endif // MERGETEST_HH

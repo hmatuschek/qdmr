@@ -220,4 +220,203 @@ MergeTest::testMergeGroupLists() {
 }
 
 
+void
+MergeTest::testMergeChannels() {
+  Config *base = new Config(), *merging = new Config();
+
+  base->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 0", 1234));
+
+  {
+    RXGroupList *lst = new RXGroupList("List 0");
+    lst->addContact(base->contacts()->contact(0)->as<DMRContact>());
+    base->rxGroupLists()->add(lst);
+
+    FMChannel *ach = new FMChannel();
+    ach->setName("FM 0");
+    ach->setRXFrequency(Frequency::fromMHz(144.0));
+    ach->setTXFrequency(Frequency::fromMHz(144.0));
+    base->channelList()->add(ach);
+
+    DMRChannel *dch = new DMRChannel();
+    dch->setName("DMR 0");
+    dch->setRXFrequency(Frequency::fromMHz(144.0));
+    dch->setTXFrequency(Frequency::fromMHz(144.0));
+    dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupListObj(lst);
+    base->channelList()->add(dch);
+  }
+
+  merging->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 0", 2345));
+  merging->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 1", 3456));
+
+  {
+    RXGroupList *lst = new RXGroupList("List 0");
+    lst->addContact(merging->contacts()->contact(0)->as<DMRContact>());
+    merging->rxGroupLists()->add(lst);
+
+    FMChannel *ach = new FMChannel();
+    ach->setName("FM 0");
+    ach->setRXFrequency(Frequency::fromMHz(145.0));
+    ach->setTXFrequency(Frequency::fromMHz(145.0));
+    merging->channelList()->add(ach);
+
+    DMRChannel *dch = new DMRChannel();
+    dch->setName("DMR 0");
+    dch->setRXFrequency(Frequency::fromMHz(145.0));
+    dch->setTXFrequency(Frequency::fromMHz(145.0));
+    dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupListObj(lst);
+    merging->channelList()->add(dch);
+  }
+
+
+  ErrorStack err;
+  Config *merged = ConfigMerge::merge(base, merging,
+                                      ConfigMergeVisitor::ItemStrategy::Ignore,
+                                      ConfigMergeVisitor::SetStrategy::Ignore, err);
+  if (nullptr == merged)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(merged->contacts()->count(), 2);
+  QCOMPARE(merged->rxGroupLists()->count(), 1);
+  QCOMPARE(merged->channelList()->count(), 2);
+
+  QVERIFY(merged->channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(merged->channelList()->channel(0)->rxFrequency().inMHz(), 144.0);
+
+  QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
+  QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 144.0);
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+
+
+  merged = ConfigMerge::merge(base, merging,
+                              ConfigMergeVisitor::ItemStrategy::Override,
+                              ConfigMergeVisitor::SetStrategy::Ignore, err);
+  if (nullptr == merged)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(merged->contacts()->count(), 2);
+  QCOMPARE(merged->rxGroupLists()->count(), 1);
+  QCOMPARE(merged->channelList()->count(), 2);
+
+  QVERIFY(merged->channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(merged->channelList()->channel(0)->rxFrequency().inMHz(), 145.0);
+
+  QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
+  QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 145.0);
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+}
+
+
+void
+MergeTest::testMergeZones() {
+  Config *base = new Config(), *merging = new Config();
+
+  base->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 0", 1234));
+
+  {
+    RXGroupList *lst = new RXGroupList("List 0");
+    lst->addContact(base->contacts()->contact(0)->as<DMRContact>());
+    base->rxGroupLists()->add(lst);
+
+    FMChannel *ach = new FMChannel();
+    ach->setName("FM 0");
+    ach->setRXFrequency(Frequency::fromMHz(144.0));
+    ach->setTXFrequency(Frequency::fromMHz(144.0));
+    base->channelList()->add(ach);
+
+    DMRChannel *dch = new DMRChannel();
+    dch->setName("DMR 0");
+    dch->setRXFrequency(Frequency::fromMHz(144.0));
+    dch->setTXFrequency(Frequency::fromMHz(144.0));
+    dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupListObj(lst);
+    base->channelList()->add(dch);
+
+    Zone *zone = new Zone("Zone 0");
+    zone->A()->add(ach);
+    zone->A()->add(dch);
+    base->zones()->add(zone);
+  }
+
+  merging->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 0", 2345));
+  merging->contacts()->add(new DMRContact(DMRContact::GroupCall, "ID 1", 3456));
+
+  {
+    RXGroupList *lst = new RXGroupList("List 0");
+    lst->addContact(merging->contacts()->contact(0)->as<DMRContact>());
+    merging->rxGroupLists()->add(lst);
+
+    FMChannel *ach = new FMChannel();
+    ach->setName("FM 0");
+    ach->setRXFrequency(Frequency::fromMHz(145.0));
+    ach->setTXFrequency(Frequency::fromMHz(145.0));
+    merging->channelList()->add(ach);
+
+    DMRChannel *dch = new DMRChannel();
+    dch->setName("DMR 1");
+    dch->setRXFrequency(Frequency::fromMHz(145.0));
+    dch->setTXFrequency(Frequency::fromMHz(145.0));
+    dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupListObj(lst);
+    merging->channelList()->add(dch);
+
+    Zone *zone = new Zone("Zone 0");
+    zone->A()->add(ach);
+    zone->A()->add(dch);
+    merging->zones()->add(zone);
+  }
+
+
+  ErrorStack err;
+  Config *merged = ConfigMerge::merge(base, merging,
+                                      ConfigMergeVisitor::ItemStrategy::Ignore,
+                                      ConfigMergeVisitor::SetStrategy::Ignore, err);
+  if (nullptr == merged)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(merged->channelList()->count(), 3);
+  QCOMPARE(merged->zones()->count(), 1);
+  QCOMPARE(merged->zones()->zone(0)->A()->count(), 2);
+  QCOMPARE(merged->zones()->zone(0)->A()->get(0)->as<Channel>(),
+           merged->channelList()->channel(0));
+  QCOMPARE(merged->zones()->zone(0)->A()->get(1)->as<Channel>(),
+           merged->channelList()->channel(1));
+
+
+  merged = ConfigMerge::merge(base, merging,
+                              ConfigMergeVisitor::ItemStrategy::Ignore,
+                              ConfigMergeVisitor::SetStrategy::Override, err);
+  if (nullptr == merged)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(merged->channelList()->count(), 3);
+  QCOMPARE(merged->zones()->count(), 1);
+  QCOMPARE(merged->zones()->zone(0)->A()->count(), 2);
+  QCOMPARE(merged->zones()->zone(0)->A()->get(0)->as<Channel>(),
+           merged->channelList()->channel(0));
+  QCOMPARE(merged->zones()->zone(0)->A()->get(1)->as<Channel>(),
+           merged->channelList()->channel(2));
+
+
+  merged = ConfigMerge::merge(base, merging,
+                              ConfigMergeVisitor::ItemStrategy::Ignore,
+                              ConfigMergeVisitor::SetStrategy::Merge, err);
+  if (nullptr == merged)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(merged->channelList()->count(), 3);
+  QCOMPARE(merged->zones()->count(), 1);
+  QCOMPARE(merged->zones()->zone(0)->A()->count(), 3);
+  QCOMPARE(merged->zones()->zone(0)->A()->get(0)->as<Channel>(),
+           merged->channelList()->channel(0));
+  QCOMPARE(merged->zones()->zone(0)->A()->get(1)->as<Channel>(),
+           merged->channelList()->channel(1));
+  QCOMPARE(merged->zones()->zone(0)->A()->get(2)->as<Channel>(),
+           merged->channelList()->channel(2));
+}
+
+
 QTEST_GUILESS_MAIN(MergeTest)
