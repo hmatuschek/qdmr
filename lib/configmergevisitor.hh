@@ -15,6 +15,7 @@ class Zone;
 class ScanList;
 class RoamingZone;
 
+
 /** Implements a visitor to merge the visited config into a given config.
  * The destination configuration object is passed to the constructor. This allows to merge several
  * configurations into one.
