@@ -299,14 +299,18 @@ public:
   /** Removes an element from the list (and deletes it if owned). */
   virtual bool del(ConfigObject *obj);
 
-  /** Moves the channel at index @c idx one step up. */
+  /** Moves an object at index @c idx one step up. */
   virtual bool moveUp(int idx);
-  /** Moves the channels at one step up. */
+  /** Moves objects at [first, last] one step up. */
   virtual bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
+  /** Moves an object at index @c idx one step down. */
   virtual bool moveDown(int idx);
-  /** Moves the channels one step down. */
+  /** Moves objects [first, last] one step down. */
   virtual bool moveDown(int first, int last);
+  /** Moves the given source range to the destination index.
+   * The destination index is given before the movement. That is, if elements 0 & 1 are moved to
+   * indices 1 & 2, call @c move(0,2, 2) */
+  virtual bool move(int source, int count, int destination);
 
   /** Returns the element type for this list. */
   const QList<QMetaObject> &elementTypes() const;

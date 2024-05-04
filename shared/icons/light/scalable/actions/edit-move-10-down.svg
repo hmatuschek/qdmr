@@ -5,7 +5,7 @@
    viewBox="0 0 8 8"
    version="1.1"
    id="svg4"
-   sodipodi:docname="edit-move-up.svg"
+   sodipodi:docname="edit-move-10-down.svg"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -32,6 +32,6 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4" />
   <path
-     d="M 1,7 H 7 L 4,1 Z"
+     d="M 7,0 H 1 L 4,4 Z M 4,4 H 1 L 4,8 7,4 Z"
      id="path2" />
 </svg>

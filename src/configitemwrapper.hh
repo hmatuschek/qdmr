@@ -12,20 +12,18 @@ protected:
   GenericListWrapper(AbstractConfigObjectList *list, QObject *parent=nullptr);
 
 public:
-  /** Moves the channel at index @c idx one step up. */
-  virtual bool moveUp(int idx);
-  /** Moves the channels at one step up. */
-  virtual bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
-  virtual bool moveDown(int idx);
-  /** Moves the channels one step down. */
-  virtual bool moveDown(int first, int last);
-
   // QAbstractListModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
   /** Implements QAbstractTableModel, returns number of columns. */
   int columnCount(const QModelIndex &index) const;
+
+  Qt::ItemFlags flags(const QModelIndex &index) const;
+
+  Qt::DropActions supportedDropActions() const;
+
+  bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                const QModelIndex &destinationParent, int destinationChild);
 
 signals:
   /** Gets emitted once the table has been changed. */
@@ -67,6 +65,16 @@ public:
   // QAbstractTableModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
+
+  Qt::ItemFlags flags(const QModelIndex &index) const;
+
+  Qt::DropActions supportedDropActions() const;
+
+  bool insertRows(int row, int count, const QModelIndex &parent);
+  bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                const QModelIndex &destinationParent, int destinationChild);
+
+  bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) const;
 
 signals:
   /** Gets emitted once the table has been changed. */

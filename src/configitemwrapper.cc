@@ -38,48 +38,30 @@ GenericListWrapper::columnCount(const QModelIndex &index) const {
   return 1;
 }
 
-bool
-GenericListWrapper::moveUp(int row) {
-  if ((0>=row) || (row>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  _list->moveUp(row);
-  endMoveRows();
-  emit modified();
-  return true;
+Qt::ItemFlags
+GenericListWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractListModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractListModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericListWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
 }
 
 bool
-GenericListWrapper::moveUp(int first, int last) {
-  if ((0>=first) || (last>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  _list->moveUp(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
-}
+GenericListWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
 
-bool
-GenericListWrapper::moveDown(int row) {
-  if ((0>row) || ((row+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  _list->moveDown(row);
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
   endMoveRows();
-  emit modified();
-  return true;
-}
 
-bool
-GenericListWrapper::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  _list->moveDown(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
+  return success;
 }
 
 
@@ -130,6 +112,46 @@ GenericTableWrapper::rowCount(const QModelIndex &index) const {
   if (nullptr == _list)
     return 0;
   return _list->count();
+}
+
+Qt::ItemFlags
+GenericTableWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractTableModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractTableModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericTableWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
+}
+
+bool
+GenericTableWrapper::insertRows(int row, int count, const QModelIndex &parent) {
+  logDebug() << "Insert " << count << " rows at " << row;
+  return QAbstractTableModel::insertRows(row, count, parent);
+}
+
+bool
+GenericTableWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
+
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
+  endMoveRows();
+
+  return success;
+}
+
+bool
+GenericTableWrapper::canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                 int row, int column, const QModelIndex &parent) const
+{
+  Q_UNUSED(column)
+  return QAbstractTableModel::canDropMimeData(data, action, row, 0, parent);
 }
 
 bool
