@@ -81,6 +81,7 @@
     <addaction name="actionOpenCodeplug"/>
     <addaction name="actionSaveCodeplug"/>
     <addaction name="actionExportToCHIRP"/>
+    <addaction name="actionImport"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -335,6 +336,14 @@
    </property>
    <property name="toolTip">
     <string>Exports all FM channels to CHRIP CSV.</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Imports and merges a codeplug into the current one.</string>
    </property>
   </action>
  </widget>

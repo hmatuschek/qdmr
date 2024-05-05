@@ -285,6 +285,8 @@ public:
   virtual const Config *config() const;
   /** Searches the config tree to find all instances of the given type names. */
   virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
+  /** Searches the list for objects with the given name. */
+  virtual QList<ConfigObject *> findItemsByName(const QString name) const;
 
   /** Returns @c true, if the list contains the given object. */
   virtual bool has(ConfigObject *obj) const;

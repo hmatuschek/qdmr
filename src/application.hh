@@ -53,6 +53,7 @@ public slots:
   void loadCodeplug();
   void saveCodeplug();
   void exportCodeplugToChirp();
+  void importCodeplug();
   void quitApplication();
 
   void detectRadio();

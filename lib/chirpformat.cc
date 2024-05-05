@@ -246,7 +246,7 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
       fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()-txFrequency.inHz()));
       break;
     case Duplex::Positive:
-      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()-txFrequency.inHz()));
+      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()+txFrequency.inHz()));
       break;
     }
 

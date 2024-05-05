@@ -268,8 +268,8 @@ ConfigCloneVisitor::takeResult(const ErrorStack &err) {
 /* ********************************************************************************************* *
  * Implementation of FixReferencesVisitor
  * ********************************************************************************************* */
-FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject *> &map)
-  : Visitor(), _map(map)
+FixReferencesVisistor::FixReferencesVisistor(QHash<ConfigObject *, ConfigObject *> &map, bool keepUnknown)
+  : Visitor(), _map(map), _keepUnknown(keepUnknown)
 {
   // Populate with default singleton instances.
   map[SelectedChannel::get()] = SelectedChannel::get();
@@ -287,13 +287,14 @@ FixReferencesVisistor::processProperty(ConfigItem *item, const QMetaProperty &pr
     if (ref->isNull())
       return true;
     ConfigObject *obj = ref->as<ConfigObject>();
-    if (! _map.contains(obj)) {
+    if ((! _keepUnknown) && (! _map.contains(obj))) {
       errMsg(err) << "Cannot fix refrence to object '" << obj->name()
                   << "' of type " << obj->metaObject()->className()
                   << ": Not mapped/cloned yet.";
       return false;
     }
-    ref->set(_map[obj]);
+    if (_map.contains(obj))
+      ref->set(_map[obj]);
     return true;
   }
 
@@ -306,17 +307,25 @@ FixReferencesVisistor::processList(AbstractConfigObjectList *list, const ErrorSt
   if (! Visitor::processList(list, err))
     return false;
   if (ConfigObjectRefList *rlist = dynamic_cast<ConfigObjectRefList*>(list)) {
+    QSet<ConfigObject*> del;
     // Resolve all references.
     for (int i=0; i<rlist->count(); i++) {
-      if (! _map.contains(rlist->get(i))) {
+      if ((! _keepUnknown) && (! _map.contains(rlist->get(i)))) {
         errMsg(err) << "Cannot fix refrence to object '" << rlist->get(i)->name()
                     << "' of type " << rlist->get(i)->metaObject()->className()
                     << ": Not mapped/cloned yet.";
         return false;
       }
-      rlist->replace(_map[rlist->get(i)], i);
+      // If the reference cannot be replaced (i.e., the replacement is already in the list):
+      if (_map.contains(rlist->get(i)) && (0 > rlist->replace(_map[rlist->get(i)], i)))
+        del.insert(rlist->get(i));
+    }
+    // Now remove all references that could not be replaced
+    foreach (ConfigObject *obj, del) {
+      rlist->del(obj);
     }
   }
+
   return true;
 }
 
@@ -333,7 +342,7 @@ ConfigCopy::copy(ConfigItem *original, const ErrorStack &err) {
     return nullptr;
   }
   ConfigItem *clone = cloner.takeResult();
-  FixReferencesVisistor fixer(map);
+  FixReferencesVisistor fixer(map, true);
   if (! fixer.processItem(clone, err)) {
     errMsg(err) << "Cannot fix references in item of type "
                 << clone->metaObject()->className() << ".";

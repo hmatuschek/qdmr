@@ -1158,6 +1158,16 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
   }
 }
 
+QList<ConfigObject *>
+AbstractConfigObjectList::findItemsByName(const QString name) const {
+  QList<ConfigObject *> items;
+  foreach (ConfigObject *obj, _items) {
+    if (obj->name() == name)
+      items.append(obj);
+  }
+  return items;
+}
+
 bool
 AbstractConfigObjectList::has(ConfigObject *obj) const {
   return 0 <= indexOf(obj);
