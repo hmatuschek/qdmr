@@ -9,6 +9,10 @@ qt5_wrap_cpp(configtest_MOC_SOURCES configtest.hh)
 add_executable(configtest configtest.cc ${configtest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(configtest ${LIBS} libdmrconf libdmrconfigtest)
 
+qt5_wrap_cpp(tableformattest_MOC_SOURCES tableformattest.hh)
+add_executable(tableformattest tableformattest.cc ${tableformattest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(tableformattest ${LIBS} libdmrconf libdmrconfigtest)
+
 qt5_wrap_cpp(copytest_MOC_SOURCES copytest.hh)
 add_executable(copytest copytest.cc ${copytest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(copytest ${LIBS} libdmrconf libdmrconfigtest)
