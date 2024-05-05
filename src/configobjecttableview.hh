@@ -30,7 +30,11 @@ signals:
 
 protected slots:
   void onMoveItemUp();
+  void onMoveItemTenUp();
+  void onMoveItemTop();
   void onMoveItemDown();
+  void onMoveItemTenDown();
+  void onMoveItemBottom();
   void onDoubleClicked(QModelIndex idx);
 
 private:

@@ -38,48 +38,30 @@ GenericListWrapper::columnCount(const QModelIndex &index) const {
   return 1;
 }
 
-bool
-GenericListWrapper::moveUp(int row) {
-  if ((0>=row) || (row>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  _list->moveUp(row);
-  endMoveRows();
-  emit modified();
-  return true;
+Qt::ItemFlags
+GenericListWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractListModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractListModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericListWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
 }
 
 bool
-GenericListWrapper::moveUp(int first, int last) {
-  if ((0>=first) || (last>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  _list->moveUp(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
-}
+GenericListWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
 
-bool
-GenericListWrapper::moveDown(int row) {
-  if ((0>row) || ((row+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  _list->moveDown(row);
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
   endMoveRows();
-  emit modified();
-  return true;
-}
 
-bool
-GenericListWrapper::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  _list->moveDown(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
+  return success;
 }
 
 
@@ -113,7 +95,7 @@ GenericListWrapper::onItemModified(int idx) {
  * Implementation of GenericTableWrapper
  * ********************************************************************************************* */
 GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent)
-  : QAbstractTableModel(parent), _list(list)
+  : QAbstractTableModel(parent), _list(list), _insertRow(-1)
 {
   if (nullptr == _list)
     return;
@@ -132,48 +114,63 @@ GenericTableWrapper::rowCount(const QModelIndex &index) const {
   return _list->count();
 }
 
-bool
-GenericTableWrapper::moveUp(int row) {
-  if ((0>=row) || (row>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  _list->moveUp(row);
-  endMoveRows();
-  emit modified();
-  return true;
+Qt::ItemFlags
+GenericTableWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractTableModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractTableModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericTableWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
 }
 
 bool
-GenericTableWrapper::moveUp(int first, int last) {
-  if ((0>=first) || (last>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  _list->moveUp(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
+GenericTableWrapper::insertRows(int row, int count, const QModelIndex &parent) {
+  Q_UNUSED(parent); Q_UNUSED(count);
+
+  if (-1 == _insertRow) {
+    _insertRow = row;
+    return true;
+  }
+  return false;
 }
 
 bool
-GenericTableWrapper::moveDown(int row) {
-  if ((0>row) || ((row+1)>=_list->count()))
+GenericTableWrapper::removeRows(int row, int count, const QModelIndex &parent) {
+  Q_UNUSED(parent);
+
+  if (-1 == _insertRow)
     return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  _list->moveDown(row);
-  endMoveRows();
-  emit modified();
-  return true;
+
+  bool success = moveRows(QModelIndex(), row, count,
+                          QModelIndex(), _insertRow);
+  _insertRow = -1;
+  return success;
 }
 
 bool
-GenericTableWrapper::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  _list->moveDown(first, last);
+GenericTableWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
+
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
   endMoveRows();
-  emit modified();
-  return true;
+
+  return success;
+}
+
+bool
+GenericTableWrapper::canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                 int row, int column, const QModelIndex &parent) const
+{
+  if (0 != column)
+    return false;
+  return QAbstractTableModel::canDropMimeData(data, action, row, column, parent);
 }
 
 void
