@@ -53,15 +53,6 @@ protected:
   GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent=nullptr);
 
 public:
-  /** Moves the channel at index @c idx one step up. */
-  virtual bool moveUp(int idx);
-  /** Moves the channels at one step up. */
-  virtual bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
-  virtual bool moveDown(int idx);
-  /** Moves the channels one step down. */
-  virtual bool moveDown(int first, int last);
-
   // QAbstractTableModel interface
   /** Implements QAbstractTableModel, returns number of rows. */
   int rowCount(const QModelIndex &index) const;
@@ -71,6 +62,7 @@ public:
   Qt::DropActions supportedDropActions() const;
 
   bool insertRows(int row, int count, const QModelIndex &parent);
+  bool removeRows(int row, int count, const QModelIndex &parent);
   bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
                 const QModelIndex &destinationParent, int destinationChild);
 
@@ -93,6 +85,8 @@ protected slots:
 protected:
   /** Holds a weak reference to the list object. */
   AbstractConfigObjectList *_list;
+  /** Insert index for drag & drop move. */
+  int _insertRow;
 };
 
 
