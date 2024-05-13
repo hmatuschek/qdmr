@@ -16,6 +16,7 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
   void testAutoRepeaterOffset();
+  void testDTMFContacts();
 };
 
 #endif // D878UV2TEST_HH
