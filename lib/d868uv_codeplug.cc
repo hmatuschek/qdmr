@@ -3,6 +3,7 @@
 #include "utils.hh"
 #include "channel.hh"
 #include "gpssystem.hh"
+#include "smsextension.hh"
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
@@ -1276,7 +1277,6 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateGPSSystems();
 
-  this->allocateSMSMessages();
   this->allocateHotKeySettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
@@ -1304,6 +1304,7 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateRXGroupLists();
   this->allocateScanLists();
   this->allocateRadioIDs();
+  this->allocateSMSMessages();
 }
 
 void
@@ -1321,6 +1322,7 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateZoneChannelList();
   this->allocateBootSettings();
   this->allocateRepeaterOffsetFrequencies();
+  this->allocateSMSMessages();
 
   // GPS settings
   this->allocateGPSSystems();
@@ -1396,6 +1398,11 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   ScanListBitmapElement scan_bitmap(data(Offset::scanListBitmap()));
   unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
   scan_bitmap.clear(); scan_bitmap.enableFirst(num_scan_lists);
+
+  // Mark SMS messages
+  MessageBytemapElement sms_bytemap(data(Offset::messageBytemap()));
+  unsigned int num_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
+  sms_bytemap.clear(); sms_bytemap.enableFirst(num_messages);
 }
 
 
@@ -1406,6 +1413,9 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
     return false;
 
   if (! this->encodeGeneralSettings(flags, ctx, err))
+    return false;
+
+  if (! this->encodeSMSMessages(flags, ctx, err))
     return false;
 
   if (! this->encodeRepeaterOffsetFrequencies(flags, ctx, err))
@@ -1445,6 +1455,9 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
     return false;
 
   if (! this->decodeGeneralSettings(ctx, err))
+    return false;
+
+  if (! this->createSMSMessages(ctx, err))
     return false;
 
   if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
@@ -2141,6 +2154,46 @@ D868UVCodeplug::allocateSMSMessages() {
     image(0).addElement(Offset::messageIndex(), Size::messageIndex()*message_count);
   }
 }
+
+bool
+D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+  for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
+    MessageElement message(data(Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()));
+    message.setMessage(ctx.get<SMSTemplate>(i)->message());
+    MessageListElement listElement(data(Offset::messageIndex() + i*Size::messageIndex()));
+    listElement.setIndex(i);
+    if (i > 0) {
+      MessageListElement prevElement(data(Offset::messageIndex() + (i-1)*Size::messageIndex()));
+      prevElement.setIndex(i);
+    }
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::createSMSMessages(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  MessageBytemapElement messages_bytemap(data(Offset::messageBytemap()));
+  for (unsigned int i=0; i<Limit::numMessages(); i++) {
+    if (! messages_bytemap.isEncoded(i))
+      continue;
+    MessageElement message(data(Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()));
+    SMSTemplate *temp = new SMSTemplate();
+    temp->setName(QString("SMS %1").arg(i+1));
+    ctx.config()->smsExtension()->smsTemplates()->add(temp);
+    ctx.add(temp, i);
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::linkSMSMessages(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // nothing to do
+  return true;
+}
+
 
 void
 D868UVCodeplug::allocateHotKeySettings() {
