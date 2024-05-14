@@ -1124,7 +1124,7 @@ AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
     return;
   memset(_data+Offset::digits(), 0, Limit::digitCount()/2);
   unsigned int n = std::min((unsigned int)number.length(), Limit::digitCount());
-  setUInt8(Offset::digits(), n);
+  setUInt8(Offset::numDigits(), n);
   for (unsigned int i=0; i<n; i++) {
     if (0 == (i%2))
       _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
