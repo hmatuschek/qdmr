@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
+#include <QRegularExpression>
 #include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
@@ -13,6 +14,12 @@ inline bool qstring_is_ascii(const QString &text) {
   }
   return true;
 }
+
+// Utility function to check string content for DTMF encoding
+inline bool qstring_is_dtmf(const QString &text) {
+  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).isValid();
+}
+
 
 
 /* ********************************************************************************************* *
@@ -209,6 +216,9 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if ((ASCII == _encoding) && (! qstring_is_ascii(value))) {
     auto &msg = context.newMessage();
     msg << "Cannot encode string '" << value << "' in ASCII.";
+  } else if ((DTMF == _encoding) && (! qstring_is_dtmf(value))) {
+    auto &msg = context.newMessage();
+    msg << "Cannot encode string '" << value << "' in DTMF.";
   }
 
   return true;
