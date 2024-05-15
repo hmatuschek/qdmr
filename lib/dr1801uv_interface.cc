@@ -295,7 +295,7 @@ DR1801UVInterface::write_finish(const ErrorStack &err) {
 
 USBDeviceInfo
 DR1801UVInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, 0, 0, false, false);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, 0, 0, false);
 }
 
 QList<USBDeviceDescriptor>

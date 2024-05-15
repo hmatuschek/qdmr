@@ -575,7 +575,7 @@ Application::autoDetect(const ErrorStack &err) {
 
   // Check if device supports identification
   RadioInfo radioInfo;
-  if ((! _lastDevice.isIdentifiable()) || settings.disableAutoDetect()){
+  if ((! _lastDevice.isSave()) || settings.disableAutoDetect()){
     RadioSelectionDialog dialog(_lastDevice);
     if (QDialog::Accepted != dialog.exec()) {
       return nullptr;

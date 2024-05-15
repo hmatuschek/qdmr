@@ -7,9 +7,8 @@
 /* ******************************************************************************************** *
  * Implementation of USBSerial::Info
  * ******************************************************************************************** */
-USBSerial::Descriptor::Descriptor(uint16_t vid, uint16_t pid, const QString &device,
-                                  bool isSave, bool isIdentifiable)
-  : USBDeviceDescriptor(USBDeviceInfo(Class::Serial, vid, pid, isSave, isIdentifiable), device)
+USBSerial::Descriptor::Descriptor(uint16_t vid, uint16_t pid, const QString &device, bool isSave)
+  : USBDeviceDescriptor(USBDeviceInfo(Class::Serial, vid, pid, isSave), device)
 {
   // pass...
 }
@@ -112,7 +111,7 @@ USBSerial::signalingChanged() {
 }
 
 QList<USBDeviceDescriptor>
-USBSerial::detect(uint16_t vid, uint16_t pid, bool isSave, bool isIdentifiable) {
+USBSerial::detect(uint16_t vid, uint16_t pid, bool isSave) {
   QList<USBDeviceDescriptor> interfaces;
   // Find matching serial port by VID/PID.
   logDebug() << "Search for serial port with matching VID:PID " <<
@@ -121,7 +120,7 @@ USBSerial::detect(uint16_t vid, uint16_t pid, bool isSave, bool isIdentifiable) 
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && (pid == port.productIdentifier()) &&
         port.hasVendorIdentifier() && (vid == port.vendorIdentifier())) {
-      interfaces.append(Descriptor(vid, pid, port.portName(), isSave, isIdentifiable));
+      interfaces.append(Descriptor(vid, pid, port.portName(), isSave));
       logDebug() << "Found " << port.portName() << " (USB "
                  << QString::number(vid, 16) << ":" << QString::number(pid, 16) << ").";
     }
@@ -138,8 +137,7 @@ USBSerial::detect() {
   QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && port.hasVendorIdentifier()) {
-      interfaces.append(Descriptor(port.vendorIdentifier(), port.productIdentifier(), port.portName(),
-                                   false, false));
+      interfaces.append(Descriptor(port.vendorIdentifier(), port.productIdentifier(), port.portName(), false));
       logDebug() << "Found " << port.portName() << " (USB "
                  << QString::number(port.vendorIdentifier(), 16) << ":"
                  << QString::number(port.productIdentifier(), 16) << ").";

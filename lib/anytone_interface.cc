@@ -118,7 +118,7 @@ AnytoneInterface::interfaceInfo() {
 QList<USBDeviceDescriptor>
 AnytoneInterface::detect(bool saveOnly) {
   Q_UNUSED(saveOnly);
-  return USBSerial::detect(USB_VID, USB_PID, true, true);
+  return USBSerial::detect(USB_VID, USB_PID, true);
 }
 
 
