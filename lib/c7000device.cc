@@ -212,8 +212,9 @@ C7000Device::interfaceInfo() {
 
 
 QList<USBDeviceDescriptor>
-C7000Device::detect()
+C7000Device::detect(bool saveOnly)
 {
+  Q_UNUSED(saveOnly)
   QList<USBDeviceDescriptor> res;
 
   int error, num;

@@ -225,7 +225,7 @@ public:
 
 public:
   /** Searches for all connected radios (may contain false positives). */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Checks a serial port. */

@@ -304,14 +304,14 @@ USBDeviceDescriptor::deviceHandle() const {
 }
 
 QList<USBDeviceDescriptor>
-USBDeviceDescriptor::detect() {
+USBDeviceDescriptor::detect(bool saveOnly) {
   QList<USBDeviceDescriptor> res;
-  res.append(AnytoneInterface::detect());
-  res.append(OpenGD77Interface::detect());
-  res.append(RadioddityInterface::detect());
-  res.append(TyTInterface::detect());
-  res.append(DR1801UVInterface::detect());
-  res.append(C7000Device::detect());
+  res.append(AnytoneInterface::detect(saveOnly));
+  res.append(OpenGD77Interface::detect(saveOnly));
+  res.append(RadioddityInterface::detect(saveOnly));
+  res.append(TyTInterface::detect(saveOnly));
+  res.append(DR1801UVInterface::detect(saveOnly));
+  res.append(C7000Device::detect(saveOnly));
   return res;
 }
 

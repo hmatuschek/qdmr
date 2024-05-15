@@ -299,8 +299,10 @@ DR1801UVInterface::interfaceInfo() {
 }
 
 QList<USBDeviceDescriptor>
-DR1801UVInterface::detect() {
-  return USBSerial::detect(USB_VID, USB_PID);
+DR1801UVInterface::detect(bool saveOnly) {
+  if (! saveOnly)
+    return USBSerial::detect(USB_VID, USB_PID, false, false);
+  return QList<USBDeviceDescriptor>();
 }
 
 bool

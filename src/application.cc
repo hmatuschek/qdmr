@@ -547,16 +547,21 @@ Application::quitApplication() {
 
 Radio *
 Application::autoDetect(const ErrorStack &err) {
+  Settings settings;
   // If the last detected device is still valid
   //  -> skip interface detection and selection
-  if (! _lastDevice.isValid()) {
+  if ((! _lastDevice.isValid()) || settings.disableAutoDetect()) {
     logDebug() << "Last device is invalid, search for new one.";
     // First get all devices that are known by VID/PID
     QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
     if (interfaces.isEmpty()) {
+      logDebug() << "No save device found, continue searching for unsave ones.";
+      interfaces = USBDeviceDescriptor::detect(false);
+    }
+    if (interfaces.isEmpty()) {
       errMsg(err) << tr("No matching devices found.");
       return nullptr;
-    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave())) {
+    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave()) || settings.disableAutoDetect()) {
       // More than one device found, or device not save -> select by user
       DeviceSelectionDialog dialog(interfaces);
       if (QDialog::Accepted != dialog.exec()) {
@@ -570,7 +575,7 @@ Application::autoDetect(const ErrorStack &err) {
 
   // Check if device supports identification
   RadioInfo radioInfo;
-  if (! _lastDevice.isIdentifiable()) {
+  if ((! _lastDevice.isIdentifiable()) || settings.disableAutoDetect()){
     RadioSelectionDialog dialog(_lastDevice);
     if (QDialog::Accepted != dialog.exec()) {
       return nullptr;
