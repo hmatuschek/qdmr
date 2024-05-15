@@ -295,13 +295,15 @@ DR1801UVInterface::write_finish(const ErrorStack &err) {
 
 USBDeviceInfo
 DR1801UVInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID, false, true);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, 0, 0, false, false);
 }
 
 QList<USBDeviceDescriptor>
 DR1801UVInterface::detect(bool saveOnly) {
+  // if non-save devices are allowed, search for all USB AMC-CDC devices.
   if (! saveOnly)
-    return USBSerial::detect(USB_VID, USB_PID, false, false);
+    return USBSerial::detect();
+  // otherwise, return none
   return QList<USBDeviceDescriptor>();
 }
 

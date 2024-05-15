@@ -138,7 +138,8 @@ USBSerial::detect() {
   QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
   foreach (QSerialPortInfo port, ports) {
     if (port.hasProductIdentifier() && port.hasVendorIdentifier()) {
-      interfaces.append(Descriptor(port.vendorIdentifier(), port.productIdentifier(), port.portName()));
+      interfaces.append(Descriptor(port.vendorIdentifier(), port.productIdentifier(), port.portName(),
+                                   false, false));
       logDebug() << "Found " << port.portName() << " (USB "
                  << QString::number(port.vendorIdentifier(), 16) << ":"
                  << QString::number(port.productIdentifier(), 16) << ").";

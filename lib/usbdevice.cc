@@ -68,7 +68,10 @@ USBDeviceInfo::operator =(const USBDeviceInfo &other) {
 
 bool
 USBDeviceInfo::operator ==(const USBDeviceInfo &other) const {
-  return (other._class == _class) && (other._vid == _vid) && (other._pid == _pid);
+  // Class must match, VID/PID only need to match, if both are != 0.
+  return (other._class == _class) &&
+      ((0 == other._vid) || (0 == _vid) || (other._vid == _vid))
+      && ((0 == other._pid) || (0 == _pid) || (other._pid == _pid));
 }
 bool
 USBDeviceInfo::operator !=(const USBDeviceInfo &other) const {
