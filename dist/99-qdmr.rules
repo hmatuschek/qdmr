@@ -11,3 +11,5 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="660",
 # Anytone AT-D868UV, AT-D878UV, etc
 # Ignore this device in Modem Manager
 ATTRS{idVendor}=="28e9" ATTRS{idProduct}=="018a", ENV{ID_MM_DEVICE_IGNORE}="1"
+# also for DR-1801UV
+ATTRS{idVendor}=="067b" ATTRS{idProduct}=="23a3", ENV{ID_MM_DEVICE_IGNORE}="1"

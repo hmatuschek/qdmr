@@ -183,6 +183,7 @@ class RadioLimitString: public RadioLimitValue
 public:
   /** Possible encoding of strings. */
   enum Encoding {
+    DTMF,    ///< Just DTMF symbols are allowed (0-9, A-D, *, #).
     ASCII,   ///< Just ASCII is allowed.
     Unicode  ///< Any Unicode character is allowed.
   };
