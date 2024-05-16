@@ -43,15 +43,14 @@ USBDeviceInfo::USBDeviceInfo()
   // pass...
 }
 
-USBDeviceInfo::USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid, bool save, bool identifiable)
-  : _class(cls), _vid(vid), _pid(pid), _save(save), _identifiable(identifiable)
+USBDeviceInfo::USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid, bool save)
+  : _class(cls), _vid(vid), _pid(pid), _save(save)
 {
   // pass...
 }
 
 USBDeviceInfo::USBDeviceInfo(const USBDeviceInfo &other)
-  : _class(other._class), _vid(other._vid), _pid(other._pid), _save(other._save),
-    _identifiable(other._identifiable)
+  : _class(other._class), _vid(other._vid), _pid(other._pid), _save(other._save)
 {
   // pass...
 }
@@ -62,13 +61,15 @@ USBDeviceInfo::operator =(const USBDeviceInfo &other) {
   _vid = other._vid;
   _pid = other._pid;
   _save = other._save;
-  _identifiable = other._identifiable;
   return *this;
 }
 
 bool
 USBDeviceInfo::operator ==(const USBDeviceInfo &other) const {
-  return (other._class == _class) && (other._vid == _vid) && (other._pid == _pid);
+  // Class must match, VID/PID only need to match, if both are != 0.
+  return (other._class == _class) &&
+      ((! other.hasVendorID()) || (! hasVendorID()) || (other._vid == _vid))
+      && ((! other.hasProductID()) || (! hasProductID()) || (other._pid == _pid));
 }
 bool
 USBDeviceInfo::operator !=(const USBDeviceInfo &other) const {
@@ -89,9 +90,18 @@ USBDeviceInfo::interfaceClass() const {
   return _class;
 }
 
+bool
+USBDeviceInfo::hasVendorID() const {
+  return 0 != vendorId();
+}
 uint16_t
 USBDeviceInfo::vendorId() const {
   return _vid;
+}
+
+bool
+USBDeviceInfo::hasProductID() const {
+  return 0 != productId();
 }
 uint16_t
 USBDeviceInfo::productId() const {
@@ -101,11 +111,6 @@ USBDeviceInfo::productId() const {
 bool
 USBDeviceInfo::isSave() const {
   return _save;
-}
-
-bool
-USBDeviceInfo::isIdentifiable() const {
-  return _identifiable;
 }
 
 QString
@@ -304,14 +309,14 @@ USBDeviceDescriptor::deviceHandle() const {
 }
 
 QList<USBDeviceDescriptor>
-USBDeviceDescriptor::detect() {
+USBDeviceDescriptor::detect(bool saveOnly) {
   QList<USBDeviceDescriptor> res;
-  res.append(AnytoneInterface::detect());
-  res.append(OpenGD77Interface::detect());
-  res.append(RadioddityInterface::detect());
-  res.append(TyTInterface::detect());
-  res.append(DR1801UVInterface::detect());
-  res.append(C7000Device::detect());
+  res.append(AnytoneInterface::detect(saveOnly));
+  res.append(OpenGD77Interface::detect(saveOnly));
+  res.append(RadioddityInterface::detect(saveOnly));
+  res.append(TyTInterface::detect(saveOnly));
+  res.append(DR1801UVInterface::detect(saveOnly));
+  res.append(C7000Device::detect(saveOnly));
   return res;
 }
 

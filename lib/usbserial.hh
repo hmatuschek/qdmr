@@ -21,7 +21,7 @@ public:
   class Descriptor: public USBDeviceDescriptor {
   public:
     /** Constructor from VID, PID and device path. */
-    Descriptor(uint16_t vid, uint16_t pid, const QString &device);
+    Descriptor(uint16_t vid, uint16_t pid, const QString &device, bool isSave=false);
   };
 
 protected:
@@ -46,7 +46,9 @@ public:
 
 public:
   /** Searches for all USB serial ports with the specified VID/PID. */
-  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid);
+  static QList<USBDeviceDescriptor> detect(uint16_t vid, uint16_t pid, bool isSave=true);
+  /** Searches for all USB serial ports */
+  static QList<USBDeviceDescriptor> detect();
 
 protected slots:
   /** Callback for serial interface errors. */
