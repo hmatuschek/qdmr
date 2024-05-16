@@ -308,7 +308,9 @@ public:
     SwitchUpDown = 47,                  ///< Switch Channel A/B.
     RightKey = 48,                      ///< Who knows?
     LeftKey = 49,                       ///< Who knows?
-    ZoneDecrement = 55                  ///< Switch to previous zone.
+    ZoneDecrement = 55,                 ///< Switch to previous zone.
+    SetTalkgroup = 81,                  ///< md380tools: set temp. TG
+    PromiscuousToggle = 86              ///< md380tools: enable/disable promiscuous mode
   };
   Q_ENUM(ButtonAction)
 
@@ -367,10 +369,6 @@ public:
   unsigned longPressDuration() const;
   /** Sets the long-press duration in msec. */
   void setLongPressDuration(unsigned dur);
-
-public:
-  /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                            const Context &ctx, const ErrorStack &err=ErrorStack());*/
 
 protected:
   /** Holds the side button 1 short-press action. */
