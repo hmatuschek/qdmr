@@ -50,6 +50,10 @@ SMSTemplates::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, co
   return new SMSTemplate();
 }
 
+SMSTemplate *
+SMSTemplates::message(unsigned int i) const {
+  return get(i)->as<SMSTemplate>();
+}
 
 
 /* ********************************************************************************************* *

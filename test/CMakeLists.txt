@@ -47,6 +47,10 @@ qt5_wrap_cpp(rd5r_MOC_SOURCES rd5r_test.hh)
 add_executable(rd5r_test rd5r_test.cc ${rd5r_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(rd5r_test ${LIBS} libdmrconf libdmrconfigtest)
 
+qt5_wrap_cpp(gd73_MOC_SOURCES gd73_test.hh)
+add_executable(gd73_test gd73_test.cc ${gd73_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(gd73_test ${LIBS} libdmrconf libdmrconfigtest)
+
 qt5_wrap_cpp(gd77_MOC_SOURCES gd77_test.hh)
 add_executable(gd77_test gd77_test.cc ${gd77_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(gd77_test ${LIBS} libdmrconf libdmrconfigtest)
