@@ -1,15 +1,15 @@
-#ifndef MD390TEST_HH
-#define MD390TEST_HH
+#ifndef GD73TEST_HH
+#define GD73TEST_HH
 
 
 #include "libdmrconfigtest.hh"
 
-class MD390Test : public UnitTestBase
+class GD73Test : public UnitTestBase
 {
   Q_OBJECT
 
 public:
-  explicit MD390Test(QObject *parent = nullptr);
+  explicit GD73Test(QObject *parent = nullptr);
 
 private slots:
   void testBasicConfigEncoding();
@@ -18,4 +18,4 @@ private slots:
   void testSMSTemplates();
 };
 
-#endif // MD390TEST_HH
+#endif // GD73TEST_HH

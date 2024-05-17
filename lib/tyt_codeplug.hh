@@ -14,7 +14,8 @@ class Zone;
 class RXGroupList;
 class ScanList;
 class GPSSystem;
-
+class SMSExtension;
+class SMSTemplate;
 
 /** Base class of all TyT codeplugs. This class implements the majority of all codeplug elements
  * present in all TyT codeplugs. This eases the support of several TyT radios, as only the
@@ -1104,6 +1105,72 @@ public:
     unsigned _numBasicKeys;
   };
 
+  /** Basic pre-defined SMS text message. */
+  class MessageElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x00120; }
+
+    void clear();
+
+    bool isValid() const;
+
+    /** Retunrs the text of the message. */
+    virtual QString text() const;
+    /** Sets the text of the message. */
+    virtual void setText(const QString &text);
+
+    /** Encodes the given SMS template. */
+    virtual bool encode(SMSTemplate *sms, const ErrorStack &err=ErrorStack());
+    /** Decodes the given SMS template. */
+    virtual SMSTemplate *decode(const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int length() { return 144; }    ///< Maximum message length.
+    };
+  };
+
+  /** Bank of pre-defined SMS text messages. */
+  class MessageBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    MessageBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    MessageBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return MessageElement::size()*Limit::messages(); }
+
+    void clear();
+
+    /** Returns the i-th message. */
+    virtual MessageElement message(unsigned int i) const;
+
+    /** Encodes all messages. */
+    virtual bool encode(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+    /** Decodes all messages. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some Limits. */
+    struct Limit {
+      static constexpr unsigned int messages() { return 50; }
+    };
+  };
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);
@@ -1209,8 +1276,14 @@ public:
 
   /** Clears the menu settings in the codeplug. */
   virtual void clearMenuSettings() = 0;
+
   /** Clears all text messages in the codeplug. */
   virtual void clearTextMessages() = 0;
+  /** Encodes text messages. */
+  virtual bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes text messages. */
+  virtual bool decodeTextMessages(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
   /** Clears all emergency systems in the codeplug. */
   virtual void clearEmergencySystems() = 0;
 };

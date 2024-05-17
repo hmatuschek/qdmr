@@ -1,57 +1,55 @@
-#include "uv390_test.hh"
+#include "gd73_test.hh"
 #include "config.hh"
-#include "uv390_codeplug.hh"
+#include "gd73.hh"
+#include "gd73_codeplug.hh"
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
 
-UV390Test::UV390Test(QObject *parent)
+GD73Test::GD73Test(QObject *parent)
   : UnitTestBase(parent)
 {
   // pass...
 }
 
 void
-UV390Test::testBasicConfigEncoding() {
+GD73Test::testBasicConfigEncoding() {
   ErrorStack err;
-  UV390Codeplug codeplug;
-  codeplug.clear();
+  GD73Codeplug codeplug;
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT UV390: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
 
 void
-UV390Test::testBasicConfigDecoding() {
+GD73Test::testBasicConfigDecoding() {
   ErrorStack err;
-  UV390Codeplug codeplug;
-  codeplug.clear();
+  GD73Codeplug codeplug;
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT UV390: %1")
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for TyT UV390: %1")
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 }
 
 void
-UV390Test::testChannelFrequency() {
+GD73Test::testChannelFrequency() {
   ErrorStack err;
-  UV390Codeplug codeplug;
-  codeplug.clear();
+  GD73Codeplug codeplug;
   if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for TyT MD-UV390: {}")
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for TyT MD-UV390: {}")
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -61,8 +59,9 @@ UV390Test::testChannelFrequency() {
            Frequency::fromHz(999999990ULL));
 }
 
+
 void
-UV390Test::testSMSTemplates() {
+GD73Test::testSMSTemplates() {
   Config config;
   config.radioIDs()->add(new DMRRadioID("ID", 1234567));
   SMSTemplate *sms0 = new SMSTemplate(); sms0->setName("SMS0"); sms0->setMessage("ABC");
@@ -71,7 +70,7 @@ UV390Test::testSMSTemplates() {
   config.smsExtension()->smsTemplates()->add(sms1);
 
   ErrorStack err;
-  UV390Codeplug codeplug;
+  GD73Codeplug codeplug;
   if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
@@ -90,6 +89,5 @@ UV390Test::testSMSTemplates() {
   QCOMPARE(decoded.smsExtension()->smsTemplates()->message(1)->message(), "XYZ");
 }
 
-
-QTEST_GUILESS_MAIN(UV390Test)
+QTEST_GUILESS_MAIN(GD73Test)
 
