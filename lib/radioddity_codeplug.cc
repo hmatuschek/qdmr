@@ -2518,35 +2518,60 @@ RadioddityCodeplug::MessageBankElement::~MessageBankElement() {
 
 void
 RadioddityCodeplug::MessageBankElement::clear() {
-  setUInt8(0x0000, 0); // set count to 0
+  setUInt8(Offset::messageConut(), 0); // set count to 0
   memset(_data+0x0001, 0x00, 7); // Fill unused
-  memset(_data+0x0008, 0x00, 32); // Set message lengths to 0
+  memset(_data+Offset::messageLengths(), 0x00, Limit::messages()); // Set message lengths to 0
   memset(_data+0x0028, 0x00, 32); // Fill unused
-  memset(_data+0x0048, 0xff, 32*144); // Clear all messages
+  memset(_data+Offset::messages(), 0xff, Limit::messages()*Limit::messageLength()); // Clear all messages
 }
 
 unsigned
 RadioddityCodeplug::MessageBankElement::numMessages() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::messageConut());
 }
 QString
 RadioddityCodeplug::MessageBankElement::message(unsigned n) const {
   if (n >= numMessages())
     return QString();
-  return readASCII(0x0048+n*144, 144, 0xff);
+  return readASCII(Offset::messages()+n*Offset::betweenMessages(), Limit::messageLength(), 0xff);
 }
 void
 RadioddityCodeplug::MessageBankElement::appendMessage(const QString msg) {
   unsigned idx = numMessages();
-  if (idx >= 32)
+  if (idx >= Limit::messages())
     return;
-  unsigned len = std::min(msg.size(), 144);
+  unsigned int len = std::min((unsigned int)msg.size(), Limit::messageLength());
   // increment counter
-  setUInt8(0x0000, idx+1);
+  setUInt8(Offset::messageConut(), idx+1);
   // store length
-  setUInt8(0x0008+idx, len);
+  setUInt8(Offset::messageLengths()+idx, len);
   // store string
-  writeASCII(0x0048+144*len, msg, 144, 0xff);
+  writeASCII(Offset::messages()+Offset::betweenMessages()*idx, msg, Limit::messageLength(), 0xff);
+}
+
+bool
+RadioddityCodeplug::MessageBankElement::encode(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+  clear();
+  unsigned int count = std::min(
+        Limit::messages(), (unsigned int)ctx.config()->smsExtension()->smsTemplates()->count());
+  for (unsigned int i=0; i<count; i++)
+    appendMessage(ctx.config()->smsExtension()->smsTemplates()->message(i)->message());
+  return true;
+}
+
+bool
+RadioddityCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  for (unsigned int i=0; i<numMessages(); i++) {
+    SMSTemplate *sms = new SMSTemplate();
+    sms->setName(QString("Message %1").arg(i+1));
+    sms->setMessage(message(i));
+    ctx.config()->smsExtension()->smsTemplates()->add(sms);
+  }
+
+  return true;
 }
 
 
@@ -2819,6 +2844,11 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
     return false;
   }
 
+  if (! this->encodeMessages(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode preset messages.";
+    return false;
+  }
+
   // Define Contacts
   if (! this->encodeContacts(ctx.config(), flags, ctx, err)) {
     errMsg(err) << "Cannot encode contacts.";
@@ -2900,6 +2930,11 @@ RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! this->decodeButtonSettings(ctx, err)) {
     errMsg(err) << "Cannot decode button settings.";
+    return false;
+  }
+
+  if (! this->decodeMessages(ctx, err)) {
+    errMsg(err) << "Cannot decode preset messages.";
     return false;
   }
 

@@ -73,13 +73,13 @@ UV390Test::testSMSTemplates() {
   ErrorStack err;
   UV390Codeplug codeplug;
   if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+    QFAIL(QString("Cannot encode codeplug for TyT MD-UV390: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config decoded;
   if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: %1")
+    QFAIL(QString("Cannot decode codeplug for TyT MD-UV390: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
