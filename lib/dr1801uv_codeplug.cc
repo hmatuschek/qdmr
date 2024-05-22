@@ -3087,6 +3087,8 @@ DR1801UVCodeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err
   case SMSExtension::Format::Hytera: setSMSFormat(SMSFormat::CompressedIP); break;
   case SMSExtension::Format::DMR: setSMSFormat(SMSFormat::DefinedData); break;
   }
+
+  return true;
 }
 
 
