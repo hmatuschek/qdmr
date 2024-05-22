@@ -2159,7 +2159,10 @@ bool
 D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
-    MessageElement message(data(Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()));
+    unsigned int addr =
+        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
+        + i*MessageElement::size();
+    MessageElement message(data(addr));
     message.setMessage(ctx.get<SMSTemplate>(i)->message());
     MessageListElement listElement(data(Offset::messageIndex() + i*Size::messageIndex()));
     listElement.setIndex(i);
@@ -2178,9 +2181,13 @@ D868UVCodeplug::createSMSMessages(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::numMessages(); i++) {
     if (! messages_bytemap.isEncoded(i))
       continue;
-    MessageElement message(data(Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()));
+    unsigned int addr =
+        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
+        + i*MessageElement::size();
+    MessageElement message(data(addr));
     SMSTemplate *temp = new SMSTemplate();
     temp->setName(QString("SMS %1").arg(i+1));
+    temp->setMessage(message.message());
     ctx.config()->smsExtension()->smsTemplates()->add(temp);
     ctx.add(temp, i);
   }
