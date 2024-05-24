@@ -125,14 +125,15 @@ public:
     None,       ///< Class for invalid interface info.
     Serial,     ///< Serial port interface class.
     DFU,        ///< DFU interface class.
-    HID         ///< HID (human-interface device) interface class.
+    HID,        ///< HID (human-interface device) interface class.
+    C7K         ///< Raw USB access to C7000 devices.
   };
 
 public:
   /** Empty constructor. */
   USBDeviceInfo();
   /** Constructor from class, VID and PID. */
-  USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid, bool save=true, bool identifiable=true);
+  USBDeviceInfo(Class cls, uint16_t vid, uint16_t pid, bool save=true);
   /** Destructor. */
   virtual ~USBDeviceInfo();
 
@@ -152,8 +153,12 @@ public:
   /** Returns the interface class. */
   Class interfaceClass() const;
 
+  /** Retunrs @c true, if a vendor ID is set. */
+  bool hasVendorID() const;
   /** Returns the vendor ID or 0 if not set. */
   uint16_t vendorId() const;
+  /** Retunrs @c true, if a product ID is set. */
+  bool hasProductID() const;
   /** Returns the product ID or 0 if not set. */
   uint16_t productId() const;
 
@@ -169,9 +174,6 @@ public:
    * may be harmful. */
   bool isSave() const;
 
-  /** Returns @c true if the radio is identifiable automatically. */
-  bool isIdentifiable() const;
-
 protected:
   /** The class of the interface. */
   Class _class;
@@ -181,8 +183,6 @@ protected:
   uint16_t _pid;
   /** If @c true, it is save to send commands to the device without user approval. */
   bool _save;
-  /** If @c true, the device may be identified automatically. */
-  bool _identifiable;
 };
 
 
@@ -224,7 +224,7 @@ public:
 
 public:
   /** Searches for all connected radios (may contain false positives). */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Checks a serial port. */

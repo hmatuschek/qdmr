@@ -1,4 +1,5 @@
 #include "md2017_codeplug.hh"
+#include "config.hh"
 #include "logger.hh"
 
 #define NUM_CHANNELS                3000

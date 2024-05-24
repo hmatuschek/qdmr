@@ -191,6 +191,9 @@ public:
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
+  bool encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
   void clearMessages();
 
   void clearContacts();

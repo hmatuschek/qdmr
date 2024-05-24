@@ -3,6 +3,8 @@
 
 #include "configobject.hh"
 
+class DMRRadioIDReference;
+
 
 /** Abstract base class for all radio IDs.
  *
@@ -37,7 +39,7 @@ class DMRRadioID : public RadioID
 
 public:
   /** Default constructor. */
-  explicit DMRRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRRadioID(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the ID.
@@ -96,7 +98,7 @@ class DTMFRadioID: public RadioID
 
 public:
   /** Default constructor. */
-  explicit DTMFRadioID(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DTMFRadioID(QObject *parent=nullptr);
 
   /** Constructor from name and number.
    * @param name Specifies the name of the DTMF radio ID.
@@ -118,13 +120,11 @@ protected:
 
 
 /** Represents the list of configured DMR IDs (radio IDs) within the abstract config.
- * There must always be at least one valid DMR ID. The first (index 0) ID is always the default
- * DMR ID of the radio.
- *
  * @ingroup conf */
 class RadioIDList: public ConfigObjectList
 {
   Q_OBJECT
+
 
 public:
   /** Constructor. */
@@ -134,14 +134,10 @@ public:
 
   /** Returns the radio ID at the given index. */
   DMRRadioID *getId(int idx) const;
-  /** Returns the current default ID for the radio. */
-  DMRRadioID * defaultId() const;
-  /** Sets the default DMR ID. Pass idx=-1 to clear default ID. */
-  bool setDefaultId(int idx);
   /** Searches the DMR ID object associated with the given DMR ID. */
   DMRRadioID *find(uint32_t id) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Adds the given DMR ID. */
   virtual int addId(const QString &name, uint32_t id);
@@ -150,14 +146,6 @@ public:
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
-
-protected slots:
-  /** Gets call whenever the default DMR ID gets deleted. */
-  void onDefaultIdDeleted();
-
-protected:
-  /** Holds a weak reference to the default DMR radio ID. */
-  DMRRadioID *_default;
 };
 
 

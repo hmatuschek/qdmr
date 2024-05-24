@@ -2,7 +2,12 @@
 #define ANYTONECODEPLUG_HH
 
 #include "codeplug.hh"
-#include "anytone_extension.hh"
+#include <QGeoCoordinate>
+#include "channel.hh"
+#include "contact.hh"
+
+class RadioSettings;
+
 
 /** Base class interface for all Anytone radio codeplugs.
  *
@@ -56,8 +61,8 @@ public:
 
   /** Represents the base class for inverted bytemaps in all AnyTone codeplugs.
    * This is obviously a result of a lazy firmware developer. There is already some code in the
-   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewere. It is
-   * inverted, because reased flash memory is usually initialized with 0xff. However, the AnyTone
+   * firmware to handle bitmaps. The developer, however, copied some BS code from elsewhere. It is
+   * inverted, because erased flash memory is usually initialized with 0xff. However, the AnyTone
    * memory gets erased to 0x00. So the inversion is not necessary. Someone really took pride in
    * his/her work and consequently, I need to implement some BS elements more. */
   class InvertedBytemapElement: public Element
@@ -372,6 +377,12 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset {
+      /// @todo Implement
+    };
   };
 
   /** Represents the channel bitmaps in all AnyTone codeplugs. */
@@ -772,7 +783,7 @@ public:
 
   /** Represents the base class for the settings elements in all AnyTone codeplugs.
    * This class only implements those few settings, common to all devices and encoded the same way.
-   * It also defines all common settings as interaces.
+   * It also defines all common settings as interfaces.
    *
    * Memory layout of encoded general settings (0xd0 bytes):
    * @verbinclude anytone_generalsettings.txt
@@ -1179,7 +1190,7 @@ public:
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Returns @c true if the talker alias is send. */
+    /** Returns @c true if the talker alias is sent. */
     virtual bool sendTalkerAlias() const = 0;
     /** Enables/disables sending the talker alias. */
     virtual void enableSendTalkerAlias(bool enable) = 0;
@@ -1478,7 +1489,7 @@ public:
     virtual void clearOffset(unsigned int n);
 
   public:
-    /** Some limts for the offset frequency table. */
+    /** Some limits for the offset frequency table. */
     struct Limit {
       static constexpr unsigned int numEntries() { return 250; }      ///< Max number of entries in the table.
     };
@@ -1676,7 +1687,7 @@ public:
 
     void clear();
 
-    /** Retunrs the n-th status message. */
+    /** Returns the n-th status message. */
     virtual QString message(unsigned int n) const;
     /** Sets the n-th status message. */
     virtual void setMessage(unsigned int n, const QString &msg);
@@ -2938,8 +2949,11 @@ public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
   bool encode(Config *config, const Flags &flags, const ErrorStack &err);
+
   bool decode(Config *config, const ErrorStack &err);
+  bool postprocess(Config *config, const ErrorStack &err) const;
 
 protected:
   virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;

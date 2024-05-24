@@ -2,12 +2,13 @@
 #define CODEPLUG_HH
 
 #include <QObject>
-#include "dfufile.hh"
-#include "userdatabase.hh"
 #include <QHash>
-#include "config.hh"
+#include "dfufile.hh"
 
-//class Config;
+//#include "userdatabase.hh"
+//#include "config.hh"
+
+class Config;
 class ConfigItem;
 
 
@@ -39,12 +40,47 @@ public:
     Flags();
   };
 
-  /** Represents the abstract base class of all codeplug elements. That is a memory region within
-   * the codeplug that encodes a specific element. E.g., channels, contacts, zones, etc.
-   * This class provides some helper methods to access specific members of the element.
+  /** Represents the abstract base class of all codeplug elements.
+   *
+   * That is a memory region within the codeplug that encodes a specific element. E.g., channels,
+   * contacts, zones, etc. This class provides some helper methods to access specific members of
+   * the element.
+   *
    * @since 0.9.0 */
   class Element
   {
+  protected:
+    /** Base class for Offsets. */
+    struct Offset {
+      /** Some type to specify a bit offset. That is the byte-offset and bit of that byte. */
+      struct BitOffset {
+        /** The byte offset. */
+        const unsigned int byte;
+        /** The bit within the byte. */
+        const unsigned int bit;
+      };
+    };
+
+  public:
+    /** Base class for Limits. */
+    struct Limit {
+      /** Holds a range of values [min, max]. */
+      template <class T> struct Range {
+        /// Lower bound.
+        const T min;
+        /// Upper bound.
+        const T max;
+        /// Limits the value to the range.
+        inline T limit(const T &value) const {
+          return std::min(max, std::max(min, value));
+        }
+        /// Checks if value is in range
+        inline bool in(const T &value) const {
+          return (value <= max) && (value >= min);
+        }
+      };
+    };
+
   protected:
     /** Hidden constructor.
      * @param ptr Specifies the pointer to the element within the codeplug.
@@ -57,6 +93,9 @@ public:
     /** Destructor. */
     virtual ~Element();
 
+    /** Copy assignment. */
+    Element &operator=(const Element &other);
+
     /** Returns @c true if the pointer is not null. */
     virtual bool isValid() const;
     /** Abstract method to reset the element within the codeplug. Any device specific element
@@ -67,7 +106,11 @@ public:
     bool fill(uint8_t value, unsigned offset=0, int size=-1);
 
     /** Reads a specific bit at the given byte-offset. */
+    bool getBit(const Offset::BitOffset &offset) const;
+    /** Reads a specific bit at the given byte-offset. */
     bool getBit(unsigned offset, unsigned bit) const;
+    /** Sets a specific bit at the given byte-offset. */
+    void setBit(const Offset::BitOffset &offset, bool value=true);
     /** Sets a specific bit at the given byte-offset. */
     void setBit(unsigned offset, unsigned bit, bool value=true);
     /** Clears a specific bit at the given byte-offset. */
@@ -270,6 +313,13 @@ public:
   /** Decodes a binary codeplug to the given abstract configuration @c config.
    * This must be implemented by the device-specific codeplug. */
   virtual bool decode(Config *config, const ErrorStack &err=ErrorStack()) = 0;
+  /** Retruns a post-processed configuration of the decoded config. By default, the passed
+   * config is returned. */
+  virtual bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
+  /** Retruns a prepared configuration for this particular radio. All unsupported featrues are
+   *  removed from the copy. The default implementation only copies the config. */
+  virtual Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
   /** Encodes a given abstract configuration (@c config) to the device specific binary code-plug.
    * This must be implemented by the device-specific codeplug. */
   virtual bool encode(Config *config, const Flags &flags=Flags(), const ErrorStack &err=ErrorStack()) = 0;

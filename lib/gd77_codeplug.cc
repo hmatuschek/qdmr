@@ -256,7 +256,7 @@ GD77Codeplug::GD77Codeplug(QObject *parent)
 {
   addImage("Radioddity GD77 Codeplug");
   image(0).addElement(0x00080, 0x07b80);
-  image(0).addElement(0x08000, 0x16300);
+  image(0).addElement(0x08000, 0x16b00);
 }
 
 void
@@ -280,6 +280,15 @@ GD77Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 void
 GD77Codeplug::clearButtonSettings() {
   ButtonSettingsElement(data(Offset::buttons())).clear();
+}
+bool
+GD77Codeplug::encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+  return ButtonSettingsElement(data(Offset::buttons())).encode(ctx, err);
+}
+bool
+GD77Codeplug::decodeButtonSettings(Context &ctx, const ErrorStack &err) {
+  return ButtonSettingsElement(data(Offset::buttons())).decode(ctx, err);
 }
 
 void
@@ -473,31 +482,16 @@ GD77Codeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &er
   ZoneBankElement bank(data(Offset::zoneBank()));
 
   // Pack Zones
-  bool pack_zone_a = true;
-  for (unsigned int i=0, j=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
+  for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     ZoneElement z(bank.get(i));
-next:
-    if (j >= ctx.count<Zone>()) {
+    if (! ctx.has<Zone>(i+1)) {
       bank.enable(i, false);
       continue;
     }
 
     // Construct from Zone obj
-    Zone *zone = ctx.get<Zone>(j+1);
-    if (pack_zone_a) {
-      pack_zone_a = false;
-      if (zone->A()->count())
-        z.fromZoneObjA(zone, ctx);
-      else
-        goto next;
-    } else {
-      pack_zone_a = true;
-      j++;
-      if (zone->B()->count())
-        z.fromZoneObjB(zone, ctx);
-      else
-        goto next;
-    }
+    Zone *zone = ctx.get<Zone>(i+1);
+    z.fromZoneObjA(zone, ctx);
     bank.enable(i, true);
   }
   return true;
@@ -507,62 +501,27 @@ bool
 GD77Codeplug::createZones(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(Offset::zoneBank()));
-
   for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = z.toZoneObj(ctx);
-      ctx.config()->zones()->add(last_zone);
-      ctx.add(last_zone, i+1);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-    }
+    Zone *zone = z.toZoneObj(ctx);
+    ctx.config()->zones()->add(zone);
+    ctx.add(zone, i+1);
   }
   return true;
 }
 
 bool
 GD77Codeplug::linkZones(Context &ctx, const ErrorStack &err) {
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(Offset::zoneBank()));
-
   for (unsigned int i=0; i<ZoneBankElement::Limit::zoneCount(); i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = ctx.get<Zone>(i+1);
-    }
-    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    Zone *zone = ctx.get<Zone>(i+1);
+    if (! z.linkZoneObj(zone, ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }

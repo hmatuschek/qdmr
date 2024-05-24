@@ -122,9 +122,6 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
   if ((node["settings"]= _settings->serialize(context, err)).IsNull())
     return false;
 
-  if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
-    node["settings"]["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
-
   if ((node["radioIDs"] = _radioIDs->serialize(context, err)).IsNull())
     return false;
 
@@ -394,7 +391,7 @@ Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     return false;
   if (node["roamingZones"] && (! _roamingZones->parse(node["roamingZones"], ctx, err)))
     return false;
-  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  /** @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0.*/
   else if (node["roaming"] && (! _roamingZones->parse(node["roaming"], ctx, err)))
     return false;
 
@@ -409,29 +406,12 @@ bool
 Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   // radio IDs must be linked before settings, as they may refer to the default DMR ID
 
-  if (! _radioIDs->link(node["radioIDs"], ctx, err))
+  if (node["radioIDs"] && (! _radioIDs->link(node["radioIDs"], ctx, err)))
     return false;
 
-  if (! _settings->link(node["settings"], ctx, err))
-    return false;
-
-  // Link default radio ID separately as it is not a property of the settings but defined there
-  if (node["settings"] && node["settings"]["defaultID"] && node["settings"]["defaultID"].IsScalar()) {
-    YAML::Node defIDNode = node["settings"]["defaultID"];
-    QString id = QString::fromStdString(defIDNode.as<std::string>());
-    if (ctx.contains(id) && ctx.getObj(id)->is<DMRRadioID>()) {
-      DMRRadioID *def = ctx.getObj(id)->as<DMRRadioID>();
-      radioIDs()->setDefaultId(radioIDs()->indexOf(def));
-      logDebug() << "Set default radio ID to '" << def->name() << "'.";
-    } else {
-      errMsg(err) << defIDNode.Mark().line << ":" << defIDNode.Mark().column
-                  << "Default radio ID '" << id << " does not refer to a radio ID.";
+  if (node["settings"])
+    if (!_settings->link(node["settings"], ctx, err))
       return false;
-    }
-  } else if (radioIDs()->count()) {
-    // If no default is set, use first one.
-    radioIDs()->setDefaultId(0);
-  }
 
   if (node["contacts"] && (! _contacts->link(node["contacts"], ctx, err)))
     return false;
@@ -447,7 +427,7 @@ Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) 
     return false;
   if (node["roamingZones"] && (! _roamingZones->link(node["roamingZones"], ctx, err)))
     return false;
-  /** @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0.*/
+  /** @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0.*/
   else if (node["roaming"] && (! _roamingZones->link(node["roaming"], ctx, err)))
     return false;
 

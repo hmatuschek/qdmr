@@ -1,6 +1,7 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
+#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -37,48 +38,30 @@ GenericListWrapper::columnCount(const QModelIndex &index) const {
   return 1;
 }
 
-bool
-GenericListWrapper::moveUp(int row) {
-  if ((0>=row) || (row>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  _list->moveUp(row);
-  endMoveRows();
-  emit modified();
-  return true;
+Qt::ItemFlags
+GenericListWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractListModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractListModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericListWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
 }
 
 bool
-GenericListWrapper::moveUp(int first, int last) {
-  if ((0>=first) || (last>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  _list->moveUp(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
-}
+GenericListWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
 
-bool
-GenericListWrapper::moveDown(int row) {
-  if ((0>row) || ((row+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  _list->moveDown(row);
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
   endMoveRows();
-  emit modified();
-  return true;
-}
 
-bool
-GenericListWrapper::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  _list->moveDown(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
+  return success;
 }
 
 
@@ -112,7 +95,7 @@ GenericListWrapper::onItemModified(int idx) {
  * Implementation of GenericTableWrapper
  * ********************************************************************************************* */
 GenericTableWrapper::GenericTableWrapper(AbstractConfigObjectList *list, QObject *parent)
-  : QAbstractTableModel(parent), _list(list)
+  : QAbstractTableModel(parent), _list(list), _insertRow(-1)
 {
   if (nullptr == _list)
     return;
@@ -131,48 +114,63 @@ GenericTableWrapper::rowCount(const QModelIndex &index) const {
   return _list->count();
 }
 
-bool
-GenericTableWrapper::moveUp(int row) {
-  if ((0>=row) || (row>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row-1);
-  _list->moveUp(row);
-  endMoveRows();
-  emit modified();
-  return true;
+Qt::ItemFlags
+GenericTableWrapper::flags(const QModelIndex &index) const {
+  if (index.isValid())
+    return QAbstractTableModel::flags(index) | Qt::ItemIsDragEnabled;
+  return QAbstractTableModel::flags(index) | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions
+GenericTableWrapper::supportedDropActions() const {
+  return Qt::MoveAction;
 }
 
 bool
-GenericTableWrapper::moveUp(int first, int last) {
-  if ((0>=first) || (last>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), first-1);
-  _list->moveUp(first, last);
-  endMoveRows();
-  emit modified();
-  return true;
+GenericTableWrapper::insertRows(int row, int count, const QModelIndex &parent) {
+  Q_UNUSED(parent); Q_UNUSED(count);
+
+  if (-1 == _insertRow) {
+    _insertRow = row;
+    return true;
+  }
+  return false;
 }
 
 bool
-GenericTableWrapper::moveDown(int row) {
-  if ((0>row) || ((row+1)>=_list->count()))
+GenericTableWrapper::removeRows(int row, int count, const QModelIndex &parent) {
+  Q_UNUSED(parent);
+
+  if (-1 == _insertRow)
     return false;
-  beginMoveRows(QModelIndex(), row, row, QModelIndex(), row+2);
-  _list->moveDown(row);
-  endMoveRows();
-  emit modified();
-  return true;
+
+  bool success = moveRows(QModelIndex(), row, count,
+                          QModelIndex(), _insertRow);
+  _insertRow = -1;
+  return success;
 }
 
 bool
-GenericTableWrapper::moveDown(int first, int last) {
-  if ((0>first) || ((last+1)>=_list->count()))
-    return false;
-  beginMoveRows(QModelIndex(), first, last, QModelIndex(), last+2);
-  _list->moveDown(first, last);
+GenericTableWrapper::moveRows(const QModelIndex &sourceParent, int sourceRow, int count,
+                             const QModelIndex &destinationParent, int destinationChild)
+{
+  logDebug() << "Move " << count << " rows from " << sourceRow << " to " << destinationChild;
+
+  beginMoveRows(sourceParent, sourceRow, sourceRow+count-1,
+                destinationParent, destinationChild);
+  bool success = _list->move(sourceRow, count, destinationChild);
   endMoveRows();
-  emit modified();
-  return true;
+
+  return success;
+}
+
+bool
+GenericTableWrapper::canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                 int row, int column, const QModelIndex &parent) const
+{
+  if (0 != column)
+    return false;
+  return QAbstractTableModel::canDropMimeData(data, action, row, column, parent);
 }
 
 void
@@ -216,11 +214,6 @@ ChannelListWrapper::columnCount(const QModelIndex &index) const {
   return 21;
 }
 
-inline QString formatFrequency(float f) {
-  int val = std::round(f*10000);
-  return QString::number(double(val)/10000, 'f', 4);
-}
-
 QVariant
 ChannelListWrapper::data(const QModelIndex &index, int role) const {
   if (nullptr == _list)
@@ -262,12 +255,9 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return channel->name();
   case 2:
-    return formatFrequency(channel->rxFrequency());
+    return channel->rxFrequency().format(Frequency::Format::MHz);
   case 3:
-    if (channel->txFrequency()<channel->rxFrequency())
-      return formatFrequency(channel->txFrequency()-channel->rxFrequency());
-    else
-      return formatFrequency(channel->txFrequency());
+    return channel->txFrequency().format(Frequency::Format::MHz);
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
@@ -504,7 +494,7 @@ RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, Q
 int
 RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 5;
+  return 6;
 }
 
 QVariant
@@ -517,11 +507,8 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
   // Dispatch by column
   switch (index.column()) {
   case 0: return ch->name();
-  case 1: return ch->rxFrequency();
-  case 2:
-    if (ch->rxFrequency() == ch->txFrequency())
-      return ch->txFrequency();
-    return ch->txFrequency()-ch->rxFrequency();
+  case 1: return ch->rxFrequency().format(Frequency::Format::MHz);
+  case 2: return ch->txFrequency().format(Frequency::Format::MHz);
   case 3:
     if (ch->colorCodeOverridden())
       return ch->colorCode();
@@ -534,6 +521,16 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
       }
     }
     return tr("[Selected]");
+  case 5: {
+      QStringList zones;
+      for(int i=0;i<ch->config()->roamingZones()->count(); i++) {
+        RoamingZone *zone = ch->config()->roamingZones()->zone(i);
+        if (zone->contains(ch))
+          zones.append(zone->name());
+      }
+      return zones.join(", ");
+    } break;
+
   default: break;
   }
 
@@ -550,6 +547,7 @@ RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, 
   case 2: return tr("TX Frequency");
   case 3: return tr("CC");
   case 4: return tr("TS");
+  case 5: return tr("Zones");
   default: break;
   }
   return QVariant();

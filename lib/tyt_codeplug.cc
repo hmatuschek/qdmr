@@ -477,8 +477,8 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
 
   // Common settings
   ch->setName(name());
-  ch->setRXFrequency(double(rxFrequency())/1e6);
-  ch->setTXFrequency(double(txFrequency())/1e6);
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
   // Power setting must be overridden by specialized class
@@ -564,8 +564,8 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
 void
 TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setName(chan->name());
-  setRXFrequency(chan->rxFrequency()*1e6);
-  setTXFrequency(chan->txFrequency()*1e6);
+  setRXFrequency(chan->rxFrequency().inHz());
+  setTXFrequency(chan->txFrequency().inHz());
   enableRXOnly(chan->rxOnly());
   if (chan->defaultTimeout())
     setTXTimeOut(ctx.config()->settings()->tot());
@@ -1557,10 +1557,10 @@ TyTCodeplug::GeneralSettingsElement::setRadioName(const QString &name) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
-  if (nullptr == config->radioIDs()->defaultId())
+  if (config->settings()->defaultIdRef()->isNull())
     return false;
-  setRadioName(config->radioIDs()->defaultId()->name());
-  setDMRId(config->radioIDs()->defaultId()->number());
+  setRadioName(config->settings()->defaultIdRef()->as<DMRRadioID>()->name());
+  setDMRId(config->settings()->defaultIdRef()->as<DMRRadioID>()->number());
 
   setIntroLine1(config->settings()->introLine1());
   setIntroLine2(config->settings()->introLine2());
@@ -1616,7 +1616,7 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   int idx = config->radioIDs()->addId(radioName(),dmrId());
   if (0 <= idx) {
     logDebug() << "Explicitly set default ID to index=" << idx << ".";
-    config->radioIDs()->setDefaultId(idx);
+    config->settings()->defaultIdRef()->set(config->radioIDs()->getId(idx));
   } else {
     logError() << "Cannot add radio DMR ID & cannot set default ID.";
     return false;
@@ -2830,7 +2830,7 @@ TyTCodeplug::clear()
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
-  if (nullptr == config->radioIDs()->defaultId()) {
+  if (config->settings()->defaultIdRef()->isNull()) {
     errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
     return false;
   }

@@ -11,6 +11,144 @@
  * needed to access these devices. The user, however, should be a member of the @c dialout group
  * to get access to the serial interfaces.
  *
+ *
+ * @section ogd77cmd Command requests
+ * The overall command requets structure is
+ *
+ * @verbinclude opengd77_protocol_command_request.txt
+ *
+ * where the optional and variable length payload field is determined by the command flag. The
+ * request starts with the command prefix 'C' (43h) followed by the command flag. Following
+ * command flags are known.
+ *
+ * <table>
+ *  <tr><th>Flag</th><th>Command</th></tr>
+ *  <tr><td>00h</td> <td>Show CPS screen.</td></tr>
+ *  <tr><td>01h</td> <td>Clear screen.</td></tr>
+ *  <tr><td>02h</td> <td>Display text.</td></tr>
+ *  <tr><td>03h</td> <td>Render screen.</td></tr>
+ *  <tr><td>06h</td> <td>Control radio.</td></tr>
+ *  <tr><td>07h</td> <td>Start GPS logging.</td></tr>
+ *  <tr><td>feh</td> <td>Ping request.</td></tr>
+ * </table>
+ *
+ * @subsection ogd77cmd_cps_screen Show CPS Screen (00h)
+ * Reserves the screen for the CPS. The content is not cleared.
+ *
+ * The command is quiet simple
+ * @verbinclude opengd77_protocol_command_show_cps_screen_request.txt
+ * as is the response
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77cmd_clear_screen Clear Screen (01h)
+ * Once the screen has been reserved, this command clears it.
+ *
+ * Also this command is quiet simple
+ * @verbinclude opengd77_protocol_command_clear_screen_request.txt
+ * as is the response
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77cmd_set_text Set text (02h)
+ * This command has a variable payload size.
+ * @verbinclude opengd77_protocol_command_display_text_request.txt
+ * <table>
+ *  <tr><th>Field</th><th>Meaning</th></tr>
+ *  <tr><td>Column Address</td> <td>Specifies the column index.</td></tr>
+ *  <tr><td>Row Address</td> <td>Specifies the row index as multiple of 10h.</td></tr>
+ *  <tr><td>Size</td> <td>Text size (?). Actually, always observed 3.</td></tr>
+ *  <tr><td>Alignment</td> <td>Specifies text alignment on row. 0=left, 1=center, 2=right(?)</td></tr>
+ *  <tr><td>Inverted</td> <td>Inverts text, 0=off, 1=inverted (?).</td></tr>
+ *  <tr><td>Payload</td> <td>Variable size, up to 16bytes ASCII text.</td></tr>
+ * </table>
+ *
+ * If there are no errors, the radio responds with
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77cmd_render_screen Render Screen (03h)
+ * Randers the transmitted screen. This command is quiet simple again, with no payload.
+ * @verbinclude opengd77_protocol_command_render_screen_request.txt
+ *
+ * as is the response:
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77cmd_ctrl Control Radio (06h)
+ * This command request is used to control the radio. The specific action is transmitted as a
+ * single payload byte.
+ * @verbinclude opengd77_protocol_command_control_request.txt
+ * <table>
+ *  <tr><th>Action Code</th><th>Meaning</th></tr>
+ *  <tr><td>00h</td> <td>Save settings and rebbot.</td></tr>
+ *  <tr><td>01h</td> <td>Reboot</td></tr>
+ *  <tr><td>02h</td> <td>Save settings and VFOs, no reboot.</td></tr>
+ *  <tr><td>03h</td> <td>Flash LED green.</td></tr>
+ *  <tr><td>04h</td> <td>Flash LED red.</td></tr>
+ *  <tr><td>05h</td> <td>Re-init internal buffers.</td></tr>
+ *  <tr><td>06h</td> <td>Re-init sound buffers.</td></tr>
+ *  <tr><td>07h</td> <td>Update date-time from GPS.</td></tr>
+ * </table>
+ *
+ * If there are no errors, the radio responds with
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77cmd_gps Start GPS Logging (07h)
+ * A simple request without any payload.
+ * @verbinclude opengd77_protocol_command_start_gps_request.txt
+ *
+ * If there is no error, the response should be.
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ * After that, the radio will send GPS information via the serial port until any other command
+ * is send to the radio.
+ *
+ * @subsection ogd77cmd_ping Ping Request (06h)
+ * A simple request without any payload
+ * @verbinclude opengd77_protocol_command_ping_request.txt
+ * and the radio should respond with
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ *
+ * @section ogd77read Read requests
+ * The read command is used to obtain different stuff. Not only the code plug. In general, all read
+ * share the same form
+ * @verbinclude opengd77_protocol_read_request.txt
+ *
+ * <table>
+ *  <tr><th>Code</th> <th>Memory region</th></tr>
+ *  <tr><td>01h</td>  <td>Flash</td></tr>
+ *  <tr><td>02h</td>  <td>EEPROM</td></tr>
+ *  <tr><td>05h</td>  <td>MCU ROM</td></tr>
+ *  <tr><td>06h</td>  <td>Display buffer</td></tr>
+ *  <tr><td>07h</td>  <td>WAV buffer</td></tr>
+ *  <tr><td>08h</td>  <td>AMBE buffer</td></tr>
+ *  <tr><td>09h</td>  <td>Radio info</td></tr>
+ *  <tr><td>0ah</td>  <td>FLASH security registers</td></tr>
+ * </table>
+ *
+ * Whenever the read request returns some data, it is tranmitted with the read response
+ * @verbinclude opengd77_protocol_read_response.txt
+ *
+ * If not, a simple ACK response is send
+ * @verbinclude opengd77_protocol_command_okay_response.txt
+ *
+ * @subsection ogd77info Radio info struct
+ * When reading the radio inforamtion, the information is returned in a binary struct:
+ * @verbinclude opengd77_radio_info.txt
+ * <table>
+ *  <tr><th>Code</th> <th>Radio Variant</th></tr>
+ *  <tr><td>00h</td>  <td>Radioddity GD-77</td></tr>
+ *  <tr><td>01h</td>  <td>Radioddity GD-77S</td></tr>
+ *  <tr><td>02h</td>  <td>Baofeng DM-1801</td></tr>
+ *  <tr><td>03h</td>  <td>Radioddity RD-5R</td></tr>
+ *  <tr><td>04h</td>  <td>Baofeng DM-1801A</td></tr>
+ *  <tr><td>05h</td>  <td>TyT MD-9600</td></tr>
+ *  <tr><td>06h</td>  <td>TyT MD-UV390</td></tr>
+ *  <tr><td>07h</td>  <td>TyT MD-380</td></tr>
+ *  <tr><td>08h</td>  <td>Baofeng DM-1701</td></tr>
+ *  <tr><td>09h</td>  <td>TyT MD-2017</td></tr>
+ *  <tr><td>0ah</td>  <td>Baofeng DM-1701 RGB</td></tr>
+ * </table>
+ *
+ * @section ogd77write Write requests
+ *
  * @ingroup ogd77 */
 class OpenGD77Interface : public USBSerial
 {
@@ -49,7 +187,7 @@ public:
   /** Returns some information about this interface. */
   static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected AnyTone radios. */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Represents a read message. */
@@ -76,10 +214,26 @@ protected:
 
     /** Constructs a FLASH read message. */
     bool initReadFlash(uint32_t address, uint16_t length);
-    /** Constructs a EEPROM read message. */
+    /** Constructs an EEPROM read message. */
     bool initReadEEPROM(uint32_t address, uint16_t length);
     /** Constructs a firmware-info read message. */
     bool initReadFirmwareInfo();
+  };
+
+  /** Radio inforation struct. */
+  struct __attribute__((packed)) FirmwareInfo {
+    /** Possible radio types, returned by the radio_info struct.*/
+    enum class RadioType {
+      GD77=0, GD77S=1, DM1801=2, RD5R=3, DM1801A=4, MD9600=5,
+      MDUV380=6, MD380=7, DM1701=8, MD2017=9, DM1701RGB=10
+    };
+
+    uint32_t structVersion;   ///< Struct version number (currently 3).
+    uint32_t radioType;       ///< Device variant (see @c RadioType).
+    char fw_revision[16];     ///< Firmware revision ASCII, 0-padded.
+    char build_date[16];      ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
+    uint32_t flashChipSerial; ///< Serial number of the flash chip.
+    uint16_t features;        ///< Some flags, signaling the presence of some features.
   };
 
   /** Represents a read response message. */
@@ -88,18 +242,10 @@ protected:
     char type;
     /// Length of paylod.
     uint16_t length;
-
+    /// Payload
     union {
-      /// Data payload.
-      uint8_t data[32];
-      /** Radio info payload */
-      struct {
-        uint32_t _unknown00;  ///< Some unknown number in little endian, seen 0x0001.
-        uint32_t _unknown04;  ///< Some unknown number in little endian, seen 0x0003.
-        char fw_revision[16]; ///< Firmware revision ASCII, 0-padded.
-        char build_date[16];  ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
-        uint32_t _unknown24;  ///< Some unknown number in little endian, seen 0x4014
-      } radio_info;
+      uint8_t data[32];    ///< Data payload.
+      FirmwareInfo info;   ///< Firmware information struct.
     };
   };
 
@@ -209,10 +355,11 @@ protected:
   };
 
 protected:
-  /** Write some data to EEPROM at the given address. */
-  bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Read some data from EEPROM at the given address. */
+  bool readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
+  /** Write some data to EEPROM at the given address. */
   bool writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
+
   /** Read some data from Flash at the given address. */
   bool readFlash(uint32_t addr, uint8_t *data, uint16_t len, const ErrorStack &err=ErrorStack());
   /** Select the correct Flash sector for the given address.
@@ -223,6 +370,9 @@ protected:
   /** Finalize writing to the Flash memory. If not send after writing to a sector,
    * the changes are lost. */
   bool finishWriteFlash(const ErrorStack &err=ErrorStack());
+
+  /** Read radio info struct. */
+  bool readFirmwareInfo(FirmwareInfo &radioInfo, const ErrorStack &err=ErrorStack());
 
   /** Send a "show CPS screen" message. */
   bool sendShowCPSScreen(const ErrorStack &err=ErrorStack());

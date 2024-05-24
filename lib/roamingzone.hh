@@ -23,7 +23,7 @@ class RoamingZone : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit RoamingZone(QObject *parent=nullptr);
+  Q_INVOKABLE explicit RoamingZone(QObject *parent=nullptr);
 
   /** Constructor.
    * @param name Specifies the name of the roaming zone.
@@ -40,6 +40,8 @@ public:
   /** Clears the zone list. */
   void clear();
 
+  /** Returns @c true, if the given roaming channel is member of this zone. */
+  bool contains(const RoamingChannel *ch) const;
   /** Returns the roaming channel, which is the member at index @c idx (0-based).
    * @param idx Specifies the index of the member channel. */
   RoamingChannel *channel(int idx) const;
@@ -59,10 +61,10 @@ public:
   RoamingChannelRefList *channels();
 
   /** Links the channel reference list.
-   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+   * @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0. */
   bool link(const YAML::Node &node, const Context &ctx, const ErrorStack &err);
   /** Serializes the channel reference list.
-   * @todo Implemented for backward compatability with version 0.10.0, remove for 1.0.0. */
+   * @todo Implemented for backward compatibility with version 0.10.0, remove for 1.0.0. */
   bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
@@ -108,7 +110,7 @@ public:
   /** Returns the roaming zone at the given index. */
   RoamingZone *zone(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

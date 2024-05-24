@@ -451,7 +451,7 @@
   </varlistentry>
   <varlistentry>
     <term><token>ToggleMainChannel</token></term>
-    <listitem><para>Toggles betwen VFOs A and B for the main channel. Applicable to 
+    <listitem><para>Toggles between VFOs A and B for the main channel. Applicable to 
       <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
       <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
       <productname>DMR-6X2UV</productname>.</para></listitem>
@@ -459,7 +459,7 @@
   <varlistentry>
     <term><token>HotKey1</token>, <token>HotKey2</token>, <token>HotKey3</token>, 
       <token>HotKey4</token>, <token>HotKey5</token>, <token>HotKey6</token></term>
-    <listitem><para>Tiggers one of the programmed hot-key function. Applicable to 
+    <listitem><para>Triggers one of the programmed hot-key function. Applicable to 
       <productname>AT-D868UV</productname>, <productname>AT-D878UV</productname>, 
       <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
       <productname>DMR-6X2UV</productname>.</para></listitem>
@@ -717,7 +717,7 @@
       <para>
         Specifies the function associated with the programmable function key <keycap>PF3</keycap> or 
         <keycap>C</keycap>. THis button is the colorful one on the top (on handheld radios) or 
-        labled <keycap>C</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+        labeled <keycap>C</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
       </para>
     </listitem>
   </varlistentry>
@@ -1121,7 +1121,7 @@
  <programlisting><![CDATA[anytoneSettings:
   # ...  
   autoRepeaterSettings:
-    directionA: Negative   # <- Only on VFO A. Beacause.
+    directionA: Negative   # <- Only on VFO A. Because.
     directionB: Off
     # VHF range 
     vhfMin: 145.569 MHz

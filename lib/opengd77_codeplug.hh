@@ -162,7 +162,7 @@ public:
     /** The size of the zone element. */
     static constexpr unsigned int size() { return 0x0000b0; }
 
-    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB, const ErrorStack &err=ErrorStack()) const;
+    bool linkZoneObj(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     bool fromZoneObjA(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
     bool fromZoneObjB(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 

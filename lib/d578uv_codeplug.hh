@@ -102,12 +102,13 @@ class GPSSystem;
  *
  *  <tr><th colspan="3">GPS/APRS</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000040</td> <td>APRS settings, see @c D878UVCodeplug::AnalogAPRSSettingsElement.</td>
- *  <tr><td>02501040</td> <td>000060</td> <td>APRS settings, see @c D878UVCodeplug::DMRAPRSSystemsElement.</td>
- *  <tr><td>025010A0</td> <td>000060</td> <td>Extended APRS settings, see @c D578UVCodeplug::AnalogAPRSSettingsExtensionElement.</tr>
+ *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings, see @c D878UVCodeplug::APRSSettingsElement.</td>
  *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
  *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
  *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
+ *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
+ *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
+ *    QDMR uses this memory section to store additional information.</td></tr>
  *
  *  <tr><th colspan="3">General Settings</th></tr>
  *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
@@ -554,12 +555,12 @@ public:
     /** Enables/disables bluetooth. */
     virtual void enableBluetooth(bool enable);
 
-    /** Returns @c true if the internal mic is addionally active when BT is active. */
+    /** Returns @c true if the internal mic is additionally active when BT is active. */
     virtual bool btAndInternalMic() const;
     /** Enables/disables the internal mic when BT is active. */
     virtual void enableBTAndInternalMic(bool enable);
 
-    /** Returns @c true if the internal speaker is addionally active when BT is active. */
+    /** Returns @c true if the internal speaker is additionally active when BT is active. */
     virtual bool btAndInternalSpeaker() const;
     /** Enables/disables the internal speaker when BT is active. */
     virtual void enableBTAndInternalSpeaker(bool enable);
@@ -574,11 +575,11 @@ public:
     /** Sets the GPS ranging interval in seconds. */
     virtual void setGPSUpdatePeriod(Interval sec);
 
-    /** Retunrs the bluetooth microphone gain [1,10]. */
+    /** Returns the bluetooth microphone gain [1,10]. */
     virtual unsigned int btMicGain() const;
     /** Sets the bluetooth microphone gain [1,10]. */
     virtual void setBTMicGain(unsigned int gain);
-    /** Retunrs the bluetooth speaker gain [1,10]. */
+    /** Returns the bluetooth speaker gain [1,10]. */
     virtual unsigned int btSpeakerGain() const;
     /** Sets the bluetooth speaker gain [1,10]. */
     virtual void setBTSpeakerGain(unsigned int gain);
@@ -636,7 +637,7 @@ public:
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
 
-    /** If enabled, the FM ID is send together with selected contact. */
+    /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);

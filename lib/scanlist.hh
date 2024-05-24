@@ -30,7 +30,7 @@ class ScanList : public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit ScanList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit ScanList(QObject *parent=nullptr);
   /** Constructs a scan list with the given name. */
 	ScanList(const QString &name, QObject *parent=nullptr);
 
@@ -119,7 +119,7 @@ public:
   /** Returns the scanlist at the given index. */
 	ScanList *scanlist(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

@@ -44,7 +44,7 @@ Field description:
    4 = CTCSS/DCS or Optional Signaling
  - OptSig: Optional signalling where 0=off, 1=DTMF, 2=2-tone, 3=5-tone
  - TxPer: TX permit/admit criterion, 0=always, 1=colorcode, 2=channel free.
- - XFR: Exlcude channel from roaming
+ - XFR: Exclude channel from roaming
  - LWK: Enable lone worker.
  - EEE: Enable enhanced encryption
  - RGP: Enable DMR-APRS RX

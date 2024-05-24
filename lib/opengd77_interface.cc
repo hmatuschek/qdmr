@@ -36,7 +36,7 @@ OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
   this->type = 'R';
   this->command = READ_FIRMWARE_INFO;
   this->address = 0;
-  this->length = 0;
+  this->length = qToBigEndian((uint16_t)sizeof(FirmwareInfo));
   return true;
 }
 
@@ -124,7 +124,7 @@ OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
   this->size = std::min(iSize, uint8_t(16));
   this->alignment = alignment;
   this->inverted = inverted;
-  strcpy(this->message, message);
+  strncpy(this->message, message, this->size);
 }
 
 void
@@ -168,7 +168,7 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
 OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : USBSerial(descr, err, parent), _sector(-1)
+  : USBSerial(descr, QSerialPort::Baud115200, err, parent), _sector(-1)
 {
   // pass...
 }
@@ -183,8 +183,9 @@ OpenGD77Interface::interfaceInfo() {
 }
 
 QList<USBDeviceDescriptor>
-OpenGD77Interface::detect() {
-  return USBSerial::detect(USB_VID, USB_PID);
+OpenGD77Interface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly)
+  return USBSerial::detect(USB_VID, USB_PID, true);
 }
 
 void
@@ -196,10 +197,36 @@ OpenGD77Interface::close() {
 RadioInfo
 OpenGD77Interface::identifier(const ErrorStack &err) {
   Q_UNUSED(err);
-  if (isOpen())
-    return RadioInfo::byID(RadioInfo::OpenGD77);
-  else
+  if (! isOpen())
     return RadioInfo();
+
+  FirmwareInfo info;
+  if (! readFirmwareInfo(info, err)) {
+    errMsg(err) << "Cannot identify OpenGD77 variant.";
+    return RadioInfo();
+  }
+
+  logDebug() << "Got type=" << info.radioType << ".";
+  switch ((FirmwareInfo::RadioType)info.radioType) {
+  case FirmwareInfo::RadioType::GD77:
+  case FirmwareInfo::RadioType::GD77S:
+  case FirmwareInfo::RadioType::RD5R:
+  case FirmwareInfo::RadioType::DM1801:
+  case FirmwareInfo::RadioType::DM1801A:
+    return RadioInfo::byID(RadioInfo::OpenGD77);
+
+  case FirmwareInfo::RadioType::MD9600:
+  case FirmwareInfo::RadioType::MDUV380:
+  case FirmwareInfo::RadioType::MD380:
+  case FirmwareInfo::RadioType::DM1701:
+  case FirmwareInfo::RadioType::DM1701RGB:
+  case FirmwareInfo::RadioType::MD2017:
+    logInfo() << "OpenGD77 variant not supported.";
+    return RadioInfo();
+  }
+
+  errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
+  return RadioInfo();
 }
 
 bool
@@ -598,6 +625,43 @@ OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
     errMsg(err) << "Cannot write to flash: Device returned error " << resp.type << ".";
     return false;
   }
+
+  return true;
+}
+
+bool
+OpenGD77Interface::readFirmwareInfo(OpenGD77Interface::FirmwareInfo &radioInfo, const ErrorStack &err) {
+  logDebug() << "Request radio info.";
+  ReadRequest req; req.initReadFirmwareInfo();
+
+  if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
+    errMsg(err) << "Serial port error: " << QSerialPort::errorString();
+    errMsg(err) << "Cannot send read request.";
+    return false;
+  }
+
+  if (! waitForReadyRead(1000)) {
+    errMsg(err) << "Cannot read from serial port: Timeout!";
+    return false;
+  }
+
+  ReadResponse resp;
+  int retlen = QSerialPort::read((char *)&resp, sizeof(ReadResponse));
+
+  if (0 > retlen) {
+    errMsg(err) << "Cannot read from serial port.";
+    return false;
+  } else if (0 == retlen) {
+    errMsg(err) << "Cannot read radio info: Device returned empty message.";
+    return false;
+  }
+
+  if (req.type != resp.type) {
+    errMsg(err) << "Cannot read radio info: Device returned error " << resp.type << ", expected 'R'.";
+    return false;
+  }
+
+  memcpy(&radioInfo, &(resp.info), sizeof(FirmwareInfo));
 
   return true;
 }

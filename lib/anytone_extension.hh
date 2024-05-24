@@ -6,8 +6,66 @@
 #include "melody.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "signaling.hh"
 
 #include <QTimeZone>
+
+/** Implements the config representation of an FM APRS frequency.
+ * @ingroup anytone */
+class AnytoneAPRSFrequency: public ConfigObject
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("IdPrefix", "af")
+
+  Q_CLASSINFO("frequencyDecription",
+              "Transmit-frequency.")
+
+  /** The frequency. */
+  Q_PROPERTY(Frequency frequency READ frequency WRITE setFrequency)
+
+public:
+  /** Default constructor. */
+  Q_INVOKABLE explicit AnytoneAPRSFrequency(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the transmit frequency. */
+  Frequency frequency() const;
+  /** Sets the transmit frequency. */
+  void setFrequency(Frequency freq);
+
+protected:
+  /** The transmit frequency. */
+  Frequency _frequency;
+};
+
+
+/** Represents a reference to an APRS frequency.
+ * @ingroup anytone */
+class AnytoneAPRSFrequencyRef: public ConfigObjectReference
+{
+  Q_OBJECT
+
+public:
+  /** Default constructor. */
+  explicit AnytoneAPRSFrequencyRef(QObject *parent=nullptr);
+};
+
+
+/** Represents a list of APRS transmit frequencies.
+ * @ingroup anytone */
+class AnytoneAPRSFrequencyList: public ConfigObjectList
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit AnytoneAPRSFrequencyList(QObject *parent=nullptr);
+
+  ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err);
+};
+
 
 /** Implements the common properties for analog and digital AnyTone channels.
  * This class cannot be instantiated directly, use one of the derived classes.
@@ -22,6 +80,8 @@ class AnytoneChannelExtension: public ConfigExtension
   Q_PROPERTY(int frequencyCorrection READ frequencyCorrection WRITE setFrequencyCorrection)
   /** If @c true, the hands-free featrue is enabled for this channel. */
   Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
+  /** A reference to the FM APRS frequency. If not set, the default will be used. */
+  Q_PROPERTY(AnytoneAPRSFrequencyRef *fmAPRSFrequency READ fmAPRSFrequency())
 
 protected:
   /** Hidden constructor. */
@@ -43,6 +103,8 @@ public:
   /** Enables/disables the hands-free feature for this channel. */
   void enableHandsFree(bool enable);
 
+  /** Holds a reference to the FM APRS frequency to be used if FM APRS is enabled on the channel. */
+  AnytoneAPRSFrequencyRef *fmAPRSFrequency() const;
 
 protected:
   /** If @c true, talkaround is enabled. */
@@ -51,6 +113,8 @@ protected:
   int _frequencyCorrection;
   /** If @c true, the hands-free featrue is enabled for this channel. */
   bool _handsFree;
+  /** A reference to the FM APRS frequency. */
+  AnytoneAPRSFrequencyRef *_fmAPRSFrequency;
 };
 
 
@@ -327,7 +391,7 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Retunrs the boot display setting. */
+  /** Returns the boot display setting. */
   BootDisplay bootDisplay() const;
   /** Sets the boot display. */
   void setBootDisplay(BootDisplay mode);
@@ -631,7 +695,7 @@ public:
   /** Sets the long-press duration in ms. */
   void setLongPressDuration(Interval ms);
 
-  /** Retruns @c true, if the automatic key-lock feature is enabled. */
+  /** Returns @c true, if the automatic key-lock feature is enabled. */
   bool autoKeyLockEnabled() const;
   /** Enables/disables auto key-lock. */
   void enableAutoKeyLock(bool enabled);
@@ -778,7 +842,7 @@ public:
   bool fmIdleChannelToneEnabled() const;
   /** Enables/disables the idle FM channel tone. */
   void enableFMIdleChannelTone(bool enable);
-  /** Retunrs @c true if the startup tone is enabled. */
+  /** Returns @c true if the startup tone is enabled. */
   bool startupToneEnabled() const;
   /** Enables/disables the startup tone. */
   void enableStartupTone(bool enable);
@@ -1023,7 +1087,7 @@ public:
   /** Enables/disables display of last caller. */
   void enableShowLastHeard(bool enable);
 
-  /** Retuns backlight duration during TX. */
+  /** Returns backlight duration during TX. */
   Interval backlightDurationTX() const;
   /** Sets the backlight duration during TX in seconds. */
   void setBacklightDurationTX(Interval sec);
@@ -1046,7 +1110,7 @@ public:
   /** Sets the zone name color for VFO B. */
   void setZoneBNameColor(Color color);
 
-  /** Retuns backlight duration during RX. */
+  /** Returns backlight duration during RX. */
   Interval backlightDurationRX() const;
   /** Sets the backlight duration during RX in seconds. */
   void setBacklightDurationRX(Interval sec);
@@ -1510,7 +1574,7 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
 
   Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
-  /** If @c true, the talker alias (name) is send. */
+  /** If @c true, the talker alias (name) is sent. */
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
   /** Specifies the talker alias source. */
   Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
@@ -1611,9 +1675,9 @@ public:
   /** Sets the SMS format. */
   void setSMSFormat(SMSFormat format);
 
-  /** Returns @c true if the talker alias is send. */
+  /** Returns @c true if the talker alias is sent. */
   bool sendTalkerAlias() const;
-  /** Enables/disbales sending talker alias. */
+  /** Enables/disables sending talker alias. */
   void enableSendTalkerAlias(bool enable);
 
   /** Returns the talker alias source. */
@@ -1668,7 +1732,7 @@ class AnytoneGPSSettingsExtension: public ConfigItem
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
 
   Q_CLASSINFO("positionReportingDescription", "Enables GPS range reporting.")
-  /** Enables GPS range reporing. */
+  /** Enables GPS range reporting. */
   Q_PROPERTY(bool reportPosition READ positionReportingEnabled WRITE enablePositionReporting)
 
   Q_CLASSINFO("updatePeriodDescription", "Specifies the GPS reporting interval in seconds.")
@@ -1711,7 +1775,7 @@ public:
   /** Sets the time zone. */
   void setTimeZone(const QTimeZone &zone);
 
-  /** Returns @c true if the GPS range reporing is enabled. */
+  /** Returns @c true if the GPS range reporting is enabled. */
   bool positionReportingEnabled() const;
   /** Enables/disables the GPS range reporting. */
   void enablePositionReporting(bool enable);
@@ -1769,7 +1833,7 @@ class AnytoneRoamingSettingsExtension: public ConfigItem
   Q_PROPERTY(bool rangeCheck READ repeaterRangeCheckEnabled WRITE enableRepeaterRangeCheck)
 
   Q_CLASSINFO("checkIntervalDescription", "Repeater range check interval in seconds.")
-  /** Repeater range check intervall in seconds. */
+  /** Repeater range check interval in seconds. */
   Q_PROPERTY(Interval checkInterval READ repeaterCheckInterval WRITE setRepeaterCheckInterval)
 
   Q_CLASSINFO("retryCount", "Number of retries to connect to a repeater before giving up.")
@@ -1826,7 +1890,7 @@ public:
   /** Sets the auto-roam delay in seconds. */
   void setAutoRoamDelay(Interval sec);
 
-  /** Retruns @c true if the repeater range check is enabled. */
+  /** Returns @c true if the repeater range check is enabled. */
   bool repeaterRangeCheckEnabled() const;
   /** Enables/disables repeater range check. */
   void enableRepeaterRangeCheck(bool enable);
@@ -1978,7 +2042,7 @@ protected:
 };
 
 
-/** Implements the device specific extension for the gerneral settings of AnyTone devices.
+/** Implements the device specific extension for the general settings of AnyTone devices.
  *
  * As there are a huge amount of different settings, they are split into separate extensions.
  * One for each topic.
@@ -2024,7 +2088,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** The keep-last-caller setting. */
   Q_PROPERTY(bool keepLastCaller READ keepLastCallerEnabled WRITE enableKeepLastCaller)
 
-  Q_CLASSINFO("vfoStepDescription", "Specifes the VFO tuning steps in kHz.")
+  Q_CLASSINFO("vfoStepDescription", "Specifies the VFO tuning steps in kHz.")
   /** The VFO tuning step-size in kHz. */
   Q_PROPERTY(Frequency vfoStep READ vfoStep WRITE setVFOStep)
 
@@ -2153,9 +2217,9 @@ public:
   /** Sets the mode for VFO B. */
   void setModeB(VFOMode mode);
 
-  /** Retruns a reference to the current zone for VFO A. */
+  /** Returns a reference to the current zone for VFO A. */
   ZoneReference *zoneA();
-  /** Retruns a reference to the current zone for VFO A. */
+  /** Returns a reference to the current zone for VFO A. */
   const ZoneReference *zoneA() const;
   /** Returns a reference to the current zone for VFO B. */
   ZoneReference *zoneB();
@@ -2204,7 +2268,7 @@ public:
   STEType steType() const;
   /** Sets the STE (squelch tail elimination) type. */
   void setSTEType(STEType type);
-  /** Retruns the STE (squelch tail elimination) frequency in Hz.
+  /** Returns the STE (squelch tail elimination) frequency in Hz.
    * A frequency of 0 disables the STE. Possible values are 55.2 and 259.2 Hz. */
   double steFrequency() const;
   /** Sets the STE (squelch tail elimination) frequency in Hz.
@@ -2277,6 +2341,139 @@ protected:
   Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
+};
+
+
+/** Implements some additional settings for the FM APRS system.
+ * This extension gets attached to a @c APRSSystem instance.
+ */
+class AnytoneFMAPRSSettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  /** The transmit delay in milliseconds. */
+  Q_PROPERTY(Interval txDelay READ txDelay WRITE setTXDelay)
+  /** The transmit pre-wave delay in milliseconds. */
+  Q_PROPERTY(Interval preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
+  /** If @c true, all APRS messages are processed, including those with invalid CRC. */
+  Q_PROPERTY(bool passAll READ passAll WRITE enablePassAll)
+  /** If @c true, the report position flag is set. */
+  Q_PROPERTY(bool reportPosition READ reportPosition WRITE enableReportPosition)
+  /** If @c true, the report Mic-E flag is set. */
+  Q_PROPERTY(bool reportMicE READ reportMicE WRITE enableReportMicE)
+  /** If @c true, the report object flag is set. */
+  Q_PROPERTY(bool reportObject READ reportObject WRITE enableReportObject)
+  /** If @c true, the report item flag is set. */
+  Q_PROPERTY(bool reportItem READ reportItem WRITE enableReportItem)
+  /** If @c true, the report message flag is set. */
+  Q_PROPERTY(bool reportMessage READ reportMessage WRITE enableReportMessage)
+  /** If @c true, the report weather flag is set. */
+  Q_PROPERTY(bool reportWeather READ reportWeather WRITE enableReportWeather)
+  /** If @c true, the report NMEA flag is set. */
+  Q_PROPERTY(bool reportNMEA READ reportNMEA WRITE enableReportNMEA)
+  /** If @c true, the report status flag is set. */
+  Q_PROPERTY(bool reportStatus READ reportStatus WRITE enableReportStatus)
+  /** If @c true, the report other flag is set. */
+  Q_PROPERTY(bool reportOther READ reportOther WRITE enableReportOther)
+
+  /** The list of additional APRS frequencies. */
+  Q_PROPERTY(AnytoneAPRSFrequencyList *frequencies READ frequencies)
+
+public:
+  /** Possible bandwidth settings. */
+  enum class Bandwidth {
+    Narrow = 0, Wide = 1
+  };
+  Q_ENUM(Bandwidth)
+
+public:
+  /** Default constructor. */
+  explicit Q_INVOKABLE AnytoneFMAPRSSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the transmit delay. */
+  Interval txDelay() const;
+  /** Sets the transmit delay. */
+  void setTXDelay(Interval intv);
+
+  /** Returns the pre-wave delay in ms. */
+  Interval preWaveDelay() const;
+  /** Sets the pre-wave delay in ms. */
+  void setPreWaveDelay(Interval ms);
+
+  /** Returns @c true if all received APRS messages are processed, even those with invalid CRC. */
+  bool passAll() const;
+  /** Enables processing of all received APRS messages, including those with invalid CRC. */
+  void enablePassAll(bool enable);
+
+  /** Returns @c true if the report position flag is set. */
+  bool reportPosition() const;
+  /** Enables/disables report position flag. */
+  void enableReportPosition(bool enable);
+  /** Returns @c true if the report Mic-E flag is set. */
+  bool reportMicE() const;
+  /** Enables/disables report Mic-E flag. */
+  void enableReportMicE(bool enable);
+  /** Returns @c true if the report object flag is set. */
+  bool reportObject() const;
+  /** Enables/disables report object flag. */
+  void enableReportObject(bool enable);
+  /** Returns @c true if the report item flag is set. */
+  bool reportItem() const;
+  /** Enables/disables report item flag. */
+  void enableReportItem(bool enable);
+  /** Returns @c true if the report message flag is set. */
+  bool reportMessage() const;
+  /** Enables/disables report message flag. */
+  void enableReportMessage(bool enable);
+  /** Returns @c true if the report weather flag is set. */
+  bool reportWeather() const;
+  /** Enables/disables report weather flag. */
+  void enableReportWeather(bool enable);
+  /** Returns @c true if the report NMEA flag is set. */
+  bool reportNMEA() const;
+  /** Enables/disables report NMEA flag. */
+  void enableReportNMEA(bool enable);
+  /** Returns @c true if the report status flag is set. */
+  bool reportStatus() const;
+  /** Enables/disables report status flag. */
+  void enableReportStatus(bool enable);
+  /** Returns @c true if the report other flag is set. */
+  bool reportOther() const;
+  /** Enables/disables report other flag. */
+  void enableReportOther(bool enable);
+
+  /** Returns the list of additional FM APRS frequencies. */
+  AnytoneAPRSFrequencyList *frequencies() const;
+
+protected:
+  /** The transmit delay. */
+  Interval _txDelay;
+  /** The pre-wave delay. */
+  Interval _preWaveDelay;
+  /** If @c true, all APRS messages are processed. */
+  bool _passAll;
+  /** If @c true the report position flag is set. */
+  bool _reportPosition;
+  /** The report Mic-E flag. */
+  bool _reportMicE;
+  /** The report object flag. */
+  bool _reportObject;
+  /** The report item flag. */
+  bool _reportItem;
+  /** The report message flag. */
+  bool _reportMessage;
+  /** The report weather flag. */
+  bool _reportWeather;
+  /** The report NMEA flag. */
+  bool _reportNMEA;
+  /** The report status flag. */
+  bool _reportStatus;
+  /** The report other flag. */
+  bool _reportOther;
+  /** The list of additional FM APRS frequencies. */
+  AnytoneAPRSFrequencyList *_frequencies;
 };
 
 #endif // ANYTONEEXTENSION_HH

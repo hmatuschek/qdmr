@@ -10,6 +10,7 @@
 #include "ui_settingsdialog.h"
 
 #include "codeplug.hh"
+#include "configmergevisitor.hh"
 
 
 class Settings : public QSettings
@@ -29,6 +30,9 @@ public:
   QString locator() const;
   void setLocator(const QString &locator);
   QGeoCoordinate position() const;
+
+  bool disableAutoDetect() const;
+  void setDisableAutoDetect(bool disable);
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
@@ -82,6 +86,12 @@ public:
 
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
+
+  ConfigMergeVisitor::ItemStrategy configMergeItemStrategy() const;
+  void setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy);
+
+  ConfigMergeVisitor::SetStrategy configMergeSetStrategy() const;
+  void setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy);
 
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);

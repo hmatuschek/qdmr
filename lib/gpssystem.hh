@@ -3,6 +3,7 @@
 
 #include "configreference.hh"
 #include <QAbstractTableModel>
+#include "anytone_extension.hh"
 
 class Config;
 class DMRContact;
@@ -70,7 +71,7 @@ class GPSSystem : public PositioningSystem
 
 public:
   /** Default constructor. */
-  explicit GPSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit GPSSystem(QObject *parent=nullptr);
   /** Constructor.
    *
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
@@ -137,6 +138,8 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
   Q_PROPERTY(QString message READ message WRITE setMessage)
+  /** Anytone sepecific settings. */
+  Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -161,7 +164,7 @@ public:
 
 public:
   /** Default constructor. */
-  explicit APRSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit APRSSystem(QObject *parent=nullptr);
   /** Constructor for a APRS system.
    * @param name Specifies the name of the APRS system. This property is just a name, it does not
    *        affect the radio configuration.
@@ -224,6 +227,11 @@ public:
   /** Sets the optional APRS message text. */
   void setMessage(const QString &msg);
 
+  /** Returns the Anytone settings extension, if set. */
+  AnytoneFMAPRSSettingsExtension *anytoneExtension() const;
+  /** Sets the Anytone settings extension. */
+  void setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -248,6 +256,8 @@ protected:
   Icon _icon;
   /** Holds the optional message. */
   QString _message;
+  /** Owns the Anytone settings extension. */
+  AnytoneFMAPRSSettingsExtension *_anytone;
 };
 
 
@@ -264,7 +274,7 @@ public:
   /** Returns the positioning system at the specified index. */
   PositioningSystem *system(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Returns the number of defined GPS systems. */
   int gpsCount() const;

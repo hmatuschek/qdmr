@@ -94,6 +94,9 @@ public:
   /** Empty constructor. */
   explicit MD390Codeplug(QObject *parent=nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearTimestamp();

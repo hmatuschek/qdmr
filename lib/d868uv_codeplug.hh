@@ -280,6 +280,12 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
+      /// @todo Implement
+    };
   };
 
   /** Represents the general config of the radio within the D868UV binary codeplug.
@@ -695,11 +701,11 @@ protected:
   /** Encode zones into codeplug. */
   virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to encode a single zone. */
-  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create zones from codeplug. */
   virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to decode a single zone. */
-  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
   virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to link a single zone. */
@@ -840,7 +846,7 @@ protected:
 
     static constexpr unsigned int settings()             { return 0x02500000; }
     static constexpr unsigned int bootSettings()         { return 0x02500600; }
-    static constexpr unsigned int dmrAPRSSettings()      { return 0x02501000; }
+    static constexpr unsigned int aprsSettings()         { return 0x02501000; }
     static constexpr unsigned int dmrAPRSMessage()       { return 0x02501100; }
     static constexpr unsigned int zoneChannelList()      { return 0x02500100; }
     static constexpr unsigned int offsetFrequencies()    { return 0x024C2000; }

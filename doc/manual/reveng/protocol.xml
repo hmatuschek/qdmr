@@ -11,7 +11,7 @@
   There is no one ultimate way to successfully reverse engineer a communication protocol. But some
   methods are very common. First, one needs to get some captures of the communication between the 
   manufacturer codeplug programming software (<acronym>CPS</acronym>) and the radio of interest. 
-  The majority of theses radios will communicate via USB. Hence, some means are needed to capture
+  The majority of these radios will communicate via USB. Hence, some means are needed to capture
   USB traffic.
 </para>
 <para>
@@ -177,7 +177,7 @@ for package in packages:
 <para>
   The <xref linkend="revEngD578"/> shows a capture of the data exchanged between the host 
   and an AnyTone AT-D578UV during a codeplug read. Everything starting with <token>&gt;</token> is
-  send from the host to the device, while everything starting with <token>&lt;</token> is send by 
+  sent from the host to the device, while everything starting with <token>&lt;</token> is sent by 
   the device to the host.
 </para>
 <para>
@@ -205,7 +205,7 @@ for package in packages:
 02 64 00 20 10
 ]]></programlisting>
   The only difference of these requests is the fourth byte. Hence, one may assume, that this byte is 
-  part of the address field. However, we do not know wich bytes are part of the address as well. 
+  part of the address field. However, we do not know which bytes are part of the address as well. 
 </para>
 <para>
   The responses to these requests also contain these bytes as well as 18 more bytes of payload. It is 
@@ -269,7 +269,6 @@ Where <token>N</token> is the number of bytes to read.
 +---+---+---+---+---+---+---+...+---+---+---+]]></programlisting>
   where the CRC is the least significant byte of the sum over the address, length and data payload.
 </para>
-
 </section>
 
 </section>

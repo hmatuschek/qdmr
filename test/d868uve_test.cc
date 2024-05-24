@@ -7,24 +7,9 @@
 #include <QTest>
 
 D868UVETest::D868UVETest(QObject *parent)
-  : QObject(parent)
+  : UnitTestBase(parent)
 {
   // pass...
-}
-
-void
-D868UVETest::initTestCase() {
-  ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-D868UVETest::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
 }
 
 void
@@ -54,6 +39,30 @@ D868UVETest::testBasicConfigDecoding() {
           .arg(err.format()).toStdString().c_str());
   }
 }
+
+void
+D868UVETest::testChannelFrequency() {
+  ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  D868UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D868UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D868UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           Frequency::fromHz(123456780ULL));
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           Frequency::fromHz(999999990ULL));
+}
+
 
 void
 D868UVETest::testAutoRepeaterOffset() {
@@ -89,7 +98,7 @@ D868UVETest::testAutoRepeaterOffset() {
   // Decode
   Config comp_config;
   if (! codeplug.decode(&comp_config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UVII: %1")
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -107,6 +116,40 @@ D868UVETest::testAutoRepeaterOffset() {
   QCOMPARE(ext->vhfRef()->as<AnytoneAutoRepeaterOffset>(), ext->offsets()->get(0)->as<AnytoneAutoRepeaterOffset>());
   QCOMPARE(ext->uhfRef()->as<AnytoneAutoRepeaterOffset>(), ext->offsets()->get(1)->as<AnytoneAutoRepeaterOffset>());
 }
+
+void
+D868UVETest::testDTMFContacts() {
+  // Assemble config
+  Config base;
+
+  DTMFContact *contact0 = new DTMFContact();
+  contact0->setName("Contact 0"); contact0->setNumber("0123456789ABCD#*");
+  base.contacts()->add(contact0);
+
+  // Encode
+  D868UVCodeplug codeplug; ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&base, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+
+  // Decode
+  Config comp_config;
+  if (! codeplug.decode(&comp_config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check contacts
+  QCOMPARE(comp_config.contacts()->count(), 1);
+  QVERIFY(comp_config.contacts()->get(0)->is<DTMFContact>());
+  QCOMPARE(comp_config.contacts()->get(0)->as<DTMFContact>()->name(), "Contact 0");
+  // Contacts are limited to 14 digit numbers.
+  QCOMPARE(comp_config.contacts()->get(0)->as<DTMFContact>()->number(), "0123456789ABCD");
+}
+
 
 QTEST_GUILESS_MAIN(D868UVETest)
 

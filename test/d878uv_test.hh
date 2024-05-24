@@ -2,10 +2,9 @@
 #define D878UVTEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class D878UVTest : public QObject
+class D878UVTest : public UnitTestBase
 {
   Q_OBJECT
 
@@ -14,20 +13,19 @@ public:
 
 private slots:
   void initTestCase();
-  void cleanupTestCase();
 
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
+  void testChannelFrequency();
 
   void testAnalogMicGain();
   void testRoaming();
   void testHangTime();
+  void testKeyFunctions();
 
 protected:
-  QTextStream _stderr;
-  Config _basicConfig;
   Config _micGainConfig;
-  Config _roamingConfig;
+  QTextStream _stderr;
 };
 
 #endif // D878UVTEST_HH

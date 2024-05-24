@@ -18,5 +18,5 @@
 <xi:include href="channel.xml"/>
 <xi:include href="zone.xml"/>
 <xi:include href="settings.xml"/>
-
+<xi:include href="aprs.xml"/>
 </section>

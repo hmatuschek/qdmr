@@ -230,7 +230,7 @@ public:
 protected:
   virtual bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
 
-  /** Helper for find the @c IdPrefix class info in the class hierachy. */
+  /** Helper to find the @c IdPrefix class info in the class hierarchy. */
   static QString findIdPrefix(const QMetaObject* meta);
 
 protected:
@@ -285,26 +285,34 @@ public:
   virtual const Config *config() const;
   /** Searches the config tree to find all instances of the given type names. */
   virtual void findItemsOfTypes(const QStringList &typeNames, QSet<ConfigItem*> &items) const;
+  /** Searches the list for objects with the given name. */
+  virtual QList<ConfigObject *> findItemsByName(const QString name) const;
 
   /** Returns @c true, if the list contains the given object. */
   virtual bool has(ConfigObject *obj) const;
   /** Returns the list element at the given index or @c nullptr if out of bounds. */
   virtual ConfigObject *get(int idx) const;
   /** Adds an element to the list. */
-  virtual int add(ConfigObject *obj, int row=-1);
+  virtual int add(ConfigObject *obj, int row=-1, bool unique=true);
+  /** Replaces an element in the list. */
+  virtual int replace(ConfigObject *obj, int row, bool unique=true);
   /** Removes an element from the list. */
   virtual bool take(ConfigObject *obj);
   /** Removes an element from the list (and deletes it if owned). */
   virtual bool del(ConfigObject *obj);
 
-  /** Moves the channel at index @c idx one step up. */
+  /** Moves an object at index @c idx one step up. */
   virtual bool moveUp(int idx);
-  /** Moves the channels at one step up. */
+  /** Moves objects at [first, last] one step up. */
   virtual bool moveUp(int first, int last);
-  /** Moves the channel at index @c idx one step down. */
+  /** Moves an object at index @c idx one step down. */
   virtual bool moveDown(int idx);
-  /** Moves the channels one step down. */
+  /** Moves objects [first, last] one step down. */
   virtual bool moveDown(int first, int last);
+  /** Moves the given source range to the destination index.
+   * The destination index is given before the movement. That is, if elements 0 & 1 are moved to
+   * indices 1 & 2, call @c move(0,2, 2) */
+  virtual bool move(int source, int count, int destination);
 
   /** Returns the element type for this list. */
   const QList<QMetaObject> &elementTypes() const;
@@ -348,7 +356,7 @@ protected:
   ConfigObjectList(const std::initializer_list<QMetaObject> &elementTypes, QObject *parent=nullptr);
 
 public:
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
   bool take(ConfigObject *obj);
   bool del(ConfigObject *obj);
   void clear();

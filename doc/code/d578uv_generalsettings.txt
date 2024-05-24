@@ -154,7 +154,7 @@ Where:
   DMR settings:
     - Group/private call hang time in seconds 1=1s, 2=2s, ..., 30=30s, 31=30min, 32=infinity.
     - Pre-wave delay in multiples of 20ms 0=0ms (default), 1=20ms, ..., 50=1000ms
-    - Wake head period in muliples of 20ms 0=0ms (default), 1=20ms, ..., 60=1200ms
+    - Wake head period in multiples of 20ms 0=0ms (default), 1=20ms, ..., 60=1200ms
     - DMR monitor mode 0=Off, 1=Single slot, 2=Dual-slot.
     - SMS format: 0=Motorola (default), 1=Hytera, 2=DMR Standard
   Boot settings:

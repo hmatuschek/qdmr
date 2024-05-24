@@ -40,6 +40,10 @@
 #include "extensionview.hh"
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
+#include "chirpformat.hh"
+#include "configmergedialog.hh"
+#include "configmergevisitor.hh"
+
 
 inline QStringList getLanguages() {
   QStringList languages = {QLocale::system().name()};
@@ -199,6 +203,8 @@ Application::createMainWindow() {
   QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
   QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
   QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
+  QAction *exportCP = _mainWindow->findChild<QAction*>("actionExportToCHIRP");
+  QAction *importCP = _mainWindow->findChild<QAction*>("actionImport");
 
   QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
   QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
@@ -217,6 +223,8 @@ Application::createMainWindow() {
   connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
   connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
+  connect(exportCP, SIGNAL(triggered()), this, SLOT(exportCodeplugToChirp()));
+  connect(importCP, SIGNAL(triggered()), this, SLOT(importCodeplug()));
   connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
   connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
   connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
@@ -421,6 +429,105 @@ Application::saveCodeplug() {
 
 
 void
+Application::exportCodeplugToChirp() {
+  if (! _mainWindow)
+    return;
+
+  Settings settings;
+  QString filename = QFileDialog::getSaveFileName(
+        nullptr, tr("Export codeplug"), settings.lastDirectory().absolutePath(),
+        tr("CHIRP CSV Files (*.csv)"));
+
+  if (filename.isEmpty())
+    return;
+
+
+  QFile file(filename);
+  if (! file.open(QIODevice::WriteOnly)) {
+    QMessageBox::critical(nullptr, tr("Cannot open file"),
+                          tr("Cannot save codeplug to file '%1': %2").arg(filename).arg(file.errorString()));
+    return;
+  }
+
+  QTextStream stream(&file);
+  QFileInfo info(filename);
+  ErrorStack err;
+  if (! ChirpWriter::write(stream, _config, err))
+    QMessageBox::critical(nullptr, tr("Cannot export codeplug"),
+                          tr("Cannot export codeplug to file '%1':\n%2").arg(filename).arg(err.format()));
+
+  file.flush();
+  file.close();
+
+  settings.setLastDirectoryDir(info.absoluteDir());
+}
+
+
+void
+Application::importCodeplug() {
+  if (! _mainWindow)
+    return;
+
+  Settings settings;
+  QString filename = QFileDialog::getOpenFileName(
+        nullptr, tr("Import codeplug"), settings.lastDirectory().absolutePath(),
+        tr("CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)"));
+
+  if (filename.isEmpty())
+    return;
+
+  Config merging;
+  ErrorStack err;
+
+  if (filename.endsWith(".csv")) {
+    // import CHIRP CSV file
+    QFile file(filename);
+    if (! file.open(QIODevice::ReadOnly)) {
+      QMessageBox::critical(nullptr, tr("Cannot open file"),
+                            tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
+      return;
+    }
+
+    QTextStream stream(&file);
+    if (! ChirpReader::read(stream, &merging, err)) {
+      QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                            tr("Cannot import codeplug from '%1': %2")
+                            .arg(filename).arg(err.format()));
+      return;
+    }
+  } else if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+    // import QDMR YAML codeplug
+    if (! merging.readYAML(filename, err)) {
+      QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                            tr("Cannot import codeplug from '%1': %2")
+                            .arg(filename).arg(err.format()));
+      return;
+    }
+  } else {
+    QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                          tr("Do not know, how to handle file '%1'.")
+                          .arg(filename));
+    return;
+  }
+
+  ConfigMergeDialog mergeDialog;
+  if (QDialog::Accepted != mergeDialog.exec())
+    return;
+
+  logDebug() << "Merging codeplugs ...";
+  if (! ConfigMerge::mergeInto(_config, &merging, mergeDialog.itemStrategy(),
+                               mergeDialog.setStrategy(), err)) {
+    QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
+                          tr("Cannot import codeplug from '%1': %2")
+                          .arg(filename).arg(err.format()));
+    _config->setModified(true);
+    return;
+  }
+
+  _config->setModified(true);
+}
+
+void
 Application::quitApplication() {
   if (_config->isModified()) {
     if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
@@ -440,16 +547,21 @@ Application::quitApplication() {
 
 Radio *
 Application::autoDetect(const ErrorStack &err) {
+  Settings settings;
   // If the last detected device is still valid
   //  -> skip interface detection and selection
-  if (! _lastDevice.isValid()) {
+  if ((! _lastDevice.isValid()) || settings.disableAutoDetect()) {
     logDebug() << "Last device is invalid, search for new one.";
     // First get all devices that are known by VID/PID
     QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
     if (interfaces.isEmpty()) {
+      logDebug() << "No save device found, continue searching for unsave ones.";
+      interfaces = USBDeviceDescriptor::detect(false);
+    }
+    if (interfaces.isEmpty()) {
       errMsg(err) << tr("No matching devices found.");
       return nullptr;
-    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave())) {
+    } else if ((1 != interfaces.count()) || (! interfaces.first().isSave()) || settings.disableAutoDetect()) {
       // More than one device found, or device not save -> select by user
       DeviceSelectionDialog dialog(interfaces);
       if (QDialog::Accepted != dialog.exec()) {
@@ -463,7 +575,7 @@ Application::autoDetect(const ErrorStack &err) {
 
   // Check if device supports identification
   RadioInfo radioInfo;
-  if (! _lastDevice.isIdentifiable()) {
+  if ((! _lastDevice.isSave()) || settings.disableAutoDetect()){
     RadioSelectionDialog dialog(_lastDevice);
     if (QDialog::Accepted != dialog.exec()) {
       return nullptr;
@@ -485,7 +597,7 @@ void
 Application::detectRadio() {
   if (Radio *radio = autoDetect()) {
     QMessageBox::information(nullptr, tr("Radio found"), tr("Found device '%1'.").arg(radio->name()));
-    radio->deleteLater();
+    delete radio;
   } else {
     QMessageBox::information(nullptr, tr("No radio found"),
                              tr("No matching device was found."));
@@ -508,9 +620,18 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
     }
     return false;
   }
+
+  ErrorStack err;
+  Config *intermediate = myRadio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    return false;
+  }
+
   Settings settings;
   RadioLimitContext ctx(settings.ignoreFrequencyLimits());
-  myRadio->limits().verifyConfig(_config, ctx);
+  myRadio->limits().verifyConfig(intermediate, ctx);
+
   bool verified = true;
   if ( (settings.ignoreVerificationWarning() && (ctx.maxSeverity()>RadioLimitIssue::Warning)) ||
        ((!settings.ignoreVerificationWarning()) && (ctx.maxSeverity()>=RadioLimitIssue::Warning)) ) {
@@ -522,6 +643,9 @@ Application::verifyCodeplug(Radio *radio, bool showSuccess) {
           nullptr, tr("Verification success"),
           tr("The codeplug was successfully verified with the radio '%1'").arg(myRadio->name()));
   }
+
+  // Delete intermediate representation
+  delete intermediate;
 
   // If no radio was given -> close connection to radio again
   if (nullptr == radio)
@@ -562,7 +686,7 @@ Application::downloadCodeplug() {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -570,7 +694,7 @@ Application::downloadCodeplug() {
 void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
@@ -591,8 +715,15 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
     _config->setModified(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
+    _config->clear();
   }
+
+  if (! radio->codeplug().postprocess(_config, err)) {
+    ErrorMessageView(err).exec();
+    _config->clear();
+  }
+
   _mainWindow->setEnabled(true);
 
   if (radio->wait(250))
@@ -626,11 +757,18 @@ Application::uploadCodeplug() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   ErrorStack err;
-  if (radio->startUpload(_config, false, settings.codePlugFlags(), err)) {
+  Config *intermediate = radio->codeplug().preprocess(_config, err);
+  if (nullptr == intermediate) {
+    ErrorMessageView(err).exec();
+    progress->setVisible(false);
+    return;
+  }
+
+  if (radio->startUpload(intermediate, false, settings.codePlugFlags(), err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -668,7 +806,7 @@ Application::uploadCallsignDB() {
   // this is part of the "auto-selection" of calls-signs for upload
   Settings settings;
   if (settings.selectUsingUserDMRID()) {
-    if (nullptr == _config->radioIDs()->defaultId()) {
+    if (nullptr == _config->settings()->defaultId()) {
       QMessageBox::critical(nullptr, tr("Cannot write call-sign DB."),
                             tr("QDMR selects the call-signs to be written based on the default DMR "
                                "ID of the radio. No default ID set."));
@@ -676,7 +814,7 @@ Application::uploadCallsignDB() {
       return;
     }
     // Sort w.r.t users DMR ID
-    unsigned id = _config->radioIDs()->defaultId()->number();
+    unsigned id = _config->settings()->defaultId()->number();
     logDebug() << "Sort call-signs closest to ID=" << id << ".";
     _users->sortUsers(id);
   } else {
@@ -709,7 +847,7 @@ Application::uploadCallsignDB() {
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
   } else {
-    ErrorMessageView(err).show();
+    ErrorMessageView(err).exec();
     progress->setVisible(false);
   }
 }
@@ -718,7 +856,7 @@ Application::uploadCallsignDB() {
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
-  ErrorMessageView(radio->errorStack()).show();
+  ErrorMessageView(radio->errorStack()).exec();
   _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 

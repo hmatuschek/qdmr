@@ -204,9 +204,9 @@ ScanLists::scanlist(int idx) const {
 }
 
 int
-ScanLists::add(ConfigObject *obj, int row) {
+ScanLists::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<ScanList>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

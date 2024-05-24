@@ -22,6 +22,7 @@ public:
     OpenRTX,
     // Radioddity devices
     RD5R,
+    GD73,
     GD77,
     // TyT devices
     MD390, MD380 = MD390, RT8 = MD390,
@@ -35,7 +36,8 @@ public:
     D878UVII,
     D578UV,
     // Baofeng/BTECH
-    DM1701, RT84 = DM1701
+    DM1701, RT84 = DM1701,
+    DR1801UV
   };
 
 public:
@@ -94,7 +96,7 @@ protected:
   QString _name;
   /** Holds the name of the manufacturer. */
   QString _manufacturer;
-  /** Holds possible identical radios from other manufactuers. */
+  /** Holds possible identical radios from other manufacturers. */
   QList<RadioInfo> _alias;
   /** Holds some information about the interface to the radio. */
   USBDeviceInfo _interface;

@@ -17,6 +17,7 @@ Currently, there are only few radios that are supported
 
   * Open GD77 firmware (since version 0.4.0)
   * Radioddity GD77 (since version 0.8.1)
+  * Radioddity GD73 (since version 0.12.0)
   * Baofeng/Radioddity RD-5R & RD-5R+ (since version 0.2.0)
   * TYT MD-390 / Retevis RT8 (since version 0.9.0)
   * TYT MD-UV380 (since version 0.9.0)
@@ -27,6 +28,7 @@ Currently, there are only few radios that are supported
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
   * BTECH DM-1701 / Retevis RT84 (since version 0.10.0)
+  * BTECH BF-1801A6 (since version 0.12.0)
   * BTECH DMR-6x2 (since version 0.11.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
@@ -42,7 +44,7 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.11.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.2)** -- Added proper support for BTech DMR-6X2UV, some bugfixes.
+ * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
  * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
  * **[Version 0.8.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.8.1)** -- Fixed Radioddity GD-77 support (callsign db still buggy).
