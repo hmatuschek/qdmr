@@ -1425,6 +1425,8 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     }
     fm->setBandwidth(bandwidth());
     fm->setSquelchDefault();
+    fm->setRXTone(rxTone());
+    fm->setTXTone(txTone());
   } else if (Type::DMR == type()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admit()) {
@@ -1517,6 +1519,8 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     case FMChannel::Admit::Free: setAdmit(Admit::Free); break;
     }
     setBandwidth(fm->bandwidth());
+    setRXTone(fm->rxTone());
+    setTXTone(fm->txTone());
   }
 
   return true;
