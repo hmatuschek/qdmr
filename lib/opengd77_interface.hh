@@ -27,6 +27,7 @@
  *  <tr><td>01h</td> <td>Clear screen.</td></tr>
  *  <tr><td>02h</td> <td>Display text.</td></tr>
  *  <tr><td>03h</td> <td>Render screen.</td></tr>
+ *  <tr><td>05h</td> <td>Close CPS screen.</td></tr>
  *  <tr><td>06h</td> <td>Control radio.</td></tr>
  *  <tr><td>07h</td> <td>Start GPS logging.</td></tr>
  *  <tr><td>feh</td> <td>Ping request.</td></tr>
