@@ -877,7 +877,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulsante Aggiungi contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
@@ -897,7 +897,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="55"/>
         <source>Delete contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulsante Elimina contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="58"/>
@@ -1321,12 +1321,12 @@
     <message>
         <location filename="../src/extensionview.cc" line="113"/>
         <source>Cannot create list element.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile creare un elemento nella lista.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile crere un elemento nella lista, puoi provare a segnalare un bug.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>
@@ -1797,12 +1797,12 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="325"/>
         <source>Refresh Talkgroup DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna DB dei talk-group</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="328"/>
         <source>Refreshes the downloaded talkgroup DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna il DB dei talk-group scaricati</translation>
     </message>
 </context>
 <context>
@@ -1810,12 +1810,12 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="43"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Selezionato/a]</translation>
     </message>
     <message>
         <location filename="../src/channelselectiondialog.cc" line="64"/>
         <source>Select a channel:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona un canale:</translation>
     </message>
 </context>
 <context>
@@ -1823,12 +1823,12 @@
     <message>
         <location filename="../src/contactselectiondialog.cc" line="17"/>
         <source>Show private calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra chiamate private</translation>
     </message>
     <message>
         <location filename="../src/contactselectiondialog.cc" line="39"/>
         <source>Select a group call:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona una chiamata di gruppo:</translation>
     </message>
 </context>
 <context>
@@ -1836,7 +1836,7 @@
     <message>
         <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
         <source>Select roaming channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona canali roaming</translation>
     </message>
 </context>
 <context>
@@ -1844,28 +1844,28 @@
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="73"/>
         <source>Cannot delete GPS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare sistema GPS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="74"/>
         <source>Cannot delete GPS system: You have to select a GPS system first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare sistema GPS: Prima selezionare un sistema GPS.</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete positioning system?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare sistema di posizionamento?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <source>Delete positioning system %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare sistema di posizionamento &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 sistemi di posizionamento?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="35"/>
@@ -1875,32 +1875,32 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="72"/>
         <source>Add GPS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Sistema GPS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="75"/>
         <source>Alt+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+G</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="85"/>
         <source>Add APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Sistema APRS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="88"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="95"/>
         <source>Delete Position System</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Sistema di Posizionamento</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="98"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1908,68 +1908,68 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="714"/>
         <source>DMR</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="716"/>
         <source>APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="718"/>
         <source>OOps!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ops!</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="724"/>
         <location filename="../src/configitemwrapper.cc" line="743"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="727"/>
         <source>%1-%2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1-%2</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="735"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Selezionato/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="739"/>
         <source>OOPS!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ops!</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="759"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="760"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="761"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Destinazione</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="762"/>
         <source>Period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation>Periodo [s]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="763"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Canale</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="764"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Messaggio</translation>
     </message>
 </context>
 <context>
@@ -1977,17 +1977,17 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="97"/>
         <source>False</source>
-        <translation type="unfinished"></translation>
+        <translation>Falso</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="98"/>
         <source>True</source>
-        <translation type="unfinished"></translation>
+        <translation>Vero</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="121"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
 </context>
 <context>
@@ -1995,38 +1995,38 @@
     <message>
         <location filename="../src/extensionwrapper.cc" line="349"/>
         <source>new element</source>
-        <translation type="unfinished"></translation>
+        <translation>nuovo elemento</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="525"/>
         <source>Property</source>
-        <translation type="unfinished"></translation>
+        <translation>Proprietà</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Valore</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="583"/>
         <source>true</source>
-        <translation type="unfinished"></translation>
+        <translation>vero</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="584"/>
         <source>false</source>
-        <translation type="unfinished"></translation>
+        <translation>falso</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="603"/>
         <location filename="../src/extensionwrapper.cc" line="611"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="613"/>
@@ -2045,132 +2045,132 @@
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
         <source>Police station</source>
-        <translation type="unfinished"></translation>
+        <translation>Stazione di polizia</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Digipeater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Digipeater</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefono</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>DX cluster</source>
-        <translation type="unfinished"></translation>
+        <translation>Cluster DX</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="12"/>
         <source>HF gateway</source>
-        <translation type="unfinished"></translation>
+        <translation>Gateway HF</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>Plane small</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plane small</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Mobile Satellite station</source>
-        <translation type="unfinished"></translation>
+        <translation>Stazione satellitare mobile</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Wheel Chair</source>
-        <translation type="unfinished"></translation>
+        <translation>Sedia a rotelle</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Snowmobile</source>
-        <translation type="unfinished"></translation>
+        <translation>Motoslitta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Red cross</source>
-        <translation type="unfinished"></translation>
+        <translation>Croce rossa</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="18"/>
         <source>Boy scout</source>
-        <translation type="unfinished"></translation>
+        <translation>Boy scout</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="21"/>
         <source>Red dot</source>
-        <translation type="unfinished"></translation>
+        <translation>Punto rosso</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Circle 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 0</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 1</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 2</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 3</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 4</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 5</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 6</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 6</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 7</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 7</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 8</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 8</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 9</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerchio 9</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
@@ -2508,37 +2508,37 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="59"/>
         <source>Add Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Contatto</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="62"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="69"/>
         <source>Remove Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovi Contatto</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="72"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -2546,47 +2546,47 @@
     <message>
         <location filename="../src/radioidlistview.cc" line="61"/>
         <source>Cannot delete radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare ID radio</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="62"/>
         <source>Cannot delete radio IDs: You have to select a radio ID first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare ID radio: Prima selezionare un ID radio.</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare ID radio?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare ID radio &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare liste scan?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete %1 scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 liste scan?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
         <source>Default Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Radio predefinito</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="46"/>
         <source>Add Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi ID Radio</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="53"/>
         <source>Delete Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina ID Radio</translation>
     </message>
 </context>
 <context>
@@ -2594,17 +2594,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="912"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="913"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="914"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numero</translation>
     </message>
 </context>
 <context>
@@ -2612,12 +2612,12 @@
     <message>
         <location filename="../src/radioselectiondialog.ui" line="14"/>
         <source>Cannot auto-detect radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile rilevare automaticamente la radio</translation>
     </message>
     <message>
         <location filename="../src/radioselectiondialog.ui" line="20"/>
         <source>Select a specific radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona una radio specifica</translation>
     </message>
 </context>
 <context>
@@ -2626,13 +2626,15 @@
         <location filename="../src/releasenotes.cc" line="31"/>
         <source>Cannot download release notes from https://github.com/hmatuschek/qdmr
 	 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile scaricare le note di rilascio da https://github.com/hmatuschek/qdmr
+	 %1</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="43"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release is not a JSON object!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile leggere le note di rilascio da https://github.com/hmatuschek/qdmr
+	Il rilascio non è un oggetto JSON!</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="48"/>
