@@ -2629,11 +2629,11 @@ RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ex
   }
 
   for (int i=0; i<ext->encryptionKeys()->count(); i++) {
-    if (! ext->encryptionKeys()->get(i)->is<DMREncryptionKey>()) {
+    if (! ext->encryptionKeys()->get(i)->is<BasicEncryptionKey>()) {
       logError() << "Can only encode basic encryption keys.";
       return false;
     }
-    DMREncryptionKey *key = ext->encryptionKeys()->get(i)->as<DMREncryptionKey>();
+    BasicEncryptionKey *key = ext->encryptionKeys()->get(i)->as<BasicEncryptionKey>();
     if (key->key().size() != 4) {
       logError() << "Can only encode 32bit basic encryption keys.";
       return false;
@@ -2654,7 +2654,7 @@ bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     if (! isBasicKeySet(i))
       continue;
     // Assemble key
-    DMREncryptionKey *key = new DMREncryptionKey();
+    BasicEncryptionKey *key = new BasicEncryptionKey();
     key->setName(QString("Basic Key %1").arg(i+1));
     key->fromHex(basicKey(i).toHex());
     // add key to extension

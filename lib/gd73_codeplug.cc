@@ -750,6 +750,118 @@ GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::EncryptionKeyElement
+ * ********************************************************************************************* */
+GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+GD73Codeplug::EncryptionKeyElement::clear() {
+  setKeySize(0);
+}
+
+bool
+GD73Codeplug::EncryptionKeyElement::isValid() const {
+  return Element::isValid() && (0 != keySize());
+}
+
+unsigned int
+GD73Codeplug::EncryptionKeyElement::keySize() const {
+  return getUInt8(Offset::size())*4;
+}
+void
+GD73Codeplug::EncryptionKeyElement::setKeySize(unsigned int size) {
+  setUInt8(Offset::size(), size/4);
+}
+
+BasicEncryptionKey *
+GD73Codeplug::EncryptionKeyElement::createEncryptionKey(const ErrorStack &err) const {
+  if (! isValid())
+    return nullptr;
+
+  BasicEncryptionKey *key = new BasicEncryptionKey();
+  if (! key->setKey(QByteArray((const char*)_data+Offset::key(), keySize()/8))) {
+    errMsg(err) << "Cannot decode encryption key of size " << keySize() << ".";
+    delete key;
+    return nullptr;
+  }
+
+  return key;
+}
+
+bool
+GD73Codeplug::EncryptionKeyElement::encodeEncryptionKey(BasicEncryptionKey *key, const ErrorStack &err) {
+  unsigned int size = key->key().size()*8;
+  if (size > 32) {
+    errMsg(err) << "Key size of " << size << " exceeds 32bit.";
+    return false;
+  }
+
+  setKeySize(size);
+  memcpy(_data+Offset::key(), key->key().constData(), key->key().size());
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::EncryptionKeyBankElement
+ * ********************************************************************************************* */
+GD73Codeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+bool
+GD73Codeplug::EncryptionKeyBankElement::createEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    EncryptionKeyElement keyElement(_data + Offset::keys() + i*Offset::betweenKeys());
+    if (! keyElement.isValid())
+      continue;
+    EncryptionKey *key = keyElement.createEncryptionKey(err);
+    if (nullptr == key) {
+      errMsg(err) << "Cannot decode " <<i+1<<"-th encryption key. Skip.";
+      continue;
+    }
+    key->setName(QString("Basic Key %1").arg(i+1));
+    ctx.add(key, i);
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::EncryptionKeyBankElement::encodeEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    EncryptionKeyElement keyElement(_data + Offset::keys() + i*Offset::betweenKeys());
+    keyElement.clear();
+    if (i >= ctx.count<BasicEncryptionKey>())
+      continue;
+    if (! keyElement.encodeEncryptionKey(ctx.get<BasicEncryptionKey>(i))) {
+      errMsg(err) << "Cannot encode " << i+1 << "-th encryption key.";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ContactBankElement
  * ********************************************************************************************* */
 GD73Codeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t size)
@@ -1451,6 +1563,19 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
       }
       dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
     }
+    if (hasEncryptionKeyIndex()) {
+      // Check if already defined
+      if (! ctx.has<BasicEncryptionKey>(encryptionKeyIndex())) {
+        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve encryption key index "
+                    << encryptionKeyIndex() << ".";
+        return false;
+      }
+      // set...
+      if (nullptr == dmr->commercialExtension())
+        dmr->setCommercialExtension(new CommercialChannelExtension());
+      dmr->commercialExtension()->setEncryptionKey(
+            ctx.get<BasicEncryptionKey>(encryptionKeyIndex()));
+    }
   }
 
   if (hasScanListIndex()) {
@@ -1495,6 +1620,9 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     }
     setColorCode(dmr->colorCode());
     setTimeSlot(dmr->timeSlot());
+    if (CommercialChannelExtension *ext = dmr->commercialExtension())
+      if ((! ext->encryptionKeyRef()->isNull()) && (0 <= ctx.index(ext->encryptionKey())) )
+        setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
     switch (fm->admit()) {
@@ -2047,6 +2175,17 @@ GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0; i<config->scanlists()->count(); i++)
     ctx.add(config->scanlists()->scanlist(i), i);
 
+  // Handle encryption keys
+  if (nullptr != config->commercialExtension()) {
+    for (int i=0, j=0; i<config->commercialExtension()->encryptionKeys()->count(); i++) {
+      EncryptionKey *key = config->commercialExtension()->encryptionKeys()->key(i);
+      // Can only encode basic encryption keys
+      if (! key->is<BasicEncryptionKey>())
+        continue;
+      ctx.add(key->as<BasicEncryptionKey>(), j++);
+    }
+  }
+
   return true;
 
 }
@@ -2082,6 +2221,11 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
     return false;
   }
 
+  if (! encodeEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys for Radioddity GD73.";
+    return false;
+  }
+
   if (! encodeChannels(ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
     return false;
@@ -2103,6 +2247,7 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
 bool
 GD73Codeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! decodeTimestamp(ctx, err)) {
     errMsg(err) << "Cannot decode codeplug.";
@@ -2295,7 +2440,19 @@ GD73Codeplug::encodeGroupLists(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::createEncryptionKeys(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).createEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot create encryption keys.";
+    return false;
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::encodeEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).encodeEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
+    return false;
+  }
   return true;
 }
 

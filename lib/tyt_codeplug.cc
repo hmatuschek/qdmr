@@ -533,12 +533,12 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
         return false;
       }
       if (PRIV_BASIC == privacyType()) {
-        if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
+        if (! ctx.has<BasicEncryptionKey>(privacyIndex())) {
           errMsg(err) << "Cannot link encryption key: No basic key with index " << privacyIndex()
                       << " defined.";
           return false;
         }
-        dc->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
+        dc->commercialExtension()->setEncryptionKey(ctx.get<BasicEncryptionKey>(privacyIndex()));
       } else if (PRIV_ENHANCED == privacyType()) {
         if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
           errMsg(err) << "Cannot link encryption key: No AES (enhances) key with index "
@@ -616,7 +616,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
         logError() << "Cannot encode encryption key '"
                    << dchan->commercialExtension()->encryptionKey()->name()
                    << "': Not indexed.";
-      } else if (dchan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
+      } else if (dchan->commercialExtension()->encryptionKey()->is<BasicEncryptionKey>()) {
         setPrivacyType(PRIV_BASIC);
         setPrivacyIndex(ctx.index(dchan->commercialExtension()->encryptionKey()));
       } else if (dchan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
@@ -2671,7 +2671,7 @@ TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
 
 bool
 TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Context &ctx) {
-  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
   ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   // Clear all keys
@@ -2680,8 +2680,8 @@ TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Con
   // Encode each key
   unsigned basicCount=0, aesCount=0;
   for (int i=0; i<encr->encryptionKeys()->count(); i++) {
-    if (encr->encryptionKeys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
-      DMREncryptionKey *key = encr->encryptionKeys()->get(i)->as<DMREncryptionKey>();
+    if (encr->encryptionKeys()->get(i)->is<BasicEncryptionKey>() && (_numBasicKeys > basicCount)) {
+      BasicEncryptionKey *key = encr->encryptionKeys()->get(i)->as<BasicEncryptionKey>();
       setBasicKey(basicCount++, key->key());
       ctx.add(key, basicCount);
     } else if (encr->encryptionKeys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
@@ -2699,7 +2699,7 @@ TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Con
 
 bool
 TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
-  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
   ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   CommercialExtension *ext = ctx.config()->commercialExtension();
@@ -2715,7 +2715,7 @@ TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
   for (unsigned i=0; i<_numBasicKeys; i++) {
     if (! isBasicKeySet(i))
       continue;
-    DMREncryptionKey *key = new DMREncryptionKey();
+    BasicEncryptionKey *key = new BasicEncryptionKey();
     key->setName(QString("Basic Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(basicKey(i).toHex());

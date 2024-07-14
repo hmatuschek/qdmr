@@ -28,6 +28,8 @@ public:
 
   /** Returns the binary key. */
   const QByteArray &key() const;
+  /** Sets the binary key. */
+  virtual bool setKey(const QByteArray &key, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Holds the key data.
@@ -38,23 +40,50 @@ protected:
 
 /** Represents a DMR (basic) encryption key.
  *
- * This is a 16bit key used for the DMR basic encryption method.
+ * This is a variable sized key used for the DMR basic encryption method.
  *
  * @ingroup conf */
-class DMREncryptionKey: public EncryptionKey
+class BasicEncryptionKey: public EncryptionKey
 {
   Q_OBJECT
   Q_CLASSINFO("description", "A basic DMR encryption key.")
   Q_CLASSINFO("longDescription",
-              "This is a 16bit pre-shared key that can be used to encrypt/decrypt traffic on DMR "
-              "channels. Encryption is forbidden in HAM radio context!")
+              "This is a variable sized pre-shared key that can be used to encrypt/decrypt traffic "
+              "on DMR channels. Encryption is forbidden in HAM radio context!")
 
 public:
   /** Empty constructor. */
-  Q_INVOKABLE explicit DMREncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit BasicEncryptionKey(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+};
+
+
+/** Represents an (enhanced) RC4 encryption key.
+ *
+ * This is a 40bit key used for the DMR enhanced encryption method.
+ *
+ * @ingroup conf */
+class EnhancedEncryptionKey: public EncryptionKey
+{
+  Q_OBJECT
+  Q_CLASSINFO("description", "An enhanced DMR encryption key.")
+  Q_CLASSINFO("longDescription",
+              "This is a 40bit pre-shared RC4 key, that can be used to encrypt/decrypt traffic on "
+              "DMR channels. Encryption is forbidden in HAM radio context!")
+
+public:
+  /** Empty constructor. */
+  Q_INVOKABLE explicit EnhancedEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
+
+  bool setKey(const QByteArray &key, const ErrorStack &err);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -71,17 +100,19 @@ class AESEncryptionKey: public EncryptionKey
 {
   Q_OBJECT
 
-  Q_CLASSINFO("description", "An AES (enhanced) DMR encryption key.")
+  Q_CLASSINFO("description", "An AES (advanced) DMR encryption key.")
   Q_CLASSINFO("longDescription",
-              "This is a 128bit pre-shared key that can be used to encrypt/decrypt traffic on DMR "
-              "channels. Encryption is forbidden in HAM radio context!")
+              "This is a variable sized (usually 128-256bit) pre-shared key that can be used to "
+              "encrypt/decrypt traffic on DMR channels. Encryption is forbidden in HAM radio "
+              "context!")
 
 public:
   /** Empty constructor. */
   Q_INVOKABLE explicit AESEncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-  bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());
+
+  bool setKey(const QByteArray &key, const ErrorStack &err);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -107,6 +138,8 @@ public:
   explicit EncryptionKeys(QObject *parent=nullptr);
 
   int add(ConfigObject *obj, int row=-1, bool unique=true);
+
+  EncryptionKey *key(int index) const;
 
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
