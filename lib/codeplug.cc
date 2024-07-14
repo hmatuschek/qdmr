@@ -615,6 +615,7 @@ Codeplug::Context::Context(Config *config)
   addTable(&APRSSystem::staticMetaObject);
   addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
+  addTable(&SMSTemplate::staticMetaObject);
 }
 
 Config  *

@@ -751,6 +751,114 @@ GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::MessageElement
+ * ********************************************************************************************* */
+GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, GD73Codeplug::MessageElement::size())
+{
+  // pass...
+}
+
+QString
+GD73Codeplug::MessageElement::text() const {
+  unsigned int length = std::min(Limit::messageLength(), (unsigned int)getUInt8(Offset::size()));
+  return readUnicode(Offset::text(), length, 0x0000);
+}
+void
+GD73Codeplug::MessageElement::setText(const QString &message) {
+  unsigned int length = std::min(Limit::messageLength(), (unsigned int)message.length());
+  writeUnicode(Offset::text(), message, length, 0x0000);
+  setUInt8(Offset::size(), length);
+}
+
+bool
+GD73Codeplug::MessageElement::encode(SMSTemplate *message, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setText(message->message());
+  return true;
+}
+
+SMSTemplate *
+GD73Codeplug::MessageElement::decode(const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  SMSTemplate *sms = new SMSTemplate();
+  sms->setName("Message");
+  sms->setMessage(text());
+  return sms;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::MessageBankElement
+ * ********************************************************************************************* */
+GD73Codeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, MessageBankElement::size())
+{
+  // pass...
+}
+
+unsigned int
+GD73Codeplug::MessageBankElement::memberCount() const {
+  return getUInt8(Offset::memberCount());
+}
+void
+GD73Codeplug::MessageBankElement::setMemberCount(unsigned int count) {
+  setUInt8(Offset::memberCount(), std::min(Limit::memberCount(), count));
+}
+
+GD73Codeplug::MessageElement
+GD73Codeplug::MessageBankElement::message(unsigned int i) {
+  i = std::min(i, memberCount()-1);
+  return MessageElement(_data + Offset::members() + i*Offset::betweenMembers());
+}
+
+bool
+GD73Codeplug::MessageBankElement::decode(SMSExtension *ext, const ErrorStack &err) {
+  ext->smsTemplates()->clear();
+  for (unsigned int i=0; i<memberCount(); i++) {
+    MessageElement element = message(i);
+    SMSTemplate *sms = element.decode(err);
+    if (nullptr == sms) {
+      errMsg(err) << "Cannot decode " << i+1 << "-th preset message.";
+      return false;
+    }
+    sms->setName(QString("Message %1").arg(i+1));
+    ext->smsTemplates()->add(sms);
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::MessageBankElement::encode(const SMSExtension *ext, const ErrorStack &err) {
+  setMemberCount(0);
+
+  unsigned int count = std::min((unsigned int) ext->smsTemplates()->count(), Limit::memberCount());
+  for (unsigned int i=0; i<count; i++) {
+    if (! message(i).encode(ext->smsTemplates()->get(i)->as<SMSTemplate>(), err)) {
+      errMsg(err) << "Cannot encode " << i+1 << "-th preset message.";
+      return false;
+    }
+  }
+  setMemberCount(count);
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ContactBankElement
  * ********************************************************************************************* */
 GD73Codeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t size)
@@ -2080,6 +2188,11 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
     return false;
   }
 
+  if (! encodeMessages(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
   if (! encodeSettings(ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
     return false;
@@ -2217,8 +2330,21 @@ GD73Codeplug::encodeTimestamp(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::createMessages(Context &ctx, const ErrorStack &err) {
-  // Not implemented yet.
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! MessageBankElement(data(Offset::messages())).decode(ctx.config()->smsExtension())) {
+    errMsg(err) << "Cannot decode preset text messages.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+GD73Codeplug::encodeMessages(Context &ctx, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).encode(ctx.config()->smsExtension())) {
+    errMsg(err) << "Cannot encode preset text messages.";
+    return false;
+  }
+
   return true;
 }
 

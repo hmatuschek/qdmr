@@ -11,6 +11,9 @@
 #include "radioddity_extensions.hh"
 
 
+class SMSTemplate;
+class SMSExtension;
+
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
  *
  * <table>
@@ -1327,6 +1330,22 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x051; }
 
+    /** Returns the message text. */
+    QString text() const;
+    /** Set message text. */
+    void setText(const QString &message);
+
+    /** Sets a message element from an SMS message. */
+    bool encode(SMSTemplate *message, const ErrorStack &err=ErrorStack());
+    /** Creates a SMS template from this message. */
+    SMSTemplate *decode(const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum message length. */
+      static constexpr unsigned int messageLength()  { return 40; }
+    };
 
   protected:
     /** Internal used offsets within the bank. */
@@ -1357,6 +1376,19 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x511; }
+
+    /** Returns the member count. */
+    unsigned int memberCount() const;
+    /** Sets the member count. */
+    void setMemberCount(unsigned int count);
+
+    /** Returns the i-th message. */
+    MessageElement message(unsigned int i);
+
+    /** Updates the SMS extension by decoding all defined messages. */
+    bool decode(SMSExtension *ext, const ErrorStack &err=ErrorStack());
+    /** Encodes all messages defined within the SMS extension. */
+    bool encode(const SMSExtension *ext, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1607,6 +1639,8 @@ protected:
 
   /** Creates messages. */
   virtual bool createMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode messages. */
+  virtual bool encodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decodes the settings fields (generic & DMR). */
   virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());

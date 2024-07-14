@@ -15,6 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+  void testSMSTemplates();
 };
 
 #endif // UV390TEST_HH

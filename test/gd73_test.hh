@@ -15,7 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
-
+  void testSMSTemplates();
   void testFMSignaling();
 };
 

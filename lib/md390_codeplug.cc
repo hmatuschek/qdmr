@@ -36,10 +36,6 @@
 #define ADDR_GPSSYSTEMS         0x03ec40
 #define GPSSYSTEM_SIZE          0x000010
 
-#define NUM_TEXTMESSAGES              50
-#define ADDR_TEXTMESSAGES       0x002180
-#define TEXTMESSAGE_SIZE        0x000120
-
 #define ADDR_EMERGENCY_SETTINGS 0x005a50
 #define NUM_EMERGENCY_SYSTEMS         32
 #define ADDR_EMERGENCY_SYSTEMS  0x005a60
@@ -605,13 +601,24 @@ MD390Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack 
 
 
 void
-MD390Codeplug::clearMenuSettings() {
-  MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
+MD390Codeplug::clearTextMessages() {
+  MessageBankElement(data(Offset::messages())).clear();
 }
 
+bool
+MD390Codeplug::encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).encode(ctx, flags, err);
+}
+
+bool
+MD390Codeplug::decodeTextMessages(Context &ctx, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).decode(ctx, err);
+}
+
+
 void
-MD390Codeplug::clearTextMessages() {
-  memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
+MD390Codeplug::clearMenuSettings() {
+  MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
 }
 
 void

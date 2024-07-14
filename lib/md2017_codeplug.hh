@@ -139,14 +139,24 @@ public:
   bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
+  void clearTextMessages();
+  bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err);
+  bool decodeTextMessages(Context &ctx, const ErrorStack &err);
+
   /** Resets/clears the boot settings. */
   virtual void clearBootSettings();
   void clearMenuSettings();
-  void clearTextMessages();
   void clearEmergencySystems();
   /** Resets VFO settings. */
   virtual void clearVFOSettings();
 
+protected:
+  /** Some internal offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int messages() { return 0x002180; }
+    /// @endcond
+  };
 };
 
 #endif // MD2017_CODEPLUG_HH

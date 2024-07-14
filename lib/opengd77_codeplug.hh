@@ -240,7 +240,6 @@ public:
   bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  void clearMessages();
 
   void clearScanLists();
   bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
