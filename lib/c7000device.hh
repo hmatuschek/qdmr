@@ -68,7 +68,7 @@ public:
   /** Returns some information about the interface. */
   static USBDeviceInfo interfaceInfo();
   /** Finds all C7000 interfaces. */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Sends the given request to the device and receives the response. */

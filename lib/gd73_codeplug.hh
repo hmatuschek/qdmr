@@ -893,6 +893,13 @@ public:
     /** Sets the name of the group list. */
     void setName(const QString &name);
 
+    /** Returns the number of entries in the group list. */
+    unsigned int members() const;
+    /** Returns @c true, if the i-th member is set. */
+    bool hasMember(unsigned int i) const;
+    /** Returns the i-th member index. */
+    unsigned int memberIndex(unsigned int i) const;
+
     /** Decodes the group list. */
     RXGroupList *toGroupList(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given RX group list. */
