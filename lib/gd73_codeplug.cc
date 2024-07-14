@@ -1748,6 +1748,7 @@ GD73Codeplug::ZoneElement::toZone(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   unsigned int count = std::min((unsigned int)getUInt8(Offset::channeCount()), Limit::channelCount());
   for (unsigned int i=0; i<count; i++) {
     unsigned int index = getUInt16_le(Offset::channelIndices() + i*Offset::betweenChannelIndices());
@@ -2016,6 +2017,8 @@ GD73Codeplug::ScanListElement::toScanList(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   if ((ChannelMode::Fixed == primaryChannelMode()) && hasPrimaryChannelIndex()) {
     if (ctx.has<Channel>(primaryChannelIndex()))
       lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
@@ -2188,7 +2191,7 @@ GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0; i<config->scanlists()->count(); i++)
     ctx.add(config->scanlists()->scanlist(i), i);
 
-  // Handle encryption keys
+  // Handle encryption keys)
   if (nullptr != config->commercialExtension()) {
     for (int i=0, j=0; i<config->commercialExtension()->encryptionKeys()->count(); i++) {
       EncryptionKey *key = config->commercialExtension()->encryptionKeys()->key(i);
@@ -2208,6 +2211,7 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
   Q_UNUSED(flags);
 
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
