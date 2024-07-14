@@ -154,7 +154,10 @@ GD73Test::testFMSignaling() {
     config.channelList()->add(ch);
   }
 
-    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: {}")
+  GD73Codeplug codeplug;
+  ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
