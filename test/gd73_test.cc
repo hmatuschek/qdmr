@@ -177,5 +177,50 @@ GD73Test::testFMSignaling() {
   }
 }
 
+void
+GD73Test::testEncryption() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+
+  DMRContact *cnt = new DMRContact(DMRContact::AllCall, "All Call", 0, false);
+  config.contacts()->add(cnt);
+
+  BasicEncryptionKey *key = new BasicEncryptionKey();
+  key->setName("Key 1");
+  key->fromHex("1234");
+  config.commercialExtension()->encryptionKeys()->add(key);
+  QCOMPARE(key->toHex(), "1234");
+
+  auto *ext = new CommercialChannelExtension();
+  ext->setEncryptionKey(key);
+
+  DMRChannel *ch = new DMRChannel();
+  ch->setName("Ch");
+  ch->setTXContactObj(cnt);
+  ch->setTXFrequency(Frequency::fromMHz(440));
+  ch->setRXFrequency(Frequency::fromMHz(440));
+  ch->setCommercialExtension(ext);
+  config.channelList()->add(ch);
+
+  GD73Codeplug codeplug;
+  ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config compare;
+  if (! codeplug.decode(&compare, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(compare.channelList()->count(), 1);
+  QVERIFY(compare.channelList()->channel(0)->is<DMRChannel>());
+  QVERIFY(compare.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(compare.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey()->key(),
+           config.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey()->key());
+}
+
 QTEST_GUILESS_MAIN(GD73Test)
 

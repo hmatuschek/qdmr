@@ -2610,13 +2610,13 @@ TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
  * Implementation of TyTCodeplug::EncryptionElement
  * ******************************************************************************************** */
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size), _numEnhancedKeys(8), _numBasicKeys(16)
+  : Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
-  : Element(ptr, 0xb0), _numEnhancedKeys(8), _numBasicKeys(16)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -2627,7 +2627,7 @@ TyTCodeplug::EncryptionElement::~EncryptionElement() {
 
 void
 TyTCodeplug::EncryptionElement::clear() {
-  memset(_data, 0xff, 0xb0);
+  memset(_data, 0xff, size());
 }
 
 bool
@@ -2641,13 +2641,15 @@ TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
-  return QByteArray((char *)(_data+n*16), 16);
+  return QByteArray((char *)(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys()),
+                    Offset::betweenAdvancedKeys());
 }
 void
 TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key) {
-  if (16 != key.size())
+  if (Offset::betweenAdvancedKeys() != key.size())
     return;
-  memcpy(_data+n*16, key.constData(), 16);
+  memcpy(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys(),
+         key.constData(), Offset::betweenAdvancedKeys());
 }
 
 bool
@@ -2660,50 +2662,35 @@ TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
-  return QByteArray((char *)(_data+0x90+n*2), 2);
+  return QByteArray((char *)(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys()), Offset::betweenBasicKeys());
 }
 void
 TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
-  if (2 != key.size())
+  if (Offset::betweenBasicKeys() != key.size())
     return;
-  memcpy(_data+0x90+n*2, key.constData(), 2);
+  memcpy(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys(), key.constData(), Offset::betweenBasicKeys());
 }
 
 bool
 TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Context &ctx) {
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
-
+  Q_UNUSED(encr)
   // Clear all keys
   clear();
 
-  // Encode each key
-  unsigned basicCount=0, aesCount=0;
-  for (int i=0; i<encr->encryptionKeys()->count(); i++) {
-    if (encr->encryptionKeys()->get(i)->is<BasicEncryptionKey>() && (_numBasicKeys > basicCount)) {
-      BasicEncryptionKey *key = encr->encryptionKeys()->get(i)->as<BasicEncryptionKey>();
-      setBasicKey(basicCount++, key->key());
-      ctx.add(key, basicCount);
-    } else if (encr->encryptionKeys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
-      AESEncryptionKey *key = encr->encryptionKeys()->get(i)->as<AESEncryptionKey>();
-      setEnhancedKey(aesCount++, key->key());
-      ctx.add(key, aesCount);
-    } else {
-      logWarn() << "Cannot encode key of type '"
-                << encr->encryptionKeys()->get(i)->metaObject()->className() << "'.";
-    }
-  }
+  // Encode each key type separately
+  for (unsigned int i=0; i<ctx.count<BasicEncryptionKey>() && i<Limit::basicKeys(); i++)
+    setBasicKey(i, ctx.get<BasicEncryptionKey>(i+1)->key());
+  for (unsigned int i=0; i<ctx.count<AESEncryptionKey>() && i<Limit::advancedKeys(); i++)
+    setEnhancedKey(i, ctx.get<AESEncryptionKey>(i+1)->key());
 
   return true;
 }
 
 bool
 TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
-
   CommercialExtension *ext = ctx.config()->commercialExtension();
-  for (unsigned i=0; i<_numEnhancedKeys; i++) {
+
+  for (unsigned i=0; i<Limit::advancedKeys(); i++) {
     if (! isEnhancedKeySet(i))
       continue;
     AESEncryptionKey *key = new AESEncryptionKey();
@@ -2712,7 +2699,8 @@ TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     key->fromHex(enhancedKey(i).toHex());
     ext->encryptionKeys()->add(key);
   }
-  for (unsigned i=0; i<_numBasicKeys; i++) {
+
+  for (unsigned i=0; i<Limit::basicKeys(); i++) {
     if (! isBasicKeySet(i))
       continue;
     BasicEncryptionKey *key = new BasicEncryptionKey();
@@ -2911,6 +2899,18 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0; i<config->roamingZones()->count(); i++)
     ctx.add(config->roamingZones()->zone(i), i+1);
 
+  // Index basic (DMR) and AES keys
+  if (CommercialExtension *ext = config->commercialExtension()) {
+    unsigned int basicIndex = 1, aesIndex = 1;
+    for (int i=0; i<ext->encryptionKeys()->count(); i++) {
+      if (ext->encryptionKeys()->key(i)->is<BasicEncryptionKey>()) {
+        ctx.add(ext->encryptionKeys()->key(i)->as<BasicEncryptionKey>(), basicIndex++);
+      } else if (ext->encryptionKeys()->key(i)->is<AESEncryptionKey>()) {
+        ctx.add(ext->encryptionKeys()->key(i)->as<AESEncryptionKey>(), aesIndex++);
+      }
+    }
+  }
+
   return true;
 }
 
@@ -2955,6 +2955,9 @@ TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
 
   // Create index<->object table.
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
+
   if (! index(config, ctx))
     return false;
 
@@ -2965,6 +2968,8 @@ bool
 TyTCodeplug::decode(Config *config, const ErrorStack &err) {
   // Create index<->object table.
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   // Clear config object
   config->clear();

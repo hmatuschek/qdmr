@@ -17,6 +17,7 @@ private slots:
   void testChannelFrequency();
   void testSMSTemplates();
   void testFMSignaling();
+  void testEncryption();
 };
 
 #endif // GD73TEST_HH
