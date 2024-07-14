@@ -298,6 +298,14 @@ void
 GD77Codeplug::clearMessages() {
   MessageBankElement(data(ADDR_MESSAGE_BANK)).clear();
 }
+bool
+GD77Codeplug::encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).encode(ctx, flags, err);
+}
+bool
+GD77Codeplug::decodeMessages(Context &ctx, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).decode(ctx, err);
+}
 
 void
 GD77Codeplug::clearScanLists() {

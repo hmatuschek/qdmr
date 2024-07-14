@@ -4571,6 +4571,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       ctx.add(autoRep->offsets()->get(i)->as<AnytoneAutoRepeaterOffset>(), i);
   }
 
+  // Map SMS templates
+  for (int i=0; i<config->smsExtension()->smsTemplates()->count(); i++)
+    ctx.add(config->smsExtension()->smsTemplates()->get(i)->as<SMSTemplate>(), i);
+
   return true;
 }
 

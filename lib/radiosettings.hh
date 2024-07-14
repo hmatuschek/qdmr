@@ -8,6 +8,7 @@
 #include "anytone_extension.hh"
 #include "tyt_extensions.hh"
 
+
 /** Represents the common radio-global settings.
  * @ingroup conf */
 class RadioSettings : public ConfigItem

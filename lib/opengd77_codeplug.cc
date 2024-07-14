@@ -541,11 +541,6 @@ OpenGD77Codeplug::clearButtonSettings() {
 }
 
 void
-OpenGD77Codeplug::clearMessages() {
-  MessageBankElement(data(ADDR_MESSAGE_BANK, IMAGE_MESSAGE_BANK)).clear();
-}
-
-void
 OpenGD77Codeplug::clearScanLists() {
   // Scan lists are not touched with OpenGD77 codeplug
 }

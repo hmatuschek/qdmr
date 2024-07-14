@@ -2733,6 +2733,124 @@ TyTCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Cont
 
 
 /* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::MessageElement
+ * ******************************************************************************************** */
+TyTCodeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, MessageElement::size())
+{
+  // pass...
+}
+
+void
+TyTCodeplug::MessageElement::clear() {
+  memset(_data, 0xffff, size());
+}
+
+bool
+TyTCodeplug::MessageElement::isValid() const {
+  return Element::isValid() && (0xffff != getUInt16_le(0));
+}
+
+QString
+TyTCodeplug::MessageElement::text() const {
+  return readUnicode(0, Limit::length(), 0x0000);
+}
+void
+TyTCodeplug::MessageElement::setText(const QString &text) {
+  writeUnicode(0, text, Limit::length(), 0x0000);
+}
+
+bool
+TyTCodeplug::MessageElement::encode(SMSTemplate *sms, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setText(sms->message());
+
+  return true;
+}
+
+SMSTemplate *
+TyTCodeplug::MessageElement::decode(const ErrorStack &err) {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid SMS message.";
+    return nullptr;
+  }
+
+  SMSTemplate *sms = new SMSTemplate();
+  sms->setName("Message");
+  sms->setMessage(text());
+  return sms;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::MessageBankElement
+ * ******************************************************************************************** */
+TyTCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, MessageBankElement::size())
+{
+  // pass...
+}
+
+void
+TyTCodeplug::MessageBankElement::clear() {
+  for (unsigned int i=0; i<Limit::messages(); i++)
+    message(i).clear();
+}
+
+TyTCodeplug::MessageElement
+TyTCodeplug::MessageBankElement::message(unsigned int i) const {
+  i = std::min(i, Limit::messages()-1);
+  return _data + i*MessageElement::size();
+}
+
+bool
+TyTCodeplug::MessageBankElement::encode(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+
+  unsigned int count = ctx.config()->smsExtension()->smsTemplates()->count();
+  count = std::min(count, Limit::messages());
+  for (unsigned int i=0; i<count; i++) {
+    if (! message(i).encode(ctx.config()->smsExtension()->smsTemplates()->message(i), err)) {
+      errMsg(err) << "Cannot encode" << i+1 << "-th preset message.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+TyTCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::messages(); i++) {
+    MessageElement msg = message(i);
+    if (!msg.isValid())
+      continue;
+    SMSTemplate *sms = msg.decode(err);
+    if (nullptr == sms) {
+      errMsg(err) << "Cannot decode " << i+1 << "-th preset message.";
+      return false;
+    }
+    ctx.config()->smsExtension()->smsTemplates()->add(sms);
+  }
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of TyTCodeplug
  * ******************************************************************************************** */
 TyTCodeplug::TyTCodeplug(QObject *parent)
@@ -2916,6 +3034,12 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
     return false;
   }
 
+  // Encode text messages
+  if (! this->encodeTextMessages(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode text messages.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2966,6 +3090,12 @@ TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // Decode button settings
   if (! this->decodeButtonSetttings(ctx.config(), err)) {
     errMsg(err) << "Cannot decode button settings.";
+    return false;
+  }
+
+  // Decode text messages
+  if (! this->decodeTextMessages(ctx, err)) {
+    errMsg(err) << "Cannot decode text messages.";
     return false;
   }
 

@@ -1306,6 +1306,17 @@ public:
     /** Returns a reference to the n-th message. */
     virtual MessageElement message(unsigned int n) const;
 
+    /** Decodes all scan lists. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all scan lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int messageCount() { return 8; }   ///< Maximum number of messages.
+    };
+
   protected:
     /** Offsets within the element. */
     struct Offset {
@@ -2195,6 +2206,12 @@ public:
     /** Enables remote monitor decoding. */
     virtual void enableRemoteMonitorDec(bool enable);
 
+    /** Decodes the DMR settings. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes all keys. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
   public:
     /** Some limits. */
     struct Limit: public Element::Limit {
@@ -2399,6 +2416,7 @@ protected:
     static constexpr unsigned int encryptionKeyBank() { return 0x1d7e0; }
     static constexpr unsigned int dtmfSettings()      { return 0x1d858; }
     static constexpr unsigned int alarmSettings()     { return 0x1daf4; }
+    static constexpr unsigned int dmrSettings()       { return 0x1dbb8; }
     static constexpr unsigned int vfoBank()           { return 0x1dd00; }
     /// @endcond
   };

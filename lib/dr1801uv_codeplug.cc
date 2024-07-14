@@ -1969,6 +1969,43 @@ DR1801UVCodeplug::MessageBankElement::message(unsigned int n) const {
   return MessageElement(_data + Offset::messages() + n*MessageElement::size());
 }
 
+bool
+DR1801UVCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
+
+  ctx.config()->smsExtension()->smsTemplates()->clear();
+
+  for (unsigned int i=0; i<messageCount(); i++) {
+    MessageElement msg = message(i);
+    if (! msg.isValid())
+      continue;
+    SMSTemplate *sms = new SMSTemplate();
+    sms->setName(QString("Message %1").arg(msg.index()));
+    sms->setMessage(msg.text());
+    ctx.config()->smsExtension()->smsTemplates()->add(sms);
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::MessageBankElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setMessageCount(0);
+
+  SMSExtension *smsExt = ctx.config()->smsExtension();
+  unsigned int count = std::min(Limit::messageCount(), (unsigned int)smsExt->smsTemplates()->count());
+  for (unsigned int i=0; i<count; i++) {
+    MessageElement msg = message(i);
+    msg.setText(smsExt->smsTemplates()->message(i)->message());
+    msg.setIndex(i+1);
+  }
+
+  setMessageCount(count);
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::MessageElement
@@ -3028,6 +3065,32 @@ DR1801UVCodeplug::DMRSettingsElement::enableRemoteMonitorDec(bool enable) {
   setBit(Offset::remoteMonitorDec(), enable);
 }
 
+bool
+DR1801UVCodeplug::DMRSettingsElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
+
+  switch(smsFormat()) {
+  case SMSFormat::IPData: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Motorola); break;
+  case SMSFormat::CompressedIP: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Hytera); break;
+  case SMSFormat::DefinedData: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::DMR); break;
+  }
+
+  return true;
+}
+
+bool
+DR1801UVCodeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  switch(ctx.config()->smsExtension()->format()) {
+  case SMSExtension::Format::Motorola: setSMSFormat(SMSFormat::IPData); break;
+  case SMSExtension::Format::Hytera: setSMSFormat(SMSFormat::CompressedIP); break;
+  case SMSExtension::Format::DMR: setSMSFormat(SMSFormat::DefinedData); break;
+  }
+
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DR1801UVCodeplug::OneTouchSettingsElement
@@ -3293,8 +3356,18 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! MessageBankElement(data(Offset::messageBank())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode preset messages.";
+    return false;
+  }
+
   if (! SettingsElement(data(Offset::settings())).updateConfig(ctx.config(), err)) {
     errMsg(err) << "Cannot decode settings element.";
+    return false;
+  }
+
+  if (! DMRSettingsElement(data(Offset::dmrSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode DMR settings element.";
     return false;
   }
 
@@ -3349,8 +3422,18 @@ DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! DMRSettingsElement(data(Offset::dmrSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode DMR settings element.";
+    return false;
+  }
+
   if (! ZoneBankElement(data(Offset::zoneBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+
+  if (! MessageBankElement(data(Offset::messageBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode messages.";
     return false;
   }
 
