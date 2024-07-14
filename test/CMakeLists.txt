@@ -55,7 +55,6 @@ qt5_wrap_cpp(gd77_MOC_SOURCES gd77_test.hh)
 add_executable(gd77_test gd77_test.cc ${gd77_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(gd77_test ${LIBS} libdmrconf libdmrconfigtest)
 
-
 # Unit tests for OpenGD77 firmware
 qt5_wrap_cpp(opengd77_MOC_SOURCES opengd77_test.hh)
 add_executable(opengd77_test opengd77_test.cc ${opengd77_MOC_SOURCES} ${testlib_RCC_SOURCES})

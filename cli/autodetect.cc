@@ -40,6 +40,9 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
   logDebug() << "Autodetect radios.";
 
   QList<USBDeviceDescriptor> interfaces = USBDeviceDescriptor::detect();
+  if (interfaces.isEmpty())
+    interfaces = USBDeviceDescriptor::detect(false);
+
   if (interfaces.isEmpty()) {
     errMsg(err) << "No matching USB devices are found. Check connection?";
     return nullptr;
@@ -99,13 +102,13 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
       return nullptr;
     }
     return rad;
-  } else if (! device.isIdentifiable()) {
+  } else if (! device.isSave()) {
     // Collect all radio keys for the device
     QStringList radios;
     foreach (RadioInfo info, RadioInfo::allRadios(device)) {
       radios.append(info.key());
     }
-    errMsg(err) << "It is not possible to identify the radio connected to the device '"
+    errMsg(err) << "It is not save or possible to identify the radio connected to the device '"
                 << device.deviceHandle() << ". You have to specify which radio to use using "
                 << "the --radio option. Possible radios for this device are "
                 << radios.join(", ") << ".";

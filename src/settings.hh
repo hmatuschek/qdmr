@@ -31,6 +31,9 @@ public:
   void setLocator(const QString &locator);
   QGeoCoordinate position() const;
 
+  bool disableAutoDetect() const;
+  void setDisableAutoDetect(bool disable);
+
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
 

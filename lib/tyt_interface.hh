@@ -90,7 +90,7 @@ public:
   /** Returns some information about the interface. */
   static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected TyT radios. */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Internal used function to send a control command to the device. */

@@ -9,57 +9,65 @@
 </info>
   
 <para>
-  Once the <glossterm>Codeplug</glossterm> is finished, it can be programmed onto the radio. Just select the
-  <guibutton>Write Codplug</guibutton> button in the tool-bar at the top of the window or select
-  <guimenuitem>Write</guimenuitem> from the <guimenu>Device</guimenu> menu.
+  Once the <glossterm>code plug</glossterm> is finished, it can be programmed onto the radio. Just select the
+  <guibutton>write cod plug</guibutton> button in the tool-bar at the top of the window or select
+  <guimenuitem>write</guimenuitem> from the <guimenu>device</guimenu> menu.
 </para>
 
 <para>
-  In a first step, <application>qdmr</application> will try to detect a connected radio. Once a 
-  radio is  found it will verify the codeplug with that radio. That is, it will check whether any 
-  limits are  exceeded. For example the number of channels, contacts, group lists, etc. 
+  In a first step, <application>qdmr</application> will try to detect a connected radio. This will 
+  be done automatically (unless disabled in the settings menu) if there is only one radio connected
+  and it is save to access the USB device. Some radios use some generic USB to serial chips in their
+  cable instead of connecting the micro controller of the radio directly to the computer. This way, 
+  it is not possible for qdmr to safely assume, that the found serial port is actually a radio. If 
+  such a generic interface is detected, qdmr will ask which interface the radio is connected to.
+</para>
+
+
+<para>Once a radio is  found it will verify the code plug with that radio. That is, it will check 
+  whether any limits are  exceeded. For example the number of channels, contacts, group lists, etc. 
 </para>
 
 <para>
-  There are several levels of issues that can be detected when verifying a codeplug with a radio. 
+  There are several levels of issues that can be detected when verifying a code plug with a radio. 
   The lowest level is the <guilabel>Information</guilabel>. These are just messages generated to inform 
-  you about minor changes made to the codeplug to fit it into the specific radio. For example when 
+  you about minor changes made to the code plug to fit it into the specific radio. For example when 
   zones are split. These information are usually ignored and <application>qdmr</application> will 
-  proceed writing the codeplug. 
+  proceed writing the code plug. 
 </para>
 
 <para>
   <guilabel>Warnings</guilabel> are one level more severe. They are issued if changes are made that 
-  may change the behavior of the codeplug. The result, however, will still be a working codeplug. They are 
+  may change the behavior of the code plug. The result, however, will still be a working code plug. They are 
   usually issued when names are too long. When warnings are issued, <application>qdmr</application>
-  will not automatically proceed writing the codeplug. The user, however, can ignore the warnings and 
+  will not automatically proceed writing the code plug. The user, however, can ignore the warnings and 
   continue. In the application settings (see <xref linkend="guiSettingsDialog"/>), 
   you may choose to always ignore verification warnings. In this case, 
-  <application>qdmr</application> will write the codeplug automatically, even if there were 
+  <application>qdmr</application> will write the code plug automatically, even if there were 
   some warnings.
 </para>
 
 <para>
   Finally <guilabel>Errors</guilabel> are the most severe verification issues. They simply prevent 
-  writing the codeplug to the device. The user cannot ignore errors as they would result in 
-  invalid and even damaging codeplugs being written to the device.
+  writing the code plug to the device. The user cannot ignore errors as they would result in 
+  invalid and even damaging code plugs being written to the device.
 </para>
 
 <para>
   If, however, everything fits into the radio, <application>qdmr</application> will start writing 
-  the binary codeplug to the device.
+  the binary code plug to the device.
 </para>
 
 <para>
-  Writing the codeplug is a two-step process. First, the current codeplug is read from the
-  radio. This includes all settings. Then the device-specific codeplug is updated and then
+  Writing the code plug is a two-step process. First, the current code plug is read from the
+  radio. This includes all settings. Then the device-specific code plug is updated and then
   re-uploaded to the device. This two-step process will maintain all device-specific settings made
   earlier unless explicitly set within qdmr.
 </para>
 
 <para>
   During the reading or writing, the <application>qdmr</application> GUI will turn gray (inactive) to
-  prevent any changes to the codeplug during the transfer. However, a progress-bar is shown in the
+  prevent any changes to the code plug during the transfer. However, a progress-bar is shown in the
   bottom-right to indicate the progress.
 </para>
 

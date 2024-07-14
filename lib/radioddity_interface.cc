@@ -39,7 +39,8 @@ RadioddityInterface::interfaceInfo() {
 }
 
 QList<USBDeviceDescriptor>
-RadioddityInterface::detect() {
+RadioddityInterface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly)
   return HIDevice::detect(USB_VID, USB_PID);
 }
 
