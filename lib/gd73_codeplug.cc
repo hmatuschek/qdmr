@@ -1,6 +1,7 @@
 #include "gd73_codeplug.hh"
 #include "config.hh"
 #include "intermediaterepresentation.hh"
+#include "logger.hh"
 
 
 QVector<Signaling::Code> _ctcss_codes = {
@@ -1072,6 +1073,19 @@ GD73Codeplug::GroupListElement::setName(const QString &name) {
   writeUnicode(Offset::name(), name, Limit::nameLength(), 0x0000);
 }
 
+unsigned int
+GD73Codeplug::GroupListElement::members() const {
+  return getUInt8(Offset::memberCount());
+}
+bool
+GD73Codeplug::GroupListElement::hasMember(unsigned int i) const {
+  return 0 != getUInt16_le(Offset::members() + i*Offset::betweenMembers());
+}
+unsigned int
+GD73Codeplug::GroupListElement::memberIndex(unsigned int i) const {
+  return getUInt16_le(Offset::members() + i*Offset::betweenMembers())-1;
+}
+
 RXGroupList *
 GD73Codeplug::GroupListElement::toGroupList(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
@@ -1080,16 +1094,18 @@ GD73Codeplug::GroupListElement::toGroupList(Context &ctx, const ErrorStack &err)
 
 bool
 GD73Codeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  Q_UNUSED(err);
+
+  unsigned int count = std::min(members(), Limit::memberCount());
   for (unsigned int i=0; i<count; i++) {
-    unsigned int idx = getUInt16_le(Offset::members() + i*Offset::betweenMembers());
-    if (0 == idx)
+    if (! hasMember(i))
       continue;
-    if (! ctx.has<DMRContact>(idx-1)) {
-      errMsg(err) << "Cannot resolve contact at index " << idx-1 << ".";
-      return false;
-    }
-    lst->addContact(ctx.get<DMRContact>(idx-1));
+    unsigned int idx = memberIndex(i);
+    if (ctx.has<DMRContact>(idx))
+      lst->addContact(ctx.get<DMRContact>(idx));
+    else
+      logWarn() << "Cannot link group list '" << lst->name()
+                << "': Cannot resolve contact at index " << idx << ".";
   }
   return true;
 }
@@ -1521,6 +1537,8 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     }
     fm->setBandwidth(bandwidth());
     fm->setSquelchDefault();
+    fm->setRXTone(rxTone());
+    fm->setTXTone(txTone());
   } else if (Type::DMR == type()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admit()) {
@@ -1544,24 +1562,23 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
 
   if (Type::DMR == type()) {
     DMRChannel *dmr = ch->as<DMRChannel>();
     if (hasTXContact()) {
-      if (! ctx.has<DMRContact>(txContactIndex())) {
-        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve contact index "
-                    << txContactIndex() << ".";
-        return false;
-      }
-      dmr->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+      if (ctx.has<DMRContact>(txContactIndex()))
+        dmr->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+      else
+        logWarn() << "Cannot link channel '" << name() << "', cannot resolve contact index "
+                  << txContactIndex() << ".";
     }
     if ((! groupListAllMatch()) && (! groupListMatchesContact())) {
-      if (! ctx.has<RXGroupList>(groupListIndex())) {
-        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve group list index "
-                    << groupListIndex() << ".";
-        return false;
-      }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      if (ctx.has<RXGroupList>(groupListIndex()))
+        dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      else
+        logWarn() << "Cannot link channel '" << name() << "', cannot resolve group list index "
+                  << groupListIndex() << ".";
     }
     if (hasEncryptionKeyIndex()) {
       // Check if already defined
@@ -1579,12 +1596,11 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
   }
 
   if (hasScanListIndex()) {
-    if (! ctx.has<ScanList>(scanListIndex())) {
-      errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve scanlist index "
-                  << scanListIndex() << ".";
-      return false;
-    }
-    ch->setScanList(ctx.get<ScanList>(scanListIndex()));
+    if (ctx.has<ScanList>(scanListIndex()))
+      ch->setScanList(ctx.get<ScanList>(scanListIndex()));
+    else
+      logWarn() << "Cannot link channel '" << name() << "', cannot resolve scanlist index "
+                << scanListIndex() << ".";
   }
 
   return true;
@@ -1631,6 +1647,8 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     case FMChannel::Admit::Free: setAdmit(Admit::Free); break;
     }
     setBandwidth(fm->bandwidth());
+    setRXTone(fm->rxTone());
+    setTXTone(fm->txTone());
   }
 
   return true;
@@ -1735,12 +1753,11 @@ GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &
     unsigned int index = getUInt16_le(Offset::channelIndices() + i*Offset::betweenChannelIndices());
     if (0 == index)
       continue;
-    if (! ctx.has<Channel>(index-1)) {
-      errMsg(err) << "Cannot link zone '" << zone->name() << "': Channel at index " << (index-1)
-                  << " not known.";
-      return false;
-    }
-    zone->A()->add(ctx.get<Channel>(index-1));
+    if (ctx.has<Channel>(index-1))
+      zone->A()->add(ctx.get<Channel>(index-1));
+    else
+      logWarn() << "Cannot link zone '" << zone->name() << "': Channel at index " << (index-1)
+                << " not known.";
   }
   return true;
 }
@@ -2000,34 +2017,31 @@ GD73Codeplug::ScanListElement::toScanList(Context &ctx, const ErrorStack &err) {
 bool
 GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const ErrorStack &err) {
   if ((ChannelMode::Fixed == primaryChannelMode()) && hasPrimaryChannelIndex()) {
-    if (! ctx.has<Channel>(primaryChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve primary channel index " << primaryChannelIndex() << ".";
-      return false;
-    }
-    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+    if (ctx.has<Channel>(primaryChannelIndex()))
+      lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve primary channel index " << primaryChannelIndex() << ".";
   } else if (ChannelMode::Selected == primaryChannelMode()) {
     lst->setPrimaryChannel(SelectedChannel::get());
   }
 
   if ((ChannelMode::Fixed == secondaryChannelMode()) && hasSecondaryChannelIndex()) {
-    if (! ctx.has<Channel>(secondaryChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve secondary channel index " << secondaryChannelIndex() << ".";
-      return false;
-    }
-    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+    if (ctx.has<Channel>(secondaryChannelIndex()))
+      lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve secondary channel index " << secondaryChannelIndex() << ".";
   } else if (ChannelMode::Selected == secondaryChannelMode()) {
     lst->setSecondaryChannel(SelectedChannel::get());
   }
 
   if ((ChannelMode::Fixed == revertChannelMode()) && hasRevertChannelIndex()) {
-    if (! ctx.has<Channel>(revertChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve revert channel index " << revertChannelIndex() << ".";
-      return false;
-    }
-    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+    if (ctx.has<Channel>(revertChannelIndex()))
+      lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve revert channel index " << revertChannelIndex() << ".";
   } else if (ChannelMode::Selected == revertChannelMode()) {
     lst->setRevertChannel(SelectedChannel::get());
   }
@@ -2037,12 +2051,11 @@ GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const E
     unsigned int index = getUInt16_le(Offset::members() + i*Offset::betweenMembers());
     if (0 == index)
       continue;
-    if (! ctx.has<Channel>(index-1)) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve member index" << index-1 << ".";
-      return false;
-    }
-    lst->addChannel(ctx.get<Channel>(index-1));
+    if (ctx.has<Channel>(index-1))
+      lst->addChannel(ctx.get<Channel>(index-1));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve member index" << index-1 << ".";
   }
 
   return true;
