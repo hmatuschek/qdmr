@@ -1405,6 +1405,14 @@ public:
     virtual bool updateCommercialExt(Context &ctx);
     /** Links the given encryption extension. */
     virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+
+  public:
+    /** Some limits for the encryption element. */
+    struct Limit {
+      /** The maximum number of (basic) encryption keys. */
+      static constexpr unsigned int basicEncryptionKeys() { return 16; }
+    };
+
   };
 
 protected:

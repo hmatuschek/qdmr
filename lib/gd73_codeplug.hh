@@ -1267,6 +1267,16 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x005; }
 
+    void clear();
+    bool isValid() const;
+
+    /** Returns the key size in bits. */
+    unsigned int keySize() const;
+    /** Sets the key size in bits. */
+    void setKeySize(unsigned int size);
+
+    BasicEncryptionKey *createEncryptionKey(const ErrorStack &err=ErrorStack()) const;
+    bool encodeEncryptionKey(BasicEncryptionKey *key, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Internal used offsets within the bank. */
@@ -1295,6 +1305,11 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0050; }
+
+    /** Decodes and create encryption keys. */
+    bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes encryption keys. */
+    bool encodeEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1664,6 +1679,8 @@ protected:
 
   /** Create encryption keys. */
   virtual bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode encryption keys. */
+  virtual bool encodeEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Create channels. */
   virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());

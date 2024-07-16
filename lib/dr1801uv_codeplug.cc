@@ -2228,15 +2228,15 @@ DR1801UVCodeplug::EncryptionKeyBankElement::link(Context &ctx, const ErrorStack 
 
 bool
 DR1801UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
-  unsigned int n = std::min(Limit::keyCount(), ctx.count<DMREncryptionKey>());
+  unsigned int n = std::min(Limit::keyCount(), ctx.count<BasicEncryptionKey>());
   for (unsigned int i=0; i<Limit::keyCount(); i++) {
     EncryptionKeyElement key = this->key(i);
     if (i>=n) {
       key.clear();
       continue;
     }
-    if (! key.encode(ctx.get<DMREncryptionKey>(i), ctx, err)) {
-      errMsg(err) << "Cannot encode DMR encryption key '" << ctx.get<DMREncryptionKey>(i)->name()
+    if (! key.encode(ctx.get<BasicEncryptionKey>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode DMR encryption key '" << ctx.get<BasicEncryptionKey>(i)->name()
                   << "' at index " << i << ".";
       return false;
     }
@@ -2304,7 +2304,7 @@ DR1801UVCodeplug::EncryptionKeyElement::toKeyObj(Context &ctx, const ErrorStack 
     return nullptr;
   }
 
-  DMREncryptionKey *obj = new DMREncryptionKey();
+  BasicEncryptionKey *obj = new BasicEncryptionKey();
   if (! obj->fromHex(key(), err)) {
     errMsg(err) << "Cannot decode key '" << key() << "'.";
     delete obj;
@@ -2325,11 +2325,11 @@ bool
 DR1801UVCodeplug::EncryptionKeyElement::encode(EncryptionKey *obj, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx);
 
-  if (!obj->is<DMREncryptionKey>()) {
+  if (!obj->is<BasicEncryptionKey>()) {
     errMsg(err) << "Cannot encode AES encryption key. Not supported by the device.";
     return false;
   }
-  DMREncryptionKey *key = obj->as<DMREncryptionKey>();
+  BasicEncryptionKey *key = obj->as<BasicEncryptionKey>();
   setKey(key->key().toHex());
 
   return true;
@@ -3303,7 +3303,7 @@ DR1801UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &e
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.addTable(&DMREncryptionKey::staticMetaObject);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug.";
     return false;
