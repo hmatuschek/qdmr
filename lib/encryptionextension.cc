@@ -74,7 +74,7 @@ BasicEncryptionKey::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["basic"] = node;
+  type["dmr"] = node;
   return type;
 }
 
@@ -252,7 +252,7 @@ EncryptionKeys::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, 
   }
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
-  if ("basic" == type) {
+  if (("basic" == type) || ("dmr" == type)) {
     return new BasicEncryptionKey();
   } else if ("rc4" == type) {
     return new EnhancedEncryptionKey();
