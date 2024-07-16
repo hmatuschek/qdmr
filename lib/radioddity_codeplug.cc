@@ -2648,8 +2648,9 @@ bool
 RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ext, Context &ctx) {
   clear();
 
-  if (ext->encryptionKeys()->count() > 16) {
-    logError() << "Cannot encode encryption extension. Can only encode 16 keys.";
+  if (ext->encryptionKeys()->count() > (int)Limit::basicEncryptionKeys()) {
+    logError() << "Cannot encode encryption extension. Can only encode "
+               << Limit::basicEncryptionKeys() << " keys.";
     return false;
   }
 
@@ -2675,7 +2676,7 @@ bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     return false;
 
   CommercialExtension *ext = ctx.config()->commercialExtension();
-  for (int i=0; i<16; i++) {
+  for (unsigned int i=0; i<Limit::basicEncryptionKeys(); i++) {
     if (! isBasicKeySet(i))
       continue;
     // Assemble key
