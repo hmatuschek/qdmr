@@ -1189,6 +1189,7 @@ public:
     };
   };
 
+
 protected:
   /** Empty constructor. */
   explicit TyTCodeplug(QObject *parent = nullptr);

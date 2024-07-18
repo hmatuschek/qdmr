@@ -58,7 +58,7 @@ class SMSExtension : public ConfigExtension
   /** The format for the SMS. */
   Q_PROPERTY(Format format READ format WRITE setFormat)
   /** All predefined SMS messages. */
-  Q_PROPERTY(SMSTemplates *smsTemplates READ smsTemplates)
+  Q_PROPERTY(SMSTemplates *templates READ smsTemplates)
 
 public:
   /** Possible SMS formats, DMR is usually a good idea. */

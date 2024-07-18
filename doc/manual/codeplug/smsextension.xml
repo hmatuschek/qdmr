@@ -6,10 +6,91 @@
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
 <info>
-  <title></title>
+  <title>SMS Extension</title>
 </info>
 
 <para>
+  This extension allows for configuring the SMS (text message) feature of all DMR radios. For now, 
+  it is implemented as an extension, but might be changed into a common core setting in the future.
 </para>
 
+<para>
+  This extension only has two elements: the SMS format and a list of predefined text messages. The 
+  latter is important for devices that do not have a keypad and thus do not allow for entering any 
+  messages. E.g., the Radioddity GD-73.
+</para>
+
+<para>
+  As this extension configures a common feature, the extension is always present.
+</para>
+
+<example>
+  <title>Example of a single SMS pre-defined text or template.</title>
+  <programlisting><![CDATA[sms:
+  format: Motorola
+  templates:
+    - id: sms1
+      name: RSSI
+      message: RSSI
+]]></programlisting>
+</example>
+
+<section>
+<info> <title>Common SMS settings</title> </info>
+
+<variablelist>
+  <varlistentry>
+    <term><token>format</token></term>
+    <listitem>
+      <para>
+        Specifies the SMS format to be used. This must be one of <token>Motorola</token>, 
+        <token>Hytera</token> or <token>DMR</token>. If an incompatible format is chosen, you cannot 
+        receive or send text messages.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info> <title>Message templates</title> </info>
+  
+<para>
+  The <token>templates</token> key defines a list of SMS templates to be programmed onto the radio. 
+  Each template is a config object with a name and ID. The latter can be used to reference the 
+  template somewhere else in the codeplug. 
+</para>
+
+<para>
+  Each template has the following properties:
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>id</token></term>
+    <listitem>
+      <para>
+        Specifies the unique ID of the message. This can be used to reference the message.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>name</token></term>
+    <listitem>
+      <para>
+        Specifies the display name of the message. Please note, that not all radios store 
+        descriptive names alongside with the preset messages.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>message</token></term>
+    <listitem>
+      <para>
+        The actual preset message. The length might differ but is usually limited to 144 chars.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 </section>

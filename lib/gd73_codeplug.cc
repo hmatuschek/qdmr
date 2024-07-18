@@ -751,6 +751,8 @@ GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+<<<<<<< HEAD
+=======
  * Implementation of GD73Codeplug::EncryptionKeyElement
  * ********************************************************************************************* */
 GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr, size_t size)
@@ -876,7 +878,7 @@ GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
 GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr)
   : Element(ptr, GD73Codeplug::MessageElement::size())
 {
-  // passs...
+  // pass...
 }
 
 QString
@@ -954,7 +956,6 @@ GD73Codeplug::MessageBankElement::decode(SMSExtension *ext, const ErrorStack &er
     sms->setName(QString("Message %1").arg(i+1));
     ext->smsTemplates()->add(sms);
   }
-
   return true;
 }
 
