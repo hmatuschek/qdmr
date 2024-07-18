@@ -1075,6 +1075,9 @@ public:
 
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x00b0; }
+
     /** Returns @c true if the n-th "enhanced" key (128bit) is set.
      * That is, if it is not filled with 0xff. */
     virtual bool isEnhancedKeySet(unsigned n) const;
@@ -1098,12 +1101,27 @@ public:
     /** Links the given encryption extension. */
     virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
 
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** Specifies the maxumum number of basic (DMR) encryption keys (16bit). */
+      static constexpr unsigned int basicKeys() { return 16; }
+      /** Specifies the maximum number of advanced (AES) encryption keys (128bit). */
+      static constexpr unsigned int advancedKeys() { return 8; }
+    };
+
   protected:
-    /** Number of enhanced keys. */
-    unsigned _numEnhancedKeys;
-    /** Number of basic keys. */
-    unsigned _numBasicKeys;
+    /** Some internal offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int advancedKeys() { return 0x0000; }
+      static constexpr unsigned int betweenAdvancedKeys() { return 0x0010; }
+      static constexpr unsigned int basicKeys() { return 0x0090; }
+      static constexpr unsigned int betweenBasicKeys() { return 0x0002; }
+      /// @endcond
+    };
   };
+
 
   /** Basic pre-defined SMS text message. */
   class MessageElement: public Element
@@ -1170,6 +1188,7 @@ public:
       static constexpr unsigned int messages() { return 50; }
     };
   };
+
 
 protected:
   /** Empty constructor. */

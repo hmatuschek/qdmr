@@ -2648,17 +2648,18 @@ bool
 RadioddityCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *ext, Context &ctx) {
   clear();
 
-  if (ext->encryptionKeys()->count() > 16) {
-    logError() << "Cannot encode encryption extension. Can only encode 16 keys.";
+  if (ext->encryptionKeys()->count() > (int)Limit::basicEncryptionKeys()) {
+    logError() << "Cannot encode encryption extension. Can only encode "
+               << Limit::basicEncryptionKeys() << " keys.";
     return false;
   }
 
   for (int i=0; i<ext->encryptionKeys()->count(); i++) {
-    if (! ext->encryptionKeys()->get(i)->is<DMREncryptionKey>()) {
+    if (! ext->encryptionKeys()->get(i)->is<BasicEncryptionKey>()) {
       logError() << "Can only encode basic encryption keys.";
       return false;
     }
-    DMREncryptionKey *key = ext->encryptionKeys()->get(i)->as<DMREncryptionKey>();
+    BasicEncryptionKey *key = ext->encryptionKeys()->get(i)->as<BasicEncryptionKey>();
     if (key->key().size() != 4) {
       logError() << "Can only encode 32bit basic encryption keys.";
       return false;
@@ -2675,11 +2676,11 @@ bool RadioddityCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     return false;
 
   CommercialExtension *ext = ctx.config()->commercialExtension();
-  for (int i=0; i<16; i++) {
+  for (unsigned int i=0; i<Limit::basicEncryptionKeys(); i++) {
     if (! isBasicKeySet(i))
       continue;
     // Assemble key
-    DMREncryptionKey *key = new DMREncryptionKey();
+    BasicEncryptionKey *key = new BasicEncryptionKey();
     key->setName(QString("Basic Key %1").arg(i+1));
     key->fromHex(basicKey(i).toHex());
     // add key to extension
