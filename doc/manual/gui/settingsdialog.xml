@@ -58,7 +58,7 @@
 </info>
 
 <para>
-  The second tab controls, how the radios are programmed. That is, how the codeplug is assembled and
+ The second tab controls, how the radios are programmed. That is, how the codeplug is assembled and
   also, how the callsign database gets curated.
 </para>
 
@@ -71,11 +71,19 @@
 </screenshot>
 
 <para>
-  The first section specifies how codeplugs are assembled. The first option 
+  The <guilabel>Radio Interfaces</guilabel> section contains settings, controlling, how the 
+  radios are accessed. For now, there is only one setting, called 
+  <guilabel>disable auto-detect</guilabel>. This will disable all means to detect and identify 
+  connected radios. You will then have to select an interface and choose a radio model, every time
+  you access it. 
+</para>
+
+<para>
+  The second section specifies how codeplugs are assembled. The first option 
   <guilabel>Update codeplug</guilabel> specifies whether a codeplug is generated from
   scratch or whether the codeplug currently programmed on the radio gets updated. 
   <application>qdmr</application> does not implement all settings possible for all radios, 
-  consequently <guilabel>Update codeplug</guilabel> should be choses to maintain all settings 
+  consequently <guilabel>Update code plug</guilabel> should be chooses to maintain all settings 
   of the radio that are not touched by <application>qdmr</application>.
 </para>
 
@@ -88,7 +96,7 @@
 </para>
 
 <para>
-  As described in <xref linkend="guiProgram"/>, the upload of a codeplug will be paused 
+  As described in <xref linkend="guiProgram"/>, the upload of a code plug will be paused 
   if some verification warnings are issued. The <guilabel>Ignore verification warnings</guilabel>
   option allows to continue silently even in the presence of verification warnings. The may be 
   needed for some radios with some rather short communication timeout. The radio may reset the 
@@ -171,9 +179,9 @@
 <para>
   Starting with <application>qdmr</application> version 0.9.0, there are some 
   device specific settings, allowing to configure features only present in one device and not 
-  represented in the general codeplug. These are called <emphasis>extensions</emphasis> and are 
+  represented in the general code plug. These are called <emphasis>extensions</emphasis> and are 
   usually hidden. To show these device specific extension, select <guilabel>Show device 
-    extensions</guilabel>.
+  extensions</guilabel>.
 </para>
 </section>
 </section>

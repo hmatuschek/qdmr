@@ -10,6 +10,7 @@
 #include "ui_settingsdialog.h"
 
 #include "codeplug.hh"
+#include "configmergevisitor.hh"
 #include "repeaterbookcompleter.hh"
 
 
@@ -30,6 +31,9 @@ public:
   QString locator() const;
   void setLocator(const QString &locator);
   QGeoCoordinate position() const;
+
+  bool disableAutoDetect() const;
+  void setDisableAutoDetect(bool disable);
 
   RepeaterBookList::Region repeaterBookRegion() const;
   void setRepeaterBookRegion(RepeaterBookList::Region region);
@@ -86,6 +90,12 @@ public:
 
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
+
+  ConfigMergeVisitor::ItemStrategy configMergeItemStrategy() const;
+  void setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy);
+
+  ConfigMergeVisitor::SetStrategy configMergeSetStrategy() const;
+  void setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy);
 
   QByteArray mainWindowState() const;
   void setMainWindowState(const QByteArray &state);

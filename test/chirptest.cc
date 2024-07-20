@@ -30,12 +30,12 @@ ChirpTest::testReaderBasic() {
 
   QCOMPARE(config.channelList()->count(), 3);
   QCOMPARE(config.channelList()->channel(0)->name(), "KD8BMI");
-  QCOMPARE(config.channelList()->channel(0)->rxFrequency(), 147.075000);
-  QCOMPARE(config.channelList()->channel(0)->txFrequency(), 147.675000);
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency().inMHz(), 147.075000);
+  QCOMPARE(config.channelList()->channel(0)->txFrequency().inMHz(), 147.675000);
   QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->txTone(), Signaling::CTCSS_103_5Hz);
   QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->rxTone(), Signaling::SIGNALING_NONE);
-  QCOMPARE(config.channelList()->channel(1)->rxFrequency(), 146.760000);
-  QCOMPARE(config.channelList()->channel(1)->txFrequency(), 146.160000);
+  QCOMPARE(config.channelList()->channel(1)->rxFrequency().inMHz(), 146.760000);
+  QCOMPARE(config.channelList()->channel(1)->txFrequency().inMHz(), 146.160000);
 }
 
 
@@ -147,11 +147,11 @@ ChirpTest::testWriterBasic() {
   Config orig;
 
   FMChannel *fm0 = new FMChannel();
-  fm0->setName("DB0SP"); fm0->setRXFrequency(145.6); fm0->setTXFrequency(145.0);
+  fm0->setName("DB0SP"); fm0->setRXFrequency(Frequency::fromMHz(145.6)); fm0->setTXFrequency(Frequency::fromMHz(145.0));
   orig.channelList()->add(fm0);
 
   FMChannel *fm1 = new FMChannel();
-  fm1->setName("DB0SP"); fm1->setRXFrequency(145.6); fm1->setTXFrequency(144.4);
+  fm1->setName("DB0SP"); fm1->setRXFrequency(Frequency::fromMHz(145.6)); fm1->setTXFrequency(Frequency::fromMHz(144.4));
   orig.channelList()->add(fm1);
 
   QString csv;
@@ -179,18 +179,18 @@ ChirpTest::testWriterCTCSS() {
   Config orig;
 
   FMChannel *fm0 = new FMChannel();
-  fm0->setName("DB0SP"); fm0->setRXFrequency(145.6); fm0->setTXFrequency(145.0);
+  fm0->setName("DB0SP"); fm0->setRXFrequency(Frequency::fromMHz(145.6)); fm0->setTXFrequency(Frequency::fromMHz(145.0));
   fm0->setTXTone(Signaling::CTCSS_67_0Hz);
   orig.channelList()->add(fm0);
 
   FMChannel *fm1 = new FMChannel();
-  fm1->setName("DB0SP"); fm1->setRXFrequency(145.6); fm1->setTXFrequency(145.0);
+  fm1->setName("DB0SP"); fm1->setRXFrequency(Frequency::fromMHz(145.6)); fm1->setTXFrequency(Frequency::fromMHz(145.0));
   fm1->setTXTone(Signaling::CTCSS_67_0Hz);
   fm1->setRXTone(Signaling::CTCSS_67_0Hz);
   orig.channelList()->add(fm1);
 
   FMChannel *fm2 = new FMChannel();
-  fm2->setName("DB0SP"); fm2->setRXFrequency(145.6); fm2->setTXFrequency(145.0);
+  fm2->setName("DB0SP"); fm2->setRXFrequency(Frequency::fromMHz(145.6)); fm2->setTXFrequency(Frequency::fromMHz(145.0));
   fm2->setTXTone(Signaling::CTCSS_67_0Hz);
   fm2->setRXTone(Signaling::CTCSS_77_0Hz);
   orig.channelList()->add(fm2);
@@ -223,25 +223,25 @@ ChirpTest::testWriterDCS() {
   Config orig;
 
   FMChannel *fm0 = new FMChannel();
-  fm0->setName("DB0SP"); fm0->setRXFrequency(145.6); fm0->setTXFrequency(145.0);
+  fm0->setName("DB0SP"); fm0->setRXFrequency(Frequency::fromMHz(145.6)); fm0->setTXFrequency(Frequency::fromMHz(145.0));
   fm0->setTXTone(Signaling::DCS_023N);
   fm0->setRXTone(Signaling::DCS_023N);
   orig.channelList()->add(fm0);
 
   FMChannel *fm1 = new FMChannel();
-  fm1->setName("DB0SP"); fm1->setRXFrequency(145.6); fm1->setTXFrequency(145.0);
+  fm1->setName("DB0SP"); fm1->setRXFrequency(Frequency::fromMHz(145.6)); fm1->setTXFrequency(Frequency::fromMHz(145.0));
   fm1->setTXTone(Signaling::DCS_023N);
   fm1->setRXTone(Signaling::DCS_023I);
   orig.channelList()->add(fm1);
 
   FMChannel *fm2 = new FMChannel();
-  fm2->setName("DB0SP"); fm2->setRXFrequency(145.6); fm2->setTXFrequency(145.0);
+  fm2->setName("DB0SP"); fm2->setRXFrequency(Frequency::fromMHz(145.6)); fm2->setTXFrequency(Frequency::fromMHz(145.0));
   fm2->setTXTone(Signaling::DCS_023N);
   fm2->setRXTone(Signaling::CTCSS_77_0Hz);
   orig.channelList()->add(fm2);
 
   FMChannel *fm3 = new FMChannel();
-  fm3->setName("DB0SP"); fm3->setRXFrequency(145.6); fm3->setTXFrequency(145.0);
+  fm3->setName("DB0SP"); fm3->setRXFrequency(Frequency::fromMHz(145.6)); fm3->setTXFrequency(Frequency::fromMHz(145.0));
   fm3->setTXTone(Signaling::DCS_023N);
   fm3->setRXTone(Signaling::DCS_032N);
   orig.channelList()->add(fm3);

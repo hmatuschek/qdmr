@@ -72,7 +72,7 @@ public:
   /** Returns some information about the interface. */
   static USBDeviceInfo interfaceInfo();
   /** Tries to find all interfaces connected AnyTone radios. */
-  static QList<USBDeviceDescriptor> detect();
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Internal used function to select a memory bank. */

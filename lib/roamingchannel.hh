@@ -17,10 +17,10 @@ class RoamingChannel : public ConfigObject
   Q_OBJECT
   Q_CLASSINFO("IdPrefix", "rch")
 
-  /** Holds the RX frequency in MHz. */
-  Q_PROPERTY(double rxFrequency READ rxFrequency WRITE setRXFrequency)
-  /** Holds the TX frequency in MHz. */
-  Q_PROPERTY(double txFrequency READ txFrequency WRITE setTXFrequency)
+  /** Holds the RX frequency in Hz. */
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  /** Holds the TX frequency in Hz. */
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
   /** If @c true, the color code of the channel gets overridden by the one specified in @c colorCode. */
   Q_PROPERTY(bool overrideColorCode READ colorCodeOverridden WRITE overrideColorCode SCRIPTABLE false)
   /** If @c overrideColorCode is @c true, specifies the color code. */
@@ -32,21 +32,21 @@ class RoamingChannel : public ConfigObject
 
 public:
   /** Default constructor for a roaming channel. */
-  explicit RoamingChannel(QObject *parent = nullptr);
+  Q_INVOKABLE explicit RoamingChannel(QObject *parent = nullptr);
   /** Copy constructor. */
   RoamingChannel(const RoamingChannel &other, QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   void clear();
 
-  /** Returns the RX frequency in MHz. */
-  double rxFrequency() const;
-  /** Sets the RX frquency in MHz. */
-  void setRXFrequency(double f);
-  /** Returns the TX frequency in MHz. */
-  double txFrequency() const;
-  /** Sets the TX frquency in MHz. */
-  void setTXFrequency(double f);
+  /** Returns the RX frequency in Hz. */
+  Frequency rxFrequency() const;
+  /** Sets the RX frquency in Hz. */
+  void setRXFrequency(Frequency f);
+  /** Returns the TX frequency in Hz. */
+  Frequency txFrequency() const;
+  /** Sets the TX frquency in Hz. */
+  void setTXFrequency(Frequency f);
 
   /** Returns @c true, if the color code of the channel gets overridden. */
   bool colorCodeOverridden() const;
@@ -77,10 +77,10 @@ protected:
   bool populate(YAML::Node &node, const Context &context, const ErrorStack &err);
 
 protected:
-  /** Holds the RX frequency in MHz. */
-  double _rxFrequency;
-  /** Holds the TX frequency in MHz. */
-  double _txFrequency;
+  /** Holds the RX frequency in Hz. */
+  Frequency _rxFrequency;
+  /** Holds the TX frequency in Hz. */
+  Frequency _txFrequency;
   /** If @c true, the color code of the channel gets overridden by the one specified in @c _colorCode. */
   bool _overrideColorCode;
   /** If @c _overrideColorCode is @c true, specifies the color code. */
@@ -106,7 +106,7 @@ public:
   /** Returns the roaming channel at the given index. */
   RoamingChannel *channel(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

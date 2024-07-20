@@ -13,7 +13,7 @@
 <para>
   This extension allows to configure the commercial encryption features of DMR. Almost all DMR 
   radios implement means for encrypting the traffic. This feature however, is usually illegal 
-  when used within a amateur radio context.
+  when used within amateur radio.
 </para>
 
 <example>
@@ -24,20 +24,23 @@
       id: key1
       name: Example key 1
       key: ABCD
-    - aes:
+    - rc4:
       id: key2
       name: Example key 2
-      key: 01234567890123456789012345678901
+      key: 0123456789
+    - aes:
+      id: key3
+      name: Example key 3
+      key: 0123456789ABCDEF0123456789ABCDEF
 ]]></programlisting>
 </example>
 
 <para> 
   This extension is a simple list of keys held in the global <token>commercial</token> extension.
-  Each key must either be a DMR (basic) or AES (enhanced) key. 
-  The former defines a simple 16bit key while the latter defines a 126bit AES key. To 
-  differentiate these key types, each list entry must be a mapping with a single entry. The name
-  specifies the type (i.e., either <token>dmr</token> or <token>aes</token>). The value then 
-  specifies the properties of the key.
+  Each key must either be a DMR (basic), RC4 (enhanced) or AES (advanced) key. 
+  To differentiate these key types, each list entry must be a mapping with a single entry. The name
+  specifies the type (i.e., either <token>dmr</token>, <token>rc4</token> or <token>aes</token>). 
+  The value then specifies the properties of the key.
 </para>
 
 
@@ -86,7 +89,9 @@
     <term><token>key</token></term>
     <listitem>
       <para>
-        Specifies the 16bit key as a HEX string. To this end, a 4-char hex string is specified.
+        Specifies the key as a HEX string. It must be at least 8bit but can be of variable size. 
+        The actual size depends on the device. Usually, a fixed size of 16 or 32bit is supported. 
+        Some devices, however, support variable sized keys.
       </para>
     </listitem>
   </varlistentry>
@@ -95,8 +100,31 @@
   
 
 <section>
+  <info>
+    <title>RC4 (enhanced) key attributes</title>
+  </info>
+      
+  <para>
+  </para>
+      
+  <variablelist>
+    <title>RC4 key fields</title>
+    <varlistentry>
+      <term><token>key</token></term>
+      <listitem>
+        <para>
+          Specifies the key as a HEX string. This key is fixed to a size of 40bit. That is, the hex 
+          string must be of length 10.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  </section>
+  
+  
+  <section>
 <info>
-  <title>AES (enhanced) key attributes</title>
+  <title>AES (advanced) key attributes</title>
 </info>
     
 <para>
@@ -108,7 +136,8 @@
     <term><token>key</token></term>
     <listitem>
       <para>
-        Specifies the 128bit key as a HEX string. To this end, a 32-char hex string is specified.
+        Specifies the key as a HEX string. Also this key can be of variable size. Usually, these 
+        keys are 128 or 256bit. The actual size depends on the device.
       </para>
     </listitem>
   </varlistentry>

@@ -14,7 +14,7 @@
  * to the device, allow for reading and writing specific memory blocks.
  *
  * This class defines the common interface for all radio-interface classes, irrespective of the
- * actual communication protocoe l being used by the device.
+ * actual communication protocol being used by the device.
  *
  * @ingroup rif */
 class RadioInterface

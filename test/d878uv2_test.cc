@@ -7,24 +7,9 @@
 #include <QTest>
 
 D878UV2Test::D878UV2Test(QObject *parent)
-  : QObject(parent)
+  : UnitTestBase(parent)
 {
   // pass...
-}
-
-void
-D878UV2Test::initTestCase() {
-  ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-D878UV2Test::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
 }
 
 void
@@ -53,6 +38,29 @@ D878UV2Test::testBasicConfigDecoding() {
     QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UVII: %1")
           .arg(err.format()).toStdString().c_str());
   }
+}
+
+void
+D878UV2Test::testChannelFrequency() {
+  ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  D868UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D878UV II: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D878UV II: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           Frequency::fromHz(123456780ULL));
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           Frequency::fromHz(999999990ULL));
 }
 
 void

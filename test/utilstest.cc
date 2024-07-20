@@ -91,7 +91,7 @@ UtilsTest::testFrequencyParser() {
   QCOMPARE(Frequency::fromString("100GHz").inHz(), 100000000000ULL);
   QCOMPARE(Frequency::fromString("100 GHz").inHz(), 100000000000ULL);
 
-  QCOMPARE(Frequency::fromString("100").inHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100").inHz(), 100000000ULL);
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
 }
 

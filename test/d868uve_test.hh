@@ -2,10 +2,9 @@
 #define D868UVETEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class D868UVETest : public QObject
+class D868UVETest : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,16 +12,12 @@ public:
   explicit D868UVETest(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
+  void testChannelFrequency();
   void testAutoRepeaterOffset();
-
-protected:
-  Config _basicConfig;
+  void testDTMFContacts();
+  void testSMSTemplates();
 };
 
 #endif // D878UV2TEST_HH

@@ -14,19 +14,24 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <cmath>
+#include "utils.hh"
 #include "application.hh"
 #include <QCompleter>
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
+#include <QRegularExpression>
+
+#include "opengd77_extension.hh"
 
 
 /* ********************************************************************************************* *
  * Implementation of Channel
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
-  : ConfigObject("ch", parent), _rxFreq(0), _txFreq(0), _defaultPower(true),
-    _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()), _rxOnly(false),
-    _vox(std::numeric_limits<unsigned>::max()), _scanlist(), _openGD77ChannelExtension(nullptr),
+  : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
+    _defaultPower(true), _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()),
+    _rxOnly(false), _vox(std::numeric_limits<unsigned>::max()), _scanlist(),
+    _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
   // Link scan list modification event (e.g., scan list gets deleted).
@@ -62,7 +67,7 @@ Channel::copy(const ConfigItem &other) {
 void
 Channel::clear() {
   ConfigObject::clear();
-  _rxFreq = 0; _txFreq = 0;
+  _rxFreq = Frequency::fromHz(0); _txFreq = Frequency::fromHz(0);
   setDefaultPower();
   setDefaultTimeout();
   _rxOnly = false;
@@ -76,23 +81,26 @@ Channel::clear() {
   _tytChannelExtension = nullptr;
 }
 
-double
-Channel::rxFrequency() const {
+Frequency Channel::rxFrequency() const {
   return _rxFreq;
 }
 bool
-Channel::setRXFrequency(double freq) {
+Channel::setRXFrequency(Frequency freq) {
+  if (freq == _rxFreq)
+    return true;
   _rxFreq = freq;
   emit modified(this);
   return true;
 }
 
-double
+Frequency
 Channel::txFrequency() const {
   return _txFreq;
 }
 bool
-Channel::setTXFrequency(double freq) {
+Channel::setTXFrequency(Frequency freq) {
+  if (freq == _txFreq)
+    return true;
   _txFreq = freq;
   emit modified(this);
   return true;
@@ -244,6 +252,10 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
+  // Serialize freuqencies in MHz
+  node["rxFrequency"] = _rxFreq;
+  node["txFrequency"] = _txFreq;
+
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -281,6 +293,21 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
+  // Parse frequencies
+  if (ch["rxFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No rxFreuqency specified.";
+    return false;
+  }
+  setRXFrequency(ch["rxFrequency"].as<Frequency>());
+
+  if (ch["txFrequency"].IsNull()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << "Cannot parse channel. No txFrequency specified.";
+    return false;
+  }
+  setTXFrequency(ch["txFrequency"].as<Frequency>());
+
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {
@@ -963,12 +990,12 @@ ChannelList::ChannelList(QObject *parent)
 }
 
 int
-ChannelList::add(ConfigObject *obj, int row) {
+ChannelList::add(ConfigObject *obj, int row, bool unique) {
   if ((nullptr == obj) || (! obj->is<Channel>())) {
     logError() << "Cannot add nullptr or non-channel objects to channel list.";
     return -1;
   }
-  return ConfigObjectList::add(obj, row);
+  return ConfigObjectList::add(obj, row, unique);
 }
 
 Channel *
@@ -979,13 +1006,12 @@ ChannelList::channel(int idx) const {
 }
 
 DMRChannel *
-ChannelList::findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsigned cc) const {
+ChannelList::findDMRChannel(Frequency rx, Frequency tx, DMRChannel::TimeSlot ts, unsigned cc) const {
   for (int i=0; i<count(); i++) {
     if (! _items[i]->is<DMRChannel>())
       continue;
     /// @bug I should certainly change the frequency handling to integer values!
-    if ( (1e-6<std::abs(channel(i)->txFrequency()-tx)) ||
-         (1e-6<std::abs(channel(i)->rxFrequency()-rx)) )
+    if ((channel(i)->txFrequency()!=tx) || (channel(i)->rxFrequency()!=rx))
       continue;
     DMRChannel *digi = channel(i)->as<DMRChannel>();
     if (digi->timeSlot() != ts)
@@ -998,11 +1024,11 @@ ChannelList::findDMRChannel(double rx, double tx, DMRChannel::TimeSlot ts, unsig
 }
 
 FMChannel *
-ChannelList::findFMChannelByTxFreq(double freq) const {
+ChannelList::findFMChannelByTxFreq(Frequency freq) const {
   for (int i=0; i<count(); i++) {
     if (! channel(i)->is<FMChannel>())
       continue;
-    if (1e-5 > std::abs(channel(i)->txFrequency()-freq))
+    if (channel(i)->txFrequency() == freq)
       return channel(i)->as<FMChannel>();
   }
   return nullptr;

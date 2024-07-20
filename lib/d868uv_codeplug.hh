@@ -701,11 +701,11 @@ protected:
   /** Encode zones into codeplug. */
   virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to encode a single zone. */
-  virtual bool encodeZone(int i, Zone *zone, bool isB, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Create zones from codeplug. */
   virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to decode a single zone. */
-  virtual bool decodeZone(int i, Zone *zone, bool isB, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link zones. */
   virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Function to link a single zone. */
@@ -753,6 +753,14 @@ protected:
 
   /** Allocate prefab SMS messages. */
   virtual void allocateSMSMessages();
+  /** Encodes prefab SMS messages. */
+  virtual bool encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Create SMS messages from codeplug. */
+  virtual bool createSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link SMS messages. */
+  virtual bool linkSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();
 

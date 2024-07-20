@@ -22,6 +22,7 @@ public:
     OpenRTX,
     // Radioddity devices
     RD5R,
+    GD73,
     GD77,
     // TyT devices
     MD390, MD380 = MD390, RT8 = MD390,
@@ -35,7 +36,8 @@ public:
     D878UVII,
     D578UV,
     // Baofeng/BTECH
-    DM1701, RT84 = DM1701
+    DM1701, RT84 = DM1701,
+    DR1801UV
   };
 
 public:

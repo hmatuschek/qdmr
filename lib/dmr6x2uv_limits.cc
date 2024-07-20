@@ -9,8 +9,8 @@
 #include "roamingzone.hh"
 
 
-DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<double, double> > &rxFreqRanges,
-                               const std::initializer_list<std::pair<double, double> > &txFreqRanges,
+DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
+                               const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
                                const QString &hardwareRevision, QObject *parent)
   : AnytoneLimits(hardwareRevision, "V102", true, parent)
 {

@@ -8,32 +8,20 @@
 #include "logger.hh"
 
 D878UVTest::D878UVTest(QObject *parent)
-  : QObject(parent), _stderr(stderr)
+  : UnitTestBase(parent), _stderr(stderr)
 {
   Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
 }
 
 void
 D878UVTest::initTestCase() {
+  UnitTestBase::initTestCase();
+
   ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
   if (! _micGainConfig.readYAML(":/data/anytone_audio_settings_extension.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
-  if (! _roamingConfig.readYAML(":/data/roaming_channel_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-D878UVTest::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
 }
 
 void
@@ -85,6 +73,29 @@ D878UVTest::testAnalogMicGain() {
 }
 
 void
+D878UVTest::testChannelFrequency() {
+  ErrorStack err;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  D868UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D878UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config config;
+  if (! codeplug.decode(&config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D878UV: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
+           Frequency::fromHz(123456780ULL));
+  QCOMPARE(config.channelList()->channel(0)->txFrequency(),
+           Frequency::fromHz(999999990ULL));
+}
+
+void
 D878UVTest::testRoaming() {
   ErrorStack err;
   Codeplug::Flags flags; flags.updateCodePlug=false;
@@ -96,7 +107,7 @@ D878UVTest::testRoaming() {
 
   Config config;
   if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot decode codeplug for AnyTone D878UV: {}")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -138,10 +149,18 @@ D878UVTest::testHangTime() {
   // Encode
   D878UVCodeplug codeplug;
   Codeplug::Flags flags; flags.updateCodePlug=false;
-  if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
+    QFAIL(QString("Cannot prepare codeplug for AnyTone AT-D878UVE: %1")
           .arg(err.format()).toStdString().c_str());
   }
+
+  if (! codeplug.encode(intermediate, flags, err)) {
+    delete intermediate;
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  delete intermediate;
 
   // Decode
   Config comp_config;

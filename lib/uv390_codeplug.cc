@@ -1,5 +1,6 @@
 #include "uv390_codeplug.hh"
 #include "logger.hh"
+#include "config.hh"
 #include "tyt_extensions.hh"
 #include <QTimeZone>
 
@@ -37,10 +38,6 @@
 #define NUM_GPSSYSTEMS                16
 #define ADDR_GPSSYSTEMS         0x03ec40
 #define GPSSYSTEM_SIZE          0x000010
-
-#define NUM_TEXTMESSAGES              50
-#define ADDR_TEXTMESSAGES       0x002180
-#define TEXTMESSAGE_SIZE        0x000120
 
 #define ADDR_EMERGENCY_SETTINGS 0x005a50
 #define NUM_EMERGENCY_SYSTEMS         32
@@ -1008,10 +1005,22 @@ UV390Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(ADDR_MENUSETTINGS)).clear();
 }
 
+
 void
 UV390Codeplug::clearTextMessages() {
-  memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
+  MessageBankElement(data(Offset::messages())).clear();
 }
+
+bool
+UV390Codeplug::encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).encode(ctx, flags, err);
+}
+
+bool
+UV390Codeplug::decodeTextMessages(Context &ctx, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).decode(ctx, err);
+}
+
 
 void
 UV390Codeplug::clearEmergencySystems() {

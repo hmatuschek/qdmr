@@ -269,7 +269,6 @@ Where <token>N</token> is the number of bytes to read.
 +---+---+---+---+---+---+---+...+---+---+---+]]></programlisting>
   where the CRC is the least significant byte of the sum over the address, length and data payload.
 </para>
-
 </section>
 
 </section>

@@ -7,29 +7,9 @@
 #include <QTest>
 
 RD5RTest::RD5RTest(QObject *parent)
-  : QObject(parent)
+  : UnitTestBase(parent)
 {
   // pass...
-}
-
-void
-RD5RTest::initTestCase() {
-  ErrorStack err;
-  if (! _basicConfig.readYAML(":/data/config_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-  if (! _channelFrequencyConfig.readYAML(":/data/channel_frequency_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-}
-
-void
-RD5RTest::cleanupTestCase() {
-  // clear codeplug
-  _basicConfig.clear();
-  _channelFrequencyConfig.clear();
 }
 
 void
@@ -81,6 +61,36 @@ RD5RTest::testChannelFrequency() {
   QCOMPARE(config.channelList()->channel(0)->txFrequency(),
            1234567890ULL);*/
 }
+
+void
+RD5RTest::testSMSTemplates() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  SMSTemplate *sms0 = new SMSTemplate(); sms0->setName("SMS0"); sms0->setMessage("ABC");
+  SMSTemplate *sms1 = new SMSTemplate(); sms1->setName("SMS1"); sms1->setMessage("XYZ");
+  config.smsExtension()->smsTemplates()->add(sms0);
+  config.smsExtension()->smsTemplates()->add(sms1);
+
+  ErrorStack err;
+  RD5RCodeplug codeplug;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity RD5R: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->count(), 2);
+  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(0)->name(), "SMS0");
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(0)->message(), "ABC");
+  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(1)->name(), "SMS1");
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(1)->message(), "XYZ");
+}
+
 
 QTEST_GUILESS_MAIN(RD5RTest)
 

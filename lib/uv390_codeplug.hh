@@ -350,14 +350,24 @@ public:
   bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
 
+  void clearTextMessages();
+  bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err);
+  bool decodeTextMessages(Context &ctx, const ErrorStack &err);
+
   /** Resets the boot setting, e.g. initial channels and zone at bootup. */
   virtual void clearBootSettings();
   void clearMenuSettings();
-  void clearTextMessages();
   void clearEmergencySystems();
   /** Clears the VFO A & B. */
   virtual void clearVFOSettings();
 
+protected:
+  /** Some internal offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int messages() { return 0x002180; }
+    /// @endcond
+  };
 };
 
 #endif // UV390CODEPLUG_HH

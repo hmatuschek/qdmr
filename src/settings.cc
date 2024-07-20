@@ -72,6 +72,15 @@ Settings::setRepeaterBookRegion(RepeaterBookList::Region region) {
 }
 
 bool
+Settings::disableAutoDetect() const {
+  return value("disableAutoDetect", false).toBool();
+}
+void
+Settings::setDisableAutoDetect(bool disable) {
+  setValue("disableAutoDetect", disable);
+}
+
+bool
 Settings::updateCodeplug() const {
   return value("updateCodeplug", true).toBool();
 }
@@ -263,6 +272,26 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+ConfigMergeVisitor::ItemStrategy
+Settings::configMergeItemStrategy() const {
+  return (ConfigMergeVisitor::ItemStrategy)value(
+        "configMergeItemStrategy", (uint) ConfigMergeVisitor::ItemStrategy::Duplicate).toUInt();
+}
+void
+Settings::setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy) {
+  setValue("configMergeItemStrategy", (uint)strategy);
+}
+
+ConfigMergeVisitor::SetStrategy
+Settings::configMergeSetStrategy() const {
+  return (ConfigMergeVisitor::SetStrategy)value(
+        "configMergeSetStrategy", (uint) ConfigMergeVisitor::SetStrategy::Merge).toUInt();
+}
+void
+Settings::setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy) {
+  setValue("configMergeSetStrategy", (uint)strategy);
+}
+
 QByteArray
 Settings::mainWindowState() const {
   return value("mainWindowState", QByteArray()).toByteArray();
@@ -331,12 +360,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
           this, SLOT(onIgnoreFrequencyLimitsSet(bool)));
   connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 
+  Ui::SettingsDialog::disableAutoDetect->setChecked(settings.disableAutoDetect());
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
   Ui::SettingsDialog::ignoreFrequencyLimits->setChecked(settings.ignoreFrequencyLimits());
-
 
   Ui::SettingsDialog::dbLimitEnable->setChecked(settings.limitCallSignDBEntries());
   if (! settings.limitCallSignDBEntries())
@@ -411,6 +440,7 @@ SettingsDialog::accept() {
   Settings settings;
   settings.setQueryPosition(queryLocation->isChecked());
   settings.setLocator(locatorEntry->text().simplified());
+  settings.setDisableAutoDetect(disableAutoDetect->isChecked());
   if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())
     settings.setRepeaterBookRegion(RepeaterBookList::World);
   else

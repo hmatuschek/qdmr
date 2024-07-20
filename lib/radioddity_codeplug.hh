@@ -6,6 +6,8 @@
 #include "channel.hh"
 #include "contact.hh"
 #include "radioddity_extensions.hh"
+#include "ranges.hh"
+
 
 class DMRContact;
 class Zone;
@@ -432,7 +434,7 @@ public:
     virtual Zone *toZoneObj(Context &ctx) const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    virtual bool linkZoneObj(Zone *zone, Context &ctx) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
@@ -745,7 +747,7 @@ public:
     /** Use monitor type from extension. */
     typedef RadiodditySettingsExtension::MonitorType MonitorType;
     /** Use ARTS tone mode from extension. */
-    typedef RadiodditySettingsExtension::ARTSTone ARTSTone;
+    typedef RadioddityToneSettingsExtension::ARTSTone ARTSTone;
     /** Use scan mode from extension. */
     typedef RadiodditySettingsExtension::ScanMode ScanMode;
 
@@ -922,30 +924,40 @@ public:
   class ButtonSettingsElement: public Element
   {
   public:
-    /** Possible actions for each button on short and long press. */
-    enum class Action {
-      None                   = 0x00,  ///< Disables button.
-      ToggleAllAlertTones    = 0x01,
-      EmergencyOn            = 0x02,
-      EmergencyOff           = 0x03,
-      ToggleMonitor          = 0x05,  ///< Toggle monitor on channel.
-      NuiaceDelete           = 0x06,
-      OneTouch1              = 0x07,  ///< Performs the first of 6 user-programmable actions (call, message).
-      OneTouch2              = 0x08,  ///< Performs the second of 6 user-programmable actions (call, message).
-      OneTouch3              = 0x09,  ///< Performs the third of 6 user-programmable actions (call, message).
-      OneTouch4              = 0x0a,  ///< Performs the fourth of 6 user-programmable actions (call, message).
-      OneTouch5              = 0x0b,  ///< Performs the fifth of 6 user-programmable actions (call, message).
-      OneTouch6              = 0x0c,  ///< Performs the sixt of 6 user-programmable actions (call, message).
-      ToggleRepeatTalkaround = 0x0d,
-      ToggleScan             = 0x0e,
-      TogglePrivacy          = 0x10,
-      ToggleVox              = 0x11,
-      ZoneSelect             = 0x12,
-      BatteryIndicator       = 0x13,
-      ToggleLoneWorker       = 0x14,
-      PhoneExit              = 0x16,
-      ToggleFlashLight       = 0x1a,
-      ToggleFMRadio          = 0x1b
+    /** Encoding/decoding of function key actions. */
+    struct KeyFunction {
+    public:
+      /** Encodes the given function. */
+      static uint8_t encode(RadioddityButtonSettingsExtension::Function func);
+      /** Decodes the action. */
+      static RadioddityButtonSettingsExtension::Function decode(uint8_t action);
+
+    protected:
+      /** Possible function key actions. */
+      enum Action {
+        None                   = 0x00,  ///< Disables button.
+        ToggleAllAlertTones    = 0x01,
+        EmergencyOn            = 0x02,
+        EmergencyOff           = 0x03,
+        ToggleMonitor          = 0x05,  ///< Toggle monitor on channel.
+        NuiaceDelete           = 0x06,
+        OneTouch1              = 0x07,  ///< Performs the first of 6 user-programmable actions (call, message).
+        OneTouch2              = 0x08,  ///< Performs the second of 6 user-programmable actions (call, message).
+        OneTouch3              = 0x09,  ///< Performs the third of 6 user-programmable actions (call, message).
+        OneTouch4              = 0x0a,  ///< Performs the fourth of 6 user-programmable actions (call, message).
+        OneTouch5              = 0x0b,  ///< Performs the fifth of 6 user-programmable actions (call, message).
+        OneTouch6              = 0x0c,  ///< Performs the sixt of 6 user-programmable actions (call, message).
+        ToggleRepeatTalkaround = 0x0d,
+        ToggleScan             = 0x0e,
+        TogglePrivacy          = 0x10,
+        ToggleVox              = 0x11,
+        ZoneSelect             = 0x12,
+        BatteryIndicator       = 0x13,
+        ToggleLoneWorker       = 0x14,
+        PhoneExit              = 0x16,
+        ToggleFlashLight       = 0x1a,
+        ToggleFMRadio          = 0x1b
+      };
     };
 
     /** Possible one-touch actions. */
@@ -970,36 +982,36 @@ public:
     void clear();
 
     /** Returns the long-press duration in ms. */
-    virtual unsigned longPressDuration() const;
+    virtual Interval longPressDuration() const;
     /** Sets the long-press duration in ms. */
-    virtual void setLongPressDuration(unsigned ms);
+    virtual void setLongPressDuration(Interval ms);
 
     /** Returns the side-key 1 short-press action. */
-    virtual Action sk1ShortPress() const;
+    virtual RadioddityButtonSettingsExtension::Function sk1ShortPress() const;
     /** Sets the side-key 1 short-press action. */
-    virtual void setSK1ShortPress(Action action);
+    virtual void setSK1ShortPress(RadioddityButtonSettingsExtension::Function action);
     /** Returns the side-key 1 long-press action. */
-    virtual Action sk1LongPress() const;
+    virtual RadioddityButtonSettingsExtension::Function sk1LongPress() const;
     /** Sets the side-key 1 long-press action. */
-    virtual void setSK1LongPress(Action action);
+    virtual void setSK1LongPress(RadioddityButtonSettingsExtension::Function action);
 
     /** Returns the side-key 2 short-press action. */
-    virtual Action sk2ShortPress() const;
+    virtual RadioddityButtonSettingsExtension::Function sk2ShortPress() const;
     /** Sets the side-key 2 short-press action. */
-    virtual void setSK2ShortPress(Action action);
+    virtual void setSK2ShortPress(RadioddityButtonSettingsExtension::Function action);
     /** Returns the side-key 2 long-press action. */
-    virtual Action sk2LongPress() const;
+    virtual RadioddityButtonSettingsExtension::Function sk2LongPress() const;
     /** Sets the side-key 2 long-press action. */
-    virtual void setSK2LongPress(Action action);
+    virtual void setSK2LongPress(RadioddityButtonSettingsExtension::Function action);
 
     /** Returns the top-key short-press action. */
-    virtual Action tkShortPress() const;
+    virtual RadioddityButtonSettingsExtension::Function tkShortPress() const;
     /** Sets the top-key short-press action. */
-    virtual void setTKShortPress(Action action);
+    virtual void setTKShortPress(RadioddityButtonSettingsExtension::Function action);
     /** Returns the top-key long-press action. */
-    virtual Action tkLongPress() const;
+    virtual RadioddityButtonSettingsExtension::Function tkLongPress() const;
     /** Sets the top-key long-press action. */
-    virtual void setTKLongPress(Action action);
+    virtual void setTKLongPress(RadioddityButtonSettingsExtension::Function action);
 
     /** Returns the n-th one-touch action. */
     virtual OneTouchAction oneTouchAction(unsigned n) const;
@@ -1015,6 +1027,38 @@ public:
     virtual void setOneTouchDigitalMessage(unsigned n, unsigned index);
     /** Configures n-th one-touch action as a analog call. */
     virtual void setOneTouchAnalogCall(unsigned n);
+
+    /** Encodes the button settings (if set). */
+    bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes the button settings. */
+    bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limits {
+      /** Range of valid long-press durations. */
+      static constexpr TimeRange longPressDuration() {
+        return TimeRange{Interval::fromMilliseconds(0), Interval::fromMilliseconds(255*250)};
+      }
+      /** Number of one-touch actions. */
+      static constexpr unsigned int oneTouchActions() { return 6; }
+    };
+
+  protected:
+    /** Internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int longPressDuration()      { return 0x0001; }
+      static constexpr unsigned int sk1ShortPress()          { return 0x0002; }
+      static constexpr unsigned int sk1LongPress()           { return 0x0003; }
+      static constexpr unsigned int sk2ShortPress()          { return 0x0004; }
+      static constexpr unsigned int sk2LongPress()           { return 0x0005; }
+      static constexpr unsigned int tkShortPress()           { return 0x0006; }
+      static constexpr unsigned int tkLongPress()            { return 0x0007; }
+      static constexpr unsigned int oneTouchActions()        { return 0x0008; }
+      static constexpr unsigned int betweenOneTouchActions() { return 0x0004; }
+      /// @endcond
+    };
   };
 
   /** Implements the base class of menu settings for all Radioddity codeplugs.
@@ -1277,6 +1321,8 @@ public:
     /** Destructor. */
     virtual ~MessageBankElement();
 
+    /** Returns the size of the message bank. */
+    static constexpr unsigned int size() { return 0x1248; }
     /** Resets all messages. */
     void clear();
 
@@ -1286,6 +1332,29 @@ public:
     virtual QString message(unsigned n) const;
     /** Appends a message to the list. */
     virtual void appendMessage(const QString msg);
+
+    /** Encodes all preset messages. */
+    virtual bool encode(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+    /** Decodes all preset messages. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int messages()      { return 32; }   ///< Maximum number of messages.
+      static constexpr unsigned int messageLength() { return 144; }  ///< Maximum length of each message.
+    };
+
+  protected:
+    /** Some internal used offset. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messageConut()    { return 0x0000; }
+      static constexpr unsigned int messageLengths()  { return 0x0008; }
+      static constexpr unsigned int messages()        { return 0x0048; }
+      static constexpr unsigned int betweenMessages() { return Limit::messageLength(); }
+      /// @endcond
+    };
   };
 
 
@@ -1336,6 +1405,14 @@ public:
     virtual bool updateCommercialExt(Context &ctx);
     /** Links the given encryption extension. */
     virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+
+  public:
+    /** Some limits for the encryption element. */
+    struct Limit {
+      /** The maximum number of (basic) encryption keys. */
+      static constexpr unsigned int basicEncryptionKeys() { return 16; }
+    };
+
   };
 
 protected:
@@ -1351,9 +1428,10 @@ public:
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
-  /** Encodes the given generic configuration as a binary codeplug. */
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err) const;
   bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:
@@ -1372,9 +1450,17 @@ public:
 
   /** Clears the button settings. */
   virtual void clearButtonSettings() = 0;
+  /** Encodes button settings. */
+  virtual bool encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the button settings. */
+  virtual bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the messages. */
   virtual void clearMessages() = 0;
+  /** Encodes preset messages. */
+  virtual bool encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes preset messages. */
+  virtual bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;

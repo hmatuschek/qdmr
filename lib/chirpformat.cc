@@ -229,7 +229,7 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
     FMChannel *fm = new FMChannel();
 
     fm->setName(name);
-    fm->setRXFrequency(rxFrequency.inMHz());
+    fm->setRXFrequency(rxFrequency);
 
     switch (duplex) {
     case Duplex::None:
@@ -240,13 +240,13 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
       fm->setRXOnly(true);
       break;
     case Duplex::Split:
-      fm->setTXFrequency(txFrequency.inMHz());
+      fm->setTXFrequency(txFrequency);
       break;
     case Duplex::Negative:
-      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()-txFrequency.inHz()).inMHz());
+      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()-txFrequency.inHz()));
       break;
     case Duplex::Positive:
-      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()+txFrequency.inHz()).inMHz());
+      fm->setTXFrequency(Frequency::fromHz(rxFrequency.inHz()+txFrequency.inHz()));
       break;
     }
 
@@ -272,6 +272,10 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
       return false;
     case ToneMode::Cross:
       switch (crossMode) {
+      case CrossMode::NoneTone:
+        fm->setTXTone(Signaling::SIGNALING_NONE);
+        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        break;
       case CrossMode::NoneDTCS:
         fm->setTXTone(Signaling::SIGNALING_NONE);
         fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
@@ -448,16 +452,16 @@ bool
 ChirpWriter::encodeFrequency(QTextStream &stream, FMChannel *channel, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  stream << "," << channel->rxFrequency();
+  stream << "," << channel->rxFrequency().inMHz();
 
   if (channel->rxOnly())
     stream << "," << "Off" << "," << 0.0;
   else if (channel->rxFrequency() == channel->txFrequency())
     stream << "," << "" << "," << 0.0;
   else if (channel->rxFrequency() > channel->txFrequency())
-    stream << "," << "-" << "," << channel->rxFrequency()-channel->txFrequency();
+    stream << "," << "-" << "," << channel->rxFrequency().inMHz()-channel->txFrequency().inMHz();
   else
-    stream << "," << "+" << "," << channel->txFrequency()-channel->rxFrequency();
+    stream << "," << "+" << "," << channel->txFrequency().inMHz()-channel->rxFrequency().inMHz();
 
   return true;
 }

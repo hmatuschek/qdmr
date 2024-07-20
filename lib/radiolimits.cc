@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
+#include <QRegularExpression>
 #include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
@@ -13,6 +14,12 @@ inline bool qstring_is_ascii(const QString &text) {
   }
   return true;
 }
+
+// Utility function to check string content for DTMF encoding
+inline bool qstring_is_dtmf(const QString &text) {
+  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).isValid();
+}
+
 
 
 /* ********************************************************************************************* *
@@ -209,6 +216,9 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if ((ASCII == _encoding) && (! qstring_is_ascii(value))) {
     auto &msg = context.newMessage();
     msg << "Cannot encode string '" << value << "' in ASCII.";
+  } else if ((DTMF == _encoding) && (! qstring_is_dtmf(value))) {
+    auto &msg = context.newMessage();
+    msg << "Cannot encode string '" << value << "' in DTMF.";
   }
 
   return true;
@@ -398,27 +408,6 @@ RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
 
 /* ********************************************************************************************* *
- * Implementation of RadioLimitFrequencies::FrequencyRange
- * ********************************************************************************************* */
-RadioLimitFrequencies::FrequencyRange::FrequencyRange(double lower, double upper)
-  : min(lower), max(upper)
-{
-  // pass...
-}
-
-RadioLimitFrequencies::FrequencyRange::FrequencyRange(const std::pair<double, double> &limit)
-  : min(limit.first), max(limit.second)
-{
-  // pass..
-}
-
-bool
-RadioLimitFrequencies::FrequencyRange::contains(double f) const {
-  return (f >= min) && (f <= max);
-}
-
-
-/* ********************************************************************************************* *
  * Implementation of RadioLimitFrequencies
  * ********************************************************************************************* */
 RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
@@ -431,20 +420,19 @@ RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, bool warnO
   : RadioLimitValue(parent), _frequencyRanges(), _warnOnly(warnOnly)
 {
   for (auto range=ranges.begin(); range!=ranges.end(); range++) {
-    _frequencyRanges.append(FrequencyRange(range->first, range->second));
+    _frequencyRanges.append({range->first, range->second});
   }
 }
 
 bool
 RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Double != prop.type()) {
+  if (qMetaTypeId<Frequency>() != prop.userType()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
-    msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
+    msg << "Cannot check property " << prop.name() << ": Expected frequency.";
     return false;
   }
 
-  double value = prop.read(item).toDouble();
-
+  Frequency value = prop.read(item).value<Frequency>();
   foreach (const FrequencyRange &range, _frequencyRanges) {
     if (range.contains(value))
       return true;
@@ -452,13 +440,13 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
 
   if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size()) || _warnOnly) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "Frequency " << value << "MHz is outside of allowed frequency ranges or "
+    msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges or "
         << "range cannot be determined.";
     return true;
   }
 
   auto &msg = context.newMessage(RadioLimitIssue::Critical);
-  msg << "Frequency " << value << "MHz is outside of allowed frequency ranges.";
+  msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges.";
   return false;
 }
 
@@ -480,7 +468,7 @@ RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(const RangeList &ra
 
 bool
 RadioLimitTransmitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Double != prop.type()) {
+  if (qMetaTypeId<Frequency>() != prop.userType()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected frequency in MHz.";
     return false;

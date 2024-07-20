@@ -21,12 +21,25 @@ ConfigObjectTableView::ConfigObjectTableView(QWidget *parent)
   : QWidget(parent), ui(new Ui::ConfigObjectTableView)
 {
   ui->setupUi(this);
+  connect(ui->itemTop, SIGNAL(clicked(bool)), this, SLOT(onMoveItemTop()));
+  connect(ui->itemTenUp, SIGNAL(clicked(bool)), this, SLOT(onMoveItemTenUp()));
   connect(ui->itemUp, SIGNAL(clicked(bool)), this, SLOT(onMoveItemUp()));
   connect(ui->itemDown, SIGNAL(clicked(bool)), this, SLOT(onMoveItemDown()));
+  connect(ui->itemTenDown, SIGNAL(clicked(bool)), this, SLOT(onMoveItemTenDown()));
+  connect(ui->itemBottom, SIGNAL(clicked(bool)), this, SLOT(onMoveItemBottom()));
   connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)),
           this, SLOT(onDoubleClicked(QModelIndex)));
+
   ui->tableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+  ui->tableView->setDragEnabled(true);
+  ui->tableView->viewport()->setAcceptDrops(true);
+  ui->tableView->setDropIndicatorShown(true);
+  ui->tableView->setDefaultDropAction(Qt::MoveAction);
+  ui->tableView->setDragDropMode(QAbstractItemView::InternalMove);
+  ui->tableView->setDragDropOverwriteMode(false);
+
   SearchPopup::attach(ui->tableView);
 }
 
@@ -61,9 +74,6 @@ ConfigObjectTableView::header() const {
 
 void
 ConfigObjectTableView::onMoveItemUp() {
-  if (! model())
-    return;
-
   // Check if there is a selection
   if (! ui->tableView->selectionModel()->hasSelection()) {
     QMessageBox::information(
@@ -75,19 +85,64 @@ ConfigObjectTableView::onMoveItemUp() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  if ((0>rows.first) || (0>rows.second))
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>=rows.first) || (0>rows.second))
     return;
 
   // Then move rows
-  model()->moveUp(rows.first, rows.second);
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), std::max(0, rows.first-1));
+}
+
+void
+ConfigObjectTableView::onMoveItemTenUp() {
+  // Check if there is a selection
+  if (! ui->tableView->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items: You have to select at least one item first."));
+    return;
+  }
+
+  // Get selection range assuming only continuous selection mode
+  QPair<int, int> rows = getSelectionRowRange(
+        ui->tableView->selectionModel()->selection().indexes());
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>=rows.first) || (0>rows.second))
+    return;
+
+  // Then move rows
+  int dest = std::max(0, rows.first-9);
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), dest);
+
+}
+
+void
+ConfigObjectTableView::onMoveItemTop() {
+  // Check if there is a selection
+  if (! ui->tableView->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items: You have to select at least one item first."));
+    return;
+  }
+
+  // Get selection range assuming only continuous selection mode
+  QPair<int, int> rows = getSelectionRowRange(
+        ui->tableView->selectionModel()->selection().indexes());
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>=rows.first) || (0>rows.second))
+    return;
+
+  // Then move rows
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), 0);
 }
 
 
 void
 ConfigObjectTableView::onMoveItemDown() {
-  if (! model())
-    return;
-
   // Check if there is a selection
   if (! ui->tableView->selectionModel()->hasSelection()) {
     QMessageBox::information(
@@ -99,11 +154,61 @@ ConfigObjectTableView::onMoveItemDown() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  if ((0>rows.first) || (0>rows.second))
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>rows.first) || (0>rows.second) ||
+      ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
 
   // Then move rows
-  model()->moveDown(rows.first, rows.second);
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), std::min(model()->rowCount(QModelIndex()), rows.second+2));
+}
+
+
+void
+ConfigObjectTableView::onMoveItemTenDown() {
+  // Check if there is a selection
+  if (! ui->tableView->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items: You have to select at least one item first."));
+    return;
+  }
+
+  // Get selection range assuming only continuous selection mode
+  QPair<int, int> rows = getSelectionRowRange(
+        ui->tableView->selectionModel()->selection().indexes());
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>rows.first) || (0>rows.second) ||
+      ((rows.second+1)>=model()->rowCount(QModelIndex())))
+    return;
+
+  // Then move rows
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), std::min(rows.second+10, model()->rowCount(QModelIndex())));
+}
+
+void
+ConfigObjectTableView::onMoveItemBottom() {
+  // Check if there is a selection
+  if (! ui->tableView->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items: You have to select at least one item first."));
+    return;
+  }
+
+  // Get selection range assuming only continuous selection mode
+  QPair<int, int> rows = getSelectionRowRange(
+        ui->tableView->selectionModel()->selection().indexes());
+  // If selection range is invalud or I cannot move at all: done.
+  if ((0>rows.first) || (0>rows.second) ||
+      ((rows.second+1)>=model()->rowCount(QModelIndex())))
+    return;
+
+  // Then move rows
+  model()->moveRows(QModelIndex(), rows.first, (rows.second-rows.first+1),
+                    QModelIndex(), model()->rowCount(QModelIndex()));
 }
 
 void

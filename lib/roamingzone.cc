@@ -194,9 +194,9 @@ RoamingZoneList::zone(int idx) const {
 }
 
 int
-RoamingZoneList::add(ConfigObject *obj, int row) {
+RoamingZoneList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RoamingZone>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

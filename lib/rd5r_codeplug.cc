@@ -5,12 +5,7 @@
 #include "logger.hh"
 #include <QDateTime>
 
-#define ADDR_TIMESTMP             0x000088
-#define ADDR_SETTINGS             0x0000e0
-#define ADDR_BUTTONS              0x000108
-#define ADDR_MESSAGES             0x000128
-
-#define ADDR_ENCRYPTION           0x001370
+//#define ADDR_ENCRYPTION           0x001370
 #define ENCRYPTION_SIZE               0x88
 
 #define NUM_CONTACTS                   256
@@ -245,19 +240,19 @@ RD5RCodeplug::clearTimestamp() {
 bool
 RD5RCodeplug::encodeTimestamp(const ErrorStack &err) {
   Q_UNUSED(err)
-  TimestampElement(data(ADDR_TIMESTMP)).set();
+  TimestampElement(data(Offset::timestamp())).set();
   return true;
 }
 
 void
 RD5RCodeplug::clearGeneralSettings() {
-  TimestampElement(data(ADDR_SETTINGS)).clear();
+  TimestampElement(data(Offset::settings())).clear();
 }
 
 bool
 RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  GeneralSettingsElement el(data(ADDR_SETTINGS));
+  GeneralSettingsElement el(data(Offset::settings()));
   if (! flags.updateCodePlug)
     el.clear();
   return el.fromConfig(config, ctx);
@@ -266,18 +261,44 @@ RD5RCodeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context 
 bool
 RD5RCodeplug::decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config, ctx);
+  return GeneralSettingsElement(data(Offset::settings())).updateConfig(config, ctx);
 }
 
 void
 RD5RCodeplug::clearButtonSettings() {
-  ButtonSettingsElement(data(ADDR_BUTTONS)).clear();
+  ButtonSettingsElement(data(Offset::buttons())).clear();
+}
+bool
+RD5RCodeplug::encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+  return ButtonSettingsElement(data(Offset::buttons())).encode(ctx, err);
+}
+bool
+RD5RCodeplug::decodeButtonSettings(Context &ctx, const ErrorStack &err) {
+  return ButtonSettingsElement(data(Offset::buttons())).decode(ctx, err);
 }
 
 void
 RD5RCodeplug::clearMessages() {
-  MessageBankElement(data(ADDR_MESSAGES)).clear();
+  MessageBankElement(data(Offset::messages())).clear();
 }
+bool
+RD5RCodeplug::encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).encode(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode preset messages.";
+    return false;
+  }
+  return true;
+}
+bool
+RD5RCodeplug::decodeMessages(Context &ctx, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode preset messages.";
+    return false;
+  }
+  return true;
+}
+
 
 void
 RD5RCodeplug::clearContacts() {
@@ -464,38 +485,23 @@ RD5RCodeplug::clearZones() {
 
 bool
 RD5RCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
 
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
 
   // Pack Zones
-  bool pack_zone_a = true;
-  for (int i=0, j=0; i<NUM_ZONES; i++) {
+  for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement z(bank.get(i));
-next:
-    if (j >= config->zones()->count()) {
+    if (! ctx.has<Zone>(i+1)) {
       bank.enable(i, false);
       continue;
     }
 
     // Construct from Zone obj
-    Zone *zone = config->zones()->zone(j);
-    if (pack_zone_a) {
-      pack_zone_a = false;
-      if (zone->A()->count())
-        z.fromZoneObjA(zone, ctx);
-      else
-        goto next;
-    } else {
-      pack_zone_a = true;
-      j++;
-      if (zone->B()->count())
-        z.fromZoneObjB(zone, ctx);
-      else
-        goto next;
-    }
+    z.fromZoneObjA(ctx.get<Zone>(i+1), ctx);
     bank.enable(i, true);
   }
+
   return true;
 }
 
@@ -503,34 +509,16 @@ bool
 RD5RCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = z.toZoneObj(ctx);
-      config->zones()->add(last_zone);
-      ctx.add(last_zone, i+1);
-    } else {
-      // when extending the last zone, chop its name to remove the "... A" part.
-      last_zone->setName(last_zonebasename);
-    }
+    Zone *zone = z.toZoneObj(ctx);
+    config->zones()->add(zone);
+    ctx.add(zone, i+1);
   }
+
   return true;
 }
 
@@ -538,29 +526,13 @@ bool
 RD5RCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config)
 
-  QString last_zonename, last_zonebasename; Zone *last_zone = nullptr;
-  bool extend_last_zone = false;
   ZoneBankElement bank(data(ADDR_ZONE_BANK));
-
   for (int i=0; i<NUM_ZONES; i++) {
     if (! bank.isEnabled(i))
       continue;
     ZoneElement z(bank.get(i));
-
-    // Determine whether this zone should be combined with the previous one
-    QString zonename = z.name();
-    QString zonebasename = zonename; zonebasename.chop(2);
-    extend_last_zone = ( zonename.endsWith(" B") && last_zonename.endsWith(" A")
-                         && (zonebasename == last_zonebasename)
-                         && (nullptr != last_zone) && (0 == last_zone->B()->count()) );
-    last_zonename = zonename;
-    last_zonebasename = zonebasename;
-
-    // Create zone obj
-    if (! extend_last_zone) {
-      last_zone = ctx.get<Zone>(i+1);
-    }
-    if (! z.linkZoneObj(last_zone, ctx, extend_last_zone)) {
+    Zone *zone = ctx.get<Zone>(i+1);
+    if (! z.linkZoneObj(zone, ctx)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
       return false;
     }
@@ -684,7 +656,7 @@ RD5RCodeplug::linkGroupLists(Config *config, Context &ctx, const ErrorStack &err
 
 void
 RD5RCodeplug::clearEncryption() {
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  EncryptionElement enc(data(Offset::encryption()));
   enc.clear();
 }
 
@@ -692,14 +664,14 @@ bool
 RD5RCodeplug::encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err);
   clearEncryption();
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  EncryptionElement enc(data(Offset::encryption()));
   return enc.fromCommercialExt(config->commercialExtension(), ctx);
 }
 
 bool
 RD5RCodeplug::createEncryption(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err);
-  EncryptionElement enc(data(ADDR_ENCRYPTION));
+  EncryptionElement enc(data(Offset::encryption()));
   if (EncryptionElement::PrivacyType::None == enc.privacyType())
     return true;
   return enc.updateCommercialExt(ctx);

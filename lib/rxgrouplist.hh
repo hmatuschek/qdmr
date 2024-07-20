@@ -20,7 +20,7 @@ class RXGroupList: public ConfigObject
 
 public:
   /** Default constructor. */
-  explicit RXGroupList(QObject *parent=nullptr);
+  Q_INVOKABLE explicit RXGroupList(QObject *parent=nullptr);
   /** Constructor.
    * @param name Specifies the name of the group list.
    * @param parent @c QObject parent instance. */
@@ -75,7 +75,7 @@ public:
   /** Returns the group list at the given index. */
 	RXGroupList *list(int idx) const;
 
-  int add(ConfigObject *obj, int row=-1);
+  int add(ConfigObject *obj, int row=-1, bool unique=true);
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

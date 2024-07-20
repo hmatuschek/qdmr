@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="exRadioddityRadioToneSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Tone settings</title>
+</info>  
+
+<para>
+  This section collects some settings relates to tones and other audio stuff.
+</para>
+
+<example>
+  <title>Tone settings extension example showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  radioddity:
+    [...]
+    tone:
+      lowBatteryWarn: false
+      lowBatteryWarnInterval: 30 s
+      lowBatteryWarnVolume: true
+      keyTone: false
+      keyToneVolume: true
+      callAlertDuration: 2 min
+      resetTone: false
+      unknownNumberTone: false
+      artsToneMode: Once
+      digitalTalkPermitTone: false
+      analogTalkPermitTone: false
+      selftestTone: true
+      channelFreeIndicationTone: false
+      allTonesDisabled: false
+      txExitTone: false
+      fmMicGain: 1
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Tone settings fields</title>
+  <varlistentry>
+    <term><token>lowBatteryWarn</token></term>
+    <listitem>
+      <para>
+        Enables the low battery-charge warning. This can either be a notification on the screen or 
+        a waring tone. The warning interval and tone-volume might be set by 
+        <token>lowBatteryInterval</token> and <token>lowBatteryWarnVolume</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>lowBatteryWarnInterval</token></term>
+    <listitem>
+      <para>
+        Specifies the interval, at which low battery warning are issued.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>lowBatteryWarnVolume</token></term>
+    <listitem>
+      <para>
+        Specifies the volume of the low-battery warning tone in a range from 1 to 10.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>keyTone</token>, <token>keyToneVolume</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the key-pad tones are enabled. Don't do it. The volume of these 
+        tones might be set using <token>keyToneVolume</token> in a range from 1 to 10.
+      </para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+</section>
