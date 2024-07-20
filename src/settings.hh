@@ -11,6 +11,7 @@
 
 #include "codeplug.hh"
 #include "configmergevisitor.hh"
+#include "repeaterbookcompleter.hh"
 
 
 class Settings : public QSettings
@@ -33,6 +34,9 @@ public:
 
   bool disableAutoDetect() const;
   void setDisableAutoDetect(bool disable);
+
+  RepeaterBookList::Region repeaterBookRegion() const;
+  void setRepeaterBookRegion(RepeaterBookList::Region region);
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
