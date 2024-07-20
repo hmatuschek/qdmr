@@ -3270,7 +3270,8 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // There can only be one DMR radio ID
-  ctx.add(config->settings()->defaultId(), 0);
+  if (! config->settings()->defaultIdRef()->isNull())
+    ctx.add(config->settings()->defaultId(), 0);
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {
