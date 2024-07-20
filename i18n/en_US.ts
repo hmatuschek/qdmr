@@ -354,33 +354,34 @@
     <message>
         <location filename="../src/application.cc" line="438"/>
         <source>Export codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Export codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="439"/>
         <source>CHIRP CSV Files (*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>CHIRP CSV Files (*.csv)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="456"/>
         <source>Cannot export codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot export codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="457"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot export codeplug to file &apos;%1&apos;:
+%2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="473"/>
         <source>Import codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Import codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="474"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
-        <translation type="unfinished"></translation>
+        <translation>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="493"/>
@@ -388,19 +389,19 @@
         <location filename="../src/application.cc" line="507"/>
         <location filename="../src/application.cc" line="520"/>
         <source>Cannot import codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot import codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="494"/>
         <location filename="../src/application.cc" line="502"/>
         <location filename="../src/application.cc" line="521"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot import codeplug from &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="508"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Do not know, how to handle file &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="562"/>
@@ -844,90 +845,90 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Merging codeplugs ...</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
         <source>Items are all atomic objects like radio IDs, channels, contacts and roaming channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Items are all atomic objects like radio IDs, channels, contacts and roaming channels.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="51"/>
         <source>Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Items</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="58"/>
         <location filename="../src/configmergedialog.ui" line="111"/>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignore</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="63"/>
         <location filename="../src/configmergedialog.ui" line="116"/>
         <source>Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Override</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="68"/>
         <location filename="../src/configmergedialog.ui" line="121"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>Duplicate</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="101"/>
         <source>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="104"/>
         <source>Sets</source>
-        <translation type="unfinished"></translation>
+        <translation>Sets</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="126"/>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Merge</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="71"/>
         <source>Ignores any duplicate item.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignores any duplicate item.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="74"/>
         <source>Replaces any duplicate item with the imported one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Replaces any duplicate item with the imported one.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="77"/>
         <source>Imports any duplicate item with a modified name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Imports any duplicate item with a modified name.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="89"/>
         <source>Ignores any duplicate set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignores any duplicate set.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="92"/>
         <source>Replaces any duplicate set with the imported one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Replaces any duplicate set with the imported one.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="95"/>
         <source>Imports any duplicate set with a modified name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Imports any duplicate set with a modified name.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="98"/>
         <source>Merges duplicate sets.</source>
-        <translation type="unfinished"></translation>
+        <translation>Merges duplicate sets.</translation>
     </message>
 </context>
 <context>
@@ -955,32 +956,32 @@
     <message>
         <location filename="../src/configobjectlistview.ui" line="25"/>
         <source>Move selected item(s) to the top.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) to the top.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="45"/>
         <source>Move selected item(s) ten positions up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) ten positions up.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="65"/>
         <source>Move selected item(s) one position up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) one position up.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="85"/>
         <source>Move selected item(s) one position down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) one position down.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="105"/>
         <source>Move selected item(s) ten positions down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) ten positions down.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="125"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) to the bottom.</translation>
     </message>
 </context>
 <context>
@@ -1008,32 +1009,32 @@
     <message>
         <location filename="../src/configobjecttableview.ui" line="25"/>
         <source>Move selected item(s) to the top.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) to the top.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="39"/>
         <source>Move selected item(s) ten positions up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) ten positions up.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="53"/>
         <source>Move selected item(s) one position up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) one position up.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="67"/>
         <source>Move selected item(s) one position down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) one position down.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="81"/>
         <source>Move selected item(s) ten positions down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) ten positions down.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="95"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selected item(s) to the bottom.</translation>
     </message>
 </context>
 <context>
@@ -2029,22 +2030,22 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="335"/>
         <source>Export to CHIRP ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Export to CHIRP ...</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="338"/>
         <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exports all FM channels to CHRIP CSV.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="343"/>
         <source>Import ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Import ...</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="346"/>
         <source>Imports and merges a codeplug into the current one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Imports and merges a codeplug into the current one.</translation>
     </message>
 </context>
 <context>
@@ -3028,7 +3029,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="550"/>
         <source>Zones</source>
-        <translation type="unfinished">Zones</translation>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="548"/>
@@ -3416,42 +3417,42 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="24"/>
         <source>Data Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Data Sources</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="69"/>
         <source>Repeater Book</source>
-        <translation type="unfinished"></translation>
+        <translation>Repeater Book</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="75"/>
         <source>Region</source>
-        <translation type="unfinished"></translation>
+        <translation>Region</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="83"/>
         <source>World</source>
-        <translation type="unfinished"></translation>
+        <translation>World</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="88"/>
         <source>North America</source>
-        <translation type="unfinished"></translation>
+        <translation>North America</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="100"/>
         <source>Programming</source>
-        <translation type="unfinished"></translation>
+        <translation>Programming</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="106"/>
         <source>Radio Interfaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio Interfaces</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="112"/>
         <source>disable auto-detect</source>
-        <translation type="unfinished"></translation>
+        <translation>disable auto-detect</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="189"/>
@@ -3521,7 +3522,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="304"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="310"/>
