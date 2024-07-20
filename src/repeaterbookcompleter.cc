@@ -258,7 +258,7 @@ RepeaterBookList::data(const QModelIndex &index, int role) const {
   if (Qt::EditRole == role) {
     return _items[index.row()].call();
   } else if (Qt::DisplayRole == role) {
-    return tr("%1 (%2, %3, %4)")
+    return QString("%1 (%2, %3, %4)")
         .arg(_items[index.row()].call())
         .arg(bandName(_items[index.row()].rxFrequency(),
              _items[index.row()].txFrequency()))
