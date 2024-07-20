@@ -2339,7 +2339,7 @@
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
-        <source>Pane large</source>
+        <source>Plane large</source>
         <translation>großes Flugzeug</translation>
     </message>
     <message>

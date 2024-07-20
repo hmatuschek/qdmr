@@ -1,4 +1,5 @@
 #include "md2017_codeplug.hh"
+#include "config.hh"
 #include "logger.hh"
 
 #define NUM_CHANNELS                3000
@@ -33,10 +34,6 @@
 #define NUM_GPSSYSTEMS                16
 #define ADDR_GPSSYSTEMS         0x03ec40
 #define GPSSYSTEM_SIZE          0x000010
-
-#define NUM_TEXTMESSAGES              50
-#define ADDR_TEXTMESSAGES       0x002180
-#define TEXTMESSAGE_SIZE        0x000120
 
 #define ADDR_EMERGENCY_SETTINGS 0x005a50
 #define NUM_EMERGENCY_SYSTEMS         32
@@ -492,8 +489,19 @@ MD2017Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack
 
 void
 MD2017Codeplug::clearTextMessages() {
-  memset(data(ADDR_TEXTMESSAGES), 0, NUM_TEXTMESSAGES*TEXTMESSAGE_SIZE);
+  MessageBankElement(data(Offset::messages())).clear();
 }
+
+bool
+MD2017Codeplug::encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).encode(ctx, flags, err);
+}
+
+bool
+MD2017Codeplug::decodeTextMessages(Context &ctx, const ErrorStack &err) {
+  return MessageBankElement(data(Offset::messages())).decode(ctx, err);
+}
+
 
 void
 MD2017Codeplug::clearEmergencySystems() {

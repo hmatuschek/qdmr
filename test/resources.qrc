@@ -6,5 +6,12 @@
         <file>data/anytone_audio_settings_extension.yaml</file>
         <file>data/roaming_channel_test.yaml</file>
         <file>data/anytone_call_hangtime.yaml</file>
+        <file>data/multiple_radio_ids.yaml</file>
+        <file>data/ctcss_copy_test.yaml</file>
+        <file>data/anytone_key_function.yaml</file>
+        <file>data/chirp_simple.csv</file>
+        <file>data/chirp_cross.csv</file>
+        <file>data/chirp_ctcss.csv</file>
+        <file>data/chirp_dcs.csv</file>
     </qresource>
 </RCC>

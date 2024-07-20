@@ -19,7 +19,7 @@
  *  <tr><td>0x002100</td> <td>0x002140</td> <td>0x00040</td> <td>Button config, see @c TyTCodeplug::ButtonSettingsElement.</td></tr>
  *  <tr><td>0x002140</td> <td>0x002180</td> <td>0x00040</td> <td>Reserved, filled with 0xff.</td></tr>
  *  <tr><td>0x002040</td> <td>0x0020f0</td> <td>0x000b0</td> <td>General settings see @c TyTCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each.</td></tr>
+ *  <tr><td>0x002180</td> <td>0x0059c0</td> <td>0x03840</td> <td>50 Text messages @ 0x120 bytes each, see @c TyTCodeplug::MessageElement.</td></tr>
  *  <tr><td>0x0059c0</td> <td>0x005a70</td> <td>0x000b0</td> <td>??? Privacy keys, see @c TyTCodeplug::EncryptionElement.</td></tr>
  *  <tr><td>0x005a70</td> <td>0x005a80</td> <td>0x00010</td> <td>Emergency system settings, see @c TyTCodeplug::EmergencySettingsElement.</td></td>
  *  <tr><td>0x005a80</td> <td>0x005f80</td> <td>0x00500</td> <td>Emergency systems, see @c TyTCodeplug::EmergencySystemElement.</td></td>
@@ -94,6 +94,9 @@ public:
   /** Empty constructor. */
   explicit MD390Codeplug(QObject *parent=nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+  bool postprocess(Config *config, const ErrorStack &err) const;
+
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearTimestamp();
@@ -140,9 +143,20 @@ public:
   bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
 
-  void clearMenuSettings();
   void clearTextMessages();
+  bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err);
+  bool decodeTextMessages(Context &ctx, const ErrorStack &err);
+
+  void clearMenuSettings();
   void clearEmergencySystems();
+
+protected:
+  /** Some internal offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int messages() { return 0x002180; }
+    /// @endcond
+  };
 };
 
 #endif // MD390CODEPLUG_HH

@@ -2,10 +2,11 @@
 #define CONFIGTEST_HH
 
 #include <QObject>
+#include "libdmrconfigtest.hh"
 #include "config.hh"
 
 
-class ConfigTest : public QObject
+class ConfigTest : public UnitTestBase
 {
   Q_OBJECT
 
@@ -14,16 +15,22 @@ public:
 
 private slots:
   void initTestCase();
-  void cleanupTestCase();
+
+  void testImmediateRefInvalidation();
 
   void testCloneChannelBasic();
+  void testCloneChannelCTCSS();
+
+  /** Regression test for issue #388. */
+  void testMultipleRadioIDs();
 
   void testMelodyLilypond();
   void testMelodyEncoding();
   void testMelodyDecoding();
 
 protected:
-  Config _config;
+  QTextStream _stderr;
+  Config _ctcssCopyTest;
 };
 
 #endif // CONFIGTEST_HH

@@ -2,10 +2,9 @@
 #define MD2017TEST_HH
 
 
-#include <QObject>
-#include "config.hh"
+#include "libdmrconfigtest.hh"
 
-class MD2017Test : public QObject
+class MD2017Test : public UnitTestBase
 {
   Q_OBJECT
 
@@ -13,14 +12,9 @@ public:
   explicit MD2017Test(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
-protected:
-  Config _basicConfig;
+  void testChannelFrequency();
 };
 
 #endif // MD2017TEST_HH

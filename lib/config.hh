@@ -53,6 +53,7 @@
 #include "radiosettings.hh"
 
 #include "commercial_extension.hh"
+#include "smsextension.hh"
 #include "tyt_extensions.hh"
 
 // Forward declaration
@@ -92,12 +93,14 @@ class Config : public ConfigItem
 
   /** Represents the config extension for encryption keys. */
   Q_PROPERTY(CommercialExtension* commercial READ commercialExtension)
+  /** Represents the extended SMS settings. */
+  Q_PROPERTY(SMSExtension *sms READ smsExtension)
   /** Represents the config extension for TyT devices. */
   Q_PROPERTY(TyTConfigExtension* tytExtension READ tytExtension WRITE setTyTExtension)
 
 public:
   /** Constructs an empty configuration. */
-  explicit Config(QObject *parent = nullptr);
+  Q_INVOKABLE explicit Config(QObject *parent = nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
@@ -140,6 +143,8 @@ public:
 
   /** Returns the commercial extension. */
   CommercialExtension *commercialExtension() const;
+  /** Returns the SMS settings extension. */
+  SMSExtension *smsExtension() const;
 
   /** Returns the TyT settings extension.
    * If this extension is not set, returns @c nullptr. */
@@ -198,6 +203,8 @@ protected:
   TyTConfigExtension *_tytExtension;
   /** Owns the commercial extension. */
   CommercialExtension *_commercialExtension;
+  /** Owns the SMS settings extension. */
+  SMSExtension *_smsExtension;
 };
 
 #endif // CONFIG_HH

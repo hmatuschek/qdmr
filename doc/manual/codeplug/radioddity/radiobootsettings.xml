@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="exRadioddityRadioBootSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Boot settings</title>
+</info>  
+
+<para>
+  This section collects some settings related to booting the radio.
+</para>
+
+<example>
+  <title>Boot settings extension example showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  radioddity:
+    [...]
+    boot:
+      displayMode: Text
+      bootPassword: ""
+      progPassword: ""
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Boot settings fields</title>
+  <varlistentry>
+    <term><token>display</token></term>
+    <listitem>
+      <para>
+        Specifies what to display during boot. Must be one of <token>None</token>, 
+        <token>Text</token> or <token>Image</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>bootPassword</token>, <token>progPassword</token></term>
+    <listitem>
+      <para>
+        Specifies the boot and programming passwords. The former (usually only numbers) must be 
+        entered, when the radio boots. The latter must be entered in the CPS to program or
+        read the codeplug.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

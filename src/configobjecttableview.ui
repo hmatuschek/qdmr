@@ -20,7 +20,38 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QPushButton" name="itemTop">
+       <property name="toolTip">
+        <string>Move selected item(s) to the top.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="edit-move-top">
+         <normaloff>.</normaloff>.</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="itemTenUp">
+       <property name="toolTip">
+        <string>Move selected item(s) ten positions up.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="edit-move-10-up">
+         <normaloff>.</normaloff>.</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="itemUp">
+       <property name="toolTip">
+        <string>Move selected item(s) one position up.</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -32,11 +63,42 @@
      </item>
      <item>
       <widget class="QPushButton" name="itemDown">
+       <property name="toolTip">
+        <string>Move selected item(s) one position down.</string>
+       </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset theme="edit-move-down">
+         <normaloff>.</normaloff>.</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="itemTenDown">
+       <property name="toolTip">
+        <string>Move selected item(s) ten positions down.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="edit-move-10-down">
+         <normaloff>.</normaloff>.</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="itemBottom">
+       <property name="toolTip">
+        <string>Move selected item(s) to the bottom.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="edit-move-bottom">
          <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>

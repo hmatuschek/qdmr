@@ -44,6 +44,14 @@ RoamingZone::clear() {
   _channel.clear();
 }
 
+bool
+RoamingZone::contains(const RoamingChannel *ch) const {
+  for (int i=0; i<count(); i++)
+    if (ch == channel(i))
+      return true;
+  return false;
+}
+
 RoamingChannel*
 RoamingZone::channel(int idx) const {
   if ((idx < 0) || (idx >= count()))
@@ -186,9 +194,9 @@ RoamingZoneList::zone(int idx) const {
 }
 
 int
-RoamingZoneList::add(ConfigObject *obj, int row) {
+RoamingZoneList::add(ConfigObject *obj, int row, bool unique) {
   if (obj && obj->is<RoamingZone>())
-    return ConfigObjectList::add(obj, row);
+    return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 

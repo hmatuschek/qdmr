@@ -1,4 +1,5 @@
 #include "uv390_limits.hh"
+#include "uv390_codeplug.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -69,8 +70,12 @@ UV390Limits::UV390Limits(QObject *parent)
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.),
+                                                                  Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.),
+                                                                  Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -93,8 +98,10 @@ UV390Limits::UV390Limits(QObject *parent)
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 480.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 480.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::Mid),
@@ -149,6 +156,24 @@ UV390Limits::UV390Limits(QObject *parent)
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
         } ) );
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList {
+           {BasicEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::basicKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{4}")}
+            }},
+           {AESEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::advancedKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{32}")}
+            }} }
+        }
+      });
 
   /* Ignore roaming zones. */
   add("roaming", new RadioLimitList(

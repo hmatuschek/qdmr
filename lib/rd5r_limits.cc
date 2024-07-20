@@ -1,4 +1,5 @@
 #include "rd5r_limits.hh"
+#include "rd5r_codeplug.hh"
 #include "radioid.hh"
 #include "channel.hh"
 #include "scanlist.hh"
@@ -75,8 +76,10 @@ RD5RLimits::RD5RLimits(QObject *parent)
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 470.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -99,8 +102,10 @@ RD5RLimits::RD5RLimits(QObject *parent)
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{136., 174.}, {400., 470.}}, true)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{136., 174.}, {400., 470.}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, true)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -144,6 +149,17 @@ RD5RLimits::RD5RLimits(QObject *parent)
           { "revert", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "channels", new RadioLimitRefList(0, 31, Channel::staticMetaObject) }
         }));
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList(
+         BasicEncryptionKey::staticMetaObject,
+         0, RadioddityCodeplug::EncryptionElement::Limit::basicEncryptionKeys(),
+         new RadioLimitObject {
+           {"name", new RadioLimitIgnored()},
+           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{8}")}
+         })}
+      });
 
   /* Ignore positioning systems. */
   add("positioning",

@@ -1,5 +1,5 @@
 ---
-version: 0.11.0
+version: 0.12.0
 settings:
   introLine1: qDMR
   introLine2: DM3MAT
@@ -54,8 +54,6 @@ channels:
   - digital:
       id: ch1
       name: DB0LDS TS1
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -64,14 +62,14 @@ channels:
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch2
       name: Sa/Th DB0LDS TS1
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -80,14 +78,14 @@ channels:
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch3
       name: TG8 DB0LDS TS2
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -96,14 +94,14 @@ channels:
       groupList: grp2
       contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch4
       name: TG9 DB0LDS TS2
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -112,14 +110,14 @@ channels:
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch5
       name: BB DB0LDS TS2
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -129,14 +127,14 @@ channels:
       contact: cont7
       aprs: aprs1
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch6
       name: HRV DB0LDS TS1
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -145,14 +143,14 @@ channels:
       groupList: grp7
       contact: cont11
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch7
       name: ChW DB0LDS TS1
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -161,14 +159,30 @@ channels:
       groupList: grp7
       contact: cont12
       roaming: !<!default> ""
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch8
+      name: BB DB0VIP TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont7
+      aprs: aprs1
+      rxFrequency: 431.75 MHz
+      txFrequency: 439.35 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch9
       name: DM0TZN TS1
-      rxFrequency: 438.82499999999999
-      txFrequency: 431.22500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -177,286 +191,190 @@ channels:
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch9
-      name: TG8 DM0TZN TS2
-      rxFrequency: 438.82499999999999
-      txFrequency: 431.22500000000002
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS2
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
-      roaming: !<!default> ""
+      rxFrequency: 438.825 MHz
+      txFrequency: 431.225 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch10
-      name: TG9 DM0TZN TS2
-      rxFrequency: 438.82499999999999
-      txFrequency: 431.22500000000002
+      name: TG8 DM0TZN TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 438.825 MHz
+      txFrequency: 431.225 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch11
-      name: BB DM0TZN TS2
-      rxFrequency: 438.82499999999999
-      txFrequency: 431.22500000000002
+      name: TG9 DM0TZN TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.825 MHz
+      txFrequency: 431.225 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch12
-      name: DB0LOS TS1
-      rxFrequency: 438.47500000000002
-      txFrequency: 430.875
+      name: BB DM0TZN TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 438.825 MHz
+      txFrequency: 431.225 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch13
-      name: R/TG9 DB0LOS TS2
-      rxFrequency: 438.47500000000002
-      txFrequency: 430.875
+      name: DB0LOS TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
+      groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.475 MHz
+      txFrequency: 430.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch14
-      name: R/TG9 DM0TT TS1
-      rxFrequency: 439.08749999999998
-      txFrequency: 431.48750000000001
+      name: R/TG9 DB0LOS TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.475 MHz
+      txFrequency: 430.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch15
-      name: TG8 DM0TT TS2
-      rxFrequency: 439.08749999999998
-      txFrequency: 431.48750000000001
+      name: R/TG9 DM0TT TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont5
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.0875 MHz
+      txFrequency: 431.4875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch16
-      name: TG9 DM0TT TS2
-      rxFrequency: 439.08749999999998
-      txFrequency: 431.48750000000001
+      name: TG8 DM0TT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.0875 MHz
+      txFrequency: 431.4875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch17
-      name: BB DM0TT TS2
-      rxFrequency: 439.08749999999998
-      txFrequency: 431.48750000000001
+      name: TG9 DM0TT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.0875 MHz
+      txFrequency: 431.4875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch18
-      name: TG9 DB0KK TS1
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
+      name: BB DM0TT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.0875 MHz
+      txFrequency: 431.4875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch19
-      name: BB DB0KK TS2
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
+      name: TG9 DB0KK TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch20
-      name: DB0OUD TS1
-      rxFrequency: 438.625
-      txFrequency: 431.02499999999998
+      name: BB DB0KK TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont1
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch21
-      name: TG8 DB0OUD TS2
-      rxFrequency: 438.625
-      txFrequency: 431.02499999999998
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS2
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
-      roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch22
-      name: TG9 DB0OUD TS2
-      rxFrequency: 438.625
-      txFrequency: 431.02499999999998
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS2
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont6
-      roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch23
-      name: BB DB0OUD TS2
-      rxFrequency: 438.625
-      txFrequency: 431.02499999999998
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS2
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont7
-      roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch24
-      name: TG9 DB0TU TS1
-      rxFrequency: 439.57499999999999
-      txFrequency: 431.97500000000002
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS1
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont6
-      roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch25
-      name: BB DB0TU TS2
-      rxFrequency: 439.57499999999999
-      txFrequency: 431.97500000000002
-      rxOnly: false
-      admit: ColorCode
-      colorCode: 1
-      timeSlot: TS2
-      radioId: !<!default> ""
-      groupList: grp2
-      contact: cont7
-      roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch26
-      name: DM0MOT TS1
-      rxFrequency: 439.52499999999998
-      txFrequency: 431.92500000000001
+      name: DB0OUD TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -465,446 +383,542 @@ channels:
       groupList: grp1
       contact: cont1
       roaming: !<!default> ""
+      rxFrequency: 438.625 MHz
+      txFrequency: 431.025 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch22
+      name: TG8 DB0OUD TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont5
+      roaming: !<!default> ""
+      rxFrequency: 438.625 MHz
+      txFrequency: 431.025 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch23
+      name: TG9 DB0OUD TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont6
+      roaming: !<!default> ""
+      rxFrequency: 438.625 MHz
+      txFrequency: 431.025 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch24
+      name: BB DB0OUD TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont7
+      roaming: !<!default> ""
+      rxFrequency: 438.625 MHz
+      txFrequency: 431.025 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch25
+      name: TG9 DB0TU TS1
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS1
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont6
+      roaming: !<!default> ""
+      rxFrequency: 439.575 MHz
+      txFrequency: 431.975 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch26
+      name: BB DB0TU TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont7
+      roaming: !<!default> ""
+      rxFrequency: 439.575 MHz
+      txFrequency: 431.975 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch27
-      name: TG8 DM0MOT TS2
-      rxFrequency: 439.52499999999998
-      txFrequency: 431.92500000000001
+      name: DM0MOT TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont1
       roaming: !<!default> ""
+      rxFrequency: 439.525 MHz
+      txFrequency: 431.925 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch28
-      name: TG9 DM0MOT TS2
-      rxFrequency: 439.52499999999998
-      txFrequency: 431.92500000000001
+      name: TG8 DM0MOT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.525 MHz
+      txFrequency: 431.925 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch29
-      name: BB DM0MOT TS2
-      rxFrequency: 439.52499999999998
-      txFrequency: 431.92500000000001
+      name: TG9 DM0MOT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.525 MHz
+      txFrequency: 431.925 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch30
-      name: DB0TA TS1
-      rxFrequency: 439.47500000000002
-      txFrequency: 431.875
+      name: BB DM0MOT TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.525 MHz
+      txFrequency: 431.925 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch31
-      name: TG8 DB0TA TS2
-      rxFrequency: 439.47500000000002
-      txFrequency: 431.875
+      name: DB0TA TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.475 MHz
+      txFrequency: 431.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch32
-      name: TG9 DB0TA TS2
-      rxFrequency: 439.47500000000002
-      txFrequency: 431.875
+      name: TG8 DB0TA TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.475 MHz
+      txFrequency: 431.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch33
-      name: BB DB0TA TS2
-      rxFrequency: 439.47500000000002
-      txFrequency: 431.875
+      name: TG9 DB0TA TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.475 MHz
+      txFrequency: 431.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch34
-      name: DB0FX TS1
-      rxFrequency: 439.44999999999999
-      txFrequency: 431.85000000000002
+      name: BB DB0TA TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.475 MHz
+      txFrequency: 431.875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch35
-      name: TG8 DB0FX TS2
-      rxFrequency: 439.44999999999999
-      txFrequency: 431.85000000000002
+      name: DB0FX TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.45 MHz
+      txFrequency: 431.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch36
-      name: TG9 DB0FX TS2
-      rxFrequency: 439.44999999999999
-      txFrequency: 431.85000000000002
+      name: TG8 DB0FX TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.45 MHz
+      txFrequency: 431.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch37
-      name: BB DB0FX TS2
-      rxFrequency: 439.44999999999999
-      txFrequency: 431.85000000000002
+      name: TG9 DB0FX TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.45 MHz
+      txFrequency: 431.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch38
-      name: DB0PDM TS1
-      rxFrequency: 438.39999999999998
-      txFrequency: 430.80000000000001
+      name: BB DB0FX TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.45 MHz
+      txFrequency: 431.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch39
-      name: TG8 DB0PDM TS2
-      rxFrequency: 438.39999999999998
-      txFrequency: 430.80000000000001
+      name: DB0PDM TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch40
-      name: TG9 DB0PDM TS2
-      rxFrequency: 438.39999999999998
-      txFrequency: 430.80000000000001
+      name: TG8 DB0PDM TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch41
-      name: BB DB0PDM TS2
-      rxFrequency: 438.39999999999998
-      txFrequency: 430.80000000000001
+      name: TG9 DB0PDM TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch42
-      name: DB0BRB TS1
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: BB DB0PDM TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch43
-      name: TG8 DB0BRB TS2
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: DB0BRB TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch44
-      name: TG9 DB0BRB TS2
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: TG8 DB0BRB TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch45
-      name: BB DB0BRB TS2
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: TG9 DB0BRB TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch46
-      name: DB0SPN TS1
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: BB DB0BRB TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
-      contact: cont6
+      groupList: grp2
+      contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch47
-      name: R/TG9 DB0SPN TS2
-      rxFrequency: 439.48750000000001
-      txFrequency: 431.88749999999999
+      name: DB0SPN TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
+      groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch48
-      name: DB0NLS TS1
-      rxFrequency: 439.51249999999999
-      txFrequency: 431.91250000000002
+      name: R/TG9 DB0SPN TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp1
+      groupList: grp2
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch49
-      name: R/TG9 DB0NLS TS2
-      rxFrequency: 439.51249999999999
-      txFrequency: 431.91250000000002
+      name: DB0NLS TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
+      groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5125 MHz
+      txFrequency: 431.9125 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch50
-      name: DB0LS TS1
-      rxFrequency: 438.22500000000002
-      txFrequency: 430.625
+      name: R/TG9 DB0NLS TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS1
+      timeSlot: TS2
       radioId: !<!default> ""
-      groupList: grp1
+      groupList: grp2
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5125 MHz
+      txFrequency: 431.9125 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch51
-      name: TG8 DB0LS TS2
-      rxFrequency: 438.22500000000002
-      txFrequency: 430.625
+      name: DB0LS TS1
       rxOnly: false
       admit: ColorCode
       colorCode: 1
-      timeSlot: TS2
+      timeSlot: TS1
       radioId: !<!default> ""
-      groupList: grp2
-      contact: cont5
+      groupList: grp1
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.225 MHz
+      txFrequency: 430.625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch52
-      name: TG9 DB0LS TS2
-      rxFrequency: 438.22500000000002
-      txFrequency: 430.625
+      name: TG8 DB0LS TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont6
+      contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 438.225 MHz
+      txFrequency: 430.625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch53
-      name: BB DB0LS TS2
-      rxFrequency: 438.22500000000002
-      txFrequency: 430.625
+      name: TG9 DB0LS TS2
       rxOnly: false
       admit: ColorCode
       colorCode: 1
       timeSlot: TS2
       radioId: !<!default> ""
       groupList: grp2
-      contact: cont7
+      contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 438.225 MHz
+      txFrequency: 430.625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch54
+      name: BB DB0LS TS2
+      rxOnly: false
+      admit: ColorCode
+      colorCode: 1
+      timeSlot: TS2
+      radioId: !<!default> ""
+      groupList: grp2
+      contact: cont7
+      roaming: !<!default> ""
+      rxFrequency: 438.225 MHz
+      txFrequency: 430.625 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch55
       name: DM0LC TS1
-      rxFrequency: 439.38749999999999
-      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -913,14 +927,14 @@ channels:
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.3875 MHz
+      txFrequency: 431.7875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch55
+      id: ch56
       name: TG8 DM0LC TS2
-      rxFrequency: 439.38749999999999
-      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -929,14 +943,14 @@ channels:
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.3875 MHz
+      txFrequency: 431.7875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch56
+      id: ch57
       name: TG9 DM0LC TS2
-      rxFrequency: 439.38749999999999
-      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -945,14 +959,14 @@ channels:
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.3875 MHz
+      txFrequency: 431.7875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch57
+      id: ch58
       name: Sa/Th DM0LC TS2
-      rxFrequency: 439.38749999999999
-      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -961,14 +975,14 @@ channels:
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
+      rxFrequency: 439.3875 MHz
+      txFrequency: 431.7875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch58
+      id: ch59
       name: BB DM0LC TS1
-      rxFrequency: 439.38749999999999
-      txFrequency: 431.78750000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -977,14 +991,14 @@ channels:
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.3875 MHz
+      txFrequency: 431.7875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch59
+      id: ch60
       name: DB0FLW TS1
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -993,14 +1007,14 @@ channels:
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch60
+      id: ch61
       name: TG8 DB0FLW TS2
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1009,14 +1023,14 @@ channels:
       groupList: grp3
       contact: cont5
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch61
+      id: ch62
       name: TG9 DB0FLW TS2
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1025,14 +1039,14 @@ channels:
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch62
+      id: ch63
       name: Sa/Th DB0FLW TS2
-      rxFrequency: 439.53750000000002
-      txFrequency: 431.9375
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1041,14 +1055,14 @@ channels:
       groupList: grp3
       contact: cont8
       roaming: !<!default> ""
+      rxFrequency: 439.5375 MHz
+      txFrequency: 431.9375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch63
+      id: ch64
       name: DB0LE TS1
-      rxFrequency: 439.57499999999999
-      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1057,14 +1071,14 @@ channels:
       groupList: grp1
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.575 MHz
+      txFrequency: 431.975 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch64
+      id: ch65
       name: R/TG9 DB0LE TS2
-      rxFrequency: 439.57499999999999
-      txFrequency: 431.97500000000002
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1073,14 +1087,14 @@ channels:
       groupList: grp3
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.575 MHz
+      txFrequency: 431.975 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch65
+      id: ch66
       name: DL DB0AFZ TS1
-      rxFrequency: 439.97500000000002
-      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1089,14 +1103,14 @@ channels:
       groupList: grp1
       contact: cont3
       roaming: !<!default> ""
+      rxFrequency: 439.975 MHz
+      txFrequency: 430.575 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch66
+      id: ch67
       name: BB DB0AFZ TS1
-      rxFrequency: 439.97500000000002
-      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1105,14 +1119,14 @@ channels:
       groupList: grp2
       contact: cont7
       roaming: !<!default> ""
+      rxFrequency: 439.975 MHz
+      txFrequency: 430.575 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch67
+      id: ch68
       name: TG9 DB0AFZ TS2
-      rxFrequency: 439.97500000000002
-      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1121,14 +1135,14 @@ channels:
       groupList: grp5
       contact: cont6
       roaming: !<!default> ""
+      rxFrequency: 439.975 MHz
+      txFrequency: 430.575 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
-      id: ch68
+      id: ch69
       name: Hes DB0AFZ TS2
-      rxFrequency: 439.97500000000002
-      txFrequency: 430.57499999999999
       rxOnly: false
       admit: ColorCode
       colorCode: 1
@@ -1137,30 +1151,14 @@ channels:
       groupList: grp5
       contact: cont10
       roaming: !<!default> ""
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-  - digital:
-      id: ch69
-      name: DMR S0
-      rxFrequency: 433.44999999999999
-      txFrequency: 433.44999999999999
-      rxOnly: false
-      admit: Free
-      colorCode: 1
-      timeSlot: TS1
-      radioId: !<!default> ""
-      groupList: grp6
-      contact: cont13
-      roaming: !<!default> ""
+      rxFrequency: 439.975 MHz
+      txFrequency: 430.575 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch70
-      name: DMR S1
-      rxFrequency: 433.61200000000002
-      txFrequency: 433.61200000000002
+      name: DMR S0
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1169,14 +1167,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.45 MHz
+      txFrequency: 433.45 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch71
-      name: DMR S2
-      rxFrequency: 433.625
-      txFrequency: 433.625
+      name: DMR S1
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1185,14 +1183,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.612 MHz
+      txFrequency: 433.612 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch72
-      name: DMR S3
-      rxFrequency: 433.63799999999998
-      txFrequency: 433.63799999999998
+      name: DMR S2
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1201,14 +1199,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.625 MHz
+      txFrequency: 433.625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch73
-      name: DMR S4
-      rxFrequency: 433.64999999999998
-      txFrequency: 433.64999999999998
+      name: DMR S3
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1217,14 +1215,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.638 MHz
+      txFrequency: 433.638 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch74
-      name: DMR S5
-      rxFrequency: 433.66300000000001
-      txFrequency: 433.66300000000001
+      name: DMR S4
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1233,14 +1231,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.65 MHz
+      txFrequency: 433.65 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch75
-      name: DMR S6
-      rxFrequency: 433.67500000000001
-      txFrequency: 433.67500000000001
+      name: DMR S5
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1249,14 +1247,14 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.663 MHz
+      txFrequency: 433.663 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - digital:
       id: ch76
-      name: DMR S7
-      rxFrequency: 433.68799999999999
-      txFrequency: 433.68799999999999
+      name: DMR S6
       rxOnly: false
       admit: Free
       colorCode: 1
@@ -1265,43 +1263,61 @@ channels:
       groupList: grp6
       contact: cont13
       roaming: !<!default> ""
+      rxFrequency: 433.675 MHz
+      txFrequency: 433.675 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch77
+      name: DMR S7
+      rxOnly: false
+      admit: Free
+      colorCode: 1
+      timeSlot: TS1
+      radioId: !<!default> ""
+      groupList: grp6
+      contact: cont13
+      roaming: !<!default> ""
+      rxFrequency: 433.688 MHz
+      txFrequency: 433.688 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
   - analog:
-      id: ch77
+      id: ch78
       name: DB0LDS
-      rxFrequency: 439.5625
-      txFrequency: 431.96249999999998
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.5625 MHz
+      txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       rxTone: {ctcss: 67}
       txTone: {ctcss: 67}
-      squelch: !<!default> ""
-  - analog:
-      id: ch78
-      name: DB0RAG
-      rxFrequency: 439.30000000000001
-      txFrequency: 431.69999999999999
-      rxOnly: false
-      admit: Always
-      bandwidth: Narrow
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch79
-      name: DB0LUD
-      rxFrequency: 438.57499999999999
-      txFrequency: 430.97500000000002
+      name: DB0RAG
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.3 MHz
+      txFrequency: 431.7 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch80
+      name: DB0LUD
+      rxOnly: false
+      admit: Always
+      bandwidth: Narrow
+      rxFrequency: 438.575 MHz
+      txFrequency: 430.975 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
@@ -1309,388 +1325,375 @@ channels:
       txTone: {ctcss: 67}
       squelch: !<!default> ""
   - analog:
-      id: ch80
-      name: DB0SP-2
-      rxFrequency: 145.59999999999999
-      txFrequency: 145
-      rxOnly: false
-      admit: Always
-      bandwidth: Narrow
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-      squelch: !<!default> ""
-  - analog:
       id: ch81
-      name: DB0SP-70
-      rxFrequency: 439.42500000000001
-      txFrequency: 431.82499999999999
+      name: DB0SP-2
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.6 MHz
+      txFrequency: 145 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch82
-      name: DB0ZOD-2
-      rxFrequency: 145.66249999999999
-      txFrequency: 145.0625
+      name: DB0SP-70
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.425 MHz
+      txFrequency: 431.825 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch83
-      name: DB0ZOD-70
-      rxFrequency: 438.72500000000002
-      txFrequency: 431.125
+      name: DB0ZOD-2
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.6625 MHz
+      txFrequency: 145.0625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch84
-      name: DB0BRL
-      rxFrequency: 145.72499999999999
-      txFrequency: 145.125
+      name: DB0ZOD-70
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 438.725 MHz
+      txFrequency: 431.125 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch85
-      name: DB0BLO
-      rxFrequency: 439.27499999999998
-      txFrequency: 431.67500000000001
+      name: DB0BRL
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.725 MHz
+      txFrequency: 145.125 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch86
-      name: DB0SX
-      rxFrequency: 439.05000000000001
-      txFrequency: 431.44999999999999
+      name: DB0BLO
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.275 MHz
+      txFrequency: 431.675 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch87
-      name: DB0TA
-      rxFrequency: 439.125
-      txFrequency: 431.52499999999998
+      name: DB0SX
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.05 MHz
+      txFrequency: 431.45 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch88
-      name: DB0PDM
-      rxFrequency: 145.67500000000001
-      txFrequency: 145.07499999999999
+      name: DB0TA
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.125 MHz
+      txFrequency: 431.525 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch89
-      name: DB0CBS
-      rxFrequency: 438.85000000000002
-      txFrequency: 431.25
+      name: DB0PDM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.675 MHz
+      txFrequency: 145.075 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch90
-      name: DB0AF
-      rxFrequency: 438.63749999999999
-      txFrequency: 431.03750000000002
+      name: DB0CBS
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 438.85 MHz
+      txFrequency: 431.25 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch91
-      name: DB0NFL
-      rxFrequency: 438.94999999999999
-      txFrequency: 431.35000000000002
+      name: DB0AF
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 438.6375 MHz
+      txFrequency: 431.0375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch92
-      name: DB0LMM
-      rxFrequency: 439.30000000000001
-      txFrequency: 431.69999999999999
+      name: DB0NFL
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 438.95 MHz
+      txFrequency: 431.35 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch93
-      name: DM0LEI
-      rxFrequency: 439.14999999999998
-      txFrequency: 431.55000000000001
+      name: DB0LMM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.3 MHz
+      txFrequency: 431.7 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch94
-      name: DB0LEI
-      rxFrequency: 145.77500000000001
-      txFrequency: 145.17500000000001
+      name: DM0LEI
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.15 MHz
+      txFrequency: 431.55 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch95
-      name: DB0SML
-      rxFrequency: 439.27499999999998
-      txFrequency: 431.67500000000001
+      name: DB0LEI
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.775 MHz
+      txFrequency: 145.175 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch96
-      name: DB0LSA
-      rxFrequency: 145.66249999999999
-      txFrequency: 145.0625
+      name: DB0SML
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 439.275 MHz
+      txFrequency: 431.675 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch97
-      name: DB0LE
-      rxFrequency: 438.78750000000002
-      txFrequency: 431.1875
+      name: DB0LSA
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.6625 MHz
+      txFrequency: 145.0625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch98
-      name: DOK Y07
-      rxFrequency: 144.67500000000001
-      txFrequency: 144.67500000000001
+      name: DB0LE
       rxOnly: false
-      admit: Free
+      admit: Always
       bandwidth: Narrow
+      rxFrequency: 438.7875 MHz
+      txFrequency: 431.1875 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch99
-      name: DOK D20
-      rxFrequency: 144.65000000000001
-      txFrequency: 144.65000000000001
+      name: DOK Y07
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 144.675 MHz
+      txFrequency: 144.675 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch100
-      name: DOK D23
-      rxFrequency: 145.375
-      txFrequency: 145.375
+      name: DOK D20
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 144.65 MHz
+      txFrequency: 144.65 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch101
-      name: DOK S31
-      rxFrequency: 144.72499999999999
-      txFrequency: 144.72499999999999
+      name: DOK D23
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 145.375 MHz
+      txFrequency: 145.375 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch102
-      name: S20
-      rxFrequency: 145.30000000000001
-      txFrequency: 145.30000000000001
+      name: DOK S31
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 144.725 MHz
+      txFrequency: 144.725 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch103
-      name: 2m Mobil
-      rxFrequency: 145.5
-      txFrequency: 145.5
+      name: S20
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 145.3 MHz
+      txFrequency: 145.3 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch104
-      name: 70cm Mobil
-      rxFrequency: 433.5
-      txFrequency: 433.5
+      name: 2m Mobil
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 145.5 MHz
+      txFrequency: 145.5 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch105
-      name: APRS
-      rxFrequency: 144.80000000000001
-      txFrequency: 144.80000000000001
+      name: 70cm Mobil
       rxOnly: false
       admit: Free
       bandwidth: Narrow
-      aprs: aprs2
+      rxFrequency: 433.5 MHz
+      txFrequency: 433.5 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch106
-      name: ISS APRS
-      rxFrequency: 145.82499999999999
-      txFrequency: 145.82499999999999
+      name: APRS
       rxOnly: false
       admit: Free
       bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 144.8 MHz
+      txFrequency: 144.8 MHz
+      power: High
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch107
+      name: ISS APRS
+      rxOnly: false
+      admit: Free
+      bandwidth: Narrow
+      rxFrequency: 145.825 MHz
+      txFrequency: 145.825 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
-      id: ch107
+      id: ch108
       name: ISS FM Rep
-      rxFrequency: 437.80000000000001
-      txFrequency: 145.99000000000001
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 437.8 MHz
+      txFrequency: 145.99 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       txTone: {ctcss: 67}
       squelch: 0
   - analog:
-      id: ch108
-      name: CAS-3H FM
-      rxFrequency: 437.19999999999999
-      txFrequency: 144.34999999999999
-      rxOnly: false
-      admit: Always
-      bandwidth: Narrow
-      power: High
-      timeout: !<!default> ""
-      vox: !<!default> ""
-      squelch: 0
-  - analog:
       id: ch109
-      name: PO-101 FM
-      rxFrequency: 145.90000000000001
-      txFrequency: 437.5
+      name: CAS-3H FM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 437.2 MHz
+      txFrequency: 144.35 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: 0
   - analog:
       id: ch110
-      name: SO-50 FM
-      rxFrequency: 436.79000000000002
-      txFrequency: 145.84999999999999
+      name: PO-101 FM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.9 MHz
+      txFrequency: 437.5 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch111
-      name: AO-92 FM
-      rxFrequency: 145.88
-      txFrequency: 435.35000000000002
+      name: SO-50 FM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 436.79 MHz
+      txFrequency: 145.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
@@ -1698,12 +1701,12 @@ channels:
       squelch: 0
   - analog:
       id: ch112
-      name: AO-91 FM
-      rxFrequency: 145.96000000000001
-      txFrequency: 435.25
+      name: AO-92 FM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 145.88 MHz
+      txFrequency: 435.35 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
@@ -1711,256 +1714,269 @@ channels:
       squelch: 0
   - analog:
       id: ch113
-      name: U0
-      rxFrequency: 430.19999999999999
-      txFrequency: 430.19999999999999
+      name: AO-91 FM
       rxOnly: false
       admit: Always
       bandwidth: Narrow
-      power: Low
+      rxFrequency: 145.96 MHz
+      txFrequency: 435.25 MHz
+      power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      squelch: !<!default> ""
+      txTone: {ctcss: 67}
+      squelch: 0
   - analog:
       id: ch114
-      name: U1
-      rxFrequency: 430.22500000000002
-      txFrequency: 430.22500000000002
+      name: U0
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 430.2 MHz
+      txFrequency: 430.2 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch115
-      name: U2
-      rxFrequency: 430.25
-      txFrequency: 430.25
+      name: U1
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 430.225 MHz
+      txFrequency: 430.225 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch116
-      name: U3
-      rxFrequency: 430.27499999999998
-      txFrequency: 430.27499999999998
+      name: U2
       rxOnly: false
       admit: Always
       bandwidth: Narrow
+      rxFrequency: 430.25 MHz
+      txFrequency: 430.25 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch117
-      name: PMR 1
-      rxFrequency: 446.00625000000002
-      txFrequency: 446.00625000000002
+      name: U3
       rxOnly: false
-      scanListRef: scan3
-      admit: Free
+      admit: Always
       bandwidth: Narrow
+      rxFrequency: 430.275 MHz
+      txFrequency: 430.275 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch118
-      name: PMR 2
-      rxFrequency: 446.01875000000001
-      txFrequency: 446.01875000000001
+      name: PMR 1
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.00625 MHz
+      txFrequency: 446.00625 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch119
-      name: PMR 3
-      rxFrequency: 446.03125
-      txFrequency: 446.03125
+      name: PMR 2
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.01875 MHz
+      txFrequency: 446.01875 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch120
-      name: PMR 4
-      rxFrequency: 446.04374999999999
-      txFrequency: 446.04374999999999
+      name: PMR 3
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.03125 MHz
+      txFrequency: 446.03125 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch121
-      name: PMR 5
-      rxFrequency: 446.05624999999998
-      txFrequency: 446.05624999999998
+      name: PMR 4
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.04375 MHz
+      txFrequency: 446.04375 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch122
-      name: PMR 6
-      rxFrequency: 446.06875000000002
-      txFrequency: 446.06875000000002
+      name: PMR 5
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.05625 MHz
+      txFrequency: 446.05625 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch123
-      name: PMR 7
-      rxFrequency: 446.08125000000001
-      txFrequency: 446.08125000000001
+      name: PMR 6
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.06875 MHz
+      txFrequency: 446.06875 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch124
-      name: PMR 8
-      rxFrequency: 446.09375
-      txFrequency: 446.09375
+      name: PMR 7
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.08125 MHz
+      txFrequency: 446.08125 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch125
-      name: PMR 9
-      rxFrequency: 446.10624999999999
-      txFrequency: 446.10624999999999
+      name: PMR 8
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.09375 MHz
+      txFrequency: 446.09375 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch126
-      name: PMR 10
-      rxFrequency: 446.11874999999998
-      txFrequency: 446.11874999999998
+      name: PMR 9
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.10625 MHz
+      txFrequency: 446.10625 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch127
-      name: PMR 11
-      rxFrequency: 446.13125000000002
-      txFrequency: 446.13125000000002
+      name: PMR 10
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.11875 MHz
+      txFrequency: 446.11875 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch128
-      name: PMR 12
-      rxFrequency: 446.14375000000001
-      txFrequency: 446.14375000000001
+      name: PMR 11
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.13125 MHz
+      txFrequency: 446.13125 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch129
-      name: PMR 13
-      rxFrequency: 446.15625
-      txFrequency: 446.15625
+      name: PMR 12
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.14375 MHz
+      txFrequency: 446.14375 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch130
-      name: PMR 14
-      rxFrequency: 446.16874999999999
-      txFrequency: 446.16874999999999
+      name: PMR 13
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.15625 MHz
+      txFrequency: 446.15625 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch131
-      name: PMR 15
-      rxFrequency: 446.18124999999998
-      txFrequency: 446.18124999999998
+      name: PMR 14
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.16875 MHz
+      txFrequency: 446.16875 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
       squelch: !<!default> ""
   - analog:
       id: ch132
-      name: PMR 16
-      rxFrequency: 446.19375000000002
-      txFrequency: 446.19375000000002
+      name: PMR 15
       rxOnly: false
       scanListRef: scan3
       admit: Free
       bandwidth: Narrow
+      rxFrequency: 446.18125 MHz
+      txFrequency: 446.18125 MHz
+      power: Low
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch133
+      name: PMR 16
+      rxOnly: false
+      scanListRef: scan3
+      admit: Free
+      bandwidth: Narrow
+      rxFrequency: 446.19375 MHz
+      txFrequency: 446.19375 MHz
       power: Low
       timeout: !<!default> ""
       vox: !<!default> ""
@@ -1968,50 +1984,50 @@ channels:
 zones:
   - id: zone1
     name: KW
-    A: [ch1, ch4, ch5, ch2, ch6, ch7, ch12, ch13, ch14, ch16, ch17, ch77, ch78, ch79, ch80]
-    B: [ch98, ch102, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch1, ch4, ch5, ch8, ch2, ch6, ch7, ch13, ch14, ch15, ch17, ch18, ch78, ch79, ch80, ch81]
+    B: [ch99, ch103, ch104, ch105, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone2
     name: TH Wildau
-    A: [ch113, ch114, ch115, ch116]
+    A: [ch114, ch115, ch116, ch117]
     B: []
   - id: zone3
     name: Hessen
-    A: [ch65, ch67, ch68]
-    B: [ch103, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch66, ch68, ch69]
+    B: [ch104, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone4
     name: Berlin
-    A: [ch17, ch19, ch23, ch25, ch29, ch33, ch37, ch80, ch81, ch82, ch83, ch84, ch85, ch86, ch87]
-    B: [ch99, ch100, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch18, ch20, ch24, ch26, ch30, ch34, ch38, ch81, ch82, ch83, ch84, ch85, ch86, ch87, ch88]
+    B: [ch100, ch101, ch104, ch105, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone5
     name: Potsdam
-    A: [ch38, ch39, ch40, ch41, ch42, ch43, ch44, ch45, ch80, ch81, ch88]
-    B: [ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch39, ch40, ch41, ch42, ch43, ch44, ch45, ch46, ch81, ch82, ch89]
+    B: [ch104, ch105, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone6
     name: Cottbus
-    A: [ch46, ch47, ch48, ch49, ch50, ch51, ch52, ch53, ch89, ch90, ch91]
-    B: [ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch47, ch48, ch49, ch50, ch51, ch52, ch53, ch54, ch90, ch91, ch92]
+    B: [ch104, ch105, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone7
     name: Leipzig
-    A: [ch54, ch56, ch57, ch58, ch59, ch61, ch62, ch63, ch64, ch92, ch93, ch94, ch95, ch96, ch97]
-    B: [ch101, ch103, ch104, ch69, ch70, ch71, ch72, ch73, ch74, ch75, ch76]
+    A: [ch55, ch57, ch58, ch59, ch60, ch62, ch63, ch64, ch65, ch93, ch94, ch95, ch96, ch97, ch98]
+    B: [ch102, ch104, ch105, ch70, ch71, ch72, ch73, ch74, ch75, ch76, ch77]
   - id: zone8
     name: Sat
-    A: [ch107, ch112, ch111, ch110, ch109, ch108]
-    B: [ch106, ch107, ch112, ch111, ch110, ch109, ch108]
+    A: [ch108, ch113, ch112, ch111, ch110, ch109]
+    B: [ch107, ch108, ch113, ch112, ch111, ch110, ch109]
   - id: zone9
     name: PMR
-    A: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
-    B: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
+    A: [ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132, ch133]
+    B: [ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132, ch133]
 scanLists:
   - id: scan1
     name: KW
-    channels: [ch4, ch5, ch77, ch78, ch98, ch103, ch69, ch113]
+    channels: [ch4, ch5, ch78, ch79, ch99, ch104, ch70, ch114]
   - id: scan2
     name: BerBra
-    channels: [ch5, ch11, ch17, ch19, ch23, ch25, ch33, ch37, ch29, ch41, ch45, ch53]
+    channels: [ch5, ch12, ch18, ch20, ch24, ch26, ch34, ch38, ch30, ch42, ch46, ch54]
   - id: scan3
     name: PMR
-    channels: [ch117, ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132]
+    channels: [ch118, ch119, ch120, ch121, ch122, ch123, ch124, ch125, ch126, ch127, ch128, ch129, ch130, ch131, ch132, ch133]
 positioning:
   - dmr:
       id: aprs1
@@ -2022,90 +2038,99 @@ positioning:
       id: aprs2
       name: APRS APAT81
       period: 300
-      revert: ch105
+      revert: ch106
       icon: Jogger
       message: Y07, QRG 144.675
       destination: APAT81-0
       source: DM3MAT-7
       path: [WIDE1-1, WIDE2-1]
 roamingChannels:
-  - id: rc1
+  - id: rch1
     name: R DB0LDS
-    rxFrequency: 439.5625
-    txFrequency: 431.96249999999998
+    rxFrequency: 439.5625 MHz
+    txFrequency: 431.9625 MHz
     colorCode: 1
-  - id: rc2
+  - id: rch2
     name: R DM0TZN
-    rxFrequency: 438.82499999999999
-    txFrequency: 431.22500000000002
+    rxFrequency: 438.825 MHz
+    txFrequency: 431.225 MHz
     colorCode: 1
-  - id: rc3
+  - id: rch3
     name: R DM0TT
-    rxFrequency: 439.08749999999998
-    txFrequency: 431.48750000000001
+    rxFrequency: 439.0875 MHz
+    txFrequency: 431.4875 MHz
     colorCode: 1
-  - id: rc4
+  - id: rch4
     name: R DB0KK
-    rxFrequency: 439.53750000000002
-    txFrequency: 431.9375
+    rxFrequency: 439.5375 MHz
+    txFrequency: 431.9375 MHz
     colorCode: 1
-  - id: rc5
+  - id: rch5
     name: R DB0OUD
-    rxFrequency: 438.625
-    txFrequency: 431.02499999999998
+    rxFrequency: 438.625 MHz
+    txFrequency: 431.025 MHz
     colorCode: 1
-  - id: rc6
+  - id: rch6
     name: R DB0TU
-    rxFrequency: 439.57499999999999
-    txFrequency: 431.97500000000002
+    rxFrequency: 439.575 MHz
+    txFrequency: 431.975 MHz
     colorCode: 1
-  - id: rc7
+  - id: rch7
     name: R DM0MOT
-    rxFrequency: 439.52499999999998
-    txFrequency: 431.92500000000001
+    rxFrequency: 439.525 MHz
+    txFrequency: 431.925 MHz
     colorCode: 1
-  - id: rc8
+  - id: rch8
     name: R DB0TA
-    rxFrequency: 439.47500000000002
-    txFrequency: 431.875
+    rxFrequency: 439.475 MHz
+    txFrequency: 431.875 MHz
     colorCode: 1
-  - id: rc9
+  - id: rch9
     name: R DB0FX
-    rxFrequency: 439.44999999999999
-    txFrequency: 431.85000000000002
+    rxFrequency: 439.45 MHz
+    txFrequency: 431.85 MHz
     colorCode: 1
-  - id: rc10
+  - id: rch10
     name: R DB0PDM
-    rxFrequency: 438.39999999999998
-    txFrequency: 430.80000000000001
+    rxFrequency: 438.4 MHz
+    txFrequency: 430.8 MHz
     colorCode: 1
-  - id: rc11
+  - id: rch11
     name: R DB0BRB
-    rxFrequency: 439.48750000000001
-    txFrequency: 431.88749999999999
+    rxFrequency: 439.4875 MHz
+    txFrequency: 431.8875 MHz
     colorCode: 1
-  - id: rc12
+  - id: rch12
     name: R DB0LS
-    rxFrequency: 438.22500000000002
-    txFrequency: 430.625
+    rxFrequency: 438.225 MHz
+    txFrequency: 430.625 MHz
     colorCode: 1
 roamingZones:
   - id: roam1
     name: Berlin/Brand
     channels:
-      - rc1
-      - rc2
-      - rc3
-      - rc4
-      - rc5
-      - rc6
-      - rc7
-      - rc8
-      - rc9
-      - rc10
-      - rc11
-      - rc12
+      - rch1
+      - rch2
+      - rch3
+      - rch4
+      - rch5
+      - rch6
+      - rch7
+      - rch8
+      - rch9
+      - rch10
+      - rch11
+      - rch12
 commercial:
   encryptionKeys:
     []
+sms:
+  format: DMR
+  smsTemplates:
+    - id: sms1
+      name: signal strength
+      message: rssi
+    - id: sms2
+      name: weather
+      message: wx
 ...

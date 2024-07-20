@@ -2,41 +2,42 @@
 #include "utils.hh"
 #include "logger.hh"
 #include "anytone_extension.hh"
+#include "config.hh"
 #include "melody.hh"
+#include "intermediaterepresentation.hh"
 #include <QTimeZone>
 #include <QRegularExpression>
 
-using namespace Signaling;
-
 #define CUSTOM_CTCSS_TONE 0x33
 
-Code _anytone_ctcss_num2code[52] = {
-  SIGNALING_NONE, // 62.5 not supported
-  CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
-  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
-  CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
-  CTCSS_103_5Hz, CTCSS_107_2Hz, CTCSS_110_9Hz, CTCSS_114_8Hz, CTCSS_118_8Hz, CTCSS_123_0Hz,
-  CTCSS_127_3Hz, CTCSS_131_8Hz, CTCSS_136_5Hz, CTCSS_141_3Hz, CTCSS_146_2Hz, CTCSS_151_4Hz,
-  CTCSS_156_7Hz,
-  SIGNALING_NONE, // 159.8 not supported
-  CTCSS_162_2Hz,
-  SIGNALING_NONE, // 165.5 not supported
-  CTCSS_167_9Hz,
-  SIGNALING_NONE, // 171.3 not supported
-  CTCSS_173_8Hz,
-  SIGNALING_NONE, // 177.3 not supported
-  CTCSS_179_9Hz,
-  SIGNALING_NONE, // 183.5 not supported
-  CTCSS_186_2Hz,
-  SIGNALING_NONE, // 189.9 not supported
-  CTCSS_192_8Hz,
-  SIGNALING_NONE, SIGNALING_NONE, // 196.6 & 199.5 not supported
-  CTCSS_203_5Hz,
-  SIGNALING_NONE, // 206.5 not supported
-  CTCSS_210_7Hz, CTCSS_218_1Hz, CTCSS_225_7Hz,
-  SIGNALING_NONE, // 229.1 not supported
-  CTCSS_233_6Hz, CTCSS_241_8Hz, CTCSS_250_3Hz,
-  SIGNALING_NONE, SIGNALING_NONE // 254.1 and custom CTCSS not supported.
+Signaling::Code
+_anytone_ctcss_num2code[52] = {
+  Signaling::SIGNALING_NONE, // 62.5 not supported
+  Signaling::CTCSS_67_0Hz,  Signaling::SIGNALING_NONE, // 69.3 not supported
+  Signaling::CTCSS_71_9Hz,  Signaling::CTCSS_74_4Hz,  Signaling::CTCSS_77_0Hz,  Signaling::CTCSS_79_7Hz,  Signaling::CTCSS_82_5Hz,
+  Signaling::CTCSS_85_4Hz,  Signaling::CTCSS_88_5Hz,  Signaling::CTCSS_91_5Hz,  Signaling::CTCSS_94_8Hz,  Signaling::CTCSS_97_4Hz,  Signaling::CTCSS_100_0Hz,
+  Signaling::CTCSS_103_5Hz, Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz, Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz,
+  Signaling::CTCSS_127_3Hz, Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz, Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz,
+  Signaling::CTCSS_156_7Hz,
+  Signaling::SIGNALING_NONE, // 159.8 not supported
+  Signaling::CTCSS_162_2Hz,
+  Signaling::SIGNALING_NONE, // 165.5 not supported
+  Signaling::CTCSS_167_9Hz,
+  Signaling::SIGNALING_NONE, // 171.3 not supported
+  Signaling::CTCSS_173_8Hz,
+  Signaling::SIGNALING_NONE, // 177.3 not supported
+  Signaling::CTCSS_179_9Hz,
+  Signaling::SIGNALING_NONE, // 183.5 not supported
+  Signaling::CTCSS_186_2Hz,
+  Signaling::SIGNALING_NONE, // 189.9 not supported
+  Signaling::CTCSS_192_8Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, // 196.6 & 199.5 not supported
+  Signaling::CTCSS_203_5Hz,
+  Signaling::SIGNALING_NONE, // 206.5 not supported
+  Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz, Signaling::CTCSS_225_7Hz,
+  Signaling::SIGNALING_NONE, // 229.1 not supported
+  Signaling::CTCSS_233_6Hz, Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE // 254.1 and custom CTCSS not supported.
 };
 
 inline uint8_t
@@ -323,7 +324,7 @@ AnytoneCodeplug::ChannelElement::rxTone() const {
   return Signaling::SIGNALING_NONE;
 }
 void
-AnytoneCodeplug::ChannelElement::setRXTone(Code code) {
+AnytoneCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
   if (Signaling::SIGNALING_NONE == code) {
     setRXSignalingMode(SignalingMode::None);
   } else if (Signaling::isCTCSS(code)) {
@@ -355,7 +356,7 @@ AnytoneCodeplug::ChannelElement::txTone() const {
   return Signaling::SIGNALING_NONE;
 }
 void
-AnytoneCodeplug::ChannelElement::setTXTone(Code code) {
+AnytoneCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
   if (Signaling::SIGNALING_NONE == code) {
     setTXSignalingMode(SignalingMode::None);
   } else if (Signaling::isCTCSS(code)) {
@@ -409,7 +410,7 @@ AnytoneCodeplug::ChannelElement::txCTCSS() const {
   return ctcss_num2code(getUInt8(0x000a));
 }
 void
-AnytoneCodeplug::ChannelElement::setTXCTCSS(Code tone) {
+AnytoneCodeplug::ChannelElement::setTXCTCSS(Signaling::Code tone) {
   setUInt8(0x000a, ctcss_code2num(tone));
 }
 void
@@ -425,7 +426,7 @@ AnytoneCodeplug::ChannelElement::rxCTCSS() const {
   return ctcss_num2code(getUInt8(0x000b));
 }
 void
-AnytoneCodeplug::ChannelElement::setRXCTCSS(Code tone) {
+AnytoneCodeplug::ChannelElement::setRXCTCSS(Signaling::Code tone) {
   setUInt8(0x000b, ctcss_code2num(tone));
 }
 void
@@ -441,7 +442,7 @@ AnytoneCodeplug::ChannelElement::txDCS() const {
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
-AnytoneCodeplug::ChannelElement::setTXDCS(Code code) {
+AnytoneCodeplug::ChannelElement::setTXDCS(Signaling::Code code) {
   if (Signaling::isDCSNormal(code))
     setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
@@ -458,7 +459,7 @@ AnytoneCodeplug::ChannelElement::rxDCS() const {
   return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
 }
 void
-AnytoneCodeplug::ChannelElement::setRXDCS(Code code) {
+AnytoneCodeplug::ChannelElement::setRXDCS(Signaling::Code code) {
   if (Signaling::isDCSNormal(code))
     setUInt16_le(0x000e, oct_to_dec(Signaling::toDCSNumber(code)));
   else if (Signaling::isDCSInverted(code))
@@ -757,8 +758,8 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   }
 
   ch->setName(name());
-  ch->setRXFrequency(rxFrequency()/1e6);
-  ch->setTXFrequency(txFrequency()/1e6);
+  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
 
@@ -796,7 +797,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
-    if (rid == ctx.config()->radioIDs()->defaultId())
+    if (rid == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>())
       dc->setRadioIdObj(DefaultRadioID::get());
     else
       dc->setRadioIdObj(rid);
@@ -824,8 +825,8 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency()*1e6);
-  setTXFrequency(c->txFrequency()*1e6);
+  setRXFrequency(c->rxFrequency().inHz());
+  setTXFrequency(c->txFrequency().inHz());
   // set power
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
@@ -896,11 +897,11 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setGroupListIndex(ctx.index(dc->groupListObj()));
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
-      if (nullptr == ctx.config()->radioIDs()->defaultId()) {
+      if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {
         logWarn() << "No default radio ID set: using index 0.";
         setRadioIDIndex(0);
       } else {
-        setRadioIDIndex(ctx.index(ctx.config()->radioIDs()->defaultId()));
+        setRadioIDIndex(ctx.index(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()));
       }
     } else {
       setRadioIDIndex(ctx.index(dc->radioIdObj()));
@@ -1123,7 +1124,7 @@ AnytoneCodeplug::DTMFContactElement::setNumber(const QString &number) {
     return;
   memset(_data+Offset::digits(), 0, Limit::digitCount()/2);
   unsigned int n = std::min((unsigned int)number.length(), Limit::digitCount());
-  setUInt8(Offset::digits(), n);
+  setUInt8(Offset::numDigits(), n);
   for (unsigned int i=0; i<n; i++) {
     if (0 == (i%2))
       _data[Offset::digits() + i/2] |= (_anytone_bin_dtmf_tab.indexOf(number[i].toLatin1())<<4);
@@ -1887,12 +1888,12 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
 
   // Store key settings
-  ext->keySettings()->setFuncKey1Short(funcKeyAShort());
-  ext->keySettings()->setFuncKey1Long(funcKeyALong());
-  ext->keySettings()->setFuncKey2Short(funcKeyBShort());
-  ext->keySettings()->setFuncKey2Long(funcKeyBLong());
-  ext->keySettings()->setFuncKey3Short(funcKeyCShort());
-  ext->keySettings()->setFuncKey3Long(funcKeyCLong());
+  ext->keySettings()->setFuncKeyAShort(funcKeyAShort());
+  ext->keySettings()->setFuncKeyALong(funcKeyALong());
+  ext->keySettings()->setFuncKeyBShort(funcKeyBShort());
+  ext->keySettings()->setFuncKeyBLong(funcKeyBLong());
+  ext->keySettings()->setFuncKeyCShort(funcKeyCShort());
+  ext->keySettings()->setFuncKeyCLong(funcKeyCLong());
   ext->keySettings()->setFuncKey1Short(funcKey1Short());
   ext->keySettings()->setFuncKey1Long(funcKey1Long());
   ext->keySettings()->setFuncKey2Short(funcKey2Short());
@@ -4570,8 +4571,49 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       ctx.add(autoRep->offsets()->get(i)->as<AnytoneAutoRepeaterOffset>(), i);
   }
 
+  // Map SMS templates
+  for (int i=0; i<config->smsExtension()->smsTemplates()->count(); i++)
+    ctx.add(config->smsExtension()->smsTemplates()->get(i)->as<SMSTemplate>(), i);
+
   return true;
 }
+
+
+Config *
+AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+AnytoneCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot post-process codeplug for anytone device.";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool
 AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {

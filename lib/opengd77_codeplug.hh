@@ -151,7 +151,7 @@ public:
 
     /** Clears the zone. */
     void clear();
-    bool linkZoneObj(Zone *zone, Context &ctx, bool putInB) const;
+    bool linkZoneObj(Zone *zone, Context &ctx) const;
     void fromZoneObjA(const Zone *zone, Context &ctx);
     void fromZoneObjB(const Zone *zone, Context &ctx);
   };
@@ -240,7 +240,6 @@ public:
   bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  void clearMessages();
 
   void clearScanLists();
   bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());

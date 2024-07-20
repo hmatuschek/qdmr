@@ -15,9 +15,9 @@
 <note>
   <para>
     <application>qdmr</application> aims at being a device and manufacturer independent CPS. To this 
-    end, the GUI reflects a device independent codeplug. This means, that not all of the shown 
+    end, the GUI reflects a device independent code plug. This means, that not all of the shown 
     features are present in all radios. For example, not all supported devices implement APRS or 
-    roaming. These settings are then ignored when generating the device specific binary codeplug.
+    roaming. These settings are then ignored when generating the device specific binary code plug.
   </para>  
 </note>
 

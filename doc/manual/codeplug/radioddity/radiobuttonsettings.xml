@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="exRadioddityRadioButtonSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<info>
+  <title>Button settings</title>
+</info>  
+
+<para>
+  This section describes how the buttons are configured for Radioddity devices.
+</para>
+
+<example>
+  <title>Button settings extension example showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  radioddity:
+    [...]
+    buttons:
+      longPressDuration: 1 s
+      funcKey1Short: ZoneSelect
+      funcKey1Long: ToggleFMRadio
+      funcKey2Short: ToggleMonitor
+      funcKey2Long: ToggleFlashLight
+      funcKey3Short: BatteryIndicator
+      funcKey3Long: ToggleVox
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Button settings fields</title>
+  <varlistentry>
+    <term><token>longPressDuration</token></term>
+    <listitem>
+      <para>
+        Sets the duration, a button must be pressed, to be considered as a
+        <quote>long press</quote>. This interval is usually expressed in ms. E.g., 1000ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKey1Short</token>, <token>funcKey1Long</token></term>
+    <listitem>
+      <para>Short and long-press functions for the programmable function key 1. This is the side key 
+        1 on the <productname>GD77</productname> and <productname>RD-5R</productname> and the 
+        <keycap>P1</keycap> button on the <productname>GD73</productname>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKey2Short</token>, <token>funcKey2Long</token></term>
+    <listitem>
+      <para>Short and long-press functions for the programmable function key 2. This is the side key 
+        2 on the <productname>GD77</productname> and <productname>RD5R</productname> and the 
+        <keycap>P2</keycap> button on the <productname>GD73</productname>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKey3Short</token>, <token>funcKey3Long</token></term>
+    <listitem>
+      <para>Short and long-press functions for the programmable function key 3. This is the top key 
+        on the <productname>GD77</productname> and <productname>RD5R</productname> This button is 
+        not present on the <productname>GD73</productname>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+    
+<variablelist>
+  <title>Button functions</title>
+  <varlistentry>
+    <term><token>None</token></term>
+    <listitem>
+      <para>
+        Disables the button. No function is associated with it.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleAllAlertTones</token></term>
+    <listitem>
+      <para>
+        Enables or disables all alert tones. Only present in <productname>GD77</productname> and 
+        <productname>RD5R</productname> radios.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>EmergencyOn</token>, <token>EmergencyOff</token></term>
+    <listitem>
+      <para>
+        Why not toggle? Either enables or disables an emergency.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleMonitor</token></term>
+    <listitem>
+      <para>
+        Enables/toggles the monitor. This is device specific, on some radios the monitor function
+        latches, on most not. Then, the monitor is enabled, as long as the button is pressed.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>OneTouch1</token>, <token>OneTouch2</token>, <token>OneTouch3</token>,
+      <token>OneTouch4</token>, <token>OneTouch5</token>, <token>OneTouch6</token></term>
+    <listitem>
+      <para>
+        Triggers one specific one-touch action. Not all radios have 6 of these. The GD-77 and RD-5R
+        have 6 one-touch actions, while the GD-73 has only 5.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleTalkaround</token></term>
+    <listitem>
+      <para>
+        Enables/disables the talkaround feature for repeater channels. The radio then also transmits
+        on the RX frequency. Consequently bypassing the repeater.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleScan</token></term>
+    <listitem>
+      <para>
+        Enables/disables the scan.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleEncryption</token></term>
+    <listitem>
+      <para>
+        Enables/disables the encryption for the channel, if configured.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleVox</token></term>
+    <listitem>
+      <para>
+        Enables/disables the VOX for the channel, if configured.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ZoneSelect</token></term>
+    <listitem>
+      <para>
+        Brings up the zone selection dialog.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>BatteryIndicator</token></term>
+    <listitem>
+      <para>
+        Shows the battery charge indicator.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleLoneWorker</token></term>
+    <listitem>
+      <para>
+        Enables/disables lone-worker feature, if configured. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>PhoneExit</token></term>
+    <listitem>
+      <para>
+        WTF?!?
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleFlashLight</token></term>
+    <listitem>
+      <para>
+        Enables/Disables the flash light. Not all devices have one.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>ToggleFMRadio</token></term>
+    <listitem>
+      <para>
+        Enables/disables the FM broadcast radio.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>RadioCheck</token>,<token>RadioDisable</token>, <token>RadioEnable</token></term>
+    <listitem>
+      <para>
+        If configured, the radio will transmit tones, that cause other radios --- if configured 
+        to do so --- to either response, disable or reenable themselves. This allows to control 
+        other radios remotely.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>TBST</token></term>
+    <listitem>
+      <para>
+        Sends the TBST tone (usually 1750Hz). Some radios have a fixed button combo for that.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>CallSwell</token></term>
+    <listitem>
+      <para>
+        WTF?!?
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

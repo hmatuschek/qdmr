@@ -14,13 +14,13 @@
     <date>August 15th, 2023</date>
     
     <copyright>
-      <year>2022-2023</year>
+      <year>2022-2024</year>
       <holder>Hannes Matuschek</holder>
     </copyright>
     
     <releaseinfo>
       <para>
-        This document covers <application>qdmr</application> version 0.11.3.
+        This document covers <application>qdmr</application> version 0.12.0.
       </para>
     </releaseinfo>
     

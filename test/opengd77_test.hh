@@ -2,11 +2,12 @@
 #define OPENGD77TEST_HH
 
 
+#include "libdmrconfigtest.hh"
 #include <QObject>
 #include <QTextStream>
 #include "config.hh"
 
-class OpenGD77Test : public QObject
+class OpenGD77Test : public UnitTestBase
 {
   Q_OBJECT
 
@@ -14,15 +15,13 @@ public:
   explicit OpenGD77Test(QObject *parent = nullptr);
 
 private slots:
-  void initTestCase();
-  void cleanupTestCase();
-
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
+  void testChannelFrequency();
+  void testSMSTemplates();
 
 protected:
   QTextStream _stderr;
-  Config _basicConfig;
 };
 
 #endif // OPENGD77TEST_HH

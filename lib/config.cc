@@ -24,7 +24,8 @@ Config::Config(QObject *parent)
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)),
     _roamingChannels(new RoamingChannelList(this)), _roamingZones(new RoamingZoneList(this)),
-    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
+    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this)),
+    _smsExtension(new SMSExtension(this))
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -56,6 +57,7 @@ Config::Config(QObject *parent)
   connect(_roamingZones, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
 
   connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+  connect(_smsExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
 }
 
 bool
@@ -121,9 +123,6 @@ Config::populate(YAML::Node &node, const Context &context, const ErrorStack &err
 
   if ((node["settings"]= _settings->serialize(context, err)).IsNull())
     return false;
-
-  if (_radioIDs->defaultId() && context.contains(_radioIDs->defaultId()))
-    node["settings"]["defaultID"] = context.getId(_radioIDs->defaultId()).toStdString();
 
   if ((node["radioIDs"] = _radioIDs->serialize(context, err)).IsNull())
     return false;
@@ -279,6 +278,11 @@ Config::commercialExtension() const {
   return _commercialExtension;
 }
 
+SMSExtension *
+Config::smsExtension() const {
+  return _smsExtension;
+}
+
 TyTConfigExtension *
 Config::tytExtension() const {
   return _tytExtension;
@@ -409,29 +413,12 @@ bool
 Config::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   // radio IDs must be linked before settings, as they may refer to the default DMR ID
 
-  if (! _radioIDs->link(node["radioIDs"], ctx, err))
+  if (node["radioIDs"] && (! _radioIDs->link(node["radioIDs"], ctx, err)))
     return false;
 
-  if (! _settings->link(node["settings"], ctx, err))
-    return false;
-
-  // Link default radio ID separately as it is not a property of the settings but defined there
-  if (node["settings"] && node["settings"]["defaultID"] && node["settings"]["defaultID"].IsScalar()) {
-    YAML::Node defIDNode = node["settings"]["defaultID"];
-    QString id = QString::fromStdString(defIDNode.as<std::string>());
-    if (ctx.contains(id) && ctx.getObj(id)->is<DMRRadioID>()) {
-      DMRRadioID *def = ctx.getObj(id)->as<DMRRadioID>();
-      radioIDs()->setDefaultId(radioIDs()->indexOf(def));
-      logDebug() << "Set default radio ID to '" << def->name() << "'.";
-    } else {
-      errMsg(err) << defIDNode.Mark().line << ":" << defIDNode.Mark().column
-                  << "Default radio ID '" << id << " does not refer to a radio ID.";
+  if (node["settings"])
+    if (!_settings->link(node["settings"], ctx, err))
       return false;
-    }
-  } else if (radioIDs()->count()) {
-    // If no default is set, use first one.
-    radioIDs()->setDefaultId(0);
-  }
 
   if (node["contacts"] && (! _contacts->link(node["contacts"], ctx, err)))
     return false;

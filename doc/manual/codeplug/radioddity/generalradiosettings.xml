@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="exRadioddityGeneralRadioSettings"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<info>
+  <title>General radio settings</title>
+</info>
+
+<para>
+  This section describes the top-level generic radio settings for Radioddity devices. 
+</para>
+
+<example>
+  <title>Radio settings extension example showing default values.</title>
+  <programlisting><![CDATA[settings:
+  [...]
+  radioddity:
+    monitorType: Open
+    loneWorkerResponseTime: 1min
+    loneWorkerReminderPeriod: 10s
+    groupCallHangTime: 3000ms
+    privateCallHangTime: 3000ms
+    downChannelModeVFO: false
+    upChannelModeVFO: false
+    powerSaveMode: true
+    preambleDuration: 360ms
+    wakeupPreamble: true
+    allLEDsDisabled: false
+    quickKeyOverrideInhibited: false
+    txOnActiveChannel: false
+    animation: false
+    scanMode: Time
+    repeaterEndDelay: 0s
+    repeaterSTE: 0s    
+]]></programlisting>
+</example>
+
+<variablelist>
+  <title>Radio settings fields</title>
+  <varlistentry>
+    <term><token>monitorType</token></term>
+    <listitem>
+      <para>
+        Specifies the monitor type. Must be either <token>Open</token> or <token>Silent</token>. Default <token>Open</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerResponseTime</token></term>
+    <listitem>
+      <para>
+        When lone worker is enabled, specifies the time in minutes before the radio will start to 
+        remind the user. Default 1min. See also <xref linkend="glLoneWorker">lone worker</xref>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorkerReminderPeriod</token></term>
+    <listitem>
+      <para>
+        Specifies the period in seconds for the lone worker reminder. Default 10s. See also 
+        <xref linkend="glLoneWorker">lone worker</xref>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>groupCallHangTime</token></term>
+    <listitem>
+      <para>        
+        Specifies the group-call hang time in milliseconds. This is the time-period the user can 
+        answer a received group call by pressing PTT. After this time has passed, a press on the
+        PTT button will call the default contact on the selected channel. Default 3000ms. See also
+        <xref linkend="glHangTime">hang time</xref>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallHangTime</token></term>
+    <listitem>
+      <para>        
+        Specifies the private-call hang time in milliseconds. This is the time-period the user can 
+        answer a received private call by pressing PTT. After this time has passed, a press on the
+        PTT button will call the default contact on the selected channel. Default 3000ms. See also
+        <xref linkend="glHangTime">hang time</xref>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>downChannelModeVFO</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, the channel-up button will tune the VFO. If <token>false</token>, 
+        it will step through the channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>upChannelModeVFO</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, the channel-donw button will tune the VFO. If <token>false</token>, 
+        it will step through the channels. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSaveMode</token></term>
+    <listitem>
+      <para>
+        Puts the radio is a sleep mode when in idle state (no traffic on the channels). This 
+        allows for some power saving. However, the radio will need some time to wake up. 
+        Consequently, all other radios in the network need to transmit a wake-up preamble. 
+        Default <token>true</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>wakeupPreamble</token></term>
+    <listitem>
+      <para>
+        Enables the transmission of a short wake-up preamble allowing receiving radios to 
+        wake-up in time for the actual transmission. Default <token>true</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>preambleDuration</token></term>
+    <listitem>
+      <para>
+        This sets the preamble duration in milliseconds. Default 360ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>powerSaveDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the delay, before an idle radio enters power save mode. 
+        (<productname>GD-73</productname> only)
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allLEDsDisabled</token></term>
+    <listitem>
+      <para>  
+        If <token>true</token>, all LEDs are disabled. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>quickKeyOverrideInhibited</token></term>
+    <listitem>
+      <para>        
+        If <token>true</token>, allows the user to transmit on a busy channel irrespective of the 
+        channels admit criterion by double pressing the PTT. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txInterrupt</token></term>
+    <listitem>
+      <para>
+        WTF?!?
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txOnActiveChannel</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the radio will transmit on the currently active channel (if 
+        double-wait) is enabled. Default <token>false</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>scanMode</token></term>
+    <listitem>
+      <para>
+        Specifies the scan mode. Must be one of <token>Time</token>, <token>Carrier</token> or 
+        <token>Search</token>. Default <token>Time</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>repeaterEndDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the delay after the end of a repeater transmission in seconds. Default 0s, off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>repeaterSTE</token></term>
+    <listitem>
+      <para>
+        Specifies the repeater STE (what ever that means) in seconds. Default 0s, off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>language</token></term>
+    <listitem>
+      <para>
+        Specifies the UI language. Must be one of <token>Chinese</token> or <token>English</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>

@@ -11,8 +11,8 @@ class DMR6X2UVLimits: public AnytoneLimits
 
 public:
   /** Constructor. */
-  DMR6X2UVLimits(const std::initializer_list<std::pair<double, double>> &rxFreqRanges,
-                 const std::initializer_list<std::pair<double, double>> &txFreqRanges,
+  DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
+                 const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
                  const QString &hardwareRevision, QObject *parent=nullptr);
 };
 

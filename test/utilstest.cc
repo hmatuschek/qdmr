@@ -3,10 +3,18 @@
 #include <QTest>
 #include "utils.hh"
 #include "frequency.hh"
+#include "chirpformat.hh"
+#include "config.hh"
 
-UtilsTest::UtilsTest(QObject *parent) : QObject(parent)
+
+UtilsTest::UtilsTest(QObject *parent)
+  : QObject{parent}
 {
   // pass...
+}
+
+void
+UtilsTest::initTestCase() {
 }
 
 void
@@ -83,9 +91,8 @@ UtilsTest::testFrequencyParser() {
   QCOMPARE(Frequency::fromString("100GHz").inHz(), 100000000000ULL);
   QCOMPARE(Frequency::fromString("100 GHz").inHz(), 100000000000ULL);
 
-  QCOMPARE(Frequency::fromString("100").inHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100").inHz(), 100000000ULL);
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
 }
-
 
 QTEST_GUILESS_MAIN(UtilsTest)
