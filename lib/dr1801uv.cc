@@ -58,6 +58,9 @@ DR1801UV::startDownload(bool blocking, const ErrorStack &err) {
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
+  if (_device && _device->isOpen())
+    _device->moveToThread(this);
   start();
   return true;
 }
@@ -79,6 +82,9 @@ DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
+  if (_device && _device->isOpen())
+    _device->moveToThread(this);
   start();
   return true;
 }
