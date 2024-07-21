@@ -2,6 +2,449 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl">
 <context>
+    <name>APRSSystem</name>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="7"/>
+        <source>[None]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="8"/>
+        <source>Police station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="9"/>
+        <source>Digipeater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="10"/>
+        <source>Phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="11"/>
+        <source>DX cluster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="12"/>
+        <source>HF gateway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="13"/>
+        <source>Plane small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="14"/>
+        <source>Mobile Satellite station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="15"/>
+        <source>Wheel Chair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="16"/>
+        <source>Snowmobile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="17"/>
+        <source>Red cross</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="18"/>
+        <source>Boy scout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="19"/>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="20"/>
+        <source>X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="21"/>
+        <source>Red dot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="22"/>
+        <source>Circle 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="23"/>
+        <source>Circle 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="24"/>
+        <source>Circle 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="25"/>
+        <source>Circle 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="26"/>
+        <source>Circle 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="27"/>
+        <source>Circle 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="28"/>
+        <source>Circle 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="29"/>
+        <source>Circle 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="30"/>
+        <source>Circle 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="31"/>
+        <source>Circle 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="32"/>
+        <source>Fire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="33"/>
+        <source>Campground</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="34"/>
+        <source>Motorcycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="35"/>
+        <source>Rail engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="36"/>
+        <source>Car</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="37"/>
+        <source>File server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="38"/>
+        <source>HC Future</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="39"/>
+        <source>Aid station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="40"/>
+        <source>BBS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="41"/>
+        <source>Canoe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="42"/>
+        <source>Eyeball</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="43"/>
+        <source>Tractor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="44"/>
+        <source>Grid Square</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="45"/>
+        <source>Hotel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="46"/>
+        <source>TCP/IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="47"/>
+        <source>School</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="48"/>
+        <source>Logon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="49"/>
+        <source>MacOS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="50"/>
+        <source>NTS station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="51"/>
+        <source>Balloon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="52"/>
+        <source>Police car</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="53"/>
+        <source>TBD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="54"/>
+        <source>RV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="55"/>
+        <source>Shuttle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="56"/>
+        <source>SSTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="57"/>
+        <source>Bus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="58"/>
+        <source>ATV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="59"/>
+        <source>Weather service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="60"/>
+        <source>Helo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="61"/>
+        <source>Yacht</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="62"/>
+        <source>MS Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="63"/>
+        <source>Jogger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="64"/>
+        <source>Triangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="65"/>
+        <source>PBBS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="66"/>
+        <source>Plane large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="67"/>
+        <source>Weather station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="68"/>
+        <source>Dish antenna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="69"/>
+        <source>Ambulance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="70"/>
+        <source>Bike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="71"/>
+        <source>ICP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="72"/>
+        <source>Fire station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="73"/>
+        <source>Horse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="74"/>
+        <source>Fire truck</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="75"/>
+        <source>Glider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="76"/>
+        <source>Hospital</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="77"/>
+        <source>IOTA</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="78"/>
+        <source>Jeep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="79"/>
+        <source>Truck small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="80"/>
+        <source>Laptop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="81"/>
+        <source>Mic-E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="82"/>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="83"/>
+        <source>EOC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="84"/>
+        <source>Rover</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="85"/>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="86"/>
+        <source>Antenna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="87"/>
+        <source>Power boat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="88"/>
+        <source>Truck stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="89"/>
+        <source>Truck large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="90"/>
+        <source>Van</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="91"/>
+        <source>Water</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="92"/>
+        <source>XAPRS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="93"/>
+        <source>Yagi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="94"/>
+        <source>Shelter</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>APRSSystemDialog</name>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
@@ -18,11 +461,11 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../src/aboutdialog.ui" line="14"/>
-        <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
@@ -119,12 +562,6 @@
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/analogchanneldialog.ui" line="144"/>
-        <source> s</source>
-        <extracomment>Transmit time out (TOT) in seconds. A value of 0 means disabled.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -679,16 +1116,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="299"/>
-        <location filename="../src/configitemwrapper.cc" line="329"/>
-        <location filename="../src/configitemwrapper.cc" line="340"/>
-        <location filename="../src/configitemwrapper.cc" line="359"/>
-        <location filename="../src/configitemwrapper.cc" line="364"/>
-        <location filename="../src/configitemwrapper.cc" line="370"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="314"/>
         <location filename="../src/configitemwrapper.cc" line="321"/>
         <location filename="../src/configitemwrapper.cc" line="332"/>
@@ -1098,36 +1525,31 @@
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
-        <source>Add contact button</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/contactlistview.ui" line="38"/>
         <source>Add Digital Contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="41"/>
+        <location filename="../src/contactlistview.ui" line="38"/>
         <source>Alt++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="48"/>
+        <location filename="../src/contactlistview.ui" line="45"/>
         <source>Add DTMF Contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="55"/>
+        <location filename="../src/contactlistview.ui" line="52"/>
         <source>Delete contact button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="58"/>
+        <location filename="../src/contactlistview.ui" line="55"/>
         <source>Delete Contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="61"/>
+        <location filename="../src/contactlistview.ui" line="58"/>
         <source>Alt+-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1429,11 +1851,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="167"/>
-        <source> s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/digitalchanneldialog.ui" line="186"/>
         <source>VOX Level</source>
         <translation type="unfinished"></translation>
@@ -1465,47 +1882,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="266"/>
+        <location filename="../src/digitalchanneldialog.ui" line="269"/>
         <source>TS 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="271"/>
+        <location filename="../src/digitalchanneldialog.ui" line="274"/>
         <source>TS 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="279"/>
+        <location filename="../src/digitalchanneldialog.ui" line="282"/>
         <source>Rx Group List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="289"/>
+        <location filename="../src/digitalchanneldialog.ui" line="292"/>
         <source>Tx Contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="299"/>
+        <location filename="../src/digitalchanneldialog.ui" line="302"/>
         <source>Positioning System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="309"/>
+        <location filename="../src/digitalchanneldialog.ui" line="312"/>
         <source>Roaming Zone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="319"/>
+        <location filename="../src/digitalchanneldialog.ui" line="322"/>
         <source>DMR ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="332"/>
+        <location filename="../src/digitalchanneldialog.ui" line="335"/>
         <source>Extended</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="335"/>
+        <location filename="../src/digitalchanneldialog.ui" line="338"/>
         <source>Device specific settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1748,11 +2165,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="213"/>
-        <source> s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
         <source>VOX Level</source>
         <translation type="unfinished"></translation>
@@ -1831,218 +2243,208 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="20"/>
-        <source>qdmr [*]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="27"/>
-        <source>Main window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../shared/ui/mainwindow.ui" line="78"/>
+        <location filename="../shared/ui/mainwindow.ui" line="75"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="90"/>
+        <location filename="../shared/ui/mainwindow.ui" line="87"/>
         <source>Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="101"/>
-        <location filename="../shared/ui/mainwindow.ui" line="276"/>
+        <location filename="../shared/ui/mainwindow.ui" line="98"/>
+        <location filename="../shared/ui/mainwindow.ui" line="273"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="108"/>
+        <location filename="../shared/ui/mainwindow.ui" line="105"/>
         <source>Databases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="128"/>
+        <location filename="../shared/ui/mainwindow.ui" line="125"/>
         <source>Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="156"/>
+        <location filename="../shared/ui/mainwindow.ui" line="153"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="159"/>
+        <location filename="../shared/ui/mainwindow.ui" line="156"/>
         <source>Creates a new Codeplug.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="162"/>
+        <location filename="../shared/ui/mainwindow.ui" line="159"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="171"/>
+        <location filename="../shared/ui/mainwindow.ui" line="168"/>
         <source>Open ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="174"/>
+        <location filename="../shared/ui/mainwindow.ui" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="177"/>
+        <location filename="../shared/ui/mainwindow.ui" line="174"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="186"/>
+        <location filename="../shared/ui/mainwindow.ui" line="183"/>
         <source>Save ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="189"/>
+        <location filename="../shared/ui/mainwindow.ui" line="186"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="192"/>
+        <location filename="../shared/ui/mainwindow.ui" line="189"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="201"/>
+        <location filename="../shared/ui/mainwindow.ui" line="198"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="204"/>
+        <location filename="../shared/ui/mainwindow.ui" line="201"/>
         <source>Quits the application.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="207"/>
+        <location filename="../shared/ui/mainwindow.ui" line="204"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="216"/>
+        <location filename="../shared/ui/mainwindow.ui" line="213"/>
         <source>Detect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="219"/>
+        <location filename="../shared/ui/mainwindow.ui" line="216"/>
         <source>Detect connected radios.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="228"/>
+        <location filename="../shared/ui/mainwindow.ui" line="225"/>
         <source>Verify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="231"/>
+        <location filename="../shared/ui/mainwindow.ui" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="234"/>
+        <location filename="../shared/ui/mainwindow.ui" line="231"/>
         <source>Ctrl+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="243"/>
+        <location filename="../shared/ui/mainwindow.ui" line="240"/>
         <source>Read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="246"/>
+        <location filename="../shared/ui/mainwindow.ui" line="243"/>
         <source>Reads a codeplug from connected radios.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="255"/>
+        <location filename="../shared/ui/mainwindow.ui" line="252"/>
         <source>Write</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="258"/>
+        <location filename="../shared/ui/mainwindow.ui" line="255"/>
         <source>Writes the codeplug to the connected radio.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="267"/>
+        <location filename="../shared/ui/mainwindow.ui" line="264"/>
         <source>About qdmr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="279"/>
+        <location filename="../shared/ui/mainwindow.ui" line="276"/>
         <source>Read the handbook.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="282"/>
+        <location filename="../shared/ui/mainwindow.ui" line="279"/>
         <source>F1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="291"/>
+        <location filename="../shared/ui/mainwindow.ui" line="288"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="294"/>
+        <location filename="../shared/ui/mainwindow.ui" line="291"/>
         <source>Shows settings dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="303"/>
+        <location filename="../shared/ui/mainwindow.ui" line="300"/>
         <source>Write Callsign DB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="306"/>
+        <location filename="../shared/ui/mainwindow.ui" line="303"/>
         <source>Writes call-sign DB to radio.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="315"/>
+        <location filename="../shared/ui/mainwindow.ui" line="312"/>
         <source>Refresh Callsign DB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="318"/>
+        <location filename="../shared/ui/mainwindow.ui" line="315"/>
         <source>Refreshes the downloaded callsign DB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="327"/>
+        <location filename="../shared/ui/mainwindow.ui" line="324"/>
         <source>Refresh Talkgroup DB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="330"/>
+        <location filename="../shared/ui/mainwindow.ui" line="327"/>
         <source>Refreshes the downloaded talkgroup DB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="335"/>
+        <location filename="../shared/ui/mainwindow.ui" line="332"/>
         <source>Export to CHIRP ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="338"/>
+        <location filename="../shared/ui/mainwindow.ui" line="335"/>
         <source>Exports all FM channels to CHRIP CSV.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="343"/>
+        <location filename="../shared/ui/mainwindow.ui" line="340"/>
         <source>Import ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../shared/ui/mainwindow.ui" line="346"/>
+        <location filename="../shared/ui/mainwindow.ui" line="343"/>
         <source>Imports and merges a codeplug into the current one.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2158,29 +2560,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="716"/>
-        <source>OOps!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="722"/>
         <location filename="../src/configitemwrapper.cc" line="741"/>
         <source>[None]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="725"/>
-        <source>%1-%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/configitemwrapper.cc" line="733"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configitemwrapper.cc" line="737"/>
-        <source>OOPS!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2284,444 +2671,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="7"/>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="8"/>
-        <source>Police station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="9"/>
-        <source>Digipeater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="10"/>
-        <source>Phone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="11"/>
-        <source>DX cluster</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="12"/>
-        <source>HF gateway</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="13"/>
-        <source>Plane small</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="14"/>
-        <source>Mobile Satellite station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="15"/>
-        <source>Wheel Chair</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="16"/>
-        <source>Snowmobile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="17"/>
-        <source>Red cross</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="18"/>
-        <source>Boy scout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="19"/>
-        <source>Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="20"/>
-        <source>X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="21"/>
-        <source>Red dot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="22"/>
-        <source>Circle 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="23"/>
-        <source>Circle 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="24"/>
-        <source>Circle 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="25"/>
-        <source>Circle 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="26"/>
-        <source>Circle 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="27"/>
-        <source>Circle 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="28"/>
-        <source>Circle 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="29"/>
-        <source>Circle 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="30"/>
-        <source>Circle 8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="31"/>
-        <source>Circle 9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="32"/>
-        <source>Fire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="33"/>
-        <source>Campground</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="34"/>
-        <source>Motorcycle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="35"/>
-        <source>Rail engine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="36"/>
-        <source>Car</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="37"/>
-        <source>File server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="38"/>
-        <source>HC Future</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="39"/>
-        <source>Aid station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="40"/>
-        <source>BBS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="41"/>
-        <source>Canoe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="42"/>
-        <source>Eyeball</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="43"/>
-        <source>Tractor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="44"/>
-        <source>Grid Square</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="45"/>
-        <source>Hotel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="46"/>
-        <source>TCP/IP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="47"/>
-        <source>School</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="48"/>
-        <source>Logon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="49"/>
-        <source>MacOS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="50"/>
-        <source>NTS station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="51"/>
-        <source>Balloon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="52"/>
-        <source>Police car</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="53"/>
-        <source>TBD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="54"/>
-        <source>RV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="55"/>
-        <source>Shuttle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="56"/>
-        <source>SSTV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="57"/>
-        <source>Bus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="58"/>
-        <source>ATV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="59"/>
-        <source>Weather service</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="60"/>
-        <source>Helo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="61"/>
-        <source>Yacht</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="62"/>
-        <source>MS Windows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="63"/>
-        <source>Jogger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="64"/>
-        <source>Triangle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="65"/>
-        <source>PBBS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="66"/>
-        <source>Plane large</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="67"/>
-        <source>Weather station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="68"/>
-        <source>Dish antenna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="69"/>
-        <source>Ambulance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="70"/>
-        <source>Bike</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="71"/>
-        <source>ICP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="72"/>
-        <source>Fire station</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="73"/>
-        <source>Horse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="74"/>
-        <source>Fire truck</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="75"/>
-        <source>Glider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="76"/>
-        <source>Hospital</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="77"/>
-        <source>IOTA</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="78"/>
-        <source>Jeep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="79"/>
-        <source>Truck small</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="80"/>
-        <source>Laptop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="81"/>
-        <source>Mic-E</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="82"/>
-        <source>Node</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="83"/>
-        <source>EOC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="84"/>
-        <source>Rover</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="85"/>
-        <source>Grid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="86"/>
-        <source>Antenna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="87"/>
-        <source>Power boat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="88"/>
-        <source>Truck stop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="89"/>
-        <source>Truck large</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="90"/>
-        <source>Van</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="91"/>
-        <source>Water</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="92"/>
-        <source>XAPRS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="93"/>
-        <source>Yagi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.cc" line="94"/>
-        <source>Shelter</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2885,14 +2836,6 @@
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RepeaterBookList</name>
-    <message>
-        <location filename="../src/repeaterbookcompleter.cc" line="261"/>
-        <source>%1 (%2, %3, %4)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3343,7 +3286,6 @@
     <message>
         <location filename="../src/searchpopup.cc" line="94"/>
         <location filename="../src/searchpopup.cc" line="109"/>
-        <location filename="../src/searchpopup.cc" line="121"/>
         <source>%1/%2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3701,19 +3643,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="75"/>
-        <location filename="../src/aprssystemdialog.ui" line="113"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/aprssystemdialog.ui" line="94"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="103"/>
-        <source>WIDE3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3734,11 +3665,6 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="153"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="169"/>
-        <source>s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
