@@ -54,13 +54,11 @@ DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const Q
 
 bool
 DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::channelCount() && j<channelCount(); i++) {
     ChannelElement ch = channel(i);
-    if (! ch.isValid()) {
-      errMsg(err) << "Cannot decode invalid channel at index " << i
-                  << ", got promissed " << channelCount() << " valid channels.";
-      return false;
-    }
+    if (! ch.isValid())
+      continue;
+    j++;
     Channel *obj = ch.toChannelObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode channel at index " << i << ".";
@@ -78,8 +76,11 @@ DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err
 
 bool
 DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::channelCount() && j<channelCount(); i++) {
     ChannelElement ch = channel(i);
+    if (! ch.isValid())
+      continue;
+    j++;
     if (! ctx.has<Channel>(ch.index())) {
       errMsg(err) << "Cannot link channel at index " << i
                   << ". Channel not defined.";
