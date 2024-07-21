@@ -141,7 +141,7 @@
               <string>Off</string>
              </property>
              <property name="suffix">
-              <string extracomment="Transmit time out (TOT) in seconds. A value of 0 means disabled."> s</string>
+              <string notr="true" extracomment="Transmit time out (TOT) in seconds. A value of 0 means disabled."> s</string>
              </property>
              <property name="maximum">
               <number>9999</number>

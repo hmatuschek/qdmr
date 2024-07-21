@@ -17,14 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>qdmr [*]</string>
+   <string notr="true">qdmr [*]</string>
   </property>
   <property name="windowIcon">
    <iconset theme="qdmr">
     <normaloff>.</normaloff>.</iconset>
-  </property>
-  <property name="accessibleName">
-   <string>Main window</string>
   </property>
   <property name="documentMode">
    <bool>true</bool>
@@ -70,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
