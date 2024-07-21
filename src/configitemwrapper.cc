@@ -296,7 +296,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->scanList()) {
       return channel->scanList()->name();
     } else {
-      return tr("-");
+      return QString("-");
     }
   case 9: { // Collect zones, the channel is a member of
       QStringList zones;
@@ -326,7 +326,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if (digi->groupListObj()) {
         return digi->groupListObj()->name();
       } else {
-        return tr("-");
+        return QString("-");
       }
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
@@ -337,7 +337,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if (digi->txContactObj())
         return digi->txContactObj()->name();
       else
-        return tr("-");
+        return QString("-");
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
@@ -356,18 +356,18 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if (digi->aprsObj())
         return digi->aprsObj()->name();
       else
-        return tr("-");
+        return QString("-");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (analog->aprsSystem())
         return analog->aprsSystem()->name();
       else
-        return tr("-");
+        return QString("-");
     }
     break;
   case 16:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
       if (nullptr == digi->roamingZone())
-        return tr("-");
+        return QString("-");
       else if (DefaultRoamingZone::get() == digi->roamingZone())
         return tr("[Default]");
       return digi->roamingZone()->name();
@@ -713,7 +713,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     else if (sys->is<APRSSystem>())
       return tr("APRS");
     else
-      return tr("OOps!");
+      return QString("Oops!");
   case 1:
     return sys->name();
   case 2:
@@ -722,7 +722,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
         return tr("[None]");
       return sys->as<GPSSystem>()->contactObj()->name();
     } else if (sys->is<APRSSystem>())
-      return tr("%1-%2").arg(sys->as<APRSSystem>()->destination())
+      return QString("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
     break;
   case 3:
@@ -734,7 +734,7 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return sys->as<GPSSystem>()->revertChannel()->name();
     } else if (sys->is<APRSSystem>())
       return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
-                sys->as<APRSSystem>()->revertChannel()->name() : tr("OOPS!"));
+                sys->as<APRSSystem>()->revertChannel()->name() : QString("Oops!"));
     break;
   case 5:
     if (sys->is<GPSSystem>())
