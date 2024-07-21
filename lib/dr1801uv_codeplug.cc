@@ -3269,9 +3269,16 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
 
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
-  // There can only be one DMR radio ID
-  if (! config->settings()->defaultIdRef()->isNull())
-    ctx.add(config->settings()->defaultId(), 0);
+  // There must be a default DMR radio ID.
+  if (nullptr == ctx.config()->settings()->defaultId()) {
+    errMsg(err) << "No default DMR radio ID specified.";
+    errMsg(err) << "Cannot index codplug for encoding for the BTECH DR-1801UV.";
+    return false;
+  }
+
+  // Map radio IDs
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
+    ctx.add(ctx.config()->radioIDs()->getId(i), i);
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {
