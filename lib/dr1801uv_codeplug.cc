@@ -54,13 +54,11 @@ DR1801UVCodeplug::ChannelBankElement::setChannelName(unsigned int index, const Q
 
 bool
 DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::channelCount() && j<channelCount(); i++) {
     ChannelElement ch = channel(i);
-    if (! ch.isValid()) {
-      errMsg(err) << "Cannot decode invalid channel at index " << i
-                  << ", got promissed " << channelCount() << " valid channels.";
-      return false;
-    }
+    if (! ch.isValid())
+      continue;
+    j++;
     Channel *obj = ch.toChannelObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode channel at index " << i << ".";
@@ -78,8 +76,11 @@ DR1801UVCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err
 
 bool
 DR1801UVCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<channelCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::channelCount() && j<channelCount(); i++) {
     ChannelElement ch = channel(i);
+    if (! ch.isValid())
+      continue;
+    j++;
     if (! ctx.has<Channel>(ch.index())) {
       errMsg(err) << "Cannot link channel at index " << i
                   << ". Channel not defined.";
@@ -844,13 +845,11 @@ DR1801UVCodeplug::GroupListBankElement::groupList(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<groupListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::groupListCount() && j<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
-    if (! gl.isValid()) {
-      errMsg(err) << "Cannot decode invalid group list at index " << i
-                  << ". Got " << groupListCount() << " valid group lists promissed.";
-      return false;
-    }
+    if (! gl.isValid())
+      continue;
+    j++;
     RXGroupList *obj = gl.toGroupListObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode group list at index " << i << ".";
@@ -866,8 +865,11 @@ DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &e
 
 bool
 DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<groupListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::groupListCount() && j<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
+    if (! gl.isValid())
+      continue;
+    j++;
     if (! ctx.has<RXGroupList>(gl.index())) {
       errMsg(err) << "Cannot link group list at index " << i
                   << ". Group list not defined.";
@@ -1052,13 +1054,11 @@ DR1801UVCodeplug::ZoneBankElement::zone(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<zoneCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::zoneCount() && j<zoneCount(); i++) {
     ZoneElement zone(this->zone(i));
-    if (! zone.isValid()) {
-      errMsg(err) << "Unexpected invalid zone at index " << i
-                  << ", was promissed " << zoneCount() << " zones.";
-      return false;
-    }
+    if (! zone.isValid())
+      continue;
+    j++;
 
     Zone *obj = zone.toZoneObj(ctx, err);
     if (nullptr == obj) {
@@ -1077,13 +1077,11 @@ DR1801UVCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) c
 
 bool
 DR1801UVCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<zoneCount(); i++) {
+  for (unsigned int i=0, j=0; i<Limit::zoneCount() && j<zoneCount(); i++) {
     ZoneElement zone(this->zone(i));
-    if (! zone.isValid()) {
-      errMsg(err) << "Unexpected invalid zone at index " << i
-                  << ", was promissed " << zoneCount() << " zones.";
-      return false;
-    }
+    if (! zone.isValid())
+      continue;
+    j++;
 
     if (! ctx.has<Zone>(zone.index())) {
       errMsg(err) << "Cannot link zone at index " << i << ", not defined.";
@@ -1672,13 +1670,11 @@ DR1801UVCodeplug::ScanListBankElement::scanList(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<scanListCount(); i++) {
+  for (unsigned int i=0, j=0; i<Limit::scanListCount() && j<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
-    if (! sl.isValid()) {
-      errMsg(err) << "Cannot decode invalid scan list at index " << i
-                  << ". Was promissed " << scanListCount() << " scan lists.";
-      return false;
-    }
+    if (! sl.isValid())
+      continue;
+    j++;
     ScanList *obj = sl.toScanListObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode scan list at index " << i << ".";
@@ -1694,13 +1690,11 @@ DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &er
 
 bool
 DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<scanListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::scanListCount() && j<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
-    if (! sl.isValid()) {
-      errMsg(err) << "Cannot link invalid scan list at index " << i
-                  << ". Was promissed " << scanListCount() << " scan lists.";
-      return false;
-    }
+    if (! sl.isValid())
+      continue;
+    j++;
     if (! ctx.has<ScanList>(sl.index())) {
       errMsg(err) << "Cannot link scan list at index " << i
                   << ". Scan list not defined.";
@@ -1975,10 +1969,11 @@ DR1801UVCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err
 
   ctx.config()->smsExtension()->smsTemplates()->clear();
 
-  for (unsigned int i=0; i<messageCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::messageCount() && j<messageCount(); i++) {
     MessageElement msg = message(i);
     if (! msg.isValid())
       continue;
+    j++;
     SMSTemplate *sms = new SMSTemplate();
     sms->setName(QString("Message %1").arg(msg.index()));
     sms->setMessage(msg.text());
@@ -2214,7 +2209,7 @@ DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStac
     ctx.add(obj, key(i).index());
     ctx.config()->commercialExtension()->encryptionKeys()->add(obj);
   }
-  return false;
+  return true;
 }
 
 bool
@@ -3269,8 +3264,16 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
 
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
-  // There can only be one DMR radio ID
-  ctx.add(config->settings()->defaultId(), 0);
+  // There must be a default DMR radio ID.
+  if (nullptr == ctx.config()->settings()->defaultId()) {
+    errMsg(err) << "No default DMR radio ID specified.";
+    errMsg(err) << "Cannot index codplug for encoding for the BTECH DR-1801UV.";
+    return false;
+  }
+
+  // Map radio IDs
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
+    ctx.add(ctx.config()->radioIDs()->getId(i), i);
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {

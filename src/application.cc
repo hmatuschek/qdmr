@@ -709,6 +709,7 @@ void
 Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   _config->clear();
   _mainWindow->setWindowModified(false);
+
   ErrorStack err;
   if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
@@ -719,7 +720,7 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     _config->clear();
   }
 
-  if (! radio->codeplug().postprocess(_config, err)) {
+  if (! codeplug->postprocess(_config, err)) {
     ErrorMessageView(err).exec();
     _config->clear();
   }

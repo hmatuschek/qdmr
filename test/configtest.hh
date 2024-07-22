@@ -26,7 +26,7 @@ private slots:
 
   void testMelodyLilypond();
   void testMelodyEncoding();
-  void testMelodyDecoding();
+  void testMelodyDecoding(); 
 
 protected:
   QTextStream _stderr;
