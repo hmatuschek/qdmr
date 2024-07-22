@@ -17,14 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>qdmr [*]</string>
+   <string notr="true">qdmr [*]</string>
   </property>
   <property name="windowIcon">
    <iconset theme="qdmr">
     <normaloff>.</normaloff>.</iconset>
-  </property>
-  <property name="accessibleName">
-   <string>Main window</string>
   </property>
   <property name="documentMode">
    <bool>true</bool>
@@ -70,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -80,6 +77,8 @@
     <addaction name="actionNewCodeplug"/>
     <addaction name="actionOpenCodeplug"/>
     <addaction name="actionSaveCodeplug"/>
+    <addaction name="actionExportToCHIRP"/>
+    <addaction name="actionImport"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -326,6 +325,22 @@
    </property>
    <property name="toolTip">
     <string>Refreshes the downloaded talkgroup DB</string>
+   </property>
+  </action>
+  <action name="actionExportToCHIRP">
+   <property name="text">
+    <string>Export to CHIRP ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Exports all FM channels to CHRIP CSV.</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Imports and merges a codeplug into the current one.</string>
    </property>
   </action>
  </widget>

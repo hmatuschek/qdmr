@@ -118,7 +118,7 @@ SearchPopup::onPrevious() {
   QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(parent());
   if (0 == _currentMatch)
     _currentMatch = _matches.count()-1;
-  _label->setText(tr("%1/%2").arg(_currentMatch+1).arg(_matches.count()));
+  _label->setText(QString("%1/%2").arg(_currentMatch+1).arg(_matches.count()));
   itemView->setCurrentIndex(_matches.at(_currentMatch));
 }
 

@@ -38,7 +38,7 @@ class FixReferencesVisistor: public Visitor
 {
 public:
   /** Constructor. */
-  FixReferencesVisistor(QHash<ConfigObject *, ConfigObject*> &map);
+  FixReferencesVisistor(QHash<ConfigObject *, ConfigObject*> &map, bool keepUnknown=false);
 
   bool processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
   bool processList(AbstractConfigObjectList *list, const ErrorStack &err=ErrorStack());
@@ -46,6 +46,8 @@ public:
 protected:
   /** Reference to the translation table origial -> cloned object. */
   QHash<ConfigObject *, ConfigObject*> &_map;
+  /** If false, an unmapped reference is an error. */
+  bool _keepUnknown;
 };
 
 /** Just a name space to hold the copy function. */

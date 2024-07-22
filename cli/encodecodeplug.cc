@@ -9,6 +9,7 @@
 #include "config.hh"
 #include "radioinfo.hh"
 #include "rd5r_codeplug.hh"
+#include "gd73_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
 #include "openrtx_codeplug.hh"
@@ -20,6 +21,7 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dr1801uv_codeplug.hh"
 #include "crc32.hh"
 
 
@@ -126,6 +128,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (! encode<RD5RCodeplug>(config, flags, parser))
       return -1;
     break;
+  case RadioInfo::GD73:
+    if (! encode<GD73Codeplug>(config, flags, parser))
+      return -1;
+    break;
   case RadioInfo::GD77:
     if (! encode<GD77Codeplug>(config, flags, parser))
       return -1;
@@ -156,6 +162,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::DMR6X2UV:
     if (! encode<DMR6X2UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DR1801UV:
+    if (! encode<DR1801UVCodeplug>(config, flags, parser))
       return -1;
     break;
   default:

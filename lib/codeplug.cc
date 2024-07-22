@@ -35,6 +35,13 @@ Codeplug::Element::~Element() {
   // pass...
 }
 
+Codeplug::Element &
+Codeplug::Element::operator =(const Element &other) {
+  this->_data = other._data;
+  this->_size = other._size;
+  return *this;
+}
+
 bool
 Codeplug::Element::isValid() const {
   return nullptr != _data;
@@ -59,6 +66,11 @@ Codeplug::Element::fill(uint8_t value, unsigned offset, int size) {
 }
 
 bool
+Codeplug::Element::getBit(const Offset::BitOffset &offset) const {
+  return getBit(offset.byte, offset.bit);
+}
+
+bool
 Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
   if (offset >= _size) {
     logFatal() << "Cannot get bit at " << QString::number(offset, 16)
@@ -70,6 +82,10 @@ Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
   return (1<<bit) & (*ptr);
 }
 
+void
+Codeplug::Element::setBit(const Offset::BitOffset &offset, bool value) {
+  setBit(offset.byte, offset.bit, value);
+}
 void
 Codeplug::Element::setBit(unsigned offset, unsigned bit, bool value) {
   if (offset >= _size) {
@@ -599,6 +615,7 @@ Codeplug::Context::Context(Config *config)
   addTable(&APRSSystem::staticMetaObject);
   addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
+  addTable(&SMSTemplate::staticMetaObject);
 }
 
 Config  *

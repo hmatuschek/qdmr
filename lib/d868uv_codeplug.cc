@@ -3,6 +3,7 @@
 #include "utils.hh"
 #include "channel.hh"
 #include "gpssystem.hh"
+#include "smsextension.hh"
 #include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
@@ -13,38 +14,37 @@
 #include <QtEndian>
 #include <QSet>
 
-using namespace Signaling;
 /* ******************************************************************************************** *
  * Implementation of D868UVCodeplug::CTCSS
  * ******************************************************************************************** */
 Signaling::Code
 D868UVCodeplug::CTCSS::_codeTable[] = {
-  SIGNALING_NONE, // 62.5 not supported
-  CTCSS_67_0Hz,  SIGNALING_NONE, // 69.3 not supported
-  CTCSS_71_9Hz,  CTCSS_74_4Hz,  CTCSS_77_0Hz,  CTCSS_79_7Hz,  CTCSS_82_5Hz,
-  CTCSS_85_4Hz,  CTCSS_88_5Hz,  CTCSS_91_5Hz,  CTCSS_94_8Hz,  CTCSS_97_4Hz,  CTCSS_100_0Hz,
-  CTCSS_103_5Hz, CTCSS_107_2Hz, CTCSS_110_9Hz, CTCSS_114_8Hz, CTCSS_118_8Hz, CTCSS_123_0Hz,
-  CTCSS_127_3Hz, CTCSS_131_8Hz, CTCSS_136_5Hz, CTCSS_141_3Hz, CTCSS_146_2Hz, CTCSS_151_4Hz,
-  CTCSS_156_7Hz,
-  SIGNALING_NONE, // 159.8 not supported
-  CTCSS_162_2Hz,
-  SIGNALING_NONE, // 165.5 not supported
-  CTCSS_167_9Hz,
-  SIGNALING_NONE, // 171.3 not supported
-  CTCSS_173_8Hz,
-  SIGNALING_NONE, // 177.3 not supported
-  CTCSS_179_9Hz,
-  SIGNALING_NONE, // 183.5 not supported
-  CTCSS_186_2Hz,
-  SIGNALING_NONE, // 189.9 not supported
-  CTCSS_192_8Hz,
-  SIGNALING_NONE, SIGNALING_NONE, // 196.6 & 199.5 not supported
-  CTCSS_203_5Hz,
-  SIGNALING_NONE, // 206.5 not supported
-  CTCSS_210_7Hz, CTCSS_218_1Hz, CTCSS_225_7Hz,
-  SIGNALING_NONE, // 229.1 not supported
-  CTCSS_233_6Hz, CTCSS_241_8Hz, CTCSS_250_3Hz,
-  SIGNALING_NONE, SIGNALING_NONE // 254.1 and custom CTCSS not supported.
+  Signaling::SIGNALING_NONE, // 62.5 not supported
+  Signaling::CTCSS_67_0Hz,  Signaling::SIGNALING_NONE, // 69.3 not supported
+  Signaling::CTCSS_71_9Hz,  Signaling::CTCSS_74_4Hz,  Signaling::CTCSS_77_0Hz,  Signaling::CTCSS_79_7Hz,  Signaling::CTCSS_82_5Hz,
+  Signaling::CTCSS_85_4Hz,  Signaling::CTCSS_88_5Hz,  Signaling::CTCSS_91_5Hz,  Signaling::CTCSS_94_8Hz,  Signaling::CTCSS_97_4Hz,  Signaling::CTCSS_100_0Hz,
+  Signaling::CTCSS_103_5Hz, Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz, Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz,
+  Signaling::CTCSS_127_3Hz, Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz, Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz,
+  Signaling::CTCSS_156_7Hz,
+  Signaling::SIGNALING_NONE, // 159.8 not supported
+  Signaling::CTCSS_162_2Hz,
+  Signaling::SIGNALING_NONE, // 165.5 not supported
+  Signaling::CTCSS_167_9Hz,
+  Signaling::SIGNALING_NONE, // 171.3 not supported
+  Signaling::CTCSS_173_8Hz,
+  Signaling::SIGNALING_NONE, // 177.3 not supported
+  Signaling::CTCSS_179_9Hz,
+  Signaling::SIGNALING_NONE, // 183.5 not supported
+  Signaling::CTCSS_186_2Hz,
+  Signaling::SIGNALING_NONE, // 189.9 not supported
+  Signaling::CTCSS_192_8Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, // 196.6 & 199.5 not supported
+  Signaling::CTCSS_203_5Hz,
+  Signaling::SIGNALING_NONE, // 206.5 not supported
+  Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz, Signaling::CTCSS_225_7Hz,
+  Signaling::SIGNALING_NONE, // 229.1 not supported
+  Signaling::CTCSS_233_6Hz, Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz,
+  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE // 254.1 and custom CTCSS not supported.
 };
 
 uint8_t
@@ -1277,7 +1277,6 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateGPSSystems();
 
-  this->allocateSMSMessages();
   this->allocateHotKeySettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
@@ -1305,6 +1304,7 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateRXGroupLists();
   this->allocateScanLists();
   this->allocateRadioIDs();
+  this->allocateSMSMessages();
 }
 
 void
@@ -1322,6 +1322,7 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateZoneChannelList();
   this->allocateBootSettings();
   this->allocateRepeaterOffsetFrequencies();
+  this->allocateSMSMessages();
 
   // GPS settings
   this->allocateGPSSystems();
@@ -1397,6 +1398,11 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   ScanListBitmapElement scan_bitmap(data(Offset::scanListBitmap()));
   unsigned int num_scan_lists = std::min(Limit::numScanLists(), ctx.count<ScanList>());
   scan_bitmap.clear(); scan_bitmap.enableFirst(num_scan_lists);
+
+  // Mark SMS messages
+  MessageBytemapElement sms_bytemap(data(Offset::messageBytemap()));
+  unsigned int num_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
+  sms_bytemap.clear(); sms_bytemap.enableFirst(num_messages);
 }
 
 
@@ -1407,6 +1413,9 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
     return false;
 
   if (! this->encodeGeneralSettings(flags, ctx, err))
+    return false;
+
+  if (! this->encodeSMSMessages(flags, ctx, err))
     return false;
 
   if (! this->encodeRepeaterOffsetFrequencies(flags, ctx, err))
@@ -1446,6 +1455,9 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
     return false;
 
   if (! this->decodeGeneralSettings(ctx, err))
+    return false;
+
+  if (! this->createSMSMessages(ctx, err))
     return false;
 
   if (! this->decodeRepeaterOffsetFrequencies(ctx, err))
@@ -2142,6 +2154,53 @@ D868UVCodeplug::allocateSMSMessages() {
     image(0).addElement(Offset::messageIndex(), Size::messageIndex()*message_count);
   }
 }
+
+bool
+D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+  for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
+    unsigned int addr =
+        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
+        + i*MessageElement::size();
+    MessageElement message(data(addr));
+    message.setMessage(ctx.get<SMSTemplate>(i)->message());
+    MessageListElement listElement(data(Offset::messageIndex() + i*Size::messageIndex()));
+    listElement.setIndex(i);
+    if (i > 0) {
+      MessageListElement prevElement(data(Offset::messageIndex() + (i-1)*Size::messageIndex()));
+      prevElement.setIndex(i);
+    }
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::createSMSMessages(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  MessageBytemapElement messages_bytemap(data(Offset::messageBytemap()));
+  for (unsigned int i=0; i<Limit::numMessages(); i++) {
+    if (! messages_bytemap.isEncoded(i))
+      continue;
+    unsigned int addr =
+        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
+        + i*MessageElement::size();
+    MessageElement message(data(addr));
+    SMSTemplate *temp = new SMSTemplate();
+    temp->setName(QString("SMS %1").arg(i+1));
+    temp->setMessage(message.message());
+    ctx.config()->smsExtension()->smsTemplates()->add(temp);
+    ctx.add(temp, i);
+  }
+  return true;
+}
+
+bool
+D868UVCodeplug::linkSMSMessages(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // nothing to do
+  return true;
+}
+
 
 void
 D868UVCodeplug::allocateHotKeySettings() {

@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
+#include <QRegularExpression>
 #include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
@@ -13,6 +14,12 @@ inline bool qstring_is_ascii(const QString &text) {
   }
   return true;
 }
+
+// Utility function to check string content for DTMF encoding
+inline bool qstring_is_dtmf(const QString &text) {
+  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).isValid();
+}
+
 
 
 /* ********************************************************************************************* *
@@ -209,6 +216,9 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   if ((ASCII == _encoding) && (! qstring_is_ascii(value))) {
     auto &msg = context.newMessage();
     msg << "Cannot encode string '" << value << "' in ASCII.";
+  } else if ((DTMF == _encoding) && (! qstring_is_dtmf(value))) {
+    auto &msg = context.newMessage();
+    msg << "Cannot encode string '" << value << "' in DTMF.";
   }
 
   return true;
@@ -422,21 +432,23 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
     return false;
   }
 
+  if (0 == _frequencyRanges.size())
+    return true;
+
   Frequency value = prop.read(item).value<Frequency>();
   foreach (const FrequencyRange &range, _frequencyRanges) {
     if (range.contains(value))
       return true;
   }
 
-  if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size()) || _warnOnly) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges or "
-        << "range cannot be determined.";
+  if (context.ignoreFrequencyLimits())
     return true;
-  }
 
-  auto &msg = context.newMessage(RadioLimitIssue::Critical);
+  auto &msg = context.newMessage(RadioLimitIssue::Warning);
   msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges.";
+
+  if(_warnOnly)
+    return true;
   return false;
 }
 
@@ -795,7 +807,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   if ((0 <= _maxSize) && (_maxSize < plist->count())) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "List '" << prop.name() << "' takes at most " << _minSize
+    msg << "List '" << prop.name() << "' takes at most " << _maxSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }
@@ -855,7 +867,7 @@ RadioLimitGroupCallRefList::verify(const ConfigItem *item, const QMetaProperty &
 
   if ((0 <= _maxSize) && (_maxSize < plist->count())) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "List '" << prop.name() << "' takes at most " << _minSize
+    msg << "List '" << prop.name() << "' takes at most " << _maxSize
         << " elements, " << plist->count() << " elements found.";
     return false;
   }

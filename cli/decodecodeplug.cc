@@ -21,6 +21,8 @@
 #include "rd5r_filereader.hh"
 #include "gd77_codeplug.hh"
 #include "gd77_filereader.hh"
+#include "gd73_codeplug.hh"
+#include "gd73_filereader.hh"
 #include "opengd77_codeplug.hh"
 #include "openrtx_codeplug.hh"
 #include "anytone_filereader.hh"
@@ -29,6 +31,8 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dr1801uv_codeplug.hh"
+#include "dr1801uv_filereader.hh"
 
 template <class Cpl, class Rdr>
 bool decode(Config &config, const QString &filename, QCommandLineParser &parser, const ErrorStack &err=ErrorStack()) {
@@ -63,7 +67,6 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     parser.showHelp(-1);
 
   QString filename = parser.positionalArguments().at(1);
-  QString errorMessage;
   ErrorStack err;
 
   if (! parser.isSet("radio")) {
@@ -109,6 +112,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
     } break;
+  case RadioInfo::GD73:
+    if (! decode<GD73Codeplug, GD73FileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
   case RadioInfo::GD77:
     if (! decode<GD77Codeplug, GD77FileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
@@ -146,6 +154,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::DMR6X2UV:
     if (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::DR1801UV:
+    if (! decode<DR1801UVCodeplug, DR1801UVFileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
     } break;

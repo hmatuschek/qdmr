@@ -55,8 +55,8 @@
  *  <tr><td>0x0af10</td> <td>0x0b1b0</td> <td>0x02a0</td> <td>??? Unknown ???</td></tr>
  *  <tr><td>0x0b1b0</td> <td>0x17620</td> <td>0xc470</td> <td>Remaining 896 channels (bank 1-7), see @c RadioddityCodeplug::ChannelBankElement, @c GD77Codeplug::ChannelElement.</td></tr>
  *  <tr><td>0x17620</td> <td>0x1d620</td> <td>0x6000</td> <td>1024 contacts, see @c GD77Codeplug::ContactElement.</td></tr>
- *  <tr><td>0x1d620</td> <td>0x1e2a0</td> <td>0x0c80</td> <td>64 RX group lists, see @c GD77Codeplug::GroupListBankElement, @c GD77Codeplug::GroupListElement.</td></tr>
- *  <tr><td>0x1e2a0</td> <td>0x1e300</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
+ *  <tr><td>0x1d620</td> <td>0x1eaa0</td> <td>0x1480</td> <td>64 RX group lists, see @c GD77Codeplug::GroupListBankElement, @c GD77Codeplug::GroupListElement.</td></tr>
+ *  <tr><td>0x1eaa0</td> <td>0x1eb00</td> <td>0x0060</td> <td>??? Unknown ???</td></tr>
  * </table>
  * @ingroup gd77 */
 class GD77Codeplug: public RadioddityCodeplug
@@ -174,6 +174,16 @@ public:
   public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
+
+    /** Size of the group list element. */
+    static constexpr unsigned int size() { return 0x0050; }
+
+  public:
+    /** Limits of the element. */
+    struct Limit: public RadioddityCodeplug::GroupListElement::Limit {
+      /** Maximum member count. */
+      static constexpr unsigned int memberCount() { return 32; }
+    };
   };
 
   /** Table of RX group lists.
@@ -194,6 +204,9 @@ public:
   public:
     /** Constructor. */
     GroupListBankElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x1480; }
 
     uint8_t *get(unsigned n) const;
   };
@@ -245,7 +258,12 @@ public:
   bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
+  bool encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+
   void clearMessages();
+  bool encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
   bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -288,6 +306,15 @@ public:
   bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
   bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
   bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+
+protected:
+  /** Internal used offsets within the codeplug. */
+  struct Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int buttonSettings()                          { return 0x000108; }
+    static constexpr unsigned int messages()                                { return 0x000128; }
+    /// @endcond
+  };
 };
 
 #endif // GD77_CODEPLUG_HH

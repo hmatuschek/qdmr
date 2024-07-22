@@ -1,7 +1,7 @@
 SET(qdmr_SOURCES main.cc
   configitemwrapper.cc
   application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
-	analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
+  analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
   ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc
@@ -11,11 +11,11 @@ SET(qdmr_SOURCES main.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
   deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
-  repeaterbookcompleter.cc m17contactdialog.cc m17channeldialog.cc)
+  m17contactdialog.cc m17channeldialog.cc configmergedialog.cc repeaterbookcompleter.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
-	analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
+  analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
   ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
   aprssystemdialog.hh releasenotes.hh searchpopup.hh
@@ -26,7 +26,7 @@ SET(qdmr_MOC_HEADERS
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
   deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
-  repeaterbookcompleter.hh m17contactdialog.hh m17channeldialog.hh)
+  repeaterbookcompleter.hh m17contactdialog.hh m17channeldialog.hh configmergedialog.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui
@@ -37,7 +37,7 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
   deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui
-  m17contactdialog.ui m17channeldialog.ui)
+  m17contactdialog.ui m17channeldialog.ui configmergedialog.ui)
 
 set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})

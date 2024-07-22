@@ -215,6 +215,10 @@ class FMChannel: public AnalogChannel
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
   /** The squelch level of the channel [1-10]. */
   Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
+  /** The RX tone (CTCSS/DSC). */
+  Q_PROPERTY(Signaling::Code rxTone READ rxTone WRITE setRXTone SCRIPTABLE false)
+  /** The TX tone (CTCSS/DSC). */
+  Q_PROPERTY(Signaling::Code txTone READ txTone WRITE setTXTone SCRIPTABLE false)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
@@ -251,9 +255,9 @@ public:
   void clear();
 
   /** Returns the admit criterion for the analog channel. */
-	Admit admit() const;
+  Admit admit() const;
   /** (Re-)Sets the admit criterion for the analog channel. */
-	void setAdmit(Admit admit);
+  void setAdmit(Admit admit);
 
   /** Returns @c true if the global default squelch level is used. */
   bool defaultSquelch() const;
@@ -278,9 +282,9 @@ public:
   bool setTXTone(Signaling::Code code);
 
   /** Returns the bandwidth of the analog channel. */
-	Bandwidth bandwidth() const;
+  Bandwidth bandwidth() const;
   /** (Re-)Sets the bandwidth of the analog channel. */
-	bool setBandwidth(Bandwidth bw);
+  bool setBandwidth(Bandwidth bw);
 
   /** Returns the reference to the APRS system. */
   const APRSSystemReference *aprs() const;

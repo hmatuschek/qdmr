@@ -3,13 +3,17 @@
 #include "anytone_interface.hh"
 #include "radioddity_interface.hh"
 #include "tyt_interface.hh"
+#include "dr1801uv_interface.hh"
+#include "gd73_interface.hh"
 
 #include "rd5r.hh"
+#include "gd73.hh"
 #include "gd77.hh"
 #include "md390.hh"
 #include "uv390.hh"
 #include "md2017.hh"
 #include "dm1701.hh"
+#include "dr1801uv.hh"
 #include "opengd77.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
@@ -82,7 +86,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     anytone->deleteLater();
-    return nullptr;
   } else if (OpenGD77Interface::interfaceInfo() == descr) {
     OpenGD77Interface *ogd77 = new OpenGD77Interface(descr, err);
     if (ogd77->isOpen()) {
@@ -98,7 +101,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     ogd77->deleteLater();
-    return nullptr;
   } else if (TyTInterface::interfaceInfo() == descr) {
     TyTInterface *dfu = new TyTInterface(descr, err);
     if (dfu->isOpen()) {
@@ -121,7 +123,6 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     dfu->deleteLater();
-    return nullptr;
   } else if (RadioddityInterface::interfaceInfo() == descr) {
     RadioddityInterface *hid = new RadioddityInterface(descr, err);
     if (hid->isOpen()) {
@@ -130,16 +131,52 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new RD5R(hid);
       } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
-      } else {
+      } else if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device not known.";
       }
       hid->close();
       hid->deleteLater();
       return nullptr;
     }
     hid->deleteLater();
-    return nullptr;
+  } else if (DR1801UVInterface::interfaceInfo() == descr) {
+    DR1801UVInterface *dif = new DR1801UVInterface(descr, err);
+    if (dif->isOpen()) {
+      RadioInfo id = dif->identifier(err);
+      if (((id.isValid()) && (RadioInfo::DR1801UV == id.id())) ||
+          (force.isValid() && (RadioInfo::DR1801UV==force.id()))) {
+        return new DR1801UV(dif);
+      } else if (id.isValid()) {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Unknown device or failed connection to the device.";
+      }
+      dif->close();
+      dif->deleteLater();
+      return nullptr;
+    }
+    dif->deleteLater();
+  } else if (C7000Device::interfaceInfo() == descr) {
+    GD73Interface *gdif = new GD73Interface(descr, err);
+    if (gdif->isOpen()) {
+      RadioInfo id = gdif->identifier();
+      if ((id.isValid() && (RadioInfo::GD73 == id.id())) ||
+          (force.isValid() && (RadioInfo::GD73 == force.id()))) {
+        return new GD73(gdif);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      }
+      gdif->close();
+      gdif->deleteLater();
+      return nullptr;
+    }
+    gdif->deleteLater();
   }
   return nullptr;
 }

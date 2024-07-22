@@ -1158,6 +1158,16 @@ AbstractConfigObjectList::findItemsOfTypes(const QStringList &typeNames, QSet<Co
   }
 }
 
+QList<ConfigObject *>
+AbstractConfigObjectList::findItemsByName(const QString name) const {
+  QList<ConfigObject *> items;
+  foreach (ConfigObject *obj, _items) {
+    if (obj->name() == name)
+      items.append(obj);
+  }
+  return items;
+}
+
 bool
 AbstractConfigObjectList::has(ConfigObject *obj) const {
   return 0 <= indexOf(obj);
@@ -1293,6 +1303,24 @@ AbstractConfigObjectList::moveDown(int first, int last) {
     return false;
   for (int row=last; row>=first; row--)
     std::swap(_items[row+1], _items[row]);
+  return true;
+}
+
+bool
+AbstractConfigObjectList::move(int source, int count, int destination) {
+  if ((0 == count) || (source == destination))
+    return true;
+  if ((source+count)>_items.size())
+    return false;
+  if (source > destination) {
+    // move up
+    for (int take=source, put=destination, i=0; i<count; i++, take++, put++)
+      _items.insert(put, _items.takeAt(take));
+  } else {
+    // move down
+    for (int i=0; i<count; i++)
+      _items.insert(destination-1, _items.takeAt(source));
+  }
   return true;
 }
 

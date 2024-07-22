@@ -12,6 +12,7 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
   ErrorStack err;
   Radio *radio = autoDetect(parser, app, err);
   if (nullptr == radio) {
+    logError() << "Cannot detect radio: \n" << err.format("  ");
     return -1;
   }
 

@@ -54,7 +54,10 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
               }},
             { "number", new RadioLimitUInt(0, 16777215) }
           } },
-        { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
+        { DTMFContact::staticMetaObject, 0, 128, new RadioLimitObject {
+            { "name", new RadioLimitString(1, 15, RadioLimitString::ASCII) },
+            { "number", new RadioLimitString(1, 14, RadioLimitString::DTMF) }
+          } }
       });
 
   /* Define limits for group lists. */

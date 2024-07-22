@@ -68,7 +68,8 @@ TyTInterface::interfaceInfo() {
 }
 
 QList<USBDeviceDescriptor>
-TyTInterface::detect() {
+TyTInterface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly);
   return DFUDevice::detect(USB_VID, USB_PID);
 }
 

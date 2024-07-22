@@ -126,7 +126,7 @@ D868UVCallsignDB::LimitsElement::setEndOfDB(unsigned addr) {
 }
 void
 D868UVCallsignDB::LimitsElement::setTotalSize(unsigned size) {
-  setEndOfDB(Offset::callsigns() + size);
+  setEndOfDB(D868UVCallsignDB::Offset::callsigns() + size);
 }
 
 unsigned

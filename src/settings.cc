@@ -62,6 +62,24 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
+RepeaterBookList::Region
+Settings::repeaterBookRegion() const {
+  return value("repeaterBookRegion", RepeaterBookList::Region::World).value<RepeaterBookList::Region>();
+}
+void
+Settings::setRepeaterBookRegion(RepeaterBookList::Region region) {
+  setValue("repeaterBookRegion", region);
+}
+
+bool
+Settings::disableAutoDetect() const {
+  return value("disableAutoDetect", false).toBool();
+}
+void
+Settings::setDisableAutoDetect(bool disable) {
+  setValue("disableAutoDetect", disable);
+}
+
 bool
 Settings::updateCodeplug() const {
   return value("updateCodeplug", true).toBool();
@@ -254,6 +272,26 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+ConfigMergeVisitor::ItemStrategy
+Settings::configMergeItemStrategy() const {
+  return (ConfigMergeVisitor::ItemStrategy)value(
+        "configMergeItemStrategy", (uint) ConfigMergeVisitor::ItemStrategy::Duplicate).toUInt();
+}
+void
+Settings::setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy) {
+  setValue("configMergeItemStrategy", (uint)strategy);
+}
+
+ConfigMergeVisitor::SetStrategy
+Settings::configMergeSetStrategy() const {
+  return (ConfigMergeVisitor::SetStrategy)value(
+        "configMergeSetStrategy", (uint) ConfigMergeVisitor::SetStrategy::Merge).toUInt();
+}
+void
+Settings::setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy) {
+  setValue("configMergeSetStrategy", (uint)strategy);
+}
+
 QByteArray
 Settings::mainWindowState() const {
   return value("mainWindowState", QByteArray()).toByteArray();
@@ -313,16 +351,21 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
 
+  switch (settings.repeaterBookRegion()) {
+  case RepeaterBookList::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
+  case RepeaterBookList::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
+  }
+
   connect(Ui::SettingsDialog::ignoreFrequencyLimits, SIGNAL(toggled(bool)),
           this, SLOT(onIgnoreFrequencyLimitsSet(bool)));
   connect(queryLocation, SIGNAL(toggled(bool)), this, SLOT(onSystemLocationToggled(bool)));
 
+  Ui::SettingsDialog::disableAutoDetect->setChecked(settings.disableAutoDetect());
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
   Ui::SettingsDialog::ignoreFrequencyLimits->setChecked(settings.ignoreFrequencyLimits());
-
 
   Ui::SettingsDialog::dbLimitEnable->setChecked(settings.limitCallSignDBEntries());
   if (! settings.limitCallSignDBEntries())
@@ -397,6 +440,11 @@ SettingsDialog::accept() {
   Settings settings;
   settings.setQueryPosition(queryLocation->isChecked());
   settings.setLocator(locatorEntry->text().simplified());
+  settings.setDisableAutoDetect(disableAutoDetect->isChecked());
+  if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())
+    settings.setRepeaterBookRegion(RepeaterBookList::World);
+  else
+    settings.setRepeaterBookRegion(RepeaterBookList::NorthAmerica);
   settings.setUpdateCodeplug(updateCodeplug->isChecked());
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());

@@ -268,11 +268,37 @@ void
 RD5RCodeplug::clearButtonSettings() {
   ButtonSettingsElement(data(Offset::buttons())).clear();
 }
+bool
+RD5RCodeplug::encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+  return ButtonSettingsElement(data(Offset::buttons())).encode(ctx, err);
+}
+bool
+RD5RCodeplug::decodeButtonSettings(Context &ctx, const ErrorStack &err) {
+  return ButtonSettingsElement(data(Offset::buttons())).decode(ctx, err);
+}
 
 void
 RD5RCodeplug::clearMessages() {
   MessageBankElement(data(Offset::messages())).clear();
 }
+bool
+RD5RCodeplug::encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).encode(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode preset messages.";
+    return false;
+  }
+  return true;
+}
+bool
+RD5RCodeplug::decodeMessages(Context &ctx, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode preset messages.";
+    return false;
+  }
+  return true;
+}
+
 
 void
 RD5RCodeplug::clearContacts() {

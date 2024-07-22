@@ -24,7 +24,8 @@ Config::Config(QObject *parent)
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
     _gpsSystems(new PositioningSystems(this)),
     _roamingChannels(new RoamingChannelList(this)), _roamingZones(new RoamingZoneList(this)),
-    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this))
+    _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this)),
+    _smsExtension(new SMSExtension(this))
 {
   connect(_settings, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(_radioIDs, SIGNAL(elementAdded(int)), this, SLOT(onConfigModified()));
@@ -56,6 +57,7 @@ Config::Config(QObject *parent)
   connect(_roamingZones, SIGNAL(elementModified(int)), this, SLOT(onConfigModified()));
 
   connect(_commercialExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+  connect(_smsExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
 }
 
 bool
@@ -274,6 +276,11 @@ Config::config() const {
 CommercialExtension *
 Config::commercialExtension() const {
   return _commercialExtension;
+}
+
+SMSExtension *
+Config::smsExtension() const {
+  return _smsExtension;
 }
 
 TyTConfigExtension *

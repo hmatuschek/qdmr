@@ -1,4 +1,5 @@
 #include "dm1701_limits.hh"
+#include "dm1701_codeplug.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -153,6 +154,24 @@ DM1701Limits::DM1701Limits(QObject *parent)
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
         } ) );
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList {
+           {BasicEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::basicKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{4}")}
+            }},
+           {AESEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::advancedKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{32}")}
+            }} }
+        }
+      });
 
   /* Ignore roaming zones. */
   add("roaming", new RadioLimitList(
