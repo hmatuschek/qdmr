@@ -1669,13 +1669,11 @@ DR1801UVCodeplug::ScanListBankElement::scanList(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<scanListCount(); i++) {
+  for (unsigned int i=0, j=0; i<Limit::scanListCount() && j<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
-    if (! sl.isValid()) {
-      errMsg(err) << "Cannot decode invalid scan list at index " << i
-                  << ". Was promissed " << scanListCount() << " scan lists.";
-      return false;
-    }
+    if (! sl.isValid())
+      continue;
+    j++;
     ScanList *obj = sl.toScanListObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode scan list at index " << i << ".";
@@ -1691,13 +1689,11 @@ DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &er
 
 bool
 DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<scanListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::scanListCount() && j<scanListCount(); i++) {
     ScanListElement sl = scanList(i);
-    if (! sl.isValid()) {
-      errMsg(err) << "Cannot link invalid scan list at index " << i
-                  << ". Was promissed " << scanListCount() << " scan lists.";
-      return false;
-    }
+    if (! sl.isValid())
+      continue;
+    j++;
     if (! ctx.has<ScanList>(sl.index())) {
       errMsg(err) << "Cannot link scan list at index " << i
                   << ". Scan list not defined.";
