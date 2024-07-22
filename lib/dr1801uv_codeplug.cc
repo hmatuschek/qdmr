@@ -1675,6 +1675,7 @@ DR1801UVCodeplug::ScanListBankElement::decode(Context &ctx, const ErrorStack &er
     if (! sl.isValid())
       continue;
     j++;
+
     ScanList *obj = sl.toScanListObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode scan list at index " << i << ".";
@@ -1695,6 +1696,7 @@ DR1801UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err)
     if (! sl.isValid())
       continue;
     j++;
+
     if (! ctx.has<ScanList>(sl.index())) {
       errMsg(err) << "Cannot link scan list at index " << i
                   << ". Scan list not defined.";

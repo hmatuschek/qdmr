@@ -73,7 +73,6 @@ DR1801Test::testBasicConfigReencoding() {
   }
 }
 
-
 void
 DR1801Test::testProstProcessingOfEmptyCodeplug() {
   Config config;
