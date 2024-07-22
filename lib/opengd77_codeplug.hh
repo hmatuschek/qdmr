@@ -281,7 +281,6 @@ public:
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  void clearMessages();
 
   void clearScanLists();
   bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -302,6 +301,7 @@ public:
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
+  void clearMessages();
   void clearMenuSettings();
 
   void clearBootText();

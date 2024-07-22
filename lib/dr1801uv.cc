@@ -58,7 +58,12 @@ DR1801UV::startDownload(bool blocking, const ErrorStack &err) {
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
+  if (_device && _device->isOpen())
+    _device->moveToThread(this);
+
   start();
+
   return true;
 }
 
@@ -79,6 +84,9 @@ DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
     return (StatusIdle == _task);
   }
 
+  // If non-blocking -> move device to this thread
+  if (_device && _device->isOpen())
+    _device->moveToThread(this);
   start();
   return true;
 }
@@ -97,6 +105,8 @@ DR1801UV::run() {
       emit downloadError(this);
       return;
     }
+
+    emit downloadStarted();
 
     if (! download()) {
       _device->read_finish();
@@ -118,6 +128,8 @@ DR1801UV::run() {
       return;
     }
 
+    emit uploadStarted();
+
     if (! upload()) {
       _device->write_finish();
       _device->reboot();
@@ -126,10 +138,12 @@ DR1801UV::run() {
       emit uploadError(this);
       return;
     }
+
     _device->write_finish();
     _device->reboot();
     _device->close();
     _task = StatusIdle;
+
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
     // Not implemented.
@@ -140,22 +154,17 @@ DR1801UV::run() {
 
 bool
 DR1801UV::download() {
-  emit downloadStarted();
-
   if (! _device->readCodeplug(_codeplug, [this](unsigned int n, unsigned int total){
                               emit downloadProgress(float(n*100)/total); }, _errorStack)) {
     errMsg(_errorStack) << "Cannot read codeplug from device.";
     return false;
   }
 
-  emit downloadFinished(this, &_codeplug);
   return true;
 }
 
 bool
 DR1801UV::upload() {
-  emit uploadStarted();
-
   // First, read codeplug from the device
   if (! _device->readCodeplug(_codeplug, [this](unsigned int n, unsigned int total) {
                               emit uploadProgress(float(n*50)/total); }, _errorStack))

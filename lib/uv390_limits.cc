@@ -1,4 +1,5 @@
 #include "uv390_limits.hh"
+#include "uv390_codeplug.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -155,6 +156,24 @@ UV390Limits::UV390Limits(QObject *parent)
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
         } ) );
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList {
+           {BasicEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::basicKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{4}")}
+            }},
+           {AESEncryptionKey::staticMetaObject,
+            0, TyTCodeplug::EncryptionElement::Limit::advancedKeys(),
+            new RadioLimitObject {
+              {"name", new RadioLimitIgnored()},
+              {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{32}")}
+            }} }
+        }
+      });
 
   /* Ignore roaming zones. */
   add("roaming", new RadioLimitList(

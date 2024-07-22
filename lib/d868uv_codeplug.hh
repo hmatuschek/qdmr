@@ -753,6 +753,14 @@ protected:
 
   /** Allocate prefab SMS messages. */
   virtual void allocateSMSMessages();
+  /** Encodes prefab SMS messages. */
+  virtual bool encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Create SMS messages from codeplug. */
+  virtual bool createSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link SMS messages. */
+  virtual bool linkSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();
 

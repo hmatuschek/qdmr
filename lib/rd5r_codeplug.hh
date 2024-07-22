@@ -195,6 +195,8 @@ public:
   bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearMessages();
+  bool encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());

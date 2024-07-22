@@ -11,6 +11,9 @@
 #include "radioddity_extensions.hh"
 
 
+class SMSTemplate;
+class SMSExtension;
+
 /** Represents, encodes and decodes the device specific codeplug for a Radioddity GD-73.
  *
  * <table>
@@ -890,6 +893,13 @@ public:
     /** Sets the name of the group list. */
     void setName(const QString &name);
 
+    /** Returns the number of entries in the group list. */
+    unsigned int members() const;
+    /** Returns @c true, if the i-th member is set. */
+    bool hasMember(unsigned int i) const;
+    /** Returns the i-th member index. */
+    unsigned int memberIndex(unsigned int i) const;
+
     /** Decodes the group list. */
     RXGroupList *toGroupList(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given RX group list. */
@@ -1257,6 +1267,16 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x005; }
 
+    void clear();
+    bool isValid() const;
+
+    /** Returns the key size in bits. */
+    unsigned int keySize() const;
+    /** Sets the key size in bits. */
+    void setKeySize(unsigned int size);
+
+    BasicEncryptionKey *createEncryptionKey(const ErrorStack &err=ErrorStack()) const;
+    bool encodeEncryptionKey(BasicEncryptionKey *key, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Internal used offsets within the bank. */
@@ -1285,6 +1305,11 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0050; }
+
+    /** Decodes and create encryption keys. */
+    bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes encryption keys. */
+    bool encodeEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1320,6 +1345,22 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x051; }
 
+    /** Returns the message text. */
+    QString text() const;
+    /** Set message text. */
+    void setText(const QString &message);
+
+    /** Sets a message element from an SMS message. */
+    bool encode(SMSTemplate *message, const ErrorStack &err=ErrorStack());
+    /** Creates a SMS template from this message. */
+    SMSTemplate *decode(const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum message length. */
+      static constexpr unsigned int messageLength()  { return 40; }
+    };
 
   protected:
     /** Internal used offsets within the bank. */
@@ -1350,6 +1391,19 @@ public:
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x511; }
+
+    /** Returns the member count. */
+    unsigned int memberCount() const;
+    /** Sets the member count. */
+    void setMemberCount(unsigned int count);
+
+    /** Returns the i-th message. */
+    MessageElement message(unsigned int i);
+
+    /** Updates the SMS extension by decoding all defined messages. */
+    bool decode(SMSExtension *ext, const ErrorStack &err=ErrorStack());
+    /** Encodes all messages defined within the SMS extension. */
+    bool encode(const SMSExtension *ext, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1600,6 +1654,8 @@ protected:
 
   /** Creates messages. */
   virtual bool createMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode messages. */
+  virtual bool encodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decodes the settings fields (generic & DMR). */
   virtual bool decodeSettings(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1623,6 +1679,8 @@ protected:
 
   /** Create encryption keys. */
   virtual bool createEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode encryption keys. */
+  virtual bool encodeEncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Create channels. */
   virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());

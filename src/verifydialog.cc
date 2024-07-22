@@ -1,11 +1,14 @@
 #include "verifydialog.hh"
 #include "radiolimits.hh"
+#include "application.hh"
 #include <QPushButton>
 
 VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget *parent)
     : QDialog(parent)
 {
 	setupUi(this);
+
+  Application *app = qobject_cast<Application *>(QApplication::instance());
 
   bool valid = true;
   for (int i=0; i<issues.count(); i++) {
@@ -19,10 +22,16 @@ VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget
       item->setForeground(Qt::gray);
       break;
     case RadioLimitIssue::Warning:
-      item->setForeground(Qt::black);
+      if (app->isDarkMode())
+        item->setForeground(Qt::white);
+      else
+        item->setForeground(Qt::black);
       break;
     case RadioLimitIssue::Critical:
-      item->setForeground(Qt::red);
+      if (app->isDarkMode())
+        item->setForeground(Qt::red);
+      else
+        item->setForeground(Qt::darkRed);
       valid = false;
       break;
     }

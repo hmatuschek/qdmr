@@ -10,24 +10,29 @@
 </info>
 
 <para>
-  The application settings dialog controls some of the behavior of <application>qdmr</application>.
-  The dialog is divided into 4 sections: <guilabel>Location</guilabel>, <guilabel>Radio 
-    Programming</guilabel>, <guilabel>Call-Sign DB</guilabel> and <guilabel>Extended Features</guilabel>.
+  The application settings dialog controls the behavior of <application>qdmr</application>.
+  The dialog is divided into 3 sections, accessible via the tabs on the top.
 </para>
 
-<screenshot>
-  <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-settings-dialog.png" width="5cm" align="center"/></imageobject>
-    <textobject>Screen shot of the application settings dialog.</textobject>
-  </mediaobject>
-  <title>The settings dialog</title>
-</screenshot>
 
 
 <section>
 <info>
-  <title>Location settings</title>
+  <title>Data Sources</title>
 </info>
+
+<para>
+  The <guilabel>Data Sources</guilabel> tab collects the settings for the location service and 
+  repeater database.  
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-settings-datasources.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen shot of the application settings dialog for the data sources.</textobject>
+  </mediaobject>
+  <title>The settings dialog: Data sources</title>
+</screenshot>
 
 <para>
   The first section concerns the location of the user. You may enter your <glossterm>Maidenhead 
@@ -36,12 +41,34 @@
   channel editors (see <xref linkend="guiChannels"/>) to provide auto-completion for repeaters 
   nearby.
 </para>
+
+<para>
+  The second section allows to set the source for the repeater database. This enables 
+  <application>qdmr</application> to automatically complete some information for a repeater if its 
+  callsign is entered as the name, when creating a new channel. For some weird reason, the single 
+  data source <ulink url="https://www.repeaterbook.com/">Repeater Book</ulink> provides two identical
+  APIs for North America and the rest of the World. You must select your source accordingly.
+</para>
 </section>
+
 
 <section>
 <info>
-  <title>Radio interface settings</title>
+  <title>Radio programming settings</title>
 </info>
+
+<para>
+ The second tab controls, how the radios are programmed. That is, how the codeplug is assembled and
+  also, how the callsign database gets curated.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-settings-programming.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen shot of the application settings dialog for programming the radios.</textobject>
+  </mediaobject>
+  <title>The settings dialog: Programming</title>
+</screenshot>
 
 <para>
   The <guilabel>Radio Interfaces</guilabel> section contains settings, controlling, how the 
@@ -50,17 +77,11 @@
   connected radios. You will then have to select an interface and choose a radio model, every time
   you access it. 
 </para>
-</section>
-
-<section>
-<info>
-  <title>Radio programming settings</title>
-</info>
 
 <para>
-  The third section controls the programming of the radio and how code plugs are assembled. The 
-  first option <guilabel>Update code plug</guilabel> specifies whether a code plug is generated from
-  scratch or whether the code plug currently programmed on the radio gets updated. 
+  The second section specifies how codeplugs are assembled. The first option 
+  <guilabel>Update codeplug</guilabel> specifies whether a codeplug is generated from
+  scratch or whether the codeplug currently programmed on the radio gets updated. 
   <application>qdmr</application> does not implement all settings possible for all radios, 
   consequently <guilabel>Update code plug</guilabel> should be chooses to maintain all settings 
   of the radio that are not touched by <application>qdmr</application>.
@@ -90,13 +111,6 @@
   manufacturer. But be aware, that transmitting outside the declared frequency range may destroy 
   the radio!
 </para>
-</section>
-
-
-<section>
-<info>
-  <title>Call-sign DB settings</title>
-</info>
 
 <para>
   The <guilabel>Call-Sign DB</guilabel> section collects options that control the automatic 
@@ -137,11 +151,22 @@
 </para>
 </section>
 
-
 <section>
 <info>
-  <title>Extended feature settings</title>
+  <title>Extension settings</title>
 </info>
+
+<para>
+  The last tab collects settings, controlling several extended settings for the devices.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-settings-extensions.png" width="5cm" align="center"/></imageobject>
+    <textobject>Screen shot of the application settings dialog for extensions.</textobject>
+  </mediaobject>
+  <title>The settings dialog: Extensions</title>
+</screenshot>
 
 <para>
   DMR originated as a standard for commercial radios. Consequently, there are many features that 

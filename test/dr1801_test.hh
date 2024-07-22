@@ -15,6 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testBasicConfigReencoding();
+  void testProstProcessingOfEmptyCodeplug();
 };
 
 #endif // DR1801TEST_HH
