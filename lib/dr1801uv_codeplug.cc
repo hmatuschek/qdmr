@@ -1972,10 +1972,11 @@ DR1801UVCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err
 
   ctx.config()->smsExtension()->smsTemplates()->clear();
 
-  for (unsigned int i=0; i<messageCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::messageCount() && j<messageCount(); i++) {
     MessageElement msg = message(i);
     if (! msg.isValid())
       continue;
+    j++;
     SMSTemplate *sms = new SMSTemplate();
     sms->setName(QString("Message %1").arg(msg.index()));
     sms->setMessage(msg.text());
