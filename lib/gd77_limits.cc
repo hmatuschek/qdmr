@@ -1,4 +1,5 @@
 #include "gd77_limits.hh"
+#include "gd77_codeplug.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -147,6 +148,17 @@ GD77Limits::GD77Limits(QObject *parent)
           { "revert", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "channels", new RadioLimitRefList(0, 32, Channel::staticMetaObject) }
         }));
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList(
+         BasicEncryptionKey::staticMetaObject,
+         0, RadioddityCodeplug::EncryptionElement::Limit::basicEncryptionKeys(),
+         new RadioLimitObject {
+           {"name", new RadioLimitIgnored()},
+           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{8}")}
+         })}
+      });
 
   /* Ignore positioning systems. */
   add("positioning", new RadioLimitList(

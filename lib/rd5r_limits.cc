@@ -1,4 +1,5 @@
 #include "rd5r_limits.hh"
+#include "rd5r_codeplug.hh"
 #include "radioid.hh"
 #include "channel.hh"
 #include "scanlist.hh"
@@ -148,6 +149,17 @@ RD5RLimits::RD5RLimits(QObject *parent)
           { "revert", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "channels", new RadioLimitRefList(0, 31, Channel::staticMetaObject) }
         }));
+
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList(
+         BasicEncryptionKey::staticMetaObject,
+         0, RadioddityCodeplug::EncryptionElement::Limit::basicEncryptionKeys(),
+         new RadioLimitObject {
+           {"name", new RadioLimitIgnored()},
+           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{8}")}
+         })}
+      });
 
   /* Ignore positioning systems. */
   add("positioning",

@@ -8,6 +8,7 @@
 
 #include "logger.hh"
 #include "utils.hh"
+#include "settings.hh"
 
 
 /* ********************************************************************************************* *
@@ -418,7 +419,12 @@ RepeaterBookList::search(const QString &text) {
   if ((_queries.contains(call)) && (_queries[call].daysTo(QDateTime::currentDateTime())<3))
     return;
 
-  QUrl url("https://www.repeaterbook.com/api/exportROW.php");
+  QUrl url;
+  if (Region::World == Settings().repeaterBookRegion())
+    url = QUrl("https://www.repeaterbook.com/api/exportROW.php");
+  else
+    url = QUrl("https://www.repeaterbook.com/api/export.php");
+
   QUrlQuery query;
   query.addQueryItem("callsign", QString("%1%").arg(call));
   url.setQuery(query);

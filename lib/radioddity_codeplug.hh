@@ -1321,6 +1321,8 @@ public:
     /** Destructor. */
     virtual ~MessageBankElement();
 
+    /** Returns the size of the message bank. */
+    static constexpr unsigned int size() { return 0x1248; }
     /** Resets all messages. */
     void clear();
 
@@ -1330,6 +1332,29 @@ public:
     virtual QString message(unsigned n) const;
     /** Appends a message to the list. */
     virtual void appendMessage(const QString msg);
+
+    /** Encodes all preset messages. */
+    virtual bool encode(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+    /** Decodes all preset messages. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      static constexpr unsigned int messages()      { return 32; }   ///< Maximum number of messages.
+      static constexpr unsigned int messageLength() { return 144; }  ///< Maximum length of each message.
+    };
+
+  protected:
+    /** Some internal used offset. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messageConut()    { return 0x0000; }
+      static constexpr unsigned int messageLengths()  { return 0x0008; }
+      static constexpr unsigned int messages()        { return 0x0048; }
+      static constexpr unsigned int betweenMessages() { return Limit::messageLength(); }
+      /// @endcond
+    };
   };
 
 
@@ -1380,6 +1405,14 @@ public:
     virtual bool updateCommercialExt(Context &ctx);
     /** Links the given encryption extension. */
     virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+
+  public:
+    /** Some limits for the encryption element. */
+    struct Limit {
+      /** The maximum number of (basic) encryption keys. */
+      static constexpr unsigned int basicEncryptionKeys() { return 16; }
+    };
+
   };
 
 protected:
@@ -1424,6 +1457,10 @@ public:
 
   /** Clears the messages. */
   virtual void clearMessages() = 0;
+  /** Encodes preset messages. */
+  virtual bool encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes preset messages. */
+  virtual bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;

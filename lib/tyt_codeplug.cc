@@ -533,12 +533,12 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
         return false;
       }
       if (PRIV_BASIC == privacyType()) {
-        if (! ctx.has<DMREncryptionKey>(privacyIndex())) {
+        if (! ctx.has<BasicEncryptionKey>(privacyIndex())) {
           errMsg(err) << "Cannot link encryption key: No basic key with index " << privacyIndex()
                       << " defined.";
           return false;
         }
-        dc->commercialExtension()->setEncryptionKey(ctx.get<DMREncryptionKey>(privacyIndex()));
+        dc->commercialExtension()->setEncryptionKey(ctx.get<BasicEncryptionKey>(privacyIndex()));
       } else if (PRIV_ENHANCED == privacyType()) {
         if (! ctx.has<AESEncryptionKey>(privacyIndex())) {
           errMsg(err) << "Cannot link encryption key: No AES (enhances) key with index "
@@ -616,7 +616,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
         logError() << "Cannot encode encryption key '"
                    << dchan->commercialExtension()->encryptionKey()->name()
                    << "': Not indexed.";
-      } else if (dchan->commercialExtension()->encryptionKey()->is<DMREncryptionKey>()) {
+      } else if (dchan->commercialExtension()->encryptionKey()->is<BasicEncryptionKey>()) {
         setPrivacyType(PRIV_BASIC);
         setPrivacyIndex(ctx.index(dchan->commercialExtension()->encryptionKey()));
       } else if (dchan->commercialExtension()->encryptionKey()->is<AESEncryptionKey>()) {
@@ -2610,13 +2610,13 @@ TyTCodeplug::EmergencySystemElement::revertChannelSelected() {
  * Implementation of TyTCodeplug::EncryptionElement
  * ******************************************************************************************** */
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size), _numEnhancedKeys(8), _numBasicKeys(16)
+  : Element(ptr, size)
 {
   // pass...
 }
 
 TyTCodeplug::EncryptionElement::EncryptionElement(uint8_t *ptr)
-  : Element(ptr, 0xb0), _numEnhancedKeys(8), _numBasicKeys(16)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -2627,7 +2627,7 @@ TyTCodeplug::EncryptionElement::~EncryptionElement() {
 
 void
 TyTCodeplug::EncryptionElement::clear() {
-  memset(_data, 0xff, 0xb0);
+  memset(_data, 0xff, size());
 }
 
 bool
@@ -2641,13 +2641,15 @@ TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
-  return QByteArray((char *)(_data+n*16), 16);
+  return QByteArray((char *)(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys()),
+                    Offset::betweenAdvancedKeys());
 }
 void
 TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key) {
-  if (16 != key.size())
+  if (Offset::betweenAdvancedKeys() != key.size())
     return;
-  memcpy(_data+n*16, key.constData(), 16);
+  memcpy(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys(),
+         key.constData(), Offset::betweenAdvancedKeys());
 }
 
 bool
@@ -2660,50 +2662,35 @@ TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
-  return QByteArray((char *)(_data+0x90+n*2), 2);
+  return QByteArray((char *)(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys()), Offset::betweenBasicKeys());
 }
 void
 TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
-  if (2 != key.size())
+  if (Offset::betweenBasicKeys() != key.size())
     return;
-  memcpy(_data+0x90+n*2, key.constData(), 2);
+  memcpy(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys(), key.constData(), Offset::betweenBasicKeys());
 }
 
 bool
 TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Context &ctx) {
-  ctx.addTable(&DMREncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
-
+  Q_UNUSED(encr)
   // Clear all keys
   clear();
 
-  // Encode each key
-  unsigned basicCount=0, aesCount=0;
-  for (int i=0; i<encr->encryptionKeys()->count(); i++) {
-    if (encr->encryptionKeys()->get(i)->is<DMREncryptionKey>() && (_numBasicKeys > basicCount)) {
-      DMREncryptionKey *key = encr->encryptionKeys()->get(i)->as<DMREncryptionKey>();
-      setBasicKey(basicCount++, key->key());
-      ctx.add(key, basicCount);
-    } else if (encr->encryptionKeys()->get(i)->is<AESEncryptionKey>() && (_numEnhancedKeys > aesCount)) {
-      AESEncryptionKey *key = encr->encryptionKeys()->get(i)->as<AESEncryptionKey>();
-      setEnhancedKey(aesCount++, key->key());
-      ctx.add(key, aesCount);
-    } else {
-      logWarn() << "Cannot encode key of type '"
-                << encr->encryptionKeys()->get(i)->metaObject()->className() << "'.";
-    }
-  }
+  // Encode each key type separately
+  for (unsigned int i=0; i<ctx.count<BasicEncryptionKey>() && i<Limit::basicKeys(); i++)
+    setBasicKey(i, ctx.get<BasicEncryptionKey>(i+1)->key());
+  for (unsigned int i=0; i<ctx.count<AESEncryptionKey>() && i<Limit::advancedKeys(); i++)
+    setEnhancedKey(i, ctx.get<AESEncryptionKey>(i+1)->key());
 
   return true;
 }
 
 bool
 TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
-  ctx.addTable(&DMREncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
-
   CommercialExtension *ext = ctx.config()->commercialExtension();
-  for (unsigned i=0; i<_numEnhancedKeys; i++) {
+
+  for (unsigned i=0; i<Limit::advancedKeys(); i++) {
     if (! isEnhancedKeySet(i))
       continue;
     AESEncryptionKey *key = new AESEncryptionKey();
@@ -2712,10 +2699,11 @@ TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     key->fromHex(enhancedKey(i).toHex());
     ext->encryptionKeys()->add(key);
   }
-  for (unsigned i=0; i<_numBasicKeys; i++) {
+
+  for (unsigned i=0; i<Limit::basicKeys(); i++) {
     if (! isBasicKeySet(i))
       continue;
-    DMREncryptionKey *key = new DMREncryptionKey();
+    BasicEncryptionKey *key = new BasicEncryptionKey();
     key->setName(QString("Basic Key %1").arg(i+1));
     ctx.add(key,i+1);
     key->fromHex(basicKey(i).toHex());
@@ -2730,6 +2718,124 @@ TyTCodeplug::EncryptionElement::linkCommercialExt(CommercialExtension *ext, Cont
   Q_UNUSED(ext); Q_UNUSED(ctx);
   return true;
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::MessageElement
+ * ******************************************************************************************** */
+TyTCodeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, MessageElement::size())
+{
+  // pass...
+}
+
+void
+TyTCodeplug::MessageElement::clear() {
+  memset(_data, 0xffff, size());
+}
+
+bool
+TyTCodeplug::MessageElement::isValid() const {
+  return Element::isValid() && (0xffff != getUInt16_le(0));
+}
+
+QString
+TyTCodeplug::MessageElement::text() const {
+  return readUnicode(0, Limit::length(), 0x0000);
+}
+void
+TyTCodeplug::MessageElement::setText(const QString &text) {
+  writeUnicode(0, text, Limit::length(), 0x0000);
+}
+
+bool
+TyTCodeplug::MessageElement::encode(SMSTemplate *sms, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setText(sms->message());
+
+  return true;
+}
+
+SMSTemplate *
+TyTCodeplug::MessageElement::decode(const ErrorStack &err) {
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid SMS message.";
+    return nullptr;
+  }
+
+  SMSTemplate *sms = new SMSTemplate();
+  sms->setName("Message");
+  sms->setMessage(text());
+  return sms;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of TyTCodeplug::MessageBankElement
+ * ******************************************************************************************** */
+TyTCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+TyTCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, MessageBankElement::size())
+{
+  // pass...
+}
+
+void
+TyTCodeplug::MessageBankElement::clear() {
+  for (unsigned int i=0; i<Limit::messages(); i++)
+    message(i).clear();
+}
+
+TyTCodeplug::MessageElement
+TyTCodeplug::MessageBankElement::message(unsigned int i) const {
+  i = std::min(i, Limit::messages()-1);
+  return _data + i*MessageElement::size();
+}
+
+bool
+TyTCodeplug::MessageBankElement::encode(Context &ctx, const Flags &flags, const ErrorStack &err) {
+  Q_UNUSED(flags);
+
+  unsigned int count = ctx.config()->smsExtension()->smsTemplates()->count();
+  count = std::min(count, Limit::messages());
+  for (unsigned int i=0; i<count; i++) {
+    if (! message(i).encode(ctx.config()->smsExtension()->smsTemplates()->message(i), err)) {
+      errMsg(err) << "Cannot encode" << i+1 << "-th preset message.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+TyTCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::messages(); i++) {
+    MessageElement msg = message(i);
+    if (!msg.isValid())
+      continue;
+    SMSTemplate *sms = msg.decode(err);
+    if (nullptr == sms) {
+      errMsg(err) << "Cannot decode " << i+1 << "-th preset message.";
+      return false;
+    }
+    ctx.config()->smsExtension()->smsTemplates()->add(sms);
+  }
+  return true;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -2793,6 +2899,18 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0; i<config->roamingZones()->count(); i++)
     ctx.add(config->roamingZones()->zone(i), i+1);
 
+  // Index basic (DMR) and AES keys
+  if (CommercialExtension *ext = config->commercialExtension()) {
+    unsigned int basicIndex = 1, aesIndex = 1;
+    for (int i=0; i<ext->encryptionKeys()->count(); i++) {
+      if (ext->encryptionKeys()->key(i)->is<BasicEncryptionKey>()) {
+        ctx.add(ext->encryptionKeys()->key(i)->as<BasicEncryptionKey>(), basicIndex++);
+      } else if (ext->encryptionKeys()->key(i)->is<AESEncryptionKey>()) {
+        ctx.add(ext->encryptionKeys()->key(i)->as<AESEncryptionKey>(), aesIndex++);
+      }
+    }
+  }
+
   return true;
 }
 
@@ -2837,6 +2955,9 @@ TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
 
   // Create index<->object table.
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
+
   if (! index(config, ctx))
     return false;
 
@@ -2847,6 +2968,8 @@ bool
 TyTCodeplug::decode(Config *config, const ErrorStack &err) {
   // Create index<->object table.
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   // Clear config object
   config->clear();
@@ -2916,6 +3039,12 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
     return false;
   }
 
+  // Encode text messages
+  if (! this->encodeTextMessages(ctx, flags, err)) {
+    errMsg(err) << "Cannot encode text messages.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2966,6 +3095,12 @@ TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // Decode button settings
   if (! this->decodeButtonSetttings(ctx.config(), err)) {
     errMsg(err) << "Cannot decode button settings.";
+    return false;
+  }
+
+  // Decode text messages
+  if (! this->decodeTextMessages(ctx, err)) {
+    errMsg(err) << "Cannot decode text messages.";
     return false;
   }
 

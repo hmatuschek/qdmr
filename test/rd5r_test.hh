@@ -13,8 +13,8 @@ public:
 private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
-
   void testChannelFrequency();
+  void testSMSTemplates();
 };
 
 #endif // RD5RTEST_HH
