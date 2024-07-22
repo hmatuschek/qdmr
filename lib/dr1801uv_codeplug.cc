@@ -845,13 +845,11 @@ DR1801UVCodeplug::GroupListBankElement::groupList(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<groupListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::groupListCount() && j<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
-    if (! gl.isValid()) {
-      errMsg(err) << "Cannot decode invalid group list at index " << i
-                  << ". Got " << groupListCount() << " valid group lists promissed.";
-      return false;
-    }
+    if (! gl.isValid())
+      continue;
+    j++;
     RXGroupList *obj = gl.toGroupListObj(ctx, err);
     if (nullptr == obj) {
       errMsg(err) << "Cannot decode group list at index " << i << ".";
@@ -867,8 +865,11 @@ DR1801UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &e
 
 bool
 DR1801UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<groupListCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::groupListCount() && j<groupListCount(); i++) {
     GroupListElement gl = groupList(i);
+    if (! gl.isValid())
+      continue;
+    j++;
     if (! ctx.has<RXGroupList>(gl.index())) {
       errMsg(err) << "Cannot link group list at index " << i
                   << ". Group list not defined.";
