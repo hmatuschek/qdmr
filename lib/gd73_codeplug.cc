@@ -751,8 +751,6 @@ GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
-<<<<<<< HEAD
-=======
  * Implementation of GD73Codeplug::EncryptionKeyElement
  * ********************************************************************************************* */
 GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr, size_t size)

@@ -90,6 +90,7 @@ GD73Test::testSMSTemplates() {
   QCOMPARE(decoded.smsExtension()->smsTemplates()->message(1)->message(), "XYZ");
 }
 
+
 void
 GD73Test::testFMSignaling() {
   Config config;
