@@ -1053,13 +1053,11 @@ DR1801UVCodeplug::ZoneBankElement::zone(unsigned int index) const {
 
 bool
 DR1801UVCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<zoneCount(); i++) {
+  for (unsigned int i=0,j=0; i<Limit::zoneCount() && j<zoneCount(); i++) {
     ZoneElement zone(this->zone(i));
-    if (! zone.isValid()) {
-      errMsg(err) << "Unexpected invalid zone at index " << i
-                  << ", was promissed " << zoneCount() << " zones.";
-      return false;
-    }
+    if (! zone.isValid())
+      continue;
+    j++;
 
     Zone *obj = zone.toZoneObj(ctx, err);
     if (nullptr == obj) {
@@ -1078,13 +1076,11 @@ DR1801UVCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) c
 
 bool
 DR1801UVCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) const {
-  for (unsigned int i=0; i<zoneCount(); i++) {
+  for (unsigned int i=0, j=0; i<Limit::zoneCount() && j<zoneCount(); i++) {
     ZoneElement zone(this->zone(i));
-    if (! zone.isValid()) {
-      errMsg(err) << "Unexpected invalid zone at index " << i
-                  << ", was promissed " << zoneCount() << " zones.";
-      return false;
-    }
+    if (! zone.isValid())
+      continue;
+    j++;
 
     if (! ctx.has<Zone>(zone.index())) {
       errMsg(err) << "Cannot link zone at index " << i << ", not defined.";
