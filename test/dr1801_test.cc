@@ -73,6 +73,17 @@ DR1801Test::testBasicConfigReencoding() {
   }
 }
 
+void
+DR1801Test::testProstProcessingOfEmptyCodeplug() {
+  Config config;
+  DR1801UVCodeplug codeplug;
+  ErrorStack err;
+
+  config.clear();
+  QVERIFY(codeplug.postprocess(&config, err));
+}
+
+
 QTEST_GUILESS_MAIN(DR1801Test)
 
 
