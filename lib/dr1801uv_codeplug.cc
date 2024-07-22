@@ -2209,7 +2209,7 @@ DR1801UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStac
     ctx.add(obj, key(i).index());
     ctx.config()->commercialExtension()->encryptionKeys()->add(obj);
   }
-  return false;
+  return true;
 }
 
 bool
