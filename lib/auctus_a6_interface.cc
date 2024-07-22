@@ -106,19 +106,20 @@ bool
 AuctusA6Interface::receive(uint16_t &command,
                            uint8_t *response, uint8_t &rlen, const ErrorStack &err)
 {
-  uint8_t buffer[255];
+  uint8_t buffer[255]; memset(buffer, 0x00, sizeof(buffer));
 
-  // read start-of-packet and length bytes
-  uint8_t total_length = 2;
-  if (! read(buffer, total_length, TIMEOUT, err)) {
-    errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
-    return false;
+  // wait for start-of-packet byte
+  while (0xaa != buffer[0]) {
+    if (! read(buffer, 1, TIMEOUT, err)) {
+      errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
+      return false;
+    }
   }
 
-  // check start of packet
-  if (0xaa != buffer[0]) {
-    errMsg(err) << "Unexpected start-of-packet byte: Expected aah, got "
-                << QString::number(buffer[0],16) << "h.";
+  // read length bytes
+  uint8_t total_length = 2;
+  if (! read(buffer+1, 1, TIMEOUT, err)) {
+    errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
     return false;
   }
 
@@ -129,6 +130,7 @@ AuctusA6Interface::receive(uint16_t &command,
                 << QString::number(total_length, 16) << "h.";
     return false;
   }
+
   // read remaining packet
   if (! read(buffer+2, total_length-2, TIMEOUT, err)) {
     errMsg(err) << "Cannot read response " << QString::number(command, 16) << "h.";
