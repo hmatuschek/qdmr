@@ -720,7 +720,7 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     _config->clear();
   }
 
-  if (! radio->codeplug().postprocess(_config, err)) {
+  if (! codeplug->postprocess(_config, err)) {
     ErrorMessageView(err).exec();
     _config->clear();
   }
