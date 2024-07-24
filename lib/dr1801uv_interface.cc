@@ -177,6 +177,7 @@ DR1801UVInterface::readCodeplug(
   }
   QThread::msleep(250);
 
+
   _state = IDLE;
 
   return true;
@@ -209,7 +210,7 @@ DR1801UVInterface::writeCodeplug(
       bytesToTransfer = WRITE_CODEPLUG_SIZE,
       total = bytesToTransfer;
   for (unsigned int i=0; i<bytesToTransfer/2; i++) {
-    crc ^= *((const uint16_t*)codeplug.image(0).data(offset +2*i));
+    crc ^= *((const uint16_t*)codeplug.image(0).data(offset + 2*i));
   }
 
   if (! prepareWriting(bytesToTransfer, DR1801UVInterface::WriteSpeed, crc, err) ) {
@@ -227,9 +228,10 @@ DR1801UVInterface::writeCodeplug(
       errMsg(err) << "Cannot write codeplug to device.";
       return false;
     }
+
     // Wait for bytes written
     while (bytesToWrite()) {
-      if (! waitForBytesWritten(2000)) {
+      if (! waitForBytesWritten(1000)) {
         errMsg(err) << errorString();
         errMsg(err) << "Cannot write codeplug to the device.";
         _state = ERROR;
@@ -406,7 +408,7 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
     errMsg(err) << "Cannot set baud-rate of serial port '" << portName() << "'.";
     return false;
   }
-  QThread::msleep(1000);
+  QThread::msleep(100);
 
   return true;
 }
@@ -414,10 +416,11 @@ DR1801UVInterface::prepareReading(uint32_t baudrate, PrepareReadResponse &respon
 bool
 DR1801UVInterface::prepareWriting(uint32_t size, uint32_t baudrate, uint16_t crc, const ErrorStack &err) {
   PrepareWriteRequest request(size, baudrate, crc);
-  PrepareReadResponse response;
-  uint8_t respSize = sizeof(request);
+  PrepareWriteResponse response;
+  uint8_t respSize = sizeof(response);
 
-  if (! send_receive(PREPARE_CODEPLUG_WRITE, (uint8_t *)&request, sizeof(request), (uint8_t *)&response, respSize, err)) {
+  if (! send_receive(PREPARE_CODEPLUG_WRITE, (uint8_t *)&request, sizeof(request),
+                     (uint8_t *)&response, respSize, err)) {
     errMsg(err) << "Cannot prepare writing of codeplug.";
     return false;
   }
