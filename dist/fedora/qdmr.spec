@@ -79,7 +79,7 @@ applications that want to make use of libdmrconf.
 
 %prep
 %setup -q -n %{name}-%{realver}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 # with 0.12.1: -DBUILD_MAN=ON -DINSTALL_UDEV_PATH=%{buildroot}%{_udevrulesdir}
@@ -119,7 +119,7 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_libdir}/libdmrconf.so
 
 %changelog
-* Tue Jul 25 2024 Hannes Matuschek <dm3mat@darc.de>
+* Thu Jul 25 2024 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.12.0
   - added translations
   - updated description
