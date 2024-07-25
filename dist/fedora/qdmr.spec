@@ -26,7 +26,8 @@ URL:            https://dm3mat.darc.de/qdmr/
 Source:         https://github.com/hmatuschek/qdmr/archive/refs/tags/v%{realver}.tar.gz
 Patch0:         fix-docbook-xsl-path.patch
 BuildRequires:  cmake
-BuildRequires:  docbook-xsl-stylesheets
+BuildRequires:  docbook5-style-xsl
+BuildRequires:  xsltproc
 BuildRequires:  gcc-c++
 BuildRequires:  hicolor-icon-theme
 BuildRequires:  pkgconfig
@@ -84,7 +85,7 @@ applications that want to make use of libdmrconf.
 %build
 # with 0.12.1: -DBUILD_MAN=ON -DINSTALL_UDEV_PATH=%{buildroot}%{_udevrulesdir}
 %cmake -DBUILD_MAN=ON
-%make_jobs
+%cmake_build
 
 %install
 %cmake_install

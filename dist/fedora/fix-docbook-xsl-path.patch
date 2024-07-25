@@ -7,6 +7,7 @@ index f6027aa..6c498bc 100644
    <xsl:strip-space elements="*"/>
  
 -  <xsl:include href="file:///usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl"/>
-+  <xsl:include href="file:///usr/share/xml/docbook/stylesheet/nwalsh/current/manpages/docbook.xsl"/>
++  <xsl:include href="file:///usr/share/sgml/docbook/xsl-ns-stylesheets/manpages/docbook.xsl"/>
  </xsl:stylesheet>
+
 
