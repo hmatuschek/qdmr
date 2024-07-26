@@ -12,7 +12,7 @@ struct Frequency
 public:
   /** Possible formatting hints. */
   enum class Format {
-    Automatic, Hz, kHz, MHz, GHz
+    Automatic, mHz, Hz, kHz, MHz, GHz
   };
 
 protected:
@@ -54,15 +54,18 @@ public:
   /** Pareses a frequency. */
   static Frequency fromString(const QString &freq);
 
-  inline unsigned long long inHz() const { return _frequency; }    ///< Unit conversion.
-  inline double inkHz() const { return double(_frequency)/1e3; }   ///< Unit conversion.
-  inline double inMHz() const { return double(_frequency)/1e6; }   ///< Unit conversion.
-  inline double inGHz() const { return double(_frequency)/1e9; }   ///< Unit conversion.
+  inline unsigned long long inmHz() const { return _frequency; }        ///< Unit conversion.
+  inline unsigned long long inHz() const { return _frequency/1000; }    ///< Unit conversion.
+  inline double inkHz() const { return double(_frequency)/1e6; }        ///< Unit conversion.
+  inline double inMHz() const { return double(_frequency)/1e9; }        ///< Unit conversion.
+  inline double inGHz() const { return double(_frequency)/1e12; }       ///< Unit conversion.
 
-  static inline Frequency fromHz(unsigned long long Hz) { return Frequency(Hz); } ///< Unit conversion.
-  static inline Frequency fromkHz(double kHz) { return Frequency(kHz*1e3); }      ///< Unit conversion.
-  static inline Frequency fromMHz(double MHz) { return Frequency(MHz*1e6); }      ///< Unit conversion.
-  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e6); }      ///< Unit conversion.
+
+  static inline Frequency frommHz(unsigned long long mHz) { return Frequency(mHz); }   ///< Unit conversion.
+  static inline Frequency fromHz(unsigned long long Hz) { return Frequency(Hz*1000); } ///< Unit conversion.
+  static inline Frequency fromkHz(double kHz) { return Frequency(kHz*1e6); }           ///< Unit conversion.
+  static inline Frequency fromMHz(double MHz) { return Frequency(MHz*1e9); }           ///< Unit conversion.
+  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e12); }          ///< Unit conversion.
 
 protected:
   /** The actual frequency in Hz. */

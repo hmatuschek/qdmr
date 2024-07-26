@@ -31,14 +31,17 @@ Frequency::format(Format f) const {
   switch (f) {
   case Format::Automatic:
     if (10000ULL > _frequency)
-      return format(Format::Hz);
+      return format(Format::mHz);
     else if (10000000ULL > _frequency)
-      return format(Format::kHz);
+      return format(Format::Hz);
     else if (10000000000ULL > _frequency)
+      return format(Format::kHz);
+    else if (10000000000000ULL > _frequency)
       return format(Format::MHz);
     return format(Format::GHz);
+  case Format::mHz:
   case Format::Hz:
-    return QString("%1 Hz").arg(inHz());
+    return QString("%1 Hz").arg(((double)inmHz())/1000, 0, 'g', 6);
   case Format::kHz:
     return QString("%1 kHz").arg(inkHz(), 0, 'g', 6);
   case Format::MHz:
@@ -51,7 +54,7 @@ Frequency::format(Format f) const {
 
 bool
 Frequency::parse(const QString &value) {
-  QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
+  QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([mkMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
   if (! match.isValid())
     return false;
@@ -62,10 +65,10 @@ Frequency::parse(const QString &value) {
   QString leading = match.captured(1);
   _frequency = leading.toUInt();
 
-  if ("Hz" == unit)
+  if ("mHz" == unit)
     return true;
 
-  if ("kHz" == unit) {
+  if ("Hz" == unit) {
     _frequency *= 1000ULL;
     unsigned long long factor = 100ULL;
     for (int i=0; i<std::min(3, decimals.size()); i++) {
@@ -75,7 +78,7 @@ Frequency::parse(const QString &value) {
     // Rounding to proper Hz
     if ((decimals.size()>3) && (decimals[3].digitValue()>=5))
       _frequency+=1;
-  } else if (("MHz"==unit) || (!hasUnit)) {
+  } else if ("kHz" == unit) {
     _frequency *= 1000000ULL;
     unsigned long long factor = 100000ULL;
     for (int i=0; i<std::min(6, decimals.size()); i++) {
@@ -83,17 +86,27 @@ Frequency::parse(const QString &value) {
       factor /= 10;
     }
     // Rounding to proper Hz
-    if ((decimals.size()>6) && (decimals[6].digitValue()>=5))
+    if ((decimals.size()>=6) && (decimals[6].digitValue()>=5))
       _frequency+=1;
-  } else if ("GHz"==unit) {
+  } else if (("MHz"==unit) || (!hasUnit)) {
     _frequency *= 1000000000ULL;
-    unsigned long long factor = 100000000;
+    unsigned long long factor = 100000000ULL;
     for (int i=0; i<std::min(9, decimals.size()); i++) {
       _frequency += decimals[i].digitValue()*factor;
       factor /= 10;
     }
     // Rounding to proper Hz
-    if ((decimals.size()>9) && (decimals[9].digitValue()>=5))
+    if ((decimals.size()>=9) && (decimals[9].digitValue()>=5))
+      _frequency+=1;
+  } else if ("GHz"==unit) {
+    _frequency *= 1000000000000ULL;
+    unsigned long long factor = 100000000000ULL;
+    for (int i=0; i<std::min(12, decimals.size()); i++) {
+      _frequency += decimals[i].digitValue()*factor;
+      factor /= 10;
+    }
+    // Rounding to proper Hz
+    if ((decimals.size()>12) && (decimals[12].digitValue()>=5))
       _frequency+=1;
   }
 

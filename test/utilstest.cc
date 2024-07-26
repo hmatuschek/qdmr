@@ -93,6 +93,13 @@ UtilsTest::testFrequencyParser() {
 
   QCOMPARE(Frequency::fromString("100").inHz(), 100000000ULL);
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
+
+  // test mHz
+  QCOMPARE(Frequency::fromString("100mHz").inmHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100 mHz").inmHz(), 100ULL);
+  QCOMPARE(Frequency::fromString("100 mHz").inHz(), 0ULL);
+  QCOMPARE(Frequency::fromString("67.2Hz").inmHz(), 67200ULL);
+  QCOMPARE(Frequency::fromString("67.2 Hz").inmHz(), 67200ULL);
 }
 
 QTEST_GUILESS_MAIN(UtilsTest)
