@@ -3,7 +3,8 @@
 #include <QHash>
 #include <QVector>
 #include <QObject>
-
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 
 /** Internal used translation table between CTCSS frequencies and AnalogChannel::Signaling codes. */
@@ -226,4 +227,109 @@ Signaling::configString(Code code) {
   else if (Signaling::isDCSInverted(code))
     return QString("i%1").arg((int)Signaling::toDCSNumber(code), 3, 10, QChar('0'));
   return "-";
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of SelectiveCall
+ * ********************************************************************************************* */
+SelectiveCall::SelectiveCall()
+  : type(Type::None), dcs{0,false}
+{
+  // Pass...
+}
+
+SelectiveCall::SelectiveCall(double ctcssFreq)
+  : type(Type::CTCSS), ctcss(ctcssFreq*10)
+{
+  // pass...
+}
+
+SelectiveCall::SelectiveCall(unsigned int octalDSCCode, bool inverted)
+  : type(Type::DCS), dcs{0, inverted}
+{
+  unsigned int e = 1;
+  while (octalDSCCode) {
+    dcs.code += (octalDSCCode % 10) * e;
+    e *= 8; octalDSCCode /= 10;
+  }
+}
+
+bool
+SelectiveCall::isValid() const {
+  return Type::None != type;
+}
+
+bool
+SelectiveCall::isCTCSS() const {
+  return Type::CTCSS == type;
+}
+
+bool
+SelectiveCall::isDCS() const {
+  return Type::DCS == type;
+}
+
+double
+SelectiveCall::Hz() const {
+  return double(ctcss)/10;
+}
+
+unsigned int
+SelectiveCall::mHz() const {
+  return ((unsigned int)ctcss)*100;
+}
+
+unsigned int
+SelectiveCall::binCode() const {
+  return dcs.code;
+}
+
+unsigned int
+SelectiveCall::octalCode() const {
+  unsigned int o=0, e=1, c=dcs.code;
+  while (c) {
+    o += (c%8)*e;
+    e *= 10; c/= 8;
+  }
+  return o;
+}
+
+bool
+SelectiveCall::isInverted() const {
+  return dcs.inverted;
+}
+
+QString
+SelectiveCall::format() const {
+  if (! isValid())
+    return QString();
+  if (isCTCSS())
+    return QString("%1 Hz").arg(Hz(), 0, 'g', 1);
+  return QString("%1%2")
+      .arg(isInverted() ? "i" : "n")
+      .arg(binCode(), 3, 8, QChar('0'));
+}
+
+SelectiveCall
+SelectiveCall::parseCTCSS(const QString &text) {
+  QRegularExpression re(R"(([0-9]+(?:\.[0-9]|))\s*(?:Hz|))");
+  QRegularExpressionMatch match = re.match(text);
+  if (! match.isValid())
+    return SelectiveCall();
+  return SelectiveCall(match.captured(1).toDouble());
+}
+
+
+SelectiveCall
+SelectiveCall::parseDCS(const QString &text) {
+  QRegularExpression re(R"(([\-iInN]?)([0-7]{1,3}))");
+  QRegularExpressionMatch match = re.match(text);
+  if (! match.isValid())
+    return SelectiveCall();
+  bool inverted = false;
+  if (("-" == match.captured(1)) || ("i" == match.captured(1)) || ("I" == match.captured(1)))
+    inverted = true;
+  return SelectiveCall(match.captured(2).toUInt(), inverted);
 }
