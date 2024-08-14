@@ -116,7 +116,7 @@ AnytoneChannelExtension::fmAPRSFrequency() const {
  * ********************************************************************************************* */
 AnytoneFMChannelExtension::AnytoneFMChannelExtension(QObject *parent)
   : AnytoneChannelExtension(parent), _reverseBurst(false), _rxCustomCTCSS(false),
-    _txCustomCTCSS(false), _customCTCSS(0), _scrambler(false)
+    _txCustomCTCSS(false), _customCTCSS(0), _squelchMode(SquelchMode::Carrier), _scrambler(false)
 {
   // pass...
 }
@@ -700,7 +700,8 @@ AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent
     _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
     _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
-    _notificationCount(1), _gpsRoaming(false), _defaultRoamingZone(new RoamingZoneReference(this))
+    _notification(false), _notificationCount(1),
+    _gpsRoaming(false), _defaultRoamingZone(new RoamingZoneReference(this))
 {
   // pass...
 }
