@@ -39,6 +39,15 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
   * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
   * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
 
+
+## Ecosystem
+As *qdmr* gets more and more popular with Linux HAMs, the ecosystem around it grows too. These are 
+tools, that make your day-to-day useage of *qdmr* easier, by providing features, not covered in 
+qdmr or dmrconf.
+
+  * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
+
+
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
