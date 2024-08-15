@@ -911,9 +911,9 @@ public:
     virtual void setFMFrequency(Frequency f);
 
     /** Returns the TX delay in ms. */
-    virtual unsigned fmTXDelay() const;
+    virtual Interval fmTXDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setFMTXDelay(unsigned ms);
+    virtual void setFMTXDelay(const Interval intv);
 
     /** Returns the sub tone settings. */
     virtual Signaling::Code txTone() const;

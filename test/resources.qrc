@@ -13,5 +13,6 @@
         <file>data/chirp_cross.csv</file>
         <file>data/chirp_ctcss.csv</file>
         <file>data/chirp_dcs.csv</file>
+        <file>data/fm_aprs_test.yaml</file>
     </qresource>
 </RCC>

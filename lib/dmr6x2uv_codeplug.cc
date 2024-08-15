@@ -1549,7 +1549,7 @@ void
 DMR6X2UVCodeplug::APRSSettingsElement::clear() {
   memset(_data, 0x00, _size);
   setUInt8(0x0000, 0xff);
-  setFMTXDelay(60);
+  setFMTXDelay(Interval::fromMilliseconds(60));
   setUInt8(0x003d, 0x01); setUInt8(0x003e, 0x03); setUInt8(0x003f, 0xff);
 }
 
@@ -1570,13 +1570,12 @@ DMR6X2UVCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
   setBCD4_be(Offset::fmFrequency(), f.inHz()/10);
 }
 
-unsigned
-DMR6X2UVCodeplug::APRSSettingsElement::fmTXDelay() const {
-  return ((unsigned)getUInt8(Offset::fmTXDelay()))*20;
+Interval DMR6X2UVCodeplug::APRSSettingsElement::fmTXDelay() const {
+  return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::fmTXDelay())*20));
 }
 void
-DMR6X2UVCodeplug::APRSSettingsElement::setFMTXDelay(unsigned ms) {
-  setUInt8(Offset::fmTXDelay(), ms/20);
+DMR6X2UVCodeplug::APRSSettingsElement::setFMTXDelay(const Interval intv) {
+  setUInt8(Offset::fmTXDelay(), intv.milliseconds()/20);
 }
 
 Signaling::Code
@@ -2168,7 +2167,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   Q_UNUSED(flags); Q_UNUSED(err)
   // replaces D868UVCodeplug::encodeGPSSystems
 
-  D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings()));
+  D878UVCodeplug::APRSSettingsElement aprs(data(Offset::aprsSettings())); aprs.clear();
   D878UVCodeplug::FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
 
   // Encode APRS system (there can only be one)
