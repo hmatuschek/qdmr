@@ -1108,7 +1108,6 @@ protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);
   void allocateForDecoding();
-  void allocateUpdated();
   void allocateForEncoding();
 
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());

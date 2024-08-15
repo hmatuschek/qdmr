@@ -29,15 +29,15 @@ channels:
 zones:
   - id: zone1
     name: Test
-    A: [ch1]
+    A: [aprs_ch]
     B: []
 
 positioning:
   - aprs:
-      id: aprs_ch
+      id: aprs
       name: APRS APAT81
       period: 300
-      revert: aprs
+      revert: aprs_ch
       icon: Jogger
       message: test message
       destination: APAT81-0

@@ -71,14 +71,18 @@ DMR6X2UVTest::testFMAPRSSettings() {
   // Load config from file
   Config config;
   if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
-    QFAIL(QString("Cannot open codeplug file: %1")
+    QFAIL(QString("Cannot open codeplug file: %1\n")
           .arg(err.format()).toStdString().c_str());
   }
 
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
   QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
+
   APRSSystem *aprs = config.posSystems()->get(0)->as<APRSSystem>();
+  QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
+  QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
+  QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
   QCOMPARE(aprs->period(), 300);
 
   // Encode
@@ -107,8 +111,12 @@ DMR6X2UVTest::testFMAPRSSettings() {
   // Check config
   QCOMPARE(comp_config.posSystems()->count(), 1);
   QVERIFY(comp_config.posSystems()->get(0)->is<APRSSystem>());
-  APRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<APRSSystem>();
 
+  APRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<APRSSystem>();
+  QCOMPARE(comp_aprs->source(), aprs->source()); QCOMPARE(comp_aprs->srcSSID(), aprs->srcSSID());
+  QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
+  QCOMPARE(comp_aprs->path(), aprs->path());
+  QCOMPARE(comp_aprs->period(), aprs->period());
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
