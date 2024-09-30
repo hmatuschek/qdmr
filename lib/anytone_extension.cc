@@ -696,8 +696,8 @@ AnytoneGPSSettingsExtension::setMode(GPSMode mode) {
  * ********************************************************************************************* */
 AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent)
   : ConfigItem(parent),
-    _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
-    _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
+    _autoRoam(false), _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(),
+    _repeaterRangeCheck(false), _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
     _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
     _notification(false), _notificationCount(1),

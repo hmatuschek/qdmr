@@ -1,0 +1,47 @@
+---
+version: 0.9.0
+settings:
+  introLine1: DM3MAT
+  introLine2: qDMR
+  micLevel: 3
+  speech: false
+  power: High
+  squelch: 1
+  vox: 0
+  tot: 0
+  defaultID: id1
+
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+channels:
+  - fm:
+      id: aprs_ch
+      name: 2m APRS
+      rxFrequency: 145.8 MHz
+      txFrequency: 145.8 MHz
+      rxOnly: false
+      admit: Always
+      power: High
+      timeout: 0
+      vox: 0
+
+zones:
+  - id: zone1
+    name: Test
+    A: [aprs_ch]
+    B: []
+
+positioning:
+  - aprs:
+      id: aprs
+      name: APRS APAT81
+      period: 300
+      revert: aprs_ch
+      icon: Jogger
+      message: test message
+      destination: APAT81-0
+      source: DM3MAT-7
+      path: [WIDE1-1, WIDE2-1]
+
+...

@@ -23,6 +23,8 @@ private slots:
   void testHangTime();
   void testKeyFunctions();
 
+  void testFMAPRSSettings();
+
 protected:
   Config _micGainConfig;
   QTextStream _stderr;
