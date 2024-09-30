@@ -2158,7 +2158,8 @@ D868UVCodeplug::allocateSMSMessages() {
 bool
 D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
+  unsigned int num_sms_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
+  for (unsigned int i=0; i<num_sms_messages; i++) {
     unsigned int bank = i/Limit::numMessagePerBank(), msg_idx = i % Limit::numMessagePerBank();
     unsigned int addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks() + msg_idx*MessageElement::size();
     MessageElement message(data(addr));

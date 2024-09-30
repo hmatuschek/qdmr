@@ -19,6 +19,7 @@ private slots:
   void testDTMFContacts();
   void testSMSTemplates();
   void testRegressionSMSTemplateOffset();
+  void testRegressionSMSCount();
 };
 
 #endif // D878UV2TEST_HH

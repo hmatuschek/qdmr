@@ -213,5 +213,25 @@ D868UVETest::testRegressionSMSTemplateOffset() {
 }
 
 
+void
+D868UVETest::testRegressionSMSCount() {
+  // Regression test for issue #482 (tries to encode too many SMS)
+    Config config;
+    config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+    for (int i=0; i<101; i++) {
+        SMSTemplate *sms = new SMSTemplate(); sms->setName(QString("SMS%1").arg(i)); sms->setMessage("ABC");
+        config.smsExtension()->smsTemplates()->add(sms);
+    }
+
+    ErrorStack err;
+    D868UVCodeplug codeplug;
+    Codeplug::Flags flags; flags.updateCodePlug=false;
+    if (! codeplug.encode(&config, flags, err)) {
+        QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+                  .arg(err.format()).toStdString().c_str());
+    }
+}
+
+
 QTEST_GUILESS_MAIN(D868UVETest)
 
