@@ -1558,7 +1558,7 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
       setAPRSType(APRSType::FM);
   } else if (const DMRChannel *dmr = c->as<DMRChannel>()) {
     if (dmr->aprs()) {
-      if (APRSSystem *sys = dmr->aprs()->as<APRSSystem>()) {
+      if (dmr->aprs()->is<APRSSystem>()) {
         setAPRSType(APRSType::FM);
       } else if (GPSSystem *sys = dmr->aprs()->as<GPSSystem>()){
         if (0 <= ctx.index(sys)) {
@@ -1948,6 +1948,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
   AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
   ext->setPreWaveDelay(fmPreWaveDelay());
   ext->setTXDelay(fmTXDelay());
+  sys->setAnytoneExtension(ext);
 
   return sys;
 }

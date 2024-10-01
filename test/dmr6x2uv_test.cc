@@ -85,6 +85,12 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
   QCOMPARE(aprs->period(), 300);
 
+  // test extension settings
+  auto ext = new AnytoneFMAPRSSettingsExtension();
+  ext->setPreWaveDelay(Interval::fromMilliseconds(100));
+  ext->setTXDelay(Interval::fromMilliseconds(200));
+  aprs->setAnytoneExtension(ext);
+
   // Encode
   DMR6X2UVCodeplug codeplug;
   Codeplug::Flags flags; flags.updateCodePlug=false;
@@ -118,6 +124,13 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(comp_aprs->path(), aprs->path());
   QCOMPARE(comp_aprs->period(), aprs->period());
 
+  // check extension settings
+  QVERIFY(nullptr != comp_aprs->anytoneExtension());
+  QCOMPARE(comp_aprs->anytoneExtension()->preWaveDelay().milliseconds(),
+           100);
+  QCOMPARE(comp_aprs->anytoneExtension()->txDelay().milliseconds(),
+           200);
+
   // Check revert channel
   QCOMPARE(comp_config.channelList()->count(), 1);
   QVERIFY(comp_config.channelList()->channel(0)->is<FMChannel>());
@@ -125,6 +138,7 @@ DMR6X2UVTest::testFMAPRSSettings() {
            config.channelList()->channel(0)->rxFrequency());
   QCOMPARE(comp_config.channelList()->channel(0)->txFrequency(),
            config.channelList()->channel(0)->txFrequency());
+
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
