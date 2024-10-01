@@ -66,7 +66,7 @@ Codeplug::Element::fill(uint8_t value, unsigned offset, int size) {
 }
 
 bool
-Codeplug::Element::getBit(const Offset::BitOffset &offset) const {
+Codeplug::Element::getBit(const Offset::Bit &offset) const {
   return getBit(offset.byte, offset.bit);
 }
 
@@ -83,7 +83,7 @@ Codeplug::Element::getBit(unsigned offset, unsigned bit) const {
 }
 
 void
-Codeplug::Element::setBit(const Offset::BitOffset &offset, bool value) {
+Codeplug::Element::setBit(const Offset::Bit &offset, bool value) {
   setBit(offset.byte, offset.bit, value);
 }
 void
@@ -113,6 +113,16 @@ Codeplug::Element::clearBit(unsigned offset, unsigned bit) {
   (*ptr) &= ~(1<<bit);
 }
 
+
+uint8_t
+Codeplug::Element::getUInt2(const Offset::Bit &offset) const {
+  return getUInt2(offset.byte, offset.bit);
+}
+void
+Codeplug::Element::setUInt2(const Offset::Bit &offset, uint8_t value) {
+  setUInt2(offset.byte, offset.bit, value);
+}
+
 uint8_t
 Codeplug::Element::getUInt2(unsigned offset, unsigned bit) const {
   if (offset >= _size) {
@@ -133,6 +143,15 @@ Codeplug::Element::setUInt2(unsigned offset, unsigned bit, uint8_t value) {
 
   *(_data+offset) &= ~(0b11 << bit);
   *(_data+offset) |= ((value & 0b11)<<bit);
+}
+
+uint8_t
+Codeplug::Element::getUInt3(const Offset::Bit &offset) const {
+  return getUInt3(offset.byte, offset.bit);
+}
+void
+Codeplug::Element::setUInt3(const Offset::Bit &offset, uint8_t value) {
+  setUInt3(offset.byte, offset.bit, value);
 }
 
 uint8_t
@@ -158,6 +177,16 @@ Codeplug::Element::setUInt3(unsigned offset, unsigned bit, uint8_t value) {
 }
 
 uint8_t
+Codeplug::Element::getUInt4(const Offset::Bit &offset) const {
+  return getUInt4(offset.byte, offset.bit);
+}
+void
+Codeplug::Element::setUInt4(const Offset::Bit &offset, uint8_t value) {
+  setUInt4(offset.byte, offset.bit, value);
+}
+
+
+uint8_t
 Codeplug::Element::getUInt4(unsigned offset, unsigned bit) const {
   if (offset >= _size) {
     logFatal() << "Cannot get uint4 at " << QString::number(offset, 16)
@@ -180,6 +209,15 @@ Codeplug::Element::setUInt4(unsigned offset, unsigned bit, uint8_t value) {
 }
 
 uint8_t
+Codeplug::Element::getUInt5(const Offset::Bit &offset) const {
+  return getUInt5(offset.byte, offset.bit);
+}
+void
+Codeplug::Element::setUInt5(const Offset::Bit &offset, uint8_t value) {
+  setUInt5(offset.byte, offset.bit, value);
+}
+
+uint8_t
 Codeplug::Element::getUInt5(unsigned offset, unsigned bit) const {
   if (offset >= _size) {
     logFatal() << "Cannot get uint5 at " << QString::number(offset, 16)
@@ -199,6 +237,15 @@ Codeplug::Element::setUInt5(unsigned offset, unsigned bit, uint8_t value) {
 
   *(_data+offset) &= ~(0b11111 << bit);
   *(_data+offset) |= ((value & 0b11111)<<bit);
+}
+
+uint8_t
+Codeplug::Element::getUInt6(const Offset::Bit &offset) const {
+  return getUInt6(offset.byte, offset.bit);
+}
+void
+Codeplug::Element::setUInt6(const Offset::Bit &offset, uint8_t value) {
+  setUInt6(offset.byte, offset.bit, value);
 }
 
 uint8_t

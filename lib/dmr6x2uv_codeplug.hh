@@ -841,6 +841,11 @@ public:
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
   public:
+    /** Possible PTT modes for FM APRS. */
+    enum class FMAPRSPTTMode {
+      Off = 0, Start = 1, End = 2
+    };
+
     /** Possible APRS report types. */
     enum class APRSType{
       Off = 0, FM = 1, DMR = 2
@@ -887,6 +892,21 @@ public:
     /** Sets the DMR APRS report channel index. */
     virtual void setDMRAPRSChannelIndex(unsigned int idx);
 
+    /** Returns @c true, if the reception of DMR APRS messages is enabled. */
+    virtual bool dmrAPRSRXEnabled() const;
+    /** Enables/disables the reception of DMR APRS messages. */
+    virtual void enableDMRARPSRX(bool enable);
+
+    /** Returns true, if the position is reported via DMR APRS on PTT. */
+    virtual bool dmrAPRSPTTEnabled() const;
+    /** Enables/disables reporting the position via DMR APRS on PTT. */
+    virtual void enableDMRAPRSPTT(bool enable);
+
+    /** Returns teh FM APRS PTT mode. */
+    virtual FMAPRSPTTMode fmAPRSPTTMode() const;
+    /** Sets the FM APRS PTT mode. */
+    virtual void setFMAPRSPTTMode(FMAPRSPTTMode mode);
+
     /** Returns the APRS type. */
     virtual APRSType aprsType() const;
     /** Sets the APRS type. */
@@ -895,12 +915,24 @@ public:
     bool linkChannelObj(Channel *c, Context &ctx) const;
     bool fromChannelObj(const Channel *c, Context &ctx);
 
+public:
+    struct Limit {
+      // Maximum number of scan list indices.
+      static constexpr unsigned int scanListIndices() { return 8; }
+    };
+
 protected:
     /// @cond DO_NOT_DOCUMENT
-    struct Offset {
-      static constexpr unsigned int ranging()                      { return 0x001b; }
+    struct Offset: public Element::Offset {
+      static constexpr Bit roaming()                               { return {0x001b, 2}; }
+      static constexpr Bit ranging()                               { return {0x001b, 0}; }
+      static constexpr unsigned int scanListIndices()              { return 0x0036; }
+      static constexpr unsigned int betweenScanListIndices()       { return 0x0001; }
       static constexpr unsigned int dmrAPRSChannelIndex()          { return 0x003e; }
-      static constexpr unsigned int aprsType()                     { return 0x003f; }
+      static constexpr Bit dmrAPRSRXEnable()                       { return {0x003f, 5}; }
+      static constexpr Bit dmrAPRSPTTEnable()                      { return {0x003f, 4}; }
+      static constexpr Bit fmAPRSPTTMode()                         { return {0x003f, 2}; }
+      static constexpr Bit aprsType()                              { return {0x003f, 0}; }
     };
     /// @endcond
   };

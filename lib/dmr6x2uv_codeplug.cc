@@ -1496,15 +1496,15 @@ DMR6X2UVCodeplug::ChannelElement::hasScanListIndex(unsigned int n) const {
 }
 unsigned int
 DMR6X2UVCodeplug::ChannelElement::scanListIndex(unsigned int n) const {
-  if (n > 7)
+  if (n >= Limit::scanListIndices())
     return 0xff;
-  return getUInt8(0x0036+n);
+  return getUInt8(Offset::scanListIndices() + n*Offset::betweenScanListIndices());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::setScanListIndex(unsigned int n, unsigned idx) {
-  if (n > 7)
+  if (n >= Limit::scanListIndices())
     return;
-  setUInt8(0x0036+n, idx);
+  setUInt8(Offset::scanListIndices() + n*Offset::betweenScanListIndices(), idx);
 }
 void
 DMR6X2UVCodeplug::ChannelElement::clearScanListIndex(unsigned int n) {
@@ -1513,20 +1513,22 @@ DMR6X2UVCodeplug::ChannelElement::clearScanListIndex(unsigned int n) {
 
 bool
 DMR6X2UVCodeplug::ChannelElement::roamingEnabled() const {
-  return ! getBit(0x001b, 2);
+  // inverted
+  return ! getBit(Offset::roaming());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::enableRoaming(bool enable) {
-  setBit(0x001b, 2, !enable);
+  // inverted
+  setBit(Offset::roaming(), !enable);
 }
 
 bool
 DMR6X2UVCodeplug::ChannelElement::ranging() const {
-  return getBit(Offset::ranging(), 0);
+  return getBit(Offset::ranging());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::enableRanging(bool enable) {
-  return setBit(Offset::ranging(), 0, enable);
+  return setBit(Offset::ranging(), enable);
 }
 
 unsigned int
@@ -1538,14 +1540,40 @@ DMR6X2UVCodeplug::ChannelElement::setDMRAPRSChannelIndex(unsigned int idx) {
   setUInt8(Offset::dmrAPRSChannelIndex(), std::min(APRSSettingsElement::Limit::dmrSystems(), idx));
 }
 
+bool
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSRXEnabled() const {
+  return getBit(Offset::dmrAPRSRXEnable());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableDMRARPSRX(bool enable) {
+  setBit(Offset::dmrAPRSRXEnable(), enable);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSPTTEnabled() const {
+  return getBit(Offset::dmrAPRSPTTEnable());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableDMRAPRSPTT(bool enable) {
+  setBit(Offset::dmrAPRSPTTEnable(), enable);
+}
+
+DMR6X2UVCodeplug::ChannelElement::FMAPRSPTTMode
+DMR6X2UVCodeplug::ChannelElement::fmAPRSPTTMode() const {
+  return (FMAPRSPTTMode)getUInt2(Offset::fmAPRSPTTMode());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setFMAPRSPTTMode(FMAPRSPTTMode mode) {
+  setUInt2(Offset::fmAPRSPTTMode(), (unsigned int)mode);
+}
 
 DMR6X2UVCodeplug::ChannelElement::APRSType
 DMR6X2UVCodeplug::ChannelElement::aprsType() const {
-  return (APRSType) getUInt2(Offset::aprsType(), 0);
+  return (APRSType) getUInt2(Offset::aprsType());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::setAPRSType(APRSType aprstype) {
-  setUInt2(Offset::aprsType(), 0, (unsigned int)aprstype);
+  setUInt2(Offset::aprsType(), (unsigned int)aprstype);
 }
 
 bool

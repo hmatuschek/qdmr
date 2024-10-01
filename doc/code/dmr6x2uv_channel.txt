@@ -16,7 +16,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 1c | RX Group list index           | 2-tone ID                     | 5-tone ID                     | DTMF ID                       |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-20 | Color code                    |LWK|EEE|RGP|EAT| 0 |EST|SMC|TSL| AES Encryption key            | Name 16 x ASCII 0-padded   ...
+20 | Color code                    |LWK|EEE|???|EAT| 0 |EST|SMC|TSL| AES Encryption key            | Name 16 x ASCII 0-padded   ...
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30  ...                                                                                            | Unused set to 0x00            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -24,7 +24,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 38 | Scanlist idx 2, 0xff=unset    | Scanlist idx 3, 0xff=unset    | Scanlist idx 4, 0xff=unset    | Scanlist idx 5, 0xff=unset    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0 |RGP|  0   0   |APRSType|
+3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0 |RGP|DAP|APRSPTT|APRSTyp|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
@@ -47,7 +47,6 @@ Field description:
  - XFR: Exclude channel from roaming
  - LWK: Enable lone worker.
  - EEE: Enable enhanced encryption
- - RGP: Enable DMR-APRS RX
  - EAT: Enable adaptive TDMA
  - EST: Enable simplex TDMA
  - SMC: SMS confirmation,
@@ -55,4 +54,7 @@ Field description:
  - DAD: Data ACK disable (inverted!)
  - ETM: Enable through mode
  - RNG: Ranging
+ - RGP: Enable DMR-APRS RX
+ - DAP: Enable DMR-APRS PTT
+ - APRSPTT: FM APRS PTT mode 0=Off, 1=start of transmission, 2 = end of transmission
  - ATy: APRS Type: 0=Off, 1=Analog APRS, 2=DMR-APRS
