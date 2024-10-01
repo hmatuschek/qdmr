@@ -638,10 +638,10 @@ public:
       static constexpr unsigned int simplxRepSpeaker()    { return 0x00b3; }
       static constexpr unsigned int showContact()         { return 0x00b4; }
       static constexpr unsigned int keyToneLevel()        { return 0x00b5; }
-      static constexpr unsigned int knobLock()            { return 0x00b6; }
-      static constexpr unsigned int keypadLock()          { return 0x00b6; }
-      static constexpr unsigned int sideKeyLock()         { return 0x00b6; }
-      static constexpr unsigned int forceKeyLock()        { return 0x00b6; }
+      static constexpr Bit knobLock()                     { return {0x00b6, 0}; }
+      static constexpr Bit keypadLock()                   { return {0x00b6, 1}; }
+      static constexpr Bit sideKeyLock()                  { return {0x00b6, 3}; }
+      static constexpr Bit forceKeyLock()                 { return {0x00b6, 4}; }
       static constexpr unsigned int simplxRepSlot()       { return 0x00b7; }
       static constexpr unsigned int showLastHeard()       { return 0x00b8; }
       static constexpr unsigned int smsFormat()           { return 0x00b9; }

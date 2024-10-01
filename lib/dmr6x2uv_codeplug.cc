@@ -751,35 +751,35 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(Offset::knobLock(), 0);
+  return getBit(Offset::knobLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(Offset::knobLock(), 0, enable);
+  setBit(Offset::knobLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(Offset::keypadLock(), 1);
+  return getBit(Offset::keypadLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(Offset::keypadLock(), 1, enable);
+  setBit(Offset::keypadLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(Offset::sideKeyLock(), 3);
+  return getBit(Offset::sideKeyLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(Offset::sideKeyLock(), 3, enable);
+  setBit(Offset::sideKeyLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keyLockForced() const {
-  return getBit(Offset::forceKeyLock(), 4);
+  return getBit(Offset::forceKeyLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
-  setBit(Offset::forceKeyLock(), 4, enable);
+  setBit(Offset::forceKeyLock(), enable);
 }
 
 AnytoneSimplexRepeaterSettingsExtension::TimeSlot
