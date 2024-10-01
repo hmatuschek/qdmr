@@ -75,6 +75,10 @@ DMR6X2UVTest::testFMAPRSSettings() {
           .arg(err.format()).toStdString().c_str());
   }
 
+  auto ch_ext = new AnytoneFMChannelExtension();
+  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
+  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
+
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
   QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
@@ -132,13 +136,17 @@ DMR6X2UVTest::testFMAPRSSettings() {
            200);
 
   // Check revert channel
-  QCOMPARE(comp_config.channelList()->count(), 1);
+  QCOMPARE(comp_config.channelList()->count(), 2);
   QVERIFY(comp_config.channelList()->channel(0)->is<FMChannel>());
   QCOMPARE(comp_config.channelList()->channel(0)->rxFrequency(),
            config.channelList()->channel(0)->rxFrequency());
   QCOMPARE(comp_config.channelList()->channel(0)->txFrequency(),
            config.channelList()->channel(0)->txFrequency());
 
+  // Check channel extension properties
+  QVERIFY(nullptr != comp_config.channelList()->channel(1)->as<FMChannel>()->anytoneChannelExtension());
+  auto comp_ch_ext = comp_config.channelList()->channel(1)->as<FMChannel>()->anytoneChannelExtension();
+  QCOMPARE(comp_ch_ext->aprsPTT(), ch_ext->aprsPTT());
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)

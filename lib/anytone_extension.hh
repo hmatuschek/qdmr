@@ -82,6 +82,16 @@ class AnytoneChannelExtension: public ConfigExtension
   Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
   /** A reference to the FM APRS frequency. If not set, the default will be used. */
   Q_PROPERTY(AnytoneAPRSFrequencyRef *fmAPRSFrequency READ fmAPRSFrequency())
+  /** Specifies if and when the position is send via the associated APRS system, once the PTT is
+   * pressed. */
+  Q_PROPERTY(APRSPTT aprsPTT READ aprsPTT WRITE setAPRSPTT)
+
+public:
+  /** Possible APRS PTT modes. */
+  enum class APRSPTT{
+    Off, Start, End
+  };
+  Q_ENUM(APRSPTT)
 
 protected:
   /** Hidden constructor. */
@@ -106,6 +116,11 @@ public:
   /** Holds a reference to the FM APRS frequency to be used if FM APRS is enabled on the channel. */
   AnytoneAPRSFrequencyRef *fmAPRSFrequency() const;
 
+  /** Holds the APRS PTT mode. That his, if and when the APRS information is send via the
+   * associated APRS system. */
+  APRSPTT aprsPTT() const;
+  void setAPRSPTT(APRSPTT mode);
+
 protected:
   /** If @c true, talkaround is enabled. */
   bool _talkaround;
@@ -115,6 +130,8 @@ protected:
   bool _handsFree;
   /** A reference to the FM APRS frequency. */
   AnytoneAPRSFrequencyRef *_fmAPRSFrequency;
+  /** Holds the APRS PTT mode. */
+  APRSPTT _aprsPTT;
 };
 
 

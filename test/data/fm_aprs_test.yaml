@@ -25,6 +25,17 @@ channels:
       power: High
       timeout: 0
       vox: 0
+  - fm:
+      id: ch1
+      name: Some FM Channel
+      rxFrequency: 145.1 MHz
+      txFrequency: 145.1 MHz
+      rxOnly: false
+      admit: Always
+      power: High
+      timeout: 0
+      vox: 0
+      aprs: aprs
 
 zones:
   - id: zone1

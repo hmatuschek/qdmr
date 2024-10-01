@@ -1582,16 +1582,33 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
     return false;
 
   if (const FMChannel *fm = c->as<FMChannel>()) {
-    if (fm->aprsSystem())
+    if (fm->aprsSystem()) {
       setAPRSType(APRSType::FM);
+      if (auto ext = fm->anytoneChannelExtension()) {
+        switch (ext->aprsPTT()) {
+        case AnytoneChannelExtension::APRSPTT::Off: setFMAPRSPTTMode(FMAPRSPTTMode::Off); break;
+        case AnytoneChannelExtension::APRSPTT::Start: setFMAPRSPTTMode(FMAPRSPTTMode::Start); break;
+        case AnytoneChannelExtension::APRSPTT::End: setFMAPRSPTTMode(FMAPRSPTTMode::End); break;
+        }
+      }
+    }
   } else if (const DMRChannel *dmr = c->as<DMRChannel>()) {
     if (dmr->aprs()) {
       if (dmr->aprs()->is<APRSSystem>()) {
         setAPRSType(APRSType::FM);
+        if (auto ext = dmr->anytoneChannelExtension()) {
+          switch (ext->aprsPTT()) {
+          case AnytoneChannelExtension::APRSPTT::Off: setFMAPRSPTTMode(FMAPRSPTTMode::Off); break;
+          case AnytoneChannelExtension::APRSPTT::Start: setFMAPRSPTTMode(FMAPRSPTTMode::Start); break;
+          case AnytoneChannelExtension::APRSPTT::End: setFMAPRSPTTMode(FMAPRSPTTMode::End); break;
+          }
+        }
       } else if (GPSSystem *sys = dmr->aprs()->as<GPSSystem>()){
         if (0 <= ctx.index(sys)) {
           setAPRSType(APRSType::DMR);
           setDMRAPRSChannelIndex(ctx.index(sys));
+          if (auto ext = dmr->anytoneChannelExtension())
+            enableDMRAPRSPTT(AnytoneChannelExtension::APRSPTT::Off != ext->aprsPTT());
         }
       }
     }
@@ -1604,14 +1621,31 @@ bool
 DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
     return false;
-
   if (FMChannel *fm = c->as<FMChannel>()) {
-    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>())
+    auto ext = fm->anytoneChannelExtension();
+    if (nullptr == ext)
+      fm->setAnytoneChannelExtension(ext = new AnytoneFMChannelExtension());
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+      switch (fmAPRSPTTMode()) {
+      case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
       fm->setAPRSSystem(ctx.get<APRSSystem>(0));
+    }
   } else if (DMRChannel *dmr = c->as<DMRChannel>()) {
-    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>())
+    auto ext = dmr->anytoneChannelExtension();
+    if (nullptr == ext)
+      dmr->setAnytoneChannelExtension(ext = new AnytoneDMRChannelExtension());
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+      switch (fmAPRSPTTMode()) {
+      case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
       dmr->setAPRSObj(ctx.get<APRSSystem>(0));
-    else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+    } else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+      ext->setAPRSPTT(dmrAPRSPTTEnabled() ? AnytoneChannelExtension::APRSPTT::Start : AnytoneChannelExtension::APRSPTT::Off);
       dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
     }
   }
