@@ -24,7 +24,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 38 | Scanlist idx 2, 0xff=unset    | Scanlist idx 3, 0xff=unset    | Scanlist idx 4, 0xff=unset    | Scanlist idx 5, 0xff=unset    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0   0   0   0   0 |RGP|ATy|
+3c | Scanlist idx 6, 0xff=unset    | Scanlist idx 7, 0xff=unset    | ARPS Report Channel Index     | 0   0 |RGP|  0   0   |APRSType|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Field description:
@@ -55,4 +55,4 @@ Field description:
  - DAD: Data ACK disable (inverted!)
  - ETM: Enable through mode
  - RNG: Ranging
- - ATy: APRS Type: 0=DMR-APRS, 1=Analog APRS
+ - ATy: APRS Type: 0=Off, 1=Analog APRS, 2=DMR-APRS

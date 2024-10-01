@@ -1522,11 +1522,73 @@ DMR6X2UVCodeplug::ChannelElement::enableRoaming(bool enable) {
 
 bool
 DMR6X2UVCodeplug::ChannelElement::ranging() const {
-  return getBit(0x001b, 0);
+  return getBit(Offset::ranging(), 0);
 }
 void
 DMR6X2UVCodeplug::ChannelElement::enableRanging(bool enable) {
-  return setBit(0x001b, 0, enable);
+  return setBit(Offset::ranging(), 0, enable);
+}
+
+unsigned int
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSChannelIndex() const {
+  return getUInt8(Offset::dmrAPRSChannelIndex());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setDMRAPRSChannelIndex(unsigned int idx) {
+  setUInt8(Offset::dmrAPRSChannelIndex(), std::min(APRSSettingsElement::Limit::dmrSystems(), idx));
+}
+
+
+DMR6X2UVCodeplug::ChannelElement::APRSType
+DMR6X2UVCodeplug::ChannelElement::aprsType() const {
+  return (APRSType) getUInt2(Offset::aprsType(), 0);
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setAPRSType(APRSType aprstype) {
+  setUInt2(Offset::aprsType(), 0, (unsigned int)aprstype);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (const FMChannel *fm = c->as<FMChannel>()) {
+    if (fm->aprsSystem())
+      setAPRSType(APRSType::FM);
+  } else if (const DMRChannel *dmr = c->as<DMRChannel>()) {
+    if (dmr->aprs()) {
+      if (APRSSystem *sys = dmr->aprs()->as<APRSSystem>()) {
+        setAPRSType(APRSType::FM);
+      } else if (GPSSystem *sys = dmr->aprs()->as<GPSSystem>()){
+        if (0 <= ctx.index(sys)) {
+          setAPRSType(APRSType::DMR);
+          setDMRAPRSChannelIndex(ctx.index(sys));
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+
+  if (FMChannel *fm = c->as<FMChannel>()) {
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>())
+      fm->setAPRSSystem(ctx.get<APRSSystem>(0));
+  } else if (DMRChannel *dmr = c->as<DMRChannel>()) {
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>())
+      dmr->setAPRSObj(ctx.get<APRSSystem>(0));
+    else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+      dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
+    }
+  }
+
+  return true;
 }
 
 
@@ -1567,7 +1629,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::fmFrequency() const {
 }
 void
 DMR6X2UVCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
-  setBCD4_be(Offset::fmFrequency(), f.inHz()/10);
+  setBCD8_be(Offset::fmFrequency(), f.inHz()/10);
 }
 
 Interval DMR6X2UVCodeplug::APRSSettingsElement::fmTXDelay() const {
@@ -1865,22 +1927,36 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setFMPreWaveDelay(Interval());
+
+  AnytoneFMAPRSSettingsExtension *ext = sys->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  setFMPreWaveDelay(ext->preWaveDelay());
+  setFMTXDelay(ext->txDelay());
+
   return true;
 }
 
 APRSSystem *
 DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
-  return new APRSSystem(
+  APRSSystem *sys = new APRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
         path(), icon(), "", autoTXInterval().seconds());
+
+  AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
+  ext->setPreWaveDelay(fmPreWaveDelay());
+  ext->setTXDelay(fmTXDelay());
+
+  return sys;
 }
 
 bool
 DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());
+  Frequency f = fmFrequency();
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(f);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
@@ -2174,6 +2250,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
     aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
     aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
   }
+
   return true;
 }
 

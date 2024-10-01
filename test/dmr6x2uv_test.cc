@@ -117,6 +117,14 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
   QCOMPARE(comp_aprs->path(), aprs->path());
   QCOMPARE(comp_aprs->period(), aprs->period());
+
+  // Check revert channel
+  QCOMPARE(comp_config.channelList()->count(), 1);
+  QVERIFY(comp_config.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(comp_config.channelList()->channel(0)->rxFrequency(),
+           config.channelList()->channel(0)->rxFrequency());
+  QCOMPARE(comp_config.channelList()->channel(0)->txFrequency(),
+           config.channelList()->channel(0)->txFrequency());
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)

@@ -840,6 +840,12 @@ public:
    *  @verbinclude dmr6x2uv_channel.txt */
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
+  public:
+    /** Possible APRS report types. */
+    enum class APRSType{
+      Off = 0, FM = 1, DMR = 2
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -872,10 +878,31 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns @c true, if ranging is enabled. */
-    bool ranging() const;
+    virtual bool ranging() const;
     /** Enables/disables ranging. */
-    void enableRanging(bool enable);
+    virtual void enableRanging(bool enable);
 
+    /** Returns the DMR APRS report channel index. */
+    virtual unsigned int dmrAPRSChannelIndex() const;
+    /** Sets the DMR APRS report channel index. */
+    virtual void setDMRAPRSChannelIndex(unsigned int idx);
+
+    /** Returns the APRS type. */
+    virtual APRSType aprsType() const;
+    /** Sets the APRS type. */
+    virtual void setAPRSType(APRSType aprstype);
+
+    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool fromChannelObj(const Channel *c, Context &ctx);
+
+protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset {
+      static constexpr unsigned int ranging()                      { return 0x001b; }
+      static constexpr unsigned int dmrAPRSChannelIndex()          { return 0x003e; }
+      static constexpr unsigned int aprsType()                     { return 0x003f; }
+    };
+    /// @endcond
   };
 
   /** Represents the APRS settings within the binary DMR-6X2UV codeplug.
