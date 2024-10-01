@@ -751,35 +751,35 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(Offset::knobLock(), 0);
+  return getBit(Offset::knobLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(Offset::knobLock(), 0, enable);
+  setBit(Offset::knobLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(Offset::keypadLock(), 1);
+  return getBit(Offset::keypadLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(Offset::keypadLock(), 1, enable);
+  setBit(Offset::keypadLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(Offset::sideKeyLock(), 3);
+  return getBit(Offset::sideKeyLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(Offset::sideKeyLock(), 3, enable);
+  setBit(Offset::sideKeyLock(), enable);
 }
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keyLockForced() const {
-  return getBit(Offset::forceKeyLock(), 4);
+  return getBit(Offset::forceKeyLock());
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
-  setBit(Offset::forceKeyLock(), 4, enable);
+  setBit(Offset::forceKeyLock(), enable);
 }
 
 AnytoneSimplexRepeaterSettingsExtension::TimeSlot
@@ -1496,15 +1496,15 @@ DMR6X2UVCodeplug::ChannelElement::hasScanListIndex(unsigned int n) const {
 }
 unsigned int
 DMR6X2UVCodeplug::ChannelElement::scanListIndex(unsigned int n) const {
-  if (n > 7)
+  if (n >= Limit::scanListIndices())
     return 0xff;
-  return getUInt8(0x0036+n);
+  return getUInt8(Offset::scanListIndices() + n*Offset::betweenScanListIndices());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::setScanListIndex(unsigned int n, unsigned idx) {
-  if (n > 7)
+  if (n >= Limit::scanListIndices())
     return;
-  setUInt8(0x0036+n, idx);
+  setUInt8(Offset::scanListIndices() + n*Offset::betweenScanListIndices(), idx);
 }
 void
 DMR6X2UVCodeplug::ChannelElement::clearScanListIndex(unsigned int n) {
@@ -1513,20 +1513,144 @@ DMR6X2UVCodeplug::ChannelElement::clearScanListIndex(unsigned int n) {
 
 bool
 DMR6X2UVCodeplug::ChannelElement::roamingEnabled() const {
-  return ! getBit(0x001b, 2);
+  // inverted
+  return ! getBit(Offset::roaming());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::enableRoaming(bool enable) {
-  setBit(0x001b, 2, !enable);
+  // inverted
+  setBit(Offset::roaming(), !enable);
 }
 
 bool
 DMR6X2UVCodeplug::ChannelElement::ranging() const {
-  return getBit(0x001b, 0);
+  return getBit(Offset::ranging());
 }
 void
 DMR6X2UVCodeplug::ChannelElement::enableRanging(bool enable) {
-  return setBit(0x001b, 0, enable);
+  return setBit(Offset::ranging(), enable);
+}
+
+unsigned int
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSChannelIndex() const {
+  return getUInt8(Offset::dmrAPRSChannelIndex());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setDMRAPRSChannelIndex(unsigned int idx) {
+  setUInt8(Offset::dmrAPRSChannelIndex(), std::min(APRSSettingsElement::Limit::dmrSystems(), idx));
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSRXEnabled() const {
+  return getBit(Offset::dmrAPRSRXEnable());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableDMRARPSRX(bool enable) {
+  setBit(Offset::dmrAPRSRXEnable(), enable);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::dmrAPRSPTTEnabled() const {
+  return getBit(Offset::dmrAPRSPTTEnable());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::enableDMRAPRSPTT(bool enable) {
+  setBit(Offset::dmrAPRSPTTEnable(), enable);
+}
+
+DMR6X2UVCodeplug::ChannelElement::FMAPRSPTTMode
+DMR6X2UVCodeplug::ChannelElement::fmAPRSPTTMode() const {
+  return (FMAPRSPTTMode)getUInt2(Offset::fmAPRSPTTMode());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setFMAPRSPTTMode(FMAPRSPTTMode mode) {
+  setUInt2(Offset::fmAPRSPTTMode(), (unsigned int)mode);
+}
+
+DMR6X2UVCodeplug::ChannelElement::APRSType
+DMR6X2UVCodeplug::ChannelElement::aprsType() const {
+  return (APRSType) getUInt2(Offset::aprsType());
+}
+void
+DMR6X2UVCodeplug::ChannelElement::setAPRSType(APRSType aprstype) {
+  setUInt2(Offset::aprsType(), (unsigned int)aprstype);
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (const FMChannel *fm = c->as<FMChannel>()) {
+    if (fm->aprsSystem()) {
+      setAPRSType(APRSType::FM);
+      if (auto ext = fm->anytoneChannelExtension()) {
+        switch (ext->aprsPTT()) {
+        case AnytoneChannelExtension::APRSPTT::Off: setFMAPRSPTTMode(FMAPRSPTTMode::Off); break;
+        case AnytoneChannelExtension::APRSPTT::Start: setFMAPRSPTTMode(FMAPRSPTTMode::Start); break;
+        case AnytoneChannelExtension::APRSPTT::End: setFMAPRSPTTMode(FMAPRSPTTMode::End); break;
+        }
+      }
+    }
+  } else if (const DMRChannel *dmr = c->as<DMRChannel>()) {
+    if (dmr->aprs()) {
+      if (dmr->aprs()->is<APRSSystem>()) {
+        setAPRSType(APRSType::FM);
+        if (auto ext = dmr->anytoneChannelExtension()) {
+          switch (ext->aprsPTT()) {
+          case AnytoneChannelExtension::APRSPTT::Off: setFMAPRSPTTMode(FMAPRSPTTMode::Off); break;
+          case AnytoneChannelExtension::APRSPTT::Start: setFMAPRSPTTMode(FMAPRSPTTMode::Start); break;
+          case AnytoneChannelExtension::APRSPTT::End: setFMAPRSPTTMode(FMAPRSPTTMode::End); break;
+          }
+        }
+      } else if (GPSSystem *sys = dmr->aprs()->as<GPSSystem>()){
+        if (0 <= ctx.index(sys)) {
+          setAPRSType(APRSType::DMR);
+          setDMRAPRSChannelIndex(ctx.index(sys));
+          if (auto ext = dmr->anytoneChannelExtension())
+            enableDMRAPRSPTT(AnytoneChannelExtension::APRSPTT::Off != ext->aprsPTT());
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+    return false;
+  if (FMChannel *fm = c->as<FMChannel>()) {
+    auto ext = fm->anytoneChannelExtension();
+    if (nullptr == ext)
+      fm->setAnytoneChannelExtension(ext = new AnytoneFMChannelExtension());
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+      switch (fmAPRSPTTMode()) {
+      case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+      fm->setAPRSSystem(ctx.get<APRSSystem>(0));
+    }
+  } else if (DMRChannel *dmr = c->as<DMRChannel>()) {
+    auto ext = dmr->anytoneChannelExtension();
+    if (nullptr == ext)
+      dmr->setAnytoneChannelExtension(ext = new AnytoneDMRChannelExtension());
+    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+      switch (fmAPRSPTTMode()) {
+      case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+      dmr->setAPRSObj(ctx.get<APRSSystem>(0));
+    } else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+      ext->setAPRSPTT(dmrAPRSPTTEnabled() ? AnytoneChannelExtension::APRSPTT::Start : AnytoneChannelExtension::APRSPTT::Off);
+      dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
+    }
+  }
+
+  return true;
 }
 
 
@@ -1567,7 +1691,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::fmFrequency() const {
 }
 void
 DMR6X2UVCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
-  setBCD4_be(Offset::fmFrequency(), f.inHz()/10);
+  setBCD8_be(Offset::fmFrequency(), f.inHz()/10);
 }
 
 Interval DMR6X2UVCodeplug::APRSSettingsElement::fmTXDelay() const {
@@ -1865,22 +1989,37 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
   setIcon(sys->icon());
-  setFMPreWaveDelay(Interval());
+
+  AnytoneFMAPRSSettingsExtension *ext = sys->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  setFMPreWaveDelay(ext->preWaveDelay());
+  setFMTXDelay(ext->txDelay());
+
   return true;
 }
 
 APRSSystem *
 DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
-  return new APRSSystem(
+  APRSSystem *sys = new APRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
         path(), icon(), "", autoTXInterval().seconds());
+
+  AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
+  ext->setPreWaveDelay(fmPreWaveDelay());
+  ext->setTXDelay(fmTXDelay());
+  sys->setAnytoneExtension(ext);
+
+  return sys;
 }
 
 bool
 DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());
+  Frequency f = fmFrequency();
+  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(f);
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();
@@ -2174,6 +2313,7 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
     aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
     aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
   }
+
   return true;
 }
 

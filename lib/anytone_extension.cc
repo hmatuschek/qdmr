@@ -64,7 +64,7 @@ AnytoneAPRSFrequencyList::allocateChild(const YAML::Node &node, ConfigItem::Cont
  * ********************************************************************************************* */
 AnytoneChannelExtension::AnytoneChannelExtension(QObject *parent)
   : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false),
-    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this))
+    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this)), _aprsPTT(APRSPTT::Off)
 {
   // pass...
 }
@@ -108,6 +108,18 @@ AnytoneChannelExtension::enableHandsFree(bool enable) {
 AnytoneAPRSFrequencyRef *
 AnytoneChannelExtension::fmAPRSFrequency() const {
   return _fmAPRSFrequency;
+}
+
+AnytoneChannelExtension::APRSPTT
+AnytoneChannelExtension::aprsPTT() const {
+  return _aprsPTT;
+}
+void
+AnytoneChannelExtension::setAPRSPTT(APRSPTT mode) {
+  if (_aprsPTT == mode)
+    return;
+  _aprsPTT = mode;
+  emit modified(this);
 }
 
 

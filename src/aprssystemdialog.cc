@@ -169,6 +169,7 @@ APRSSystemDialog::aprsSystem() {
   _myAPRS->setRevertChannel(ui->channel->currentData().value<FMChannel*>());
   _myAPRS->setSource(ui->source->text().simplified(), ui->srcSSID->value());
   _myAPRS->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
+  _myAPRS->setPath(ui->path->text().simplified());
   _myAPRS->setIcon(APRSSystem::Icon(ui->icon->currentData().toUInt()));
   _myAPRS->setPeriod(ui->updatePeriod->value());
   _myAPRS->setMessage(ui->message->text().simplified());

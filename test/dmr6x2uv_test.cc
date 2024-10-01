@@ -75,6 +75,10 @@ DMR6X2UVTest::testFMAPRSSettings() {
           .arg(err.format()).toStdString().c_str());
   }
 
+  auto ch_ext = new AnytoneFMChannelExtension();
+  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
+  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
+
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
   QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
@@ -84,6 +88,12 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
   QCOMPARE(aprs->period(), 300);
+
+  // test extension settings
+  auto ext = new AnytoneFMAPRSSettingsExtension();
+  ext->setPreWaveDelay(Interval::fromMilliseconds(100));
+  ext->setTXDelay(Interval::fromMilliseconds(200));
+  aprs->setAnytoneExtension(ext);
 
   // Encode
   DMR6X2UVCodeplug codeplug;
@@ -117,6 +127,26 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
   QCOMPARE(comp_aprs->path(), aprs->path());
   QCOMPARE(comp_aprs->period(), aprs->period());
+
+  // check extension settings
+  QVERIFY(nullptr != comp_aprs->anytoneExtension());
+  QCOMPARE(comp_aprs->anytoneExtension()->preWaveDelay().milliseconds(),
+           100);
+  QCOMPARE(comp_aprs->anytoneExtension()->txDelay().milliseconds(),
+           200);
+
+  // Check revert channel
+  QCOMPARE(comp_config.channelList()->count(), 2);
+  QVERIFY(comp_config.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(comp_config.channelList()->channel(0)->rxFrequency(),
+           config.channelList()->channel(0)->rxFrequency());
+  QCOMPARE(comp_config.channelList()->channel(0)->txFrequency(),
+           config.channelList()->channel(0)->txFrequency());
+
+  // Check channel extension properties
+  QVERIFY(nullptr != comp_config.channelList()->channel(1)->as<FMChannel>()->anytoneChannelExtension());
+  auto comp_ch_ext = comp_config.channelList()->channel(1)->as<FMChannel>()->anytoneChannelExtension();
+  QCOMPARE(comp_ch_ext->aprsPTT(), ch_ext->aprsPTT());
 }
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
