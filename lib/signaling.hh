@@ -104,6 +104,13 @@ public:
   /** Constructs a DCS code for the specified ocal code and inversion. */
   SelectiveCall(unsigned int octalDSCCode, bool inverted);
 
+  /** Comparison operator. */
+  bool operator==(const SelectiveCall &other) const;
+  /** Comparison operator. */
+  bool operator!=(const SelectiveCall &other) const;
+
+  /** Returns @c false, if a selective call is set. */
+  bool isInvalid() const;
   /** Returns @c true, if a selective call is set. */
   bool isValid() const;
   /** Returns @c true, if a CTCSS sub tone is set. */
@@ -131,6 +138,10 @@ public:
   static SelectiveCall parseCTCSS(const QString &text);
   /** Parses a DCS code. */
   static SelectiveCall parseDCS(const QString &text);
+  /** Construct from binary DCS code. */
+  static SelectiveCall fromBinaryDCS(unsigned int code, bool inverted);
+  /** Returns a vector of standard selective calls. */
+  static const QVector<SelectiveCall> &standard();
 
 protected:
   /// Specifies the selective call type.
@@ -145,7 +156,12 @@ protected:
       bool inverted;
     } dcs;
   };
+
+protected:
+  static QVector<SelectiveCall> _standard;
 };
+
+
 Q_DECLARE_METATYPE(SelectiveCall)
 
 

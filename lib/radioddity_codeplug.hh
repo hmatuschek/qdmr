@@ -105,13 +105,13 @@ public:
     virtual void setScanListIndex(unsigned index);
 
     /** Returns the RX subtone. */
-    virtual Signaling::Code rxTone() const;
+    virtual SelectiveCall rxTone() const;
     /** Sets the RX subtone. */
-    virtual void setRXTone(Signaling::Code code);
+    virtual void setRXTone(const SelectiveCall &code);
     /** Returns the TX subtone. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the TX subtone. */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns TX signaling index (+1). */
     virtual unsigned txSignalingIndex() const;

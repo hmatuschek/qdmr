@@ -7,10 +7,11 @@ CTCSSBox::CTCSSBox(QWidget *parent)
 }
 
 void
-populateCTCSSBox(QComboBox *box, Signaling::Code code) {
-  for(unsigned i=Signaling::SIGNALING_NONE; i<=Signaling::DCS_754I; i++) {
-    box->addItem(Signaling::codeLabel(Signaling::Code(i)), i);
-    if (Signaling::Code(i) == code)
+populateCTCSSBox(QComboBox *box, const SelectiveCall &call) {
+  foreach (SelectiveCall c, SelectiveCall::standard()) {
+    int i = box->count();
+    box->addItem(c.format(), QVariant::fromValue(c));
+    if (c == call)
       box->setCurrentIndex(i);
   }
 }

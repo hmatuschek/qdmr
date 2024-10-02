@@ -13,6 +13,6 @@ public:
 	double selectedFreq() const;
 };
 
-void populateCTCSSBox(QComboBox *box, Signaling::Code code=Signaling::SIGNALING_NONE);
+void populateCTCSSBox(QComboBox *box, const SelectiveCall &call=SelectiveCall());
 
 #endif // CTCSSBOX_HH

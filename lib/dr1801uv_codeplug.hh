@@ -217,13 +217,13 @@ public:
     virtual void clearScanListIndex();
 
     /** Retunrs the RX CTCSS/DCS signaling. */
-    virtual Signaling::Code rxTone() const;
+    virtual SelectiveCall rxTone() const;
     /** Sets the RX CTCSS/DCS signaling. */
-    virtual void setRXTone(Signaling::Code code);
+    virtual void setRXTone(const SelectiveCall &code);
     /** Retunrs the TX CTCSS/DCS signaling. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the TX CTCSS/DCS signaling. */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns @c true if talkaround is enabled. */
     virtual bool talkaround() const;

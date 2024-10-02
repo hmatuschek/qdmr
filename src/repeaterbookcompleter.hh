@@ -31,8 +31,8 @@ public:
   double txFrequency() const;
   bool isFM() const;
   bool isDMR() const;
-  Signaling::Code rxTone() const;
-  Signaling::Code txTone() const;
+  SelectiveCall rxTone() const;
+  SelectiveCall txTone() const;
   unsigned int colorCode() const;
   qint64 age() const;
 
@@ -49,8 +49,8 @@ protected:
   double _txFrequency;
   bool _isFM;
   bool _isDMR;
-  Signaling::Code _rxTone;
-  Signaling::Code _txTone;
+  SelectiveCall _rxTone;
+  SelectiveCall _txTone;
   unsigned int _colorCode;
   QDateTime _timestamp;
 };

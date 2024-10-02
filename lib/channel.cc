@@ -454,23 +454,23 @@ FMChannel::setSquelchDefault() {
   setSquelch(std::numeric_limits<unsigned>::max());
 }
 
-Signaling::Code
+SelectiveCall
 FMChannel::rxTone() const {
   return _rxTone;
 }
 bool
-FMChannel::setRXTone(Signaling::Code code) {
+FMChannel::setRXTone(SelectiveCall code) {
   _rxTone = code;
   emit modified(this);
   return true;
 }
 
-Signaling::Code
+SelectiveCall
 FMChannel::txTone() const {
   return _txTone;
 }
 bool
-FMChannel::setTXTone(Signaling::Code code) {
+FMChannel::setTXTone(SelectiveCall code) {
   _txTone = code;
   emit modified(this);
   return true;
@@ -546,30 +546,6 @@ FMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &
   if (! AnalogChannel::populate(node, context, err))
     return false;
 
-  if (Signaling::SIGNALING_NONE != _rxTone) {
-    YAML::Node tone;
-    if (Signaling::isCTCSS(_rxTone))
-      tone["ctcss"] = Signaling::toCTCSSFrequency(_rxTone);
-    else if (Signaling::isDCSNormal(_rxTone))
-      tone["dcs"] = Signaling::toDCSNumber(_rxTone);
-    else if (Signaling::isDCSInverted(_rxTone))
-      tone["dcs"] = -Signaling::toDCSNumber(_rxTone);
-    tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["rxTone"] = tone;
-  }
-
-  if (Signaling::SIGNALING_NONE != _txTone) {
-    YAML::Node tone;
-    if (Signaling::isCTCSS(_txTone))
-      tone["ctcss"] = Signaling::toCTCSSFrequency(_txTone);
-    else if (Signaling::isDCSNormal(_txTone))
-      tone["dcs"] = Signaling::toDCSNumber(_txTone);
-    else if (Signaling::isDCSInverted(_txTone))
-      tone["dcs"] = -Signaling::toDCSNumber(_txTone);
-    tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["txTone"] = tone;
-  }
-
   if (defaultSquelch()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["squelch"] = def;
@@ -592,28 +568,6 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   }
 
   YAML::Node ch = node.begin()->second;
-
-  setRXTone(Signaling::SIGNALING_NONE);
-  if (ch["rxTone"] && ch["rxTone"].IsMap()) {
-    if (ch["rxTone"]["ctcss"] && ch["rxTone"]["ctcss"].IsScalar()) {
-      setRXTone(Signaling::fromCTCSSFrequency(ch["rxTone"]["ctcss"].as<double>()));
-    } else if (ch["rxTone"]["dcs"] && ch["rxTone"]["dcs"].IsScalar()) {
-      int code = ch["rxTone"]["dcs"].as<int>();
-      bool inverted = (code < 0); code = std::abs(code);
-      setRXTone(Signaling::fromDCSNumber(code, inverted));
-    }
-  }
-
-  setTXTone(Signaling::SIGNALING_NONE);
-  if (ch["txTone"] && ch["txTone"].IsMap()) {
-    if (ch["txTone"]["ctcss"] && ch["txTone"]["ctcss"].IsScalar()) {
-      setTXTone(Signaling::fromCTCSSFrequency(ch["txTone"]["ctcss"].as<double>()));
-    } else if (ch["txTone"]["dcs"] && ch["txTone"]["dcs"].IsScalar()) {
-      int code = ch["txTone"]["dcs"].as<int>();
-      bool inverted = (code < 0); code = std::abs(code);
-      setTXTone(Signaling::fromDCSNumber(code, inverted));
-    }
-  }
 
   if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
     setSquelchDefault();

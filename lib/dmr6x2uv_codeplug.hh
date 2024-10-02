@@ -916,9 +916,9 @@ public:
     virtual void setFMTXDelay(unsigned ms);
 
     /** Returns the sub tone settings. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the sub tone settings. */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns the manual TX interval in seconds. */
     virtual Interval manualTXInterval() const;

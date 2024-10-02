@@ -171,10 +171,10 @@ GD73Test::testFMSignaling() {
   QCOMPARE(compare.channelList()->count(), 6);
   for (int i=0; i<compare.channelList()->count(); i++) {
     QVERIFY(compare.channelList()->channel(i)->is<FMChannel>());
-    QCOMPARE((unsigned int)compare.channelList()->channel(i)->as<FMChannel>()->rxTone(),
-             (unsigned int)config.channelList()->channel(i)->as<FMChannel>()->rxTone());
-    QCOMPARE((unsigned int)compare.channelList()->channel(i)->as<FMChannel>()->txTone(),
-             (unsigned int)config.channelList()->channel(i)->as<FMChannel>()->txTone());
+    QCOMPARE(compare.channelList()->channel(i)->as<FMChannel>()->rxTone(),
+             config.channelList()->channel(i)->as<FMChannel>()->rxTone());
+    QCOMPARE(compare.channelList()->channel(i)->as<FMChannel>()->txTone(),
+             config.channelList()->channel(i)->as<FMChannel>()->txTone());
   }
 }
 

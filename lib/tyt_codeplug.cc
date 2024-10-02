@@ -356,21 +356,21 @@ TyTCodeplug::ChannelElement::setTXFrequency(uint32_t freq_Hz) {
   return setBCD8_le(20, freq_Hz/10);
 }
 
-Signaling::Code
+SelectiveCall
 TyTCodeplug::ChannelElement::rxSignaling() const {
   return decode_ctcss_tone_table(getUInt16_le(24));
 }
 void
-TyTCodeplug::ChannelElement::setRXSignaling(Signaling::Code code) {
+TyTCodeplug::ChannelElement::setRXSignaling(const SelectiveCall &code) {
   setUInt16_le(24, encode_ctcss_tone_table(code));
 }
 
-Signaling::Code
+SelectiveCall
 TyTCodeplug::ChannelElement::txSignaling() const {
   return decode_ctcss_tone_table(getUInt16_le(26));
 }
 void
-TyTCodeplug::ChannelElement::setTXSignaling(Signaling::Code code) {
+TyTCodeplug::ChannelElement::setTXSignaling(const SelectiveCall &code) {
   setUInt16_le(26, encode_ctcss_tone_table(code));
 }
 

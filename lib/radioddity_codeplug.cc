@@ -133,20 +133,20 @@ RadioddityCodeplug::ChannelElement::setScanListIndex(unsigned index) {
   setUInt8(0x001f, index);
 }
 
-Signaling::Code
+SelectiveCall
 RadioddityCodeplug::ChannelElement::rxTone() const {
   return decode_ctcss_tone_table(getUInt16_le(0x0020));
 }
 void
-RadioddityCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
+RadioddityCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
   setUInt16_le(0x0020, encode_ctcss_tone_table(code));
 }
-Signaling::Code
+SelectiveCall
 RadioddityCodeplug::ChannelElement::txTone() const {
   return decode_ctcss_tone_table(getUInt16_le(0x0022));
 }
 void
-RadioddityCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
+RadioddityCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
   setUInt16_le(0x0022, encode_ctcss_tone_table(code));
 }
 
