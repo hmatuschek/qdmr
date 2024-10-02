@@ -661,7 +661,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
                     << ": Expected selective call.";
         return false;
       }
-      prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;
