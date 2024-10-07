@@ -42,8 +42,8 @@ RadioddityCodeplug::ChannelElement::clear() {
   setAdmitCriterion(ADMIT_ALWAYS);
   setUInt8(0x001e, 0x50);
   setScanListIndex(0x00);
-  setRXTone(Signaling::SIGNALING_NONE);
-  setTXTone(Signaling::SIGNALING_NONE);
+  setRXTone(SelectiveCall());
+  setTXTone(SelectiveCall());
   setUInt8(0x0024, 0x00);
   setTXSignalingIndex(0);
   setUInt8(0x0026, 0x00);

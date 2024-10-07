@@ -289,7 +289,7 @@ SelectiveCall::SelectiveCall(unsigned int octalDSCCode, bool inverted)
 {
   unsigned int e = 1;
   while (octalDSCCode) {
-    dcs.code += (octalDSCCode % 10) * e;
+    dcs.code += std::min(7U, (octalDSCCode % 10)) * e;
     e *= 8; octalDSCCode /= 10;
   }
 }
@@ -363,7 +363,7 @@ SelectiveCall::format() const {
   if (! isValid())
     return QString();
   if (isCTCSS())
-    return QString("%1 Hz").arg(Hz(), 0, 'g', 1);
+    return QString("%1 Hz").arg(Hz(), 0, 'f', 1);
   return QString("%1%2")
       .arg(isInverted() ? "i" : "n")
       .arg(binCode(), 3, 8, QChar('0'));

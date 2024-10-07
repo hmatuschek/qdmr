@@ -251,21 +251,24 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
     }
 
     switch (toneMode) {
-    case ToneMode::None: break;
+    case ToneMode::None:
+      fm->setTXTone(SelectiveCall());
+      fm->setRXTone(SelectiveCall());
+      break;
     case ToneMode::Tone:
-      fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
-      fm->setRXTone(Signaling::SIGNALING_NONE);
+      fm->setTXTone(SelectiveCall(txTone));
+      fm->setRXTone(SelectiveCall());
       break;
     case ToneMode::TSQL:
-      fm->setTXTone(Signaling::fromCTCSSFrequency(rxTone));
-      fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+      fm->setTXTone(SelectiveCall(rxTone));
+      fm->setRXTone(SelectiveCall(rxTone));
       break;
     case ToneMode::TSQL_R:
       errMsg(err) << "Reversed CTCSS not supported.";
       return false;
     case ToneMode::DTCS:
-      fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
-      fm->setRXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == rxPol));
+      fm->setTXTone(SelectiveCall(txDTCSCode, Polarity::Reversed == txPol));
+      fm->setRXTone(SelectiveCall(txDTCSCode, Polarity::Reversed == rxPol));
       break;
     case ToneMode::DTCS_R:
       errMsg(err) << "Reversed DCS not supported.";
@@ -273,36 +276,36 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
     case ToneMode::Cross:
       switch (crossMode) {
       case CrossMode::NoneTone:
-        fm->setTXTone(Signaling::SIGNALING_NONE);
-        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        fm->setTXTone(SelectiveCall());
+        fm->setRXTone(SelectiveCall(rxTone));
         break;
       case CrossMode::NoneDTCS:
-        fm->setTXTone(Signaling::SIGNALING_NONE);
-        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        fm->setTXTone(SelectiveCall());
+        fm->setRXTone(SelectiveCall(rxDTCSCode, Polarity::Reversed == rxPol));
         break;
       case CrossMode::ToneNone:
-        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
-        fm->setRXTone(Signaling::SIGNALING_NONE);
+        fm->setTXTone(SelectiveCall(txTone));
+        fm->setRXTone(SelectiveCall());
         break;
       case CrossMode::ToneTone:
-        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
-        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        fm->setTXTone(SelectiveCall(txTone));
+        fm->setRXTone(SelectiveCall(rxTone));
         break;
       case CrossMode::ToneDTCS:
-        fm->setTXTone(Signaling::fromCTCSSFrequency(txTone));
-        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        fm->setTXTone(SelectiveCall(txTone));
+        fm->setRXTone(SelectiveCall(rxDTCSCode, Polarity::Reversed == rxPol));
         break;
       case CrossMode::DTCSNone:
-        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
-        fm->setRXTone(Signaling::SIGNALING_NONE);
+        fm->setTXTone(SelectiveCall(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(SelectiveCall());
         break;
       case CrossMode::DTCSTone:
-        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
-        fm->setRXTone(Signaling::fromCTCSSFrequency(rxTone));
+        fm->setTXTone(SelectiveCall(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(SelectiveCall(rxTone));
         break;
       case CrossMode::DTCSDTCS:
-        fm->setTXTone(Signaling::fromDCSNumber(txDTCSCode, Polarity::Reversed == txPol));
-        fm->setRXTone(Signaling::fromDCSNumber(rxDTCSCode, Polarity::Reversed == rxPol));
+        fm->setTXTone(SelectiveCall(txDTCSCode, Polarity::Reversed == txPol));
+        fm->setRXTone(SelectiveCall(rxDTCSCode, Polarity::Reversed == rxPol));
         break;
       }
     }
@@ -478,17 +481,17 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
            << "Tone->Tone" ;
   else if (channel->txTone().isCTCSS() && channel->rxTone().isInvalid())
     stream << "," << "Tone" << ","
-           << QString::number(channel->txTone().Hz(), 'g', 1) << "," << 67.0 << ","
+           << QString::number(channel->txTone().Hz(), 'f', 1) << "," << 67.0 << ","
            << "023" << "," << "023" << "," << "NN" << ","
            << "Tone->Tone";
   else if (channel->txTone().isCTCSS() && (channel->txTone() == channel->rxTone()))
     stream << "," << "TSQL" << "," << 67.0 << ","
-           << QString::number(channel->txTone().Hz(), 'g', 1) << ","
+           << QString::number(channel->txTone().Hz(), 'f', 1) << ","
            << "023" << "," << "023" << "," << "NN" << ","
            << "Tone->Tone";
   else if (channel->txTone().isInvalid() && channel->rxTone().isCTCSS())
     stream << "," << "Cross" << "," << 67.0 << ","
-           << QString::number(channel->rxTone().Hz(), 'g', 1) << ","
+           << QString::number(channel->rxTone().Hz(), 'f', 1) << ","
            << "023" << "," << "023" << "," << "NN" << ","
            << "->Tone";
   else if (channel->txTone().isInvalid() && channel->rxTone().isDCS())
@@ -499,19 +502,19 @@ ChirpWriter::encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorS
   else if (channel->txTone().isCTCSS() && channel->rxTone().isCTCSS() &&
            (channel->txTone() != channel->rxTone()))
     stream << "," << "Cross" << ","
-           << QString::number(channel->txTone().Hz(), 'g', 1) << ","
-           << QString::number(channel->rxTone().Hz(), 'g', 1) << ","
+           << QString::number(channel->txTone().Hz(), 'f', 1) << ","
+           << QString::number(channel->rxTone().Hz(), 'f', 1) << ","
            << "023" << "," << "023" << "," << "NN" << ","
            << "Tone->Tone";
   else if (channel->txTone().isCTCSS() && channel->rxTone().isDCS())
     stream << "," << "Cross" << ","
-           << QString::number(channel->txTone().Hz(), 'g', 1) << "," << 67.0 << ","
+           << QString::number(channel->txTone().Hz(), 'f', 1) << "," << 67.0 << ","
            << "023" << "," << channel->rxTone().octalCode() << ","
            << (channel->rxTone().isInverted() ? "NR" : "NN") << ","
            << "Tone->DTCS";
   else if (channel->txTone().isDCS() && channel->rxTone().isCTCSS())
     stream << "," << "Cross" << "," << 67.0 << ","
-           << QString::number(channel->rxTone().Hz(), 'g', 1) << ","
+           << QString::number(channel->rxTone().Hz(), 'f', 1) << ","
            << channel->txTone().octalCode() << "," << "023" << ","
            << (channel->txTone().isInverted() ? "RN" : "NN") << ","
            << "DTCS->Tone";

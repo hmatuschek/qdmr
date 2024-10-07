@@ -2516,7 +2516,7 @@ D878UVCodeplug::APRSSettingsElement::txTone() const {
     return SelectiveCall::fromBinaryDCS(code-512, true);
   }
 
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
 D878UVCodeplug::APRSSettingsElement::setTXTone(const SelectiveCall &code) {

@@ -100,8 +100,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 1");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::CTCSS_67_0Hz);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(67.0));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -110,8 +110,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 2");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::CTCSS_67_0Hz);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(67.0));
     config.channelList()->add(ch);
   }
 
@@ -120,8 +120,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 3");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::DCS_023N);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(23,false));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -130,8 +130,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 4");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::DCS_023N);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(23, false));
     config.channelList()->add(ch);
   }
 
@@ -140,8 +140,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 5");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::DCS_023I);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(23, true));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -150,8 +150,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 6");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::DCS_023I);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(23, true));
     config.channelList()->add(ch);
   }
 

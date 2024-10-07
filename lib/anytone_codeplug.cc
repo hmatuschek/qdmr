@@ -48,7 +48,7 @@ AnytoneCodeplug::CTCSS::encode(const SelectiveCall &code) {
 SelectiveCall
 AnytoneCodeplug::CTCSS::decode(uint8_t num) {
   if (num >= 52)
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   return _codeTable[num];
 }
 
@@ -192,8 +192,8 @@ AnytoneCodeplug::ChannelElement::clear() {
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
   setBandwidth(FMChannel::Bandwidth::Narrow);
-  setRXTone(Signaling::SIGNALING_NONE);
-  setTXTone(Signaling::SIGNALING_NONE);
+  setRXTone(SelectiveCall());
+  setTXTone(SelectiveCall());
   setBit(0x0008, 5, false); // Unused set to 0
 }
 
@@ -309,12 +309,12 @@ AnytoneCodeplug::ChannelElement::setRXSignalingMode(SignalingMode mode) {
 SelectiveCall
 AnytoneCodeplug::ChannelElement::rxTone() const {
   if (SignalingMode::None == rxSignalingMode())
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   else if (SignalingMode::CTCSS == rxSignalingMode())
     return rxCTCSS();
   else if (SignalingMode::DCS == rxSignalingMode())
     return rxDCS();
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
 AnytoneCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {

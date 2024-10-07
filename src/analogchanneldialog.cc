@@ -65,8 +65,10 @@ AnalogChannelDialog::construct() {
   txAdmit->setItemData(1, unsigned(FMChannel::Admit::Free));
   txAdmit->setItemData(2, unsigned(FMChannel::Admit::Tone));
   squelchDefault->setChecked(true); squelchValue->setValue(1); squelchValue->setEnabled(false);
-  populateCTCSSBox(rxTone, (nullptr != _myChannel ? _myChannel->rxTone() : SelectiveCall()));
-  populateCTCSSBox(txTone, (nullptr != _myChannel ? _myChannel->txTone() : SelectiveCall()));
+  if (_myChannel) {
+    rxTone->setSelectiveCall(_myChannel->rxTone());
+    txTone->setSelectiveCall(_myChannel->txTone());
+  }
   bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
@@ -151,8 +153,8 @@ AnalogChannelDialog::channel()
     _myChannel->setSquelchDefault();
   else
     _myChannel->setSquelch(squelchValue->value());
-  _myChannel->setRXTone(rxTone->currentData().value<SelectiveCall>());
-  _myChannel->setTXTone(txTone->currentData().value<SelectiveCall>());
+  _myChannel->setRXTone(rxTone->selectiveCall());
+  _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
@@ -182,12 +184,8 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->model())->mapToSource(src);
   double rx = app->repeater()->repeater(src.row())->rxFrequency();
   double tx = app->repeater()->repeater(src.row())->txFrequency();
-  int idx = rxTone->findData(QVariant::fromValue(app->repeater()->repeater(src.row())->rxTone()));
-  if (0 <= idx)
-    rxTone->setCurrentIndex(idx);
-  idx = txTone->findData(QVariant::fromValue(app->repeater()->repeater(src.row())->txTone()));
-  if (0 <= idx)
-    txTone->setCurrentIndex(idx);
+  rxTone->setSelectiveCall(app->repeater()->repeater(src.row())->rxTone());
+  txTone->setSelectiveCall(app->repeater()->repeater(src.row())->txTone());
   txFrequency->setText(QString::number(tx, 'f'));
   rxFrequency->setText(QString::number(rx, 'f'));
 }

@@ -368,7 +368,7 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
     _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
-    _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
+    _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
     _aprsSystem(), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
@@ -410,8 +410,8 @@ FMChannel::clear() {
   AnalogChannel::clear();
   setAdmit(Admit::Always);
   setSquelchDefault();
-  setRXTone(Signaling::SIGNALING_NONE);
-  setTXTone(Signaling::SIGNALING_NONE);
+  setRXTone(SelectiveCall());
+  setTXTone(SelectiveCall());
   setBandwidth(Bandwidth::Narrow);
   setAPRSSystem(nullptr);
   setAnytoneChannelExtension(nullptr);
