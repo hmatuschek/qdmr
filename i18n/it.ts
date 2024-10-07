@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl">
+<TS version="2.1" language="it">
 <context>
     <name>APRSSystem</name>
     <message>
@@ -11,127 +11,127 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
         <source>Police station</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stazione di polizia</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Digipeater</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Digipeater</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Telefono</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>DX cluster</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cluster DX</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="12"/>
         <source>HF gateway</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gateway HF</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>Plane small</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plane small</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Mobile Satellite station</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stazione satellitare mobile</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Wheel Chair</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sedia a rotelle</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Snowmobile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Motoslitta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Red cross</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Croce rossa</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="18"/>
         <source>Boy scout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Boy scout</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Home</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">X</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="21"/>
         <source>Red dot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Punto rosso</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Circle 0</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 0</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 1</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 2</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 3</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 4</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 5</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 5</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 6</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 6</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 7</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 7</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 8</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 8</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 9</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerchio 9</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
@@ -449,12 +449,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="102"/>
         <source>Create APRS system</source>
-        <translation>Utwórz system APRS</translation>
+        <translation>Crea sistema APRS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="110"/>
         <source>Edit APRS system</source>
-        <translation>Edytuj system APRS</translation>
+        <translation>Modifica sistema APRS</translation>
     </message>
 </context>
 <context>
@@ -462,19 +462,19 @@
     <message>
         <location filename="../src/aboutdialog.ui" line="14"/>
         <source>About qdrm</source>
-        <translation>O qdrm</translation>
+        <translation>Informazioni su qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="14"/>
         <location filename="../shared/ui/aboutdialog.ui" line="28"/>
         <location filename="../shared/ui/aboutdialog.ui" line="46"/>
         <source>About qdmr</source>
-        <translation>O qdrm</translation>
+        <translation>Informazioni su qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="76"/>
         <source>Supported Radios</source>
-        <translation>Wspierane radia</translation>
+        <translation>Radio supportate</translation>
     </message>
 </context>
 <context>
@@ -483,12 +483,12 @@
         <location filename="../src/analogchanneldialog.cc" line="56"/>
         <location filename="../src/analogchanneldialog.cc" line="72"/>
         <source>[None]</source>
-        <translation>Zależy ściśle od kontekstu.</translation>
+        <translation type="unfinished">[None]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
         <source>Edit Analog Channel</source>
-        <translation>Edytuj kanał analogowy</translation>
+        <translation>Modifica canale analogico</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="23"/>
@@ -498,52 +498,52 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation>Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation>Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation>Częstotliwość RX</translation>
+        <translation>Frequenza RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation>Częstotliwość TX</translation>
+        <translation>Frequenza TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation>Moc</translation>
+        <translation>Potenza</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
-        <translation>Maks</translation>
+        <translation>Massima</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
-        <translation>Wysoki</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
-        <translation>Średni</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
-        <translation>Niski</translation>
+        <translation>Bassa</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
-        <translation>Min</translation>
+        <translation>Minima</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
@@ -551,83 +551,83 @@
         <location filename="../src/analogchanneldialog.ui" line="182"/>
         <location filename="../src/analogchanneldialog.ui" line="311"/>
         <source>Default</source>
-        <translation>Domyślny</translation>
+        <translation>Default</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="132"/>
         <source>Tx Timeout</source>
-        <translation>Limit czasu TX</translation>
+        <translation>Timeout TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation>Wyłącz</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="163"/>
         <source>VOX Level</source>
-        <translation>Poziom VOX</translation>
+        <translation>Livello VOX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="191"/>
         <source>Rx Only</source>
-        <translation>Tylko RX</translation>
+        <translation>Solo RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="201"/>
         <source>Scan List</source>
-        <translation>Skanuj listę</translation>
+        <translation>Lista Scan</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>Admit TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="223"/>
         <source>Always</source>
-        <translation>Zawsze</translation>
+        <translation>Sempre</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation>Wolny kanał</translation>
+        <translation>Canale libero</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>Tone</source>
-        <translation>Ton</translation>
+        <translation>Tono</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="241"/>
         <source>Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Rx Tone</source>
-        <translation>Ton RX</translation>
+        <translation>Tono RX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="258"/>
         <source>Tx Tone</source>
-        <translation>Ton TX</translation>
+        <translation>Tono TX</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="268"/>
         <source>Bandwidth</source>
-        <translation>Szerokość pasma</translation>
+        <translation>Larghezza di banda</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="276"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="281"/>
         <source>Wide (25 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wide (25 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="289"/>
@@ -637,12 +637,12 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>Open</source>
-        <translation>Otwórz</translation>
+        <translation type="unfinished">Open</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Extensions</source>
-        <translation>Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -650,38 +650,38 @@
     <message>
         <location filename="../src/application.cc" line="246"/>
         <source>Settings</source>
-        <translation>Ustawienia</translation>
+        <translation>Impostazioni</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="260"/>
         <location filename="../src/application.cc" line="899"/>
         <source>Radio IDs</source>
-        <translation>Identyfikatory radia</translation>
+        <translation>ID Radio</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="264"/>
         <source>Contacts</source>
-        <translation>Kontakty</translation>
+        <translation>Contatti</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="268"/>
         <source>Group Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Gruppi</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="272"/>
         <source>Channels</source>
-        <translation>Kanały</translation>
+        <translation>Canali</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="276"/>
         <source>Zones</source>
-        <translation>Strefy</translation>
+        <translation>Zone</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="280"/>
         <source>Scan Lists</source>
-        <translation>Skanuj listy</translation>
+        <translation>Liste Scan</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="284"/>
@@ -691,18 +691,18 @@
     <message>
         <location filename="../src/application.cc" line="288"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Canali Roaming</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="292"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone Roaming</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="297"/>
         <location filename="../src/application.cc" line="913"/>
         <source>Extensions</source>
-        <translation>Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="316"/>
@@ -710,7 +710,7 @@
         <location filename="../src/application.cc" line="533"/>
         <location filename="../src/application.cc" line="664"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifiche non salvate al codeplug.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="317"/>
@@ -718,17 +718,17 @@
         <location filename="../src/application.cc" line="534"/>
         <location filename="../src/application.cc" line="665"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ci sono modifiche non salvate al codeplug corrente. Queste modifiche andranno perse se procedi.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="342"/>
         <source>Open codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Apri codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="344"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>File Codeplug (*.yaml);;File Codeplug, vecchio formato (*.conf *.csv *.txt);;All Files (*)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="350"/>
@@ -736,7 +736,7 @@
         <location filename="../src/application.cc" line="447"/>
         <location filename="../src/application.cc" line="486"/>
         <source>Cannot open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile aprire il file</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="351"/>
@@ -744,49 +744,49 @@
         <location filename="../src/application.cc" line="376"/>
         <location filename="../src/application.cc" line="487"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile leggere il codeplug dal file &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="364"/>
         <location filename="../src/application.cc" line="375"/>
         <source>Cannot read codeplug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile leggere il codeplug.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="391"/>
         <source>Save codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="392"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
-        <translation type="unfinished"></translation>
+        <translation>File Codeplug (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="398"/>
         <source>Please use new YAML format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilizzare il nuovo formato YAML.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="399"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il salvataggio nel vecchio formato conf basato su tabelle è stato disabilitato dalla la versione 0.9.0 in poi. La lettura di questi file è ancora possibile.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="411"/>
         <location filename="../src/application.cc" line="448"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile salvare il codeplug nel file &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="420"/>
         <source>Cannot save codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile salvare il codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="421"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile salvare il codeplug nel file &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="438"/>
@@ -842,27 +842,27 @@
     <message>
         <location filename="../src/application.cc" line="562"/>
         <source>No matching devices found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun dispositivo corrispondente trovato.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="588"/>
         <source>Cannot connect to radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile connettersi alla radio</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="589"/>
         <source>Cannot connect to radio: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile connettersi alla radio: %1</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="599"/>
         <source>Radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio rilevata</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="599"/>
         <source>Found device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rilevato dispositivo &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="602"/>
@@ -871,7 +871,7 @@
         <location filename="../src/application.cc" line="740"/>
         <location filename="../src/application.cc" line="781"/>
         <source>No radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuna radio rilevata</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="603"/>
@@ -880,79 +880,79 @@
         <location filename="../src/application.cc" line="741"/>
         <location filename="../src/application.cc" line="782"/>
         <source>No matching device was found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun dispositivo corrispondente trovato.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="643"/>
         <source>Verification success</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifica riuscita</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="644"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Il codeplug è stato verificato con successo con la radio &apos;%1</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="686"/>
         <source>Read ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lettura …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="696"/>
         <source>Read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore di lettura</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="714"/>
         <source>Read complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Lettura completata</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="768"/>
         <source>Upload ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Caricamento …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="788"/>
         <location filename="../src/application.cc" line="798"/>
         <location filename="../src/application.cc" line="810"/>
         <source>Cannot write call-sign DB.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile scrivere il DB dei nominativi.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="789"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
-        <translation type="unfinished"></translation>
+        <translation>La radio rilevata &apos;%1&apos; non supporta un DB dei nominativi.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="799"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>La radio rilevata &apos;%1&apos; supporta un DB dei nominativi. Tuttavia, questa funzione non è ancora stata implementata.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="811"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
-        <translation type="unfinished"></translation>
+        <translation>QDMR seleziona i nominativi da scrivere in base all&apos;ID DMR predefinito della radio. Non è stato impostato alcun ID predefinito.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="847"/>
         <source>Write call-sign DB ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrittura del DB dei nominativi …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="858"/>
         <source>Write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore di scrittura</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="870"/>
         <source>Write complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrittura completata</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="950"/>
         <source>%1 (alias for %2 %3)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 (alias for %2 %3)</translation>
     </message>
 </context>
 <context>
@@ -960,78 +960,78 @@
     <message>
         <location filename="../src/channellistview.cc" line="66"/>
         <source>Select a single channel first</source>
-        <translation type="unfinished"></translation>
+        <translation>Prima selezionare un canale singolo</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="67"/>
         <source>To clone a channel, please select a single channel to clone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Per clonare un canale, selezionare un canale singolo da clonare.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="112"/>
         <source>Cannot delete channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare canale</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="113"/>
         <source>Cannot delete channel: You have to select a channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare canale: Selezionare prima un canale.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="123"/>
         <location filename="../src/channellistview.cc" line="127"/>
         <source>Delete channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare canale?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="123"/>
         <source>Delete channel %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare canale &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="127"/>
         <source>Delete %1 channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 canali?</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Analog Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Canale Analogico</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="35"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
         <source>Add Digital Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Canale Digitale</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="45"/>
         <source>Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+D</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="52"/>
         <source>Clone Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Clona Canale</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="55"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+C</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="62"/>
         <source>Delete Channel</source>
-        <translation>Usuń kanał</translation>
+        <translation>Elimina Canale</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="65"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1039,12 +1039,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="252"/>
         <source>FM</source>
-        <translation type="unfinished"></translation>
+        <translation>FM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="254"/>
         <source>DMR</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="263"/>
@@ -1053,32 +1053,32 @@
         <location filename="../src/configitemwrapper.cc" line="372"/>
         <location filename="../src/configitemwrapper.cc" line="383"/>
         <source>[Default]</source>
-        <translation>Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
+        <translation>[Predefinito]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="265"/>
         <source>Max</source>
-        <translation type="unfinished">Maks</translation>
+        <translation>Massima</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="266"/>
         <source>High</source>
-        <translation>Wysoki</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="267"/>
         <source>Mid</source>
-        <translation>Średni</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="268"/>
         <source>Low</source>
-        <translation>Niski</translation>
+        <translation>Bassa</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="269"/>
         <source>Min</source>
-        <translation>Minimum</translation>
+        <translation>Minima</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="276"/>
@@ -1086,34 +1086,34 @@
         <location filename="../src/configitemwrapper.cc" line="395"/>
         <location filename="../src/configitemwrapper.cc" line="405"/>
         <source>Off</source>
-        <translation>Wyłącz</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>On</source>
-        <translation>Włącz</translation>
+        <translation>On</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="283"/>
         <location filename="../src/configitemwrapper.cc" line="289"/>
         <source>Always</source>
-        <translation>Zawsze</translation>
+        <translation>Sempre</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="284"/>
         <location filename="../src/configitemwrapper.cc" line="290"/>
         <source>Free</source>
-        <translation>Wolny</translation>
+        <translation type="unfinished">Free</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="285"/>
         <source>Color</source>
-        <translation>Kolor</translation>
+        <translation>Colore</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="291"/>
         <source>Tone</source>
-        <translation>Ton</translation>
+        <translation>Tono</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="314"/>
@@ -1127,127 +1127,127 @@
         <location filename="../src/configitemwrapper.cc" line="402"/>
         <location filename="../src/configitemwrapper.cc" line="412"/>
         <source>[None]</source>
-        <translation>Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="385"/>
         <source>Open</source>
-        <translation>Otwórz</translation>
+        <translation type="unfinished">Open</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="415"/>
         <source>Wide</source>
-        <translation>Szeroki</translation>
+        <translation>Wide</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="417"/>
         <source>Narrow</source>
-        <translation>Wąski</translation>
+        <translation>Narrow</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="433"/>
         <source>Type</source>
-        <translation>Typ</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="434"/>
         <source>Name</source>
-        <translation>Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="435"/>
         <source>Rx Frequency</source>
-        <translation>Częstotliwość RX</translation>
+        <translation>Frequenza RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="436"/>
         <source>Tx Frequency</source>
-        <translation>Częstotliwość TX</translation>
+        <translation>Frequenza TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="437"/>
         <source>Power</source>
-        <translation>Moc</translation>
+        <translation>Potenza</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="438"/>
         <source>Timeout</source>
-        <translation>Koniec czasu połączenia</translation>
+        <translation>Timeout</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="439"/>
         <source>Rx Only</source>
-        <translation>Tylko RX</translation>
+        <translation>Solo RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="440"/>
         <source>Admit</source>
-        <translation>Zezwól</translation>
+        <translation type="unfinished">Admit</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="441"/>
         <source>Scanlist</source>
-        <translation>Lista skanowania</translation>
+        <translation>Lista scan</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="442"/>
         <source>Zones</source>
-        <translation type="unfinished">Strefy</translation>
+        <translation>Zone</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="444"/>
         <source>TS</source>
-        <translation type="unfinished"></translation>
+        <translation>TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>RX Group List</source>
-        <translation>Lista grupy</translation>
+        <translation>Lista Gruppo RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>TX Contact</source>
-        <translation>Kontakt TX</translation>
+        <translation>Contatto TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>DMR ID</source>
-        <translation>Identyfikator DMR</translation>
+        <translation>ID DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="448"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished">GPS/APRS</translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="449"/>
         <source>Roaming</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="450"/>
         <source>Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Rx Tone</source>
-        <translation>Ton RX</translation>
+        <translation>Tono RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="452"/>
         <source>Tx Tone</source>
-        <translation>Ton TX</translation>
+        <translation>Tono TX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>Bandwidth</source>
-        <translation>Szerokość pasma</translation>
+        <translation>Larghezza di banda</translation>
     </message>
 </context>
 <context>
@@ -1255,7 +1255,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="481"/>
         <source>Channel</source>
-        <translation>Kanał</translation>
+        <translation>Canale</translation>
     </message>
 </context>
 <context>
@@ -1263,7 +1263,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="23"/>
         <source>Select a channel:</source>
-        <translation>Wybierz kanał:</translation>
+        <translation>Seleziona un canale:</translation>
     </message>
 </context>
 <context>
@@ -1367,7 +1367,7 @@
         <location filename="../src/configobjectlistview.cc" line="165"/>
         <location filename="../src/configobjectlistview.cc" line="188"/>
         <source>Cannot move items.</source>
-        <translation>Nie można przenieść elementów.</translation>
+        <translation>Impossibile spostare gli elementi.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.cc" line="73"/>
@@ -1377,7 +1377,7 @@
         <location filename="../src/configobjectlistview.cc" line="166"/>
         <location filename="../src/configobjectlistview.cc" line="189"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Nie można przenieść elementów: Musisz wybrać conajmniej jeden z nich.</translation>
+        <translation>Impossibile spostare gli elementi: Prima selezionare almeno un elemento.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="25"/>
@@ -1420,7 +1420,7 @@
         <location filename="../src/configobjecttableview.cc" line="173"/>
         <location filename="../src/configobjecttableview.cc" line="196"/>
         <source>Cannot move items.</source>
-        <translation>Nie można przenieść elementów</translation>
+        <translation>Impossibile spostare gli elementi.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="81"/>
@@ -1430,7 +1430,7 @@
         <location filename="../src/configobjecttableview.cc" line="174"/>
         <location filename="../src/configobjecttableview.cc" line="197"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Nie można przenieść elementów: Musisz wybrać conajmniej jeden z nich.</translation>
+        <translation>Impossibile spostare elementi: Prima selezionare almeno un elemento.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="25"/>
@@ -1468,22 +1468,22 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="44"/>
         <source>An instance of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">An instance of &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="55"/>
         <source>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
         <source>Create extension object</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea oggetto di estensione</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare la classe di oggetto da creare</translation>
     </message>
 </context>
 <context>
@@ -1491,67 +1491,67 @@
     <message>
         <location filename="../src/contactlistview.cc" line="63"/>
         <source>Cannot delete contact</source>
-        <translation>Nie można usunąć kontaktu</translation>
+        <translation>Impossibile eliminare contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="64"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare contatto: Prima selezionare un contatto.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare contatto?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
         <source>Delete contact %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare contatto &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare contatti?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="78"/>
         <source>Delete %1 contacts?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 contatti?</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>
         <source>Adds a contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunge un contatto alla lista.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add Digital Contact</source>
-        <translation>Dodaj cyfrowy kontakt</translation>
+        <translation>Aggiungi Contatto Digitale</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Add DTMF Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Contatto DTMF</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="52"/>
         <source>Delete contact button</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulsante Elimina contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="55"/>
         <source>Delete Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="58"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -1559,54 +1559,54 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="607"/>
         <source>DTMF</source>
-        <translation type="unfinished"></translation>
+        <translation>DTMF</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="613"/>
         <location filename="../src/configitemwrapper.cc" line="632"/>
         <source>On</source>
-        <translation type="unfinished">Włącz</translation>
+        <translation>On</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="613"/>
         <location filename="../src/configitemwrapper.cc" line="632"/>
         <source>Off</source>
-        <translation type="unfinished">Wyłącz</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="622"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata Privata</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="623"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata di Gruppo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="624"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata Generale</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="648"/>
         <source>Type</source>
-        <translation type="unfinished">Typ</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="650"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="652"/>
         <source>Number</source>
-        <translation>Numer</translation>
+        <translation>Numero</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="654"/>
         <source>RX Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Tono RX</translation>
     </message>
 </context>
 <context>
@@ -1614,57 +1614,57 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="23"/>
         <source>Create DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea Contatto DMR</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="48"/>
         <source>Edit DMR Contact</source>
-        <translation>Edytuj kontakt DMR</translation>
+        <translation>Modifica Contatto DMR</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="79"/>
         <source>Private Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata Privata</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="80"/>
         <source>Group Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata di Gruppo</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="81"/>
         <source>All Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata Generale</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
         <source>Type</source>
-        <translation>Typ</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="40"/>
         <source>Name</source>
-        <translation>Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="50"/>
         <source>Number</source>
-        <translation>Numer</translation>
+        <translation>Numero</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="60"/>
         <source>Ring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ring</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="71"/>
         <source>Extensions</source>
-        <translation>Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -1672,22 +1672,22 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Name</source>
-        <translation>Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="40"/>
         <source>DMR ID</source>
-        <translation>Identyfikator DMR</translation>
+        <translation>ID DMR</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="51"/>
         <source>Extensions</source>
-        <translation>Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -1695,37 +1695,37 @@
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="12"/>
         <source>Create DTMF Contact</source>
-        <translation>Utwórz kontakt DTMF</translation>
+        <translation>Crea Contatto DTMF</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
-        <translation>Edytuj kontakt DMR</translation>
+        <translation>Modifica Contatto DMR</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="40"/>
         <source>Number</source>
-        <translation type="unfinished">Numer</translation>
+        <translation>Numero</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="50"/>
         <source>Ring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ring</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="61"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -1733,7 +1733,7 @@
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="14"/>
         <source>Select a device</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona un dispositivo</translation>
     </message>
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="20"/>
@@ -1749,18 +1749,18 @@
         <location filename="../src/digitalchanneldialog.cc" line="82"/>
         <location filename="../src/digitalchanneldialog.cc" line="89"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[None]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="90"/>
         <location filename="../src/digitalchanneldialog.cc" line="99"/>
         <source>[Default]</source>
-        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
+        <translation>[Predefinito]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="14"/>
         <source>Edit Digital Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica canale digitale</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="23"/>
@@ -1770,161 +1770,161 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="40"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="65"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">Częstotliwość RX</translation>
+        <translation>Frequenza RX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="75"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">Częstotliwość TX</translation>
+        <translation>Frequenza TX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished">Moc</translation>
+        <translation>Potenza</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="92"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished">Limit czasu TX</translation>
+        <translation>Timeout TX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="99"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Tylko RX</translation>
+        <translation>Solo RX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="109"/>
         <source>Scan List</source>
-        <translation type="unfinished">Skanuj listę</translation>
+        <translation>Lista Scan</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
-        <translation type="unfinished">Maks</translation>
+        <translation>Massima</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="127"/>
         <source>High</source>
-        <translation type="unfinished">Wysoki</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="132"/>
         <source>Mid</source>
-        <translation type="unfinished">Średni</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="137"/>
         <source>Low</source>
-        <translation type="unfinished">Niski</translation>
+        <translation>Bassa</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="142"/>
         <source>Min</source>
-        <translation type="unfinished">Minimum</translation>
+        <translation>Minima</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="150"/>
         <location filename="../src/digitalchanneldialog.ui" line="177"/>
         <location filename="../src/digitalchanneldialog.ui" line="202"/>
         <source>Default</source>
-        <translation type="unfinished">Domyślny</translation>
+        <translation>Predefinita</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="161"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Specifica il timeout di trasmissione in secondi. Un valore pari a 0 significa che il timeout di trasmissione è disabilitato.</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="164"/>
         <location filename="../src/digitalchanneldialog.ui" line="195"/>
         <source>Off</source>
-        <translation type="unfinished">Wyłącz</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="186"/>
         <source>VOX Level</source>
-        <translation type="unfinished">Poziom VOX</translation>
+        <translation>Livello VOX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="215"/>
         <source>Tx Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>Admit TX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="223"/>
         <source>Always</source>
-        <translation type="unfinished">Zawsze</translation>
+        <translation>Sempre</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="228"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Wolny kanał</translation>
+        <translation>Canale Libero</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="233"/>
         <location filename="../src/digitalchanneldialog.ui" line="241"/>
         <source>Color Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Color Code</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="258"/>
         <source>Time Slot</source>
-        <translation type="unfinished"></translation>
+        <translation>Time Slot</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="269"/>
         <source>TS 1</source>
-        <translation type="unfinished"></translation>
+        <translation>TS 1</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="274"/>
         <source>TS 2</source>
-        <translation type="unfinished"></translation>
+        <translation>TS 2</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="282"/>
         <source>Rx Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista Gruppo</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="292"/>
         <source>Tx Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Contatto TX</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="302"/>
         <source>Positioning System</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistema di Posizionamento</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="312"/>
         <source>Roaming Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Zona Roaming</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="322"/>
         <source>DMR ID</source>
-        <translation type="unfinished">Identyfikator DMR</translation>
+        <translation>ID DMR</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="335"/>
         <source>Extended</source>
-        <translation type="unfinished"></translation>
+        <translation>Esteso</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="338"/>
         <source>Device specific settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni specifiche del dispositivo</translation>
     </message>
 </context>
 <context>
@@ -1932,17 +1932,17 @@
     <message>
         <location filename="../src/errormessageview.cc" line="12"/>
         <source>Error: Unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore: Sconosciuto.</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.cc" line="18"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore: %1</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.ui" line="30"/>
         <source>Traceback:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Traceback:</translation>
     </message>
 </context>
 <context>
@@ -1950,32 +1950,32 @@
     <message>
         <location filename="../src/extensionview.cc" line="109"/>
         <source>Cannot create extension.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile creare estensione.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="110"/>
         <source>Cannot create extension, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile creare estensione, puoi provare a segnalare un bug.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="113"/>
         <source>Cannot create list element.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile creare un elemento nella lista.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile crere un elemento nella lista, puoi provare a segnalare un bug.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="32"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina</translation>
     </message>
 </context>
 <context>
@@ -1983,52 +1983,52 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
         <source>Create DMR APRS Sysmtem</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea Sistema APRS DMR</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
         <source>Edit DMR APRS Sysmtem</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica Sistema APRS DMR</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Selezionato]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="14"/>
         <source>Edit GPS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica Sistema GPS</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="43"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Destinazione</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="50"/>
         <source>Update period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervallo di aggiornamento [s]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="67"/>
         <source>Revert Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Revert Channel</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="78"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -2036,143 +2036,143 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
         <source>DMR Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID DMR della Radio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="28"/>
         <source>DMR ID</source>
-        <translation type="unfinished">Identyfikator DMR</translation>
+        <translation>DMR ID</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="35"/>
         <source>Radio Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome della Radio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="42"/>
         <source>Enter your name or callsign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserisci il tuo nome o nominativo.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="45"/>
         <source>Name/Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome/Nominativo</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Boot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni di avvio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="64"/>
         <source>Intro Line 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro Riga 1</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="71"/>
         <source>First greeting line (if supported by the radio).</source>
-        <translation type="unfinished"></translation>
+        <translation>Prima riga di benvenuto (se supportata dalla radio).</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="74"/>
         <source>Intro line 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro riga 1</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="81"/>
         <source>Intro Line 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro Riga 2</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="88"/>
         <source>Second greeting line (if supported by the radio).</source>
-        <translation type="unfinished"></translation>
+        <translation>Seconda riga di benvenuto (se supportata dalla radio).</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="94"/>
         <source>Intro line 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro riga 2</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="104"/>
         <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni Audio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>MIC Amp.</source>
-        <translation type="unfinished"></translation>
+        <translation>Amp. Microfono</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="127"/>
         <source>Speech Synthesis</source>
-        <translation type="unfinished"></translation>
+        <translation>Sintesi Vocale</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="144"/>
         <source>Channel Default Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Valori Predefiniti dei Canali</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="150"/>
         <source>Power</source>
-        <translation type="unfinished">Moc</translation>
+        <translation>Potenza</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="158"/>
         <source>Max</source>
-        <translation type="unfinished">Maks</translation>
+        <translation>Massima</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="163"/>
         <source>High</source>
-        <translation type="unfinished">Wysoki</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="168"/>
         <source>Mid</source>
-        <translation type="unfinished">Średni</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="173"/>
         <source>Low</source>
-        <translation type="unfinished">Niski</translation>
+        <translation>Bassa</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="178"/>
         <source>Min</source>
-        <translation type="unfinished">Minimum</translation>
+        <translation>Minima</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="186"/>
         <source>Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="193"/>
         <source>Open</source>
-        <translation type="unfinished">Otwórz</translation>
+        <translation type="unfinished">Open</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="203"/>
         <source>Transmit Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout di Trasmissione</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="210"/>
         <location filename="../src/generalsettingsview.ui" line="230"/>
         <source>Off</source>
-        <translation type="unfinished">Wyłącz</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
         <source>VOX Level</source>
-        <translation type="unfinished">Poziom VOX</translation>
+        <translation>Livello VOX</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="247"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -2180,7 +2180,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="838"/>
         <source>Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Contatto</translation>
     </message>
 </context>
 <context>
@@ -2188,7 +2188,7 @@
     <message>
         <location filename="../src/grouplistsview.cc" line="46"/>
         <source>Cannot delete RX group list</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare lista di gruppo</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="47"/>
@@ -2214,22 +2214,22 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="32"/>
         <source>Add RX Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Lista di Gruppo</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
         <source>Delete RX Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Lista di Gruppo</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -2237,7 +2237,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="814"/>
         <source>RX Group Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste di Gruppo</translation>
     </message>
 </context>
 <context>
@@ -2245,23 +2245,23 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="75"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>File</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="87"/>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="98"/>
         <location filename="../shared/ui/mainwindow.ui" line="273"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aiuto</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="105"/>
         <source>Databases</source>
-        <translation type="unfinished"></translation>
+        <translation>Database</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="125"/>
@@ -2271,162 +2271,162 @@
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="153"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuovo</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="156"/>
         <source>Creates a new Codeplug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea un nuovo Codeplug.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="159"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+N</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="168"/>
         <source>Open ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Apri …</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Importa un codeplug da file &amp;quot;conf&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="174"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+O</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="183"/>
         <source>Save ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva …</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="186"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Salva il codeplug in un file &amp;quot;conf&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="189"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+S</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="198"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Esci</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="201"/>
         <source>Quits the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esci dall&apos;applicazione.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="204"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="213"/>
         <source>Detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Rileva</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="216"/>
         <source>Detect connected radios.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rileva le radio collegate.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="225"/>
         <source>Verify</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifica</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifica il codeplug corrente con le radio collegate.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="231"/>
         <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+R</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="240"/>
         <source>Read</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggi</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="243"/>
         <source>Reads a codeplug from connected radios.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legge il codeplug dalle radio collegate.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="252"/>
         <source>Write</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrivi</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="255"/>
         <source>Writes the codeplug to the connected radio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrive il codeplug sulla radio collegata.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="264"/>
         <source>About qdmr</source>
-        <translation type="unfinished">O qdrm</translation>
+        <translation>Informazioni su qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="276"/>
         <source>Read the handbook.</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggi il manuale.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="279"/>
         <source>F1</source>
-        <translation type="unfinished"></translation>
+        <translation>F1</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="288"/>
         <source>Settings</source>
-        <translation type="unfinished">Ustawienia</translation>
+        <translation>Impostazioni</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="291"/>
         <source>Shows settings dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra la finestra delle impostazioni.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="300"/>
         <source>Write Callsign DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrivi il DB dei nominativi</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="303"/>
         <source>Writes call-sign DB to radio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrive il DB dei nominativi sulla radio.</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="312"/>
         <source>Refresh Callsign DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna il DB dei nominativi</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="315"/>
         <source>Refreshes the downloaded callsign DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna il DB dei nominativi scaricati</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="324"/>
         <source>Refresh Talkgroup DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna DB dei talk-group</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="327"/>
         <source>Refreshes the downloaded talkgroup DB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiorna il DB dei talk-group scaricati</translation>
     </message>
     <message>
         <location filename="../shared/ui/mainwindow.ui" line="332"/>
@@ -2454,12 +2454,12 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="43"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Selezionato/a]</translation>
     </message>
     <message>
         <location filename="../src/channelselectiondialog.cc" line="64"/>
         <source>Select a channel:</source>
-        <translation type="unfinished">Wybierz kanał:</translation>
+        <translation>Seleziona un canale:</translation>
     </message>
 </context>
 <context>
@@ -2467,12 +2467,12 @@
     <message>
         <location filename="../src/contactselectiondialog.cc" line="17"/>
         <source>Show private calls</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra chiamate private</translation>
     </message>
     <message>
         <location filename="../src/contactselectiondialog.cc" line="39"/>
         <source>Select a group call:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona una chiamata di gruppo:</translation>
     </message>
 </context>
 <context>
@@ -2480,7 +2480,7 @@
     <message>
         <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
         <source>Select roaming channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona canali roaming</translation>
     </message>
 </context>
 <context>
@@ -2488,28 +2488,28 @@
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="73"/>
         <source>Cannot delete GPS system</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare sistema GPS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="74"/>
         <source>Cannot delete GPS system: You have to select a GPS system first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare sistema GPS: Prima selezionare un sistema GPS.</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete positioning system?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare sistema di posizionamento?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <source>Delete positioning system %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare sistema di posizionamento &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 sistemi di posizionamento?</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="35"/>
@@ -2519,32 +2519,32 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="72"/>
         <source>Add GPS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Sistema GPS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="75"/>
         <source>Alt+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+G</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="85"/>
         <source>Add APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Sistema APRS</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="88"/>
         <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="95"/>
         <source>Delete Position System</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Sistema di Posizionamento</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="98"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -2552,53 +2552,53 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="712"/>
         <source>DMR</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="714"/>
         <source>APRS</source>
-        <translation type="unfinished">APRS</translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="722"/>
         <location filename="../src/configitemwrapper.cc" line="741"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="733"/>
         <source>[Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Selezionato/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="757"/>
         <source>Type</source>
-        <translation type="unfinished">Typ</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="758"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="759"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Destinazione</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="760"/>
         <source>Period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation>Periodo [s]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="761"/>
         <source>Channel</source>
-        <translation type="unfinished">Kanał</translation>
+        <translation>Canale</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="762"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Messaggio</translation>
     </message>
 </context>
 <context>
@@ -2606,17 +2606,17 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="97"/>
         <source>False</source>
-        <translation type="unfinished"></translation>
+        <translation>Falso</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="98"/>
         <source>True</source>
-        <translation type="unfinished"></translation>
+        <translation>Vero</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="121"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
 </context>
 <context>
@@ -2624,38 +2624,38 @@
     <message>
         <location filename="../src/extensionwrapper.cc" line="349"/>
         <source>new element</source>
-        <translation type="unfinished"></translation>
+        <translation>nuovo elemento</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="525"/>
         <source>Property</source>
-        <translation type="unfinished"></translation>
+        <translation>Proprietà</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Valore</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="583"/>
         <source>true</source>
-        <translation type="unfinished"></translation>
+        <translation>vero</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="584"/>
         <source>false</source>
-        <translation type="unfinished"></translation>
+        <translation>falso</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="603"/>
         <location filename="../src/extensionwrapper.cc" line="611"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="613"/>
@@ -2673,7 +2673,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[None]</translation>
     </message>
 </context>
 <context>
@@ -2701,37 +2701,37 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="59"/>
         <source>Add Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Contatto</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="62"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="69"/>
         <source>Remove Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovi Contatto</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="72"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="82"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -2739,47 +2739,47 @@
     <message>
         <location filename="../src/radioidlistview.cc" line="61"/>
         <source>Cannot delete radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare ID radio</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="62"/>
         <source>Cannot delete radio IDs: You have to select a radio ID first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare ID radio: Prima selezionare un ID radio.</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare ID radio?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare ID radio &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare liste scan?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete %1 scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 liste scan?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
         <source>Default Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Radio predefinito</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="46"/>
         <source>Add Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi ID Radio</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="53"/>
         <source>Delete Radio ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina ID Radio</translation>
     </message>
 </context>
 <context>
@@ -2787,17 +2787,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="910"/>
         <source>Type</source>
-        <translation type="unfinished">Typ</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="911"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="912"/>
         <source>Number</source>
-        <translation type="unfinished">Numer</translation>
+        <translation>Numero</translation>
     </message>
 </context>
 <context>
@@ -2805,12 +2805,12 @@
     <message>
         <location filename="../src/radioselectiondialog.ui" line="14"/>
         <source>Cannot auto-detect radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile rilevare automaticamente la radio</translation>
     </message>
     <message>
         <location filename="../src/radioselectiondialog.ui" line="20"/>
         <source>Select a specific radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona una radio specifica</translation>
     </message>
 </context>
 <context>
@@ -2819,13 +2819,15 @@
         <location filename="../src/releasenotes.cc" line="31"/>
         <source>Cannot download release notes from https://github.com/hmatuschek/qdmr
 	 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile scaricare le note di rilascio da https://github.com/hmatuschek/qdmr
+	 %1</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="43"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release is not a JSON object!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile leggere le note di rilascio da https://github.com/hmatuschek/qdmr
+	Il rilascio non è un oggetto JSON!</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="48"/>
@@ -2844,7 +2846,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="22"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="29"/>
@@ -2859,12 +2861,12 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="43"/>
         <source>Time Slot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Time Slot</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="50"/>
         <source>Color Code</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Color Code</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="68"/>
@@ -2885,12 +2887,12 @@
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="46"/>
         <source>TS 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS 1</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="47"/>
         <source>TS 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS 2</translation>
     </message>
 </context>
 <context>
@@ -2948,7 +2950,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="545"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="546"/>
@@ -2963,17 +2965,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="549"/>
         <source>TS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TS</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="550"/>
         <source>Zones</source>
-        <translation type="unfinished">Strefy</translation>
+        <translation type="unfinished">Zone</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="548"/>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CC</translation>
     </message>
 </context>
 <context>
@@ -3022,7 +3024,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation type="unfinished">Base</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="32"/>
@@ -3042,7 +3044,7 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="66"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="73"/>
@@ -3052,12 +3054,12 @@
     <message>
         <location filename="../src/roamingzonedialog.ui" line="76"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="86"/>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estensione</translation>
     </message>
 </context>
 <context>
@@ -3115,7 +3117,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="51"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="58"/>
@@ -3130,7 +3132,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="68"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3144,12 +3146,12 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation type="unfinished">Base</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="42"/>
@@ -3174,7 +3176,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="89"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="96"/>
@@ -3184,12 +3186,12 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="99"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="109"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation type="unfinished">Estensioni</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
@@ -3240,12 +3242,12 @@
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminare liste scan?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete %1 scan lists?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminare %1 liste scan?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="35"/>
@@ -3255,7 +3257,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="38"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt++</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="45"/>
@@ -3265,7 +3267,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="48"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3287,7 +3289,7 @@
         <location filename="../src/searchpopup.cc" line="94"/>
         <location filename="../src/searchpopup.cc" line="109"/>
         <source>%1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1/%2</translation>
     </message>
 </context>
 <context>
@@ -3300,7 +3302,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished">Ustawienia</translation>
+        <translation type="unfinished">Impostazioni</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="36"/>
@@ -3415,7 +3417,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="226"/>
         <source>Call-Sign DB</source>
-        <translation type="unfinished"></translation>
+        <translation>DB dei Nominativi</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="232"/>
@@ -3455,27 +3457,27 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="293"/>
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se abilitati, questi prefissi ID DMR separati da virgole vengono utilizzati per selezionare le voci del DB dei nominativi.</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="304"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation type="unfinished">Estensioni</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="310"/>
         <source>Extended Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Funzionalità Estese</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="316"/>
         <source>Show commercial features</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra le funzionalità commerciali</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="330"/>
         <source>Show device extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra estensioni del dispositivo</translation>
     </message>
 </context>
 <context>
@@ -3483,7 +3485,7 @@
     <message>
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Verifica Codeplug</translation>
     </message>
 </context>
 <context>
@@ -3492,66 +3494,66 @@
         <location filename="../src/zonedialog.ui" line="14"/>
         <location filename="../src/zonedialog.cc" line="18"/>
         <source>Edit Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica zona</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="33"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Le zone sono raccolte di canali che di solito sono validi per una regione specifica. Ad esempio, una raccolta di canali per i ripetitori di una certa regione. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR gestisce le zone consentendo due elenchi di canali indipendenti per ogni VFO della radio (se ne ha due). Molte radio, tuttavia, consentono di assegnare le zone a ciascun VFO individualmente. In questi casi, il QDMR divide la zona in due (A e B) e le programma singolarmente nella radio..&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="65"/>
         <source>Channels A</source>
-        <translation type="unfinished"></translation>
+        <translation>Canali A</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="83"/>
         <location filename="../src/zonedialog.ui" line="120"/>
         <source>add</source>
-        <translation type="unfinished"></translation>
+        <translation>aggiungi</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="90"/>
         <location filename="../src/zonedialog.ui" line="127"/>
         <source>remove</source>
-        <translation type="unfinished"></translation>
+        <translation>elimina</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="102"/>
         <source>Channels B</source>
-        <translation type="unfinished"></translation>
+        <translation>Canali B</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="142"/>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation>Estensione</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="28"/>
         <source>Create Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea zona</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="76"/>
         <location filename="../src/zonedialog.cc" line="107"/>
         <source>Cannot remove channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare canale</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="77"/>
         <location filename="../src/zonedialog.cc" line="108"/>
         <source>Select at least one channel first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prima selezionare almeno un canale.</translation>
     </message>
 </context>
 <context>
@@ -3559,52 +3561,52 @@
     <message>
         <location filename="../src/zonelistview.cc" line="41"/>
         <source>Cannot delete zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare zona</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="42"/>
         <source>Cannot delete zone: You have to select a zone first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile eliminare zona: Prima selezionare almeno una zona.</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="52"/>
         <source>Delete zone?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare zona?</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="52"/>
         <source>Delete zone %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare zona &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="56"/>
         <source>Delete zones?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare zone?</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="56"/>
         <source>Delete %1 zones?</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare %1 zone?</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="32"/>
         <source>Add Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi Zona</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="35"/>
         <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="42"/>
         <source>Delete Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Zona</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="45"/>
         <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+-</translation>
     </message>
 </context>
 <context>
@@ -3625,17 +3627,17 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Podstawowe</translation>
+        <translation type="unfinished">Base</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="46"/>
         <source>Channel</source>
-        <translation type="unfinished">Kanał</translation>
+        <translation type="unfinished">Canale</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="56"/>
@@ -3645,7 +3647,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="94"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destinazione</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="132"/>
@@ -3660,17 +3662,17 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="146"/>
         <source>Update period [s]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intervallo di aggiornamento [s]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="153"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Messaggio</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="186"/>
         <source>Extensions</source>
-        <translation type="unfinished">Rozszerzenia</translation>
+        <translation type="unfinished">Estensioni</translation>
     </message>
 </context>
 </TS>
