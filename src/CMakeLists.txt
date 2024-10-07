@@ -3,7 +3,7 @@ SET(qdmr_SOURCES main.cc
   application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
   analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
-  ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
+  verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc
   roamingchanneldialog.cc roamingchannelselectiondialog.cc
   configobjectlistview.cc configobjecttableview.cc
@@ -18,7 +18,7 @@ SET(qdmr_MOC_HEADERS
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
   analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
-  ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
+  verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
   aprssystemdialog.hh releasenotes.hh searchpopup.hh
   roamingzonedialog.hh roamingchannellistview.hh roamingchanneldialog.hh
   roamingchannelselectiondialog.hh
