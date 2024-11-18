@@ -61,6 +61,9 @@ public:
     /** Destructor. */
     virtual ~ChannelElement();
 
+    /** The size of the channel. */
+    static constexpr unsigned int size() { return 0x0038; }
+
     /** Resets the channel. */
     virtual void clear();
 
@@ -218,6 +221,49 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
+
+  public:
+    /** Some limits for the channel. */
+    struct Limit: public Codeplug::Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int nameLength()              { return 16; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Codeplug::Element::Offset {
+      static constexpr unsigned int name()                    { return 0x0000; }
+      static constexpr unsigned int rxFrequency()             { return 0x0010; }
+      static constexpr unsigned int txFrequency()             { return 0x0014; }
+      static constexpr unsigned int mode()                    { return 0x0018; }
+      static constexpr unsigned int txTimeout()               { return 0x001b; }
+      static constexpr unsigned int totRekeyDelay()           { return 0x001c; }
+      static constexpr unsigned int admitCriterion()          { return 0x001d; }
+      static constexpr unsigned int scanListIndex()           { return 0x001f; }
+      static constexpr unsigned int rxTone()                  { return 0x0020; }
+      static constexpr unsigned int txTone()                  { return 0x0022; }
+      static constexpr unsigned int txSignalingIndex()        { return 0x0025; }
+      static constexpr unsigned int rxSignalingIndex()        { return 0x0027; }
+      static constexpr unsigned int privacyGroup()            { return 0x0029; }
+      static constexpr unsigned int txColorCode()             { return 0x002a; }
+      static constexpr unsigned int groupListIndex()          { return 0x002b; }
+      static constexpr unsigned int rxColorCode()             { return 0x002c; }
+      static constexpr unsigned int emergencySystemIndex()    { return 0x002d; }
+      static constexpr unsigned int contextIndex()            { return 0x002e; }
+      static constexpr BitOffset    dataCallConfirm()         { return {0x0030, 7}; }
+      static constexpr BitOffset    emergencyAlarmACK()       { return {0x0030, 6}; }
+      static constexpr BitOffset    privateCallConfirm()      { return {0x0031, 0}; }
+      static constexpr BitOffset    privacyEnabled()          { return {0x0031, 4}; }
+      static constexpr BitOffset    timeSlot()                { return {0x0031, 6}; }
+      static constexpr BitOffset    dualCapacityDirectMode()  { return {0x0032, 0}; }
+      static constexpr BitOffset    nonSTEFrequency()         { return {0x0032, 5}; }
+      static constexpr BitOffset    bandwidth()               { return {0x0033, 1}; }
+      static constexpr BitOffset    rxOnly()                  { return {0x0033, 2}; }
+      static constexpr BitOffset    talkaround()              { return {0x0033, 3}; }
+      static constexpr BitOffset    vox()                     { return {0x0033, 6}; }
+      static constexpr BitOffset    power()                   { return {0x0033, 7}; }
+    };
+    /// @endcond
   };
 
   /** Implements the base for channel banks in Radioddity codeplugs.
@@ -235,6 +281,9 @@ public:
     explicit ChannelBankElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ChannelBankElement();
+
+    /** The size of the channel bank. */
+    static constexpr unsigned int size() { return 0x1c10; }
 
     /** Clears the bank. */
     void clear();
@@ -301,6 +350,15 @@ public:
     virtual void setTXOffset(double f);
     /** Sets the transmit frequency offset mode. */
     virtual void setOffsetMode(OffsetMode mode);
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public ChannelElement::Offset {
+      static constexpr BitOffset stepSize()                   { return {0x0036, 4} ; }
+      static constexpr BitOffset offsetMode()                 { return {0x0036, 2} ; }
+      static constexpr unsigned int txOffset()                { return 0x0034; }
+    };
+    /// @endcond
   };
 
 
@@ -319,6 +377,9 @@ public:
     explicit ContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ContactElement();
+
+    /** The size of the contact element. */
+    static constexpr unsigned int size() { return 0x0018; }
 
     /** Resets the contact. */
     void clear();
@@ -354,7 +415,28 @@ public:
     virtual DMRContact *toContactObj(Context &ctx) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
     virtual void fromContactObj(const DMRContact *obj, Context &ctx);
+
+  public:
+    /** Some limits for the context element. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length. */
+      static constexpr unsigned int name()                            { return 16; }
+      /// Maximum number of ring-styles. */
+      static constexpr unsigned int ringStyles()                      { return 10; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name()                            { return 0x0000; }
+      static constexpr unsigned int number()                          { return 0x0010; }
+      static constexpr unsigned int type()                            { return 0x0014; }
+      static constexpr unsigned int ring()                            { return 0x0015; }
+      static constexpr unsigned int ringStyle()                       { return 0x0016; }
+    };
+    /// @endcond
   };
+
 
   /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
    *
@@ -372,6 +454,9 @@ public:
     explicit DTMFContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~DTMFContactElement();
+
+    /** The size of the contact element. */
+    static constexpr unsigned int size() { return 0x0020; }
 
     /** Resets the contact. */
     void clear();
@@ -392,6 +477,23 @@ public:
     virtual DTMFContact *toContactObj(Context &ctx) const;
     /** Resets this codeplug contact from the given @c DTMFContact. */
     virtual void fromContactObj(const DTMFContact *obj, Context &ctx);
+
+public:
+    /** Some limits for the context element. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length. */
+      static constexpr unsigned int name()                            { return 16; }
+      /// Maximum DTMF number length. */
+      static constexpr unsigned int number()                          { return 16; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name()                            { return 0x0000; }
+      static constexpr unsigned int number()                          { return 0x0010; }
+    };
+    /// @endcode
   };
 
   /** Represents a zone within Radioddity codeplugs.
@@ -409,6 +511,9 @@ public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
     virtual ~ZoneElement();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the zone. */
     void clear();
@@ -439,6 +544,23 @@ public:
     virtual void fromZoneObjA(const Zone *zone, Context &ctx);
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
     virtual void fromZoneObjB(const Zone *zone, Context &ctx);
+
+  public:
+    /** Some limits for the context element. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length. */
+      static constexpr unsigned int name()                            { return 16; }
+      static constexpr unsigned int members()                         { return 16; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name()                            { return 0x0000; }
+      static constexpr unsigned int members()                         { return 0x0010; }
+      static constexpr unsigned int betweenMembers()                  { return 0x0002; }
+    };
+    /// @endcond
   };
 
   /** Implements the base class for all zone banks of Radioddity codeplugs.
@@ -457,6 +579,9 @@ public:
     explicit ZoneBankElement(uint8_t *ptr);
     /** Destructor. */
     ~ZoneBankElement();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x2f00; }
 
     /** Resets the bank. */
     void clear();
@@ -614,6 +739,9 @@ public:
     /** Destructor. */
     virtual ~ScanListElement();
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0058; }
+
     /** Resets the scan list. */
     void clear();
 
@@ -706,6 +834,32 @@ public:
     virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
     /** Initializes this codeplug representation from the given @c ScanList object. */
     virtual void fromScanListObj(const ScanList *lst, Context &ctx);
+
+  public:
+    /** Some limits for the scan list. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name()                    { return 15; }
+      /// Maximum number of members.
+      static constexpr unsigned int members()                 { return 32; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name()                    { return 0x0000; }
+      static constexpr BitOffset channelMark()                { return {0x000f, 4}; }
+      static constexpr BitOffset mode()                       { return {0x000f, 6}; }
+      static constexpr BitOffset talkback()                   { return {0x000f, 7}; }
+      static constexpr unsigned int members()                 { return 0x0010; }
+      static constexpr unsigned int betweenMembers()          { return 0x0002; }
+      static constexpr unsigned int primary()                 { return 0x0050; }
+      static constexpr unsigned int secondary()               { return 0x0052; }
+      static constexpr unsigned int revert()                  { return 0x0054; }
+      static constexpr unsigned int holdTime()                { return 0x0056; }
+      static constexpr unsigned int primaryHoldTime()         { return 0x0057; }
+    };
+    /// @endcond
   };
 
   /** Implements the base class of scan lists banks for all Radioddity codeplugs.
@@ -725,6 +879,9 @@ public:
     /** Destructor. */
     virtual ~ScanListBankElement();
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x56f0; }
+
     /** Resets the scan list bank. */
     void clear();
 
@@ -735,6 +892,7 @@ public:
     /** Returns a pointer to the n-th scan list. */
     virtual uint8_t *get(unsigned n) const;
   };
+
 
   /** Implements the base class of general settings for all Radioddity codeplugs.
    *
