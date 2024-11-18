@@ -1,7 +1,6 @@
 #include "analogchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
-#include "ctcssbox.hh"
 #include "utils.hh"
 #include "settings.hh"
 #include "repeaterbookcompleter.hh"

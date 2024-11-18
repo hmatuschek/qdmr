@@ -1,6 +1,5 @@
 #include "channel.hh"
 #include "contact.hh"
-#include "ctcssbox.hh"
 #include "rxgrouplist.hh"
 #include "config.hh"
 #include "scanlist.hh"
