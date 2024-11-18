@@ -1,7 +1,7 @@
 #include "openrtx_interface.hh"
 
 OpenRTXInterface::OpenRTXInterface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : USBSerial(descr, err, parent)
+  : USBSerial(descr, USBSerial::Baud115200, err, parent)
 {
   // pass...
 }

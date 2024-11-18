@@ -79,6 +79,7 @@ protected:
 };
 
 
+/** An abstract stream encapsulated within OpenRTXLink. */
 class OpenRTXLinkStream: public QIODevice
 {
   Q_OBJECT

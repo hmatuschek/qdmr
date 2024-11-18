@@ -47,10 +47,10 @@ protected:
   QByteArray _buffer;
 
 private:
-  static const char END_OF_PACKET = '\xC0';
-  static const char ESCAPE = '\xDB';
-  static const char ESCAPED_C0 = '\xDC';
-  static const char ESCAPED_DB = '\xDD';
+  static constexpr char END_OF_PACKET = '\xC0';
+  static constexpr char ESCAPE = '\xDB';
+  static constexpr char ESCAPED_C0 = '\xDC';
+  static constexpr char ESCAPED_DB = '\xDD';
 };
 
 
