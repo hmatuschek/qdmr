@@ -274,8 +274,8 @@ public:
       static constexpr unsigned int colorCode() { return 0x0010; }
       static constexpr unsigned int timeSlot() { return 0x0011; }
       static constexpr unsigned int encryptionKeyIndex() { return 0x0014; }
-      static constexpr BitOffset dcdm() { return {0x0015, 1} ; }
-      static constexpr BitOffset confirmPivateCall() { return {0x0015, 0}; }
+      static constexpr Bit dcdm() { return {0x0015, 1} ; }
+      static constexpr Bit confirmPivateCall() { return {0x0015, 0}; }
       static constexpr unsigned int signalingMode() { return 0x0016; }
       static constexpr unsigned int alarmSystemIndex() { return 0x0018; }
       static constexpr unsigned int bandwidth() { return 0x0019; }
@@ -1008,21 +1008,21 @@ public:
       static constexpr unsigned int voxDelay()              { return 0x000c; }
       static constexpr unsigned int encryptionEnabled()     { return 0x000d; }
       static constexpr unsigned int keyLockDelay()          { return 0x000e; }
-      static constexpr BitOffset lockPTT()                  { return {0x000f, 0}; }
-      static constexpr BitOffset lockSideKey1()             { return {0x000f, 1}; }
-      static constexpr BitOffset lockSideKey2()             { return {0x000f, 2}; }
+      static constexpr Bit lockPTT()                  { return {0x000f, 0}; }
+      static constexpr Bit lockSideKey1()             { return {0x000f, 1}; }
+      static constexpr Bit lockSideKey2()             { return {0x000f, 2}; }
       static constexpr unsigned int language()              { return 0x0010; }
       static constexpr unsigned int squelchMode()           { return 0x0011; }
       static constexpr unsigned int rogerTonesEnabled()     { return 0x0013; }
       static constexpr unsigned int keyLockEnabled()        { return 0x0017; }
       static constexpr unsigned int ringTone()              { return 0x0016; }
       static constexpr unsigned int radioName()             { return 0x0018; }
-      static constexpr BitOffset dmrCallOutToneEnabled()    { return {0x0028, 1}; }
-      static constexpr BitOffset fmCallOutToneEnabled()     { return {0x0028, 2}; }
-      static constexpr BitOffset dmrVoiceEndToneEnabled()   { return {0x0028, 3}; }
-      static constexpr BitOffset fmVoiceEndToneEnabled()    { return {0x0028, 4}; }
-      static constexpr BitOffset dmrCallEndToneEnabled()    { return {0x0028, 5}; }
-      static constexpr BitOffset messageToneEnabled()       { return {0x0028, 6}; }
+      static constexpr Bit dmrCallOutToneEnabled()    { return {0x0028, 1}; }
+      static constexpr Bit fmCallOutToneEnabled()     { return {0x0028, 2}; }
+      static constexpr Bit dmrVoiceEndToneEnabled()   { return {0x0028, 3}; }
+      static constexpr Bit fmVoiceEndToneEnabled()    { return {0x0028, 4}; }
+      static constexpr Bit dmrCallEndToneEnabled()    { return {0x0028, 5}; }
+      static constexpr Bit messageToneEnabled()       { return {0x0028, 6}; }
       static constexpr unsigned int reverseBurstFrequency() { return 0x002c; }
       static constexpr unsigned int backlightTime()         { return 0x002f; }
       static constexpr unsigned int voxEnabled()            { return 0x0030; }
@@ -1038,8 +1038,8 @@ public:
       static constexpr unsigned int ledEnabled()            { return 0x0050; }
       static constexpr unsigned int loneWorkerResponseTime() { return 0x0051; }
       static constexpr unsigned int loneWorkerReminderTime() { return 0x005c; }
-      static constexpr BitOffset progPasswordEnabled()       { return {0x0052, 0}; }
-      static constexpr BitOffset bootPasswordEnabled()       { return {0x0052, 1}; }
+      static constexpr Bit progPasswordEnabled()       { return {0x0052, 0}; }
+      static constexpr Bit bootPasswordEnabled()       { return {0x0052, 1}; }
       static constexpr unsigned int progPasswordLength()     { return 0x0053; }
       static constexpr unsigned int progPassword()           { return 0x0054; }
       static constexpr unsigned int boolPasswordLength()     { return 0x005d; }
@@ -2246,10 +2246,10 @@ public:
       static constexpr unsigned int checkDec() { return 0x000a; }
       static constexpr unsigned int smsFormat() { return 0x000b; }
       static constexpr unsigned int voiceHead() { return 0x000c; }
-      static constexpr BitOffset callAlterEnc() { return {0x000d, 0}; }
-      static constexpr BitOffset callAlterDec() { return {0x000d, 1}; }
-      static constexpr BitOffset remoteMonitorEnc() { return {0x000d, 2}; }
-      static constexpr BitOffset remoteMonitorDec() { return {0x000d, 3}; }
+      static constexpr Bit callAlterEnc() { return {0x000d, 0}; }
+      static constexpr Bit callAlterDec() { return {0x000d, 1}; }
+      static constexpr Bit remoteMonitorEnc() { return {0x000d, 2}; }
+      static constexpr Bit remoteMonitorDec() { return {0x000d, 3}; }
       /// @endcond
     };
   };

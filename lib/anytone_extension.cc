@@ -64,7 +64,7 @@ AnytoneAPRSFrequencyList::allocateChild(const YAML::Node &node, ConfigItem::Cont
  * ********************************************************************************************* */
 AnytoneChannelExtension::AnytoneChannelExtension(QObject *parent)
   : ConfigExtension(parent), _talkaround(false), _frequencyCorrection(0), _handsFree(false),
-    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this))
+    _fmAPRSFrequency(new AnytoneAPRSFrequencyRef(this)), _aprsPTT(APRSPTT::Off)
 {
   // pass...
 }
@@ -110,13 +110,25 @@ AnytoneChannelExtension::fmAPRSFrequency() const {
   return _fmAPRSFrequency;
 }
 
+AnytoneChannelExtension::APRSPTT
+AnytoneChannelExtension::aprsPTT() const {
+  return _aprsPTT;
+}
+void
+AnytoneChannelExtension::setAPRSPTT(APRSPTT mode) {
+  if (_aprsPTT == mode)
+    return;
+  _aprsPTT = mode;
+  emit modified(this);
+}
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAnalogChannelExtension
  * ********************************************************************************************* */
 AnytoneFMChannelExtension::AnytoneFMChannelExtension(QObject *parent)
   : AnytoneChannelExtension(parent), _reverseBurst(false), _rxCustomCTCSS(false),
-    _txCustomCTCSS(false), _customCTCSS(0), _scrambler(false)
+    _txCustomCTCSS(false), _customCTCSS(0), _squelchMode(SquelchMode::Carrier), _scrambler(false)
 {
   // pass...
 }
@@ -696,11 +708,12 @@ AnytoneGPSSettingsExtension::setMode(GPSMode mode) {
  * ********************************************************************************************* */
 AnytoneRoamingSettingsExtension::AnytoneRoamingSettingsExtension(QObject *parent)
   : ConfigItem(parent),
-    _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(), _repeaterRangeCheck(false),
-    _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
+    _autoRoam(false), _autoRoamPeriod(Interval::fromMinutes(1)), _autoRoamDelay(),
+    _repeaterRangeCheck(false), _repeaterCheckInterval(Interval::fromSeconds(5)), _repeaterRangeCheckCount(3),
     _outOfRangeAlert(OutOfRangeAlert::None),
     _roamingStartCondition(RoamStart::Periodic), _roamingReturnCondition(RoamStart::Periodic),
-    _notificationCount(1), _gpsRoaming(false), _defaultRoamingZone(new RoamingZoneReference(this))
+    _notification(false), _notificationCount(1),
+    _gpsRoaming(false), _defaultRoamingZone(new RoamingZoneReference(this))
 {
   // pass...
 }

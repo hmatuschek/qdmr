@@ -1179,7 +1179,7 @@ public:
 
   protected:
     /** Internal used offsets within the element. */
-    struct Offset {
+    struct Offset : public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int displayMode()     { return 0x0001; }
       static constexpr unsigned int autoKeyLock()     { return 0x0002; }

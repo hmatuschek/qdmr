@@ -2108,10 +2108,10 @@ D868UVCodeplug::allocateSMSMessages() {
 bool
 D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
-    unsigned int addr =
-        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
-        + i*MessageElement::size();
+  unsigned int num_sms_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
+  for (unsigned int i=0; i<num_sms_messages; i++) {
+    unsigned int bank = i/Limit::numMessagePerBank(), msg_idx = i % Limit::numMessagePerBank();
+    unsigned int addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks() + msg_idx*MessageElement::size();
     MessageElement message(data(addr));
     message.setMessage(ctx.get<SMSTemplate>(i)->message());
     MessageListElement listElement(data(Offset::messageIndex() + i*Size::messageIndex()));
@@ -2131,9 +2131,8 @@ D868UVCodeplug::createSMSMessages(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::numMessages(); i++) {
     if (! messages_bytemap.isEncoded(i))
       continue;
-    unsigned int addr =
-        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
-        + i*MessageElement::size();
+    unsigned int bank = i/Limit::numMessagePerBank(), msg_idx = i % Limit::numMessagePerBank();
+    unsigned int addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks() + msg_idx*MessageElement::size();
     MessageElement message(data(addr));
     SMSTemplate *temp = new SMSTemplate();
     temp->setName(QString("SMS %1").arg(i+1));
