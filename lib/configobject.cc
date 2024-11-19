@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "signaling.hh"
 #include "commercial_extension.hh"
 
 #include <QMetaProperty>
@@ -431,6 +432,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).value<Frequency>();
     } else if (QString("Interval") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<Interval>();
+    } else if (QString("SelectiveCall") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
@@ -645,6 +648,20 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
+    } else if (QString("SelectiveCall") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()]) {
+        prop.write(this, QVariant::fromValue(SelectiveCall()));
+        continue;
+      }
+      // parse & check type
+      if ((! node[prop.name()].IsMap()) || (1 != node[prop.name()].size())) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected selective call.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;

@@ -102,6 +102,10 @@ Codeplug::Element::setBit(unsigned offset, unsigned bit, bool value) {
 }
 
 void
+Codeplug::Element::clearBit(const Offset::Bit &offset) {
+  clearBit(offset.byte, offset.bit);
+}
+void
 Codeplug::Element::clearBit(unsigned offset, unsigned bit) {
   if (offset >= _size) {
     logFatal() << "Cannot clear bit at " << QString::number(offset, 16)

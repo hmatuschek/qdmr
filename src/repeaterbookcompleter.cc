@@ -44,8 +44,8 @@ inline QString bandName(double rx, double tx) {
  * ********************************************************************************************* */
 RepeaterBookEntry::RepeaterBookEntry(QObject *parent)
   : QObject(parent), _id(), _call(), _location(), _qth(), _rxFrequency(0), _txFrequency(0),
-    _isFM(false), _isDMR(false), _rxTone(Signaling::SIGNALING_NONE),
-    _txTone(Signaling::SIGNALING_NONE), _colorCode(0), _timestamp(QDateTime::currentDateTime())
+    _isFM(false), _isDMR(false), _rxTone(), _txTone(),
+    _colorCode(0), _timestamp(QDateTime::currentDateTime())
 {
 }
 
@@ -123,12 +123,10 @@ RepeaterBookEntry::isDMR() const {
   return _isDMR;
 }
 
-Signaling::Code
-RepeaterBookEntry::rxTone() const {
+SelectiveCall RepeaterBookEntry::rxTone() const {
   return _rxTone;
 }
-Signaling::Code
-RepeaterBookEntry::txTone() const {
+SelectiveCall RepeaterBookEntry::txTone() const {
   return _txTone;
 }
 
@@ -160,9 +158,9 @@ RepeaterBookEntry::fromRepeaterBook(const QJsonObject &obj) {
   if (obj["FM Analog"].toString() == "Yes") {
     _isFM = true;
     if (obj.contains("PL"))
-      _txTone = Signaling::fromCTCSSFrequency(obj["PL"].toString().toDouble());
+      _txTone = SelectiveCall(obj["PL"].toString().toDouble());
     if (obj.contains("TSQ"))
-      _rxTone = Signaling::fromCTCSSFrequency(obj["TSQ"].toString().toDouble());
+      _rxTone = SelectiveCall(obj["TSQ"].toString().toDouble());
   }
 
   if (obj["DMR"].toString() == "Yes") {
@@ -192,9 +190,9 @@ RepeaterBookEntry::fromCache(const QJsonObject &obj) {
 
   if (_isFM) {
     if (obj.contains("PL"))
-      _txTone = Signaling::fromCTCSSFrequency(obj["PL"].toDouble());
+      _txTone = SelectiveCall(obj["PL"].toDouble());
     if (obj.contains("TSQ"))
-      _rxTone = Signaling::fromCTCSSFrequency(obj["TSQ"].toDouble());
+      _rxTone = SelectiveCall(obj["TSQ"].toDouble());
   }
   if (_isDMR) {
     if (obj.contains("DMR Color Code"))
@@ -219,10 +217,10 @@ RepeaterBookEntry::toCache() const {
   obj.insert("FM Analog", _isFM);
   obj.insert("DMR", _isDMR);
   if (_isFM) {
-    if (Signaling::SIGNALING_NONE != _txTone)
-      obj.insert("PL", Signaling::toCTCSSFrequency(_txTone));
-    if (Signaling::SIGNALING_NONE != _rxTone)
-      obj.insert("TSQ", Signaling::toCTCSSFrequency(_rxTone));
+    if (_txTone.isInvalid())
+      obj.insert("PL", _txTone.Hz());
+    if (_rxTone.isValid())
+      obj.insert("TSQ", _rxTone.Hz());
   }
   if (_isDMR) {
     obj.insert("DMR Color Code", (int)_colorCode);

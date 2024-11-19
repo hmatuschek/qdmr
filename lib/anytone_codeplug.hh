@@ -20,6 +20,21 @@ class AnytoneCodeplug : public Codeplug
 {
   Q_OBJECT
 
+protected:
+  /** Implements encoding of CTCSS tones. */
+  struct CTCSS {
+  public:
+    /** Encodes Signaling::Code CTCSS tones. */
+    static uint8_t encode(const SelectiveCall &tone);
+    /** Decodes to Signaling::Code CTCSS tones. */
+    static SelectiveCall decode(uint8_t code);
+
+  protected:
+    /** Translation table. */
+    static SelectiveCall _codeTable[52];
+  };
+
+
 public:
   /** Represents the base class for bitmaps in all AnyTone codeplugs. */
   class BitmapElement: public Element
@@ -199,18 +214,18 @@ public:
     /** Sets the RX signaling mode */
     virtual void setRXSignalingMode(SignalingMode mode);
     /** Simplified access to RX signaling (tone). */
-    virtual Signaling::Code rxTone() const;
+    virtual SelectiveCall rxTone() const;
     /** Sets the RX signaling (tone). */
-    virtual void setRXTone(Signaling::Code code);
+    virtual void setRXTone(const SelectiveCall &code);
 
     /** Returns the TX signaling mode */
     virtual SignalingMode txSignalingMode() const;
     /** Sets the TX signaling mode */
     virtual void setTXSignalingMode(SignalingMode mode);
     /** Simplified access to TX signaling (tone). */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the RX signaling (tone). */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns @c true if the CTCSS phase reversal is enabled. */
     virtual bool ctcssPhaseReversal() const;
@@ -233,28 +248,28 @@ public:
     /** Returns @c true if the TX CTCSS tone frequency is custom (non standard). */
     virtual bool txCTCSSIsCustom() const;
     /** Returns the TX CTCSS tone. */
-    virtual Signaling::Code txCTCSS() const;
+    virtual SelectiveCall txCTCSS() const;
     /** Sets the TX CTCSS tone. */
-    virtual void setTXCTCSS(Signaling::Code tone);
+    virtual void setTXCTCSS(const SelectiveCall &tone);
     /** Enables TX custom CTCSS frequency. */
     virtual void enableTXCustomCTCSS();
     /** Returns @c true if the RX CTCSS tone frequency is custom (non standard). */
     virtual bool rxCTCSSIsCustom() const;
     /** Returns the RX CTCSS tone. */
-    virtual Signaling::Code rxCTCSS() const;
+    virtual SelectiveCall rxCTCSS() const;
     /** Sets the RX CTCSS tone. */
-    virtual void setRXCTCSS(Signaling::Code tone);
+    virtual void setRXCTCSS(const SelectiveCall &tone);
     /** Enables RX custom CTCSS frequency. */
     virtual void enableRXCustomCTCSS();
 
     /** Returns the TX DCS code. */
-    virtual Signaling::Code txDCS() const;
+    virtual SelectiveCall txDCS() const;
     /** Sets the TX DCS code. */
-    virtual void setTXDCS(Signaling::Code code);
+    virtual void setTXDCS(const SelectiveCall &code);
     /** Returns the RX DCS code. */
-    virtual Signaling::Code rxDCS() const;
+    virtual SelectiveCall rxDCS() const;
     /** Sets the RX DCS code. */
-    virtual void setRXDCS(Signaling::Code code);
+    virtual void setRXDCS(const SelectiveCall &code);
 
     /** Returns the custom CTCSS frequency in Hz. */
     virtual double customCTCSSFrequency() const;

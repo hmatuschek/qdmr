@@ -205,18 +205,6 @@ protected:
     } CodedColor;
   };
 
-  /** Implements encoding of CTCSS tones. */
-  struct CTCSS {
-  public:
-    /** Encodes Signaling::Code CTCSS tones. */
-    static uint8_t encode(Signaling::Code tone);
-    /** Decodes to Signaling::Code CTCSS tones. */
-    static Signaling::Code decode(uint8_t code);
-
-  protected:
-    /** Translation table. */
-    static Signaling::Code _codeTable[52];
-  };
 
 public:
   /** Represents the channel element for AnyTone D868UV devices.

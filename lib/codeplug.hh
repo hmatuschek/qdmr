@@ -115,30 +115,32 @@ public:
     void setBit(unsigned offset, unsigned bit, bool value=true);
     /** Clears a specific bit at the given byte-offset. */
     void clearBit(unsigned offset, unsigned bit);
+    /** Clears a specific bit. */
+    void clearBit(const Offset::Bit &offset);
 
-    /** Reads a 2bit unsigned integer at the given byte- and bit-offset. */
+    /** Reads a 2bit unsigned integer at the given bit-offset. */
     uint8_t getUInt2(const Offset::Bit &offset) const;
     /** Reads a 2bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt2(unsigned offset, unsigned bit) const;
-    /** Stores a 2bit unsigned integer at the given byte- and bit-offset. */
+    /** Stores a 2bit unsigned integer at the given bit-offset. */
     void setUInt2(const Offset::Bit &offset, uint8_t value);
     /** Stores a 2bit unsigned integer at the given byte- and bit-offset. */
     void setUInt2(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 3bit unsigned integer at the given byte- and bit-offset. */
+    /** Reads a 3bit unsigned integer at the given bit-offset. */
     uint8_t getUInt3(const Offset::Bit &offset) const;
     /** Reads a 3bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt3(unsigned offset, unsigned bit) const;
-    /** Stores a 3bit unsigned integer at the given byte- and bit-offset. */
+    /** Stores a 3bit unsigned integer at the given bit-offset. */
     void setUInt3(const Offset::Bit &offset, uint8_t value);
     /** Stores a 3bit unsigned integer at the given byte- and bit-offset. */
     void setUInt3(unsigned offset, unsigned bit, uint8_t value);
 
-    /** Reads a 4bit unsigned integer at the given byte- and bit-offset. */
+    /** Reads a 4bit unsigned integer at the given bit-offset. */
     uint8_t getUInt4(const Offset::Bit &offset) const;
     /** Reads a 4bit unsigned integer at the given byte- and bit-offset. */
     uint8_t getUInt4(unsigned offset, unsigned bit) const;
-    /** Stores a 4bit unsigned integer at the given byte- and bit-offset. */
+    /** Stores a 4bit unsigned integer at the given bit-offset. */
     void setUInt4(const Offset::Bit &offset, uint8_t value);
     /** Stores a 4bit unsigned integer at the given byte- and bit-offset. */
     void setUInt4(unsigned offset, unsigned bit, uint8_t value);

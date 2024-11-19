@@ -622,13 +622,13 @@ public:
     void setAdmit(Admit admit);
 
     /** Returns the RX tone. */
-    Signaling::Code rxTone() const;
+    SelectiveCall rxTone() const;
     /** Sets the RX tone. */
-    void setRXTone(Signaling::Code code);
+    void setRXTone(const SelectiveCall &code);
     /** Returns the TX tone. */
-    Signaling::Code txTone() const;
+    SelectiveCall txTone() const;
     /** Sets the TX tone. */
-    void setTXTone(Signaling::Code code);
+    void setTXTone(const SelectiveCall &code);
 
     /** Returns the time slot. */
     DMRChannel::TimeSlot timeSlot() const;

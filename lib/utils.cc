@@ -283,10 +283,10 @@ encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill) 
   return true;
 }
 
-Signaling::Code
+SelectiveCall
 decode_ctcss_tone_table(uint16_t data) {
   if (data == 0xffff)
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
 
   unsigned tag = data >> 14;
   unsigned a = (data >> 12) & 3;
@@ -297,48 +297,43 @@ decode_ctcss_tone_table(uint16_t data) {
   switch (tag) {
   case 2:
     // DCS Normal
-    return Signaling::fromDCSNumber(100*b+10*c+1*d, false);
+    return SelectiveCall(100*b+10*c+1*d, false);
   case 3:
     // DCS Inverted
-    return Signaling::fromDCSNumber(100*b+10*c+1*d, true);
+    return SelectiveCall(100*b+10*c+1*d, true);
   default:
     break;
   }
 
   // CTCSS
-  return Signaling::fromCTCSSFrequency(100.0*a+10.0*b+1.0*c+0.1*d);
+  return SelectiveCall(100.0*a+10.0*b+1.0*c+0.1*d);
 }
 
 
 uint16_t
-encode_ctcss_tone_table(Signaling::Code code)
+encode_ctcss_tone_table(const SelectiveCall &code)
 {
   unsigned tag=0xff, a=0xf, b=0xf, c=0xf, d=0xf;
 
   // Disabled
-  if (Signaling::SIGNALING_NONE == code)
+  if (code.isInvalid())
     return 0xffff;
 
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     // CTCSS tone
     tag = 0;
-    unsigned val = Signaling::toCTCSSFrequency(code) * 10.0 + 0.5;
+    unsigned val = code.Hz() * 10.0 + 0.5;
     a = val / 1000;
     b = (val / 100) % 10;
     c = (val / 10) % 10;
     d = val % 10;
-  } else if (Signaling::isDCSNormal(code)) {
+  } else if (code.isDCS()) {
     // DCS normal
-    tag = 2;
-    unsigned val = Signaling::toDCSNumber(code);
-    a = 0;
-    b = (val / 100) % 10;
-    c = (val / 10) % 10;
-    d = val % 10;
-  } else if (Signaling::isDCSInverted(code)) {
-    // DCS inverted
-    tag = 3;
-    unsigned val = Signaling::toDCSNumber(code);
+    if (code.isInverted())
+      tag = 3;
+    else
+      tag = 2;
+    unsigned val = code.octalCode();
     a = 0;
     b = (val / 100) % 10;
     c = (val / 10) % 10;
@@ -348,26 +343,6 @@ encode_ctcss_tone_table(Signaling::Code code)
   return (a << 12) | (b << 8) | (c << 4) | d | (tag << 14);
 }
 
-
-uint16_t oct_to_dec(uint16_t oct) {
-  uint16_t a = oct % 10; oct /= 10;
-  uint16_t b = oct % 10; oct /= 10;
-  uint16_t c = oct % 10; oct /= 10;
-  uint16_t d = oct % 10; oct /= 10;
-  if ((a>7) || (b>7) || (c>6) || (d>7) || (oct>0))
-    return 0;
-  return (((d*8+c)*8 + b)*8 + a);
-}
-
-uint16_t dec_to_oct(uint16_t dec) {
-  uint16_t a = dec % 8; dec /= 8;
-  uint16_t b = dec % 8; dec /= 8;
-  uint16_t c = dec % 8; dec /= 8;
-  uint16_t d = dec % 8; dec /= 8;
-  if (dec>0)
-    return 0;
-  return (((d*10+c)*10 + b)*10 + a);
-}
 
 bool
 validDMRNumber(const QString &text) {
