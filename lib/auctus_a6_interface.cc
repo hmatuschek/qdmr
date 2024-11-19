@@ -39,7 +39,7 @@ AuctusA6Interface::send_receive(uint16_t command,
     return false;
   }
 
-  uint16_t rcommand;
+  uint16_t rcommand=0;
   if (! receive(rcommand, response, rlen, err)) {
     errMsg(err) << "Cannot receive response.";
     return false;

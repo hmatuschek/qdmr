@@ -15,6 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+  void testSMSTemplates();
 };
 
 #endif // GD77TEST_HH

@@ -15,6 +15,8 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+
+  void testFMAPRSSettings();
 };
 
 #endif // DMR6X2UVTEST_HH

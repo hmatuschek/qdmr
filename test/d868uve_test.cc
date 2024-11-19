@@ -151,5 +151,87 @@ D868UVETest::testDTMFContacts() {
 }
 
 
+void
+D868UVETest::testSMSTemplates() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  SMSTemplate *sms0 = new SMSTemplate(); sms0->setName("SMS0"); sms0->setMessage("ABC");
+  SMSTemplate *sms1 = new SMSTemplate(); sms1->setName("SMS1"); sms1->setMessage("XYZ");
+  config.smsExtension()->smsTemplates()->add(sms0);
+  config.smsExtension()->smsTemplates()->add(sms1);
+
+  ErrorStack err;
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // For now, messages are not encoded
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->count(), 2);
+  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(0)->name(), "SMS0");
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(0)->message(), "ABC");
+  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(1)->name(), "SMS1");
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(1)->message(), "XYZ");
+}
+
+
+void
+D868UVETest::testRegressionSMSTemplateOffset() {
+  // Regression test for issue #469, message index offset error if more than one bank is used
+  // (i.e., more than 8 SMS).
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  for (int i=0; i<9; i++) {
+    SMSTemplate *sms = new SMSTemplate(); sms->setName(QString("SMS%1").arg(i)); sms->setMessage("ABC");
+    config.smsExtension()->smsTemplates()->add(sms);
+  }
+
+  ErrorStack err;
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // For now, messages are not encoded
+  QCOMPARE(decoded.smsExtension()->smsTemplates()->count(), 9);
+}
+
+
+void
+D868UVETest::testRegressionSMSCount() {
+  // Regression test for issue #482 (tries to encode too many SMS)
+    Config config;
+    config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+    for (int i=0; i<101; i++) {
+        SMSTemplate *sms = new SMSTemplate(); sms->setName(QString("SMS%1").arg(i)); sms->setMessage("ABC");
+        config.smsExtension()->smsTemplates()->add(sms);
+    }
+
+    ErrorStack err;
+    D868UVCodeplug codeplug;
+    Codeplug::Flags flags; flags.updateCodePlug=false;
+    if (! codeplug.encode(&config, flags, err)) {
+        QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+                  .arg(err.format()).toStdString().c_str());
+    }
+}
+
+
 QTEST_GUILESS_MAIN(D868UVETest)
 

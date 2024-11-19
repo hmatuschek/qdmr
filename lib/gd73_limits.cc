@@ -130,7 +130,7 @@ GD73Limits::GD73Limits(QObject *parent)
           })
         ) );
 
-  /* Ignore scan lists. */
+  /* Check scan lists. */
   add("scanlists", new RadioLimitList(
         ScanList::staticMetaObject, 1, GD73Codeplug::ScanListBankElement::Limit::memberCount(), new RadioLimitObject{
           { "name", new RadioLimitString(1, GD73Codeplug::ScanListElement::Limit::nameLength(), RadioLimitString::Unicode) },
@@ -140,6 +140,17 @@ GD73Limits::GD73Limits(QObject *parent)
           { "channels", new RadioLimitRefList(0, GD73Codeplug::ScanListElement::Limit::memberCount(), Channel::staticMetaObject) }
         }));
 
+  /* Check encryption keys. */
+  add("commercial", new RadioLimitItem {
+        {"encryptionKeys", new RadioLimitList(
+         BasicEncryptionKey::staticMetaObject,
+         0, GD73Codeplug::EncryptionKeyBankElement::Limit::keys(),
+         new RadioLimitObject {
+           {"name", new RadioLimitIgnored()},
+           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{2,8}")}
+         })}
+      });
+
   /* Ignore positioning systems. */
   add("positioning", new RadioLimitList(
         ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored()) );
@@ -148,4 +159,5 @@ GD73Limits::GD73Limits(QObject *parent)
   add("roaming",
       new RadioLimitList(
         ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored()) );
+
 }

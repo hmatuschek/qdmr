@@ -1,6 +1,7 @@
 #include "gd73_codeplug.hh"
 #include "config.hh"
 #include "intermediaterepresentation.hh"
+#include "logger.hh"
 
 
 QVector<Signaling::Code> _ctcss_codes = {
@@ -750,6 +751,229 @@ GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::EncryptionKeyElement
+ * ********************************************************************************************* */
+GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+GD73Codeplug::EncryptionKeyElement::clear() {
+  setKeySize(0);
+}
+
+bool
+GD73Codeplug::EncryptionKeyElement::isValid() const {
+  return Element::isValid() && (0 != keySize());
+}
+
+unsigned int
+GD73Codeplug::EncryptionKeyElement::keySize() const {
+  return getUInt8(Offset::size())*4;
+}
+void
+GD73Codeplug::EncryptionKeyElement::setKeySize(unsigned int size) {
+  setUInt8(Offset::size(), size/4);
+}
+
+BasicEncryptionKey *
+GD73Codeplug::EncryptionKeyElement::createEncryptionKey(const ErrorStack &err) const {
+  if (! isValid())
+    return nullptr;
+
+  BasicEncryptionKey *key = new BasicEncryptionKey();
+  if (! key->setKey(QByteArray((const char*)_data+Offset::key(), keySize()/8))) {
+    errMsg(err) << "Cannot decode encryption key of size " << keySize() << ".";
+    delete key;
+    return nullptr;
+  }
+
+  return key;
+}
+
+bool
+GD73Codeplug::EncryptionKeyElement::encodeEncryptionKey(BasicEncryptionKey *key, const ErrorStack &err) {
+  unsigned int size = key->key().size()*8;
+  if (size > 32) {
+    errMsg(err) << "Key size of " << size << " exceeds 32bit.";
+    return false;
+  }
+
+  setKeySize(size);
+  memcpy(_data+Offset::key(), key->key().constData(), key->key().size());
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::EncryptionKeyBankElement
+ * ********************************************************************************************* */
+GD73Codeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+bool
+GD73Codeplug::EncryptionKeyBankElement::createEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    EncryptionKeyElement keyElement(_data + Offset::keys() + i*Offset::betweenKeys());
+    if (! keyElement.isValid())
+      continue;
+    EncryptionKey *key = keyElement.createEncryptionKey(err);
+    if (nullptr == key) {
+      errMsg(err) << "Cannot decode " <<i+1<<"-th encryption key. Skip.";
+      continue;
+    }
+    key->setName(QString("Basic Key %1").arg(i+1));
+    ctx.add(key, i);
+
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::EncryptionKeyBankElement::encodeEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    EncryptionKeyElement keyElement(_data + Offset::keys() + i*Offset::betweenKeys());
+    keyElement.clear();
+    if (i >= ctx.count<BasicEncryptionKey>())
+      continue;
+    if (! keyElement.encodeEncryptionKey(ctx.get<BasicEncryptionKey>(i))) {
+      errMsg(err) << "Cannot encode " << i+1 << "-th encryption key.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::MessageElement
+ * ********************************************************************************************* */
+GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, GD73Codeplug::MessageElement::size())
+{
+  // pass...
+}
+
+QString
+GD73Codeplug::MessageElement::text() const {
+  unsigned int length = std::min(Limit::messageLength(), (unsigned int)getUInt8(Offset::size()));
+  return readUnicode(Offset::text(), length, 0x0000);
+}
+
+void
+GD73Codeplug::MessageElement::setText(const QString &message) {
+  unsigned int length = std::min(Limit::messageLength(), (unsigned int)message.length());
+  writeUnicode(Offset::text(), message, length, 0x0000);
+  setUInt8(Offset::size(), length);
+}
+
+bool
+GD73Codeplug::MessageElement::encode(SMSTemplate *message, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setText(message->message());
+  return true;
+}
+
+SMSTemplate *
+GD73Codeplug::MessageElement::decode(const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  SMSTemplate *sms = new SMSTemplate();
+  sms->setName("Message");
+  sms->setMessage(text());
+  return sms;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of GD73Codeplug::MessageBankElement
+ * ********************************************************************************************* */
+GD73Codeplug::MessageBankElement::MessageBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+GD73Codeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, MessageBankElement::size())
+{
+  // pass...
+}
+
+unsigned int
+GD73Codeplug::MessageBankElement::memberCount() const {
+  return getUInt8(Offset::memberCount());
+}
+void
+GD73Codeplug::MessageBankElement::setMemberCount(unsigned int count) {
+  setUInt8(Offset::memberCount(), std::min(Limit::memberCount(), count));
+}
+
+GD73Codeplug::MessageElement
+GD73Codeplug::MessageBankElement::message(unsigned int i) {
+  i = std::min(i, memberCount()-1);
+  return MessageElement(_data + Offset::members() + i*Offset::betweenMembers());
+}
+
+bool
+GD73Codeplug::MessageBankElement::decode(SMSExtension *ext, const ErrorStack &err) {
+  ext->smsTemplates()->clear();
+  for (unsigned int i=0; i<memberCount(); i++) {
+    MessageElement element = message(i);
+    SMSTemplate *sms = element.decode(err);
+    if (nullptr == sms) {
+      errMsg(err) << "Cannot decode " << i+1 << "-th preset message.";
+      return false;
+    }
+    sms->setName(QString("Message %1").arg(i+1));
+    ext->smsTemplates()->add(sms);
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::MessageBankElement::encode(const SMSExtension *ext, const ErrorStack &err) {
+  setMemberCount(0);
+
+  unsigned int count = std::min((unsigned int) ext->smsTemplates()->count(), Limit::memberCount());
+  for (unsigned int i=0; i<count; i++) {
+    if (! message(i).encode(ext->smsTemplates()->get(i)->as<SMSTemplate>(), err)) {
+      errMsg(err) << "Cannot encode " << i+1 << "-th preset message.";
+      return false;
+    }
+  }
+  setMemberCount(count);
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of GD73Codeplug::ContactBankElement
  * ********************************************************************************************* */
 GD73Codeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t size)
@@ -960,6 +1184,19 @@ GD73Codeplug::GroupListElement::setName(const QString &name) {
   writeUnicode(Offset::name(), name, Limit::nameLength(), 0x0000);
 }
 
+unsigned int
+GD73Codeplug::GroupListElement::members() const {
+  return getUInt8(Offset::memberCount());
+}
+bool
+GD73Codeplug::GroupListElement::hasMember(unsigned int i) const {
+  return 0 != getUInt16_le(Offset::members() + i*Offset::betweenMembers());
+}
+unsigned int
+GD73Codeplug::GroupListElement::memberIndex(unsigned int i) const {
+  return getUInt16_le(Offset::members() + i*Offset::betweenMembers())-1;
+}
+
 RXGroupList *
 GD73Codeplug::GroupListElement::toGroupList(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
@@ -968,16 +1205,18 @@ GD73Codeplug::GroupListElement::toGroupList(Context &ctx, const ErrorStack &err)
 
 bool
 GD73Codeplug::GroupListElement::linkGroupList(RXGroupList *lst, Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min((unsigned int)getUInt8(Offset::memberCount()), Limit::memberCount());
+  Q_UNUSED(err);
+
+  unsigned int count = std::min(members(), Limit::memberCount());
   for (unsigned int i=0; i<count; i++) {
-    unsigned int idx = getUInt16_le(Offset::members() + i*Offset::betweenMembers());
-    if (0 == idx)
+    if (! hasMember(i))
       continue;
-    if (! ctx.has<DMRContact>(idx-1)) {
-      errMsg(err) << "Cannot resolve contact at index " << idx-1 << ".";
-      return false;
-    }
-    lst->addContact(ctx.get<DMRContact>(idx-1));
+    unsigned int idx = memberIndex(i);
+    if (ctx.has<DMRContact>(idx))
+      lst->addContact(ctx.get<DMRContact>(idx));
+    else
+      logWarn() << "Cannot link group list '" << lst->name()
+                << "': Cannot resolve contact at index " << idx << ".";
   }
   return true;
 }
@@ -1409,6 +1648,8 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     }
     fm->setBandwidth(bandwidth());
     fm->setSquelchDefault();
+    fm->setRXTone(rxTone());
+    fm->setTXTone(txTone());
   } else if (Type::DMR == type()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admit()) {
@@ -1432,34 +1673,45 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
 
   if (Type::DMR == type()) {
     DMRChannel *dmr = ch->as<DMRChannel>();
     if (hasTXContact()) {
-      if (! ctx.has<DMRContact>(txContactIndex())) {
-        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve contact index "
-                    << txContactIndex() << ".";
-        return false;
-      }
-      dmr->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+      if (ctx.has<DMRContact>(txContactIndex()))
+        dmr->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+      else
+        logWarn() << "Cannot link channel '" << name() << "', cannot resolve contact index "
+                  << txContactIndex() << ".";
     }
     if ((! groupListAllMatch()) && (! groupListMatchesContact())) {
-      if (! ctx.has<RXGroupList>(groupListIndex())) {
-        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve group list index "
-                    << groupListIndex() << ".";
+      if (ctx.has<RXGroupList>(groupListIndex()))
+        dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      else
+        logWarn() << "Cannot link channel '" << name() << "', cannot resolve group list index "
+                  << groupListIndex() << ".";
+    }
+    if (hasEncryptionKeyIndex()) {
+      // Check if already defined
+      if (! ctx.has<BasicEncryptionKey>(encryptionKeyIndex())) {
+        errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve encryption key index "
+                    << encryptionKeyIndex() << ".";
         return false;
       }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      // set...
+      if (nullptr == dmr->commercialExtension())
+        dmr->setCommercialExtension(new CommercialChannelExtension());
+      dmr->commercialExtension()->setEncryptionKey(
+            ctx.get<BasicEncryptionKey>(encryptionKeyIndex()));
     }
   }
 
   if (hasScanListIndex()) {
-    if (! ctx.has<ScanList>(scanListIndex())) {
-      errMsg(err) << "Cannot link channel '" << name() << "', cannot resolve scanlist index "
-                  << scanListIndex() << ".";
-      return false;
-    }
-    ch->setScanList(ctx.get<ScanList>(scanListIndex()));
+    if (ctx.has<ScanList>(scanListIndex()))
+      ch->setScanList(ctx.get<ScanList>(scanListIndex()));
+    else
+      logWarn() << "Cannot link channel '" << name() << "', cannot resolve scanlist index "
+                << scanListIndex() << ".";
   }
 
   return true;
@@ -1495,6 +1747,9 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     }
     setColorCode(dmr->colorCode());
     setTimeSlot(dmr->timeSlot());
+    if (CommercialChannelExtension *ext = dmr->commercialExtension())
+      if ((! ext->encryptionKeyRef()->isNull()) && (0 <= ctx.index(ext->encryptionKey())) )
+        setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
     switch (fm->admit()) {
@@ -1503,6 +1758,8 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     case FMChannel::Admit::Free: setAdmit(Admit::Free); break;
     }
     setBandwidth(fm->bandwidth());
+    setRXTone(fm->rxTone());
+    setTXTone(fm->txTone());
   }
 
   return true;
@@ -1602,17 +1859,17 @@ GD73Codeplug::ZoneElement::toZone(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ZoneElement::linkZone(Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
   unsigned int count = std::min((unsigned int)getUInt8(Offset::channeCount()), Limit::channelCount());
   for (unsigned int i=0; i<count; i++) {
     unsigned int index = getUInt16_le(Offset::channelIndices() + i*Offset::betweenChannelIndices());
     if (0 == index)
       continue;
-    if (! ctx.has<Channel>(index-1)) {
-      errMsg(err) << "Cannot link zone '" << zone->name() << "': Channel at index " << (index-1)
-                  << " not known.";
-      return false;
-    }
-    zone->A()->add(ctx.get<Channel>(index-1));
+    if (ctx.has<Channel>(index-1))
+      zone->A()->add(ctx.get<Channel>(index-1));
+    else
+      logWarn() << "Cannot link zone '" << zone->name() << "': Channel at index " << (index-1)
+                << " not known.";
   }
   return true;
 }
@@ -1871,35 +2128,34 @@ GD73Codeplug::ScanListElement::toScanList(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
   if ((ChannelMode::Fixed == primaryChannelMode()) && hasPrimaryChannelIndex()) {
-    if (! ctx.has<Channel>(primaryChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve primary channel index " << primaryChannelIndex() << ".";
-      return false;
-    }
-    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+    if (ctx.has<Channel>(primaryChannelIndex()))
+      lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve primary channel index " << primaryChannelIndex() << ".";
   } else if (ChannelMode::Selected == primaryChannelMode()) {
     lst->setPrimaryChannel(SelectedChannel::get());
   }
 
   if ((ChannelMode::Fixed == secondaryChannelMode()) && hasSecondaryChannelIndex()) {
-    if (! ctx.has<Channel>(secondaryChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve secondary channel index " << secondaryChannelIndex() << ".";
-      return false;
-    }
-    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+    if (ctx.has<Channel>(secondaryChannelIndex()))
+      lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve secondary channel index " << secondaryChannelIndex() << ".";
   } else if (ChannelMode::Selected == secondaryChannelMode()) {
     lst->setSecondaryChannel(SelectedChannel::get());
   }
 
   if ((ChannelMode::Fixed == revertChannelMode()) && hasRevertChannelIndex()) {
-    if (! ctx.has<Channel>(revertChannelIndex())) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve revert channel index " << revertChannelIndex() << ".";
-      return false;
-    }
-    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+    if (ctx.has<Channel>(revertChannelIndex()))
+      lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve revert channel index " << revertChannelIndex() << ".";
   } else if (ChannelMode::Selected == revertChannelMode()) {
     lst->setRevertChannel(SelectedChannel::get());
   }
@@ -1909,12 +2165,11 @@ GD73Codeplug::ScanListElement::linkScanList(ScanList *lst, Context &ctx, const E
     unsigned int index = getUInt16_le(Offset::members() + i*Offset::betweenMembers());
     if (0 == index)
       continue;
-    if (! ctx.has<Channel>(index-1)) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Cannot resolve member index" << index-1 << ".";
-      return false;
-    }
-    lst->addChannel(ctx.get<Channel>(index-1));
+    if (ctx.has<Channel>(index-1))
+      lst->addChannel(ctx.get<Channel>(index-1));
+    else
+      logWarn() << "Cannot link scan list '" << lst->name()
+                << "': Cannot resolve member index" << index-1 << ".";
   }
 
   return true;
@@ -2047,6 +2302,17 @@ GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   for (int i=0; i<config->scanlists()->count(); i++)
     ctx.add(config->scanlists()->scanlist(i), i);
 
+  // Handle encryption keys)
+  if (nullptr != config->commercialExtension()) {
+    for (int i=0, j=0; i<config->commercialExtension()->encryptionKeys()->count(); i++) {
+      EncryptionKey *key = config->commercialExtension()->encryptionKeys()->key(i);
+      // Can only encode basic encryption keys
+      if (! key->is<BasicEncryptionKey>())
+        continue;
+      ctx.add(key->as<BasicEncryptionKey>(), j++);
+    }
+  }
+
   return true;
 
 }
@@ -2056,6 +2322,7 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
   Q_UNUSED(flags);
 
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
@@ -2063,6 +2330,11 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
   }
 
   if (! encodeTimestamp(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeMessages(ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
     return false;
   }
@@ -2079,6 +2351,11 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
 
   if (! encodeGroupLists(ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
+    return false;
+  }
+
+  if (! encodeEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys for Radioddity GD73.";
     return false;
   }
 
@@ -2103,6 +2380,7 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
 bool
 GD73Codeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
+  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! decodeTimestamp(ctx, err)) {
     errMsg(err) << "Cannot decode codeplug.";
@@ -2204,8 +2482,21 @@ GD73Codeplug::encodeTimestamp(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::createMessages(Context &ctx, const ErrorStack &err) {
-  // Not implemented yet.
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! MessageBankElement(data(Offset::messages())).decode(ctx.config()->smsExtension())) {
+    errMsg(err) << "Cannot decode preset text messages.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+GD73Codeplug::encodeMessages(Context &ctx, const ErrorStack &err) {
+  if (! MessageBankElement(data(Offset::messages())).encode(ctx.config()->smsExtension())) {
+    errMsg(err) << "Cannot encode preset text messages.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2295,7 +2586,19 @@ GD73Codeplug::encodeGroupLists(Context &ctx, const ErrorStack &err) {
 
 bool
 GD73Codeplug::createEncryptionKeys(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).createEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot create encryption keys.";
+    return false;
+  }
+  return true;
+}
+
+bool
+GD73Codeplug::encodeEncryptionKeys(Context &ctx, const ErrorStack &err) {
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).encodeEncryptionKeys(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
+    return false;
+  }
   return true;
 }
 

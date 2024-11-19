@@ -432,21 +432,23 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
     return false;
   }
 
+  if (0 == _frequencyRanges.size())
+    return true;
+
   Frequency value = prop.read(item).value<Frequency>();
   foreach (const FrequencyRange &range, _frequencyRanges) {
     if (range.contains(value))
       return true;
   }
 
-  if (context.ignoreFrequencyLimits() || (0 == _frequencyRanges.size()) || _warnOnly) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges or "
-        << "range cannot be determined.";
+  if (context.ignoreFrequencyLimits())
     return true;
-  }
 
-  auto &msg = context.newMessage(RadioLimitIssue::Critical);
+  auto &msg = context.newMessage(RadioLimitIssue::Warning);
   msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges.";
+
+  if(_warnOnly)
+    return true;
   return false;
 }
 

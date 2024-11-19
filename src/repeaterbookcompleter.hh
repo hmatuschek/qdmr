@@ -61,6 +61,12 @@ class RepeaterBookList: public QAbstractListModel
   Q_OBJECT
 
 public:
+  enum Region {
+    World, NorthAmerica
+  };
+  Q_ENUM(Region)
+
+public:
   explicit RepeaterBookList(QObject *parent=nullptr);
 
   int rowCount(const QModelIndex &parent) const;

@@ -753,6 +753,14 @@ protected:
 
   /** Allocate prefab SMS messages. */
   virtual void allocateSMSMessages();
+  /** Encodes prefab SMS messages. */
+  virtual bool encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Create SMS messages from codeplug. */
+  virtual bool createSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Link SMS messages. */
+  virtual bool linkSMSMessages(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
   /** Allocates hot key settings memory section. */
   virtual void allocateHotKeySettings();
 
@@ -845,10 +853,10 @@ protected:
     static constexpr unsigned int radioIDs()             { return 0x02580000; }
 
     static constexpr unsigned int settings()             { return 0x02500000; }
+    static constexpr unsigned int zoneChannelList()      { return 0x02500100; }
     static constexpr unsigned int bootSettings()         { return 0x02500600; }
     static constexpr unsigned int aprsSettings()         { return 0x02501000; }
     static constexpr unsigned int dmrAPRSMessage()       { return 0x02501100; }
-    static constexpr unsigned int zoneChannelList()      { return 0x02500100; }
     static constexpr unsigned int offsetFrequencies()    { return 0x024C2000; }
 
     static constexpr unsigned int zoneBitmap()           { return 0x024c1300; }

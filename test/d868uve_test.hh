@@ -17,6 +17,9 @@ private slots:
   void testChannelFrequency();
   void testAutoRepeaterOffset();
   void testDTMFContacts();
+  void testSMSTemplates();
+  void testRegressionSMSTemplateOffset();
+  void testRegressionSMSCount();
 };
 
 #endif // D878UV2TEST_HH

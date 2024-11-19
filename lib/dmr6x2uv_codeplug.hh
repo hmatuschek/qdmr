@@ -638,10 +638,10 @@ public:
       static constexpr unsigned int simplxRepSpeaker()    { return 0x00b3; }
       static constexpr unsigned int showContact()         { return 0x00b4; }
       static constexpr unsigned int keyToneLevel()        { return 0x00b5; }
-      static constexpr unsigned int knobLock()            { return 0x00b6; }
-      static constexpr unsigned int keypadLock()          { return 0x00b6; }
-      static constexpr unsigned int sideKeyLock()         { return 0x00b6; }
-      static constexpr unsigned int forceKeyLock()        { return 0x00b6; }
+      static constexpr Bit knobLock()                     { return {0x00b6, 0}; }
+      static constexpr Bit keypadLock()                   { return {0x00b6, 1}; }
+      static constexpr Bit sideKeyLock()                  { return {0x00b6, 3}; }
+      static constexpr Bit forceKeyLock()                 { return {0x00b6, 4}; }
       static constexpr unsigned int simplxRepSlot()       { return 0x00b7; }
       static constexpr unsigned int showLastHeard()       { return 0x00b8; }
       static constexpr unsigned int smsFormat()           { return 0x00b9; }
@@ -840,6 +840,17 @@ public:
    *  @verbinclude dmr6x2uv_channel.txt */
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
+  public:
+    /** Possible PTT modes for FM APRS. */
+    enum class FMAPRSPTTMode {
+      Off = 0, Start = 1, End = 2
+    };
+
+    /** Possible APRS report types. */
+    enum class APRSType{
+      Off = 0, FM = 1, DMR = 2
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -872,10 +883,58 @@ public:
     virtual void enableRoaming(bool enable);
 
     /** Returns @c true, if ranging is enabled. */
-    bool ranging() const;
+    virtual bool ranging() const;
     /** Enables/disables ranging. */
-    void enableRanging(bool enable);
+    virtual void enableRanging(bool enable);
 
+    /** Returns the DMR APRS report channel index. */
+    virtual unsigned int dmrAPRSChannelIndex() const;
+    /** Sets the DMR APRS report channel index. */
+    virtual void setDMRAPRSChannelIndex(unsigned int idx);
+
+    /** Returns @c true, if the reception of DMR APRS messages is enabled. */
+    virtual bool dmrAPRSRXEnabled() const;
+    /** Enables/disables the reception of DMR APRS messages. */
+    virtual void enableDMRARPSRX(bool enable);
+
+    /** Returns true, if the position is reported via DMR APRS on PTT. */
+    virtual bool dmrAPRSPTTEnabled() const;
+    /** Enables/disables reporting the position via DMR APRS on PTT. */
+    virtual void enableDMRAPRSPTT(bool enable);
+
+    /** Returns teh FM APRS PTT mode. */
+    virtual FMAPRSPTTMode fmAPRSPTTMode() const;
+    /** Sets the FM APRS PTT mode. */
+    virtual void setFMAPRSPTTMode(FMAPRSPTTMode mode);
+
+    /** Returns the APRS type. */
+    virtual APRSType aprsType() const;
+    /** Sets the APRS type. */
+    virtual void setAPRSType(APRSType aprstype);
+
+    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool fromChannelObj(const Channel *c, Context &ctx);
+
+public:
+    struct Limit {
+      // Maximum number of scan list indices.
+      static constexpr unsigned int scanListIndices() { return 8; }
+    };
+
+protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr Bit roaming()                               { return {0x001b, 2}; }
+      static constexpr Bit ranging()                               { return {0x001b, 0}; }
+      static constexpr unsigned int scanListIndices()              { return 0x0036; }
+      static constexpr unsigned int betweenScanListIndices()       { return 0x0001; }
+      static constexpr unsigned int dmrAPRSChannelIndex()          { return 0x003e; }
+      static constexpr Bit dmrAPRSRXEnable()                       { return {0x003f, 5}; }
+      static constexpr Bit dmrAPRSPTTEnable()                      { return {0x003f, 4}; }
+      static constexpr Bit fmAPRSPTTMode()                         { return {0x003f, 2}; }
+      static constexpr Bit aprsType()                              { return {0x003f, 0}; }
+    };
+    /// @endcond
   };
 
   /** Represents the APRS settings within the binary DMR-6X2UV codeplug.
@@ -911,9 +970,9 @@ public:
     virtual void setFMFrequency(Frequency f);
 
     /** Returns the TX delay in ms. */
-    virtual unsigned fmTXDelay() const;
+    virtual Interval fmTXDelay() const;
     /** Sets the TX delay in ms. */
-    virtual void setFMTXDelay(unsigned ms);
+    virtual void setFMTXDelay(const Interval intv);
 
     /** Returns the sub tone settings. */
     virtual Signaling::Code txTone() const;
@@ -1108,7 +1167,6 @@ protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);
   void allocateForDecoding();
-  void allocateUpdated();
   void allocateForEncoding();
 
   bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());

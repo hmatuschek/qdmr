@@ -262,6 +262,8 @@ public:
   bool decodeButtonSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearMessages();
+  bool encodeMessages(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
+  bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
   bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -310,6 +312,7 @@ protected:
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int buttonSettings()                          { return 0x000108; }
+    static constexpr unsigned int messages()                                { return 0x000128; }
     /// @endcond
   };
 };
