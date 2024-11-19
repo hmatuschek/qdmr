@@ -250,18 +250,18 @@ public:
       static constexpr unsigned int rxColorCode()             { return 0x002c; }
       static constexpr unsigned int emergencySystemIndex()    { return 0x002d; }
       static constexpr unsigned int contextIndex()            { return 0x002e; }
-      static constexpr BitOffset    dataCallConfirm()         { return {0x0030, 7}; }
-      static constexpr BitOffset    emergencyAlarmACK()       { return {0x0030, 6}; }
-      static constexpr BitOffset    privateCallConfirm()      { return {0x0031, 0}; }
-      static constexpr BitOffset    privacyEnabled()          { return {0x0031, 4}; }
-      static constexpr BitOffset    timeSlot()                { return {0x0031, 6}; }
-      static constexpr BitOffset    dualCapacityDirectMode()  { return {0x0032, 0}; }
-      static constexpr BitOffset    nonSTEFrequency()         { return {0x0032, 5}; }
-      static constexpr BitOffset    bandwidth()               { return {0x0033, 1}; }
-      static constexpr BitOffset    rxOnly()                  { return {0x0033, 2}; }
-      static constexpr BitOffset    talkaround()              { return {0x0033, 3}; }
-      static constexpr BitOffset    vox()                     { return {0x0033, 6}; }
-      static constexpr BitOffset    power()                   { return {0x0033, 7}; }
+      static constexpr Bit dataCallConfirm()                  { return {0x0030, 7}; }
+      static constexpr Bit emergencyAlarmACK()                { return {0x0030, 6}; }
+      static constexpr Bit privateCallConfirm()               { return {0x0031, 0}; }
+      static constexpr Bit privacyEnabled()                   { return {0x0031, 4}; }
+      static constexpr Bit timeSlot()                         { return {0x0031, 6}; }
+      static constexpr Bit dualCapacityDirectMode()           { return {0x0032, 0}; }
+      static constexpr Bit nonSTEFrequency()                  { return {0x0032, 5}; }
+      static constexpr Bit bandwidth()                        { return {0x0033, 1}; }
+      static constexpr Bit rxOnly()                           { return {0x0033, 2}; }
+      static constexpr Bit talkaround()                       { return {0x0033, 3}; }
+      static constexpr Bit vox()                              { return {0x0033, 6}; }
+      static constexpr Bit power()                            { return {0x0033, 7}; }
     };
     /// @endcond
   };
@@ -354,8 +354,8 @@ public:
   protected:
     /// @cond DO_NOT_DOCUMENT
     struct Offset: public ChannelElement::Offset {
-      static constexpr BitOffset stepSize()                   { return {0x0036, 4} ; }
-      static constexpr BitOffset offsetMode()                 { return {0x0036, 2} ; }
+      static constexpr Bit stepSize()                         { return {0x0036, 4} ; }
+      static constexpr Bit offsetMode()                       { return {0x0036, 2} ; }
       static constexpr unsigned int txOffset()                { return 0x0034; }
     };
     /// @endcond
@@ -848,9 +848,9 @@ public:
     /// @cond DO_NOT_DOCUMENT
     struct Offset: public Element::Offset {
       static constexpr unsigned int name()                    { return 0x0000; }
-      static constexpr BitOffset channelMark()                { return {0x000f, 4}; }
-      static constexpr BitOffset mode()                       { return {0x000f, 6}; }
-      static constexpr BitOffset talkback()                   { return {0x000f, 7}; }
+      static constexpr Bit channelMark()                      { return {0x000f, 4}; }
+      static constexpr Bit mode()                             { return {0x000f, 6}; }
+      static constexpr Bit talkback()                         { return {0x000f, 7}; }
       static constexpr unsigned int members()                 { return 0x0010; }
       static constexpr unsigned int betweenMembers()          { return 0x0002; }
       static constexpr unsigned int primary()                 { return 0x0050; }
