@@ -4,24 +4,20 @@
 #include "logger.hh"
 
 
-QVector<Signaling::Code> _ctcss_codes = {
-  Signaling::SIGNALING_NONE, Signaling::CTCSS_67_0Hz, Signaling::SIGNALING_NONE,
-  Signaling::CTCSS_71_9Hz, Signaling::CTCSS_74_4Hz, Signaling::CTCSS_77_0Hz,
-  Signaling::CTCSS_79_7Hz, Signaling::CTCSS_82_5Hz, Signaling::CTCSS_85_4Hz,
-  Signaling::CTCSS_88_5Hz, Signaling::CTCSS_91_5Hz, Signaling::CTCSS_94_8Hz,
-  Signaling::CTCSS_97_4Hz, Signaling::CTCSS_100_0Hz, Signaling::CTCSS_103_5Hz,
-  Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz,
-  Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz, Signaling::CTCSS_127_3Hz,
-  Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz,
-  Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz, Signaling::CTCSS_156_7Hz,
-  Signaling::SIGNALING_NONE, Signaling::CTCSS_162_2Hz, Signaling::SIGNALING_NONE,
-  Signaling::CTCSS_167_9Hz, Signaling::SIGNALING_NONE, Signaling::CTCSS_173_8Hz,
-  Signaling::SIGNALING_NONE, Signaling::CTCSS_179_9Hz, Signaling::SIGNALING_NONE,
-  Signaling::CTCSS_186_2Hz, Signaling::SIGNALING_NONE, Signaling::CTCSS_192_8Hz,
-  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, Signaling::CTCSS_203_5Hz,
-  Signaling::SIGNALING_NONE, Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz,
-  Signaling::CTCSS_225_7Hz, Signaling::SIGNALING_NONE, Signaling::CTCSS_233_6Hz,
-  Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz, Signaling::SIGNALING_NONE
+QVector<SelectiveCall> _ctcss_codes = {
+  SelectiveCall(62.5),  SelectiveCall(67.0),  SelectiveCall(69.3),  SelectiveCall(71.9),
+  SelectiveCall(74.4),  SelectiveCall(77.0),  SelectiveCall(79.7),  SelectiveCall(82.5),
+  SelectiveCall(85.4),  SelectiveCall(88.5),  SelectiveCall(91.5),  SelectiveCall(94.8),
+  SelectiveCall(97.4), SelectiveCall(100.0), SelectiveCall(103.5), SelectiveCall(107.2),
+ SelectiveCall(110.9), SelectiveCall(114.8), SelectiveCall(118.8), SelectiveCall(123.0),
+ SelectiveCall(127.3), SelectiveCall(131.8), SelectiveCall(136.5), SelectiveCall(141.3),
+ SelectiveCall(146.2), SelectiveCall(151.4), SelectiveCall(156.7), SelectiveCall(159.8),
+ SelectiveCall(162.2), SelectiveCall(165.5), SelectiveCall(167.9), SelectiveCall(171.3),
+ SelectiveCall(173.8), SelectiveCall(177.3), SelectiveCall(179.9), SelectiveCall(183.5),
+ SelectiveCall(186.2), SelectiveCall(189.9), SelectiveCall(192.8), SelectiveCall(196.6),
+ SelectiveCall(199.5), SelectiveCall(203.5), SelectiveCall(206.5), SelectiveCall(210.7),
+ SelectiveCall(218.1), SelectiveCall(225.7), SelectiveCall(229.1), SelectiveCall(233.6),
+ SelectiveCall(241.8), SelectiveCall(250.3), SelectiveCall(254.1)
 };
 
 QVector<unsigned int> _dcs_codes = {
@@ -1460,68 +1456,68 @@ GD73Codeplug::ChannelElement::setAdmit(Admit admit) {
   setUInt8(Offset::admid(), (unsigned int) admit);
 }
 
-Signaling::Code
+SelectiveCall
 GD73Codeplug::ChannelElement::rxTone() const {
   int mode = getUInt8(Offset::rxToneMode());
   int ctcss_code = getUInt8(Offset::rxCTCSS());
   int dcs_code = getUInt8(Offset::rxDCS());
   if (0 == mode)
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   if (1 == mode) {
     if (ctcss_code >= _ctcss_codes.size())
-      return Signaling::SIGNALING_NONE;
+      return SelectiveCall();
     return _ctcss_codes[ctcss_code];
   }
   if (dcs_code >= _dcs_codes.size())
-    return Signaling::SIGNALING_NONE;
-  return Signaling::fromDCSNumber(_dcs_codes[dcs_code], 3 == mode);
+    return SelectiveCall();
+  return SelectiveCall(_dcs_codes[dcs_code], 3 == mode);
 }
 void
-GD73Codeplug::ChannelElement::setRXTone(Signaling::Code code) {
+GD73Codeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
   int mode = 0, ctcss_code = 0, dcs_code = 0;
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     mode = 1;
     ctcss_code = _ctcss_codes.indexOf(code);
-  } else if (Signaling::isDCSNormal(code)) {
-    mode = 2;
-    dcs_code = _dcs_codes.indexOf(Signaling::toDCSNumber(code));
-  } else if (Signaling::isDCSInverted(code)) {
-    mode = 3;
-    dcs_code = _dcs_codes.indexOf(Signaling::toDCSNumber(code));
+  } else if (code.isDCS()) {
+    if (code.isInverted())
+      mode = 3;
+    else
+      mode = 2;
+    dcs_code = _dcs_codes.indexOf(code.octalCode());
   }
   setUInt8(Offset::rxToneMode(), mode);
   setUInt8(Offset::rxCTCSS(), ctcss_code);
   setUInt8(Offset::rxDCS(), dcs_code);
 }
 
-Signaling::Code
+SelectiveCall
 GD73Codeplug::ChannelElement::txTone() const {
   int mode = getUInt8(Offset::txToneMode());
   int ctcss_code = getUInt8(Offset::txCTCSS());
   int dcs_code = getUInt8(Offset::txDCS());
   if (0 == mode)
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   if (1 == mode) {
     if (ctcss_code >= _ctcss_codes.size())
-      return Signaling::SIGNALING_NONE;
+      return SelectiveCall();
     return _ctcss_codes[ctcss_code];
   }
   if (dcs_code >= _dcs_codes.size())
-    return Signaling::SIGNALING_NONE;
-  return Signaling::fromDCSNumber(_dcs_codes[dcs_code], 3 == mode);
+    return SelectiveCall();
+  return SelectiveCall(_dcs_codes[dcs_code], 3 == mode);
 }
 void
-GD73Codeplug::ChannelElement::setTXTone(Signaling::Code code) {
+GD73Codeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
   int mode = 0, ctcss_code = 0, dcs_code = 0;
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     mode = 1;
     ctcss_code = _ctcss_codes.indexOf(code);
-  } else if (Signaling::isDCSNormal(code)) {
-    mode = 2;
-    dcs_code = _dcs_codes.indexOf(Signaling::toDCSNumber(code));
-  } else if (Signaling::isDCSInverted(code)) {
-    mode = 3;
-    dcs_code = _dcs_codes.indexOf(Signaling::toDCSNumber(code));
+  } else if (code.isDCS()) {
+    if (code.isInverted())
+      mode = 3;
+    else
+      mode = 2;
+    dcs_code = _dcs_codes.indexOf(code.octalCode());
   }
   setUInt8(Offset::txToneMode(), mode);
   setUInt8(Offset::txCTCSS(), ctcss_code);

@@ -43,7 +43,6 @@ SET(libdmrconf_SOURCES
     dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc)
 
 SET(libdmrconf_MOC_HEADERS
-    signaling.hh
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh
     melody.hh
@@ -72,7 +71,7 @@ SET(libdmrconf_MOC_HEADERS
     auctus_a6_interface.hh
     dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh dr1801uv_limits.hh)
 
-SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
+SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh signaling.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh gd73_filereader.hh
     md390_filereader.hh dr1801uv_filereader.hh dummyfilereader.hh
     utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
@@ -101,6 +100,6 @@ install(FILES ${libdmrconf_MOC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDE
 install(FILES ${PROJECT_BINARY_DIR}/lib/config.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
 
 if (UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
-  install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION "/etc/udev/rules.d/")
+  install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION ${INSTALL_UDEV_PATH})
 endif(UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
 

@@ -219,13 +219,13 @@ public:
     virtual void setAltitude(unsigned int alt);
 
     /** Returns the CTCSS RX sub-tone. Only valid for FM channels. */
-    virtual Signaling::Code rxTone() const;
+    virtual SelectiveCall rxTone() const;
     /** Sets the CTCSS RX sub-tone. Only valid for FM channels. */
-    virtual void setRXTone(Signaling::Code code, const ErrorStack &err=ErrorStack());
+    virtual void setRXTone(const SelectiveCall &code, const ErrorStack &err=ErrorStack());
     /** Returns the CTCSS TX sub-tone. Only valid for FM channels. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the CTCSS TX sub-tone. Only valid for FM channels. */
-    virtual void setTXTone(Signaling::Code code, const ErrorStack &err=ErrorStack());
+    virtual void setTXTone(const SelectiveCall &code, const ErrorStack &err=ErrorStack());
 
     /** Returns the RX color code. Only valid for DMR channels. */
     virtual unsigned int rxColorCode() const;

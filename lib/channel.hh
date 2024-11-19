@@ -215,9 +215,9 @@ class FMChannel: public AnalogChannel
   /** The squelch level of the channel [1-10]. */
   Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
   /** The RX tone (CTCSS/DSC). */
-  Q_PROPERTY(Signaling::Code rxTone READ rxTone WRITE setRXTone SCRIPTABLE false)
+  Q_PROPERTY(SelectiveCall rxTone READ rxTone WRITE setRXTone)
   /** The TX tone (CTCSS/DSC). */
-  Q_PROPERTY(Signaling::Code txTone READ txTone WRITE setTXTone SCRIPTABLE false)
+  Q_PROPERTY(SelectiveCall txTone READ txTone WRITE setTXTone)
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
@@ -272,13 +272,13 @@ public:
   void setSquelchDefault();
 
   /** Returns the CTCSS/DCS RX tone, @c SIGNALING_NONE means disabled. */
-  Signaling::Code rxTone() const;
+  SelectiveCall rxTone() const;
   /** (Re-)Sets the CTCSS/DCS RX tone, @c SIGNALING_NONE disables the RX tone. */
-  bool setRXTone(Signaling::Code code);
+  bool setRXTone(SelectiveCall code);
   /** Returns the CTCSS/DCS TX tone, @c SIGNALING_NONE means disabled. */
-  Signaling::Code txTone() const;
+  SelectiveCall txTone() const;
   /** (Re-)Sets the CTCSS/DCS TX tone, @c SIGNALING_NONE disables the TX tone. */
-  bool setTXTone(Signaling::Code code);
+  bool setTXTone(SelectiveCall code);
 
   /** Returns the bandwidth of the analog channel. */
   Bandwidth bandwidth() const;
@@ -314,10 +314,10 @@ protected:
 	Admit _admit;
   /** Holds the squelch level [0,10]. */
   unsigned _squelch;
-  /** The RX CTCSS tone. */
-  Signaling::Code _rxTone;
-  /** The TX CTCSS tone. */
-  Signaling::Code _txTone;
+  /** The RX CTCSS/DCS setting. */
+  SelectiveCall _rxTone;
+  /** The TX CTCSS/DCS setting. */
+  SelectiveCall _txTone;
   /** The channel bandwidth. */
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */

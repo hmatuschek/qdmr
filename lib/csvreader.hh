@@ -144,7 +144,7 @@ public:
       qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a analog channel has been parsed. */
   virtual bool handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
-      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
       FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   /** Gets called once a zone list has been parsed. */
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
@@ -278,9 +278,8 @@ public:
       qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
       qint64 tot, bool ro, DMRChannel::Admit admit, qint64 color, DMRChannel::TimeSlot slot,
       qint64 gl, qint64 contact, qint64 gps, qint64 roam, qint64 radioID, qint64 line, qint64 column, QString &errorMessage);
-  virtual bool handleAnalogChannel(
-      qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
-      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+  virtual bool handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan, qint64 aprs,
+      qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
       FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage);
   virtual bool handleZone(qint64 idx, const QString &name, bool a, const QList<qint64> &channels,
                           qint64 line, qint64 column, QString &errorMessage);

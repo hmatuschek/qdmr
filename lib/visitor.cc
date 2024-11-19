@@ -89,6 +89,12 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
                   << item->metaObject()->className() << "'.";
       return false;
     }
+  } else if (QString("SelectiveCall") == prop.typeName()) {
+    if (! this->processSelectiveCall(item, prop, err)) {
+      errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
   } else if (ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>()) {
     if (! this->processReference(ref, err)) {
       errMsg(err) << "While processing reference '" << prop.name() << "' of '"
@@ -181,6 +187,13 @@ Visitor::processFrequency(ConfigItem *parent, const QMetaProperty &prop, const E
 
 bool
 Visitor::processInterval(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processSelectiveCall(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
   Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
   // Does nothing, return true;
   return true;

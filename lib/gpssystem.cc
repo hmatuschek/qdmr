@@ -59,7 +59,7 @@ PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack 
               << ": Positioning system has no period.";
   }
 
-  return ConfigObject::parse(pos, ctx);
+  return ConfigObject::parse(pos, ctx, err);
 }
 
 bool
@@ -265,29 +265,55 @@ const QString &
 APRSSystem::destination() const {
   return _destination;
 }
+
 unsigned
 APRSSystem::destSSID() const {
   return _destSSID;
 }
+
 void
 APRSSystem::setDestination(const QString &call, unsigned ssid) {
   _destination = call;
   _destSSID = ssid;
 }
 
+void
+APRSSystem::setDestination(const QString &call) {
+  _destination = call;
+}
+
+void
+APRSSystem::setDestSSID(unsigned int ssid) {
+  _destSSID = ssid;
+}
+
+
 const QString &
 APRSSystem::source() const {
   return _source;
 }
+
 unsigned
 APRSSystem::srcSSID() const {
   return _srcSSID;
 }
+
 void
 APRSSystem::setSource(const QString &call, unsigned ssid) {
   _source = call;
   _srcSSID = ssid;
 }
+
+void
+APRSSystem::setSource(const QString &call) {
+  _source = call;
+}
+
+void
+APRSSystem::setSrcSSID(unsigned ssid) {
+  _srcSSID = ssid;
+}
+
 
 const QString &
 APRSSystem::path() const {
@@ -421,7 +447,7 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
       if (it->IsScalar())
         path.append(QString::fromStdString(it->as<std::string>()));
     }
-    setPath(path.join(""));
+    setPath(path.join(","));
   }
 
   return PositioningSystem::parse(node, ctx, err);

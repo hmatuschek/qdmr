@@ -2,7 +2,7 @@ name: qdmr
 
 #version: git
 #grade: devel
-version: 0.11.3
+version: 0.12.0
 grade: stable
 
 summary: Graphical code-plug programming tool for DMR radios.
@@ -13,8 +13,8 @@ description: |
    * Retevis RT8, RT82, RT3, RT3S, RT84
    * Open GD77 firmware (GD77, RD-5R & DM-1801)
    * AnyTone AT-D868UVE, AT-D878UV AT-D878UVII, AT-D578UV
-   * Radioddity GD77, RD-5R
-   * Baofeng DMR-6X2, DM-1701
+   * Radioddity GD-73, GD-77, RD-5R
+   * Baofeng/BTech DMR-6X2, DM-1701, DR-1801UV (A6)
 
 confinement: strict
 base: core20

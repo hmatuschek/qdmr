@@ -41,6 +41,10 @@ qt5_wrap_cpp(mergetest_MOC_SOURCES mergetest.hh)
 add_executable(mergetest mergetest.cc ${mergetest_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(mergetest ${LIBS} libdmrconf)
 
+qt5_wrap_cpp(smstemplatetest_MOC_SOURCES smstemplatetest.hh)
+add_executable(smstemplatetest smstemplatetest.cc ${smstemplatetest_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(smstemplatetest ${LIBS} libdmrconf libdmrconfigtest)
+
 
 # Unit tests for Radioddity devices
 qt5_wrap_cpp(rd5r_MOC_SOURCES rd5r_test.hh)
@@ -110,6 +114,7 @@ target_link_libraries(dr1801_test ${LIBS} libdmrconf libdmrconfigtest)
 add_test(NAME Config    COMMAND configtest)
 add_test(NAME CRC32     COMMAND crc32test)
 add_test(NAME Utils     COMMAND utilstest)
+add_test(NAME CHIRP     COMMAND chirptest)
 
 add_test(NAME RD5R      COMMAND rd5r_test)
 add_test(NAME GD77      COMMAND gd77_test)

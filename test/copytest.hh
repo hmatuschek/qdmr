@@ -14,6 +14,7 @@ private slots:
   void testChannelClone();
   void testConfigClone();
   void testConfigCopy();
+  void testAPRSSystemCopy();
 };
 
 #endif // COPYTEST_HH
