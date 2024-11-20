@@ -288,11 +288,13 @@ RepeaterBookList::cachePath() const {
 QString
 RepeaterBookList::queryPath() const {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
   QDir directory;
-  if ((! directory.exists(path)) && (!directory.mkpath(path))) {
+  if ((! directory.exists(path)) && (! directory.mkpath(path))) {
     logError() << "Cannot create path '" << path << "'.";
     return "";
   }
+
   return path+"/repeaterbook.query.json";
 }
 
