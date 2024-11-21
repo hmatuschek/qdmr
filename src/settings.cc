@@ -62,12 +62,12 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
-RepeaterBookList::Region
+RepeaterBookSource::Region
 Settings::repeaterBookRegion() const {
-  return value("repeaterBookRegion", RepeaterBookList::Region::World).value<RepeaterBookList::Region>();
+  return value("repeaterBookRegion", RepeaterBookSource::Region::World).value<RepeaterBookSource::Region>();
 }
 void
-Settings::setRepeaterBookRegion(RepeaterBookList::Region region) {
+Settings::setRepeaterBookRegion(RepeaterBookSource::Region region) {
   setValue("repeaterBookRegion", region);
 }
 
@@ -352,8 +352,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     locatorEntry->setEnabled(false);
 
   switch (settings.repeaterBookRegion()) {
-  case RepeaterBookList::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
-  case RepeaterBookList::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
+  case RepeaterBookSource::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
+  case RepeaterBookSource::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
   }
 
   connect(Ui::SettingsDialog::ignoreFrequencyLimits, SIGNAL(toggled(bool)),
@@ -442,9 +442,9 @@ SettingsDialog::accept() {
   settings.setLocator(locatorEntry->text().simplified());
   settings.setDisableAutoDetect(disableAutoDetect->isChecked());
   if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())
-    settings.setRepeaterBookRegion(RepeaterBookList::World);
+    settings.setRepeaterBookRegion(RepeaterBookSource::World);
   else
-    settings.setRepeaterBookRegion(RepeaterBookList::NorthAmerica);
+    settings.setRepeaterBookRegion(RepeaterBookSource::NorthAmerica);
   settings.setUpdateCodeplug(updateCodeplug->isChecked());
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());

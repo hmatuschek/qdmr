@@ -1,12 +1,21 @@
 #ifndef REPEATERDATABASE_HH
 #define REPEATERDATABASE_HH
 
-#include <QObject>
+#include <QAbstractListModel>
 #include <QGeoCoordinate>
-#include "frequency.hh"
-#include "signaling.hh"
 #include <QDateTime>
 #include <QFile>
+#include <QCompleter>
+#include <QSortFilterProxyModel>
+#include <QNetworkAccessManager>
+
+#include "frequency.hh"
+#include "signaling.hh"
+
+
+class QNetworkReply;
+
+
 
 /** Repeater database entry.
  * Just a collection of some meaningful information for FM and DMR repeater. */
@@ -45,8 +54,10 @@ public:
   RepeaterDatabaseEntry &operator=(const RepeaterDatabaseEntry &other) = default;
   /** Comparison. */
   bool operator==(const RepeaterDatabaseEntry &other) const;
+  /** Comparison. */
+  bool operator<(const RepeaterDatabaseEntry &other) const;
 
-  QJsonObject toJson() const;
+  QJsonValue toJson() const;
 
   bool isValid() const;
 
@@ -56,6 +67,7 @@ public:
   const Frequency &txFrequency() const;
 
   const QGeoCoordinate &location() const;
+  QString locator() const;
 
   const SelectiveCall &rxTone() const;
   const SelectiveCall &txTone() const;
@@ -116,7 +128,7 @@ public:
 
 signals:
   /** Gets emitted, once an entry gets updated or is added. */
-  void updated(unsigned int idx);
+  void updated(const RepeaterDatabaseEntry &entry);
 
 protected:
   /** Needs to be implemented to query new entries. */
@@ -131,7 +143,7 @@ class CachedRepeaterDatabaseSource: public RepeaterDatabaseSource
   Q_OBJECT
 
 protected:
-  explicit CachedRepeaterDatabaseSource(const QString &filename, QObject *parent = nullptr);
+  CachedRepeaterDatabaseSource(const QString &filename, QObject *parent = nullptr);
 
 public:
   unsigned int count() const;
@@ -152,21 +164,62 @@ protected:
 
 
 
-/** Base class of all repeater databases. */
-class RepeaterDatabase : public QObject
+class DownloadableRepeaterDatabaseSource: public CachedRepeaterDatabaseSource
 {
   Q_OBJECT
 
 protected:
-  /** Hidden constructor. */
-  explicit RepeaterDatabase(QObject *parent = nullptr);
+  DownloadableRepeaterDatabaseSource(const QString &filename, const QUrl &source,
+                                     unsigned int maxAge=5, QObject *parent=nullptr);
 
 public:
+  bool needsUpdate() const;
+
+protected:
+  virtual bool parse(const QByteArray &doc) = 0;
+  bool load(const QString &call, const QGeoCoordinate &pos);
+
+protected slots:
+  void onRequestFinished(QNetworkReply *reply);
+  void download();
+
+protected:
+  QUrl _url;
+  QNetworkAccessManager _network;
+  QNetworkReply *_currentReply;
+};
+
+
+
+/** Base class of all repeater databases. */
+class RepeaterDatabase : public QAbstractListModel
+{
+  Q_OBJECT
+
+public:
+  /** Constructor. */
+  explicit RepeaterDatabase(QObject *parent = nullptr);
+
+  RepeaterDatabaseEntry get(unsigned int idx) const;
+  void addSource(RepeaterDatabaseSource *source);
+
   virtual bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
 
-signals:
+  int rowCount(const QModelIndex &parent = QModelIndex()) const;
+  QVariant data(const QModelIndex &index, int role) const;
 
+
+protected slots:
+  void merge(const RepeaterDatabaseEntry &entry);
+
+
+protected:
+  QList<RepeaterDatabaseSource *> _sources;
+  QMap<RepeaterDatabaseEntry, unsigned int> _indices;
+  QVector<RepeaterDatabaseEntry> _entries;
 };
+
+
 
 
 #endif // REPEATERDATABASE_HH

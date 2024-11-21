@@ -20,7 +20,9 @@
 #include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
 #include "aprssystemdialog.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeaterdatabase.hh"
+#include "repeaterbooksource.hh"
+#include "repeatermapsource.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
@@ -89,7 +91,9 @@ Application::Application(int &argc, char *argv[])
   // load settings
   Settings settings;
   // load databases
-  _repeater   = new RepeaterBookList(this);
+  _repeater   = new RepeaterDatabase(this);
+  _repeater->addSource(new RepeaterBookSource());
+  _repeater->addSource(new RepeaterMapSource());
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   // create empty codeplug
@@ -175,7 +179,7 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterBookList *Application::repeater() const{
+RepeaterDatabase *Application::repeater() const{
   return _repeater;
 }
 

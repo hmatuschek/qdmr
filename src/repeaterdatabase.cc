@@ -5,7 +5,40 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QFile>
+#include <QNetworkReply>
+
 #include "logger.hh"
+#include "utils.hh"
+
+
+
+/* ********************************************************************************************* *
+ * Helper functions
+ * ********************************************************************************************* */
+static const QSet<double> _aprs_frequencies = {
+  144.390, 144.575, 144.660, 144.800, 144.930, 145.175, 145.570, 432.500
+};
+
+inline QString bandName(const Frequency &F) {
+  if (30 >= F.inMHz())
+    return "HF";
+  else if (300 >= F.inMHz())
+    return "VHF";
+  else if (3000 >= F.inMHz())
+    return "UHF";
+  else if (30000 >= F.inMHz())
+    return "SHF";
+  return "EHF";
+}
+
+inline QString bandName(const Frequency &rx, const Frequency & tx) {
+  QString rband = bandName(rx), tband=bandName(tx);
+  if ((rx == tx) && (_aprs_frequencies.contains(rx.inMHz())))
+    return "APRS";
+  else if (rband == tband)
+    return rband;
+  return QString("%1/%2").arg(rband,tband);
+}
 
 
 
@@ -52,8 +85,47 @@ RepeaterDatabaseEntry::operator==(const RepeaterDatabaseEntry &other) const {
   if (Type::Invalid == _type)
     return true;
 
-  return (other._call == _call) && (other._rxFrequency == _rxFrequency)
-      && (other._txFrequency == _txFrequency);
+  return (other._call == _call) && (other._rxFrequency == _rxFrequency);
+}
+
+bool
+RepeaterDatabaseEntry::operator<(const RepeaterDatabaseEntry &other) const {
+  return (_type < other._type) || (_call < other._call) || (_rxFrequency < other._rxFrequency);
+}
+
+QJsonValue
+RepeaterDatabaseEntry::toJson() const {
+  QJsonObject obj;
+
+  switch (type()) {
+  case Type::Invalid: return QJsonValue();
+  case Type::FM: obj.insert("type", "FM"); break;
+  case Type::DMR: obj.insert("type", "DMR"); break;
+  case Type::M17: obj.insert("type", "M17"); break;
+  }
+
+  obj.insert("call", call());
+
+  obj.insert("rx", rxFrequency().format());
+  if (txFrequency().inHz())
+    obj.insert("tx", txFrequency().format());
+
+  obj.insert("latitude", location().latitude());
+  obj.insert("longitude", location().longitude());
+
+  if (Type::FM == type()) {
+    if (rxTone().isInvalid()) obj.insert("rx-tone", rxTone().format());
+    if (txTone().isInvalid()) obj.insert("tx-tone", rxTone().format());
+  } else if (Type::DMR == type()) {
+    obj.insert("color-code", (int)colorCode());
+  }
+
+  if (updated().isValid())
+    obj.insert("updated", updated().toString(Qt::ISODate));
+  if (loaded().isValid())
+    obj.insert("loaded", loaded().toString(Qt::ISODate));
+
+  return obj;
 }
 
 bool
@@ -84,6 +156,11 @@ RepeaterDatabaseEntry::txFrequency() const {
 const QGeoCoordinate &
 RepeaterDatabaseEntry::location() const {
   return _location;
+}
+
+QString
+RepeaterDatabaseEntry::locator() const {
+  return deg2loc(_location);
 }
 
 const SelectiveCall &
@@ -130,6 +207,53 @@ RepeaterDatabaseEntry::dmr(const QString &call, const Frequency &rxFrequency,
   return RepeaterDatabaseEntry{
     call.simplified().toUpper(), rxFrequency, txFrequency,
         location, colorCode, updated, loaded};
+}
+
+RepeaterDatabaseEntry
+RepeaterDatabaseEntry::fromJson(const QJsonObject &obj) {
+  if (obj.isEmpty() || (! obj.contains("type")))
+    return RepeaterDatabaseEntry();
+
+  Type type = Type::Invalid;
+  if ("FM" == obj.value("type").toString())
+    type = Type::FM;
+  else if ("DMR" == obj.value("type").toString())
+    type = Type::DMR;
+  else if ("M17" == obj.value("type").toString())
+    type = Type::M17;
+
+  QString call = obj.value("call").toString().simplified().toUpper();
+
+  Frequency rx = Frequency::fromString(obj.value("rx").toString()), tx;
+  if (obj.contains("tx"))
+    tx = Frequency::fromString(obj.value("tx").toString());
+
+  QGeoCoordinate location(obj.value("latitude").toDouble(),
+                          obj.value("longitude").toDouble());
+
+  QDateTime updated, loaded;
+  if (obj.contains("updated"))
+    updated = QDateTime::fromString(obj.value("updated").toString(), Qt::ISODate);
+  if (obj.contains("loaded"))
+    loaded = QDateTime::fromString(obj.value("loaded").toString(), Qt::ISODate);
+
+  if (Type::FM == type) {
+    SelectiveCall rxTone, txTone;
+    if (obj.contains("rx-tone"))
+      rxTone = SelectiveCall::parseCTCSS(obj.value("rx-tone").toString());
+    if (obj.contains("tx-tone"))
+      txTone = SelectiveCall::parseCTCSS(obj.value("tx-tone").toString());
+    return RepeaterDatabaseEntry::fm(
+          call, rx, tx, location, rxTone, txTone, updated, loaded);
+  } else if (Type::DMR == type) {
+    unsigned int colorCode = 0;
+    if (obj.contains("color-code"))
+      colorCode = obj.value("color-code").toInt();
+    return RepeaterDatabaseEntry::dmr(
+          call, rx, tx, location, colorCode, updated, loaded);
+  }
+
+  return RepeaterDatabaseEntry();
 }
 
 
@@ -212,9 +336,8 @@ CachedRepeaterDatabaseSource::loadCache() {
     RepeaterDatabaseEntry entry = RepeaterDatabaseEntry::fromJson(obj.toObject());
     if (! entry.isValid())
       continue;
-    int idx = _cache.size();
     _cache.append(entry);
-    emit updated(idx);
+    emit updated(entry);
   }
 }
 
@@ -253,7 +376,7 @@ CachedRepeaterDatabaseSource::cache(const RepeaterDatabaseEntry &entry) {
     _cache.append(entry);
   }
 
-  emit updated(idx);
+  emit updated(entry);
 }
 
 
@@ -286,10 +409,155 @@ CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &l
 
 
 /* ********************************************************************************************* *
+ * Implementation of DownloadableRepeaterDatabaseSource
+ * ********************************************************************************************* */
+DownloadableRepeaterDatabaseSource::DownloadableRepeaterDatabaseSource(
+    const QString &filename, const QUrl &source, unsigned int maxAge, QObject *parent)
+  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _network(), _currentReply(nullptr)
+{
+  connect(&_network, SIGNAL(finished(QNetworkReply*)),
+          this, SLOT(onRequestFinished(QNetworkReply*)));
+
+  if (needsUpdate())
+    download();
+}
+
+bool
+DownloadableRepeaterDatabaseSource::needsUpdate() const {
+  QFileInfo info(_cacheFile);
+  return (! info.exists()) || (info.lastModified().daysTo(QDateTime::currentDateTime()) > _maxAge);
+}
+
+
+bool
+DownloadableRepeaterDatabaseSource::load(const QString &call, const QGeoCoordinate &pos) {
+  Q_UNUSED(call); Q_UNUSED(pos);
+  // No action needed
+  return true;
+}
+
+
+void
+DownloadableRepeaterDatabaseSource::download() {
+  // Cancel running requests
+  if (_currentReply)
+    _currentReply->abort();
+
+  QNetworkRequest request(_url);
+  request.setHeader(
+        QNetworkRequest::UserAgentHeader,
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/115.0.0.0 Safari/537.36 Edg/114.0.1823.86");
+
+  logDebug() << "Query " << _url.toString() << "'.";
+  _currentReply = _network.get(request);
+}
+
+
+void
+DownloadableRepeaterDatabaseSource::onRequestFinished(QNetworkReply *reply) {
+  if (reply->error()) {
+    logError() << "Cannot download repeater list: " << reply->errorString();
+    reply->deleteLater();
+    _currentReply = nullptr;
+    return;
+  }
+
+  QByteArray content = reply->readAll();
+
+  reply->deleteLater();
+  _currentReply = nullptr;
+
+  parse(content);
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RepeaterDatabase
  * ********************************************************************************************* */
 RepeaterDatabase::RepeaterDatabase(QObject *parent)
-  : QObject{parent}
+  : QAbstractListModel{parent}, _sources(), _indices(), _entries()
 {
-
+  // pass...
 }
+
+
+void
+RepeaterDatabase::addSource(RepeaterDatabaseSource *source) {
+  if ((nullptr == source) || _sources.contains(source))
+    return;
+
+  _sources.append(source);
+  source->setParent(this);
+  connect(source, &RepeaterDatabaseSource::updated, this, &RepeaterDatabase::merge);
+
+  for (unsigned int i=0; i<source->count(); i++) {
+    merge(source->get(i));
+  }
+}
+
+
+void
+RepeaterDatabase::merge(const RepeaterDatabaseEntry &entry) {
+  if (_indices.contains(entry)) {
+    int row = _indices[entry];
+    RepeaterDatabaseEntry myEntry(_entries[row]);
+    if ((! myEntry.updated().isValid()) ||
+        (myEntry.updated().isValid() && entry.updated().isValid() &&
+         (myEntry.updated() < entry.updated()))) {
+      _entries[_indices[entry]] = entry;
+      emit dataChanged(index(row), index(row));
+    }
+    return;
+  }
+
+  int row = _entries.size();
+  beginInsertRows(QModelIndex(), row, row);
+  _entries.append(entry);
+  _indices[entry] = row;
+  endInsertRows();
+}
+
+
+int
+RepeaterDatabase::rowCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent);
+  return _entries.size();
+}
+
+RepeaterDatabaseEntry
+RepeaterDatabase::get(unsigned int idx) const {
+  if (idx >= (unsigned int)_entries.size())
+    return RepeaterDatabaseEntry();
+  return _entries[idx];
+}
+
+QVariant
+RepeaterDatabase::data(const QModelIndex &index, int role) const {
+  if (index.row() >= _entries.count())
+    return QVariant();
+
+  if (Qt::EditRole == role) {
+    return _entries[index.row()].call();
+  } else if (Qt::DisplayRole == role) {
+    return QString("%1 (%2, %3)")
+        .arg(_entries[index.row()].call())
+        .arg(bandName(_entries[index.row()].rxFrequency(),
+             _entries[index.row()].txFrequency()))
+        .arg(_entries[index.row()].locator());
+  }
+  return QVariant();
+}
+
+
+bool
+RepeaterDatabase::query(const QString &call, const QGeoCoordinate &pos) {
+  for (auto source: _sources) {
+    source->query(call, pos);
+  }
+  return true;
+}
+
+
+
