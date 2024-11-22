@@ -3,7 +3,9 @@
 #include <QCompleter>
 #include "utils.hh"
 #include "settings.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeatercompleter.hh"
+#include "repeaterdatabase.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
@@ -37,7 +39,7 @@ AnalogChannelDialog::construct() {
   Application *app = qobject_cast<Application *>(qApp);
   FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
@@ -181,12 +183,12 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row())->rxFrequency();
-  double tx = app->repeater()->repeater(src.row())->txFrequency();
-  rxTone->setSelectiveCall(app->repeater()->repeater(src.row())->rxTone());
-  txTone->setSelectiveCall(app->repeater()->repeater(src.row())->txTone());
-  txFrequency->setText(QString::number(tx, 'f'));
-  rxFrequency->setText(QString::number(rx, 'f'));
+  Frequency rx = app->repeater()->get(src.row()).rxFrequency();
+  Frequency tx = app->repeater()->get(src.row()).txFrequency();
+  rxTone->setSelectiveCall(app->repeater()->get(src.row()).rxTone());
+  txTone->setSelectiveCall(app->repeater()->get(src.row()).txTone());
+  txFrequency->setText(tx.format());
+  rxFrequency->setText(rx.format());
 }
 
 void
