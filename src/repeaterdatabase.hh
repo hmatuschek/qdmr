@@ -32,6 +32,7 @@ protected:
   RepeaterDatabaseEntry(const QString &call,
                         const Frequency &rxFrequency, const Frequency &txFrequency,
                         const QGeoCoordinate &location,
+                        const QString &qth,
                         const SelectiveCall &rxTone,
                         const SelectiveCall &txTone,
                         const QDateTime &updated,
@@ -41,6 +42,7 @@ protected:
   RepeaterDatabaseEntry(const QString &call,
                         const Frequency &rxFrequency, const Frequency &txFrequency,
                         const QGeoCoordinate &location,
+                        const QString &qth,
                         unsigned int colorCode,
                         const QDateTime &updated,
                         const QDateTime &loaded);
@@ -56,6 +58,8 @@ public:
   bool operator==(const RepeaterDatabaseEntry &other) const;
   /** Comparison. */
   bool operator<(const RepeaterDatabaseEntry &other) const;
+  /** Update operator. */
+  RepeaterDatabaseEntry &operator +=(const RepeaterDatabaseEntry &other);
 
   QJsonValue toJson() const;
 
@@ -68,6 +72,7 @@ public:
 
   const QGeoCoordinate &location() const;
   QString locator() const;
+  const QString &qth() const;
 
   const SelectiveCall &rxTone() const;
   const SelectiveCall &txTone() const;
@@ -81,6 +86,7 @@ public:
   static RepeaterDatabaseEntry fm(const QString &call,
                                   const Frequency &rxFrequency, const Frequency &txFrequency,
                                   const QGeoCoordinate &location,
+                                  const QString &qth="",
                                   const SelectiveCall &rxTone=SelectiveCall(),
                                   const SelectiveCall &txTone=SelectiveCall(),
                                   const QDateTime &updated = QDateTime(),
@@ -89,6 +95,7 @@ public:
   static RepeaterDatabaseEntry dmr(const QString &call,
                                    const Frequency &rxFrequeny, const Frequency &txFrequency,
                                    const QGeoCoordinate &location,
+                                   const QString &qth="",
                                    unsigned int colorCode = 0,
                                    const QDateTime &updated = QDateTime(),
                                    const QDateTime &loaded = QDateTime::currentDateTime());
@@ -101,6 +108,7 @@ protected:
   Frequency      _rxFrequency;
   Frequency      _txFrequency;
   QGeoCoordinate _location;
+  QString        _qth;
   SelectiveCall  _rxTone;
   SelectiveCall  _txTone;
   unsigned int   _colorCode;
@@ -159,7 +167,8 @@ protected:
 protected:
   unsigned int _maxAge;
   QFile _cacheFile;
-  QList<RepeaterDatabaseEntry> _cache;
+  QMap<RepeaterDatabaseEntry, unsigned int> _indices;
+  QVector<RepeaterDatabaseEntry> _cache;
 };
 
 

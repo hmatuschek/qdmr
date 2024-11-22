@@ -62,6 +62,43 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
+bool
+Settings::repeaterBookSourceEnabled() const {
+  return value("repeaterSource/repeaterBook", true).toBool();
+}
+void
+Settings::enableRepeaterBookSource(bool enabled) {
+  return setValue("repeaterSource/repeaterBook", enabled);
+}
+
+bool
+Settings::repeaterMapSourceEnabled() const {
+  return value("repeaterSource/repeaterMap", true).toBool();
+}
+void
+Settings::enableRepeaterMapSource(bool enabled) {
+  return setValue("repeaterSource/repeaterMap", enabled);
+}
+
+bool
+Settings::hearhamSourceEnabled() const {
+  return value("repeaterSource/hearham", false).toBool();
+}
+void
+Settings::enableHearhamSource(bool enabled) {
+  return setValue("repeaterSource/hearham", enabled);
+}
+
+bool
+Settings::radioIdRepeaterSourceEnabled() const {
+  return value("repeaterSource/radioId", true).toBool();
+}
+void
+Settings::enableRadioIdRepeaterSource(bool enabled) {
+  return setValue("repeaterSource/radioId", enabled);
+}
+
+
 RepeaterBookSource::Region
 Settings::repeaterBookRegion() const {
   return value("repeaterBookRegion", RepeaterBookSource::Region::World).value<RepeaterBookSource::Region>();
@@ -351,10 +388,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
 
+  Ui::SettingsDialog::repeaterBookEnable->setChecked(settings.repeaterBookSourceEnabled());
   switch (settings.repeaterBookRegion()) {
   case RepeaterBookSource::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
   case RepeaterBookSource::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
   }
+  Ui::SettingsDialog::repeaterMapEnable->setChecked(settings.repeaterMapSourceEnabled());
+  Ui::SettingsDialog::hearhamEnable->setChecked(settings.hearhamSourceEnabled());
+  Ui::SettingsDialog::radioIdEnable->setChecked(settings.radioIdRepeaterSourceEnabled());
 
   connect(Ui::SettingsDialog::ignoreFrequencyLimits, SIGNAL(toggled(bool)),
           this, SLOT(onIgnoreFrequencyLimitsSet(bool)));
@@ -441,10 +482,15 @@ SettingsDialog::accept() {
   settings.setQueryPosition(queryLocation->isChecked());
   settings.setLocator(locatorEntry->text().simplified());
   settings.setDisableAutoDetect(disableAutoDetect->isChecked());
+  settings.enableRepeaterBookSource(Ui::SettingsDialog::repeaterBookEnable->isChecked());
   if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())
     settings.setRepeaterBookRegion(RepeaterBookSource::World);
   else
     settings.setRepeaterBookRegion(RepeaterBookSource::NorthAmerica);
+  settings.enableRepeaterMapSource(Ui::SettingsDialog::repeaterMapEnable->isChecked());
+  settings.enableHearhamSource(Ui::SettingsDialog::hearhamEnable->isChecked());
+  settings.enableRadioIdRepeaterSource(Ui::SettingsDialog::radioIdEnable->isChecked());
+
   settings.setUpdateCodeplug(updateCodeplug->isChecked());
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());

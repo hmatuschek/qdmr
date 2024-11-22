@@ -10,9 +10,8 @@
 #include <QJsonValue>
 
 #include "logger.hh"
-#include "utils.hh"
 #include "settings.hh"
-
+#include "config.h"
 
 
 RepeaterBookSource::RepeaterBookSource(QObject *parent)
@@ -50,10 +49,8 @@ RepeaterBookSource::load(const QString &queryCall, const QGeoCoordinate &pos) {
   query.addQueryItem("callsign", QString("%1%").arg(call));
   url.setQuery(query);
   QNetworkRequest request(url);
-  request.setHeader(
-        QNetworkRequest::UserAgentHeader,
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/115.0.0.0 Safari/537.36 Edg/114.0.1823.86");
+  request.setHeader(QNetworkRequest::UserAgentHeader,
+                    "qdmr " VERSION_STRING " https://dm3mat.darc.de/qdmr/");
   logDebug() << "Query RepeaterBook at " << url.toString()
              << " as '" << request.header(QNetworkRequest::UserAgentHeader).toString() << "'.";
 
@@ -107,6 +104,8 @@ RepeaterBookSource::onRequestFinished(QNetworkReply *reply) {
     auto rxFrequency = Frequency::fromMHz(obj["Frequency"].toString().toDouble());
     auto txFrequency = Frequency::fromMHz(obj["Input Freq"].toString().toDouble());
     auto location = QGeoCoordinate(obj["Lat"].toString().toDouble(), obj["Long"].toString().toDouble());
+    auto qth = obj["Nearest City"].toString();
+
     auto type = RepeaterDatabaseEntry::Type::Invalid;
     SelectiveCall rxTone, txTone;
     unsigned int colorCode = 0;
@@ -130,10 +129,10 @@ RepeaterBookSource::onRequestFinished(QNetworkReply *reply) {
       updated = QDateTime::fromString(obj["timestamp"].toString(), Qt::ISODate);
 
     if (RepeaterDatabaseEntry::Type::FM == type) {
-      cache(RepeaterDatabaseEntry::fm(call, rxFrequency, txFrequency, location,
+      cache(RepeaterDatabaseEntry::fm(call, rxFrequency, txFrequency, location, qth,
                                       rxTone, txTone, updated));
     } else if (RepeaterDatabaseEntry::Type::DMR == type) {
-      cache(RepeaterDatabaseEntry::dmr(call, rxFrequency, txFrequency, location,
+      cache(RepeaterDatabaseEntry::dmr(call, rxFrequency, txFrequency, location, qth,
                                        colorCode, updated));
     }
   }

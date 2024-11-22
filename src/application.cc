@@ -12,23 +12,17 @@
 #include "settings.hh"
 #include "radiolimits.hh"
 #include "verifydialog.hh"
-#include "analogchanneldialog.hh"
-#include "digitalchanneldialog.hh"
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
-#include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
-#include "aprssystemdialog.hh"
 #include "repeaterdatabase.hh"
 #include "repeaterbooksource.hh"
 #include "repeatermapsource.hh"
 #include "hearhamrepeatersource.hh"
+#include "radioidrepeatersource.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
-#include "searchpopup.hh"
-#include "contactselectiondialog.hh"
-#include "configitemwrapper.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"
@@ -93,9 +87,14 @@ Application::Application(int &argc, char *argv[])
   Settings settings;
   // load databases
   _repeater   = new RepeaterDatabase(this);
-  _repeater->addSource(new RepeaterBookSource());
-  _repeater->addSource(new RepeaterMapSource());
-  _repeater->addSource(new HearhamRepeaterSource());
+  if (settings.repeaterBookSourceEnabled())
+    _repeater->addSource(new RepeaterBookSource());
+  if (settings.repeaterMapSourceEnabled())
+    _repeater->addSource(new RepeaterMapSource());
+  if (settings.hearhamSourceEnabled())
+    _repeater->addSource(new HearhamRepeaterSource());
+  if (settings.radioIdRepeaterSourceEnabled())
+    _repeater->addSource(new RadioidRepeaterSource());
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   // create empty codeplug

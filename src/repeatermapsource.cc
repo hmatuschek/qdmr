@@ -39,13 +39,16 @@ RepeaterMapSource::parse(const QByteArray &json) {
     auto rx = Frequency::fromMHz(repeater["rx"].toDouble());
     auto tx = Frequency::fromMHz(repeater["tx"].toDouble());
     auto position = QGeoCoordinate(repeater["lat"].toDouble(), repeater["lon"].toDouble());
+    auto qth = repeater["qth"].toString();
 
     if ("FM" == mode) {
-      cache(RepeaterDatabaseEntry::fm(call, rx, tx, position));
-    } else {
-      cache(RepeaterDatabaseEntry::dmr(call, rx, tx, position));
+      cache(RepeaterDatabaseEntry::fm(call, rx, tx, position, qth));
+    } else if ("DMR" == mode) {
+      cache(RepeaterDatabaseEntry::dmr(call, rx, tx, position, qth));
     }
   }
+
+  logDebug() << "Loaded " << _cache.size() << " elements from " << _url.toDisplayString() << ".";
 
   return true;
 }

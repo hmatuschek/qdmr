@@ -48,11 +48,12 @@ inline QString bandName(const Frequency &rx, const Frequency & tx) {
 RepeaterDatabaseEntry::RepeaterDatabaseEntry(const QString &call, const Frequency &rxFrequency,
                                              const Frequency &txFrequency,
                                              const QGeoCoordinate &location,
+                                             const QString &qth,
                                              const SelectiveCall &rxTone,
                                              const SelectiveCall &txTone,
                                              const QDateTime &updated, const QDateTime& loaded)
   : _type(Type::FM), _call(call), _rxFrequency(rxFrequency), _txFrequency(txFrequency),
-    _location(location), _rxTone(rxTone), _txTone(txTone), _colorCode(0),
+    _location(location), _qth(qth), _rxTone(rxTone), _txTone(txTone), _colorCode(0),
     _updated(updated), _loaded(loaded)
 {
   // pass...
@@ -60,11 +61,11 @@ RepeaterDatabaseEntry::RepeaterDatabaseEntry(const QString &call, const Frequenc
 
 RepeaterDatabaseEntry::RepeaterDatabaseEntry(const QString &call, const Frequency &rxFrequency,
                                              const Frequency &txFrequency,
-                                             const QGeoCoordinate &location,
+                                             const QGeoCoordinate &location, const QString &qth,
                                              unsigned int colorCode,
                                              const QDateTime &updated, const QDateTime& loaded)
-  : _type(Type::FM), _call(call), _rxFrequency(rxFrequency), _txFrequency(txFrequency),
-    _location(location), _rxTone(), _txTone(), _colorCode(colorCode),
+  : _type(Type::DMR), _call(call), _rxFrequency(rxFrequency), _txFrequency(txFrequency),
+    _location(location), _qth(qth), _rxTone(), _txTone(), _colorCode(colorCode),
     _updated(updated), _loaded(loaded)
 {
   // pass...
@@ -112,6 +113,7 @@ RepeaterDatabaseEntry::toJson() const {
 
   obj.insert("latitude", location().latitude());
   obj.insert("longitude", location().longitude());
+  obj.insert("qth", qth());
 
   if (Type::FM == type()) {
     if (rxTone().isInvalid()) obj.insert("rx-tone", rxTone().format());
@@ -127,6 +129,37 @@ RepeaterDatabaseEntry::toJson() const {
 
   return obj;
 }
+
+
+RepeaterDatabaseEntry &
+RepeaterDatabaseEntry::operator+=(const RepeaterDatabaseEntry &other) {
+  if ((_type != other.type()) || (_call != other.call()))
+    return *this;
+
+  if ((!_loaded.isValid()) || (_loaded < other._loaded))
+    return (*this)=other;
+
+  if ((!_updated.isValid()) || (_updated < other._updated))
+    return (*this)=other;
+
+  if (! _location.isValid())
+    _location = other._location;
+  if (_qth.isEmpty())
+    _qth = other.qth();
+
+  if (Type::FM == _type) {
+    if (_rxTone.isInvalid())
+      _rxTone = other.rxTone();
+    if (_txTone.isInvalid())
+      _txTone = other.txTone();
+  } else if (Type::DMR == _type) {
+    if (0 == _colorCode)
+      _colorCode = other.colorCode();
+  }
+
+  return *this;
+}
+
 
 bool
 RepeaterDatabaseEntry::isValid() const {
@@ -163,6 +196,11 @@ RepeaterDatabaseEntry::locator() const {
   return deg2loc(_location);
 }
 
+const QString &
+RepeaterDatabaseEntry::qth() const {
+  return _qth;
+}
+
 const SelectiveCall &
 RepeaterDatabaseEntry::rxTone() const {
   return _rxTone;
@@ -189,24 +227,24 @@ RepeaterDatabaseEntry::loaded() const {
 
 RepeaterDatabaseEntry
 RepeaterDatabaseEntry::fm(const QString &call, const Frequency &rxFrequency,
-                          const Frequency &txFrequency, const QGeoCoordinate &location,
+                          const Frequency &txFrequency, const QGeoCoordinate &location, const QString &qth,
                           const SelectiveCall &rxTone, const SelectiveCall &txTone,
                           const QDateTime &updated, const QDateTime& loaded)
 {
-  return RepeaterDatabaseEntry{
+  return RepeaterDatabaseEntry(
     call.simplified().toUpper(), rxFrequency, txFrequency,
-        location, rxTone, txTone, updated, loaded};
+        location, qth, rxTone, txTone, updated, loaded);
 }
 
 RepeaterDatabaseEntry
 RepeaterDatabaseEntry::dmr(const QString &call, const Frequency &rxFrequency,
-                           const Frequency &txFrequency, const QGeoCoordinate &location,
+                           const Frequency &txFrequency, const QGeoCoordinate &location, const QString &qth,
                            unsigned int colorCode,
                            const QDateTime &updated, const QDateTime& loaded)
 {
-  return RepeaterDatabaseEntry{
+  return RepeaterDatabaseEntry(
     call.simplified().toUpper(), rxFrequency, txFrequency,
-        location, colorCode, updated, loaded};
+        location, qth, colorCode, updated, loaded);
 }
 
 RepeaterDatabaseEntry
@@ -231,6 +269,8 @@ RepeaterDatabaseEntry::fromJson(const QJsonObject &obj) {
   QGeoCoordinate location(obj.value("latitude").toDouble(),
                           obj.value("longitude").toDouble());
 
+  QString qth = obj.value("qth").toString();
+
   QDateTime updated, loaded;
   if (obj.contains("updated"))
     updated = QDateTime::fromString(obj.value("updated").toString(), Qt::ISODate);
@@ -244,13 +284,13 @@ RepeaterDatabaseEntry::fromJson(const QJsonObject &obj) {
     if (obj.contains("tx-tone"))
       txTone = SelectiveCall::parseCTCSS(obj.value("tx-tone").toString());
     return RepeaterDatabaseEntry::fm(
-          call, rx, tx, location, rxTone, txTone, updated, loaded);
+          call, rx, tx, location, qth, rxTone, txTone, updated, loaded);
   } else if (Type::DMR == type) {
     unsigned int colorCode = 0;
     if (obj.contains("color-code"))
       colorCode = obj.value("color-code").toInt();
     return RepeaterDatabaseEntry::dmr(
-          call, rx, tx, location, colorCode, updated, loaded);
+          call, rx, tx, location, qth, colorCode, updated, loaded);
   }
 
   return RepeaterDatabaseEntry();
@@ -365,16 +405,11 @@ CachedRepeaterDatabaseSource::saveCache() {
 
 void
 CachedRepeaterDatabaseSource::cache(const RepeaterDatabaseEntry &entry) {
-  unsigned int idx=0; auto iter = _cache.begin();
-  for (; iter != _cache.end(); ++iter, idx++) {
-    if (entry == *iter) {
-      *iter = entry;
-      break;
-    }
-  }
-
-  if (idx != (unsigned int)_cache.size()) {
+  if (! _indices.contains(entry)) {
+    _indices[entry] = _cache.size();
     _cache.append(entry);
+  } else {
+    _cache[_indices[entry]] += entry;
   }
 
   emit updated(entry);
@@ -470,7 +505,8 @@ DownloadableRepeaterDatabaseSource::onRequestFinished(QNetworkReply *reply) {
   reply->deleteLater();
   _currentReply = nullptr;
 
-  parse(content);
+  if (parse(content))
+    saveCache();
 }
 
 
@@ -543,8 +579,9 @@ RepeaterDatabase::data(const QModelIndex &index, int role) const {
   if (Qt::EditRole == role) {
     return _entries[index.row()].call();
   } else if (Qt::DisplayRole == role) {
-    return QString("%1 (%2, %3)")
+    return QString("%1 (%2, %3, %4)")
         .arg(_entries[index.row()].call())
+        .arg(_entries[index.row()].qth())
         .arg(bandName(_entries[index.row()].rxFrequency(),
              _entries[index.row()].txFrequency()))
         .arg(_entries[index.row()].locator());

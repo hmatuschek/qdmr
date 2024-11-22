@@ -35,6 +35,15 @@ public:
   bool disableAutoDetect() const;
   void setDisableAutoDetect(bool disable);
 
+  bool repeaterBookSourceEnabled() const;
+  void enableRepeaterBookSource(bool enable);
+  bool repeaterMapSourceEnabled() const;
+  void enableRepeaterMapSource(bool enable);
+  bool hearhamSourceEnabled() const;
+  void enableHearhamSource(bool enable);
+  bool radioIdRepeaterSourceEnabled() const;
+  void enableRadioIdRepeaterSource(bool enable);
+
   RepeaterBookSource::Region repeaterBookRegion() const;
   void setRepeaterBookRegion(RepeaterBookSource::Region region);
 

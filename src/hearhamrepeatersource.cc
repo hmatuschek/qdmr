@@ -43,6 +43,7 @@ HearhamRepeaterSource::parse(const QByteArray &json) {
     auto rx = Frequency::fromHz(obj["frequency"].toInt()),
         tx = Frequency::fromHz(rx.inHz() + obj["offset"].toInt());
     auto location = QGeoCoordinate(obj["latitude"].toDouble(), obj["longitude"].toDouble());
+    auto qth = obj["city"].toString();
 
     if ("FM" == mode) {
       SelectiveCall rxTone, txTone;
@@ -59,16 +60,18 @@ HearhamRepeaterSource::parse(const QByteArray &json) {
       else if (0 != obj["encode"].toString().toDouble())
         txTone = SelectiveCall(obj["encode"].toString().toDouble());
 
-      cache(RepeaterDatabaseEntry::fm(call, rx, tx, location, rxTone, txTone));
+      cache(RepeaterDatabaseEntry::fm(call, rx, tx, location, qth, rxTone, txTone));
     } else if ("DMR" == mode) {
       unsigned int colorCode = 0;
       auto CC = ccPattern.match(obj["encode"].toString());
       if (CC.isValid())
         colorCode = CC.captured(1).toUInt();
 
-      cache(RepeaterDatabaseEntry::dmr(call, rx, tx, location, colorCode));
+      cache(RepeaterDatabaseEntry::dmr(call, rx, tx, location, qth, colorCode));
     }
   }
+
+  logDebug() << "Loaded " << _cache.size() << " elements from " << _url.toDisplayString() << ".";
 
   return true;
 }
