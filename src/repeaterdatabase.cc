@@ -329,7 +329,6 @@ CachedRepeaterDatabaseSource::loadCache() {
   }
 
   _cache.clear();
-
   for (QJsonValue obj: doc.array()) {
     if (! obj.isObject())
       continue;
@@ -339,6 +338,8 @@ CachedRepeaterDatabaseSource::loadCache() {
     _cache.append(entry);
     emit updated(entry);
   }
+
+  logDebug() << "Loaded " << _cache.size() << " entries from '" << _cacheFile.fileName() << "'.";
 }
 
 
@@ -413,7 +414,8 @@ CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &l
  * ********************************************************************************************* */
 DownloadableRepeaterDatabaseSource::DownloadableRepeaterDatabaseSource(
     const QString &filename, const QUrl &source, unsigned int maxAge, QObject *parent)
-  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _network(), _currentReply(nullptr)
+  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _maxAge(maxAge), _network(),
+    _currentReply(nullptr)
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(onRequestFinished(QNetworkReply*)));

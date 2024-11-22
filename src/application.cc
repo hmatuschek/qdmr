@@ -23,6 +23,7 @@
 #include "repeaterdatabase.hh"
 #include "repeaterbooksource.hh"
 #include "repeatermapsource.hh"
+#include "hearhamrepeatersource.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "searchpopup.hh"
@@ -94,6 +95,7 @@ Application::Application(int &argc, char *argv[])
   _repeater   = new RepeaterDatabase(this);
   _repeater->addSource(new RepeaterBookSource());
   _repeater->addSource(new RepeaterMapSource());
+  _repeater->addSource(new HearhamRepeaterSource());
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   // create empty codeplug

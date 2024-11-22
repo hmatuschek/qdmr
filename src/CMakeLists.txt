@@ -12,7 +12,7 @@ SET(qdmr_SOURCES main.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
   deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
   configmergedialog.cc
-  repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc selectivecallbox.cc)
+  repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc hearhamrepeatersource.cc selectivecallbox.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -28,7 +28,7 @@ SET(qdmr_MOC_HEADERS
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
   deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
   configmergedialog.hh
-  repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh selectivecallbox.hh)
+  repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh hearhamrepeatersource.hh selectivecallbox.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui

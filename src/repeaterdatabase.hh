@@ -185,6 +185,7 @@ protected slots:
 
 protected:
   QUrl _url;
+  unsigned int _maxAge;
   QNetworkAccessManager _network;
   QNetworkReply *_currentReply;
 };
