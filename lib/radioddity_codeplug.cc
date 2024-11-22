@@ -78,11 +78,11 @@ RadioddityCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
 }
 uint32_t
 RadioddityCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_le(Offset::rxFrequency())*10;
+  return getBCD8_le(Offset::txFrequency())*10;
 }
 void
 RadioddityCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setBCD8_le(Offset::rxFrequency(), freq/10);
+  setBCD8_le(Offset::txFrequency(), freq/10);
 }
 
 RadioddityCodeplug::ChannelElement::Mode
