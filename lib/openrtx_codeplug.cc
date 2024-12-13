@@ -312,69 +312,69 @@ OpenRTXCodeplug::ChannelElement::setAltitude(unsigned int alt) {
 }
 
 
-Signaling::Code
+SelectiveCall
 OpenRTXCodeplug::ChannelElement::rxTone() const {
   if (! getBit(OffsetRXTone, 0))
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   int idx = getUInt8(OffsetRXTone)>>1;
   if (idx >= _openrtx_ctcss_tone_table.size())
-    return Signaling::SIGNALING_NONE;
-  return Signaling::fromCTCSSFrequency(float(_openrtx_ctcss_tone_table[idx])/10);
+    return SelectiveCall();
+  return SelectiveCall(double(_openrtx_ctcss_tone_table[idx])/10);
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setRXTone(Signaling::Code code, const ErrorStack &err) {
-  if (Signaling::SIGNALING_NONE == code) {
+OpenRTXCodeplug::ChannelElement::setRXTone(const SelectiveCall &code, const ErrorStack &err) {
+  if (code.isInvalid()) {
     setBit(OffsetRXTone, 0, false);
     return;
   }
-  if (! Signaling::isCTCSS(code)) {
+  if (! code.isCTCSS()) {
     errMsg(err) << "Can only encode CTCSS tones.";
     setBit(OffsetRXTone, 0, false);
     return;
   }
-  if (! _openrtx_ctcss_tone_table.contains((unsigned int)(Signaling::toCTCSSFrequency(code)*10))) {
-    errMsg(err) << "Cannot encode CTCSS frequency " << Signaling::toCTCSSFrequency(code) << "Hz: "
+  if (! _openrtx_ctcss_tone_table.contains((unsigned int)(code.Hz()*10))) {
+    errMsg(err) << "Cannot encode CTCSS frequency " << code.Hz() << "Hz: "
                 << "Not supported.";
     setBit(OffsetRXTone, 0, false);
     return;
   }
 
   uint8_t index = _openrtx_ctcss_tone_table.indexOf(
-        (unsigned int)(Signaling::toCTCSSFrequency(code)*10));
+        (unsigned int)(code.Hz()*10));
   setUInt8(OffsetRXTone, (index<<1)|1);
 }
 
-Signaling::Code
+SelectiveCall
 OpenRTXCodeplug::ChannelElement::txTone() const {
   if (! getBit(OffsetTXTone, 0))
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   int idx = getUInt8(OffsetTXTone)>>1;
   if (idx >= _openrtx_ctcss_tone_table.size())
-    return Signaling::SIGNALING_NONE;
-  return Signaling::fromCTCSSFrequency(float(_openrtx_ctcss_tone_table[idx])/10);
+    return SelectiveCall();
+  return SelectiveCall(float(_openrtx_ctcss_tone_table[idx])/10);
 }
 
 void
-OpenRTXCodeplug::ChannelElement::setTXTone(Signaling::Code code, const ErrorStack &err) {
-  if (Signaling::SIGNALING_NONE == code) {
+OpenRTXCodeplug::ChannelElement::setTXTone(const SelectiveCall &code, const ErrorStack &err) {
+  if (code.isInvalid()) {
     setBit(OffsetRXTone, 0, false);
     return;
   }
-  if (! Signaling::isCTCSS(code)) {
+  if (! code.isCTCSS()) {
     errMsg(err) << "Can only encode CTCSS tones.";
     setBit(OffsetRXTone, 0, false);
     return;
   }
-  if (! _openrtx_ctcss_tone_table.contains((unsigned int)(Signaling::toCTCSSFrequency(code)*10))) {
-    errMsg(err) << "Cannot encode CTCSS frequency " << Signaling::toCTCSSFrequency(code) << "Hz: "
+  if (! _openrtx_ctcss_tone_table.contains((unsigned int)(code.Hz()*10))) {
+    errMsg(err) << "Cannot encode CTCSS frequency " << code.Hz() << "Hz: "
                 << "Not supported.";
     setBit(OffsetRXTone, 0, false);
     return;
   }
 
   uint8_t index = _openrtx_ctcss_tone_table.indexOf(
-        (unsigned int)(Signaling::toCTCSSFrequency(code)*10));
+        (unsigned int)(code.Hz()*10));
   setUInt8(OffsetTXTone, (index<<1)|1);
 }
 

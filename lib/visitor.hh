@@ -77,6 +77,11 @@ public:
    * @param prop Specifies the property.
    * @param err Specifies the error stack to pass on. */
   virtual bool processInterval(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
+  /** Handles a @c SelectiveCall typed property.
+   * @param item Specifies the config item holding this property.
+   * @param prop Specifies the property.
+   * @param err Specifies the error stack to pass on. */
+  virtual bool processSelectiveCall(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
   /** Handles a property of unknown type.
    * Returns always @c false.
    * @param item Specifies the config item holding this property.

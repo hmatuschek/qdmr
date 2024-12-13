@@ -39,11 +39,21 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
   * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
   * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
 
+
+## Ecosystem
+As *qdmr* gets more and more popular with Linux HAMs, the ecosystem around it grows too. These are 
+tools, that make your day-to-day useage of *qdmr* easier, by providing features, not covered in 
+qdmr or dmrconf.
+
+  * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
+
+
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
+ * **[Version 0.12.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.0)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
  * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
  * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.

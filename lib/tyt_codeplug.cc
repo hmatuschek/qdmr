@@ -83,8 +83,8 @@ TyTCodeplug::ChannelElement::clear() {
     setDTMFDecode(i, false);
   setRXFrequency(400000000UL);
   setTXFrequency(400000000UL);
-  setRXSignaling(Signaling::SIGNALING_NONE);
-  setTXSignaling(Signaling::SIGNALING_NONE);
+  setRXSignaling(SelectiveCall());
+  setTXSignaling(SelectiveCall());
   setRXSignalingSystemIndex(0);
   setTXSignalingSystemIndex(0);
   setBit(30,2); setBit(30,3); setBit(30,4); setBit(30,5); setBit(30,6); setBit(30,7);
@@ -356,21 +356,21 @@ TyTCodeplug::ChannelElement::setTXFrequency(uint32_t freq_Hz) {
   return setBCD8_le(20, freq_Hz/10);
 }
 
-Signaling::Code
+SelectiveCall
 TyTCodeplug::ChannelElement::rxSignaling() const {
   return decode_ctcss_tone_table(getUInt16_le(24));
 }
 void
-TyTCodeplug::ChannelElement::setRXSignaling(Signaling::Code code) {
+TyTCodeplug::ChannelElement::setRXSignaling(const SelectiveCall &code) {
   setUInt16_le(24, encode_ctcss_tone_table(code));
 }
 
-Signaling::Code
+SelectiveCall
 TyTCodeplug::ChannelElement::txSignaling() const {
   return decode_ctcss_tone_table(getUInt16_le(26));
 }
 void
-TyTCodeplug::ChannelElement::setTXSignaling(Signaling::Code code) {
+TyTCodeplug::ChannelElement::setTXSignaling(const SelectiveCall &code) {
   setUInt16_le(26, encode_ctcss_tone_table(code));
 }
 
@@ -598,8 +598,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     if (dchan->txContactObj())
       setContactIndex(ctx.index(dchan->txContactObj()));
     setBandwidth(FMChannel::Bandwidth::Narrow);
-    setRXSignaling(Signaling::SIGNALING_NONE);
-    setTXSignaling(Signaling::SIGNALING_NONE);
+    setRXSignaling(SelectiveCall());
+    setTXSignaling(SelectiveCall());
     if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
       setPositioningSystemIndex(ctx.index(dchan->aprsObj()->as<GPSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);

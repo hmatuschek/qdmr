@@ -161,6 +161,10 @@ public:
   /** The Flash memory bank. */
   static const uint32_t FLASH  = 1;
 
+  enum class Variant {
+    GD77, UV380
+  };
+
 public:
   /** Constructs a new interface to a specific OpenGD77 device.  */
   explicit OpenGD77Interface(const USBDeviceDescriptor &descr,
@@ -281,13 +285,13 @@ protected:
     };
 
     /** Constructs a write-to-eeprom message. */
-    bool initWriteEEPROM(uint32_t addr, const uint8_t *data, uint16_t size);
+    bool initWriteEEPROM(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size);
     /** Constructs a set-flash-sector message. */
-    bool initSetFlashSector(uint32_t addr);
+    bool initSetFlashSector(Variant variant, uint32_t addr);
     /** Constructs a write-to-flash message. */
-    bool initWriteFlash(uint32_t addr, const uint8_t *data, uint16_t size);
+    bool initWriteFlash(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size);
     /** Constructs a finish-write-to-flash message. */
-    bool initFinishWriteFlash();
+    bool initFinishWriteFlash(Variant variant);
   };
 
   /** Represents a write-response message. */
@@ -389,6 +393,8 @@ protected:
   bool sendCommand(CommandRequest::Option option, const ErrorStack &err=ErrorStack());
 
 protected:
+  /** The protocol variant determined by the device type obtained by the firmware info. */
+  Variant _protocolVariant;
   /** The current Flash sector, set to -1 if none is currently selected. */
   int32_t _sector;
 };

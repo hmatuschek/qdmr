@@ -44,10 +44,10 @@ OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
  * Implementation of OpenGD77Interface::WriteRequest
  * ********************************************************************************************* */
 bool
-OpenGD77Interface::WriteRequest::initWriteEEPROM(uint32_t addr, const uint8_t *data, uint16_t size) {
+OpenGD77Interface::WriteRequest::initWriteEEPROM(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_EEPROM;
   this->payload.address = qToBigEndian(addr);
   this->payload.length = qToBigEndian(size);
@@ -56,9 +56,9 @@ OpenGD77Interface::WriteRequest::initWriteEEPROM(uint32_t addr, const uint8_t *d
 }
 
 bool
-OpenGD77Interface::WriteRequest::initSetFlashSector(uint32_t addr) {
+OpenGD77Interface::WriteRequest::initSetFlashSector(Variant variant, uint32_t addr) {
   uint32_t sec = addr/SECTOR_SIZE;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = SET_FLASH_SECTOR;
   this->sector[0] = ((sec>>16) & 0xff);
   this->sector[1] = ((sec>>8) & 0xff);
@@ -67,10 +67,10 @@ OpenGD77Interface::WriteRequest::initSetFlashSector(uint32_t addr) {
 }
 
 bool
-OpenGD77Interface::WriteRequest::initWriteFlash(uint32_t addr, const uint8_t *data, uint16_t size) {
+OpenGD77Interface::WriteRequest::initWriteFlash(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_SECTOR_BUFFER;
   this->payload.address = qToBigEndian(addr);
   this->payload.length = qToBigEndian(size);
@@ -79,8 +79,8 @@ OpenGD77Interface::WriteRequest::initWriteFlash(uint32_t addr, const uint8_t *da
 }
 
 bool
-OpenGD77Interface::WriteRequest::initFinishWriteFlash() {
-  this->type = 'W';
+OpenGD77Interface::WriteRequest::initFinishWriteFlash(Variant variant) {
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_FLASH_SECTOR;
   return true;
 }
@@ -213,16 +213,23 @@ OpenGD77Interface::identifier(const ErrorStack &err) {
   case FirmwareInfo::RadioType::RD5R:
   case FirmwareInfo::RadioType::DM1801:
   case FirmwareInfo::RadioType::DM1801A:
-    return RadioInfo::byID(RadioInfo::OpenGD77);
+    _protocolVariant = Variant::GD77;
+  return RadioInfo::byID(RadioInfo::OpenGD77);
 
-  case FirmwareInfo::RadioType::MD9600:
   case FirmwareInfo::RadioType::MDUV380:
   case FirmwareInfo::RadioType::MD380:
   case FirmwareInfo::RadioType::DM1701:
   case FirmwareInfo::RadioType::DM1701RGB:
+    _protocolVariant = Variant::UV380;
+  return RadioInfo::byID(RadioInfo::OpenUV380);
+
+  case FirmwareInfo::RadioType::MD9600:
+    logInfo() << "OpenGD77 variant MD9600 not supported (yet).";
+  return RadioInfo();
+
   case FirmwareInfo::RadioType::MD2017:
-    logInfo() << "OpenGD77 variant not supported.";
-    return RadioInfo();
+    logInfo() << "OpenGD77 variant MD2017 not supported (yet).";
+  return RadioInfo();
   }
 
   errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
@@ -438,7 +445,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const 
 
 bool
 OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
-  WriteRequest req; req.initWriteEEPROM(addr, data, len);
+  WriteRequest req; req.initWriteEEPROM(_protocolVariant, addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
@@ -523,7 +530,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len, const E
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
-  WriteRequest req; req.initSetFlashSector(addr);
+  WriteRequest req; req.initSetFlashSector(_protocolVariant, addr);
   WriteResponse resp;
 
   if (5 != QSerialPort::write((const char *)&req, 5)) {
@@ -559,7 +566,7 @@ OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
 
 bool
 OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
-  WriteRequest req; req.initWriteFlash(addr, data, len);
+  WriteRequest req; req.initWriteFlash(_protocolVariant, addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
@@ -598,7 +605,7 @@ bool
 OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
   //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
-  req.initFinishWriteFlash();
+  req.initFinishWriteFlash(_protocolVariant);
   WriteResponse resp;
 
   if ((2) != QSerialPort::write((const char *)&req, 2)) {

@@ -134,6 +134,17 @@ class APRSSystem: public PositioningSystem
 
   /** The transmit channel. */
   Q_PROPERTY(FMChannelReference* revert READ revert WRITE setRevert)
+  /** The destination call. */
+  Q_PROPERTY(QString destination READ destination WRITE setDestination SCRIPTABLE false)
+  /** The destination SSID. */
+  Q_PROPERTY(unsigned int destSSID READ destSSID WRITE setDestSSID SCRIPTABLE false)
+  /** The source call. */
+  Q_PROPERTY(QString source READ source WRITE setSource SCRIPTABLE false)
+  /** The source SSID. */
+  Q_PROPERTY(unsigned int srcSSID READ srcSSID WRITE setSrcSSID SCRIPTABLE false)
+  /** The APRS path as a string. */
+  Q_PROPERTY(QString path READ path WRITE setPath SCRIPTABLE false)
+
   /** The APRS icon. */
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
@@ -204,6 +215,10 @@ public:
   unsigned destSSID() const;
   /** Sets the destination call and SSID. */
   void setDestination(const QString &call, unsigned ssid);
+  /** Sets the destination call. */
+  void setDestination(const QString &call);
+  /** Sets the destination SSID. */
+  void setDestSSID(unsigned ssid);
 
   /** Returns the source call. */
   const QString &source() const;
@@ -211,6 +226,10 @@ public:
   unsigned srcSSID() const;
   /** Sets the source call and SSID. */
   void setSource(const QString &call, unsigned ssid);
+  /** Sets the source call. */
+  void setSource(const QString &call);
+  /** Sets the source SSID. */
+  void setSrcSSID(unsigned ssid);
 
   /** Returns the APRS path. */
   const QString &path() const;

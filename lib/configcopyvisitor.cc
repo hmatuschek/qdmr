@@ -21,7 +21,8 @@ ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop,
   if (prop.isEnumType() || (QString("bool") == prop.typeName())
       || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
       || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
-      || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())) {
+      || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())
+      || (QString("SelectiveCall") == prop.typeName())) {
     if ((! prop.isReadable()) && (!prop.isWritable())) {
       logDebug() << "Skip property " << prop.name()
                  << " of item " << item->metaObject()->className() << ": Not readable or writable.";

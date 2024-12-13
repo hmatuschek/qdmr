@@ -78,7 +78,6 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   // Cannot upload null-pointer
   if (nullptr == (_config = config))
     return false;
-  _config->setParent(this);
 
   _task = StatusUpload;
   _codeplugFlags = flags;
@@ -92,6 +91,8 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   // If non-blocking -> move device to this thread
   if (_dev && _dev->isOpen())
     _dev->moveToThread(this);
+
+  // also, move config to thread
   _config->moveToThread(this);
 
   start();

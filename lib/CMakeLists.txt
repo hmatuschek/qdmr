@@ -29,7 +29,7 @@ SET(libdmrconf_SOURCES
     radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc rd5r_limits.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc gd77_limits.cc
-    opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc
+    opengd77.cc opengd77_interface.cc opengd77base_codeplug.cc opengd77_codeplug.cc opengd77_extension.cc
     opengd77_callsigndb.cc opengd77_limits.cc
     openrtx.cc openrtx_interface.cc openrtx_codeplug.cc
     c7000device.cc gd73.cc gd73_interface.cc gd73_codeplug.cc gd73_filereader.cc gd73_limits.cc
@@ -43,7 +43,6 @@ SET(libdmrconf_SOURCES
     dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc)
 
 SET(libdmrconf_MOC_HEADERS
-    signaling.hh
     radio.hh ${hid_HEADERS} dfu_libusb.hh usbserial.hh radiolimits.hh
     csvreader.hh dfufile.hh userdatabase.hh logger.hh
     melody.hh
@@ -59,7 +58,7 @@ SET(libdmrconf_MOC_HEADERS
     radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh rd5r_limits.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_limits.hh
-    opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh
+    opengd77.hh opengd77_interface.hh opengd77base_codeplug.hh opengd77_codeplug.hh opengd77_extension.hh
     opengd77_callsigndb.hh opengd77_limits.hh
     c7000device.hh gd73.hh gd73_interface.hh gd73_codeplug.hh gd73_limits.hh
     openrtx.hh openrtx_interface.hh openrtx_codeplug.hh
@@ -72,7 +71,7 @@ SET(libdmrconf_MOC_HEADERS
     auctus_a6_interface.hh
     dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh dr1801uv_limits.hh)
 
-SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh
+SET(libdmrconf_HEADERS libdmrconf.hh radiointerface.hh radioinfo.hh usbdevice.hh signaling.hh
     gd77_filereader.hh rd5r_filereader.hh uv390_filereader.hh md2017_filereader.hh gd73_filereader.hh
     md390_filereader.hh dr1801uv_filereader.hh dummyfilereader.hh
     utils.hh crc32.hh signaling.hh addressmap.hh errorstack.hh frequency.hh interval.hh ranges.hh
@@ -87,7 +86,8 @@ configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 #SET(CMAKE_AUTOMOC ON)
 qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 
-add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
+add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES}
+  opengd77base_codeplug.hh opengd77base_codeplug.cc)
 set_target_properties(libdmrconf PROPERTIES
 	MACOSX_RPATH TRUE
   OUTPUT_NAME dmrconf
@@ -101,6 +101,6 @@ install(FILES ${libdmrconf_MOC_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDE
 install(FILES ${PROJECT_BINARY_DIR}/lib/config.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/libdmrconf)
 
 if (UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
-  install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION "/etc/udev/rules.d/")
+  install(FILES "${CMAKE_SOURCE_DIR}/dist/99-qdmr.rules" DESTINATION ${INSTALL_UDEV_PATH})
 endif(UNIX AND NOT APPLE AND ${INSTALL_UDEV_RULES})
 

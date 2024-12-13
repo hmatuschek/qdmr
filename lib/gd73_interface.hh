@@ -4,6 +4,8 @@
 #include "c7000device.hh"
 #include "radiointerface.hh"
 
+/** Implements the communication interface to the GD-73.
+ * @ingroup gd73 */
 class GD73Interface: public C7000Device, public RadioInterface
 {
   Q_OBJECT

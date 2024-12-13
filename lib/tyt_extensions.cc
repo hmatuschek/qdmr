@@ -463,15 +463,6 @@ TyTButtonSettings::setLongPressDuration(unsigned dur) {
   _longPressDuration = dur;
 }
 
-/*ConfigItem *
-TyTButtonSettings::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                 const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // There are no further extension/children to TyTButtonSettings.
-  return nullptr;
-}*/
-
 
 /* ******************************************************************************************** *
  * Implementation of TyTMenuSettings

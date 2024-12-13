@@ -2503,34 +2503,31 @@ D878UVCodeplug::APRSSettingsElement::setFMTXDelay(Interval ms) {
   setUInt8(Offset::fmTXDelay(), ms.milliseconds()/20);
 }
 
-Signaling::Code
+SelectiveCall
 D878UVCodeplug::APRSSettingsElement::txTone() const {
   if ((uint8_t)SignalingType::Off ==getUInt8(Offset::fmSigType())) { // none
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   } else if ((uint8_t)SignalingType::CTCSS == getUInt8(Offset::fmSigType())) { // CTCSS
     return CTCSS::decode(getUInt8(Offset::fmCTCSS()));
   } else if ((uint8_t)SignalingType::DCS == getUInt8(Offset::fmSigType())) { // DCS
     uint16_t code = getUInt16_le(Offset::fmDCS());
     if (512 < code)
-      return Signaling::fromDCSNumber(dec_to_oct(code), false);
-    return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
+      return SelectiveCall::fromBinaryDCS(code, false);
+    return SelectiveCall::fromBinaryDCS(code-512, true);
   }
 
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
-D878UVCodeplug::APRSSettingsElement::setTXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
+D878UVCodeplug::APRSSettingsElement::setTXTone(const SelectiveCall &code) {
+  if (code.isInvalid()) {
     setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::Off);
-  } else if (Signaling::isCTCSS(code)) {
+  } else if (code.isCTCSS()) {
     setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::CTCSS);
     setUInt8(Offset::fmCTCSS(), CTCSS::encode(code));
-  } else if (Signaling::isDCSNormal(code)) {
+  } else if (code.isDCS()) {
     setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::DCS);
-    setUInt16_le(Offset::fmDCS(), oct_to_dec(Signaling::toDCSNumber(code)));
-  } else if (Signaling::isDCSInverted(code)) {
-    setUInt8(Offset::fmSigType(), (uint8_t)SignalingType::DCS);
-    setUInt16_le(Offset::fmDCS(), oct_to_dec(Signaling::toDCSNumber(code))+512);
+    setUInt16_le(Offset::fmDCS(), code.binCode() + (code.isInverted() ? 512 : 0));
   }
 }
 

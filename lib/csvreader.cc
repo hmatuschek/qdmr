@@ -226,7 +226,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
     FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -1174,15 +1174,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   qint64 squelch = token.value.toInt();
 
   token = lexer.next();
-  Signaling::Code rxTone;
+  SelectiveCall rxTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    rxTone = Signaling::SIGNALING_NONE;
+    rxTone = SelectiveCall();
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    rxTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+    rxTone = SelectiveCall(token.value.toFloat());
   } else if (CSVLexer::Token::T_DCS_N == token.type) {
-    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+    rxTone = SelectiveCall(token.value.toUInt(), false);
   } else if (CSVLexer::Token::T_DCS_I == token.type) {
-    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
+    rxTone = SelectiveCall(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1190,15 +1190,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  Signaling::Code txTone;
+  SelectiveCall txTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    txTone = Signaling::SIGNALING_NONE;
+    txTone = SelectiveCall();
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    txTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+    txTone = SelectiveCall(token.value.toFloat());
   } else if (CSVLexer::Token::T_DCS_N == token.type) {
-    txTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+    txTone = SelectiveCall(token.value.toUInt(), false);
   } else if (CSVLexer::Token::T_DCS_I == token.type) {
-    txTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
+    txTone = SelectiveCall(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1999,7 +1999,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
 bool
 CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
     FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {

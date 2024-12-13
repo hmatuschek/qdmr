@@ -214,13 +214,13 @@ public:
     virtual void setTXFrequency(uint32_t Hz);
 
     /** Returns the CTCSS/DSC signaling for RX. */
-    virtual Signaling::Code rxSignaling() const;
+    virtual SelectiveCall rxSignaling() const;
     /** Sets the CTCSS/DSC signaling for RX. */
-    virtual void setRXSignaling(Signaling::Code code);
+    virtual void setRXSignaling(const SelectiveCall &code);
     /** Returns the CTCSS/DSC signaling for TX. */
-    virtual Signaling::Code txSignaling() const;
+    virtual SelectiveCall txSignaling() const;
     /** Sets the CTCSS/DSC signaling for TX. */
-    virtual void setTXSignaling(Signaling::Code code);
+    virtual void setTXSignaling(const SelectiveCall &code);
     /** Returns the signaling system index (+1) for RX. */
     virtual uint8_t rxSignalingSystemIndex() const;
     /** Sets the signaling system index (+1) for RX. */

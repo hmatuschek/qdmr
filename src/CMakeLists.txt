@@ -3,7 +3,7 @@ SET(qdmr_SOURCES main.cc
   application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
   analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
   channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
-  ctcssbox.cc verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
+  verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
   aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc
   roamingchanneldialog.cc roamingchannelselectiondialog.cc
   configobjectlistview.cc configobjecttableview.cc
@@ -12,13 +12,14 @@ SET(qdmr_SOURCES main.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
   deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
   configmergedialog.cc
-  repeaterbookcompleter.cc)
+  repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc
+  hearhamrepeatersource.cc radioidrepeatersource.cc selectivecallbox.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
   analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
   channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
-  ctcssbox.hh verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
+  verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
   aprssystemdialog.hh releasenotes.hh searchpopup.hh
   roamingzonedialog.hh roamingchannellistview.hh roamingchanneldialog.hh
   roamingchannelselectiondialog.hh
@@ -28,7 +29,8 @@ SET(qdmr_MOC_HEADERS
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
   deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
   configmergedialog.hh
-  repeaterbookcompleter.hh)
+  repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh
+  hearhamrepeatersource.hh radioidrepeatersource.hh selectivecallbox.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui

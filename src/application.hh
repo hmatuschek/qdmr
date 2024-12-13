@@ -11,7 +11,7 @@
 
 class QMainWindow;
 class QTranslator;
-class RepeaterBookList;
+class RepeaterDatabase;
 class UserDatabase;
 class TalkGroupDatabase;
 class RadioIDListView;
@@ -37,7 +37,7 @@ public:
   QMainWindow *mainWindow();
 
   UserDatabase *user() const;
-  RepeaterBookList *repeater() const;
+  RepeaterDatabase *repeater() const;
   TalkGroupDatabase *talkgroup() const;
 
   bool hasPosition() const;
@@ -99,7 +99,7 @@ protected:
   RoamingZoneListView *_roamingZoneList;
   ExtensionView *_extensionView;
 
-  RepeaterBookList *_repeater;
+  RepeaterDatabase *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
 
