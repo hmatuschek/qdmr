@@ -3,12 +3,27 @@
 
 #include "channel.hh"
 #include "codeplug.hh"
+#include "gpssystem.hh"
+#include "contact.hh"
+#include "zone.hh"
+
 #include <QGeoCoordinate>
 
 
 class OpenGD77BaseCodeplug : public Codeplug
 {
   Q_OBJECT
+
+public:
+  /** Encodes an angle used to store locations. */
+  static uint32_t encodeAngle(double degee);
+  /** Decodes an angle used to store locations. */
+  static double decodeAngle(uint32_t code);
+
+  /** Encodes a selective call (tx/rx tone). */
+  static uint16_t encodeSelectiveCall(const SelectiveCall &call);
+  /** Decodes a selective call (tx/rx tone). */
+  static SelectiveCall decodeSelectiveCall(uint16_t code);
 
 public:
   /** Implements the base for all OpenGD77 channel encodings.
@@ -352,6 +367,444 @@ public:
     };
     /// @endcond
   };
+
+
+  /** APRS system for OpenGD77 devices. */
+  class APRSSettingsElement: public Element
+  {
+  public:
+    enum class BaudRate {
+      Baud300 = 1, Baud1200 = 0
+    };
+
+    enum class PositionPrecision {
+      Max = 0,
+      Mask1_8sec = 1,
+      Mask3_6sec = 2,
+      Mask18sec = 3,
+      Mask36sec = 4,
+      Mask3min = 5,
+      Mask6min = 6,
+      Mask30min = 7
+    };
+
+  public:
+    /** Constructor from pointer. */
+    explicit APRSSettingsElement(uint8_t *ptr);
+
+  protected:
+    /** Hidden constructor. */
+    APRSSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** The size of the channel bank. */
+    static constexpr unsigned int size() { return 0x40; }
+
+    /** Clears the bank. */
+    void clear();
+
+    /** Returns @c true, if the system is valid. */
+    virtual bool isValid() const;
+
+    /** Returns the name of the system. */
+    virtual QString name() const;
+    /** Sets the name of the system. */
+    virtual void setName(const QString &name);
+
+    /** Returns the source SSID. */
+    virtual unsigned int sourceSSID() const;
+    /** Sets the source SSID. */
+    virtual void setSourceSSID(unsigned int ssid);
+
+    /** Returns @c true, if a fixed position is send. */
+    virtual bool hasFixedPosition() const;
+    /** Returns the fixed position. */
+    virtual QGeoCoordinate fixedPosition() const;
+    /** Sets the fixed position. */
+    virtual void setFixedPosition(const QGeoCoordinate &coor);
+    /** Resets the fixed position. */
+    virtual void clearFixedPosition();
+
+    /** Retunrs the posiiton reporting precision. */
+    virtual PositionPrecision positionPrecision() const;
+    /** Sets the position reporting precision in degrees. */
+    virtual void setPositionPrecision(PositionPrecision prec);
+
+    /** Returns @c true, if the first via node is set. */
+    virtual bool hasVia1() const;
+    /** Returns the first via node call. */
+    virtual QString via1Call() const;
+    /** Returns the first via node ssid. */
+    virtual unsigned int via1SSID() const;
+    /** Sets the first via node. */
+    virtual void setVia1(const QString &call, unsigned int ssid);
+    /** Clears the first via node. */
+    virtual void clearVia1();
+
+    /** Returns @c true, if the second via node is set. */
+    virtual bool hasVia2() const;
+    /** Returns the second via node call. */
+    virtual QString via2Call() const;
+    /** Returns the second via node ssid. */
+    virtual unsigned int via2SSID() const;
+    /** Sets the second via node. */
+    virtual void setVia2(const QString &call, unsigned int ssid);
+    /** Clears the second via node. */
+    virtual void clearVia2();
+
+    /** Retunrs the icon. */
+    virtual APRSSystem::Icon icon() const;
+    /** Sets the icon. */
+    virtual void setIcon(APRSSystem::Icon icon);
+
+    /** Retunrs the comment text. */
+    virtual QString comment() const;
+    /** Sets the comment text. */
+    virtual void setComment(const QString &text);
+
+    /** Retunrs the baud-rate. */
+    virtual BaudRate baudRate() const;
+    /** Sets the baud rate. */
+    virtual void setBaudRate(BaudRate rate);
+
+    /** Encodes the APRS settings. */
+    virtual bool encode(const APRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes some APRS settings. */
+    virtual APRSSystem *decode(const Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links the ARPS settings. */
+    virtual bool link(APRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: public Element::Limit {
+      static constexpr unsigned int nameLength() { return 8; }
+      static constexpr unsigned int commentLength() { return 23; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset
+    {
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int sourceSSID() { return 0x0008; }
+      static constexpr unsigned int latitude() { return 0x0009; }
+      static constexpr unsigned int longitude() { return 0x000c; }
+      static constexpr unsigned int via1Call() { return 0x000f; }
+      static constexpr unsigned int via1SSID() { return 0x0015; }
+      static constexpr unsigned int via2Call() { return 0x0016; }
+      static constexpr unsigned int via2SSID() { return 0x001c; }
+      static constexpr unsigned int iconTable() { return 0x001d; }
+      static constexpr unsigned int iconIndex() { return 0x001e; }
+      static constexpr unsigned int comment() { return 0x001f; }
+      static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
+      static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
+      static constexpr Bit baudRate() { return { 0x003d, 0}; }
+    };
+    /// @endcond
+  };
+
+
+  /** APRS System bank. */
+  class APRSSettingsBankElement: public Element
+  {
+  public:
+    /** Constructor from pointer. */
+    explicit APRSSettingsBankElement(uint8_t *ptr);
+
+  protected:
+    /** Hidden constructor. */
+    APRSSettingsBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** The size of the channel bank. */
+    static constexpr unsigned int size() { return 0x40; }
+
+    /** Clears the bank. */
+    void clear();
+
+    /** Retunrs the n-th APRS system. */
+    APRSSettingsElement system(unsigned int idx) const;
+
+  public:
+    /** Some limits for the bank. */
+    struct Limit: public Element::Limit {
+      /** The total number of APRS systems. */
+      static constexpr unsigned int systems() { return 8; }
+    };
+
+  public:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int systems() { return 0x0000; }
+      static constexpr unsigned int betweenSystems() { return APRSSettingsElement::size(); }
+    };
+    /// @endcond
+  };
+
+
+  /** DTMF contact element.
+   * Just a name and DTMF number. */
+  class DTMFContactElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    explicit DTMFContactElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    /** Returns the DTMF number. */
+    virtual QString number() const;
+    /** Sets the DTMF number. */
+    virtual void setNumber(const QString &number);
+
+    /** Encodes a number. */
+    virtual bool encode(const DTMFContact *contact, const Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes a number. */
+    virtual DTMFContact *decode(const Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. Ü*/
+    struct Limit: public Element::Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** The maximum length of the number. */
+      static constexpr unsigned int numberLength() { return 16; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int number() { return 0x0010; }
+    };
+    /// @endcond
+  };
+
+
+  /** DTMF contact bank. */
+  class DTMFContactBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DTMFContactBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DTMFContactBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return Limit::contacts()*DTMFContactElement::size(); }
+
+    void clear();
+
+    /** Returns the n-th DTMF contact. */
+    DTMFContactElement contact(unsigned int n) const;
+
+  public:
+    /** Some limits for the bank. */
+    struct Limit: public Element::Limit {
+      /** The total number of contacts. */
+      static constexpr unsigned int contacts() { return 64; }
+    };
+
+  public:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int contacts() { return 0x0000; }
+      static constexpr unsigned int betweenContacts() { return DTMFContactElement::size(); }
+    };
+    /// @endcond
+  };
+
+
+  /** Implements the base class of boot settings for all OpenGD77 codeplugs. */
+  class BootSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BootSettingsElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit BootSettingsElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~BootSettingsElement();
+
+    /** Resets the settings. */
+    void clear();
+
+    /** Returns @c true if the text is shown on boot, other wise an image is shown. */
+    virtual bool bootText() const;
+    /** Enables/disables boot text. */
+    virtual void enableBootText(bool enable);
+
+    /** Returns @c true if the boot password is enabled. */
+    virtual bool bootPasswordEnabled() const;
+    /** Returns the boot password (6 digit). */
+    virtual unsigned bootPassword() const;
+    /** Sets the boot password (6 digit). */
+    virtual void setBootPassword(unsigned passwd);
+    /** Clear boot password. */
+    virtual void clearBootPassword();
+
+    /** Returns the first line. */
+    virtual QString line1() const;
+    /** Sets the first line. */
+    virtual void setLine1(const QString &text);
+    /** Returns the Second line. */
+    virtual QString line2() const;
+    /** Sets the second line. */
+    virtual void setLine2(const QString &text);
+
+    /** Encodes boot text settings from configuration. */
+    virtual bool encode(const Context &ctx, const ErrorStack &err = ErrorStack());
+    /** Updates the configuration with the boot text settings. */
+    virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: public Element::Limit {
+      /** The total number of contacts. */
+      static constexpr unsigned int lineLength() { return 16; }
+    };
+
+  public:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int bootText() { return 0x0000; }
+      static constexpr unsigned int bootPasswdEnable() { return 0x0001; }
+      static constexpr unsigned int bootPasswd() { return 0x000c; }
+      static constexpr unsigned int line1() { return 0x0028; }
+      static constexpr unsigned int line2() { return 0x0038; }
+    };
+    /// @endcond
+  };
+
+
+  /** Represents a zone within OpenGD77 codeplugs. */
+  class ZoneElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit ZoneElement(uint8_t *ptr);
+    virtual ~ZoneElement();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x00b0; }
+
+    /** Resets the zone. */
+    void clear();
+    /** Returns @c true if the zone is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name of the zone. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if a member is stored at the given index.
+     * That is, if the index is not 0. */
+    virtual bool hasMember(unsigned n) const;
+    /** Returns the n-th member index (+1). */
+    virtual unsigned member(unsigned n) const;
+    /** Sets the n-th member index (+1). */
+    virtual void setMember(unsigned n, unsigned idx);
+    /** Clears the n-th member index. */
+    virtual void clearMember(unsigned n);
+
+    /** Resets this codeplug zone representation from the given generic @c Zone object. */
+    virtual bool encode(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Constructs a generic @c Zone object from this codeplug zone. */
+    virtual Zone *decode(const Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links a previously constructed @c Zone object to the rest of the configuration. That is
+     * linking to the referred channels. */
+    virtual bool link(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  public:
+    /** Some limits for zone elements. */
+    struct Limit: public Element::Limit {
+      /** The maximum length of the zone name. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount() { return 80; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()  { return 0x0000; }
+      static constexpr unsigned int channels() { return 0x0010; }
+      static constexpr unsigned int betweenChannels() { return 0x0002; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the base class for all zone banks of OpenGD77 codeplugs. */
+  class ZoneBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ZoneBankElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit ZoneBankElement(uint8_t *ptr);
+    /** Destructor. */
+    ~ZoneBankElement();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() {
+      return 0x0020 + Limit::zoneCount()*ZoneElement::size();
+    }
+
+    /** Resets the bank. */
+    void clear();
+
+    /** Returns @c true if the zone is enabled. */
+    virtual bool isEnabled(unsigned idx) const ;
+    /** Enable/disable a zone in the bank. */
+    virtual void enable(unsigned idx, bool enabled);
+
+    /** Retunrs the n-th zone. */
+    ZoneElement zone(unsigned int n);
+
+  public:
+    /** Some limits for the zone bank. */
+    struct Limit: public Element::Limit {
+      /** The maximum number of zones in this bank. */
+      static constexpr unsigned int zoneCount() { return 68; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmap() { return 0x0000; }
+      static constexpr unsigned int zones()  { return 0x0020; }
+      static constexpr unsigned int betweenZones() { return ZoneElement::size(); }
+      /// @endcond
+    };
+  };
+
 
 public:
   explicit OpenGD77BaseCodeplug(QObject *parent = nullptr);

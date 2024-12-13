@@ -1,5 +1,60 @@
 #include "opengd77base_codeplug.hh"
 #include "config.hh"
+#include "logger.hh"
+
+
+/* ********************************************************************************************* *
+ * Implementation of some helper functions
+ * ********************************************************************************************* */
+uint32_t
+OpenGD77BaseCodeplug::encodeAngle(double angle) {
+  uint32_t sign = (angle < 0) ? 1 : 0;
+  uint32_t decimals = std::abs(int(angle * 10000));
+  uint32_t deg  = decimals/10000; decimals = decimals % 10000;
+  return (sign << 23) | (deg <<15) | decimals;
+}
+
+double
+OpenGD77BaseCodeplug::decodeAngle(uint32_t code) {
+  return (((code >> 23) & 1) ? -1 : 1) * (
+        ((code >> 15) & 0xff) + double(code & 0x7ff)/10000
+        );
+}
+
+
+uint16_t
+OpenGD77BaseCodeplug::encodeSelectiveCall(const SelectiveCall &call) {
+  if (call.isInvalid())
+    return 0xffff;
+
+  uint16_t dcs = 0, inverted = 0, toneCode = 0;
+  if (call.isDCS()) {
+    dcs = 1;
+    inverted = call.isInverted() ? 1 : 0;
+    toneCode = call.octalCode();
+  } else {
+    dcs = inverted = 0;
+    toneCode = call.mHz()/100;
+  }
+
+  return (dcs<<15) | (inverted << 14) | (toneCode & 0x3fff);
+}
+
+SelectiveCall
+OpenGD77BaseCodeplug::decodeSelectiveCall(uint16_t code) {
+  if (0xffff == code)
+    return SelectiveCall();
+
+  bool dcs = ((code >> 15) & 1),
+      inverted = ((code >> 14) & 1);
+  code &= 0x3fff;
+
+  if (! dcs)
+    return SelectiveCall(double(code)/10);
+
+  return SelectiveCall(code, inverted);
+}
+
 
 
 /* ********************************************************************************************* *
@@ -133,14 +188,7 @@ OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
       (((uint32_t)getUInt8(Offset::longitude1())) << 16) +
       ((uint32_t)getUInt8(Offset::longitude0()));
 
-  double lat = (((latCode >> 23) & 1) ? -1 : 1) * (
-        ((latCode >> 15) & 0xff) + double(latCode & 0x7ff)/10000
-        );
-  double lon = (((lonCode >> 23) & 1) ? -1 : 1) * (
-        ((lonCode >> 15) & 0xff) + double(lonCode & 0x7ff)/10000
-        );
-
-  return QGeoCoordinate(lat, lon);
+  return QGeoCoordinate(decodeAngle(latCode), decodeAngle(lonCode));
 }
 
 void
@@ -150,15 +198,8 @@ OpenGD77BaseCodeplug::ChannelElement::setFixedPosition(const QGeoCoordinate &coo
     return;
   }
 
-  uint32_t latSign = (coordinate.latitude()<0) ? 1 : 0;
-  uint32_t decimals = std::abs(int(coordinate.latitude()*10000));
-  uint32_t latDeg  = decimals/10000, latDec = decimals % 10000;
-  uint32_t lonSign = (coordinate.longitude()<0) ? 1 : 0;
-  decimals = std::abs(int(coordinate.longitude()*10000));
-  uint32_t lonDeg  = decimals/10000, lonDec = decimals % 10000;
-
-  uint32_t latCode = (latSign<<23) | (latDeg<<15) | latDec;
-  uint32_t lonCode = (lonSign<<23) | (lonDeg<<15) | lonDec;
+  uint32_t latCode = encodeAngle(coordinate.latitude());
+  uint32_t lonCode = encodeAngle(coordinate.longitude());
 
   setBit(Offset::useFixedLocation(), true);
   setUInt8(Offset::latitude0(), ((latCode >>  0) & 0xff));
@@ -177,70 +218,22 @@ OpenGD77BaseCodeplug::ChannelElement::clearFixedPosition() {
 
 SelectiveCall
 OpenGD77BaseCodeplug::ChannelElement::rxTone() const {
-  uint16_t toneCode = getUInt16_le(Offset::rxTone());
-  if (0xffff == toneCode)
-    return SelectiveCall();
-
-  bool dcs = ((toneCode >> 15) & 1),
-      inverted = ((toneCode >> 14) & 1);
-  toneCode &= 0x3fff;
-
-  if (! dcs)
-    return SelectiveCall(double(toneCode)/10);
-
-  return SelectiveCall(toneCode, inverted);
+  return decodeSelectiveCall(getUInt16_le(Offset::rxTone()));
 }
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
-  if (code.isInvalid())
-    setUInt16_le(Offset::rxTone(), 0xffff);
-
-  uint16_t dcs = 0, inverted = 0, toneCode = 0;
-  if (code.isDCS()) {
-    dcs = 1;
-    inverted = code.isInverted() ? 1 : 0;
-    toneCode = code.octalCode();
-  } else {
-    dcs = inverted = 0;
-    toneCode = code.mHz()/100;
-  }
-
-  setUInt16_le(Offset::rxTone(), (dcs<<15) | (inverted << 14) | (toneCode & 0x3fff));
+  setUInt16_le(Offset::rxTone(), encodeSelectiveCall(code));
 }
 
 SelectiveCall
 OpenGD77BaseCodeplug::ChannelElement::txTone() const {
-  uint16_t toneCode = getUInt16_le(Offset::txTone());
-  if (0xffff == toneCode)
-    return SelectiveCall();
-
-  bool dcs = ((toneCode >> 15) & 1),
-      inverted = ((toneCode >> 14) & 1);
-  toneCode &= 0x3fff;
-
-  if (! dcs)
-    return SelectiveCall(double(toneCode)/10);
-
-  return SelectiveCall(toneCode, inverted);
+  return decodeSelectiveCall(getUInt16_le(Offset::txTone()));
 }
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
-  if (code.isInvalid())
-    setUInt16_le(Offset::txTone(), 0xffff);
-
-  uint16_t dcs = 0, inverted = 0, toneCode = 0;
-  if (code.isDCS()) {
-    dcs = 1;
-    inverted = code.isInverted() ? 1 : 0;
-    toneCode = code.octalCode();
-  } else {
-    dcs = inverted = 0;
-    toneCode = code.mHz()/100;
-  }
-
-  setUInt16_le(Offset::txTone(), (dcs<<15) | (inverted << 14) | (toneCode & 0x3fff));
+  setUInt16_le(Offset::txTone(), encodeSelectiveCall(code));
 }
 
 
@@ -595,6 +588,7 @@ OpenGD77BaseCodeplug::ChannelBankElement::channel(unsigned int n) {
 }
 
 
+
 /* ******************************************************************************************** *
  * Implementation of OpenGD77BaseCodeplug::VFOChannelElement
  * ******************************************************************************************** */
@@ -678,6 +672,644 @@ OpenGD77BaseCodeplug::VFOChannelElement::txOffset() const {
 void
 OpenGD77BaseCodeplug::VFOChannelElement::setTXOffset(double f) {
   setBCD4_le(Offset::txOffset(), (f*100));
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77BaseCodeplug::APRSSettings
+ * ******************************************************************************************** */
+OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
+  Element::clear();
+  setName("");
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::isValid() const {
+  return ! name().isEmpty();
+}
+
+
+QString
+OpenGD77BaseCodeplug::APRSSettingsElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+}
+
+
+unsigned int
+OpenGD77BaseCodeplug::APRSSettingsElement::sourceSSID() const {
+  return getUInt8(Offset::sourceSSID());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setSourceSSID(unsigned int ssid) {
+  setUInt8(Offset::sourceSSID(), ssid);
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::hasFixedPosition() const {
+  return getBit(Offset::useFixedPosition());
+}
+
+QGeoCoordinate
+OpenGD77BaseCodeplug::APRSSettingsElement::fixedPosition() const {
+  uint32_t latCode = getUInt24_le(Offset::latitude());
+  uint32_t lonCode = getUInt24_le(Offset::longitude());
+  return QGeoCoordinate(decodeAngle(latCode), decodeAngle(lonCode));
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setFixedPosition(const QGeoCoordinate &coor) {
+  setUInt24_le(Offset::latitude(), encodeAngle(coor.latitude()));
+  setUInt24_le(Offset::longitude(), encodeAngle(coor.longitude()));
+  setBit(Offset::useFixedPosition());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::clearFixedPosition() {
+  clearBit(Offset::useFixedPosition());
+}
+
+OpenGD77BaseCodeplug::APRSSettingsElement::PositionPrecision
+OpenGD77BaseCodeplug::APRSSettingsElement::positionPrecision() const {
+  return (PositionPrecision)getUInt4(Offset::positionPrecision());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setPositionPrecision(PositionPrecision prec) {
+  setUInt4(Offset::positionPrecision(), (unsigned int) prec);
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::hasVia1() const {
+  return ! via1Call().isEmpty();
+}
+
+QString
+OpenGD77BaseCodeplug::APRSSettingsElement::via1Call() const {
+  return readASCII(Offset::via1Call(), 6, 0x00);
+}
+
+unsigned int
+OpenGD77BaseCodeplug::APRSSettingsElement::via1SSID() const {
+  return getUInt8(Offset::via1SSID());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setVia1(const QString &call, unsigned int ssid) {
+  writeASCII(Offset::via1Call(), call, 6, 0x00);
+  setUInt8(Offset::via1SSID(), ssid);
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::clearVia1() {
+  setVia1("", 0);
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::hasVia2() const {
+  return ! via2Call().isEmpty();
+}
+
+QString
+OpenGD77BaseCodeplug::APRSSettingsElement::via2Call() const {
+  return readASCII(Offset::via2Call(), 6, 0x00);
+}
+
+unsigned int
+OpenGD77BaseCodeplug::APRSSettingsElement::via2SSID() const {
+  return getUInt8(Offset::via2SSID());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setVia2(const QString &call, unsigned int ssid) {
+  writeASCII(Offset::via2Call(), call, 6, 0x00);
+  setUInt8(Offset::via2SSID(), ssid);
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::clearVia2() {
+  setVia2("", 0);
+}
+
+
+APRSSystem::Icon
+OpenGD77BaseCodeplug::APRSSettingsElement::icon() const {
+  return (APRSSystem::Icon)getUInt8(Offset::iconIndex());
+}
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setIcon(APRSSystem::Icon icon) {
+  setUInt8(Offset::iconTable(), (APRSSystem::SECONDARY_TABLE & (unsigned int)icon) ? 1 : 0);
+  setUInt8(Offset::iconIndex(), APRSSystem::ICON_MASK & (unsigned int)icon);
+}
+
+QString
+OpenGD77BaseCodeplug::APRSSettingsElement::comment() const {
+  return readASCII(Offset::comment(), Limit::commentLength(), 0x00);
+}
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setComment(const QString &comment) {
+  writeASCII(Offset::comment(), comment, Limit::commentLength(), 0x00);
+}
+
+OpenGD77BaseCodeplug::APRSSettingsElement::BaudRate
+OpenGD77BaseCodeplug::APRSSettingsElement::baudRate() const {
+  return getBit(Offset::baudRate()) ? BaudRate::Baud300 : BaudRate::Baud1200;
+}
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setBaudRate(BaudRate rate) {
+  setBit(Offset::baudRate(), BaudRate::Baud300 == rate);
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  setName(sys->name());
+  setSourceSSID(sys->srcSSID());
+
+  QStringList vias = sys->path().split(",");
+  unsigned int viaCount = 0;
+  for (auto via: vias) {
+    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    if (! pattern.exactMatch(via))
+      continue;
+    if (0 == viaCount)
+      setVia1(pattern.cap(1), pattern.cap(2).toUInt());
+    else if (1 == viaCount)
+      setVia2(pattern.cap(1), pattern.cap(2).toUInt());
+    else
+      break;
+    viaCount++;
+  }
+
+  setIcon(sys->icon());
+  setComment(sys->message());
+
+  clearFixedPosition();
+  setBaudRate(BaudRate::Baud1200);
+  setPositionPrecision(PositionPrecision::Max);
+
+  return true;
+}
+
+
+APRSSystem *
+OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid APRS settings.";
+    return nullptr;
+  }
+
+  APRSSystem *sys = new APRSSystem();
+  sys->setName(name());
+  sys->setDestination("APN000", 0);
+  sys->setSrcSSID(sourceSSID());
+  QStringList path;
+  if (hasVia1()) path.append(QString("%1-%2").arg(via1Call(), via1SSID()));
+  if (hasVia2()) path.append(QString("%1-%2").arg(via2Call(), via2SSID()));
+  sys->setPath(path.join(","));
+
+  sys->setIcon(icon());
+  sys->setMessage(comment());
+
+  return sys;
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsElement::link(APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (ctx.config()->settings()->defaultId())
+    sys->setSource(ctx.config()->settings()->defaultId()->name());
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77BaseCodeplug::APRSSettingsBank
+ * ******************************************************************************************** */
+OpenGD77BaseCodeplug::APRSSettingsBankElement::APRSSettingsBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::APRSSettingsBankElement::APRSSettingsBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsBankElement::clear() {
+  for (unsigned int i=0; i<Limit::systems(); i++)
+    system(i).clear();
+}
+
+OpenGD77BaseCodeplug::APRSSettingsElement
+OpenGD77BaseCodeplug::APRSSettingsBankElement::system(unsigned int idx) const {
+  return APRSSettingsElement(_data + Offset::systems() + idx*Offset::betweenSystems());
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77BaseCodeplug::DTMFContactElement
+ * ******************************************************************************************** */
+OpenGD77BaseCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::DTMFContactElement::DTMFContactElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+bool
+OpenGD77BaseCodeplug::DTMFContactElement::isValid() const {
+  return !name().isEmpty();
+}
+
+
+void
+OpenGD77BaseCodeplug::DTMFContactElement::clear() {
+  setName("");
+  setNumber("");
+}
+
+
+QString
+OpenGD77BaseCodeplug::DTMFContactElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+}
+
+void
+OpenGD77BaseCodeplug::DTMFContactElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+}
+
+
+QString
+OpenGD77BaseCodeplug::DTMFContactElement::number() const {
+  QString number;
+  uint8_t *ptr = _data + Offset::number();
+  const QVector<char> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
+  for (unsigned int i=0; (i<Limit::numberLength()) && (lut.size() < *ptr); i++, ptr++)
+    number.append(lut[*ptr]);
+  return number;
+}
+
+void
+OpenGD77BaseCodeplug::DTMFContactElement::setNumber(const QString &number) {
+  uint8_t *ptr = _data + Offset::number();
+  unsigned int n = std::min(Limit::numberLength(), (unsigned int)number.length());
+  const QVector<QChar> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
+  for (unsigned int i=0; (i<n) && (lut.contains(number.at(i))); i++, ptr++)
+    *ptr = lut.indexOf(number.at(i));
+}
+
+
+bool
+OpenGD77BaseCodeplug::DTMFContactElement::encode(const DTMFContact *contact, const Context &ctx, const ErrorStack &err)
+{
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  setName(contact->name());
+  setNumber(contact->number());
+
+  return true;
+}
+
+
+DTMFContact *
+OpenGD77BaseCodeplug::DTMFContactElement::decode(const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx);
+
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode invalid DTMF contact.";
+    return nullptr;
+  }
+
+  return new DTMFContact(name(), number());
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77BaseCodeplug::DTMFContactBankElement
+ * ******************************************************************************************** */
+OpenGD77BaseCodeplug::DTMFContactBankElement::DTMFContactBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::DTMFContactBankElement::DTMFContactBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::DTMFContactBankElement::clear() {
+  for (unsigned int i=0; i<Limit::contacts(); i++)
+    contact(i).clear();
+}
+
+
+OpenGD77BaseCodeplug::DTMFContactElement
+OpenGD77BaseCodeplug::DTMFContactBankElement::contact(unsigned int n) const {
+  return DTMFContactElement(_data + Offset::contacts() + n*Offset::betweenContacts());
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::BootSettingsElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::BootSettingsElement::BootSettingsElement(uint8_t *ptr)
+  : Element(ptr, 0x20)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::BootSettingsElement::~BootSettingsElement() {
+  // pass...
+}
+
+void
+OpenGD77BaseCodeplug::BootSettingsElement::clear() {
+  enableBootText(true);
+  clearBootPassword();
+  setLine1("");
+  setLine2("");
+}
+
+
+bool
+OpenGD77BaseCodeplug::BootSettingsElement::bootText() const {
+  return (1 == getUInt8(Offset::bootText()));
+}
+
+void
+OpenGD77BaseCodeplug::BootSettingsElement::enableBootText(bool enable) {
+  setUInt8(Offset::bootText(), (enable ? 1 :0));
+}
+
+
+bool
+OpenGD77BaseCodeplug::BootSettingsElement::bootPasswordEnabled() const {
+  return (1 == getUInt8(Offset::bootPasswdEnable()));
+}
+
+unsigned
+OpenGD77BaseCodeplug::BootSettingsElement::bootPassword() const {
+  return getBCD8_be(Offset::bootPasswd());
+}
+
+void
+OpenGD77BaseCodeplug::BootSettingsElement::setBootPassword(unsigned passwd) {
+  setBCD8_be(Offset::bootPasswd(), passwd);
+  setUInt8(Offset::bootPasswdEnable(), 1);
+}
+
+void
+OpenGD77BaseCodeplug::BootSettingsElement::clearBootPassword() {
+  setUInt8(Offset::bootPasswdEnable(), 0);
+}
+
+
+QString
+OpenGD77BaseCodeplug::BootSettingsElement::line1() const {
+  return readASCII(Offset::line1(), Limit::lineLength(), 0xff);
+}
+void
+OpenGD77BaseCodeplug::BootSettingsElement::setLine1(const QString &text) {
+  writeASCII(Offset::line1(), text, Limit::lineLength(), 0xff);
+}
+
+QString
+OpenGD77BaseCodeplug::BootSettingsElement::line2() const {
+  return readASCII(Offset::line2(), Limit::lineLength(), 0xff);
+}
+void
+OpenGD77BaseCodeplug::BootSettingsElement::setLine2(const QString &text) {
+  writeASCII(Offset::line2(), text, Limit::lineLength(), 0xff);
+}
+
+
+bool
+OpenGD77BaseCodeplug::BootSettingsElement::encode(const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  setLine1(ctx.config()->settings()->introLine1());
+  setLine2(ctx.config()->settings()->introLine2());
+  return true;
+}
+
+bool
+OpenGD77BaseCodeplug::BootSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  ctx.config()->settings()->setIntroLine1(line1());
+  ctx.config()->settings()->setIntroLine2(line2());
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::ZoneElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::ZoneElement::ZoneElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ZoneElement::~ZoneElement() {
+  // pass...
+}
+
+void
+OpenGD77BaseCodeplug::ZoneElement::clear() {
+  memset(_data+Offset::name(), 0xff, Limit::nameLength());
+  memset(_data+Offset::channels(), 0x00, Offset::betweenChannels()*Limit::memberCount());
+}
+bool
+OpenGD77BaseCodeplug::ZoneElement::isValid() const {
+  return (! name().isEmpty());
+}
+
+QString
+OpenGD77BaseCodeplug::ZoneElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+}
+void
+OpenGD77BaseCodeplug::ZoneElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+}
+
+bool
+OpenGD77BaseCodeplug::ZoneElement::hasMember(unsigned n) const {
+  if (n >= Limit::memberCount())
+    return false;
+  return (0 != member(n));
+}
+unsigned
+OpenGD77BaseCodeplug::ZoneElement::member(unsigned n) const {
+  if (n >= Limit::memberCount())
+    return 0;
+  return getUInt16_le(Offset::channels()+Offset::betweenChannels()*n);
+}
+void
+OpenGD77BaseCodeplug::ZoneElement::setMember(unsigned n, unsigned idx) {
+  if (n >= Limit::memberCount())
+    return;
+  setUInt16_le(Offset::channels()+Offset::betweenChannels()*n, idx);
+}
+void
+OpenGD77BaseCodeplug::ZoneElement::clearMember(unsigned n) {
+  setMember(n, 0);
+}
+
+
+Zone *
+OpenGD77BaseCodeplug::ZoneElement::decode(const Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx)
+  if (! isValid()) {
+    errMsg(err) << "Cannot decode an invalid zone.";
+    return nullptr;
+  }
+  return new Zone(name());
+}
+
+
+bool
+OpenGD77BaseCodeplug::ZoneElement::link(Zone *zone, Context &ctx, const ErrorStack &err) const {
+  if (! isValid()) {
+    errMsg(err) << "Cannot link invalid zone.";
+    return false;
+  }
+
+  for (unsigned int i=0; (i<Limit::memberCount()) && hasMember(i); i++) {
+    if (ctx.has<Channel>(member(i))) {
+      zone->A()->add(ctx.get<Channel>(member(i)));
+    } else {
+      logWarn() << "While linking zone '" << zone->name() << "': " << i <<"-th channel index "
+                << member(i) << " out of bounds.";
+    }
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::ZoneElement::encode(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  if (zone->A()->count() && zone->B()->count())
+    setName(zone->name() + " A");
+  else
+    setName(zone->name());
+
+  for (unsigned int i=0; i<Limit::memberCount(); i++) {
+    if (i < (unsigned int)zone->A()->count())
+      setMember(i, ctx.index(zone->A()->get(i)));
+    else
+      clearMember(i);
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::ZoneBankElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ZoneBankElement::~ZoneBankElement() {
+  // pass...
+}
+
+void
+OpenGD77BaseCodeplug::ZoneBankElement::clear() {
+  memset(_data, 0, size());
+}
+
+bool
+OpenGD77BaseCodeplug::ZoneBankElement::isEnabled(unsigned idx) const {
+  unsigned byte=Offset::bitmap() + idx/8, bit = idx%8;
+  return getBit(byte, bit);
+}
+void
+OpenGD77BaseCodeplug::ZoneBankElement::enable(unsigned idx, bool enabled) {
+  unsigned byte=Offset::bitmap() + idx/8, bit = idx%8;
+  setBit(byte, bit, enabled);
+}
+
+
+OpenGD77BaseCodeplug::ZoneElement
+OpenGD77BaseCodeplug::ZoneBankElement::zone(unsigned int idx) {
+  return ZoneElement(_data + Offset::zones() + idx*Offset::betweenZones());
 }
 
 
