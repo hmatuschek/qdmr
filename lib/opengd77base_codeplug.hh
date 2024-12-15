@@ -806,6 +806,79 @@ public:
   };
 
 
+  class OrbitalElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    OrbitalElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    OrbitalElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0064; }
+
+    void clear();
+
+    /** Sets the name of the element. */
+    virtual void setName(const QString &name);
+
+    /** Sets the epoch. */
+    virtual void setEpoch(unsigned int year, double julienDayOfYear);
+    /** Sets the first derivative of mean motion. */
+    virtual void setMeamMotion(double mm);
+    /** Sets the first derivative of mean motion. */
+    virtual void setMeamMotionDerivative(double dmm);
+    /** Sets the inclination. */
+    virtual void setInclination(double incl);
+    /** Right ascension of the ascending node. */
+    virtual void setAscension(double asc);
+    /** Sets eccentricity. */
+    virtual void setEccentricity(double ecc);
+    /** Sets argument of perigee. */
+    virtual void setPerigee(double arg);
+    /** Set the mean anomaly. */
+    virtual void setMeanAnomaly(double ma);
+    /** Sets the revolution number at epoch. */
+    virtual void setRevolutionNumber(unsigned int num);
+
+    /** Sets the downlink frequency. */
+    void setFMDownlink(const Frequency &f);
+    /** Sets the uplink frequency. */
+    void setFMUplink(const Frequency &f);
+    /** Sets the CTCSS tone. */
+    void setCTCSS(const SelectiveCall &call);
+    /** Sets the APRS downlink frequency. */
+    void setAPRSDownlink(const Frequency &f);
+    /** Sets the APRS uplink frequency. */
+    void setAPRSUplink(const Frequency &f);
+
+    /** Sets the beacon frequency. */
+    void setBeacon(const Frequency &f);
+
+    /** Sets the APRS path. */
+    void setAPRSPath(const QString &path);
+
+  public:
+    /** Some limits for the zone bank. */
+    struct Limit: public Element::Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength() { return 8; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int epochYear()  { return 0x0008; }
+      static constexpr unsigned int epochJulienDay()  { return 0x0009; }
+      static constexpr unsigned int meanMotionDerivative()  { return 0x0008; }
+      /// @endcond
+    };
+  };
+
 public:
   explicit OpenGD77BaseCodeplug(QObject *parent = nullptr);
 

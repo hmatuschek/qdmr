@@ -1315,6 +1315,36 @@ OpenGD77BaseCodeplug::ZoneBankElement::zone(unsigned int idx) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::OrbitalElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::OrbitalElement::OrbitalElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::OrbitalElement::OrbitalElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::clear() {
+  memset(_data, 0, size());
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+
+
+/* ********************************************************************************************* *
  * Implementation of OpenGD77BaseCodeplug
  * ********************************************************************************************* */
 OpenGD77BaseCodeplug::OpenGD77BaseCodeplug(QObject *parent)
