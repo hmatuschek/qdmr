@@ -86,8 +86,7 @@ configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
 #SET(CMAKE_AUTOMOC ON)
 qt5_wrap_cpp(libdmrconf_MOC_SOURCES ${libdmrconf_MOC_HEADERS})
 
-add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES}
-  opengd77base_codeplug.hh opengd77base_codeplug.cc)
+add_library(libdmrconf SHARED ${libdmrconf_SOURCES} ${libdmrconf_MOC_SOURCES})
 set_target_properties(libdmrconf PROPERTIES
 	MACOSX_RPATH TRUE
   OUTPUT_NAME dmrconf

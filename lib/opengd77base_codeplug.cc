@@ -1337,11 +1337,160 @@ OpenGD77BaseCodeplug::OrbitalElement::clear() {
 
 
 void
+OpenGD77BaseCodeplug::OrbitalElement::writeDigit(const Offset::Bit &offset, uint8_t digit) {
+  // Must be bit 0 or 4 (BCD)
+  if (offset.bit % 4)
+    return;
+
+  uint8_t val = getUInt8(offset.byte);
+  val &= ~(0xf << offset.bit);
+  val |= ((digit & 0xf) << offset.bit);
+  setUInt8(offset.byte, val);
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::writeInteger(const Offset::Bit &offset, int value, bool sign, unsigned int dec) {
+  unsigned int o = 0;
+  // Must be bit 0 or 4 (BCD)
+  if (offset.bit % 4)
+    return;
+  if (0 == dec)
+    return;
+
+  if (sign && 0 > value)
+    writeDigit(offset + o, 0xc); // '-' ?!?
+  else
+    writeDigit(offset + o, 0xb); // blank
+
+  o += 4*(dec-1);
+  for (int i=dec; i>0; i++, o = o - 4) {
+    if (value)
+      writeDigit(offset + o, value % 10);
+    else
+      writeDigit(offset + o, 0xb);
+    value /= 10;
+  }
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::writeFractional(const Offset::Bit &offset, double value, bool sign, unsigned int frac) {
+  unsigned int o = 0;
+  if (offset.bit % 4)
+    return;
+
+  if (0 == frac)
+    return;
+
+  if (sign && (0 > value))
+    writeDigit(offset + o, 0xc);
+  else
+    writeDigit(offset + o, 0xb);
+  o += 4;
+
+  value -= int(value);
+  for (unsigned int i=0; i<frac; i++, o += 4) {
+    value *= 10;
+    writeDigit(offset + o, int(value));
+    value -= int(value);
+  }
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::writeFixedPoint(const Offset::Bit &offset, double value, bool sign, unsigned int dec, unsigned int frac) {
+  unsigned int o = 0;
+  writeInteger(offset + o, value, sign, dec);
+  o += 4*dec + (sign ? 4 : 0);
+
+  writeDigit(offset + o, 0xa);
+  o += 4;
+
+  value = std::abs(value);
+  value -= int(value);
+  writeFractional(offset + o, value, false, frac);
+}
+
+
+void
 OpenGD77BaseCodeplug::OrbitalElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
+void
+OpenGD77BaseCodeplug::OrbitalElement::setEpoch(unsigned int year, double julienDay) {
+  writeInteger(Offset::epochYear(), year%100, false, 2);
+  writeFixedPoint(Offset::epochJulienDay(), julienDay, false, 3, 8);
+}
 
+void
+OpenGD77BaseCodeplug::OrbitalElement::setMeamMotionDerivative(double dmm) {
+  writeFixedPoint(Offset::meanMotionDerivative(), dmm, true, 0, 8);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setInclination(double incl) {
+  writeFixedPoint(Offset::inclination(), incl, false, 3, 4);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setAscension(double asc) {
+  writeFixedPoint(Offset::ascension(), asc, false, 3, 4);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setEccentricity(double ecc) {
+  writeFractional(Offset::eccentricity(), ecc, false, 7);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setPerigee(double arg) {
+  writeFixedPoint(Offset::perigee(), arg, false, 3, 4);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setMeanAnomaly(double ma) {
+  writeFixedPoint(Offset::meanAnomaly(), ma, false, 3, 4);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setMeamMotion(double mm) {
+  writeFixedPoint(Offset::meanMotion(), mm, false, 2, 8);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setRevolutionNumber(unsigned int num) {
+  writeInteger(Offset::revolutionNumber(), num, false, 5);
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setFMDownlink(const Frequency &f) {
+  setUInt32_le(Offset::fmDownlink(), f.inHz()/10);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setFMUplink(const Frequency &f) {
+  setUInt32_le(Offset::fmUplink(), f.inHz()/10);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setCTCSS(const SelectiveCall &call) {
+  if (! call.isCTCSS())
+    return;
+  setUInt32_le(Offset::ctcss(), call.mHz()/100);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setAPRSDownlink(const Frequency &f) {
+  setUInt32_le(Offset::aprsDownlink(), f.inHz()/10);
+}
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setAPRSUplink(const Frequency &f) {
+  setUInt32_le(Offset::aprsUplink(), f.inHz()/10);
+}
 
 
 /* ********************************************************************************************* *

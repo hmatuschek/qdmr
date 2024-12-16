@@ -860,21 +860,60 @@ public:
     /** Sets the APRS path. */
     void setAPRSPath(const QString &path);
 
+  protected:
+    /** Writes a fixed point value as a BCD number. Using 0-9 as digits, ah as decimal dot and bh
+     * as blank.
+     * @param offset Specifies, where to write the fixed point value.
+     * @param value The value to write.
+     * @param sign If @c true, a sign is written.
+     * @param dec The number of digits in the integer part.
+     * @param frac The number of digits in the fractional part.
+     */
+    void writeFixedPoint(const Offset::Bit &offset, double value, bool sign, unsigned int dec, unsigned int frac);
+    /** Writes a fixed point value as a BCD number. Using 0-9 as digits and bh as blank. In contrast
+     * to @c writeFixedPoint, this function expects no integer part.
+     * @param offset Specifies, where to write the fixed point value.
+     * @param value The value to write.
+     * @param sign If @c true, a sign is written.
+     * @param frac The number of digits in the fractional part.
+     */
+    void writeFractional(const Offset::Bit &offset, double value, bool sign, unsigned int frac);
+    /** Write a fixed digit integer value. */
+    void writeInteger(const Offset::Bit &offset, int value, bool sign, unsigned dec);
+    /** Writes a single digit at the given offset. */
+    void writeDigit(const Offset::Bit &offset, uint8_t digit);
+
   public:
     /** Some limits for the zone bank. */
     struct Limit: public Element::Limit {
       /** The maximum name length. */
       static constexpr unsigned int nameLength() { return 8; }
+      /** Maximum length of the APRS path. */
+      static constexpr unsigned int pathLength() { return 24; }
     };
 
   protected:
     /** Some internal offsets within the element. */
     struct Offset: public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int name() { return 0x0000; }
-      static constexpr unsigned int epochYear()  { return 0x0008; }
-      static constexpr unsigned int epochJulienDay()  { return 0x0009; }
-      static constexpr unsigned int meanMotionDerivative()  { return 0x0008; }
+      static constexpr unsigned int name()         { return 0x0000; }
+      static constexpr Bit epochYear()             { return {0x0008, 4}; }
+      static constexpr Bit epochJulienDay()        { return {0x0009, 4}; }
+      static constexpr Bit meanMotionDerivative()  { return {0x000f, 4}; }
+      static constexpr Bit inclination()           { return {0x0014, 4}; }
+      static constexpr Bit ascension()             { return {0x0018, 4}; }
+      static constexpr Bit eccentricity()          { return {0x001c, 4}; }
+      static constexpr Bit perigee()               { return {0x001f, 0}; }
+      static constexpr Bit meanAnomaly()           { return {0x0023, 0}; }
+      static constexpr Bit meanMotion()            { return {0x0027, 0}; }
+      static constexpr Bit revolutionNumber()      { return {0x002d, 4}; }
+      static constexpr unsigned int fmDownlink()   { return 0x0030; }
+      static constexpr unsigned int fmUplink()     { return 0x0034; }
+      static constexpr unsigned int ctcss()        { return 0x0038; }
+      static constexpr unsigned int aprsDownlink() { return 0x003c; }
+      static constexpr unsigned int aprsUplink()   { return 0x0040; }
+      static constexpr unsigned int beacon()       { return 0x0044; }
+      static constexpr unsigned int aprsPath()     { return 0x004c; }
       /// @endcond
     };
   };
