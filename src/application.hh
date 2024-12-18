@@ -14,6 +14,7 @@ class QTranslator;
 class RepeaterDatabase;
 class UserDatabase;
 class TalkGroupDatabase;
+class SatelliteDatabase;
 class RadioIDListView;
 class GeneralSettingsView;
 class ContactListView;
@@ -25,6 +26,8 @@ class PositioningSystemListView;
 class RoamingChannelListView;
 class RoamingZoneListView;
 class ExtensionView;
+
+
 
 class Application : public QApplication
 {
@@ -67,6 +70,8 @@ public slots:
   void showAbout();
   void showHelp();
 
+  void editSatellites();
+
 private slots:
   QMainWindow *createMainWindow();
 
@@ -102,6 +107,7 @@ protected:
   RepeaterDatabase *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
+  SatelliteDatabase *_satellites;
 
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
