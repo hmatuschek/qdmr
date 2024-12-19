@@ -369,6 +369,77 @@ public:
   };
 
 
+  /** Encodes the settings element for all OpenGD77 codeplugs. */
+  class GeneralSettingsElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GeneralSettingsElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
+
+    void clear();
+
+    /** Returns the UHF minimum frequency. */
+    virtual Frequency uhfMinFrequency() const;
+    /** Sets the UHF minimum frequency. */
+    virtual void setUHFMinFrequency(const Frequency &f);
+    /** Returns the UHF maximum frequency. */
+    virtual Frequency uhfMaxFrequency() const;
+    /** Sets the UHF maximum frequency. */
+    virtual void setUHFMaxFrequency(const Frequency &f);
+
+    /** Returns the VHF minimum frequency. */
+    virtual Frequency vhfMinFrequency() const;
+    /** Sets the VHF minimum frequency. */
+    virtual void setVHFMinFrequency(const Frequency &f);
+    /** Returns the VHF maximum frequency. */
+    virtual Frequency vhfMaxFrequency() const;
+    /** Sets the VHF maximum frequency. */
+    virtual void setVHFMaxFrequency(const Frequency &f);
+
+    /** Returns the radio callsign. */
+    virtual QString call() const;
+    /** Sets the radio callsign. */
+    virtual void setCall(const QString &call);
+
+    /** Returns the DMR ID. */
+    virtual unsigned int radioId() const;
+    /** Sets the DMR ID. */
+    virtual void setRadioId(unsigned int id);
+
+    /** Encodes the settings. */
+    virtual bool encode(const Context &ctx, const ErrorStack &err = ErrorStack());
+    /** Decodes the settings. */
+    virtual bool decode(const Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: public Element::Limit {
+      /** The maximum call length. */
+      static constexpr unsigned int callLength() { return 8; }
+    };
+
+  protected:
+    /** Some internal offset within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int uhfMinFrequency() { return 0x0000; }
+      static constexpr unsigned int uhfMaxFrequency() { return 0x0002; }
+      static constexpr unsigned int vhfMinFrequency() { return 0x0004; }
+      static constexpr unsigned int vhfMaxFrequency() { return 0x0006; }
+      static constexpr unsigned int call()            { return 0x0060; }
+      static constexpr unsigned int dmrId()           { return 0x0068; }
+      /// @endcond
+    };
+  };
+
+
   /** APRS system for OpenGD77 devices. */
   class APRSSettingsElement: public Element
   {
@@ -525,6 +596,11 @@ public:
     /** Retunrs the n-th APRS system. */
     APRSSettingsElement system(unsigned int idx) const;
 
+    /** Encodes all FM APRS systems. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes all FM APRS systems. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits for the bank. */
     struct Limit: public Element::Limit {
@@ -612,6 +688,11 @@ public:
 
     /** Returns the n-th DTMF contact. */
     DTMFContactElement contact(unsigned int n) const;
+
+    /** Encodes all DTMF contacts. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes all DTMF contacts. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the bank. */
@@ -787,6 +868,13 @@ public:
     /** Retunrs the n-th zone. */
     ZoneElement zone(unsigned int n);
 
+    /** Encodes all zones. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes all zones. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all zones. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits for the zone bank. */
     struct Limit: public Element::Limit {
@@ -918,10 +1006,329 @@ public:
     };
   };
 
+
+  /** Implements digital contacts in OpenGD77 codeplugs. */
+  class ContactElement: public Element
+  {
+  public:
+    enum class TimeSlotOverride {
+      None, TS1, TS2
+    };
+
+  protected:
+    /** Hidden constructor. */
+    ContactElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor. */
+    explicit ContactElement(uint8_t *ptr);
+    /** Destructor. */
+    virtual ~ContactElement();
+
+    /** The size of the contact element. */
+    static constexpr unsigned int size() { return 0x0018; }
+
+    /** Resets the contact. */
+    void clear();
+
+    /** Returns @c true if the contact is valid. */
+    bool isValid() const;
+
+    /** Returns the name of the contact. */
+    virtual QString name() const;
+    /** Sets the name of the contact. */
+    virtual void setName(const QString name);
+
+    /** Returns the DMR number of the contact. */
+    virtual unsigned number() const;
+    /** Sets the DMR number of the contact. */
+    virtual void setNumber(unsigned id);
+
+    /** Returns the call type. */
+    virtual DMRContact::Type type() const;
+    /** Sets the call type. */
+    virtual void setType(DMRContact::Type type);
+
+    /** Returns the time slot override of the contact. */
+    virtual TimeSlotOverride timeSlotOverride() const;
+    /** Sets the time slot override. */
+    virtual void setTimeSlotOverride(TimeSlotOverride ts);
+
+    /** Constructs a @c DigitalContact instance from this codeplug contact. */
+    virtual DMRContact *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Resets this codeplug contact from the given @c DigitalContact. */
+    virtual bool encode(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the contact. */
+    struct Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int number() { return 0x0010; }
+      static constexpr unsigned int type() { return 0x0014; }
+      static constexpr unsigned int timeSlotOverride() { return 0x0017; }
+      /// @endcond
+    };
+  };
+
+
+  /** Encodes the contact bank. */
+  class ContactBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ContactBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ContactBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() {
+      return Limit::contactCount() * ContactElement::size();
+    }
+
+    /** Resets the contact. */
+    void clear();
+
+    /** Returns the i-th contact element. */
+    ContactElement contact(unsigned int idx) const;
+
+    /** Encodes all DMR contacts. */
+    virtual bool encode(Context &ctx, const ErrorStack &err = ErrorStack());
+    /** Decodes all DMR contacts. */
+    virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** Maximum number of contacts. */
+      static constexpr unsigned int contactCount() { return 1024; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contacts() { return 0x0000; }
+      static constexpr unsigned int betweenContacts() { return ContactElement::size(); }
+      // @endcond
+    };
+  };
+
+
+  /** Encodes a group list for all OpenGD77 codeplugs. */
+  class GroupListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0050; }
+
+    /** Clears the group list. */
+    void clear();
+
+    /** Returns the name of the group list. */
+    virtual QString name() const;
+    /** Sets the name of the group list. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true, if the i-th contact is set. */
+    virtual bool hasContactIndex(unsigned int i) const;
+    /** Returns the i-th contact index. */
+    virtual unsigned int contactIndex(unsigned int i) const;
+    /** Sets the i-th contact index. */
+    virtual void setContactIndex(unsigned int i, unsigned int contactIdx);
+    /** Clears the i-th contact index. */
+    virtual void clearContactIndex(unsigned int i);
+
+    /** Encodes group list element. */
+    virtual bool encode(RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes group list element. */
+    virtual RXGroupList *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Links the group list element. */
+    virtual bool link(RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 15; }
+      /** Maximum number of contacts. */
+      static constexpr unsigned int contactCount() { return 1024; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int contacts() { return 0x0010; }
+      static constexpr unsigned int betweenContacts() { return 0x0002; }
+      // @endcond
+    };
+  };
+
+
+  /** Encodes a group list bank for all OpenGD77 codeplugs. */
+  class GroupListBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GroupListBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GroupListBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x1840; }
+
+    /** Clears the group list bank. */
+    void clear();
+
+    /** Returns @c true, if the i-th group list is encoded. */
+    virtual bool hasGroupList(unsigned int i) const;
+    /** Returns the number of contacts in the given group list. */
+    virtual unsigned int groupListContactCount(unsigned int i) const;
+    /** Sets the number of contacts in the given group list. */
+    virtual void setGroupListContactCount(unsigned int i, unsigned int count);
+    /** Returns the i-th group list. */
+    virtual GroupListElement groupList(unsigned int i) const;
+    /** Clears the i-th group list. */
+    virtual void clearGroupList(unsigned int i);
+
+    /** Encodes all group lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err = ErrorStack());
+    /** Decodes all group lists. */
+    virtual bool decode(Context &ctx, const ErrorStack &err = ErrorStack());
+    /** Links all group lists. */
+    virtual bool link(Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits for the element. */
+    struct Limit {
+      /** Maximum number of group lists. */
+      static constexpr unsigned int groupListCount() { return 76; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int length() { return 0x0000; }
+      static constexpr unsigned int groupLists() { return 0x0080; }
+      static constexpr unsigned int betweenGroupLists() { return GroupListElement::size(); }
+      // @endcond
+    };
+  };
+
+
 public:
   explicit OpenGD77BaseCodeplug(QObject *parent = nullptr);
 
+  /** Clears and resets the complete codeplug to some default values. */
+  virtual void clear();
 
+  bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  bool decode(Config *config, const ErrorStack &err=ErrorStack());
+  bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+  bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
+
+public:
+  /** Decodes the binary codeplug and stores its content in the given generic configuration using
+   * the given context. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encodes the given generic configuration as a binary codeplug using the given context. */
+  virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Clears the general settings in the codeplug. */
+  virtual void clearGeneralSettings() = 0;
+  /** Updates the general settings from the given configuration. */
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Updates the given configuration from the general settings. */
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears the DTMF settings. */
+  virtual void clearDTMFSettings() = 0;
+  /** Encodes DTMF settings. */
+  virtual bool encodeDTMFSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the DTMF settings. */
+  virtual bool decodeDTMFSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears the APRS settings. */
+  virtual void clearAPRSSettings() = 0;
+  /** Encodes APRS settings. */
+  virtual bool encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the APRS settings. */
+  virtual bool decodeAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all DTMF contacts in the codeplug. */
+  virtual void clearDTMFContacts() = 0;
+  /** Encodes all DTMF contacts. */
+  virtual bool encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Adds all DTMF contacts to the configuration. */
+  virtual bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clear all channels. */
+  virtual void clearChannels() = 0;
+  /** Encode all channels. */
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Adds all defined channels to the configuration. */
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all channels. */
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clear boot settings. */
+  virtual void clearBootSettings() = 0;
+  /** Encodes boot settings. */
+  virtual bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the boot settings. */
+  virtual bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears the VFO settings. */
+  virtual void clearVFOSettings() = 0;
+
+  /** Clears all zones. */
+  virtual void clearZones() = 0;
+  /** Encodes zones. */
+  virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Adds zones to the configuration. */
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all zones within the configuration. */
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all contacts in the codeplug. */
+  virtual void clearContacts() = 0;
+  /** Encodes all digital contacts in the configuration into the codeplug. */
+  virtual bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Adds a digital contact to the configuration for each one in the codeplug. */
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Clears all group lists. */
+  virtual void clearGroupLists() = 0;
+  /** Encodes all group lists. */
+  virtual bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Creates all group lists. */
+  virtual bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all group lists. */
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // OPENGD77BASE_CODEPLUG_HH

@@ -1,6 +1,8 @@
 #include "opengd77base_codeplug.hh"
+#include "radioid.hh"
 #include "config.hh"
 #include "logger.hh"
+#include "intermediaterepresentation.hh"
 
 
 /* ********************************************************************************************* *
@@ -677,7 +679,122 @@ OpenGD77BaseCodeplug::VFOChannelElement::setTXOffset(double f) {
 
 
 /* ******************************************************************************************** *
- * Implementation of OpenGD77BaseCodeplug::APRSSettings
+ * Implementation of OpenGD77BaseCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+OpenGD77BaseCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::clear() {
+  setCall("");
+  setRadioId(0);
+}
+
+
+Frequency
+OpenGD77BaseCodeplug::GeneralSettingsElement::uhfMinFrequency() const {
+  return Frequency::fromMHz(getBCD4_le(Offset::uhfMinFrequency()));
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setUHFMinFrequency(const Frequency &f) {
+  setBCD4_le(Offset::uhfMinFrequency(), f.inMHz());
+}
+
+Frequency
+OpenGD77BaseCodeplug::GeneralSettingsElement::uhfMaxFrequency() const {
+  return Frequency::fromMHz(getBCD4_le(Offset::uhfMaxFrequency()));
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setUHFMaxFrequency(const Frequency &f) {
+  setBCD4_le(Offset::uhfMaxFrequency(), f.inMHz());
+}
+
+
+Frequency
+OpenGD77BaseCodeplug::GeneralSettingsElement::vhfMinFrequency() const {
+  return Frequency::fromMHz(getBCD4_le(Offset::vhfMinFrequency()));
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setVHFMinFrequency(const Frequency &f) {
+  setBCD4_le(Offset::vhfMinFrequency(), f.inMHz());
+}
+
+
+Frequency
+OpenGD77BaseCodeplug::GeneralSettingsElement::vhfMaxFrequency() const {
+  return Frequency::fromMHz(getBCD4_le(Offset::vhfMaxFrequency()));
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setVHFMaxFrequency(const Frequency &f) {
+  setBCD4_le(Offset::vhfMaxFrequency(), f.inMHz());
+}
+
+
+QString
+OpenGD77BaseCodeplug::GeneralSettingsElement::call() const {
+  return readASCII(Offset::call(), Limit::callLength(), 0xff);
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setCall(const QString &call) {
+  writeASCII(Offset::call(), call, Limit::callLength(), 0xff);
+}
+
+
+unsigned int
+OpenGD77BaseCodeplug::GeneralSettingsElement::radioId() const {
+  return getBCD8_be(Offset::dmrId());
+}
+
+void
+OpenGD77BaseCodeplug::GeneralSettingsElement::setRadioId(unsigned int id) {
+  setBCD8_be(Offset::dmrId(), id);
+}
+
+
+bool
+OpenGD77BaseCodeplug::GeneralSettingsElement::encode(const Context &ctx, const ErrorStack &err) {
+  DMRRadioID *id = ctx.config()->settings()->defaultId();
+  if (nullptr == id) {
+    errMsg(err) << "Cannot encode DMR ID. No default ID defined.";
+    return false;
+  }
+
+  setCall(id->name());
+  setRadioId(id->number());
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::GeneralSettingsElement::decode(const Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  DMRRadioID *id = new DMRRadioID(call(), radioId());
+  ctx.config()->radioIDs()->add(id);
+  ctx.config()->settings()->setDefaultId(id);
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77BaseCodeplug::APRSSettingsElement
  * ******************************************************************************************** */
 OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr, size_t size)
   : Element(ptr, size)
@@ -930,15 +1047,52 @@ OpenGD77BaseCodeplug::APRSSettingsBankElement::APRSSettingsBankElement(uint8_t *
   // pass...
 }
 
+
 void
 OpenGD77BaseCodeplug::APRSSettingsBankElement::clear() {
   for (unsigned int i=0; i<Limit::systems(); i++)
     system(i).clear();
 }
 
+
 OpenGD77BaseCodeplug::APRSSettingsElement
 OpenGD77BaseCodeplug::APRSSettingsBankElement::system(unsigned int idx) const {
   return APRSSettingsElement(_data + Offset::systems() + idx*Offset::betweenSystems());
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::systems(); i++) {
+    if (ctx.has<APRSSystem>(i)) {
+      if (! system(i).encode(ctx.get<APRSSystem>(i), ctx, err)) {
+        errMsg(err) << "Cannot encode APRS system '" << ctx.get<APRSSystem>(i)->name()
+                    << " at index " << i << ".";
+        return false;
+      }
+    } else {
+      system(i).clear();
+    }
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::systems(); i++) {
+    if (system(i).isValid()) {
+      APRSSystem *sys = system(i).decode(ctx, err);
+      if (nullptr == sys) {
+        errMsg(err) << "Cannot decode APRS system at index " << i << ".";
+        return false;
+      }
+      ctx.add(sys, i);
+    }
+  }
+
+  return true;
 }
 
 
@@ -1055,6 +1209,40 @@ OpenGD77BaseCodeplug::DTMFContactBankElement::clear() {
 OpenGD77BaseCodeplug::DTMFContactElement
 OpenGD77BaseCodeplug::DTMFContactBankElement::contact(unsigned int n) const {
   return DTMFContactElement(_data + Offset::contacts() + n*Offset::betweenContacts());
+}
+
+
+bool
+OpenGD77BaseCodeplug::DTMFContactBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::contacts(); i++) {
+    if (ctx.has<DTMFContact>(i)) {
+      if (! contact(i).encode(ctx.get<DTMFContact>(i), ctx, err)) {
+        errMsg(err) << "Cannot encode DTMF contact " << ctx.get<DTMFContact>(i)->name()
+                    << " at index " << i << ".";
+        return false;
+      }
+    } else {
+      contact(i).clear();
+    }
+  }
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::DTMFContactBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::contacts(); i++) {
+    if (! contact(i).isValid())
+      continue;
+    DTMFContact *cnt = contact(i).decode(ctx, err);
+    if (nullptr == cnt) {
+      errMsg(err) << "Cannot decode DTMF contact at index " << i << ".";
+      return false;
+    }
+    ctx.add(cnt, i);
+  }
+
+  return true;
 }
 
 
@@ -1313,6 +1501,62 @@ OpenGD77BaseCodeplug::ZoneBankElement::zone(unsigned int idx) {
 }
 
 
+bool
+OpenGD77BaseCodeplug::ZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::zoneCount(); i++) {
+    if (ctx.has<Zone>(i)) {
+      if (! zone(i).encode(ctx.get<Zone>(i), ctx, err)) {
+        errMsg(err) << "Cannot encode zone '" << ctx.get<Zone>(i)->name()
+                    << "' at index " << i << ".";
+        return false;
+      }
+      enable(i, true);
+    } else {
+      zone(i).clear();
+      enable(i, false);
+    }
+  }
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::zoneCount(); i++ ) {
+    if (! isEnabled(i))
+      continue;
+
+    Zone *obj = zone(i).decode(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode zone at index " << i << ".";
+      return false;
+    }
+
+    ctx.add(obj, i);
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::zoneCount(); i++ ) {
+    if (! isEnabled(i))
+      continue;
+
+    Zone *obj = ctx.get<Zone>(i);
+    if (! zone(i).link(obj, ctx, err)) {
+      errMsg(err) << "Cannot link zone '" << obj->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of OpenGD77BaseCodeplug::OrbitalElement
@@ -1493,11 +1737,670 @@ OpenGD77BaseCodeplug::OrbitalElement::setAPRSUplink(const Frequency &f) {
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::ContactElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::ContactElement::ContactElement(uint8_t *ptr, unsigned size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ContactElement::~ContactElement() {
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::ContactElement::clear() {
+  setName("");
+  setNumber(0);
+  setType(DMRContact::GroupCall);
+  setTimeSlotOverride(TimeSlotOverride::None);
+}
+
+
+bool
+OpenGD77BaseCodeplug::ContactElement::isValid() const {
+  return (! name().isEmpty());
+}
+
+
+QString
+OpenGD77BaseCodeplug::ContactElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+}
+
+void
+OpenGD77BaseCodeplug::ContactElement::setName(const QString name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+}
+
+
+unsigned
+OpenGD77BaseCodeplug::ContactElement::number() const {
+  return getBCD8_be(Offset::number());
+}
+
+void
+OpenGD77BaseCodeplug::ContactElement::setNumber(unsigned id) {
+  setBCD8_be(Offset::number(), id);
+}
+
+
+DMRContact::Type
+OpenGD77BaseCodeplug::ContactElement::type() const {
+  switch (getUInt8(Offset::type())) {
+  case 0: return DMRContact::GroupCall;
+  case 1: return DMRContact::PrivateCall;
+  case 2: return DMRContact::AllCall;
+  default: break;
+  }
+  return DMRContact::PrivateCall;
+}
+
+void
+OpenGD77BaseCodeplug::ContactElement::setType(DMRContact::Type type) {
+  switch (type) {
+  case DMRContact::GroupCall: setUInt8(Offset::type(), 0); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::type(), 1); break;
+  case DMRContact::AllCall: setUInt8(Offset::type(), 2); break;
+  }
+}
+
+
+OpenGD77BaseCodeplug::ContactElement::TimeSlotOverride
+OpenGD77BaseCodeplug::ContactElement::timeSlotOverride() const {
+  return (TimeSlotOverride)getUInt8(Offset::timeSlotOverride());
+}
+void
+OpenGD77BaseCodeplug::ContactElement::setTimeSlotOverride(TimeSlotOverride ts) {
+  setUInt8(Offset::timeSlotOverride(), (unsigned int) ts);
+}
+
+
+DMRContact *
+OpenGD77BaseCodeplug::ContactElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx)
+  if (! isValid()) {
+    errMsg(err) << "Cannot create contact from an invalid element.";
+    return nullptr;
+  }
+
+  auto contact = new DMRContact(type(), name(), number(), false);
+  contact->setOpenGD77ContactExtension(new OpenGD77ContactExtension());
+
+  switch (timeSlotOverride()) {
+  case TimeSlotOverride::None:
+    contact->openGD77ContactExtension()->setTimeSlotOverride(
+          OpenGD77ContactExtension::TimeSlotOverride::None);
+    break;
+  case TimeSlotOverride::TS1:
+    contact->openGD77ContactExtension()->setTimeSlotOverride(
+          OpenGD77ContactExtension::TimeSlotOverride::TS1);
+    break;
+  case TimeSlotOverride::TS2:
+    contact->openGD77ContactExtension()->setTimeSlotOverride(
+          OpenGD77ContactExtension::TimeSlotOverride::TS2);
+    break;
+  }
+
+  return contact;
+}
+
+bool
+OpenGD77BaseCodeplug::ContactElement::encode(const DMRContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
+  setName(cont->name());
+  setNumber(cont->number());
+  setType(cont->type());
+
+  if (nullptr == cont->openGD77ContactExtension())
+    return true;
+
+  switch (cont->openGD77ContactExtension()->timeSlotOverride()) {
+  case OpenGD77ContactExtension::TimeSlotOverride::None:
+    setTimeSlotOverride(TimeSlotOverride::None);
+    break;
+  case OpenGD77ContactExtension::TimeSlotOverride::TS1:
+    setTimeSlotOverride(TimeSlotOverride::TS1);
+    break;
+  case OpenGD77ContactExtension::TimeSlotOverride::TS2:
+    setTimeSlotOverride(TimeSlotOverride::TS2);
+    break;
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::ContactBankElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::ContactBankElement::clear() {
+  for (unsigned int i=0; i<Limit::contactCount(); i++)
+    contact(i).clear();
+}
+
+
+OpenGD77BaseCodeplug::ContactElement
+OpenGD77BaseCodeplug::ContactBankElement::contact(unsigned int idx) const {
+  return ContactElement(_data + Offset::contacts() + idx*Offset::betweenContacts());
+}
+
+
+bool
+OpenGD77BaseCodeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    if (ctx.has<DMRContact>(i)) {
+      if (! contact(i).encode(ctx.get<DMRContact>(i), ctx, err)) {
+        errMsg(err) << "Cannot encode DMR contact " << ctx.get<DMRContact>(i)->name()
+                    << " at index " << i << ".";
+        return false;
+      }
+    } else {
+      contact(i).clear();
+    }
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    if (! contact(i).isValid())
+      continue;
+    DMRContact *cnt = contact(i).decode(ctx, err);
+    if (nullptr == cnt) {
+      errMsg(err) << "Cannot decode contact at index " << i << ".";
+      return false;
+    }
+    ctx.add(cnt, i);
+  }
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::GroupListElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::GroupListElement::GroupListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::GroupListElement::clear() {
+  memset(_data + Offset::name(), 0xff, Limit::nameLength()+1);
+  memset(_data + Offset::contacts(), 0, Limit::contactCount()*2);
+}
+
+
+QString
+OpenGD77BaseCodeplug::GroupListElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+}
+
+void
+OpenGD77BaseCodeplug::GroupListElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListElement::hasContactIndex(unsigned int i) const {
+  return 0 != getUInt16_le(Offset::contacts() + i*Offset::betweenContacts());
+}
+
+unsigned int
+OpenGD77BaseCodeplug::GroupListElement::contactIndex(unsigned int i) const {
+  return getUInt16_le(Offset::contacts() + i*Offset::betweenContacts())-1;
+}
+
+void
+OpenGD77BaseCodeplug::GroupListElement::setContactIndex(unsigned int i, unsigned int contactIdx) {
+  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), contactIdx+1);
+}
+
+void
+OpenGD77BaseCodeplug::GroupListElement::clearContactIndex(unsigned int i) {
+  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), 0);
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListElement::encode(RXGroupList *lst, Context &ctx, const ErrorStack &err) {
+  setName(lst->name());
+
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    if (i < (unsigned int)lst->count()) {
+      int idx = ctx.index(lst->contact(i));
+      if (0 > idx) {
+        errMsg(err) << "Cannot encode group list '" << lst->name()
+                    << "', contact '" << lst->contact(i)->name() << "' not indexed.";
+        return false;
+      }
+      setContactIndex(i, idx);
+    } else {
+      clearContactIndex(i);
+    }
+  }
+  return true;
+}
+
+
+RXGroupList *
+OpenGD77BaseCodeplug::GroupListElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  return new RXGroupList(name());
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListElement::link(RXGroupList *lst, Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i=0; i<Limit::contactCount(); i++) {
+    if (! hasContactIndex(i))
+      continue;
+
+    if (! ctx.has<DMRContact>(contactIndex(i))) {
+      errMsg(err) << "Cannot resolve contact index " << contactIndex(i) << ".";
+      return false;
+    }
+
+    lst->addContact(ctx.get<DMRContact>(contactIndex(i)));
+  }
+
+  return false;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::GroupListBankElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::GroupListBankElement::clear() {
+  for (unsigned int i=0; i<Limit::groupListCount(); i++)
+    clearGroupList(i);
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListBankElement::hasGroupList(unsigned int i) const {
+  return 0 != getUInt8(Offset::length() + i);
+}
+
+unsigned int
+OpenGD77BaseCodeplug::GroupListBankElement::groupListContactCount(unsigned int i) const {
+  return getUInt8(Offset::length() + i) - 1;
+}
+
+void
+OpenGD77BaseCodeplug::GroupListBankElement::setGroupListContactCount(unsigned int i, unsigned int count) {
+  setUInt8(Offset::length() + i, count+1);
+}
+
+OpenGD77BaseCodeplug::GroupListElement
+OpenGD77BaseCodeplug::GroupListBankElement::groupList(unsigned int i) const {
+  return GroupListElement(_data + Offset::groupLists()  + i*Offset::betweenGroupLists());
+}
+
+void
+OpenGD77BaseCodeplug::GroupListBankElement::clearGroupList(unsigned int i) {
+  setUInt8(Offset::length() + i, 0);
+  groupList(i).clear();
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::groupListCount(); i++) {
+    if (ctx.has<RXGroupList>(i)) {
+      auto obj = ctx.get<RXGroupList>(i);
+      setGroupListContactCount(i, obj->count());
+      if (! groupList(i).encode(obj, ctx, err)) {
+        clearGroupList(i);
+        errMsg(err) << "Cannot encode group list '" << obj->name() << "' at index " << i << ".";
+        return false;
+      }
+    } else {
+      clearGroupList(i);
+    }
+  }
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::groupListCount(); i++) {
+    if (! hasGroupList(i))
+      continue;
+    auto obj = groupList(i).decode(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode group list at index " << i << ".";
+      return false;
+    }
+    ctx.add(obj, i);
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::groupListCount(); i++) {
+    if (! hasGroupList(i))
+      continue;
+    auto obj = ctx.get<RXGroupList>(i);
+    if (! groupList(i).link(obj, ctx, err)) {
+      errMsg(err) << "Cannot link group list '" << obj->name() << "' at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of OpenGD77BaseCodeplug
  * ********************************************************************************************* */
 OpenGD77BaseCodeplug::OpenGD77BaseCodeplug(QObject *parent)
   : Codeplug{parent}
 {
-
+  // pass...
 }
+
+
+void
+OpenGD77BaseCodeplug::clear() {
+  // Clear general config
+  clearGeneralSettings();
+  clearDTMFSettings();
+  clearAPRSSettings();
+  // clear DTMF contacts
+  clearDTMFContacts();
+  // clear channel
+  clearChannels();
+  // clear boot settings
+  clearBootSettings();
+  // clear VFO settings
+  clearVFOSettings();
+  // clear zones
+  clearZones();
+  // Clear contacts
+  clearContacts();
+  // clear group lists
+  clearGroupLists();
+}
+
+bool
+OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err)
+
+  // Map radio IDs
+  for (int i=0; i<config->radioIDs()->count(); i++)
+    ctx.add(config->radioIDs()->getId(i), i+1);
+
+  // Map digital and DTMF contacts
+  for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
+    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i);
+
+  // Map DMR APRS systems
+  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
+    if (config->posSystems()->system(i)->is<APRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
+    }
+  }
+
+  return true;
+}
+
+Config *
+OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process OpenGD77 codeplug.";
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zone for OpenGD77 codeplug.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+OpenGD77BaseCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
+  // Check if default DMR id is set.
+  if (config->settings()->defaultIdRef()->isNull()) {
+    errMsg(err) << "No default radio ID specified.";
+    return false;
+  }
+
+  // Create index<->object table.
+  Context ctx(config);
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot index configuration objects.";
+    return false;
+  }
+
+  return this->encodeElements(flags, ctx);
+}
+
+
+bool
+OpenGD77BaseCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  // General config
+  if (! this->encodeGeneralSettings(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode general settings.";
+    return false;
+  }
+
+  if (! this->encodeDTMFSettings(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode DTMF settings.";
+    return false;
+  }
+
+  if (! this->encodeAPRSSettings(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode APRS settings.";
+    return false;
+  }
+
+  if (! this->encodeDTMFContacts(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode DTMF contacts.";
+    return false;
+  }
+
+  if (! this->encodeChannels(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode channels";
+    return false;
+  }
+
+  if (! this->encodeBootSettings(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode boot text.";
+    return false;
+  }
+
+  if (! this->encodeZones(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+
+  // Define Contacts
+  if (! this->encodeContacts(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  if (! this->encodeGroupLists(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::decode(Config *config, const ErrorStack &err) {
+  // Clear config object
+  config->clear();
+
+  // Create index<->object table.
+  Context ctx(config);
+  return this->decodeElements(ctx, err);
+}
+
+bool
+OpenGD77BaseCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process Radioddy codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merg zones in decoded Radioddity codeplug.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+OpenGD77BaseCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! this->decodeGeneralSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode general settings.";
+    return false;
+  }
+
+  if (! this->decodeDTMFSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode DTMF settings.";
+    return false;
+  }
+
+  if (! this->decodeAPRSSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode APRS settings.";
+    return false;
+  }
+
+  if (! this->decodeBootSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode boot settings.";
+    return false;
+  }
+
+  if (! this->createContacts(ctx, err)) {
+    errMsg(err) << "Cannot create contacts.";
+    return false;
+  }
+
+  if (! this->createDTMFContacts(ctx, err)) {
+    errMsg(err) << "Cannot create DTMF contacts";
+    return false;
+  }
+
+  if (! this->createChannels(ctx, err)) {
+    errMsg(err) << "Cannot create channels.";
+    return false;
+  }
+
+  if (! this->createZones(ctx, err)) {
+    errMsg(err) << "Cannot create zones.";
+    return false;
+  }
+
+  if (! this->createGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot create group lists.";
+    return false;
+  }
+
+  if (! this->linkChannels(ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
+    return false;
+  }
+
+  if (! this->linkZones(ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
+    return false;
+  }
+
+  if (! this->linkGroupLists(ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
+    return false;
+  }
+
+  return true;
+}
+

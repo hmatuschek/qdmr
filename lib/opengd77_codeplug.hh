@@ -1,7 +1,7 @@
 #ifndef OPENGD77_CODEPLUG_HH
 #define OPENGD77_CODEPLUG_HH
 
-#include "gd77_codeplug.hh"
+#include "opengd77base_codeplug.hh"
 #include "opengd77_extension.hh"
 
 
@@ -53,223 +53,13 @@
  *  <tr><td>0x8e2a0</td> <td>0x8ee60</td> <td>0x0bc0</td> <td>??? Unknown ???</td></tr>
  * </table>
  * @ingroup ogd77 */
-class OpenGD77Codeplug: public GD77Codeplug
+class OpenGD77Codeplug: public OpenGD77BaseCodeplug
 {
   Q_OBJECT
 
 public:
   /** Possible image types. */
   enum ImageType { EEPROM = 0, FLASH = 1 };
-
-public:
-  /** Implements the OpenGD77 specific channel.
-   *
-   * Encoding of channel:
-   * @verbinclude opengd77_channel.txt */
-  class ChannelElement: public GD77Codeplug::ChannelElement
-  {
-  public:
-    /** Reuse Power enum from extension. */
-    typedef OpenGD77ChannelExtension::Power Power;
-
-  public:
-    /** Constructor. */
-    explicit ChannelElement(uint8_t *ptr);
-
-    void clear();
-
-    Channel::Power power() const;
-    void setPower(Channel::Power power);
-
-    /** If @c true, the scan zone skip is enabled. */
-    virtual bool scanZoneSkip() const;
-    /** Enables/disables scan zone skip. */
-    virtual void enableScanZoneSkip(bool enable);
-    /** If @c true, the scan all skip is enabled. */
-    virtual bool scanAllSkip() const;
-    /** Enables/disables scan all skip. */
-    virtual void enableScanAllSkip(bool enable);
-
-    /** Returns extended power settings. */
-    virtual Power extendedPower() const;
-    /** Sets extended power. */
-    virtual void setExtendedPower(Power power);
-
-    /** Returns @c true if the squelch is set to radio wide default. */
-    virtual bool squelchIsDefault() const;
-    /** Returns the quelch value [0-10]. 0=open, 10=closed. */
-    virtual unsigned squelch() const;
-    /** Sets the squelch value. */
-    virtual void setSquelch(unsigned squelch);
-    /** Sets the squelch to radio wide default. */
-    virtual void setSquelchDefault();
-
-    /** Returns @c true if the channel specific radio ID is set. */
-    virtual bool hasRadioId() const;
-    /** Returns the radio ID for the channel. Only valid if @c hasRadioId() returns @c true. */
-    virtual unsigned radioId() const;
-    /** Sets and enables the radio ID for the channel. */
-    virtual void setRadioId(unsigned id);
-    /** Clears the radio ID. */
-    virtual void clearRadioId();
-
-    Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
-    bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
-    bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
-
-    /* Reused fields in OpenGD77.
-     * The following properties are reused in the OpenGD77 firmware for other purposes.*/
-    /** Overridden, reused in OpenGD77. */
-    bool autoscan() const;
-    /** Overridden, reused in OpenGD77. */
-    void enableAutoscan(bool enable);
-    /** Overridden, reused in OpenGD77. */
-    bool loneWorker() const;
-    /** Overridden, reused in OpenGD77. */
-    void enableLoneWorker(bool enable);
-    /** Overridden, reused in OpenGD77. */
-    unsigned rxSignalingIndex() const;
-    /** Overridden, reused in OpenGD77. */
-    void setRXSignalingIndex(unsigned idx);
-    /** Overridden, reused in OpenGD77. */
-    PrivacyGroup privacyGroup() const ;
-    /** Overridden, reused in OpenGD77. */
-    void setPrivacyGroup(PrivacyGroup grp);
-
-  protected:
-    /** Some internal offsets within the element. */
-    struct Offset: public GD77Codeplug::ChannelElement::Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int extendedPower() { return 0x0019; }
-      static constexpr unsigned int squelch() { return 0x0037; }
-      static constexpr unsigned int radioID() { return 0x0027; }
-      /// @endcond
-    };
-  };
-
-  /** Implements the OpenGD77 specific zone.
-   *
-   * Encoding of zone:
-   * @verbinclude opengd77_zone.txt */
-  class ZoneElement: public RadioddityCodeplug::ZoneElement
-  {
-  public:
-    /** Constructor. */
-    explicit ZoneElement(uint8_t *ptr);
-
-    void clear();
-
-    /** The size of the zone element. */
-    static constexpr unsigned int size() { return 0x0000b0; }
-
-    bool linkZoneObj(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack()) const;
-    bool fromZoneObjA(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
-    bool fromZoneObjB(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
-
-  public:
-    /** Some limits for the zone element. */
-    struct Limit: public GD77Codeplug::ZoneElement::Limit {
-      /** The maximum number of channels per zone. */
-      static constexpr unsigned int channelCount() { return 80; }
-    };
-  };
-
-  /** Implements the OpenGD77 specific zone bank.
-   *
-   * Encoding of the entire zone bank:
-   * @verbinclude opengd77_zonebank.txt */
-  class ZoneBankElement: public RadioddityCodeplug::ZoneBankElement
-  {
-  public:
-    /** Constructor. */
-    explicit ZoneBankElement(uint8_t *ptr);
-
-    /** The size of the zone bank element. */
-    static constexpr unsigned int size() { return 0x20 + Limit::zoneCount()*ZoneElement::size(); }
-
-    uint8_t *get(unsigned n) const;
-    /** Returns the n-th zone element. */
-    ZoneElement zone(unsigned int n) const;
-
-  public:
-    /** Some limts for the zone bank. */
-    struct Limit {
-      /** The maximum number of zones in this bank. */
-      static constexpr unsigned int zoneCount() { return 68; }
-    };
-
-  protected:
-    /** Some internal offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int bitmap() { return 0x0000; }
-      static constexpr unsigned int zones() { return 0x0020; }
-      /// @endcond
-    };
-  };
-
-  /** Implements the OpenGD77 specific DMR contact.
-   *
-   * Encoding of the contact:
-   * @verbinclude opengd77_contact.txt
-   */
-  class ContactElement: public GD77Codeplug::ContactElement
-  {
-  public:
-    /** Reuse enum from extension. */
-    typedef OpenGD77ContactExtension::TimeSlotOverride TimeSlotOverride;
-
-  public:
-    /** Constructor. */
-    explicit ContactElement(uint8_t *ptr);
-
-    /** Resets the contact. */
-    void clear();
-    /** Returns @c true if the contact is valid. I.e., has a name. */
-    bool isValid() const;
-
-    void markValid(bool valid=true);
-
-    /** Returns @c true if this contact overrides the channel time slot. */
-    virtual bool overridesTimeSlot() const;
-    /** Returns the time slot associated with the contact.
-     * Only valid if @c overridesTimeSlot returns @c true. */
-    virtual DMRChannel::TimeSlot timeSlot() const;
-    /** Associates the given time slot with this contact.
-     * This will cause the use this time slot whenever this contact is chosen as the TX contact.
-     * Irrespective of the selected time slot of the channel. */
-    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
-    /** Disables time slot override feature. */
-    virtual void disableTimeSlotOverride();
-
-    DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
-    bool fromContactObj(const DMRContact *c, Context &ctx, const ErrorStack &err=ErrorStack());
-
-  protected:
-    /** Holds some offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int timslotOverride() { return 0x0017; }
-      /// @endcond
-    };
-  };
-
-  /** Implements the OpenGD77 specific group list.
-   *
-   * This class is identical to the GD77 one, but allows for private calls to be added to
-   * the group list. */
-  class GroupListElement: public GD77Codeplug::GroupListElement
-  {
-  protected:
-    /** Hidden constructor. */
-    GroupListElement(uint8_t *ptr, unsigned size);
-
-  public:
-    /** Constructor. */
-    GroupListElement(uint8_t *ptr);
-
-    bool fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
-  };
 
 public:
   /** Constructs an empty codeplug for the GD-77. */
@@ -280,12 +70,13 @@ public:
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void clearButtonSettings();
+  void clearDTMFSettings();
+  bool encodeDTMFSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeDTMFSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void clearScanLists();
-  bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  void clearAPRSSettings();
+  bool encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -301,12 +92,8 @@ public:
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
-  void clearMessages();
-  void clearMenuSettings();
-
-  void clearBootText();
-  bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
@@ -320,14 +107,11 @@ public:
   bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void clearEncryption();
-  bool encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err);
-  bool createEncryption(Context &ctx, const ErrorStack &err);
-  bool linkEncryption(Context &ctx, const ErrorStack &err);
-
 public:
-  /** Some limtis for the codeplug. */
-  struct Limit: public GD77Codeplug::Limit {
+  /** Some Limits for this codeplug. */
+  struct Limit: public Element::Limit {
+    /** Number of channel banks. */
+    static constexpr unsigned int channelBanks() { return 8; }
   };
 
 protected:
@@ -335,12 +119,11 @@ protected:
   struct ImageIndex {
     /// @cond DO_NOT_DOCUEMNT
     static constexpr unsigned int settings()     { return EEPROM; }
-    static constexpr unsigned int messages()     { return EEPROM; }
+    static constexpr unsigned int dtmfSettings() { return EEPROM; }
+    static constexpr unsigned int aprsSettings() { return EEPROM; }
     static constexpr unsigned int dtmfContacts() { return EEPROM; }
     static constexpr unsigned int channelBank0() { return EEPROM; }
     static constexpr unsigned int bootSettings() { return EEPROM; }
-    static constexpr unsigned int menuSettings() { return EEPROM; }
-    static constexpr unsigned int bootText()     { return EEPROM; }
     static constexpr unsigned int vfoA()         { return EEPROM; }
     static constexpr unsigned int vfoB()         { return EEPROM; }
     static constexpr unsigned int zoneBank()     { return EEPROM; }
@@ -353,13 +136,12 @@ protected:
   /** Some offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUEMNT
-    static constexpr unsigned int settings()     { return 0x0000e0; }
-    static constexpr unsigned int messages()     { return 0x000128; }
+    static constexpr unsigned int settings()     { return 0x000080; }
+    static constexpr unsigned int dtmfSettings() { return 0x001470; }
+    static constexpr unsigned int aprsSettings() { return 0x001588; }
     static constexpr unsigned int dtmfContacts() { return 0x002f88; }
     static constexpr unsigned int channelBank0() { return 0x003780; } // Channels 1-128
     static constexpr unsigned int bootSettings() { return 0x007518; }
-    static constexpr unsigned int menuSettings() { return 0x007538;}
-    static constexpr unsigned int bootText()     { return 0x007540; }
     static constexpr unsigned int vfoA()         { return 0x007590; }
     static constexpr unsigned int vfoB()         { return 0x0075c8; }
     static constexpr unsigned int zoneBank()     { return 0x008010; }
