@@ -453,8 +453,8 @@ OpenGD77BaseCodeplug::ChannelElement::setSquelch(SquelchMode mode, unsigned int 
 
 
 Channel *
-OpenGD77BaseCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const ErrorStack& err) const {
-  Q_UNUSED(ctx); Q_UNUSED(err)
+OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const ErrorStack& err) const {
+  Q_UNUSED(err); Q_UNUSED(ctx);
   Channel *ch = nullptr;
   if (MODE_ANALOG == mode()) {
     FMChannel *ach = new FMChannel(); ch = ach;
@@ -485,7 +485,7 @@ OpenGD77BaseCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const
 
 
 bool
-OpenGD77BaseCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack& err) const {
+OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const ErrorStack& err) const {
   Q_UNUSED(err)
 
   // Link common
@@ -501,7 +501,7 @@ OpenGD77BaseCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, c
 
 
 bool
-OpenGD77BaseCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, const ErrorStack& err) {
+OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack& err) {
   clear();
 
   setName(c->name());

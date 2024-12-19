@@ -15,6 +15,10 @@ class OpenGD77BaseCodeplug : public Codeplug
   Q_OBJECT
 
 public:
+  /** Possible image types. */
+  enum ImageType { EEPROM = 0, FLASH = 1 };
+
+public:
   /** Encodes an angle used to store locations. */
   static uint32_t encodeAngle(double degee);
   /** Decodes an angle used to store locations. */
@@ -202,11 +206,11 @@ public:
     virtual void setSquelch(SquelchMode mode, unsigned int level);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual Channel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual bool link(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool encode(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for this element. */

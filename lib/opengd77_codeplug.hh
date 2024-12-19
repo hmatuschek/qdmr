@@ -58,10 +58,6 @@ class OpenGD77Codeplug: public OpenGD77BaseCodeplug
   Q_OBJECT
 
 public:
-  /** Possible image types. */
-  enum ImageType { EEPROM = 0, FLASH = 1 };
-
-public:
   /** Constructs an empty codeplug for the GD-77. */
   explicit OpenGD77Codeplug(QObject *parent=nullptr);
 

@@ -141,6 +141,17 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << err.format();
       return -1;
     }
+  } else if (RadioInfo::OpenUV380 == radio) {
+    OpenGD77CallsignDB db;
+    if (! db.encode(&userdb, selection, err)) {
+      logError() << "Cannot encode call-sign DB: " << err.format();
+      return -1;
+    }
+    if (! db.write(parser.positionalArguments().at(1), err)) {
+      logError() << "Cannot write output call-sign DB file '" << parser.positionalArguments().at(1)
+                 << "': " << err.format();
+      return -1;
+    }
   } else if (RadioInfo::GD77 == radio) {
     GD77CallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
