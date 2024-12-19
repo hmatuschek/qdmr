@@ -46,7 +46,7 @@ RepeaterBookSource::load(const QString &queryCall, const QGeoCoordinate &pos) {
     url = QUrl("https://www.repeaterbook.com/api/export.php");
 
   QUrlQuery query;
-  query.addQueryItem("callsign", QString("%1%").arg(call));
+  query.addQueryItem("callsign", QString("%1").arg(call));
   url.setQuery(query);
   QNetworkRequest request(url);
   request.setHeader(QNetworkRequest::UserAgentHeader,
