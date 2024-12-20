@@ -1,5 +1,5 @@
-#ifndef OPENGD77CALLSIGNDB_HH
-#define OPENGD77CALLSIGNDB_HH
+#ifndef OPENUV380CALLSIGNDB_HH
+#define OPENUV380CALLSIGNDB_HH
 
 #include "opengd77base_callsigndb.hh"
 #include "userdatabase.hh"
@@ -16,13 +16,13 @@
  * efficient binary search. No index table is used here.
  *
  * @ingroup ogd77 */
-class OpenGD77CallsignDB : public OpenGD77BaseCallsignDB
+class OpenUV380CallsignDB : public OpenGD77BaseCallsignDB
 {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit OpenGD77CallsignDB(QObject *parent=nullptr);
+  explicit OpenUV380CallsignDB(QObject *parent=nullptr);
 
   /** Encodes as many entries as possible of the given user-database. */
   bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
@@ -35,7 +35,7 @@ public:
 
 protected:
   struct Offset {
-    static constexpr unsigned int callsignDB() { return 0x30000; }
+    static constexpr unsigned int callsignDB() { return 0x00050000; }
   };
 };
 

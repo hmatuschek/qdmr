@@ -7,7 +7,7 @@
 
 #include "opengd77base.hh"
 #include "openuv380_codeplug.hh"
-#include "opengd77_callsigndb.hh"
+#include "openuv380_callsigndb.hh"
 
 
 /** Implements an USB interface to Open UV380 VHF/UHF 5W DMR (Tier I&II) radios.
@@ -39,7 +39,7 @@ protected:
   /** The actual binary codeplug representation. */
   OpenUV380Codeplug _codeplug;
   /** The actual binary callsign DB representation. */
-  OpenGD77CallsignDB _callsigns;
+  OpenUV380CallsignDB _callsigns;
 };
 
 #endif // OPENGD77_HH
