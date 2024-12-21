@@ -20,7 +20,7 @@ SET(libdmrconf_SOURCES
     configobject.cc configreference.cc config.cc radiosettings.cc contact.cc rxgrouplist.cc
     channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc roamingzone.cc roamingchannel.cc
     callsigndb.cc talkgroupdatabase.cc radioid.cc encryptionextension.cc commercial_extension.cc
-    smsextension.cc
+    smsextension.cc satellitedatabase.cc orbitalelementsdatabase.cc transponderdatabase.cc
     tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
     md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
     md390.cc md390_codeplug.cc md390_filereader.cc md390_limits.cc
@@ -51,7 +51,7 @@ SET(libdmrconf_MOC_HEADERS
     configobject.hh configreference.hh config.hh radiosettings.hh contact.hh rxgrouplist.hh
     channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh roamingzone.hh roamingchannel.hh
     callsigndb.hh talkgroupdatabase.hh radioid.hh encryptionextension.hh commercial_extension.hh
-    smsextension.hh
+    smsextension.hh satellitedatabase.hh orbitalelementsdatabase.hh transponderdatabase.hh
     tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
     md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_limits.hh
     md390.hh md390_codeplug.hh md390_limits.hh
