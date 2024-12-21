@@ -2,7 +2,8 @@
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeatercompleter.hh"
+#include "repeaterdatabase.hh"
 #include "extensionwrapper.hh"
 #include "propertydelegate.hh"
 #include "settings.hh"
@@ -40,7 +41,7 @@ DigitalChannelDialog::construct() {
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
@@ -201,11 +202,11 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row())->rxFrequency();
-  double tx = app->repeater()->repeater(src.row())->txFrequency();
-  colorCode->setValue(app->repeater()->repeater(src.row())->colorCode());
-  txFrequency->setText(QString::number(tx, 'f'));
-  rxFrequency->setText(QString::number(rx, 'f'));
+  Frequency rx = app->repeater()->get(src.row()).rxFrequency();
+  Frequency tx = app->repeater()->get(src.row()).txFrequency();
+  colorCode->setValue(app->repeater()->get(src.row()).colorCode());
+  txFrequency->setText(tx.format());
+  rxFrequency->setText(rx.format());
 }
 
 void
