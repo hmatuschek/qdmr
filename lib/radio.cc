@@ -15,6 +15,7 @@
 #include "dm1701.hh"
 #include "dr1801uv.hh"
 #include "opengd77.hh"
+#include "openuv380.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
@@ -92,6 +93,8 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = ogd77->identifier();
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
+      } else if ((id.isValid() && (RadioInfo::OpenUV380 == id.id())) || (force.isValid() && (RadioInfo::OpenUV380 == force.id()))) {
+        return new OpenUV380(ogd77);
       } else {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";

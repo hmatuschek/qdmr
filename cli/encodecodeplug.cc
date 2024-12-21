@@ -12,6 +12,7 @@
 #include "gd73_codeplug.hh"
 #include "gd77_codeplug.hh"
 #include "opengd77_codeplug.hh"
+#include "openuv380_codeplug.hh"
 #include "openrtx_codeplug.hh"
 #include "md390_codeplug.hh"
 #include "uv390_codeplug.hh"
@@ -138,6 +139,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::OpenGD77:
     if (! encode<OpenGD77Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::OpenUV380:
+    if (! encode<OpenUV380Codeplug>(config, flags, parser))
       return -1;
     break;
   case RadioInfo::OpenRTX:

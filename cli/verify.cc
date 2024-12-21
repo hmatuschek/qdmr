@@ -16,6 +16,7 @@
 #include "md2017.hh"
 #include "gd77.hh"
 #include "opengd77.hh"
+#include "openuv380.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
@@ -114,6 +115,16 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     } break;
   case RadioInfo::OpenGD77: {
       OpenGD77 radio; ErrorStack err;
+      Config *intermediate = radio.codeplug().preprocess(&config, err);
+      if (nullptr == intermediate) {
+        logError() << "Cannot pre-process codeplug: " << err.format();
+        return -1;
+      }
+      radio.limits().verifyConfig(intermediate, ctx);
+      delete intermediate;
+    } break;
+  case RadioInfo::OpenUV380: {
+      OpenUV380 radio; ErrorStack err;
       Config *intermediate = radio.codeplug().preprocess(&config, err);
       if (nullptr == intermediate) {
         logError() << "Cannot pre-process codeplug: " << err.format();

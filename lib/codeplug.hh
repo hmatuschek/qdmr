@@ -58,6 +58,18 @@ public:
         const unsigned int byte;
         /** The bit within the byte. */
         const unsigned int bit;
+
+        /** Implements a simple increment. */
+        inline Bit operator+ (unsigned int bits) const {
+          unsigned int tmp = 8 * byte + (7-bit) + bits;
+          return {tmp/8, (7 - bit % 8)};
+        }
+
+        /** Implements a simple increment. */
+        inline Bit operator- (unsigned int bits) const {
+          unsigned int tmp = 8 * byte + (7-bit) - bits;
+          return {tmp/8, (7 - bit % 8)};
+        }
       };
     };
 

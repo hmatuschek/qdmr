@@ -24,6 +24,7 @@
 #include "gd73_codeplug.hh"
 #include "gd73_filereader.hh"
 #include "opengd77_codeplug.hh"
+#include "openuv380_codeplug.hh"
 #include "openrtx_codeplug.hh"
 #include "anytone_filereader.hh"
 #include "d868uv_codeplug.hh"
@@ -124,6 +125,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::OpenGD77:
     if (! decode<OpenGD77Codeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      return -1;
+    } break;
+  case RadioInfo::OpenUV380:
+    if (! decode<OpenUV380Codeplug, DummyFileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
       return -1;
     } break;

@@ -23,6 +23,7 @@
 #include "radioidrepeatersource.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
+#include "satellitedatabase.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"
@@ -40,6 +41,8 @@
 #include "chirpformat.hh"
 #include "configmergedialog.hh"
 #include "configmergevisitor.hh"
+#include "satellitedatabasedialog.hh"
+
 
 
 inline QStringList getLanguages() {
@@ -56,7 +59,7 @@ inline QString getLocalePath(const QString &language) {
 
 Application::Application(int &argc, char *argv[])
   : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _translator(nullptr),
-    _repeater(nullptr), _lastDevice()
+    _repeater(nullptr), _satellites(nullptr), _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -97,6 +100,8 @@ Application::Application(int &argc, char *argv[])
     _repeater->addSource(new RadioidRepeaterSource());
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
+  _satellites = new SatelliteDatabase(7, this);
+
   // create empty codeplug
   _config     = new Config(this);
 
@@ -219,6 +224,8 @@ Application::createMainWindow() {
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
+  QAction *refreshOrbitalElements  = _mainWindow->findChild<QAction*>("actionRefreshOrbitalElements");
+  QAction *editSatellites  = _mainWindow->findChild<QAction*>("actionEditSatellites");
 
   QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
@@ -237,6 +244,8 @@ Application::createMainWindow() {
 
   connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
   connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
+  connect(refreshOrbitalElements, SIGNAL(triggered()), _satellites, SLOT(update()));
+  connect(editSatellites, SIGNAL(triggered()), this, SLOT(editSatellites()));
 
   connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
   connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
@@ -969,6 +978,17 @@ Application::showAbout() {
 void
 Application::showHelp() {
   QDesktopServices::openUrl(QUrl("https://dm3mat.darc.de/qdmr/manual"));
+}
+
+
+void
+Application::editSatellites() {
+  SatelliteDatabaseDialog dialog(_satellites);
+  if (QDialog::Accepted == dialog.exec()) {
+    _satellites->save();
+  } else {
+    _satellites->load();
+  }
 }
 
 

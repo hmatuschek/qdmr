@@ -1,6 +1,7 @@
 #include "radioinfo.hh"
 
 #include "opengd77.hh"
+#include "openuv380.hh"
 #include "openrtx.hh"
 #include "gd73.hh"
 #include "gd77.hh"
@@ -19,47 +20,49 @@
 
 QHash<QString, RadioInfo::Radio>
 RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
-  {"opengd77", RadioInfo::OpenGD77},
-  {"openrtx",  RadioInfo::OpenRTX},
-  {"rd5r",     RadioInfo::RD5R},
-  {"gd73",     RadioInfo::GD73},
-  {"gd77",     RadioInfo::GD77},
-  {"md380",    RadioInfo::MD380},
-  {"md390",    RadioInfo::MD390},
-  {"rt8",      RadioInfo::RT8},
-  {"uv380",    RadioInfo::UV380},
-  {"uv390",    RadioInfo::UV390},
-  {"rt3s",     RadioInfo::RT3S},
-  {"md2017",   RadioInfo::MD2017},
-  {"rt82",     RadioInfo::RT82},
-  {"dm1701",   RadioInfo::DM1701},
-  {"rt84",     RadioInfo::RT84},
-  {"d868uv",   RadioInfo::D868UV},
-  {"d868uve",  RadioInfo::D868UVE},
-  {"dmr6x2uv", RadioInfo::DMR6X2UV},
-  {"d878uv",   RadioInfo::D878UV},
-  {"d878uv2",  RadioInfo::D878UVII},
-  {"d578uv",   RadioInfo::D578UV},
-  {"dr1801uv", RadioInfo::DR1801UV}
+  {"opengd77",  RadioInfo::OpenGD77},
+  {"openuv380", RadioInfo::OpenUV380},
+  {"openrtx",   RadioInfo::OpenRTX},
+  {"rd5r",      RadioInfo::RD5R},
+  {"gd73",      RadioInfo::GD73},
+  {"gd77",      RadioInfo::GD77},
+  {"md380",     RadioInfo::MD380},
+  {"md390",     RadioInfo::MD390},
+  {"rt8",       RadioInfo::RT8},
+  {"uv380",     RadioInfo::UV380},
+  {"uv390",     RadioInfo::UV390},
+  {"rt3s",      RadioInfo::RT3S},
+  {"md2017",    RadioInfo::MD2017},
+  {"rt82",      RadioInfo::RT82},
+  {"dm1701",    RadioInfo::DM1701},
+  {"rt84",      RadioInfo::RT84},
+  {"d868uv",    RadioInfo::D868UV},
+  {"d868uve",   RadioInfo::D868UVE},
+  {"dmr6x2uv",  RadioInfo::DMR6X2UV},
+  {"d878uv",    RadioInfo::D878UV},
+  {"d878uv2",   RadioInfo::D878UVII},
+  {"d578uv",    RadioInfo::D578UV},
+  {"dr1801uv",  RadioInfo::DR1801UV}
 };
 
 QHash<unsigned, RadioInfo>
 RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
-  {RadioInfo::OpenGD77, OpenGD77::defaultRadioInfo()},
-  {RadioInfo::OpenRTX,  OpenRTX::defaultRadioInfo()},
-  {RadioInfo::RD5R,     RD5R::defaultRadioInfo()},
-  {RadioInfo::GD73,     GD73::defaultRadioInfo()},
-  {RadioInfo::GD77,     GD77::defaultRadioInfo()},
-  {RadioInfo::MD390,    MD390::defaultRadioInfo()},
-  {RadioInfo::UV390,    UV390::defaultRadioInfo()},
-  {RadioInfo::MD2017,   MD2017::defaultRadioInfo()},
-  {RadioInfo::DM1701,   DM1701::defaultRadioInfo()},
-  {RadioInfo::D868UVE,  D868UV::defaultRadioInfo()},
-  {RadioInfo::D878UV,   D878UV::defaultRadioInfo()},
-  {RadioInfo::D878UVII, D878UV2::defaultRadioInfo()},
-  {RadioInfo::D578UV,   D578UV::defaultRadioInfo()},
-  {RadioInfo::DMR6X2UV, DMR6X2UV::defaultRadioInfo()},
-  {RadioInfo::DR1801UV, DR1801UV::defaultRadioInfo()}
+  {RadioInfo::OpenGD77,  OpenGD77::defaultRadioInfo()},
+  {RadioInfo::OpenUV380, OpenUV380::defaultRadioInfo()},
+  {RadioInfo::OpenRTX,   OpenRTX::defaultRadioInfo()},
+  {RadioInfo::RD5R,      RD5R::defaultRadioInfo()},
+  {RadioInfo::GD73,      GD73::defaultRadioInfo()},
+  {RadioInfo::GD77,      GD77::defaultRadioInfo()},
+  {RadioInfo::MD390,     MD390::defaultRadioInfo()},
+  {RadioInfo::UV390,     UV390::defaultRadioInfo()},
+  {RadioInfo::MD2017,    MD2017::defaultRadioInfo()},
+  {RadioInfo::DM1701,    DM1701::defaultRadioInfo()},
+  {RadioInfo::D868UVE,   D868UV::defaultRadioInfo()},
+  {RadioInfo::D878UV,    D878UV::defaultRadioInfo()},
+  {RadioInfo::D878UVII,  D878UV2::defaultRadioInfo()},
+  {RadioInfo::D578UV,    D578UV::defaultRadioInfo()},
+  {RadioInfo::DMR6X2UV,  DMR6X2UV::defaultRadioInfo()},
+  {RadioInfo::DR1801UV,  DR1801UV::defaultRadioInfo()}
 };
 
 

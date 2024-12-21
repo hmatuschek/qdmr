@@ -19,6 +19,7 @@ public:
   enum Radio {
     // Open source firmware
     OpenGD77,
+    OpenUV380,
     OpenRTX,
     // Radioddity devices
     RD5R,

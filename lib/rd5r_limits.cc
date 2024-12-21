@@ -154,7 +154,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
   add("commercial", new RadioLimitItem {
         {"encryptionKeys", new RadioLimitList(
          BasicEncryptionKey::staticMetaObject,
-         0, RadioddityCodeplug::EncryptionElement::Limit::basicEncryptionKeys(),
+         0, RadioddityCodeplug::EncryptionElement::Limit::keyCount(),
          new RadioLimitObject {
            {"name", new RadioLimitIgnored()},
            {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{8}")}
