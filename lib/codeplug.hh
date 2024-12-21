@@ -10,6 +10,7 @@
 
 class Config;
 class ConfigItem;
+class SatelliteDatabase;
 
 
 /** This class defines the interface all device-specific code-plugs must implement.
@@ -277,6 +278,9 @@ public:
     /** Returns the reference to the config object. */
     Config *config() const;
 
+    /** Returns a reference to the satellite database. */
+    SatelliteDatabase *satellites() const;
+
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
     ConfigItem *obj(const QMetaObject *elementType, unsigned idx);
@@ -326,6 +330,8 @@ public:
   protected:
     /** A weak reference to the config object. */
     Config *_config;
+    /** A weak reference to the satellite database. */
+    SatelliteDatabase *_satellites;
     /** Table of tables. */
     QHash<QString, Table> _tables;
   };

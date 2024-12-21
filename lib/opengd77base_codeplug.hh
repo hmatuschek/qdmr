@@ -6,6 +6,7 @@
 #include "gpssystem.hh"
 #include "contact.hh"
 #include "zone.hh"
+#include "satellitedatabase.hh"
 
 #include <QGeoCoordinate>
 
@@ -917,11 +918,11 @@ public:
     virtual void setName(const QString &name);
 
     /** Sets the epoch. */
-    virtual void setEpoch(unsigned int year, double julienDayOfYear);
+    virtual void setEpoch(const ::OrbitalElement::Epoch &epoch);
     /** Sets the first derivative of mean motion. */
-    virtual void setMeamMotion(double mm);
+    virtual void setMeanMotion(double mm);
     /** Sets the first derivative of mean motion. */
-    virtual void setMeamMotionDerivative(double dmm);
+    virtual void setMeanMotionDerivative(double dmm);
     /** Sets the inclination. */
     virtual void setInclination(double incl);
     /** Right ascension of the ascending node. */
@@ -951,6 +952,9 @@ public:
 
     /** Sets the APRS path. */
     void setAPRSPath(const QString &path);
+
+    /** Encodes a satellite. */
+    virtual bool encode(const Satellite &sat, const ErrorStack &err = ErrorStack());
 
   protected:
     /** Writes a fixed point value as a BCD number. Using 0-9 as digits, ah as decimal dot and bh
@@ -1006,6 +1010,45 @@ public:
       static constexpr unsigned int aprsUplink()   { return 0x0040; }
       static constexpr unsigned int beacon()       { return 0x0044; }
       static constexpr unsigned int aprsPath()     { return 0x004c; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a bank of several satellites for all OpenGD77 codeplugs. */
+  class OrbitalBankElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    OrbitalBankElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    OrbitalBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x09cc; }
+
+    /** Returns the i-th orbital element. */
+    OrbitalElement element(unsigned int i) const;
+
+    /** Encodes the given satellites. */
+    virtual bool encode(Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits for the element. */
+    struct Limit: public Element::Limit {
+      /** Maximum number of orbital elements. */
+      static constexpr unsigned int elements() { return 25; }
+    };
+
+  protected:
+    /** Some internal offset. */
+    struct Offset: public Element::Offset
+    {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int elements() { return 0x0008; }
+      static constexpr unsigned int betweenElements() { return OrbitalElement::size(); }
       /// @endcond
     };
   };

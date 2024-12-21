@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "logger.hh"
 #include "intermediaterepresentation.hh"
+#include "satellitedatabase.hh"
 
 
 /* ********************************************************************************************* *
@@ -1663,13 +1664,13 @@ OpenGD77BaseCodeplug::OrbitalElement::setName(const QString &name) {
 }
 
 void
-OpenGD77BaseCodeplug::OrbitalElement::setEpoch(unsigned int year, double julienDay) {
-  writeInteger(Offset::epochYear(), year%100, false, 2);
-  writeFixedPoint(Offset::epochJulienDay(), julienDay, false, 3, 8);
+OpenGD77BaseCodeplug::OrbitalElement::setEpoch(const::OrbitalElement::Epoch &epoch) {
+  writeInteger(Offset::epochYear(), epoch.year%100, false, 2);
+  writeFixedPoint(Offset::epochJulienDay(), epoch.toEpoch(), false, 3, 8);
 }
 
 void
-OpenGD77BaseCodeplug::OrbitalElement::setMeamMotionDerivative(double dmm) {
+OpenGD77BaseCodeplug::OrbitalElement::setMeanMotionDerivative(double dmm) {
   writeFixedPoint(Offset::meanMotionDerivative(), dmm, true, 0, 8);
 }
 
@@ -1699,7 +1700,7 @@ OpenGD77BaseCodeplug::OrbitalElement::setMeanAnomaly(double ma) {
 }
 
 void
-OpenGD77BaseCodeplug::OrbitalElement::setMeamMotion(double mm) {
+OpenGD77BaseCodeplug::OrbitalElement::setMeanMotion(double mm) {
   writeFixedPoint(Offset::meanMotion(), mm, false, 2, 8);
 }
 
@@ -1734,6 +1735,92 @@ OpenGD77BaseCodeplug::OrbitalElement::setAPRSDownlink(const Frequency &f) {
 void
 OpenGD77BaseCodeplug::OrbitalElement::setAPRSUplink(const Frequency &f) {
   setUInt32_le(Offset::aprsUplink(), f.inHz()/10);
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setBeacon(const Frequency &f) {
+  setUInt32_le(Offset::beacon(), f.inHz()/10);
+}
+
+
+void
+OpenGD77BaseCodeplug::OrbitalElement::setAPRSPath(const QString &path) {
+  writeASCII(Offset::aprsPath(), path, Limit::pathLength(), 0x00);
+}
+
+
+bool
+OpenGD77BaseCodeplug::OrbitalElement::encode(const Satellite &sat, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // meta
+  setName(sat.name());
+
+  // orbital elements
+  setMeanMotion(sat.meanMotion());
+  setMeanMotionDerivative(sat.meanMotionDerivative());
+  setInclination(sat.inclination());
+  setAscension(sat.ascension());
+  setEccentricity(sat.eccentricity());
+  setPerigee(sat.perigee());
+  setMeanAnomaly(sat.meanAnomaly());
+  setRevolutionNumber(sat.revolutionNumber());
+
+  // transponder
+  setFMDownlink(sat.fmDownlink());
+  setFMUplink(sat.fmUplink());
+  setCTCSS(sat.fmUplinkTone());
+  setAPRSDownlink(sat.aprsDownlink());
+  setAPRSUplink(sat.aprsUplink());
+  setBeacon(sat.beacon());
+
+  /// @bug set APRS path
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::OrbitalBankElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::OrbitalBankElement::OrbitalBankElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+OpenGD77BaseCodeplug::OrbitalBankElement::OrbitalBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+OpenGD77BaseCodeplug::OrbitalElement
+OpenGD77BaseCodeplug::OrbitalBankElement::element(unsigned int i) const {
+  return OrbitalElement(_data + Offset::elements() + i*Offset::betweenElements());
+}
+
+
+bool
+OpenGD77BaseCodeplug::OrbitalBankElement::encode(Context &ctx, const ErrorStack &err) {
+  const SatelliteDatabase *db = ctx.satellites();
+
+  for (unsigned int i=0; i<Limit::elements(); i++) {
+    if (db && (i<db->count())) {
+      const Satellite &sat = db->getAt(i);
+      if (! element(i).encode(sat)) {
+        errMsg(err) << "Cannot encode satellite '" << sat.name() << "' at index " << i << ".";
+        return false;
+      }
+    } else {
+      element(i).clear();
+    }
+  }
+
+  return true;
 }
 
 
