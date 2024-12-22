@@ -29,8 +29,10 @@ SET(libdmrconf_SOURCES
     radioddity_radio.cc radioddity_codeplug.cc radioddity_extensions.cc radioddity_interface.cc
     rd5r.cc rd5r_codeplug.cc rd5r_filereader.cc rd5r_limits.cc
     gd77.cc gd77_codeplug.cc gd77_callsigndb.cc gd77_filereader.cc gd77_limits.cc
-    opengd77.cc opengd77_interface.cc opengd77_codeplug.cc opengd77_extension.cc
-    opengd77_callsigndb.cc opengd77_limits.cc
+    opengd77_interface.cc opengd77base.cc opengd77base_codeplug.cc opengd77base_callsigndb.cc
+    opengd77_extension.cc opengd77_limits.cc
+    opengd77.cc opengd77_codeplug.cc opengd77_callsigndb.cc
+    openuv380.cc openuv380_codeplug.cc openuv380_callsigndb.cc
     openrtx.cc openrtx_interface.cc openrtx_codeplug.cc
     c7000device.cc gd73.cc gd73_interface.cc gd73_codeplug.cc gd73_filereader.cc gd73_limits.cc
     anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc anytone_limits.cc
@@ -58,8 +60,10 @@ SET(libdmrconf_MOC_HEADERS
     radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
     rd5r.hh rd5r_codeplug.hh rd5r_limits.hh
     gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_limits.hh
-    opengd77.hh opengd77_interface.hh opengd77_codeplug.hh opengd77_extension.hh
-    opengd77_callsigndb.hh opengd77_limits.hh
+    opengd77_interface.hh opengd77base.hh opengd77base_codeplug.hh opengd77base_callsigndb.hh
+    opengd77_extension.hh opengd77_limits.hh
+    opengd77.hh opengd77_codeplug.hh opengd77_callsigndb.hh
+    openuv380.hh openuv380_codeplug.hh openuv380_callsigndb.hh
     c7000device.hh gd73.hh gd73_interface.hh gd73_codeplug.hh gd73_limits.hh
     openrtx.hh openrtx_interface.hh openrtx_codeplug.hh
     anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh anytone_limits.hh

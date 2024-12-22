@@ -1,26 +1,25 @@
 /** @defgroup ogd77 Open GD-77 Firmware
- * Implements a radio running the Open GD77 firmware.
+ * Implements a radio running the Open MD-UV380 firmware.
  * @ingroup dsc */
 
-#ifndef OPENGD77_HH
-#define OPENGD77_HH
+#ifndef OPENUV380_HH
+#define OPENUV380_HH
 
 #include "opengd77base.hh"
-#include "opengd77_interface.hh"
-#include "opengd77_codeplug.hh"
-#include "opengd77_callsigndb.hh"
+#include "openuv380_codeplug.hh"
+#include "openuv380_callsigndb.hh"
 
 
-/** Implements an USB interface to Open GD-77(S) VHF/UHF 5W DMR (Tier I&II) radios.
+/** Implements an USB interface to Open UV380 VHF/UHF 5W DMR (Tier I&II) radios.
  *
  * @ingroup ogd77 */
-class OpenGD77 : public OpenGD77Base
+class OpenUV380 : public OpenGD77Base
 {
 	Q_OBJECT
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
-  explicit OpenGD77(OpenGD77Interface *device=nullptr, QObject *parent=nullptr);
+  explicit OpenUV380(OpenGD77Interface *device=nullptr, QObject *parent=nullptr);
 
 	const QString &name() const;
 
@@ -38,9 +37,9 @@ protected:
   /** The device identifier. */
 	QString _name;
   /** The actual binary codeplug representation. */
-  OpenGD77Codeplug _codeplug;
+  OpenUV380Codeplug _codeplug;
   /** The actual binary callsign DB representation. */
-  OpenGD77CallsignDB _callsigns;
+  OpenUV380CallsignDB _callsigns;
 };
 
 #endif // OPENGD77_HH

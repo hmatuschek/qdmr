@@ -1,5 +1,5 @@
-#ifndef OPENGD77TEST_HH
-#define OPENGD77TEST_HH
+#ifndef OPENUV380TEST_HH
+#define OPENUV380TEST_HH
 
 
 #include "libdmrconfigtest.hh"
@@ -7,12 +7,12 @@
 #include <QTextStream>
 #include "config.hh"
 
-class OpenGD77Test : public UnitTestBase
+class OpenUV380Test : public UnitTestBase
 {
   Q_OBJECT
 
 public:
-  explicit OpenGD77Test(QObject *parent = nullptr);
+  explicit OpenUV380Test(QObject *parent = nullptr);
 
 private slots:
   void testBasicConfigEncoding();
@@ -23,4 +23,4 @@ protected:
   QTextStream _stderr;
 };
 
-#endif // OPENGD77TEST_HH
+#endif // OPENUV380TEST_HH

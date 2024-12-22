@@ -225,6 +225,11 @@ SatelliteDatabase::transponders() {
   return _transponders;
 }
 
+unsigned int
+SatelliteDatabase::count() const {
+  return _satellites.count();
+}
+
 const Satellite &
 SatelliteDatabase::getAt(unsigned int idx) const {
   return _satellites[idx];

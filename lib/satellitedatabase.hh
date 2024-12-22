@@ -72,6 +72,7 @@ public:
   const TransponderDatabase &transponders() const;
   TransponderDatabase &transponders();
 
+  unsigned int count() const;
   const Satellite &getAt(unsigned int idx) const;
   void add(const Satellite &sat);
   bool removeRows(int row, int count, const QModelIndex &parent=QModelIndex());

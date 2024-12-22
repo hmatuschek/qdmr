@@ -1,4 +1,4 @@
-#include "opengd77_callsigndb.hh"
+#include "openuv380_callsigndb.hh"
 #include "utils.hh"
 #include "userdatabase.hh"
 #include <QtEndian>
@@ -8,17 +8,17 @@
 
 
 /* ******************************************************************************************** *
- * Implementation of OpenGD77CallsignDB
+ * Implementation of OpenUV380CallsignDB
  * ******************************************************************************************** */
-OpenGD77CallsignDB::OpenGD77CallsignDB(QObject *parent)
+OpenUV380CallsignDB::OpenUV380CallsignDB(QObject *parent)
   : OpenGD77BaseCallsignDB(parent)
 {
-  addImage("OpenGD77 call-sign database");
+  addImage("OpenUV380 call-sign database");
 }
 
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Limit entries to USERDB_NUM_ENTRIES
