@@ -2300,7 +2300,7 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
     ctx.add(config->zones()->zone(i), i);
 
   // Map DMR APRS systems
-  for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
+  for (int i=0,a=0; i<config->posSystems()->count(); i++) {
     if (config->posSystems()->system(i)->is<APRSSystem>()) {
       ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
     }

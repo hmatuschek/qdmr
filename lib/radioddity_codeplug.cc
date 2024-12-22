@@ -973,6 +973,10 @@ RadioddityCodeplug::GroupListElement::~GroupListElement() {
 void
 RadioddityCodeplug::GroupListElement::clear() {
   setName("");
+  if ((Offset::members() + Offset::betweenMembers()*Limit::memberCount()) > _size) {
+    logFatal() << "Cannot clear group list: Overflow.";
+    return;
+  }
   memset(_data+Offset::members(), 0, Offset::betweenMembers()*Limit::memberCount());
 }
 
@@ -1073,7 +1077,7 @@ RadioddityCodeplug::GroupListBankElement::~GroupListBankElement() {
 
 void
 RadioddityCodeplug::GroupListBankElement::clear() {
-  memset(_data, 0, 128);
+  memset(_data, 0, Limit::groupListCount());
 }
 
 bool
@@ -1095,6 +1099,10 @@ RadioddityCodeplug::GroupListBankElement::disable(unsigned n) {
 
 uint8_t *
 RadioddityCodeplug::GroupListBankElement::get(unsigned n) const {
+  if ((Offset::groupLists() + (n+1)*GroupListElement::size())>_size) {
+    logFatal() << "Cannot resolve group list at index " << n << ": Overflow.";
+    return nullptr;
+  }
   return _data + Offset::groupLists() + n*GroupListElement::size();
 }
 
@@ -2800,8 +2808,6 @@ RadioddityCodeplug::clear() {
   clearButtonSettings();
   // Clear messages
   clearMessages();
-  // Clear emergency systems
-  //clearEmergencySystems();
   // Clear contacts
   clearContacts();
   // clear DTMF contacts
