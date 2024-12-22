@@ -64,6 +64,11 @@ qt5_wrap_cpp(opengd77_MOC_SOURCES opengd77_test.hh)
 add_executable(opengd77_test opengd77_test.cc ${opengd77_MOC_SOURCES} ${testlib_RCC_SOURCES})
 target_link_libraries(opengd77_test ${LIBS} libdmrconf libdmrconfigtest)
 
+# Unit tests for OpenGD77 firmware
+qt5_wrap_cpp(openuv380_MOC_SOURCES openuv380_test.hh)
+add_executable(openuv380_test openuv380_test.cc ${openuv380_MOC_SOURCES} ${testlib_RCC_SOURCES})
+target_link_libraries(openuv380_test ${LIBS} libdmrconf libdmrconfigtest)
+
 
 # Unit tests for TyT devices
 qt5_wrap_cpp(md390_MOC_SOURCES md390_test.hh)

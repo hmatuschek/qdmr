@@ -17,10 +17,17 @@ GD77Test::testBasicConfigEncoding() {
   ErrorStack err;
   GD77Codeplug codeplug;
   codeplug.clear();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+
+  auto intermediate = codeplug.preprocess(&_basicConfig, err);
+  if (nullptr == intermediate)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
+
+  delete intermediate;
 }
 
 void
@@ -28,16 +35,23 @@ GD77Test::testBasicConfigDecoding() {
   ErrorStack err;
   GD77Codeplug codeplug;
   codeplug.clear();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
+
+  auto intermediate = codeplug.preprocess(&_basicConfig, err);
+  if (nullptr == intermediate)
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
+  delete intermediate;
 
   Config config;
   if (! codeplug.decode(&config, err)) {
     QFAIL(QString("Cannot decode codeplug for Radioddity GD77: %1")
           .arg(err.format()).toStdString().c_str());
   }
+  codeplug.clear();
 }
 
 void

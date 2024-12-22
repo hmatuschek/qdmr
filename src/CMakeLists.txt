@@ -11,9 +11,10 @@ SET(qdmr_SOURCES main.cc
   zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
   collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
   deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
-  configmergedialog.cc
+  configmergedialog.cc satellitedatabasedialog.cc satelliteselectiondialog.cc
   repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc
-  hearhamrepeatersource.cc radioidrepeatersource.cc selectivecallbox.cc)
+  hearhamrepeatersource.cc radioidrepeatersource.cc selectivecallbox.cc
+  transponderfrequencydelegate.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -28,9 +29,10 @@ SET(qdmr_MOC_HEADERS
   zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
   collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
   deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
-  configmergedialog.hh
+  configmergedialog.hh satellitedatabasedialog.hh satelliteselectiondialog.hh
   repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh
-  hearhamrepeatersource.hh radioidrepeatersource.hh selectivecallbox.hh)
+  hearhamrepeatersource.hh radioidrepeatersource.hh selectivecallbox.hh
+  transponderfrequencydelegate.hh)
 SET(qdmr_HEADERS )
 SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui
@@ -41,7 +43,7 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
   deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui
-  configmergedialog.ui)
+  configmergedialog.ui satellitedatabasedialog.ui satelliteselectiondialog.ui)
 
 set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})

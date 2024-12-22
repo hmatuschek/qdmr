@@ -652,7 +652,7 @@ Codeplug::Element::writeUnicode(unsigned offset, const QString &txt, unsigned ma
  * Implementation of CodePlug::Context
  * ********************************************************************************************* */
 Codeplug::Context::Context(Config *config)
-  : _config(config), _tables()
+  : _config(config), _satellites(nullptr), _tables()
 {
   // Add tables for common elements
   addTable(&DMRRadioID::staticMetaObject);
@@ -672,6 +672,11 @@ Codeplug::Context::Context(Config *config)
 Config  *
 Codeplug::Context::config() const {
   return _config;
+}
+
+SatelliteDatabase *
+Codeplug::Context::satellites() const {
+  return _satellites;
 }
 
 bool
