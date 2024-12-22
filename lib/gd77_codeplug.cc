@@ -244,6 +244,10 @@ GD77Codeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
 
 uint8_t *
 GD77Codeplug::GroupListBankElement::get(unsigned n) const {
+  if ((Offset::groupLists() + (n+1)*GroupListElement::size())>_size) {
+    logFatal() << "Cannot resolve group list at index " << n << ": Overflow.";
+    return nullptr;
+  }
   return _data + Offset::groupLists() + n*GroupListElement::size();
 }
 
@@ -621,7 +625,7 @@ void
 GD77Codeplug::clearGroupLists() {
   GroupListBankElement bank(data(Offset::groupListBank())); bank.clear();
   for (unsigned int i=0; i<GroupListBankElement::Limit::groupListCount(); i++)
-    GroupListElement(bank.get(i)).clear();
+    GroupListElement(bank.get(0)).clear();
 }
 
 bool

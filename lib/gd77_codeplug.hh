@@ -217,14 +217,14 @@ public:
     GroupListBankElement(uint8_t *ptr);
 
     /** The size of the group list bank. */
-    static constexpr unsigned int size() { return 0x1840; }
+    static constexpr unsigned int size() { return 0x1480; }
 
     uint8_t *get(unsigned n) const;
 
   public:
     /** Some limits for the group list bank. */
     struct Limit: public RadioddityCodeplug::GroupListBankElement::Limit {
-      static constexpr unsigned int groupListCount() { return 76; }   ///< Number of group lists.
+      static constexpr unsigned int groupListCount() { return 64; }   ///< Number of group lists.
     };
   };
 
