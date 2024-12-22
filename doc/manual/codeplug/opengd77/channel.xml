@@ -24,7 +24,13 @@
       name: Example channel 
       # all the other channel settings
       openGD77:
-        power: P750mW 
+        scanZoneSkip: false
+        scanAllSkip: false
+        beep: true
+        powerSave: true
+        location: JO62jl
+        talkerAliasTS1: APRS
+        talkerAliasTS2: Both
 ]]></programlisting>
 </example>
 
@@ -40,24 +46,11 @@
 </info>
 
 <para>
-  For now, there are only few attributes specifying more detailed power settings and scan behavior for the 
-  channel.
+  For now, there are only few attributes specifying scan behavior for the channel.
 </para>
 
 <variablelist>
   <title>Channel extension fields</title>
-  <varlistentry>
-    <term><token>power</token></term>
-    <listitem>
-      <para>Specifies the detailed power settings for the channel. This is one of the following 
-        strings <token>Global</token>, <token>P50mW</token>, <token>P250mW</token>, <token>P500mW</token>, 
-        <token>P750mW</token>, <token>P1W</token>, <token>P2W</token>, <token>P3W</token>, 
-        <token>P4W</token>, , <token>P5W</token>, <token>Max</token>. Where <token>Global</token> 
-        implies that the global power settings is used and <token>Max</token> the maximal possible 
-        power is used (usually 7W on VHF and 5.5W on UHF). This power setting overrides the 
-        common channel power setting. See <xref linkend="cpChannels"/>.</para>
-    </listitem>
-  </varlistentry>
   <varlistentry>
     <term>
       <token>scanZoneSkip</token>
@@ -70,6 +63,49 @@
         zone can be scanned. To exclude some channels from these scans, the 
         <token>scanZoneSkip</token> and <token>scanAllSkip</token> flags can be used. When enabled,
         the channel will be excluded from the respective scan.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>
+      <token>beep</token>
+    </term>
+    <listitem>
+      <para>
+        If enabled (default), the channel beeps are played.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>
+      <token>powerSave</token>
+    </term>
+    <listitem>
+      <para>
+        Enables the power save featrue for this channel (default).
+      </para>
+    </listitem>
+  </varlistentry>
+    <varlistentry>
+    <term>
+      <token>location</token>
+    </term>
+    <listitem>
+      <para>
+        Allows to specify a fixed location to be used for this channel and the associated APRS system.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>
+      <token>talkerAliasTS1</token>
+      <token>talkerAliasTS2</token>
+    </term>
+    <listitem>
+      <para>
+        Specifies what to be send as the talker alias, depending on the current timeslot. This must
+        be one of <token>None</token>, <token>APRS</token>, <token>Text</token> or
+        <token>Both</token>.
       </para>
     </listitem>
   </varlistentry>

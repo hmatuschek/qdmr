@@ -288,7 +288,7 @@ OpenGD77BaseCodeplug::ChannelElement::dmrId() const {
 void
 OpenGD77BaseCodeplug::ChannelElement::setDMRId(unsigned int dmrId) {
   setBit(Offset::overrideDMRID());
-
+  setUInt24_be(Offset::dmrId(), dmrId);
 }
 
 void
@@ -350,24 +350,49 @@ OpenGD77BaseCodeplug::ChannelElement::clearAPRSIndex() {
 }
 
 
-OpenGD77BaseCodeplug::ChannelElement::Alias
+OpenGD77ChannelExtension::TalkerAlias
 OpenGD77BaseCodeplug::ChannelElement::aliasTimeSlot1() const {
-  return (Alias) getUInt2(Offset::aliasTimeSlot1());
+  switch ((Alias) getUInt2(Offset::aliasTimeSlot1())) {
+  case Alias::None: return OpenGD77ChannelExtension::TalkerAlias::None;
+  case Alias::APRS: return OpenGD77ChannelExtension::TalkerAlias::APRS;
+  case Alias::Text: return OpenGD77ChannelExtension::TalkerAlias::Text;
+  case Alias::Both: return OpenGD77ChannelExtension::TalkerAlias::Both;
+  }
+
+  return OpenGD77ChannelExtension::TalkerAlias::None;
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setAliasTimeSlot1(Alias alias) {
-  setUInt2(Offset::aliasTimeSlot1(), (unsigned int)alias);
+OpenGD77BaseCodeplug::ChannelElement::setAliasTimeSlot1(OpenGD77ChannelExtension::TalkerAlias alias) {
+  switch (alias) {
+  case OpenGD77ChannelExtension::TalkerAlias::None: setUInt2(Offset::aliasTimeSlot1(), (unsigned int)Alias::None); break;
+  case OpenGD77ChannelExtension::TalkerAlias::APRS: setUInt2(Offset::aliasTimeSlot1(), (unsigned int)Alias::APRS); break;
+  case OpenGD77ChannelExtension::TalkerAlias::Text: setUInt2(Offset::aliasTimeSlot1(), (unsigned int)Alias::Text); break;
+  case OpenGD77ChannelExtension::TalkerAlias::Both: setUInt2(Offset::aliasTimeSlot1(), (unsigned int)Alias::Both); break;
+  }
 }
 
-OpenGD77BaseCodeplug::ChannelElement::Alias
+
+OpenGD77ChannelExtension::TalkerAlias
 OpenGD77BaseCodeplug::ChannelElement::aliasTimeSlot2() const {
-  return (Alias) getUInt2(Offset::aliasTimeSlot2());
+  switch ((Alias) getUInt2(Offset::aliasTimeSlot2())) {
+  case Alias::None: return OpenGD77ChannelExtension::TalkerAlias::None;
+  case Alias::APRS: return OpenGD77ChannelExtension::TalkerAlias::APRS;
+  case Alias::Text: return OpenGD77ChannelExtension::TalkerAlias::Text;
+  case Alias::Both: return OpenGD77ChannelExtension::TalkerAlias::Both;
+  }
+
+  return OpenGD77ChannelExtension::TalkerAlias::None;
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setAliasTimeSlot2(Alias alias) {
-  setUInt2(Offset::aliasTimeSlot2(), (unsigned int)alias);
+OpenGD77BaseCodeplug::ChannelElement::setAliasTimeSlot2(OpenGD77ChannelExtension::TalkerAlias alias) {
+  switch (alias) {
+  case OpenGD77ChannelExtension::TalkerAlias::None: setUInt2(Offset::aliasTimeSlot2(), (unsigned int)Alias::None); break;
+  case OpenGD77ChannelExtension::TalkerAlias::APRS: setUInt2(Offset::aliasTimeSlot2(), (unsigned int)Alias::APRS); break;
+  case OpenGD77ChannelExtension::TalkerAlias::Text: setUInt2(Offset::aliasTimeSlot2(), (unsigned int)Alias::Text); break;
+  case OpenGD77ChannelExtension::TalkerAlias::Both: setUInt2(Offset::aliasTimeSlot2(), (unsigned int)Alias::Both); break;
+  }
 }
 
 
@@ -475,13 +500,25 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   // Apply common settings
   ch->setName(name());
   ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
-  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
+  if (isSimplex())
+    ch->setTXFrequency(Frequency::fromHz(rxFrequency()));
+  else
+    ch->setTXFrequency(Frequency::fromHz(txFrequency()));
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
   if (vox())
     ch->setVOXDefault();
   else
     ch->disableVOX();
+
+  ch->setOpenGD77ChannelExtension(new OpenGD77ChannelExtension());
+  ch->openGD77ChannelExtension()->enableScanZoneSkip(skipZoneScan());
+  ch->openGD77ChannelExtension()->enableScanAllSkip(skipScan());
+  ch->openGD77ChannelExtension()->enableBeep(beep());
+  ch->openGD77ChannelExtension()->enablePowerSave(powerSave());
+  ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  ch->openGD77ChannelExtension()->setTalkerAliasTS1(aliasTimeSlot1());
+  ch->openGD77ChannelExtension()->setTalkerAliasTS2(aliasTimeSlot2());
 
   // done.
   return ch;
@@ -526,19 +563,21 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   clear();
 
   setName(c->name());
+
   setRXFrequency(c->rxFrequency().inHz());
   setTXFrequency(c->txFrequency().inHz());
+
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
   else
     setPower(c->power());
+
   enableRXOnly(c->rxOnly());
 
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
-
 
   if (c->is<FMChannel>()) {
     const FMChannel *ac = c->as<const FMChannel>();
@@ -563,6 +602,22 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
                 << "': Not supported by the radio.";
     return false;
   }
+
+  if (nullptr == c->openGD77ChannelExtension())
+    return true;
+
+  // apply extension
+  enableSkipZoneScan(c->openGD77ChannelExtension()->scanZoneSkip());
+  enableSkipScan(c->openGD77ChannelExtension()->scanAllSkip());
+  enableBeep(c->openGD77ChannelExtension()->beep());
+  enablePowerSave(c->openGD77ChannelExtension()->powerSave());
+  if (c->openGD77ChannelExtension()->location().isValid())
+    setFixedPosition(c->openGD77ChannelExtension()->location());
+  else
+    clearFixedPosition();
+
+  setAliasTimeSlot1(c->openGD77ChannelExtension()->talkerAliasTS1());
+  setAliasTimeSlot2(c->openGD77ChannelExtension()->talkerAliasTS2());
 
   return true;
 }
