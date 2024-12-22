@@ -147,23 +147,24 @@ bool
 OpenUV380Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
-  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++,c++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     ChannelBankElement bank(nullptr);
     if (0 == b)
       bank = ChannelBankElement(data(Offset::channelBank0(), ImageIndex::channelBank0()));
     else
       bank = ChannelBankElement(data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1()));
 
-    unsigned int i = c % ChannelBankElement::Limit::channelCount();
-    if (ctx.has<Channel>(c)) {
-      if (! bank.channel(i).encode(ctx.get<Channel>(c), ctx, err)) {
-        errMsg(err) << "Cannot encode channel '" << ctx.get<Channel>(c)->name()
-                    << "' at index " << i << " of bank " << b << ".";
-        return false;
+    for (unsigned int i=0; i<ChannelBankElement::Limit::channelCount(); i++, c++) {
+      if (ctx.has<Channel>(c)) {
+        if (! bank.channel(i).encode(ctx.get<Channel>(c), ctx, err)) {
+          errMsg(err) << "Cannot encode channel '" << ctx.get<Channel>(c)->name()
+                      << "' at index " << i << " of bank " << b << ".";
+          return false;
+        }
+        bank.enable(i, true);
+      } else {
+        bank.enable(i, false);
       }
-      bank.enable(i, true);
-    } else {
-      bank.enable(i, false);
     }
   }
 
@@ -172,24 +173,25 @@ OpenUV380Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorS
 
 bool
 OpenUV380Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
-  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++,c++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     ChannelBankElement bank(nullptr);
     if (0 == b)
       bank = ChannelBankElement(data(Offset::channelBank0(), ImageIndex::channelBank0()));
     else
       bank = ChannelBankElement(data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1()));
 
-    unsigned int i = c % ChannelBankElement::Limit::channelCount();
-    if (! bank.isEnabled(i))
-      continue;
+    for (unsigned int i=0; i<ChannelBankElement::Limit::channelCount(); i++, c++) {
+      if (! bank.isEnabled(i))
+        continue;
 
-    Channel *obj = bank.channel(i).decode(ctx, err);
-    if (nullptr == obj) {
-      errMsg(err) << "Cannot create channel from index " << i << " in bank " << b << ".";
-      return false;
+      Channel *obj = bank.channel(i).decode(ctx, err);
+      if (nullptr == obj) {
+        errMsg(err) << "Cannot create channel from index " << i << " in bank " << b << ".";
+        return false;
+      }
+      ctx.config()->channelList()->add(obj);
+      ctx.add(obj, c);
     }
-    ctx.config()->channelList()->add(obj);
-    ctx.add(obj, c);
   }
 
   return true;
@@ -204,15 +206,16 @@ OpenUV380Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     else
       bank = ChannelBankElement(data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1()));
 
-    unsigned int i = c % ChannelBankElement::Limit::channelCount();
-    if (! bank.isEnabled(i))
-      continue;
+    for (unsigned int i=0; i<ChannelBankElement::Limit::channelCount(); i++, c++) {
+      if (! bank.isEnabled(i))
+        continue;
 
-    Channel *obj = ctx.get<Channel>(i);
-    if (! bank.channel(i).link(obj, ctx, err)) {
-      errMsg(err) << "Cannot link channel '" << obj->name()
-                  << "' from index " << i << " in bank " << b << ".";
-      return false;
+      Channel *obj = ctx.get<Channel>(c);
+      if (! bank.channel(i).link(obj, ctx, err)) {
+        errMsg(err) << "Cannot link channel '" << obj->name()
+                    << "' from index " << i << " in bank " << b << ".";
+        return false;
+      }
     }
   }
 

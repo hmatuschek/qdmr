@@ -89,6 +89,8 @@ OpenGD77BaseCodeplug::ChannelElement::clear() {
   setTXTone(SelectiveCall());
   setColorCode(0);
   setGroupListIndex(0);
+  clearDMRId();
+
 }
 
 
@@ -286,11 +288,12 @@ OpenGD77BaseCodeplug::ChannelElement::dmrId() const {
 void
 OpenGD77BaseCodeplug::ChannelElement::setDMRId(unsigned int dmrId) {
   setBit(Offset::overrideDMRID());
-  setUInt24_be(Offset::dmrId(), dmrId);
+
 }
 
 void
 OpenGD77BaseCodeplug::ChannelElement::clearDMRId() {
+  setUInt24_be(Offset::dmrId(), 0x001600);
   clearBit(Offset::overrideDMRID());
 }
 
