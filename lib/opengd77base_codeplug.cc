@@ -1089,6 +1089,7 @@ OpenGD77BaseCodeplug::APRSSettingsBankElement::decode(Context &ctx, const ErrorS
         errMsg(err) << "Cannot decode APRS system at index " << i << ".";
         return false;
       }
+      ctx.config()->posSystems()->add(sys);
       ctx.add(sys, i);
     }
   }
@@ -1240,6 +1241,7 @@ OpenGD77BaseCodeplug::DTMFContactBankElement::decode(Context &ctx, const ErrorSt
       errMsg(err) << "Cannot decode DTMF contact at index " << i << ".";
       return false;
     }
+    ctx.config()->contacts()->add(cnt);
     ctx.add(cnt, i);
   }
 
@@ -1486,7 +1488,7 @@ OpenGD77BaseCodeplug::ZoneBankElement::clear() {
 
 bool
 OpenGD77BaseCodeplug::ZoneBankElement::isEnabled(unsigned idx) const {
-  unsigned byte=Offset::bitmap() + idx/8, bit = idx%8;
+  unsigned byte= Offset::bitmap() + idx/8, bit = idx%8;
   return getBit(byte, bit);
 }
 void
@@ -1533,6 +1535,7 @@ OpenGD77BaseCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &er
       return false;
     }
 
+    ctx.config()->zones()->add(obj);
     ctx.add(obj, i);
   }
 
@@ -2026,6 +2029,7 @@ OpenGD77BaseCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack 
       errMsg(err) << "Cannot decode contact at index " << i << ".";
       return false;
     }
+    ctx.config()->contacts()->add(cnt);
     ctx.add(cnt, i);
   }
   return true;
@@ -2130,7 +2134,7 @@ OpenGD77BaseCodeplug::GroupListElement::link(RXGroupList *lst, Context &ctx, con
     lst->addContact(ctx.get<DMRContact>(contactIndex(i)));
   }
 
-  return false;
+  return true;
 }
 
 
@@ -2214,6 +2218,7 @@ OpenGD77BaseCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStac
       errMsg(err) << "Cannot decode group list at index " << i << ".";
       return false;
     }
+    ctx.config()->rxGroupLists()->add(obj);
     ctx.add(obj, i);
   }
 

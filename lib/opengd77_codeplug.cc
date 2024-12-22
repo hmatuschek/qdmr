@@ -16,8 +16,8 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 {
   // Delete allocated image by GD77 codeplug
   addImage("OpenGD77 Codeplug EEPROM");
-  image(EEPROM).addElement(0x00080, 0x05f80);
-  image(EEPROM).addElement(0x07500, 0x0bb00);
+  image(EEPROM).addElement(0x00080, 0x05fe0);
+  image(EEPROM).addElement(0x07500, 0x03b00);
 
   addImage("OpenGD77 Codeplug FLASH");
   image(FLASH).addElement(0x00000, 0x011a0);
@@ -190,6 +190,7 @@ OpenGD77Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
       errMsg(err) << "Cannot create channel from index " << i << " in bank " << b << ".";
       return false;
     }
+    ctx.config()->channelList()->add(obj);
     ctx.add(obj, c);
   }
 

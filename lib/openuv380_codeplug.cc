@@ -16,9 +16,10 @@ OpenUV380Codeplug::OpenUV380Codeplug(QObject *parent)
 {
   addImage("OpenGD77 Codeplug EEPROM");
   addImage("OpenGD77 Codeplug FLASH");
-  /// @bug Update sections
-  image(FLASH).addElement(0, 0);
-  image(FLASH).addElement(0, 0);
+  image(FLASH).addElement(0x00000080, 0x00005fe0);
+  image(FLASH).addElement(0x00007500, 0x00003b00);
+  image(FLASH).addElement(0x00020000, 0x000011a0);
+  image(FLASH).addElement(0x0009b000, 0x00013e60);
 }
 
 void
@@ -187,6 +188,7 @@ OpenUV380Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
       errMsg(err) << "Cannot create channel from index " << i << " in bank " << b << ".";
       return false;
     }
+    ctx.config()->channelList()->add(obj);
     ctx.add(obj, c);
   }
 

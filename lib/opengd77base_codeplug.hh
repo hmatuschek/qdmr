@@ -1215,7 +1215,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 15; }
       /** Maximum number of contacts. */
-      static constexpr unsigned int contactCount() { return 1024; }
+      static constexpr unsigned int contactCount() { return 32; }
     };
 
   protected:
