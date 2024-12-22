@@ -1,10 +1,12 @@
 #include "opengd77_extension.hh"
+#include "utils.hh"
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77ChannelExtension
  * ******************************************************************************************** */
 OpenGD77ChannelExtension::OpenGD77ChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _power(Power::Global), _zoneSkip(false), _allSkip(false)
+  : ConfigExtension(parent), _zoneSkip(false), _allSkip(false), _beep(true), _powerSave(true),
+    _location(), _txTalkerAliasTS1(TalkerAlias::None), _txTalkerAliasTS2(TalkerAlias::None)
 {
   // pass...
 }
@@ -19,33 +21,93 @@ OpenGD77ChannelExtension::clone() const {
   return ex;
 }
 
-OpenGD77ChannelExtension::Power
-OpenGD77ChannelExtension::power() const {
-  return _power;
-}
-void
-OpenGD77ChannelExtension::setPower(Power power) {
-  _power = power;
-  emit modified(this);
-}
 
 bool
 OpenGD77ChannelExtension::scanZoneSkip() const {
   return _zoneSkip;
 }
+
 void
 OpenGD77ChannelExtension::enableScanZoneSkip(bool enable) {
   _zoneSkip = enable;
 }
 
+
 bool
 OpenGD77ChannelExtension::scanAllSkip() const {
   return _allSkip;
 }
+
 void
 OpenGD77ChannelExtension::enableScanAllSkip(bool enable) {
   _allSkip = enable;
 }
+
+
+bool
+OpenGD77ChannelExtension::beep() const {
+  return _beep;
+}
+
+void
+OpenGD77ChannelExtension::enableBeep(bool enable) {
+  _beep = enable;
+}
+
+
+bool
+OpenGD77ChannelExtension::powerSave() const {
+  return _powerSave;
+}
+
+void
+OpenGD77ChannelExtension::enablePowerSave(bool enable) {
+  _powerSave = enable;
+}
+
+const QGeoCoordinate &
+OpenGD77ChannelExtension::location() const {
+  return _location;
+}
+
+void
+OpenGD77ChannelExtension::setLocation(const QGeoCoordinate &loc) {
+  _location = loc;
+}
+
+QString
+OpenGD77ChannelExtension::locator() const {
+  return deg2loc(location());
+}
+
+void
+OpenGD77ChannelExtension::setLocator(const QString &loc) {
+  _location = loc2deg(loc);
+}
+
+
+OpenGD77ChannelExtension::TalkerAlias
+OpenGD77ChannelExtension::talkerAliasTS1() const {
+  return _txTalkerAliasTS1;
+}
+
+void
+OpenGD77ChannelExtension::setTalkerAliasTS1(TalkerAlias ta) {
+  _txTalkerAliasTS1 = ta;
+}
+
+
+OpenGD77ChannelExtension::TalkerAlias
+OpenGD77ChannelExtension::talkerAliasTS2() const {
+  return _txTalkerAliasTS2;
+}
+
+void
+OpenGD77ChannelExtension::setTalkerAliasTS2(TalkerAlias ta) {
+  _txTalkerAliasTS2 = ta;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of OpenGD77ContactExtension

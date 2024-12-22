@@ -44,7 +44,7 @@ public:
 
     /** Alias to transmit. */
     enum class Alias {
-      None, APRS, Text, Both
+      None = 0, APRS = 1, Text = 2, Both = 3
     };
 
     /** Possible squelch modes. */
@@ -162,13 +162,13 @@ public:
     virtual void clearAPRSIndex();
 
     /** Returns the alias transmitted on time slot 1. */
-    virtual Alias aliasTimeSlot1() const;
+    virtual OpenGD77ChannelExtension::TalkerAlias aliasTimeSlot1() const;
     /** Sets the alias transmitted on time slot 1. */
-    virtual void setAliasTimeSlot1(Alias alias);
+    virtual void setAliasTimeSlot1(OpenGD77ChannelExtension::TalkerAlias alias);
     /** Returns the alias transmitted on time slot 2. */
-    virtual Alias aliasTimeSlot2() const;
+    virtual OpenGD77ChannelExtension::TalkerAlias aliasTimeSlot2() const;
     /** Sets the alias transmitted on time slot 2. */
-    virtual void setAliasTimeSlot2(Alias alias);
+    virtual void setAliasTimeSlot2(OpenGD77ChannelExtension::TalkerAlias alias);
 
     /** Returns the time slot of the channel. */
     virtual DMRChannel::TimeSlot timeSlot() const;
