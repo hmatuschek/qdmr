@@ -1,23 +1,21 @@
-#include "opengd77_test.hh"
+#include "openuv380_test.hh"
 #include "config.hh"
-#include "opengd77_codeplug.hh"
+#include "openuv380_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
-#include <iostream>
 #include "logger.hh"
 
 
-OpenGD77Test::OpenGD77Test(QObject *parent)
+OpenUV380Test::OpenUV380Test(QObject *parent)
   : UnitTestBase(parent), _stderr(stderr)
 {
   Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
 }
 
 void
-OpenGD77Test::testBasicConfigEncoding() {
+OpenUV380Test::testBasicConfigEncoding() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
+  OpenUV380Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
@@ -26,9 +24,9 @@ OpenGD77Test::testBasicConfigEncoding() {
 }
 
 void
-OpenGD77Test::testBasicConfigDecoding() {
+OpenUV380Test::testBasicConfigDecoding() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
+  OpenUV380Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
@@ -43,9 +41,9 @@ OpenGD77Test::testBasicConfigDecoding() {
 }
 
 void
-OpenGD77Test::testChannelFrequency() {
+OpenUV380Test::testChannelFrequency() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
+  OpenUV380Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for OpenGD77: {}")
@@ -65,5 +63,6 @@ OpenGD77Test::testChannelFrequency() {
 }
 
 
-QTEST_GUILESS_MAIN(OpenGD77Test)
+
+QTEST_GUILESS_MAIN(OpenUV380Test)
 

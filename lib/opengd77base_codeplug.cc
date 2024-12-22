@@ -498,6 +498,23 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+    if (hasDMRId()) {
+      auto id = ctx.config()->radioIDs()->find(dmrId());
+      if (nullptr == id) {
+        id = new DMRRadioID(QString("Unknown ID"), dmrId());
+        ctx.config()->radioIDs()->add(id);
+      }
+      dc->setRadioIdObj(id);
+    }
+  } else if (c->is<FMChannel>()) {
+    auto fm = c->as<FMChannel>();
+    if (hasAPRSIndex()) {
+      if (! ctx.has<APRSSystem>(aprsIndex())) {
+        logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unkown index. (ignored)";
+      } else {
+        fm->setAPRSSystem(ctx.get<APRSSystem>(aprsIndex()));
+      }
+    }
   }
 
   return true;
@@ -530,6 +547,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // no per channel squelch setting
+    if (ac->aprsSystem() && (0<=ctx.index(ac->aprsSystem())))
+      setAPRSIndex(ctx.index(ac->aprsSystem()));
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
@@ -537,6 +556,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setColorCode(dc->colorCode());
     if (dc->groupListObj())
       setGroupListIndex(ctx.index(dc->groupListObj()));
+    if (dc->radioIdObj() != ctx.config()->settings()->defaultId())
+      setDMRId(dc->radioIdObj()->number());
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
                 << "': Not supported by the radio.";
@@ -2307,7 +2328,7 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
   for (int i=0; i<config->zones()->count(); i++)
     ctx.add(config->zones()->zone(i), i);
 
-  // Map DMR APRS systems
+  // Map FM APRS systems
   for (int i=0,a=0; i<config->posSystems()->count(); i++) {
     if (config->posSystems()->system(i)->is<APRSSystem>()) {
       ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
