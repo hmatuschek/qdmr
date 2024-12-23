@@ -221,6 +221,7 @@ Application::createMainWindow() {
   QAction *downCP  = _mainWindow->findChild<QAction*>("actionDownload");
   QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
   QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
+  QAction *upSat   = _mainWindow->findChild<QAction*>("actionWriteSatellites");
 
   QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
   QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
@@ -231,6 +232,8 @@ Application::createMainWindow() {
   QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
   QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
   QAction *quit    = _mainWindow->findChild<QAction*>("actionQuit");
+
+  upSat->setIcon(QIcon::fromTheme("device-write-satellite"));
 
   connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
   connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
@@ -252,6 +255,7 @@ Application::createMainWindow() {
   connect(downCP, SIGNAL(triggered()), this, SLOT(downloadCodeplug()));
   connect(upCP, SIGNAL(triggered()), this, SLOT(uploadCodeplug()));
   connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
+  connect(upSat, SIGNAL(triggered()), this, SLOT(uploadSatellites()));
 
   QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
 
@@ -867,6 +871,11 @@ Application::uploadCallsignDB() {
   }
 }
 
+
+void
+Application::uploadSatellites() {
+
+}
 
 void
 Application::onCodeplugUploadError(Radio *radio) {

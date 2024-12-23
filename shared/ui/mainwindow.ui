@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -92,6 +92,7 @@
     <addaction name="actionDownload"/>
     <addaction name="actionUpload"/>
     <addaction name="actionUploadCallsignDB"/>
+    <addaction name="actionWriteSatellites"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -141,6 +142,7 @@
    <addaction name="actionDownload"/>
    <addaction name="actionUpload"/>
    <addaction name="actionUploadCallsignDB"/>
+   <addaction name="actionWriteSatellites"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -359,6 +361,14 @@
    </property>
    <property name="toolTip">
     <string>Opens an editor to edit your satellite database.</string>
+   </property>
+  </action>
+  <action name="actionWriteSatellites">
+   <property name="text">
+    <string>Write satellites</string>
+   </property>
+   <property name="toolTip">
+    <string>Writes the orbital elements and transponder information onto the connected device.</string>
    </property>
   </action>
  </widget>
