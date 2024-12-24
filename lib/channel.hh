@@ -232,7 +232,7 @@ public:
   enum class Admit {
     Always,  ///< Allow always.
     Free,    ///< Allow when channel free.
-    Tone     ///< Allow when admit tone is present.
+    Tone     ///< Allow when free or wrong ctcss/dcs tone is present.
   };
   Q_ENUM(Admit)
 
@@ -381,7 +381,7 @@ public:
   enum class Admit {
     Always,      ///< No admit criteria, allows one to transmit any time.
     Free,        ///< Transmit only if channel is free.
-    ColorCode    ///< Transmit only if channel is free and matches given color code.
+    ColorCode    ///< Transmit if channel is free or differs given color code.
   };
   Q_ENUM(Admit)
 
