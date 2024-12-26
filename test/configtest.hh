@@ -28,6 +28,8 @@ private slots:
   void testMelodyEncoding();
   void testMelodyDecoding(); 
 
+  void testCTCSSNull();
+
 protected:
   QTextStream _stderr;
   Config _ctcssCopyTest;
