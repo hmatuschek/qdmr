@@ -153,12 +153,21 @@ public:
 
     /** Resets the contact. */
     void clear();
+
     /** Returns @c true if the contact is valid. */
     bool isValid() const;
-
     /** Marks the entry as valid/invalid. */
     virtual void markValid(bool valid=true);
-    void fromContactObj(const DMRContact *obj, Context &ctx);
+
+    bool fromContactObj(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: RadioddityCodeplug::ContactElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int validFlag() { return 0x0017; }
+      /// @endcond
+    };
   };
 
   /** Represents an RX group list within the codeplug.
@@ -175,14 +184,16 @@ public:
     /** Constructor. */
     GroupListElement(uint8_t *ptr);
 
-    /** Size of the group list element. */
+    /** The size of the element. */
     static constexpr unsigned int size() { return 0x0050; }
 
+    virtual bool linkRXGroupListObj(unsigned int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err = ErrorStack()) const;
+    virtual bool fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err = ErrorStack());
+
   public:
-    /** Limits of the element. */
-    struct Limit: public RadioddityCodeplug::GroupListElement::Limit {
-      /** Maximum member count. */
-      static constexpr unsigned int memberCount() { return 32; }
+    /** Some limits for the group list. */
+    struct Limit: public RadioddityCodeplug::GroupListElement {
+      static constexpr unsigned int memberCount() { return 32; }  ///< Maximum number of entries.
     };
   };
 
@@ -205,10 +216,16 @@ public:
     /** Constructor. */
     GroupListBankElement(uint8_t *ptr);
 
-    /** Size of the element. */
+    /** The size of the group list bank. */
     static constexpr unsigned int size() { return 0x1480; }
 
     uint8_t *get(unsigned n) const;
+
+  public:
+    /** Some limits for the group list bank. */
+    struct Limit: public RadioddityCodeplug::GroupListBankElement::Limit {
+      static constexpr unsigned int groupListCount() { return 64; }   ///< Number of group lists.
+    };
   };
 
   /** Represents a single scan list within the GD77 codeplug.
@@ -243,9 +260,28 @@ public:
     /** Constructor. */
     ScanListBankElement(uint8_t *ptr);
 
+    /** The size of the scan list bank. */
+    static constexpr unsigned int size() { return 0x1640; }
+
     /** Clears the scan list bank. */
     void clear();
+
     uint8_t *get(unsigned n) const;
+
+  public:
+    /** Some limits for the scan list bank. */
+    struct Limit: public RadioddityCodeplug::ScanListBankElement::Limit {
+      static constexpr unsigned int scanListCount() { return 64; } ///< Maximum number of scan lists.
+    };
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset: public RadioddityCodeplug::ScanListBankElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bytemap()   { return 0x0000; }
+      static constexpr unsigned int scanLists() { return 0x0040; }
+      /// @endcond
+    };
   };
 
 public:
@@ -254,8 +290,8 @@ public:
 
 public:
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
   bool encodeButtonSettings(Context &ctx, const Flags &flags, const ErrorStack &err=ErrorStack());
@@ -266,53 +302,76 @@ public:
   bool decodeMessages(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearDTMFContacts();
-  bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearBootSettings();
   void clearMenuSettings();
 
   void clearBootText();
-  bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearEncryption();
-  bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
-  bool createEncryption(Config *config, Context &ctx, const ErrorStack &err);
-  bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err);
+  bool encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool createEncryption(Context &ctx, const ErrorStack &err);
+  bool linkEncryption(Context &ctx, const ErrorStack &err);
+
+public:
+  /** Some limits for the GD77 codeplug. */
+  struct Limit {
+    static constexpr unsigned int dtmfContactCount() { return 32; }   ///< Maximum number of DTMF contacts.
+    static constexpr unsigned int channelBankCount() { return 8; }    ///< Number of channel banks.
+    static constexpr unsigned int channelCount()     { return 1024; } ///< Maximum number of channels.
+    static constexpr unsigned int contactCount()     { return 1024; } ///< Maximum number of contacts.
+  };
 
 protected:
-  /** Internal used offsets within the codeplug. */
+  /** Some internal offsets within the codeplug. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int buttonSettings()                          { return 0x000108; }
-    static constexpr unsigned int messages()                                { return 0x000128; }
+    static constexpr unsigned int settings()        { return 0x0000e0; }
+    static constexpr unsigned int buttons()         { return 0x000108; }
+    static constexpr unsigned int messages()        { return 0x000128; }
+    static constexpr unsigned int encryption()      { return 0x001370; }
+    static constexpr unsigned int scanListBank()    { return 0x001790; }
+    static constexpr unsigned int dtmfContacts()    { return 0x002f88; }
+    static constexpr unsigned int channelBank0()    { return 0x003780; } // Channels 1-128
+    static constexpr unsigned int bootSettings()    { return 0x007518; }
+    static constexpr unsigned int bootText()        { return 0x007540; }
+    static constexpr unsigned int menuSettings()    { return 0x007538; }
+    static constexpr unsigned int vfoA()            { return 0x007590; }
+    static constexpr unsigned int vfoB()            { return 0x0075c8; }
+    static constexpr unsigned int zoneBank()        { return 0x008010; }
+    static constexpr unsigned int channelBank1()    { return 0x00b1b0; } // Channels 129-1024
+    static constexpr unsigned int contacts()        { return 0x017620; }
+    static constexpr unsigned int groupListBank()   { return 0x01d620; }
     /// @endcond
   };
 };
