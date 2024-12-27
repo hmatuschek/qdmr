@@ -117,7 +117,7 @@ RepeaterDatabaseEntry::toJson() const {
 
   if (Type::FM == type()) {
     if (rxTone().isInvalid()) obj.insert("rx-tone", rxTone().format());
-    if (txTone().isInvalid()) obj.insert("tx-tone", rxTone().format());
+    if (txTone().isInvalid()) obj.insert("tx-tone", txTone().format());
   } else if (Type::DMR == type()) {
     obj.insert("color-code", (int)colorCode());
   }

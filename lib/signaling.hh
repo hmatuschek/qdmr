@@ -115,7 +115,7 @@ namespace YAML
         rhs = SelectiveCall::parseCTCSS(QString::fromStdString(node["ctcss"].as<std::string>()));
 
       if (node["dcs"])
-        rhs = SelectiveCall::parseDCS(QString::fromStdString(node["ctcss"].as<std::string>()));
+        rhs = SelectiveCall::parseDCS(QString::fromStdString(node["dcs"].as<std::string>()));
 
       return rhs.isValid();
     }

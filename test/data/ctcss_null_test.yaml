@@ -1,0 +1,61 @@
+---
+version: 0.12.1
+
+settings:
+  introLine1: DM3MAT
+  introLine2: qDMR
+  micLevel: 3
+  speech: false
+  power: High
+  squelch: 1
+  vox: 0
+  tot: 0
+  defaultID: id1
+
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+contacts:
+  - dmr: {id: cont1, name: Local, ring: false, type: GroupCall, number: 9}
+
+groupLists:
+  - {id: grp1, name: Local, contacts: [cont1]}
+
+channels:
+  - fm:
+      id: ch1
+      name: DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      rxTone: ~
+      txTone: {ctcss: 67}
+      power: High
+      timeout: 0
+      vox: 0
+
+  - fm:
+      id: ch2
+      name: DB0LDS
+      rxFrequency: 439.5625
+      txFrequency: 431.9625
+      rxOnly: false
+      admit: Always
+      rxTone: {dcs: i037}
+      txTone: {ctcss: 67.0 Hz}
+      power: High
+      timeout: 0
+      vox: 0
+
+scanLists:
+  - id: scan1
+    name: KW
+    channels: [ch1]
+
+zones:
+  - id: zone1
+    name: Zu Hause
+    A: [ch1]
+    B: []
+...

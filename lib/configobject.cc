@@ -650,7 +650,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
     } else if (QString("SelectiveCall") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()]) {
+      if ((! node[prop.name()]) || (node[prop.name()].IsNull())) {
         prop.write(this, QVariant::fromValue(SelectiveCall()));
         continue;
       }
