@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Geen]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -16,17 +16,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Digipeater</source>
-        <translation type="unfinished"></translation>
+        <translation>Digipeater</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefoon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>DX cluster</source>
-        <translation type="unfinished"></translation>
+        <translation>DX cluster</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="12"/>
@@ -36,17 +36,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>Plane small</source>
-        <translation type="unfinished"></translation>
+        <translation>Vliegtuig klein</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Mobile Satellite station</source>
-        <translation type="unfinished"></translation>
+        <translation>Mobiel satelliet station</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Wheel Chair</source>
-        <translation type="unfinished"></translation>
+        <translation>Rolstoel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
@@ -66,12 +66,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Thuis</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="21"/>
@@ -81,57 +81,57 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Circle 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 0</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 1</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 2</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 3</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 4</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 5</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 6</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 6</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 7</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 7</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 8</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 8</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 9</source>
-        <translation type="unfinished"></translation>
+        <translation>Cirkel 9</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuur</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
@@ -141,7 +141,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="34"/>
         <source>Motorcycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Motorfiets</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="35"/>
@@ -151,7 +151,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="36"/>
         <source>Car</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="37"/>
@@ -196,17 +196,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="45"/>
         <source>Hotel</source>
-        <translation type="unfinished"></translation>
+        <translation>Hotel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="46"/>
         <source>TCP/IP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP/IP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="47"/>
         <source>School</source>
-        <translation type="unfinished"></translation>
+        <translation>School</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="48"/>
@@ -216,7 +216,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="49"/>
         <source>MacOS</source>
-        <translation type="unfinished"></translation>
+        <translation>MacOS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="50"/>
@@ -226,12 +226,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>Balloon</source>
-        <translation type="unfinished"></translation>
+        <translation>Ballon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
         <source>Police car</source>
-        <translation type="unfinished"></translation>
+        <translation>Politie auto</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="53"/>
@@ -251,12 +251,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="56"/>
         <source>SSTV</source>
-        <translation type="unfinished"></translation>
+        <translation>SSTV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="57"/>
         <source>Bus</source>
-        <translation type="unfinished"></translation>
+        <translation>Bus</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="58"/>
@@ -281,17 +281,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="62"/>
         <source>MS Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>MS Windows</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="63"/>
         <source>Jogger</source>
-        <translation type="unfinished"></translation>
+        <translation>Jogger</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="64"/>
         <source>Triangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Driehoek</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="65"/>
@@ -301,27 +301,27 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
         <source>Plane large</source>
-        <translation type="unfinished"></translation>
+        <translation>Vliegtuig groot</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="67"/>
         <source>Weather station</source>
-        <translation type="unfinished"></translation>
+        <translation>Weerstation</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="68"/>
         <source>Dish antenna</source>
-        <translation type="unfinished"></translation>
+        <translation>Schotelantenne</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="69"/>
         <source>Ambulance</source>
-        <translation type="unfinished"></translation>
+        <translation>Ambulance</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="70"/>
         <source>Bike</source>
-        <translation type="unfinished"></translation>
+        <translation>Fiets</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="71"/>
@@ -336,7 +336,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="73"/>
         <source>Horse</source>
-        <translation type="unfinished"></translation>
+        <translation>Paard</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="74"/>
@@ -351,7 +351,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="76"/>
         <source>Hospital</source>
-        <translation type="unfinished"></translation>
+        <translation>Ziekenhuis</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="77"/>
@@ -361,7 +361,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="78"/>
         <source>Jeep</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeep</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="79"/>
@@ -371,7 +371,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="80"/>
         <source>Laptop</source>
-        <translation type="unfinished"></translation>
+        <translation>Laptop</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="81"/>
@@ -401,7 +401,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="86"/>
         <source>Antenna</source>
-        <translation type="unfinished"></translation>
+        <translation>Antenne</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="87"/>
@@ -426,7 +426,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="91"/>
         <source>Water</source>
-        <translation type="unfinished"></translation>
+        <translation>Water</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="92"/>
@@ -436,7 +436,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="93"/>
         <source>Yagi</source>
-        <translation type="unfinished"></translation>
+        <translation>Yagi</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="94"/>
@@ -474,7 +474,7 @@
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="76"/>
         <source>Supported Radios</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondersteunde Radios</translation>
     </message>
 </context>
 <context>
@@ -483,7 +483,7 @@
         <location filename="../src/analogchanneldialog.cc" line="57"/>
         <location filename="../src/analogchanneldialog.cc" line="75"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Geen]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="14"/>
@@ -503,7 +503,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="65"/>
@@ -518,32 +518,32 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Vermogen</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="95"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Max</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="100"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoog</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="105"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation>Mid</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="110"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Laag</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="115"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>Min</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
@@ -562,7 +562,7 @@
         <location filename="../src/analogchanneldialog.ui" line="141"/>
         <location filename="../src/analogchanneldialog.ui" line="172"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Uit</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="163"/>
@@ -577,7 +577,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="201"/>
         <source>Scan List</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Lijst</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="221"/>
@@ -587,62 +587,62 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="229"/>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="234"/>
         <source>Channel Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal Vrij</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="239"/>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="247"/>
         <source>Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="254"/>
         <source>Rx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>RX Toon</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="261"/>
         <source>Tx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Toon</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="268"/>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbreedte</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="276"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Smal (12.5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="281"/>
         <source>Wide (25 kHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Breed (25 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="289"/>
         <source>APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Open</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="343"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensies</translation>
     </message>
 </context>
 <context>
@@ -650,18 +650,18 @@
     <message>
         <location filename="../src/application.cc" line="251"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="265"/>
         <location filename="../src/application.cc" line="905"/>
         <source>Radio IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio IDs</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="269"/>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Contacten</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="273"/>
@@ -671,38 +671,38 @@
     <message>
         <location filename="../src/application.cc" line="277"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="281"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="285"/>
         <source>Scan Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Lijsten</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="289"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="293"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming Kanalen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="297"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Roaming Zones</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="302"/>
         <location filename="../src/application.cc" line="919"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensies</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="321"/>
@@ -723,7 +723,7 @@
     <message>
         <location filename="../src/application.cc" line="347"/>
         <source>Open codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Open codeplug</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="349"/>
@@ -847,7 +847,7 @@
     <message>
         <location filename="../src/application.cc" line="593"/>
         <source>Cannot connect to radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan niet verbinden met radio</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="594"/>
@@ -857,7 +857,7 @@
     <message>
         <location filename="../src/application.cc" line="604"/>
         <source>Radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio gevonden</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="604"/>
@@ -871,7 +871,7 @@
         <location filename="../src/application.cc" line="746"/>
         <location filename="../src/application.cc" line="787"/>
         <source>No radio found</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen radio gevonden</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="608"/>
@@ -900,7 +900,7 @@
     <message>
         <location filename="../src/application.cc" line="701"/>
         <source>Read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Leesfout</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="720"/>
@@ -910,7 +910,7 @@
     <message>
         <location filename="../src/application.cc" line="774"/>
         <source>Upload ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Upload …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="794"/>
@@ -942,7 +942,7 @@
     <message>
         <location filename="../src/application.cc" line="864"/>
         <source>Write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Schrijffout</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="876"/>
@@ -1021,7 +1021,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="55"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt+C</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="62"/>
@@ -1190,7 +1190,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="436"/>
         <source>Zones</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zones</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="437"/>
@@ -1235,17 +1235,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="445"/>
         <source>Rx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RX Toon</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="446"/>
         <source>Tx Tone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TX Toon</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="447"/>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bandbreedte</translation>
     </message>
 </context>
 <context>
@@ -1253,7 +1253,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="475"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kanaal</translation>
     </message>
 </context>
 <context>
@@ -1594,17 +1594,17 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="644"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="646"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="648"/>
         <source>RX Tone</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RX Toon</translation>
     </message>
 </context>
 <context>
@@ -1647,7 +1647,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="40"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="50"/>
@@ -1675,7 +1675,7 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naam</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="40"/>
@@ -1747,7 +1747,7 @@
         <location filename="../src/digitalchanneldialog.cc" line="83"/>
         <location filename="../src/digitalchanneldialog.cc" line="90"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[Geen]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="91"/>
@@ -1788,7 +1788,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="85"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vermogen</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="92"/>
@@ -1803,32 +1803,32 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="109"/>
         <source>Scan List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scan Lijst</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="122"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="127"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hoog</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="132"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mid</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="137"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Laag</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="142"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Min</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="150"/>
@@ -1846,7 +1846,7 @@
         <location filename="../src/digitalchanneldialog.ui" line="164"/>
         <location filename="../src/digitalchanneldialog.ui" line="195"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uit</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="186"/>
@@ -2591,12 +2591,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="755"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="756"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Bericht</translation>
     </message>
 </context>
 <context>
@@ -2614,7 +2614,7 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="121"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Geen]</translation>
     </message>
 </context>
 <context>
@@ -2632,12 +2632,12 @@
     <message>
         <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarde</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="583"/>
@@ -2653,7 +2653,7 @@
         <location filename="../src/extensionwrapper.cc" line="603"/>
         <location filename="../src/extensionwrapper.cc" line="611"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Geen]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="613"/>
@@ -2671,7 +2671,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Geen]</translation>
     </message>
 </context>
 <context>
@@ -2842,7 +2842,7 @@
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="22"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="29"/>
@@ -3279,7 +3279,7 @@
     <message>
         <location filename="../src/searchpopup.cc" line="18"/>
         <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+F</translation>
     </message>
     <message>
         <location filename="../src/searchpopup.cc" line="94"/>
@@ -3321,27 +3321,27 @@
     <message>
         <location filename="../src/settings.cc" line="454"/>
         <source>Warning!</source>
-        <translation type="unfinished"></translation>
+        <translation>Waarschuwing!</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="36"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Locatie</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="42"/>
         <source>System location</source>
-        <translation type="unfinished"></translation>
+        <translation>Systeem locatie</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="56"/>
         <source>Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>Locator</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="69"/>
@@ -3369,7 +3369,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="197"/>
         <source>Update codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Update codeplug</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="204"/>
@@ -3404,7 +3404,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="98"/>
         <source>World</source>
-        <translation type="unfinished"></translation>
+        <translation>Wereld</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="103"/>
@@ -3454,7 +3454,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="265"/>
         <source>Ignore frequency limits</source>
-        <translation type="unfinished"></translation>
+        <translation>Negeer frequentie limieten</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="272"/>
@@ -3556,7 +3556,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="65"/>
@@ -3661,7 +3661,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="675"/>
         <source>Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone</translation>
     </message>
 </context>
 <context>
@@ -3679,12 +3679,12 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="36"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="46"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaal</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="56"/>
@@ -3719,7 +3719,7 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="186"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Extensies</translation>
     </message>
 </context>
 </TS>
