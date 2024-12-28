@@ -32,12 +32,24 @@ OpenGD77Test::encodeDecode(Config &config, Config &decoded, const ErrorStack &er
   OpenGD77Codeplug codeplug;
   codeplug.clear();
 
-  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
     errMsg(err) << "Cannot encode codeplug for OpenGD77.";
     return false;
   }
 
+  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
+    errMsg(err) << "Cannot encode codeplug for OpenGD77.";
+    return false;
+  }
+  delete intermediate;
+
   if (! codeplug.decode(&decoded, err)) {
+    errMsg(err) << "Cannot decode codeplug for OpenGD77.";
+    return false;
+  }
+
+  if (! codeplug.postprocess(&decoded, err)) {
     errMsg(err) << "Cannot decode codeplug for OpenGD77.";
     return false;
   }
@@ -75,7 +87,6 @@ OpenGD77Test::testChannelPowerSettings() {
   ErrorStack err;
 
   Config config, decoded;
-  OpenGD77Codeplug codeplug;
   if (! config.readYAML(":/data/config_test.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toLocal8Bit().constData());
@@ -97,6 +108,16 @@ OpenGD77Test::testChannelPowerSettings() {
     QFAIL(err.format().toLocal8Bit().constData());
   QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
   QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::High);
+
+
+  // Check re-encoding power settings.
+  OpenGD77Codeplug codeplug;
+  config.channelList()->channel(0)->setPower(Channel::Power::High);
+  codeplug.encode(&config, Codeplug::Flags());
+  config.channelList()->channel(0)->setDefaultPower();
+  codeplug.encode(&config, Codeplug::Flags());
+  codeplug.decode(&decoded, err);
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), true);
 }
 
 
