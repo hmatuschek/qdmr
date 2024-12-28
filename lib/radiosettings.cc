@@ -44,6 +44,12 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
+  defaultIdRef()->clear();
+
+  // delete extensions
+  setTyTExtension(nullptr);
+  setRadioddityExtension(nullptr);
+  setAnytoneExtension(nullptr);
 }
 
 const QString &
