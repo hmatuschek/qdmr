@@ -159,6 +159,7 @@ OpenGD77BaseCodeplug::ChannelElement::power() const {
   default:
   break;
   }
+
   return Channel::Power::Min;
 }
 
@@ -504,7 +505,10 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
     ch->setTXFrequency(Frequency::fromHz(rxFrequency()));
   else
     ch->setTXFrequency(Frequency::fromHz(txFrequency()));
-  ch->setPower(power());
+  if (globalPower())
+    ch->setDefaultPower();
+  else
+    ch->setPower(power());
   ch->setRXOnly(rxOnly());
   if (vox())
     ch->setVOXDefault();
@@ -568,9 +572,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   setTXFrequency(c->txFrequency().inHz());
   enableSimplex(false);
 
-  if (c->defaultPower())
-    setPower(ctx.config()->settings()->power());
-  else
+  clearPower();
+  if (! c->defaultPower())
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());

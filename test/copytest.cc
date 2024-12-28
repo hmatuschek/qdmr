@@ -11,19 +11,60 @@ CopyTest::CopyTest(QObject *parent)
 void
 CopyTest::testChannelClone() {
   QHash<ConfigObject *, ConfigObject *> map;
-  ConfigCloneVisitor cloner(map);
-  Channel *ch = _basicConfig.channelList()->channel(0);
 
   ErrorStack err;
-  if (! cloner.processItem(ch, err)) {
-    QFAIL(err.format().toLocal8Bit().constData());
+  ConfigCloneVisitor cloner(map);
+
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml"))
+    QFAIL("Cannot load config.");
+  auto ch = config.channelList()->channel(0);
+
+  {
+    if (! cloner.processItem(ch, err))
+      QFAIL(err.format().toLocal8Bit().constData());
+
+    ConfigItem *item = cloner.takeResult(err);
+    QVERIFY(item);
+    QCOMPARE(ch->compare(*item), 0);
+    delete item;
   }
 
-  ConfigItem *item = cloner.takeResult(err);
-  QVERIFY(item);
+  {
+    ch->setPower(Channel::Power::Min);
+    ch->setTimeout(60);
+    ch->setVOX(3);
 
-  QCOMPARE(ch->compare(*item), 0);
+    if (! cloner.processItem(ch, err))
+      QFAIL(err.format().toLocal8Bit().constData());
+
+    ConfigItem *item = cloner.takeResult(err);
+    QVERIFY(item);
+    QVERIFY(item->is<Channel>());
+    QCOMPARE(item->as<Channel>()->power(), Channel::Power::Min);
+    QCOMPARE(item->as<Channel>()->timeout(), 60);
+    QCOMPARE(item->as<Channel>()->vox(), 3);
+    delete item;
+  }
+
+  {
+    ch->setDefaultPower();
+    ch->setDefaultTimeout();
+    ch->setVOXDefault();
+
+    if (! cloner.processItem(ch, err))
+      QFAIL(err.format().toLocal8Bit().constData());
+
+    ConfigItem *item = cloner.takeResult(err);
+    QVERIFY(item);
+    QVERIFY(item->is<Channel>());
+    QVERIFY(item->as<Channel>()->defaultPower());
+    QVERIFY(item->as<Channel>()->defaultTimeout());
+    QVERIFY(item->as<Channel>()->defaultVOX());
+    delete item;
+  }
 }
+
 
 void
 CopyTest::testConfigClone() {
