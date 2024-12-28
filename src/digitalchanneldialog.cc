@@ -117,7 +117,7 @@ DigitalChannelDialog::construct() {
     case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
     case Channel::Power::High: powerValue->setCurrentIndex(1); break;
     case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
-      case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
+    case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }

@@ -571,9 +571,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   setRXFrequency(c->rxFrequency().inHz());
   setTXFrequency(c->txFrequency().inHz());
 
-  if (c->defaultPower())
-    clearPower();
-  else
+  clearPower();
+  if (! c->defaultPower())
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());

@@ -89,11 +89,13 @@ OpenGD77Test::testChannelPowerSettings() {
   config.channelList()->channel(0)->setPower(Channel::Power::Low);
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
   QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::Low);
 
   config.channelList()->channel(0)->setPower(Channel::Power::High);
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
   QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::High);
 }
 
