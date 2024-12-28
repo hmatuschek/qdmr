@@ -566,6 +566,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
 
   setRXFrequency(c->rxFrequency().inHz());
   setTXFrequency(c->txFrequency().inHz());
+  enableSimplex(false);
 
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
