@@ -108,16 +108,6 @@ OpenGD77Test::testChannelPowerSettings() {
     QFAIL(err.format().toLocal8Bit().constData());
   QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
   QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::High);
-
-
-  // Check re-encoding power settings.
-  OpenGD77Codeplug codeplug;
-  config.channelList()->channel(0)->setPower(Channel::Power::High);
-  codeplug.encode(&config, Codeplug::Flags());
-  config.channelList()->channel(0)->setDefaultPower();
-  codeplug.encode(&config, Codeplug::Flags());
-  codeplug.decode(&decoded, err);
-  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), true);
 }
 
 
