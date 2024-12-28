@@ -38,4 +38,34 @@ SMSTemplateTest::serializationTest() {
 }
 
 
+void
+SMSTemplateTest::testMessageDuplication() {
+  Config config;
+
+  {
+    auto msg1 = new SMSTemplate();
+    msg1->setName("Message 1");
+    msg1->setMessage("Some message");
+    config.smsExtension()->smsTemplates()->add(msg1);
+  }
+
+  ErrorStack err;
+  QString buffer;
+  QTextStream stream(&buffer);
+  if (! config.toYAML(stream, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  config.clear();
+  Config::Context ctx;
+  YAML::Node doc = YAML::Load(buffer.toStdString());
+  if (! config.parse(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  if (! config.link(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(config.smsExtension()->smsTemplates()->count(), 1);
+  QCOMPARE(config.smsExtension()->smsTemplates()->message(0)->name(), "Message 1");
+  QCOMPARE(config.smsExtension()->smsTemplates()->message(0)->message(), "Some message");
+}
+
 QTEST_GUILESS_MAIN(SMSTemplateTest)
