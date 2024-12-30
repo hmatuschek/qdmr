@@ -805,12 +805,11 @@ public:
     /** Sets the name of the zone. */
     virtual void setName(const QString &name);
 
-    /** Returns @c true if a member is stored at the given index.
-     * That is, if the index is not 0. */
+    /** Returns @c true if a member is stored at the given index. */
     virtual bool hasMember(unsigned n) const;
-    /** Returns the n-th member index (+1). */
+    /** Returns the n-th member index. */
     virtual unsigned member(unsigned n) const;
-    /** Sets the n-th member index (+1). */
+    /** Sets the n-th member index. */
     virtual void setMember(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
     virtual void clearMember(unsigned n);
