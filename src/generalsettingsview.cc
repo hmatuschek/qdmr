@@ -39,10 +39,10 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->extensionView->setObject(_config->settings(), _config);
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
-  connect(ui->dmrID, SIGNAL(textEdited(QString)), this, SLOT(onDMRIDChanged()));
-  connect(ui->radioName, SIGNAL(textEdited(QString)), this, SLOT(onNameChanged()));
-  connect(ui->introLine1, SIGNAL(textEdited(QString)), this, SLOT(onIntroLine1Changed()));
-  connect(ui->introLine2, SIGNAL(textEdited(QString)), this, SLOT(onIntroLine2Changed()));
+  connect(ui->dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
+  connect(ui->radioName, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
+  connect(ui->introLine1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Edited()));
+  connect(ui->introLine2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Edited()));
   connect(ui->mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
   connect(ui->speech, SIGNAL(stateChanged(int)), this, SLOT(onSpeechChanged()));
   connect(ui->powerValue, SIGNAL(currentIndexChanged(int)), this, SLOT(onPowerChanged()));
@@ -117,12 +117,12 @@ GeneralSettingsView::onNameChanged() {
 }
 
 void
-GeneralSettingsView::onIntroLine1Changed() {
+GeneralSettingsView::onIntroLine1Edited() {
   _config->settings()->setIntroLine1(ui->introLine1->text().simplified());
 }
 
 void
-GeneralSettingsView::onIntroLine2Changed() {
+GeneralSettingsView::onIntroLine2Edited() {
   _config->settings()->setIntroLine2(ui->introLine2->text().simplified());
 }
 
