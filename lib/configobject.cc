@@ -1366,7 +1366,7 @@ AbstractConfigObjectList::classNames() const {
 void
 AbstractConfigObjectList::onElementModified(ConfigItem *obj) {
   int idx = indexOf(obj->as<ConfigObject>());
-  if (0 >= idx)
+  if (0 <= idx)
     emit elementModified(idx);
 }
 

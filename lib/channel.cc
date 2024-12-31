@@ -66,29 +66,33 @@ Channel::copy(const ConfigItem &other) {
 void
 Channel::clear() {
   ConfigObject::clear();
-  _rxFreq = Frequency::fromHz(0); _txFreq = Frequency::fromHz(0);
+
+  setRXFrequency(Frequency::fromHz(0));
+  setTXFrequency(Frequency::fromHz(0));
   setDefaultPower();
   setDefaultTimeout();
-  _rxOnly = false;
+  setRXOnly(false);
   setVOXDefault();
+
   _scanlist.clear();
-  if (_openGD77ChannelExtension)
-    _openGD77ChannelExtension->deleteLater();
-  _openGD77ChannelExtension = nullptr;
-  if (_tytChannelExtension)
-    _tytChannelExtension->deleteLater();
-  _tytChannelExtension = nullptr;
+
+  setOpenGD77ChannelExtension(nullptr);
+  setTyTChannelExtension(nullptr);
 }
+
 
 Frequency Channel::rxFrequency() const {
   return _rxFreq;
 }
+
 bool
 Channel::setRXFrequency(Frequency freq) {
   if (freq == _rxFreq)
     return true;
+
   _rxFreq = freq;
   emit modified(this);
+
   return true;
 }
 
@@ -96,60 +100,88 @@ Frequency
 Channel::txFrequency() const {
   return _txFreq;
 }
+
 bool
 Channel::setTXFrequency(Frequency freq) {
   if (freq == _txFreq)
     return true;
+
   _txFreq = freq;
   emit modified(this);
+
   return true;
 }
+
 
 bool
 Channel::defaultPower() const {
   return _defaultPower;
 }
+
 Channel::Power
 Channel::power() const {
   return _power;
 }
+
 void
 Channel::setPower(Power power) {
+  if ((power == _power) && (! _defaultPower))
+    return;
   _power = power;
   _defaultPower = false;
   emit modified(this);
 }
+
 void
 Channel::setDefaultPower() {
+  if (defaultPower())
+    return;
+
   _defaultPower = true;
+  emit modified(this);
 }
+
 
 bool
 Channel::defaultTimeout() const {
   return std::numeric_limits<unsigned>::max() == timeout();
 }
+
 bool
 Channel::timeoutDisabled() const {
   return 0 == timeout();
 }
+
 unsigned
 Channel::timeout() const {
   return _txTimeOut;
 }
+
 bool
 Channel::setTimeout(unsigned dur) {
+  if (dur == _txTimeOut)
+    return true;
+
   _txTimeOut = dur;
   emit modified(this);
+
   return true;
 }
+
 void
 Channel::setDefaultTimeout() {
+  if (defaultTimeout())
+    return;
+
   setTimeout(std::numeric_limits<unsigned>::max());
+  emit modified(this);
 }
+
 void
 Channel::disableTimeout() {
   setTimeout(0);
 }
+
 
 bool
 Channel::rxOnly() const {
