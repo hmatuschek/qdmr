@@ -1323,12 +1323,15 @@ AbstractConfigObjectList::moveDown(int first, int last) {
   return true;
 }
 
+
 bool
 AbstractConfigObjectList::move(int source, int count, int destination) {
   if ((0 == count) || (source == destination))
     return true;
+
   if ((source+count)>_items.size())
     return false;
+
   if (source > destination) {
     // move up
     for (int take=source, put=destination, i=0; i<count; i++, take++, put++)
@@ -1338,8 +1341,13 @@ AbstractConfigObjectList::move(int source, int count, int destination) {
     for (int i=0; i<count; i++)
       _items.insert(destination-1, _items.takeAt(source));
   }
+
+  for (int i=0; i<count; i++)
+    emit elementModified(destination+i);
+
   return true;
 }
+
 
 const QList<QMetaObject> &
 AbstractConfigObjectList::elementTypes() const {
