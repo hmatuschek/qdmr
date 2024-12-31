@@ -332,6 +332,7 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
   return true;
 }
 
+
 bool
 Config::readYAML(const QString &filename, const ErrorStack &err) {
   YAML::Node node;
@@ -364,8 +365,10 @@ Config::readYAML(const QString &filename, const ErrorStack &err) {
   if (! link(node, context, err))
     return false;
 
+  setModified(false);
   return true;
 }
+
 
 bool
 Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
