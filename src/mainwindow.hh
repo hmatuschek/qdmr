@@ -23,6 +23,9 @@ public:
 public slots:
   void applySettings();
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 private:
   Ui::MainWindow *ui;
   GeneralSettingsView *_generalSettings;

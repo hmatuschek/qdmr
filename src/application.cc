@@ -168,6 +168,11 @@ Application::isDarkMode(const QPalette &palette) const {
 }
 
 
+bool
+Application::isModified() const {
+  return _config->isModified();
+}
+
 MainWindow *
 Application::mainWindow() {
   if (_mainWindow)
@@ -411,23 +416,6 @@ Application::importCodeplug() {
   }
 
   _config->setModified(true);
-}
-
-void
-Application::quitApplication() {
-  if (_config->isModified()) {
-    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
-                                                 tr("There are unsaved changes to the current codeplug. "
-                                                    "These changes are lost if you proceed."),
-                                                 QMessageBox::Cancel|QMessageBox::Ok))
-      return;
-  }
-
-  Settings settings;
-  if (_mainWindow)
-    settings.setMainWindowState(_mainWindow->saveGeometry());
-
-  quit();
 }
 
 

@@ -39,6 +39,8 @@ public:
 
   MainWindow *mainWindow();
 
+  bool isModified() const;
+
   UserDatabase *user() const;
   RepeaterDatabase *repeater() const;
   TalkGroupDatabase *talkgroup() const;
@@ -58,7 +60,6 @@ public slots:
   void saveCodeplug();
   void exportCodeplugToChirp();
   void importCodeplug();
-  void quitApplication();
 
   void detectRadio();
   bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
@@ -90,18 +91,6 @@ protected:
   Config *_config;
   MainWindow *_mainWindow;
   QTranslator *_translator;
-
-  /*GeneralSettingsView *_generalSettings;
-  RadioIDListView *_radioIdTab;
-  ContactListView *_contactList;
-  GroupListsView *_groupLists;
-  ChannelListView *_channelList;
-  ZoneListView *_zoneList;
-  ScanListsView *_scanLists;
-  PositioningSystemListView *_posSysList;
-  RoamingChannelListView *_roamingChannelList;
-  RoamingZoneListView *_roamingZoneList;
-  ExtensionView *_extensionView;*/
 
   RepeaterDatabase *_repeater;
   UserDatabase *_users;

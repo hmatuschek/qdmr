@@ -1,6 +1,8 @@
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
 #include <QProgressBar>
+#include <QCloseEvent>
+#include <QMessageBox>
 
 #include "settings.hh"
 #include "logger.hh"
@@ -19,6 +21,7 @@
 #include "extensionview.hh"
 #include "talkgroupdatabase.hh"
 #include "satellitedatabase.hh"
+
 
 
 MainWindow::MainWindow(Config *config, QWidget *parent)
@@ -40,7 +43,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionSaveCodeplug, SIGNAL(triggered()), app, SLOT(saveCodeplug()));
   connect(ui->actionExportToCHIRP, SIGNAL(triggered()), app, SLOT(exportCodeplugToChirp()));
   connect(ui->actionImport, SIGNAL(triggered()), app, SLOT(importCodeplug()));
-  connect(ui->actionQuit, SIGNAL(triggered()), app, SLOT(quitApplication()));
+  connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
   connect(ui->actionAbout, SIGNAL(triggered()), app, SLOT(showAbout()));
   connect(ui->actionSettings, SIGNAL(triggered()), app, SLOT(showSettings()));
   connect(ui->actionHelp, SIGNAL(triggered()), app, SLOT(showHelp()));
@@ -107,6 +110,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   restoreGeometry(settings.mainWindowState());
 }
 
+
 void
 MainWindow::applySettings() {
   Settings settings;
@@ -138,4 +142,20 @@ MainWindow::applySettings() {
     }
     _generalSettings->hideExtensions(true);
   }
+}
+
+
+void
+MainWindow::closeEvent(QCloseEvent *event) {
+  if (qobject_cast<Application*>(Application::instance())->isModified()) {
+    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
+                                                 tr("There are unsaved changes to the current codeplug. "
+                                                    "These changes are lost if you proceed."),
+                                                 QMessageBox::Cancel|QMessageBox::Ok))
+      event->ignore();
+    return;
+  }
+
+  Settings().setMainWindowState(saveGeometry());
+  event->accept();
 }
