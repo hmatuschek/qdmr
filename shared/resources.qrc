@@ -112,7 +112,7 @@
         <file alias="32x32/actions/edit-move-10-up.png">icons/dark/32x32/actions/edit-move-10-up.png</file>
         <file alias="32x32/actions/edit-move-bottom.png">icons/dark/32x32/actions/edit-move-bottom.png</file>
         <file alias="32x32/actions/edit-move-down.png">icons/dark/32x32/actions/edit-move-down.png</file>
-        <file alias="32x32/actions/edit-move-up.png">icons/dark/32x32/actions/edit-move-top.png</file>
+        <file alias="32x32/actions/edit-move-top.png">icons/dark/32x32/actions/edit-move-top.png</file>
         <file alias="32x32/actions/edit-move-up.png">icons/dark/32x32/actions/edit-move-up.png</file>
         <file alias="32x32/actions/help-about.png">icons/dark/32x32/actions/help-about.png</file>
         <file alias="32x32/actions/help-contents.png">icons/dark/32x32/actions/help-contents.png</file>
