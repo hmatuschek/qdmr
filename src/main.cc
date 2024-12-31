@@ -1,12 +1,13 @@
 #include "application.hh"
 #include <QFile>
 #include <QTextStream>
-#include <QMainWindow>
+#include "mainwindow.hh"
 #include <QMessageBox>
 #include "logger.hh"
 #include "settings.hh"
 #include <stdio.h>
 #include <QSplashScreen>
+
 
 int main(int argc, char *argv[])
 {

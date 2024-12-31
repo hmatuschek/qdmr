@@ -42,6 +42,7 @@
 #include "configmergedialog.hh"
 #include "configmergevisitor.hh"
 #include "satellitedatabasedialog.hh"
+#include "mainwindow.hh"
 
 
 
@@ -167,12 +168,11 @@ Application::isDarkMode(const QPalette &palette) const {
 }
 
 
-QMainWindow *
+MainWindow *
 Application::mainWindow() {
-  if (0 == _mainWindow)
-    return createMainWindow();
-
-  return _mainWindow;
+  if (_mainWindow)
+    return _mainWindow;
+  return (_mainWindow = new MainWindow(_config));
 }
 
 UserDatabase *
@@ -185,142 +185,14 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterDatabase *Application::repeater() const{
+RepeaterDatabase *
+Application::repeater() const{
   return _repeater;
 }
 
-
-QMainWindow *
-Application::createMainWindow() {
-  if (_mainWindow)
-    return _mainWindow;
-
-  Settings settings;
-  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
-
-  QUiLoader loader;
-  QFile uiFile("://ui/mainwindow.ui");
-  uiFile.open(QIODevice::ReadOnly);
-
-  QWidget *window = loader.load(&uiFile);
-  _mainWindow = qobject_cast<QMainWindow *>(window);
-
-  QProgressBar *progress = new QProgressBar();
-  progress->setObjectName("progress");
-  _mainWindow->statusBar()->addPermanentWidget(progress);
-  progress->setVisible(false);
-
-  QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
-  QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
-  QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
-  QAction *exportCP = _mainWindow->findChild<QAction*>("actionExportToCHIRP");
-  QAction *importCP = _mainWindow->findChild<QAction*>("actionImport");
-
-  QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
-  QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
-  QAction *downCP  = _mainWindow->findChild<QAction*>("actionDownload");
-  QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
-  QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
-
-  QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
-  QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-  QAction *refreshOrbitalElements  = _mainWindow->findChild<QAction*>("actionRefreshOrbitalElements");
-  QAction *editSatellites  = _mainWindow->findChild<QAction*>("actionEditSatellites");
-
-  QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
-  QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
-  QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
-  QAction *quit    = _mainWindow->findChild<QAction*>("actionQuit");
-
-  connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
-  connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
-  connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
-  connect(exportCP, SIGNAL(triggered()), this, SLOT(exportCodeplugToChirp()));
-  connect(importCP, SIGNAL(triggered()), this, SLOT(importCodeplug()));
-  connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
-  connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
-  connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
-  connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
-
-  connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
-  connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-  connect(refreshOrbitalElements, SIGNAL(triggered()), _satellites, SLOT(update()));
-  connect(editSatellites, SIGNAL(triggered()), this, SLOT(editSatellites()));
-
-  connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
-  connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
-  connect(downCP, SIGNAL(triggered()), this, SLOT(downloadCodeplug()));
-  connect(upCP, SIGNAL(triggered()), this, SLOT(uploadCodeplug()));
-  connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
-
-  QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
-
-  // Wire-up "General Settings" view
-  _generalSettings = new GeneralSettingsView(_config);
-  tabs->addTab(_generalSettings, tr("Settings"));
-  if (settings.showCommercialFeatures()) {
-    _generalSettings->hideDMRID(true);
-  } else {
-    _generalSettings->hideDMRID(false);
-  }
-  if (settings.showExtensions()) {
-    _generalSettings->hideExtensions(false);
-  } else {
-    _generalSettings->hideExtensions(true);
-  }
-
-  // Wire-up "Radio IDs" view
-  _radioIdTab = new RadioIDListView(_config);
-  tabs->addTab(_radioIdTab, tr("Radio IDs"));
-
-  // Wire-up "Contact List" view
-  _contactList = new ContactListView(_config);
-  tabs->addTab(_contactList, tr("Contacts"));
-
-  // Wire-up "RX Group List" view
-  _groupLists = new GroupListsView(_config);
-  tabs->addTab(_groupLists, tr("Group Lists"));
-
-  // Wire-up "Channel List" view
-  _channelList = new ChannelListView(_config);
-  tabs->addTab(_channelList, tr("Channels"));
-
-  // Wire-up "Zone List" view
-  _zoneList = new ZoneListView(_config);
-  tabs->addTab(_zoneList, tr("Zones"));
-
-  // Wire-up "Scan List" view
-  _scanLists = new ScanListsView(_config);
-  tabs->addTab(_scanLists, tr("Scan Lists"));
-
-  // Wire-up "GPS System List" view
-  _posSysList = new PositioningSystemListView(_config);
-  tabs->addTab(_posSysList, tr("GPS/APRS"));
-
-  // Wire-up "Roaming Zone List" view
-  _roamingChannelList = new RoamingChannelListView(_config);
-  tabs->addTab(_roamingChannelList, tr("Roaming Channels"));
-
-  // Wire-up "Roaming Zone List" view
-  _roamingZoneList = new RoamingZoneListView(_config);
-  tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
-
-  // Wire-up "extension view"
-  _extensionView = new ExtensionView();
-  _extensionView->setObject(_config, _config);
-  tabs->addTab(_extensionView, tr("Extensions"));
-
-  if (! settings.showCommercialFeatures()) {
-    tabs->removeTab(tabs->indexOf(_radioIdTab));
-    _radioIdTab->setHidden(true);
-  }
-  if (! settings.showExtensions()) {
-    tabs->removeTab(tabs->indexOf(_extensionView));
-    _extensionView->setHidden(true);
-  }
-
-  _mainWindow->restoreGeometry(settings.mainWindowState());
-  return _mainWindow;
+SatelliteDatabase *
+Application::satellite() const {
+  return _satellites;
 }
 
 
@@ -896,48 +768,24 @@ Application::onCodeplugUploaded(Radio *radio) {
 void
 Application::showSettings() {
   SettingsDialog dialog;
-  if (QDialog::Accepted == dialog.exec()) {
-    Settings settings;
-    // Handle positioning
-    if (! settings.queryPosition()) {
-      if (_source)
-        _source->stopUpdates();
-      _currentPosition = settings.position();
-    } else {
-      if (_source)
-        _source->startUpdates();
-    }
-    // Handle commercial features
-    QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
-    if (settings.showCommercialFeatures()) {
-      if (-1 == tabs->indexOf(_radioIdTab)) {
-        tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
-        _mainWindow->update();
-      }
-      _generalSettings->hideDMRID(true);
-    } else if (! settings.showCommercialFeatures()) {
-      if (-1 != tabs->indexOf(_radioIdTab)) {
-        tabs->removeTab(tabs->indexOf(_radioIdTab));
-        _mainWindow->update();
-      }
-      _generalSettings->hideDMRID(false);
-    }
-    // Handle extensions
-    if (settings.showExtensions()) {
-      if (-1 == tabs->indexOf(_extensionView)) {
-        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
-        _mainWindow->update();
-      }
-      _generalSettings->hideExtensions(false);
-    } else {
-      if (-1 != tabs->indexOf(_extensionView)) {
-        tabs->removeTab(tabs->indexOf(_extensionView));
-        _mainWindow->update();
-      }
-      _generalSettings->hideExtensions(true);
-    }
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+
+  Settings settings;
+  // Handle positioning
+  if (! settings.queryPosition()) {
+    if (_source)
+      _source->stopUpdates();
+    _currentPosition = settings.position();
+  } else {
+    if (_source)
+      _source->startUpdates();
   }
+
+  _mainWindow->applySettings();
 }
+
 
 void
 Application::showAbout() {

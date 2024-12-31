@@ -10,7 +10,6 @@
     </qresource>
     <qresource prefix="/ui">
         <file alias="aboutdialog.ui">ui/aboutdialog.ui</file>
-        <file alias="mainwindow.ui">ui/mainwindow.ui</file>
     </qresource>
     <qresource prefix="/icons/aprs">
         <file alias="table0.png">aprs/aprs-symbols-24-0.png</file>
