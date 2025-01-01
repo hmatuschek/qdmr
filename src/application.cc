@@ -220,6 +220,7 @@ void
 Application::loadCodeplug() {
   if (! _mainWindow)
     return;
+
   if (_config->isModified()) {
     if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
@@ -269,6 +270,9 @@ Application::loadCodeplug() {
       _config->clear();
     }
   }
+
+  processEvents();
+  _config->setModified(false);
 }
 
 
