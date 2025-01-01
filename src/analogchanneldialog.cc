@@ -172,6 +172,7 @@ AnalogChannelDialog::channel()
     _channel->copy(*_myChannel);
     channel = _channel;
   }
+
   return channel;
 }
 
