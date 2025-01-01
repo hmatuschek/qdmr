@@ -161,6 +161,15 @@ public:
     /** Resets the APRS system index. */
     virtual void clearAPRSIndex();
 
+    /** Returns @c true, if the TX contact is set. */
+    virtual bool hasTXContact() const;
+    /** Returns the TX contact index. */
+    virtual unsigned int txContactIndex() const;
+    /** Sets the TX contact index. */
+    virtual void setTXContactIndex(unsigned int index);
+    /** Clears the TX contact index. */
+    virtual void clearTXContact();
+
     /** Returns the alias transmitted on time slot 1. */
     virtual OpenGD77ChannelExtension::TalkerAlias aliasTimeSlot1() const;
     /** Sets the alias transmitted on time slot 1. */
@@ -246,6 +255,7 @@ public:
       static constexpr unsigned int groupList() { return 0x002b; }
       static constexpr unsigned int colorCode() { return 0x002c; }
       static constexpr unsigned int aprsIndex() { return 0x002d; }
+      static constexpr unsigned int txContact() { return 0x002e; }
       static constexpr Bit aliasTimeSlot2() { return { 0x030, 2}; }
       static constexpr Bit aliasTimeSlot1() { return { 0x030, 0}; }
       static constexpr Bit timeSlot() { return {0x0031, 6}; }
