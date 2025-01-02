@@ -733,6 +733,11 @@ Application::uploadCallsignDB() {
 
 
 void
+Application::uploadSatellites() {
+
+}
+
+void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
   ErrorMessageView(radio->errorStack()).exec();

@@ -76,6 +76,9 @@
         <file alias="scalable/actions/help-about.svg">icons/light/scalable/actions/help-about.svg</file>
         <file alias="scalable/actions/help-contents.svg">icons/light/scalable/actions/help-contents.svg</file>
         <file alias="scalable/apps/qdmr.svg">icons/light/scalable/apps/qdmr.svg</file>
+        <file alias="scalable/actions/device-write-satellite.svg">icons/light/scalable/actions/device-write-satellites.svg</file>
+        <file alias="32x32/actions/device-write-satellite.png">icons/light/32x32/actions/device-write-satellites.png</file>
+        <file alias="16x16/actions/device-write-satellite.png">icons/light/16x16/actions/device-write-satellites.png</file>
     </qresource>
     <qresource prefix="/icons/dark">
         <file alias="16x16/actions/application-exit.png">icons/dark/16x16/actions/application-exit.png</file>
@@ -117,5 +120,7 @@
         <file alias="32x32/actions/help-contents.png">icons/dark/32x32/actions/help-contents.png</file>
         <file alias="32x32/apps/qdmr.png">icons/dark/32x32/apps/qdmr.png</file>
         <file alias="index.theme">icons/dark/index.theme</file>
+        <file alias="32x32/actions/device-write-satellite.png">icons/dark/32x32/actions/device-write-satellites.png</file>
+        <file alias="16x16/actions/device-write-satellite.png">icons/dark/16x16/actions/device-write-satellites.png</file>
     </qresource>
 </RCC>
