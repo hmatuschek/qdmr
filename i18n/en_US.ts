@@ -2388,94 +2388,94 @@
     <message>
         <location filename="../src/mainwindow.ui" line="352"/>
         <source>Refresh Orbital Elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Refresh Orbital Elements</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="355"/>
         <source>Refreshes the orbital elements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Refreshes the orbital elements.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="363"/>
         <source>Edit Satellites ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Satellites ...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="366"/>
         <source>Opens an editor to edit your satellite database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Opens an editor to edit your satellite database.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="374"/>
         <source>Write satellites</source>
-        <translation type="unfinished"></translation>
+        <translation>Write satellites</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="377"/>
         <source>Writes the orbital elements and transponder information onto the connected device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Writes the orbital elements and transponder information onto the connected device.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="78"/>
         <location filename="../src/mainwindow.cc" line="120"/>
         <source>Radio IDs</source>
-        <translation type="unfinished">Radio IDs</translation>
+        <translation>Radio IDs</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="80"/>
         <source>Contacts</source>
-        <translation type="unfinished">Contacts</translation>
+        <translation>Contacts</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="82"/>
         <source>Group Lists</source>
-        <translation type="unfinished">Group Lists</translation>
+        <translation>Group Lists</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="84"/>
         <source>Channels</source>
-        <translation type="unfinished">Channels</translation>
+        <translation>Channels</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="86"/>
         <source>Zones</source>
-        <translation type="unfinished">Zones</translation>
+        <translation>Zones</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="88"/>
         <source>Scan Lists</source>
-        <translation type="unfinished">Scan Lists</translation>
+        <translation>Scan Lists</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="90"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished">GPS/APRS</translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="92"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished">Roaming Channels</translation>
+        <translation>Roaming Channels</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="95"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished">Roaming Zones</translation>
+        <translation>Roaming Zones</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="99"/>
         <location filename="../src/mainwindow.cc" line="134"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="151"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation type="unfinished">Unsaved changes to codeplug.</translation>
+        <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="152"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation type="unfinished">There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
+        <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
 </context>
 <context>
@@ -3170,17 +3170,17 @@
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="14"/>
         <source>Edit satellite database</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit satellite database</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="39"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Add</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="46"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete</translation>
     </message>
 </context>
 <context>
@@ -3189,7 +3189,7 @@
         <location filename="../src/satelliteselectiondialog.ui" line="14"/>
         <location filename="../src/satelliteselectiondialog.ui" line="20"/>
         <source>Select a satellite</source>
-        <translation type="unfinished"></translation>
+        <translation>Select a satellite</translation>
     </message>
 </context>
 <context>
