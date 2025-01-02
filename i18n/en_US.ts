@@ -3297,27 +3297,27 @@
     <message>
         <location filename="../src/selectivecallbox.cc" line="12"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="13"/>
         <source>CTCSS</source>
-        <translation type="unfinished"></translation>
+        <translation>CTCSS</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="14"/>
         <source>DCS</source>
-        <translation type="unfinished"></translation>
+        <translation>DCS</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="29"/>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Hz</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="37"/>
         <source>Inverted</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverted</translation>
     </message>
 </context>
 <context>
@@ -3350,12 +3350,12 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="69"/>
         <source>Repeater Info Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Repeater Info Sources</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="75"/>
         <source>repeaterbook.com</source>
-        <translation type="unfinished"></translation>
+        <translation>repeaterbook.com</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="84"/>
@@ -3363,7 +3363,7 @@
         <location filename="../src/settingsdialog.ui" line="134"/>
         <location filename="../src/settingsdialog.ui" line="148"/>
         <source>enable</source>
-        <translation type="unfinished"></translation>
+        <translation>enable</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="188"/>
@@ -3418,17 +3418,17 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="113"/>
         <source>repeatermap.de</source>
-        <translation type="unfinished"></translation>
+        <translation>repeatermap.de</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="127"/>
         <source>hearham.com</source>
-        <translation type="unfinished"></translation>
+        <translation>hearham.com</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="141"/>
         <source>radioid.com</source>
-        <translation type="unfinished"></translation>
+        <translation>radioid.com</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="159"/>
