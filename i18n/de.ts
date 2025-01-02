@@ -186,262 +186,262 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="43"/>
         <source>Tractor</source>
-        <translation type="unfinished">Traktor</translation>
+        <translation>Traktor</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="44"/>
         <source>Grid Square</source>
-        <translation type="unfinished">Grid Square</translation>
+        <translation>Grid Square</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="45"/>
         <source>Hotel</source>
-        <translation type="unfinished">Hotel</translation>
+        <translation>Hotel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="46"/>
         <source>TCP/IP</source>
-        <translation type="unfinished">TCP/IP</translation>
+        <translation>TCP/IP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="47"/>
         <source>School</source>
-        <translation type="unfinished">Schule</translation>
+        <translation>Schule</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="48"/>
         <source>Logon</source>
-        <translation type="unfinished">Logon</translation>
+        <translation>Logon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="49"/>
         <source>MacOS</source>
-        <translation type="unfinished">MacOS</translation>
+        <translation>MacOS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="50"/>
         <source>NTS station</source>
-        <translation type="unfinished">NTS-Station</translation>
+        <translation>NTS-Station</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>Balloon</source>
-        <translation type="unfinished">Ballon</translation>
+        <translation>Ballon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
         <source>Police car</source>
-        <translation type="unfinished">Polizeiauto</translation>
+        <translation>Polizeiauto</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="53"/>
         <source>TBD</source>
-        <translation type="unfinished">TBD</translation>
+        <translation>TBD</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="54"/>
         <source>RV</source>
-        <translation type="unfinished">RV</translation>
+        <translation>RV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="55"/>
         <source>Shuttle</source>
-        <translation type="unfinished">Shuttle</translation>
+        <translation>Shuttle</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="56"/>
         <source>SSTV</source>
-        <translation type="unfinished">SSTV</translation>
+        <translation>SSTV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="57"/>
         <source>Bus</source>
-        <translation type="unfinished">Bus</translation>
+        <translation>Bus</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="58"/>
         <source>ATV</source>
-        <translation type="unfinished">ATV</translation>
+        <translation>ATV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="59"/>
         <source>Weather service</source>
-        <translation type="unfinished">Wetterdienst</translation>
+        <translation>Wetterdienst</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="60"/>
         <source>Helo</source>
-        <translation type="unfinished">Helo</translation>
+        <translation>Helo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="61"/>
         <source>Yacht</source>
-        <translation type="unfinished">Yacht</translation>
+        <translation>Yacht</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="62"/>
         <source>MS Windows</source>
-        <translation type="unfinished">MS Windows</translation>
+        <translation>MS Windows</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="63"/>
         <source>Jogger</source>
-        <translation type="unfinished">Jogger</translation>
+        <translation>Jogger</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="64"/>
         <source>Triangle</source>
-        <translation type="unfinished">Dreieck</translation>
+        <translation>Dreieck</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="65"/>
         <source>PBBS</source>
-        <translation type="unfinished">PBBS</translation>
+        <translation>PBBS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
         <source>Plane large</source>
-        <translation type="unfinished">großes Flugzeug</translation>
+        <translation>großes Flugzeug</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="67"/>
         <source>Weather station</source>
-        <translation type="unfinished">Wetterstation</translation>
+        <translation>Wetterstation</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="68"/>
         <source>Dish antenna</source>
-        <translation type="unfinished">Parabolantenne</translation>
+        <translation>Parabolantenne</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="69"/>
         <source>Ambulance</source>
-        <translation type="unfinished">Krankenwagen</translation>
+        <translation>Krankenwagen</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="70"/>
         <source>Bike</source>
-        <translation type="unfinished">Fahrrad</translation>
+        <translation>Fahrrad</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="71"/>
         <source>ICP</source>
-        <translation type="unfinished">ICP</translation>
+        <translation>ICP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="72"/>
         <source>Fire station</source>
-        <translation type="unfinished">Feuerwache</translation>
+        <translation>Feuerwache</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="73"/>
         <source>Horse</source>
-        <translation type="unfinished">Pferd</translation>
+        <translation>Pferd</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="74"/>
         <source>Fire truck</source>
-        <translation type="unfinished">Löschzug</translation>
+        <translation>Löschzug</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="75"/>
         <source>Glider</source>
-        <translation type="unfinished">Gleiter</translation>
+        <translation>Gleiter</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="76"/>
         <source>Hospital</source>
-        <translation type="unfinished">Krankenhaus</translation>
+        <translation>Krankenhaus</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="77"/>
         <source>IOTA</source>
-        <translation type="unfinished">IOTA</translation>
+        <translation>IOTA</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="78"/>
         <source>Jeep</source>
-        <translation type="unfinished">Jeep</translation>
+        <translation>Jeep</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="79"/>
         <source>Truck small</source>
-        <translation type="unfinished">kleiner Truck</translation>
+        <translation>kleiner Truck</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="80"/>
         <source>Laptop</source>
-        <translation type="unfinished">Laptop</translation>
+        <translation>Laptop</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="81"/>
         <source>Mic-E</source>
-        <translation type="unfinished">Mic-E</translation>
+        <translation>Mic-E</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="82"/>
         <source>Node</source>
-        <translation type="unfinished">Knoten</translation>
+        <translation>Knoten</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="83"/>
         <source>EOC</source>
-        <translation type="unfinished">EOC</translation>
+        <translation>EOC</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="84"/>
         <source>Rover</source>
-        <translation type="unfinished">Rover</translation>
+        <translation>Rover</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="85"/>
         <source>Grid</source>
-        <translation type="unfinished">Grid</translation>
+        <translation>Grid</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="86"/>
         <source>Antenna</source>
-        <translation type="unfinished">Antenne</translation>
+        <translation>Antenne</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="87"/>
         <source>Power boat</source>
-        <translation type="unfinished">Motorboot</translation>
+        <translation>Motorboot</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="88"/>
         <source>Truck stop</source>
-        <translation type="unfinished">Rastplatz</translation>
+        <translation>Rastplatz</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="89"/>
         <source>Truck large</source>
-        <translation type="unfinished">großer Truck</translation>
+        <translation>großer Truck</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="90"/>
         <source>Van</source>
-        <translation type="unfinished">Van</translation>
+        <translation>Van</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="91"/>
         <source>Water</source>
-        <translation type="unfinished">Wasser</translation>
+        <translation>Wasser</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="92"/>
         <source>XAPRS</source>
-        <translation type="unfinished">XAPRS</translation>
+        <translation>XAPRS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="93"/>
         <source>Yagi</source>
-        <translation type="unfinished">Yagi</translation>
+        <translation>Yagi</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="94"/>
         <source>Shelter</source>
-        <translation type="unfinished">Schutzhütte</translation>
+        <translation>Schutzhütte</translation>
     </message>
 </context>
 <context>
