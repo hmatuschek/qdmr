@@ -336,8 +336,8 @@ protected:
     };
     /** The y-position on the screen. */
     uint8_t y;
-    /** The size. */
-    uint8_t size;
+    /** The font size. */
+    uint8_t font;
     /** The text alignment. */
     uint8_t alignment;
     /** Is text inverted? */
@@ -350,7 +350,8 @@ protected:
     /** Construct a clear-screen command message. */
     void initClearScreen();
     /** Construct a "show text on screen" message. */
-    void initDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted);
+    void initDisplay(uint8_t x, uint8_t y, const char *message, unsigned int iSize,
+                     uint8_t font, uint8_t alignment, uint8_t inverted);
     /** Construct a "render CPS" message. */
     void initRenderCPS();
     /** Construct a "close screen" command message. */
