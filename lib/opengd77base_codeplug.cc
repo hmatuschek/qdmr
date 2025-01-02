@@ -159,6 +159,7 @@ OpenGD77BaseCodeplug::ChannelElement::power() const {
   default:
   break;
   }
+
   return Channel::Power::Min;
 }
 
@@ -504,7 +505,10 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
     ch->setTXFrequency(Frequency::fromHz(rxFrequency()));
   else
     ch->setTXFrequency(Frequency::fromHz(txFrequency()));
-  ch->setPower(power());
+  if (globalPower())
+    ch->setDefaultPower();
+  else
+    ch->setPower(power());
   ch->setRXOnly(rxOnly());
   if (vox())
     ch->setVOXDefault();
@@ -566,10 +570,10 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
 
   setRXFrequency(c->rxFrequency().inHz());
   setTXFrequency(c->txFrequency().inHz());
+  enableSimplex(false);
 
-  if (c->defaultPower())
-    setPower(ctx.config()->settings()->power());
-  else
+  clearPower();
+  if (! c->defaultPower())
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());
@@ -1465,27 +1469,31 @@ OpenGD77BaseCodeplug::ZoneElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
+
 bool
 OpenGD77BaseCodeplug::ZoneElement::hasMember(unsigned n) const {
   if (n >= Limit::memberCount())
     return false;
-  return (0 != member(n));
+  return 0 != getUInt16_le(Offset::channels() + Offset::betweenChannels()*n);
 }
+
 unsigned
 OpenGD77BaseCodeplug::ZoneElement::member(unsigned n) const {
   if (n >= Limit::memberCount())
     return 0;
-  return getUInt16_le(Offset::channels()+Offset::betweenChannels()*n);
+  return getUInt16_le(Offset::channels() + Offset::betweenChannels()*n)-1;
 }
+
 void
 OpenGD77BaseCodeplug::ZoneElement::setMember(unsigned n, unsigned idx) {
   if (n >= Limit::memberCount())
     return;
-  setUInt16_le(Offset::channels()+Offset::betweenChannels()*n, idx);
+  setUInt16_le(Offset::channels() + Offset::betweenChannels()*n, idx+1);
 }
+
 void
 OpenGD77BaseCodeplug::ZoneElement::clearMember(unsigned n) {
-  setMember(n, 0);
+  setUInt16_le(Offset::channels() + Offset::betweenChannels()*n, 0);
 }
 
 
@@ -2157,12 +2165,12 @@ OpenGD77BaseCodeplug::GroupListElement::hasContactIndex(unsigned int i) const {
 
 unsigned int
 OpenGD77BaseCodeplug::GroupListElement::contactIndex(unsigned int i) const {
-  return getUInt16_le(Offset::contacts() + i*Offset::betweenContacts())-1;
+  return getUInt16_le(Offset::contacts() + i*Offset::betweenContacts()) - 1;
 }
 
 void
 OpenGD77BaseCodeplug::GroupListElement::setContactIndex(unsigned int i, unsigned int contactIdx) {
-  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), contactIdx+1);
+  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), contactIdx + 1);
 }
 
 void

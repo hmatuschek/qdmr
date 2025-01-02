@@ -95,7 +95,7 @@ OpenGD77Interface::CommandRequest::initShowCPSScreen() {
   this->command = SHOW_CPS_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -107,7 +107,7 @@ OpenGD77Interface::CommandRequest::initClearScreen() {
   this->command = CLEAR_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -115,16 +115,17 @@ OpenGD77Interface::CommandRequest::initClearScreen() {
 
 void
 OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
-                                               const char *message, uint8_t iSize,
-                                               uint8_t alignment, uint8_t inverted) {
+                                               const char *message, unsigned int iSize,
+                                               uint8_t font, uint8_t alignment, uint8_t inverted) {
   this->type = 'C';
   this->command = DISPLAY;
   this->x = x;
   this->y = y;
-  this->size = std::min(iSize, uint8_t(16));
+  this->font = font;
   this->alignment = alignment;
   this->inverted = inverted;
-  strncpy(this->message, message, this->size);
+  memset(this->message, 0, 16);
+  strncpy(this->message, message, std::min(16u, iSize));
 }
 
 void
@@ -133,7 +134,7 @@ OpenGD77Interface::CommandRequest::initRenderCPS() {
   this->command = RENDER_CPS;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -145,7 +146,7 @@ OpenGD77Interface::CommandRequest::initCloseScreen() {
   this->command = CLOSE_CPS_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -157,7 +158,7 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
   this->command = COMMAND;
   this->option = option;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -246,11 +247,11 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &e
   if (! sendClearScreen(err))
     return false;
   //logDebug() << "Send display text ...";
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
+  if (! sendDisplay(0, 0, "qDMR", 4, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Writing", 3, 1, 0, err))
+  if (! sendDisplay(0, 16, "Writing", 7, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
+  if (! sendDisplay(0, 32, "Codeplug", 8, 1, 0, err))
     return false;
   //logDebug() << "Send 'render CPS' ...";
   if (! sendRenderCPS(err))
@@ -341,11 +342,11 @@ OpenGD77Interface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
     return false;
   if (! sendClearScreen(err))
     return false;
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
+  if (! sendDisplay(0, 0, "qDMR", 4, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Reading", 3, 1, 0, err))
+  if (! sendDisplay(0, 16, "Reading", 7, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
+  if (! sendDisplay(0, 32, "Codeplug", 8, 1, 0, err))
     return false;
   if (! sendRenderCPS(err))
     return false;
@@ -741,7 +742,7 @@ OpenGD77Interface::sendClearScreen(const ErrorStack &err) {
 bool
 OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted, const ErrorStack &err) {
   CommandRequest req;
-  req.initDisplay(x,y, message, iSize, alignment, inverted);
+  req.initDisplay(x,y, message, iSize, 3, alignment, inverted);
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {

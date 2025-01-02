@@ -4,6 +4,7 @@
 #include "visitor.hh"
 
 class ConfigObject;
+class Channel;
 
 /** This visitor traverses the the given configuration and clones it. All references are still
  *  pointing to the originals.
@@ -18,6 +19,9 @@ public:
   bool processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
   bool processItem(ConfigItem *item, const ErrorStack &err=ErrorStack());
   bool processList(AbstractConfigObjectList *list, const ErrorStack &err=ErrorStack());
+
+  /** Specialized handler for channels, must traverse the channel object. */
+  virtual bool processChannel(Channel *item, const ErrorStack &err=ErrorStack());
 
   /** Extracts the cloned item. */
   ConfigItem *takeResult(const ErrorStack &err=ErrorStack());

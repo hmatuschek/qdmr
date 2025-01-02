@@ -12,6 +12,10 @@ public:
 
 private slots:
   void serializationTest();
+
+  /** Regression test for #511. */
+  void testMessageDuplication();
+
 };
 
 #endif // SMSTEMPLATETEST_HH
