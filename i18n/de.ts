@@ -156,32 +156,32 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="37"/>
         <source>File server</source>
-        <translation type="unfinished">Dateiserver</translation>
+        <translation>Dateiserver</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="38"/>
         <source>HC Future</source>
-        <translation type="unfinished">Hurrikan Vorhersage</translation>
+        <translation>Hurrikan Vorhersage</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="39"/>
         <source>Aid station</source>
-        <translation type="unfinished">Erste Hilfe</translation>
+        <translation>Erste Hilfe</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="40"/>
         <source>BBS</source>
-        <translation type="unfinished">Mailbox</translation>
+        <translation>Mailbox</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="41"/>
         <source>Canoe</source>
-        <translation type="unfinished">Kanu</translation>
+        <translation>Kanu</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="42"/>
         <source>Eyeball</source>
-        <translation type="unfinished">Augapfel</translation>
+        <translation>Augapfel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="43"/>
@@ -2388,94 +2388,94 @@
     <message>
         <location filename="../src/mainwindow.ui" line="352"/>
         <source>Refresh Orbital Elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Bahnelement aktualisieren</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="355"/>
         <source>Refreshes the orbital elements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisiert die Bahnelemente.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="363"/>
         <source>Edit Satellites ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Satelliten bearbeiten ...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="366"/>
         <source>Opens an editor to edit your satellite database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffnet einen Editor, um die Satellitendatenbank zu bearbeiten.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="374"/>
         <source>Write satellites</source>
-        <translation type="unfinished"></translation>
+        <translation>Satelliten schreiben</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="377"/>
         <source>Writes the orbital elements and transponder information onto the connected device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schreibt die Bahnelemente und Transponderinformationen auf das angeschlossene Gerät.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="78"/>
         <location filename="../src/mainwindow.cc" line="120"/>
         <source>Radio IDs</source>
-        <translation type="unfinished">Radio IDs</translation>
+        <translation>Radio IDs</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="80"/>
         <source>Contacts</source>
-        <translation type="unfinished">Kontakte</translation>
+        <translation>Kontakte</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="82"/>
         <source>Group Lists</source>
-        <translation type="unfinished">Empfangsgruppen</translation>
+        <translation>Empfangsgruppen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="84"/>
         <source>Channels</source>
-        <translation type="unfinished">Kanäle</translation>
+        <translation>Kanäle</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="86"/>
         <source>Zones</source>
-        <translation type="unfinished">Zonen</translation>
+        <translation>Zonen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="88"/>
         <source>Scan Lists</source>
-        <translation type="unfinished">Scanlisten</translation>
+        <translation>Scanlisten</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="90"/>
         <source>GPS/APRS</source>
-        <translation type="unfinished">GPS/APRS</translation>
+        <translation>GPS/APRS</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="92"/>
         <source>Roaming Channels</source>
-        <translation type="unfinished">Roamingkanäle</translation>
+        <translation>Roamingkanäle</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="95"/>
         <source>Roaming Zones</source>
-        <translation type="unfinished">Roamingzonen</translation>
+        <translation>Roamingzonen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="99"/>
         <location filename="../src/mainwindow.cc" line="134"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="151"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation type="unfinished">Nicht gespeicherte Änderungen am Codeplug.</translation>
+        <translation>Nicht gespeicherte Änderungen am Codeplug.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="152"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation type="unfinished">Es gibt nicht gespeicherte Änderungen am Codeplug. Diese gehen verloren, wenn Sie fortfahren.</translation>
+        <translation>Es gibt nicht gespeicherte Änderungen am Codeplug. Diese gehen verloren, wenn Sie fortfahren.</translation>
     </message>
 </context>
 <context>
@@ -3170,17 +3170,17 @@
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="14"/>
         <source>Edit satellite database</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitendatenbank bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="39"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="46"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -3189,7 +3189,7 @@
         <location filename="../src/satelliteselectiondialog.ui" line="14"/>
         <location filename="../src/satelliteselectiondialog.ui" line="20"/>
         <source>Select a satellite</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle einen Satelliten aus</translation>
     </message>
 </context>
 <context>
@@ -3354,27 +3354,27 @@
     <message>
         <location filename="../src/selectivecallbox.cc" line="12"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="13"/>
         <source>CTCSS</source>
-        <translation type="unfinished"></translation>
+        <translation>CTCSS</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="14"/>
         <source>DCS</source>
-        <translation type="unfinished"></translation>
+        <translation>DCS</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="29"/>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Hz</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="37"/>
         <source>Inverted</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertiert</translation>
     </message>
 </context>
 <context>
@@ -3407,7 +3407,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="69"/>
         <source>Repeater Info Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Repeaterinformationsquellen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="84"/>
@@ -3415,7 +3415,7 @@
         <location filename="../src/settingsdialog.ui" line="134"/>
         <location filename="../src/settingsdialog.ui" line="148"/>
         <source>enable</source>
-        <translation type="unfinished"></translation>
+        <translation>aktivieren</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="188"/>
