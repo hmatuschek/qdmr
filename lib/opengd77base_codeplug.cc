@@ -82,15 +82,29 @@ OpenGD77BaseCodeplug::ChannelElement::~ChannelElement() {
 void
 OpenGD77BaseCodeplug::ChannelElement::clear() {
   setName("");
-  setRXFrequency(0);
-  setTXFrequency(0);
+  setRXFrequency(Frequency());
+  setTXFrequency(Frequency());
   setMode(MODE_ANALOG);
+  setPower(Channel::Power::High);
+  clearFixedPosition();
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
-  setColorCode(0);
-  setGroupListIndex(0);
+  enableSimplex(false);
+  enablePowerSave(false);
+  enableBeep(false);
   clearDMRId();
-
+  setGroupListIndex(0);
+  setColorCode(0);
+  clearAPRSIndex();
+  setAliasTimeSlot1(OpenGD77ChannelExtension::TalkerAlias::None);
+  setAliasTimeSlot2(OpenGD77ChannelExtension::TalkerAlias::None);
+  setTimeSlot(DMRChannel::TimeSlot::TS1);
+  setBandwidth(FMChannel::Bandwidth::Narrow);
+  enableRXOnly(false);
+  enableSkipScan(false);
+  enableSkipZoneScan(false);
+  enableVOX(false);
+  setSquelch(SquelchMode::Global, 0);
 }
 
 
@@ -105,25 +119,25 @@ OpenGD77BaseCodeplug::ChannelElement::setName(const QString &n) {
 }
 
 
-uint32_t
+Frequency
 OpenGD77BaseCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_le(Offset::rxFrequency())*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(Offset::rxFrequency()))*10);
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
-  setBCD8_le(Offset::rxFrequency(), freq/10);
+OpenGD77BaseCodeplug::ChannelElement::setRXFrequency(const Frequency &freq) {
+  setBCD8_le(Offset::rxFrequency(), freq.inHz()/10);
 }
 
 
-uint32_t
+Frequency
 OpenGD77BaseCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_le(Offset::txFrequency())*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(Offset::txFrequency()))*10);
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setBCD8_le(Offset::txFrequency(), freq/10);
+OpenGD77BaseCodeplug::ChannelElement::setTXFrequency(const Frequency &freq) {
+  setBCD8_le(Offset::txFrequency(), freq.inHz()/10);
 }
 
 
@@ -500,11 +514,11 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
 
   // Apply common settings
   ch->setName(name());
-  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setRXFrequency(rxFrequency());
   if (isSimplex())
-    ch->setTXFrequency(Frequency::fromHz(rxFrequency()));
+    ch->setTXFrequency(rxFrequency());
   else
-    ch->setTXFrequency(Frequency::fromHz(txFrequency()));
+    ch->setTXFrequency(txFrequency());
   if (globalPower())
     ch->setDefaultPower();
   else
@@ -568,8 +582,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
 
   setName(c->name());
 
-  setRXFrequency(c->rxFrequency().inHz());
-  setTXFrequency(c->txFrequency().inHz());
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
   enableSimplex(false);
 
   clearPower();
