@@ -36,6 +36,7 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
 ## Questions?
 
   * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions).
+  * If you want to help translating qdmr in your language, checkout [qdmr's weblate project](https://translate.codeberg.org/projects/qdmr/graphical-user-interface/).
   * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
   * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
 
@@ -46,7 +47,8 @@ tools, that make your day-to-day useage of *qdmr* easier, by providing features,
 qdmr or dmrconf.
 
   * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
-
+  * **[anytone-emu](https://github.com/dmr-tools/anytone-emu) -- A tool for emulating radios, reverse engineering and documenting codeplugs. Also generates some [codeplug documentation](https://dmr-tools.github.io/codeplugs/).
+  
 
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
