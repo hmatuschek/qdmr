@@ -74,13 +74,13 @@ public:
     virtual void setName(const QString &n);
 
     /** Returns the RX frequency of the channel. */
-    virtual uint32_t rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency of the channel. */
-    virtual void setRXFrequency(uint32_t freq);
+    virtual void setRXFrequency(const Frequency &freq);
     /** Returns the TX frequency of the channel. */
-    virtual uint32_t txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency of the channel. */
-    virtual void setTXFrequency(uint32_t freq);
+    virtual void setTXFrequency(const Frequency &freq);
 
     /** Returns the channel mode. */
     virtual Mode mode() const;
@@ -161,6 +161,15 @@ public:
     /** Resets the APRS system index. */
     virtual void clearAPRSIndex();
 
+    /** Returns @c true, if the TX contact is set. */
+    virtual bool hasTXContact() const;
+    /** Returns the TX contact index. */
+    virtual unsigned int txContactIndex() const;
+    /** Sets the TX contact index. */
+    virtual void setTXContactIndex(unsigned int index);
+    /** Clears the TX contact index. */
+    virtual void clearTXContact();
+
     /** Returns the alias transmitted on time slot 1. */
     virtual OpenGD77ChannelExtension::TalkerAlias aliasTimeSlot1() const;
     /** Sets the alias transmitted on time slot 1. */
@@ -237,7 +246,7 @@ public:
       static constexpr unsigned int rxTone() { return 0x0020; }
       static constexpr unsigned int txTone() { return 0x0022; }
       static constexpr unsigned int longitude2() { return 0x0024; }
-      static constexpr Bit simplex() { return {0x0026, 3}; }
+      static constexpr Bit simplex() { return {0x0026, 2}; }
       static constexpr Bit useFixedLocation() { return {0x0026, 3}; }
       static constexpr Bit disablePowerSave() { return {0x0026, 5}; }
       static constexpr Bit disableBeep() { return {0x0026, 6}; }
@@ -246,6 +255,7 @@ public:
       static constexpr unsigned int groupList() { return 0x002b; }
       static constexpr unsigned int colorCode() { return 0x002c; }
       static constexpr unsigned int aprsIndex() { return 0x002d; }
+      static constexpr unsigned int txContact() { return 0x002e; }
       static constexpr Bit aliasTimeSlot2() { return { 0x030, 2}; }
       static constexpr Bit aliasTimeSlot1() { return { 0x030, 0}; }
       static constexpr Bit timeSlot() { return {0x0031, 6}; }

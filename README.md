@@ -36,6 +36,7 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
 ## Questions?
 
   * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions).
+  * If you want to help translating qdmr in your language, checkout [qdmr's weblate project](https://translate.codeberg.org/projects/qdmr/graphical-user-interface/).
   * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
   * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
 
@@ -46,13 +47,15 @@ tools, that make your day-to-day useage of *qdmr* easier, by providing features,
 qdmr or dmrconf.
 
   * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
-
+  * **[anytone-emu](https://github.com/dmr-tools/anytone-emu)** -- A tool for emulating radios, reverse engineering and documenting codeplugs. Also generates some [codeplug documentation](https://dmr-tools.github.io/codeplugs/).
+  
 
 ## Releases
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
+ * **[Version 0.12.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.1)** -- Updated support for OpenGD77.
  * **[Version 0.12.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.0)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
  * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
