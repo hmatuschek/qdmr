@@ -47,7 +47,7 @@ tools, that make your day-to-day useage of *qdmr* easier, by providing features,
 qdmr or dmrconf.
 
   * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
-  * **[anytone-emu](https://github.com/dmr-tools/anytone-emu) -- A tool for emulating radios, reverse engineering and documenting codeplugs. Also generates some [codeplug documentation](https://dmr-tools.github.io/codeplugs/).
+  * **[anytone-emu](https://github.com/dmr-tools/anytone-emu)** -- A tool for emulating radios, reverse engineering and documenting codeplugs. Also generates some [codeplug documentation](https://dmr-tools.github.io/codeplugs/).
   
 
 ## Releases
