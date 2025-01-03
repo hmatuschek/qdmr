@@ -74,13 +74,13 @@ public:
     virtual void setName(const QString &n);
 
     /** Returns the RX frequency of the channel. */
-    virtual uint32_t rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency of the channel. */
-    virtual void setRXFrequency(uint32_t freq);
+    virtual void setRXFrequency(const Frequency &freq);
     /** Returns the TX frequency of the channel. */
-    virtual uint32_t txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency of the channel. */
-    virtual void setTXFrequency(uint32_t freq);
+    virtual void setTXFrequency(const Frequency &freq);
 
     /** Returns the channel mode. */
     virtual Mode mode() const;
@@ -246,7 +246,7 @@ public:
       static constexpr unsigned int rxTone() { return 0x0020; }
       static constexpr unsigned int txTone() { return 0x0022; }
       static constexpr unsigned int longitude2() { return 0x0024; }
-      static constexpr Bit simplex() { return {0x0026, 3}; }
+      static constexpr Bit simplex() { return {0x0026, 2}; }
       static constexpr Bit useFixedLocation() { return {0x0026, 3}; }
       static constexpr Bit disablePowerSave() { return {0x0026, 5}; }
       static constexpr Bit disableBeep() { return {0x0026, 6}; }

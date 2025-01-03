@@ -282,15 +282,15 @@ SatelliteDatabase::headerData(int section, Qt::Orientation orientation, int role
   switch (section) {
   case 0: return tr("NORAD");
   case 1: return tr("Name");
-  case 2: return tr("FM Downlink Frquency");
-  case 3: return tr("FM Uplink Frquency");
+  case 2: return tr("FM Downlink Frequency");
+  case 3: return tr("FM Uplink Frequency");
   case 4: return tr("FM Downlink Tone");
   case 5: return tr("FM Uplink Tone");
-  case 6: return tr("APRS Downlink Frquency");
-  case 7: return tr("APRS Uplink Frquency");
+  case 6: return tr("APRS Downlink Frequency");
+  case 7: return tr("APRS Uplink Frequency");
   case 8: return tr("APRS Downlink Tone");
   case 9: return tr("APRS Uplink Tone");
-  case 10: return tr("Beacon Frquency");
+  case 10: return tr("Beacon Frequency");
   }
 
   return QVariant();

@@ -1,11 +1,8 @@
 #include "opengd77_codeplug.hh"
 #include "config.hh"
 #include "channel.hh"
-#include "utils.hh"
-#include "logger.hh"
 #include <QDateTime>
 #include <QtEndian>
-#include "opengd77_extension.hh"
 
 
 /* ******************************************************************************************** *

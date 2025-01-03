@@ -49,7 +49,8 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui
   configmergedialog.ui satellitedatabasedialog.ui satelliteselectiondialog.ui
   mainwindow.ui)
 
-set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts)
+set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts
+  ../i18n/pl.ts ../i18n/fr.ts)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
 qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
 
