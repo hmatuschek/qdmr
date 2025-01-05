@@ -615,6 +615,8 @@ public:
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Decodes all FM APRS systems. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all FM APRS systems. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the bank. */
@@ -1334,6 +1336,8 @@ public:
   virtual bool encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Decodes the APRS settings. */
   virtual bool decodeAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links the APRS settings. */
+  virtual bool linkAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all DTMF contacts in the codeplug. */
   virtual void clearDTMFContacts() = 0;

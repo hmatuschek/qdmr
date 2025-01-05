@@ -577,13 +577,17 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
     if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
       dc->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
-    if (hasDMRId()) {
+    // Testing dmrId() == 0 fixes a bug in the OpenGD77 firmware. May change in future.
+    if (hasDMRId() && (0 != dmrId())) {
+      logDebug() << "Channel '" << c->name() << "' overrides default DMR id with "
+                 << dmrId() << ".";
       auto id = ctx.config()->radioIDs()->find(dmrId());
       if (nullptr == id) {
+        logDebug() << "DMR Id " << dmrId() << " is not defined yet, create one as 'Unknown ID'.";
         id = new DMRRadioID(QString("Unknown ID"), dmrId());
         ctx.config()->radioIDs()->add(id);
+        dc->setRadioIdObj(id);
       }
-      dc->setRadioIdObj(id);
     }
   } else if (c->is<FMChannel>()) {
     auto fm = c->as<FMChannel>();
@@ -1134,8 +1138,8 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   sys->setDestination("APN000", 0);
   sys->setSrcSSID(sourceSSID());
   QStringList path;
-  if (hasVia1()) path.append(QString("%1-%2").arg(via1Call(), via1SSID()));
-  if (hasVia2()) path.append(QString("%1-%2").arg(via2Call(), via2SSID()));
+  if (hasVia1()) path.append(QString("%1-%2").arg(via1Call()).arg(via1SSID()));
+  if (hasVia2()) path.append(QString("%1-%2").arg(via2Call()).arg(via2SSID()));
   sys->setPath(path.join(","));
 
   sys->setIcon(icon());
@@ -1218,6 +1222,24 @@ OpenGD77BaseCodeplug::APRSSettingsBankElement::decode(Context &ctx, const ErrorS
     }
   }
 
+  return true;
+}
+
+bool
+OpenGD77BaseCodeplug::APRSSettingsBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::systems(); i++) {
+    if (system(i).isValid()) {
+      if (! ctx.has<APRSSystem>(i)) {
+        errMsg(err) << "Cannot link APRS system at index " << i << ": Not found in context.";
+        return false;
+      }
+      if (! system(i).link(ctx.get<APRSSystem>(i), ctx, err)) {
+        errMsg(err) << "Cannot link APRS system '" << ctx.get<APRSSystem>(i)->name()
+                    << "' at index " << i << ".";
+        return false;
+      }
+    }
+  }
   return true;
 }
 
@@ -2618,6 +2640,11 @@ OpenGD77BaseCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! this->linkGroupLists(ctx, err)) {
     errMsg(err) << "Cannot link group lists.";
+    return false;
+  }
+
+  if (! this->linkAPRSSettings(ctx, err)) {
+    errMsg(err) << "Cannot decode APRS settings.";
     return false;
   }
 
