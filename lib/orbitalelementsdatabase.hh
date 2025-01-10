@@ -1,3 +1,6 @@
+/** @defgroup sat Satellite tracking settings.
+ * @ingroup conf */
+
 #ifndef ORBITALELEMENTSDATABASE_HH
 #define ORBITALELEMENTSDATABASE_HH
 
@@ -5,16 +8,27 @@
 #include <QNetworkAccessManager>
 
 
+/** Defines a single orbital element, enabling the tracking of a single satellite. This dataset
+ * does not contain any transponder information.
+ * @ingroup sat */
 class OrbitalElement
 {
 public:
+  /** Represents a Julien day epoch since a specified year. */
   struct Epoch {
+    /** The year of the epoch. */
     unsigned int year;
+    /** The month. */
     unsigned int month;
+    /** The day. */
     unsigned int day;
+    /** The hour. */
     unsigned int hour;
+    /** The minute. */
     unsigned int minute;
+    /** The second. */
     unsigned int second;
+    /** The microsecond. */
     unsigned int microsecond;
 
     /** Default constructor. */
@@ -27,8 +41,11 @@ public:
     /** Copy assignment. */
     Epoch &operator =(const Epoch &other) = default;
 
+    /** Parses a date-time string into the epoch. */
     static Epoch parse(const QString &datetime);
+    /** Computes the decimal epoch as the day of year a  */
     double toEpoch() const;
+    /** Encodes the Epoch as YYYY-MM-DDThh:mm:ss.uuuuuu. */
     QString toString() const;
   };
 
@@ -69,41 +86,68 @@ public:
   unsigned int revolutionNumber() const;
 
 public:
+  /** Constructs a orbital element from a CelesTrak JSON object. */
   static OrbitalElement fromCelesTrak(const QJsonObject &obj);
 
 protected:
+  /** NORAD id of the satellite. */
   unsigned int _id;
+  /** Desriptive name of the satellite. */
   QString _name;
+  /** The epoch. */
   Epoch _epoch;
+  /** Mean motion. */
   double _meanMotion;
+  /** First derivative of the mean motion. */
   double _meanMotionDerivative;
+  /** Inclination. */
   double _inclination;
+  /** Right ascension of the ascending node. */
   double _ascension;
+  /** Eccentricity. */
   double _eccentricity;
+  /** Argument of perigee. */
   double _perigee;
+  /** Mean anomaly. */
   double _meanAnomaly;
+  /** The revolution number. */
   unsigned int _revolutionNumber;
 };
 
 
 
+/** Downloads and updates a database of orbital elements from CelesTrak.
+ * @ingroup sat */
 class OrbitalElementsDatabase: public QAbstractTableModel
 {
   Q_OBJECT
 
 public:
+  /** Constructs a orbital element database.
+   * @param autoLoad [in] If @c true, the database gets downloaded and loaded automatically.
+   * @param updatePeriodDays [in] Specifies the max age of the local database cache in days.
+   * @param parent [in] Specifies the QObject parent. */
   explicit OrbitalElementsDatabase(bool autoLoad, unsigned int updatePeriodDays=7, QObject *parent=nullptr);
 
+  /** @c returns @c true if the database contains a satellite with the given NORAD id. */
   bool contains(unsigned int id) const;
+  /** Retunrs the orbital elements for the satellite with the given NORAD id. */
   OrbitalElement getById(unsigned int id) const;
+  /** Returns the i-th orbital element. */
   const OrbitalElement &getAt(unsigned int idx) const;
+  /** Returns the i-th orbital element. */
   OrbitalElement &getAt(unsigned int idx);
 
+  /** Returns the current age of the cache. */
   unsigned int dbAge() const;
+  /** If needed, downloads the database and loads all received orbital elements. */
   void load();
 
+  /** Returns the number of elements in the database. */
   int rowCount(const QModelIndex &parent = QModelIndex()) const;
+  /** Returns the number of columns of the database table. */
   int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  /** Returns a single cell of the database table. */
   QVariant data(const QModelIndex &index, int role) const;
 
 signals:
@@ -121,6 +165,7 @@ private slots:
   void downloadFinished(QNetworkReply *reply);
 
 protected:
+  /** Loads a database from the given filename. */
   bool load(const QString &filename);
 
 private:

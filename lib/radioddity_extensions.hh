@@ -38,6 +38,7 @@ public:
   Q_ENUM(Function)
 
 public:
+  /** Default constructor. */
   explicit RadioddityButtonSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;

@@ -918,7 +918,7 @@ public:
 public:
     /** Some limits of this element. */
     struct Limit {
-      // Maximum number of scan list indices.
+      /// Maximum number of scan list indices.
       static constexpr unsigned int scanListIndices() { return 8; }
     };
 

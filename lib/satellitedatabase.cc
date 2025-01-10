@@ -25,7 +25,7 @@ Satellite::Satellite()
 }
 
 Satellite::Satellite(const OrbitalElement &orbit)
-  : OrbitalElement(orbit), _name(orbit.name()),
+  : OrbitalElement(orbit), _name(),
     _fmUplink(), _fmDownlink(), _fmUplinkTone(), _fmDownlinkTone(),
     _aprsUplink(), _aprsDownlink(), _aprsUplinkTone(), _aprsDownlinkTone(), _beacon()
 {
@@ -42,6 +42,7 @@ void
 Satellite::setName(const QString &name) {
   _name = name.simplified();
 }
+
 
 const Frequency &
 Satellite::fmUplink() const {
