@@ -28,14 +28,12 @@ public:
   bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
               const ErrorStack &err=ErrorStack());
 
-public:
-  struct Limit: public OpenGD77BaseCallsignDB::Limit {
-
-  };
-
 protected:
+  /** Some internal offsets within the callsign db. */
   struct Offset {
+    /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int callsignDB() { return 0x30000; }
+    /// @endcond
   };
 };
 

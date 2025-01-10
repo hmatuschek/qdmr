@@ -12,6 +12,7 @@
 struct SelectiveCall
 {
 protected:
+  /** Type of the subtone. */
   enum class Type {
     None, CTCSS, DCS
   };
@@ -78,9 +79,9 @@ protected:
   };
 
 protected:
+  /** Fixed table of standard values. */
   static QVector<SelectiveCall> _standard;
 };
-
 
 Q_DECLARE_METATYPE(SelectiveCall)
 

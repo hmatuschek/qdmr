@@ -1185,6 +1185,7 @@ public:
   public:
     /** Some Limits. */
     struct Limit {
+      /** The maximum number of messages in a bank. */
       static constexpr unsigned int messages() { return 50; }
     };
   };

@@ -161,6 +161,7 @@ public:
   /** The Flash memory bank. */
   static const uint32_t FLASH  = 1;
 
+  /** Specifies the detected model variant. */
   enum class Variant {
     GD77, UV380
   };
