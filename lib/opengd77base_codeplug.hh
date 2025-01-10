@@ -10,7 +10,8 @@
 
 #include <QGeoCoordinate>
 
-
+/** Base codeplug for all OpenGD77 based firmware variants.
+ * @ingroup ogd77 */
 class OpenGD77BaseCodeplug : public Codeplug
 {
   Q_OBJECT
@@ -31,8 +32,7 @@ public:
   static SelectiveCall decodeSelectiveCall(uint16_t code);
 
 public:
-  /** Implements the base for all OpenGD77 channel encodings.
-   */
+  /** Implements the base for all OpenGD77 channel encodings. */
   class ChannelElement: public Codeplug::Element
   {
   public:
@@ -265,6 +265,7 @@ public:
       static constexpr Bit skipZoneScan() { return {0x0033, 5}; }
       static constexpr Bit vox() { return {0x0033, 6}; }
       static constexpr unsigned int squelch() { return 0x0037; }
+      /// @endcond
     };
   };
 
@@ -459,10 +460,12 @@ public:
   class APRSSettingsElement: public Element
   {
   public:
+    /** Possible APRS baud rates. */
     enum class BaudRate {
       Baud300 = 1, Baud1200 = 0
     };
 
+    /** Possible position precisions. */
     enum class PositionPrecision {
       Max = 0,
       Mask1_8sec = 1,
@@ -563,14 +566,17 @@ public:
   public:
     /** Some limits. */
     struct Limit: public Element::Limit {
+      /** The maximum name length in chars. */
       static constexpr unsigned int nameLength() { return 8; }
+      /** The maximum comment length in chars. */
       static constexpr unsigned int commentLength() { return 23; }
     };
 
   protected:
-    /// @cond DO_NOT_DOCUMENT
+    /** Some internal offsets within the element. */
     struct Offset: public Element::Offset
     {
+      /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name() { return 0x0000; }
       static constexpr unsigned int sourceSSID() { return 0x0008; }
       static constexpr unsigned int latitude() { return 0x0009; }
@@ -585,8 +591,8 @@ public:
       static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
       static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
       static constexpr Bit baudRate() { return { 0x003d, 0}; }
+      /// @endcond
     };
-    /// @endcond
   };
 
 
@@ -615,6 +621,8 @@ public:
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Decodes all FM APRS systems. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all FM APRS systems. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the bank. */
@@ -908,6 +916,7 @@ public:
   };
 
 
+  /** Encodes an orbital element of OpenGD77 devices. */
   class OrbitalElement: public Element
   {
   protected:
@@ -1067,8 +1076,11 @@ public:
   class ContactElement: public Element
   {
   public:
+    /** Possible modes of time slot override. */
     enum class TimeSlotOverride {
-      None, TS1, TS2
+      None, ///< Do not override time slot.
+      TS1,  ///< Override with time slot 1.
+      TS2   ///< Override with time slot 2.
     };
 
   protected:
@@ -1293,9 +1305,11 @@ public:
   };
 
 
-public:
+protected:
+  /** Default hidden constructor. */
   explicit OpenGD77BaseCodeplug(QObject *parent = nullptr);
 
+public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 
@@ -1334,6 +1348,8 @@ public:
   virtual bool encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Decodes the APRS settings. */
   virtual bool decodeAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links the APRS settings. */
+  virtual bool linkAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all DTMF contacts in the codeplug. */
   virtual void clearDTMFContacts() = 0;

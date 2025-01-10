@@ -263,6 +263,7 @@ public:
       static constexpr Bit talkaround() { return {0x0033, 3}; }
       static constexpr Bit vox() { return {0x0033, 6}; }
       static constexpr Bit power() { return {0x0033, 7}; }
+      /// @endcond
     };
   };
 

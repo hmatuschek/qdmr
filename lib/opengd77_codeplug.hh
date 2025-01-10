@@ -73,6 +73,7 @@ public:
   void clearAPRSSettings();
   bool encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool decodeAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkAPRSSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
   bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
