@@ -148,5 +148,27 @@ ConfigTest::testMelodyDecoding() {
   QCOMPARE(melody.bpm(), 100);
 }
 
+
+void
+ConfigTest::testCTCSSNull() {
+  ErrorStack err;
+  Config ctcssConfig;
+  if (! ctcssConfig.readYAML(":/data/ctcss_null_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Test backward compatability
+  QVERIFY(ctcssConfig.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(SelectiveCall() ,ctcssConfig.channelList()->channel(0)->as<FMChannel>()->rxTone());
+  QCOMPARE(SelectiveCall(67.0) ,ctcssConfig.channelList()->channel(0)->as<FMChannel>()->txTone());
+
+  // Test new format
+  QVERIFY(ctcssConfig.channelList()->channel(1)->is<FMChannel>());
+  QCOMPARE(SelectiveCall(37, true), ctcssConfig.channelList()->channel(1)->as<FMChannel>()->rxTone());
+  QCOMPARE(SelectiveCall(67.0) ,ctcssConfig.channelList()->channel(1)->as<FMChannel>()->txTone());
+}
+
+
 QTEST_GUILESS_MAIN(ConfigTest)
 

@@ -1176,8 +1176,7 @@ public:
   };
 
 
-  /** Implements some storage to hold the names for the FM APRS frequencies.
-   * @verbinclude d878uv_fm_aprs_frequency_names.txt */
+  /** Implements some storage to hold the names for the FM APRS frequencies. */
   class FMAPRSFrequencyNamesElement: public Element
   {
   protected:

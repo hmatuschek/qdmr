@@ -24,8 +24,8 @@ protected slots:
   void onConfigModified();
   void onDMRIDChanged();
   void onNameChanged();
-  void onIntroLine1Changed();
-  void onIntroLine2Changed();
+  void onIntroLine1Edited();
+  void onIntroLine2Edited();
   void onMicLevelChanged();
   void onSpeechChanged();
   void onPowerChanged();

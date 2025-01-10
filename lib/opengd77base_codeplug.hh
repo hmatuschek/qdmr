@@ -10,7 +10,8 @@
 
 #include <QGeoCoordinate>
 
-
+/** Base codeplug for all OpenGD77 based firmware variants.
+ * @ingroup ogd77 */
 class OpenGD77BaseCodeplug : public Codeplug
 {
   Q_OBJECT
@@ -31,8 +32,7 @@ public:
   static SelectiveCall decodeSelectiveCall(uint16_t code);
 
 public:
-  /** Implements the base for all OpenGD77 channel encodings.
-   */
+  /** Implements the base for all OpenGD77 channel encodings. */
   class ChannelElement: public Codeplug::Element
   {
   public:
@@ -74,13 +74,13 @@ public:
     virtual void setName(const QString &n);
 
     /** Returns the RX frequency of the channel. */
-    virtual uint32_t rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency of the channel. */
-    virtual void setRXFrequency(uint32_t freq);
+    virtual void setRXFrequency(const Frequency &freq);
     /** Returns the TX frequency of the channel. */
-    virtual uint32_t txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency of the channel. */
-    virtual void setTXFrequency(uint32_t freq);
+    virtual void setTXFrequency(const Frequency &freq);
 
     /** Returns the channel mode. */
     virtual Mode mode() const;
@@ -161,6 +161,15 @@ public:
     /** Resets the APRS system index. */
     virtual void clearAPRSIndex();
 
+    /** Returns @c true, if the TX contact is set. */
+    virtual bool hasTXContact() const;
+    /** Returns the TX contact index. */
+    virtual unsigned int txContactIndex() const;
+    /** Sets the TX contact index. */
+    virtual void setTXContactIndex(unsigned int index);
+    /** Clears the TX contact index. */
+    virtual void clearTXContact();
+
     /** Returns the alias transmitted on time slot 1. */
     virtual OpenGD77ChannelExtension::TalkerAlias aliasTimeSlot1() const;
     /** Sets the alias transmitted on time slot 1. */
@@ -237,7 +246,7 @@ public:
       static constexpr unsigned int rxTone() { return 0x0020; }
       static constexpr unsigned int txTone() { return 0x0022; }
       static constexpr unsigned int longitude2() { return 0x0024; }
-      static constexpr Bit simplex() { return {0x0026, 3}; }
+      static constexpr Bit simplex() { return {0x0026, 2}; }
       static constexpr Bit useFixedLocation() { return {0x0026, 3}; }
       static constexpr Bit disablePowerSave() { return {0x0026, 5}; }
       static constexpr Bit disableBeep() { return {0x0026, 6}; }
@@ -246,6 +255,7 @@ public:
       static constexpr unsigned int groupList() { return 0x002b; }
       static constexpr unsigned int colorCode() { return 0x002c; }
       static constexpr unsigned int aprsIndex() { return 0x002d; }
+      static constexpr unsigned int txContact() { return 0x002e; }
       static constexpr Bit aliasTimeSlot2() { return { 0x030, 2}; }
       static constexpr Bit aliasTimeSlot1() { return { 0x030, 0}; }
       static constexpr Bit timeSlot() { return {0x0031, 6}; }
@@ -255,6 +265,7 @@ public:
       static constexpr Bit skipZoneScan() { return {0x0033, 5}; }
       static constexpr Bit vox() { return {0x0033, 6}; }
       static constexpr unsigned int squelch() { return 0x0037; }
+      /// @endcond
     };
   };
 
@@ -449,10 +460,12 @@ public:
   class APRSSettingsElement: public Element
   {
   public:
+    /** Possible APRS baud rates. */
     enum class BaudRate {
       Baud300 = 1, Baud1200 = 0
     };
 
+    /** Possible position precisions. */
     enum class PositionPrecision {
       Max = 0,
       Mask1_8sec = 1,
@@ -553,14 +566,17 @@ public:
   public:
     /** Some limits. */
     struct Limit: public Element::Limit {
+      /** The maximum name length in chars. */
       static constexpr unsigned int nameLength() { return 8; }
+      /** The maximum comment length in chars. */
       static constexpr unsigned int commentLength() { return 23; }
     };
 
   protected:
-    /// @cond DO_NOT_DOCUMENT
+    /** Some internal offsets within the element. */
     struct Offset: public Element::Offset
     {
+      /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name() { return 0x0000; }
       static constexpr unsigned int sourceSSID() { return 0x0008; }
       static constexpr unsigned int latitude() { return 0x0009; }
@@ -575,8 +591,8 @@ public:
       static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
       static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
       static constexpr Bit baudRate() { return { 0x003d, 0}; }
+      /// @endcond
     };
-    /// @endcond
   };
 
 
@@ -805,12 +821,11 @@ public:
     /** Sets the name of the zone. */
     virtual void setName(const QString &name);
 
-    /** Returns @c true if a member is stored at the given index.
-     * That is, if the index is not 0. */
+    /** Returns @c true if a member is stored at the given index. */
     virtual bool hasMember(unsigned n) const;
-    /** Returns the n-th member index (+1). */
+    /** Returns the n-th member index. */
     virtual unsigned member(unsigned n) const;
-    /** Sets the n-th member index (+1). */
+    /** Sets the n-th member index. */
     virtual void setMember(unsigned n, unsigned idx);
     /** Clears the n-th member index. */
     virtual void clearMember(unsigned n);
@@ -899,6 +914,7 @@ public:
   };
 
 
+  /** Encodes an orbital element of OpenGD77 devices. */
   class OrbitalElement: public Element
   {
   protected:
@@ -1058,8 +1074,11 @@ public:
   class ContactElement: public Element
   {
   public:
+    /** Possible modes of time slot override. */
     enum class TimeSlotOverride {
-      None, TS1, TS2
+      None, ///< Do not override time slot.
+      TS1,  ///< Override with time slot 1.
+      TS2   ///< Override with time slot 2.
     };
 
   protected:
@@ -1284,9 +1303,11 @@ public:
   };
 
 
-public:
+protected:
+  /** Default hidden constructor. */
   explicit OpenGD77BaseCodeplug(QObject *parent = nullptr);
 
+public:
   /** Clears and resets the complete codeplug to some default values. */
   virtual void clear();
 

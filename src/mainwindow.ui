@@ -354,6 +354,9 @@
    <property name="toolTip">
     <string>Refreshes the orbital elements.</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionEditSatellites">
    <property name="text">
@@ -361,6 +364,20 @@
    </property>
    <property name="toolTip">
     <string>Opens an editor to edit your satellite database.</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionWriteSatellites">
+   <property name="text">
+    <string>Write satellites</string>
+   </property>
+   <property name="toolTip">
+    <string>Writes the orbital elements and transponder information onto the connected device.</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionWriteSatellites">

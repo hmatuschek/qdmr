@@ -82,15 +82,30 @@ OpenGD77BaseCodeplug::ChannelElement::~ChannelElement() {
 void
 OpenGD77BaseCodeplug::ChannelElement::clear() {
   setName("");
-  setRXFrequency(0);
-  setTXFrequency(0);
+  setRXFrequency(Frequency());
+  setTXFrequency(Frequency());
   setMode(MODE_ANALOG);
+  setPower(Channel::Power::High);
+  clearFixedPosition();
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
-  setColorCode(0);
-  setGroupListIndex(0);
+  enableSimplex(false);
+  enablePowerSave(false);
+  enableBeep(false);
   clearDMRId();
-
+  setGroupListIndex(0);
+  setColorCode(0);
+  clearAPRSIndex();
+  clearTXContact();
+  setAliasTimeSlot1(OpenGD77ChannelExtension::TalkerAlias::None);
+  setAliasTimeSlot2(OpenGD77ChannelExtension::TalkerAlias::None);
+  setTimeSlot(DMRChannel::TimeSlot::TS1);
+  setBandwidth(FMChannel::Bandwidth::Narrow);
+  enableRXOnly(false);
+  enableSkipScan(false);
+  enableSkipZoneScan(false);
+  enableVOX(false);
+  setSquelch(SquelchMode::Global, 0);
 }
 
 
@@ -105,25 +120,25 @@ OpenGD77BaseCodeplug::ChannelElement::setName(const QString &n) {
 }
 
 
-uint32_t
+Frequency
 OpenGD77BaseCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_le(Offset::rxFrequency())*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(Offset::rxFrequency()))*10);
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setRXFrequency(uint32_t freq) {
-  setBCD8_le(Offset::rxFrequency(), freq/10);
+OpenGD77BaseCodeplug::ChannelElement::setRXFrequency(const Frequency &freq) {
+  setBCD8_le(Offset::rxFrequency(), freq.inHz()/10);
 }
 
 
-uint32_t
+Frequency
 OpenGD77BaseCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_le(Offset::txFrequency())*10;
+  return Frequency::fromHz(((unsigned long long)getBCD8_le(Offset::txFrequency()))*10);
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::setTXFrequency(uint32_t freq) {
-  setBCD8_le(Offset::txFrequency(), freq/10);
+OpenGD77BaseCodeplug::ChannelElement::setTXFrequency(const Frequency &freq) {
+  setBCD8_le(Offset::txFrequency(), freq.inHz()/10);
 }
 
 
@@ -159,6 +174,7 @@ OpenGD77BaseCodeplug::ChannelElement::power() const {
   default:
   break;
   }
+
   return Channel::Power::Min;
 }
 
@@ -350,6 +366,27 @@ OpenGD77BaseCodeplug::ChannelElement::clearAPRSIndex() {
 }
 
 
+bool
+OpenGD77BaseCodeplug::ChannelElement::hasTXContact() const {
+  return 0 != getUInt16_le(Offset::txContact());
+}
+
+unsigned int
+OpenGD77BaseCodeplug::ChannelElement::txContactIndex() const {
+  return getUInt16_le(Offset::txContact()) - 1;
+}
+
+void
+OpenGD77BaseCodeplug::ChannelElement::setTXContactIndex(unsigned int index) {
+  setUInt16_le(Offset::txContact(), index+1);
+}
+
+void
+OpenGD77BaseCodeplug::ChannelElement::clearTXContact() {
+  setUInt16_le(Offset::txContact(), 0);
+}
+
+
 OpenGD77ChannelExtension::TalkerAlias
 OpenGD77BaseCodeplug::ChannelElement::aliasTimeSlot1() const {
   switch ((Alias) getUInt2(Offset::aliasTimeSlot1())) {
@@ -499,12 +536,15 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
 
   // Apply common settings
   ch->setName(name());
-  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
+  ch->setRXFrequency(rxFrequency());
   if (isSimplex())
-    ch->setTXFrequency(Frequency::fromHz(rxFrequency()));
+    ch->setTXFrequency(rxFrequency());
   else
-    ch->setTXFrequency(Frequency::fromHz(txFrequency()));
-  ch->setPower(power());
+    ch->setTXFrequency(txFrequency());
+  if (globalPower())
+    ch->setDefaultPower();
+  else
+    ch->setPower(power());
   ch->setRXOnly(rxOnly());
   if (vox())
     ch->setVOXDefault();
@@ -535,6 +575,8 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+    if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
+      dc->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
     if (hasDMRId()) {
       auto id = ctx.config()->radioIDs()->find(dmrId());
       if (nullptr == id) {
@@ -564,12 +606,12 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
 
   setName(c->name());
 
-  setRXFrequency(c->rxFrequency().inHz());
-  setTXFrequency(c->txFrequency().inHz());
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
+  enableSimplex(false);
 
-  if (c->defaultPower())
-    setPower(ctx.config()->settings()->power());
-  else
+  clearPower();
+  if (! c->defaultPower())
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());
@@ -593,8 +635,11 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setMode(MODE_DIGITAL);
     setTimeSlot(dc->timeSlot());
     setColorCode(dc->colorCode());
+    // OpenGD77 does not allow for both TX contact and group list, select one, prefer group list
     if (dc->groupListObj())
       setGroupListIndex(ctx.index(dc->groupListObj()));
+    else if (dc->txContactObj())
+      setTXContactIndex(ctx.index(dc->txContactObj()));
     if (dc->radioIdObj() != ctx.config()->settings()->defaultId())
       setDMRId(dc->radioIdObj()->number());
   } else {
@@ -1465,27 +1510,31 @@ OpenGD77BaseCodeplug::ZoneElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
 }
 
+
 bool
 OpenGD77BaseCodeplug::ZoneElement::hasMember(unsigned n) const {
   if (n >= Limit::memberCount())
     return false;
-  return (0 != member(n));
+  return 0 != getUInt16_le(Offset::channels() + Offset::betweenChannels()*n);
 }
+
 unsigned
 OpenGD77BaseCodeplug::ZoneElement::member(unsigned n) const {
   if (n >= Limit::memberCount())
     return 0;
-  return getUInt16_le(Offset::channels()+Offset::betweenChannels()*n);
+  return getUInt16_le(Offset::channels() + Offset::betweenChannels()*n)-1;
 }
+
 void
 OpenGD77BaseCodeplug::ZoneElement::setMember(unsigned n, unsigned idx) {
   if (n >= Limit::memberCount())
     return;
-  setUInt16_le(Offset::channels()+Offset::betweenChannels()*n, idx);
+  setUInt16_le(Offset::channels() + Offset::betweenChannels()*n, idx+1);
 }
+
 void
 OpenGD77BaseCodeplug::ZoneElement::clearMember(unsigned n) {
-  setMember(n, 0);
+  setUInt16_le(Offset::channels() + Offset::betweenChannels()*n, 0);
 }
 
 
@@ -2157,12 +2206,12 @@ OpenGD77BaseCodeplug::GroupListElement::hasContactIndex(unsigned int i) const {
 
 unsigned int
 OpenGD77BaseCodeplug::GroupListElement::contactIndex(unsigned int i) const {
-  return getUInt16_le(Offset::contacts() + i*Offset::betweenContacts())-1;
+  return getUInt16_le(Offset::contacts() + i*Offset::betweenContacts()) - 1;
 }
 
 void
 OpenGD77BaseCodeplug::GroupListElement::setContactIndex(unsigned int i, unsigned int contactIdx) {
-  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), contactIdx+1);
+  setUInt16_le(Offset::contacts() + i*Offset::betweenContacts(), contactIdx + 1);
 }
 
 void

@@ -96,7 +96,7 @@ C7000Device::Packet::payloadSize() const {
 
 QByteArray
 C7000Device::Packet::payload() const {
-  return _encoded.mid(8,payloadSize());
+  return _encoded.mid(8, payloadSize());
 }
 
 const QByteArray &

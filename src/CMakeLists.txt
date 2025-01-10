@@ -14,7 +14,8 @@ SET(qdmr_SOURCES main.cc
   configmergedialog.cc satellitedatabasedialog.cc satelliteselectiondialog.cc
   repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc
   hearhamrepeatersource.cc radioidrepeatersource.cc selectivecallbox.cc
-  transponderfrequencydelegate.cc)
+  transponderfrequencydelegate.cc
+  mainwindow.cc)
 SET(qdmr_MOC_HEADERS
   configitemwrapper.hh
   application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
@@ -32,9 +33,11 @@ SET(qdmr_MOC_HEADERS
   configmergedialog.hh satellitedatabasedialog.hh satelliteselectiondialog.hh
   repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh
   hearhamrepeatersource.hh radioidrepeatersource.hh selectivecallbox.hh
-  transponderfrequencydelegate.hh)
+  transponderfrequencydelegate.hh
+  mainwindow.hh)
 SET(qdmr_HEADERS )
-SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui analogchanneldialog.ui zonedialog.ui
+SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui
+  analogchanneldialog.ui zonedialog.ui
   digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui
   gpssystemdialog.ui aprssystemdialog.ui
   roamingzonedialog.ui roamingchannellistview.ui roamingchanneldialog.ui
@@ -43,9 +46,11 @@ SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui 
   zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
   errormessageview.ui extensionview.ui
   deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui
-  configmergedialog.ui satellitedatabasedialog.ui satelliteselectiondialog.ui)
+  configmergedialog.ui satellitedatabasedialog.ui satelliteselectiondialog.ui
+  mainwindow.ui)
 
-set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts)
+set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts
+  ../i18n/pl.ts ../i18n/fr.ts)
 qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
 qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
 

@@ -9,7 +9,7 @@
 #include "releasenotes.hh"
 #include "radio.hh"
 
-class QMainWindow;
+class MainWindow;
 class QTranslator;
 class RepeaterDatabase;
 class UserDatabase;
@@ -37,11 +37,14 @@ public:
   Application(int &argc, char *argv[]);
   virtual ~Application();
 
-  QMainWindow *mainWindow();
+  MainWindow *mainWindow();
+
+  bool isModified() const;
 
   UserDatabase *user() const;
   RepeaterDatabase *repeater() const;
   TalkGroupDatabase *talkgroup() const;
+  SatelliteDatabase *satellite() const;
 
   bool hasPosition() const;
   QGeoCoordinate position() const;
@@ -57,7 +60,6 @@ public slots:
   void saveCodeplug();
   void exportCodeplugToChirp();
   void importCodeplug();
-  void quitApplication();
 
   void detectRadio();
   bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
@@ -74,8 +76,6 @@ public slots:
   void editSatellites();
 
 private slots:
-  QMainWindow *createMainWindow();
-
   void onCodeplugDownloadError(Radio *radio);
   void onCodeplugDownloaded(Radio *radio, Codeplug *codeplug);
 
@@ -90,20 +90,8 @@ private slots:
 
 protected:
   Config *_config;
-  QMainWindow *_mainWindow;
+  MainWindow *_mainWindow;
   QTranslator *_translator;
-
-  GeneralSettingsView *_generalSettings;
-  RadioIDListView *_radioIdTab;
-  ContactListView *_contactList;
-  GroupListsView *_groupLists;
-  ChannelListView *_channelList;
-  ZoneListView *_zoneList;
-  ScanListsView *_scanLists;
-  PositioningSystemListView *_posSysList;
-  RoamingChannelListView *_roamingChannelList;
-  RoamingZoneListView *_roamingZoneList;
-  ExtensionView *_extensionView;
 
   RepeaterDatabase *_repeater;
   UserDatabase *_users;

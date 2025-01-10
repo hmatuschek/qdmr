@@ -119,6 +119,7 @@ public:
   /** Holds the APRS PTT mode. That his, if and when the APRS information is send via the
    * associated APRS system. */
   APRSPTT aprsPTT() const;
+  /** Sets the APRS PTT mode. */
   void setAPRSPTT(APRSPTT mode);
 
 protected:

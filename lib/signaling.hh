@@ -12,6 +12,7 @@
 struct SelectiveCall
 {
 protected:
+  /** Type of the subtone. */
   enum class Type {
     None, CTCSS, DCS
   };
@@ -78,9 +79,9 @@ protected:
   };
 
 protected:
+  /** Fixed table of standard values. */
   static QVector<SelectiveCall> _standard;
 };
-
 
 Q_DECLARE_METATYPE(SelectiveCall)
 
@@ -115,7 +116,7 @@ namespace YAML
         rhs = SelectiveCall::parseCTCSS(QString::fromStdString(node["ctcss"].as<std::string>()));
 
       if (node["dcs"])
-        rhs = SelectiveCall::parseDCS(QString::fromStdString(node["ctcss"].as<std::string>()));
+        rhs = SelectiveCall::parseDCS(QString::fromStdString(node["dcs"].as<std::string>()));
 
       return rhs.isValid();
     }

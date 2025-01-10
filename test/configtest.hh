@@ -28,6 +28,9 @@ private slots:
   void testMelodyEncoding();
   void testMelodyDecoding(); 
 
+  /** Regression test for #509. */
+  void testCTCSSNull();
+
 protected:
   QTextStream _stderr;
   Config _ctcssCopyTest;
