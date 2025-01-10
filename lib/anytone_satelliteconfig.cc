@@ -1,6 +1,7 @@
 #include "anytone_satelliteconfig.hh"
 #include "anytone_codeplug.hh"
 #include "satellitedatabase.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -26,7 +27,7 @@ AnytoneSatelliteConfig::SatelliteElement::clear() {
 
 void
 AnytoneSatelliteConfig::SatelliteElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::name(), 0x20);
+  writeASCII(Offset::name(), name, Limit::name(), 0);
 }
 
 void
@@ -42,13 +43,15 @@ AnytoneSatelliteConfig::SatelliteElement::setEpoch(const OrbitalElement::Epoch &
       .arg(fday, 8, 10, QChar('0'));
 
   writeASCII(Offset::epochYear(), fmt_year, 2);
-  writeASCII(Offset::epochDay(), fmt_day, 12);
+  writeASCII(Offset::epochDay(), fmt_day, 12, 0x20);
 }
 
 void
 AnytoneSatelliteConfig::SatelliteElement::setMeanMotionDerivative(double dmm) {
-  QString fmt = QString("%1").arg((int)(dmm * 100000000), 8, 10, QChar('0'));
-  writeASCII(Offset::meanMotionDerivative(), fmt, 8);
+  QString fmt = QString("%1.%2")
+      .arg(dmm < 0 ? '-' :  ' ')
+      .arg((int)(std::abs(dmm) * 100000000), 8, 10, QChar('0'));
+  writeASCII(Offset::meanMotionDerivative(), fmt, 10, 0x20);
 }
 
 void
@@ -60,7 +63,7 @@ AnytoneSatelliteConfig::SatelliteElement::setInclination(double incl) {
       .arg(ddd, 3, 10, QChar(' '))
       .arg(ffff, 4, 10, QChar('0'));
 
-  writeASCII(Offset::inclination(), fmt, 8);
+  writeASCII(Offset::inclination(), fmt, 8, 0x20);
 }
 
 void
@@ -72,13 +75,13 @@ AnytoneSatelliteConfig::SatelliteElement::setAscension(double asc) {
       .arg(ddd, 3, 10, QChar(' '))
       .arg(ffff, 4, 10, QChar('0'));
 
-  writeASCII(Offset::ascension(), fmt, 8);
+  writeASCII(Offset::ascension(), fmt, 8, 0x20);
 }
 
 void
 AnytoneSatelliteConfig::SatelliteElement::setEccentricity(double ecc) {
   QString fmt = QString("%1").arg((int)(ecc * 10000000), 7, 10, QChar('0'));
-  writeASCII(Offset::meanMotionDerivative(), fmt, 7);
+  writeASCII(Offset::eccentricity(), fmt, 7, 0x20);
 }
 
 void
@@ -90,7 +93,7 @@ AnytoneSatelliteConfig::SatelliteElement::setPerigee(double peri) {
       .arg(ddd, 3, 10, QChar(' '))
       .arg(ffff, 4, 10, QChar('0'));
 
-  writeASCII(Offset::perigee(), fmt, 8);
+  writeASCII(Offset::perigee(), fmt, 8, 0x20);
 }
 
 void
@@ -102,7 +105,7 @@ AnytoneSatelliteConfig::SatelliteElement::setAnomaly(double ma) {
       .arg(ddd, 3, 10, QChar(' '))
       .arg(ffff, 4, 10, QChar('0'));
 
-  writeASCII(Offset::anomaly(), fmt, 8);
+  writeASCII(Offset::anomaly(), fmt, 8, 0x20);
 }
 
 void
@@ -114,12 +117,12 @@ AnytoneSatelliteConfig::SatelliteElement::setMeanMotion(double mm) {
       .arg(dd, 2, 10, QChar(' '))
       .arg(ffffffff, 8, 10, QChar('0'));
 
-  writeASCII(Offset::meanMotion(), fmt, 11);
+  writeASCII(Offset::meanMotion(), fmt, 11, 0x20);
 }
 
 void
 AnytoneSatelliteConfig::SatelliteElement::setRevolution(unsigned int num) {
-  writeASCII(Offset::revolution(), QString("%1").arg(num, 5, 10, QChar('0')), 5);
+  writeASCII(Offset::revolution(), QString("%1").arg(num, 5, 10, QChar('0')), 5, 0x20);
 }
 
 
@@ -211,6 +214,7 @@ AnytoneSatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
   unsigned int numSat = std::min(Limit::satellites(), db->count());
 
   for (unsigned int i=0; i<numSat; i++) {
+    logDebug() << "Encode sat '" << db->getAt(i).name() << "' at index " << i << ".";
     if (! satellite(i).encode(db->getAt(i), err)) {
       errMsg(err) << "Cannot encode satellite '" << db->getAt(i).name()
                   << "at index " << i << ".";
@@ -218,5 +222,6 @@ AnytoneSatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
     }
   }
 
+  this->write("debug_satellite_d878uv.dfu");
   return true;
 }

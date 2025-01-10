@@ -84,7 +84,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name() { return 0x0000; }
       static constexpr unsigned int epochYear() { return 0x0008; }
-      static constexpr unsigned int epochDay() { return 0x0008; }
+      static constexpr unsigned int epochDay() { return 0x000a; }
       static constexpr unsigned int meanMotionDerivative() { return 0x0017; }
       static constexpr unsigned int inclination() { return 0x0021; }
       static constexpr unsigned int ascension() { return 0x002a; }
