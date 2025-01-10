@@ -700,6 +700,13 @@ public:
   /** Returns the maximum number of entries in the call-sign DB. */
   unsigned numCallSignDBEntries() const;
 
+  /** Returns @c true if the radio supports satellite config. */
+  bool hasSatelliteConfig() const;
+  /** Returns @c true if satellite config is implemented. */
+  bool satelliteConfigImplemented() const;
+  /** Returns the maximum number of satellites. */
+  unsigned numSatellites() const;
+
 protected:
   /** If @c true, a warning is issued that the radio is still under development and not well
    * tested yet. */
@@ -710,6 +717,12 @@ protected:
   bool _callSignDBImplemented;
   /** Holds the number of possible call-sign DB entries. */
   unsigned _numCallSignDBEntries;
+  /** If @c true, the radio supports satellite config. */
+  bool _hasSatelliteConfig;
+  /** If @c true, satellite config is implemented. */
+  bool _satelliteConfigImplemented;
+  /** Holds the number of possible satellites. */
+  unsigned _numSatellites;
 };
 
 #endif // RADIOLIMITS_HH

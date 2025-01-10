@@ -16,6 +16,11 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 15796;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{

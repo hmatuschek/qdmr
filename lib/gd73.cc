@@ -85,14 +85,23 @@ GD73::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, c
 
 bool
 GD73::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
-  Q_UNUSED(db);
-  Q_UNUSED(blocking);
-  Q_UNUSED(selection);
+  Q_UNUSED(db); Q_UNUSED(blocking); Q_UNUSED(selection);
 
   errMsg(err) << "Radio does not support a callsign DB.";
 
   return false;
 }
+
+
+bool
+GD73::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(blocking);
+
+  errMsg(err) << "Satellite config upload is not implemented yet.";
+
+  return false;
+}
+
 
 void
 GD73::run() {

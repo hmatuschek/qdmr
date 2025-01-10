@@ -34,6 +34,8 @@ public slots:
                              const CallsignDB::Selection &selection=CallsignDB::Selection(),
                              const ErrorStack &err=ErrorStack());
 
+  bool startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err);
+
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
 	void run();

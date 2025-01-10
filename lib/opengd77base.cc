@@ -128,6 +128,13 @@ OpenGD77Base::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 }
 
 
+bool
+OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  errMsg(err) << "Satellite config upload is not implemented yet.";
+  return false;
+}
+
+
 void
 OpenGD77Base::run() {
   if (StatusDownload == _task) {

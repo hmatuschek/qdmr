@@ -921,16 +921,21 @@ RadioLimitSingleZone::verifyItem(const ConfigItem *item, RadioLimitContext &cont
  * Implementation of RadioLimits
  * ********************************************************************************************* */
 RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
-  : RadioLimitItem(parent), _betaWarning(betaWarning)
+  : RadioLimitItem(parent), _betaWarning(betaWarning),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
 
 RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
-  : RadioLimitItem(list, parent)
+  : RadioLimitItem(list, parent),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
+
 
 bool
 RadioLimits::hasCallSignDB() const {
@@ -946,6 +951,23 @@ unsigned
 RadioLimits::numCallSignDBEntries() const {
   return _numCallSignDBEntries;
 }
+
+
+bool
+RadioLimits::hasSatelliteConfig() const {
+  return _hasSatelliteConfig;
+}
+
+bool
+RadioLimits::satelliteConfigImplemented() const {
+  return _satelliteConfigImplemented;
+}
+
+unsigned
+RadioLimits::numSatellites() const {
+  return _numSatellites;
+}
+
 
 bool
 RadioLimits::verifyConfig(const Config *config, RadioLimitContext &context) const {
