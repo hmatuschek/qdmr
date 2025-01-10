@@ -10,7 +10,8 @@
 
 #include <QGeoCoordinate>
 
-
+/** Base codeplug for all OpenGD77 based firmware variants.
+ * @ingroup ogd77 */
 class OpenGD77BaseCodeplug : public Codeplug
 {
   Q_OBJECT
@@ -31,8 +32,7 @@ public:
   static SelectiveCall decodeSelectiveCall(uint16_t code);
 
 public:
-  /** Implements the base for all OpenGD77 channel encodings.
-   */
+  /** Implements the base for all OpenGD77 channel encodings. */
   class ChannelElement: public Codeplug::Element
   {
   public:
@@ -265,6 +265,7 @@ public:
       static constexpr Bit skipZoneScan() { return {0x0033, 5}; }
       static constexpr Bit vox() { return {0x0033, 6}; }
       static constexpr unsigned int squelch() { return 0x0037; }
+      /// @endcond
     };
   };
 
