@@ -570,8 +570,9 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
   Q_UNUSED(err)
 
   // Link common
-  // Link digital channel
+
   if (c->is<DMRChannel>()) {
+    // Link DMR channel
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
@@ -586,10 +587,11 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
         logDebug() << "DMR Id " << dmrId() << " is not defined yet, create one as 'Unknown ID'.";
         id = new DMRRadioID(QString("Unknown ID"), dmrId());
         ctx.config()->radioIDs()->add(id);
-        dc->setRadioIdObj(id);
       }
+      dc->setRadioIdObj(id);
     }
   } else if (c->is<FMChannel>()) {
+    // Link FM channel
     auto fm = c->as<FMChannel>();
     if (hasAPRSIndex()) {
       if (! ctx.has<APRSSystem>(aprsIndex())) {
