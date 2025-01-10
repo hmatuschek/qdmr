@@ -79,6 +79,12 @@ OpenGD77Codeplug::decodeAPRSSettings(Context &ctx, const ErrorStack &err) {
       .decode(ctx, err);
 }
 
+bool
+OpenGD77Codeplug::linkAPRSSettings(Context &ctx, const ErrorStack &err) {
+  return APRSSettingsBankElement(data(Offset::aprsSettings(), ImageIndex::aprsSettings()))
+      .link(ctx, err);
+}
+
 
 bool
 OpenGD77Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {

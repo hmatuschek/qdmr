@@ -80,6 +80,12 @@ OpenUV380Codeplug::decodeAPRSSettings(Context &ctx, const ErrorStack &err) {
       .decode(ctx, err);
 }
 
+bool
+OpenUV380Codeplug::linkAPRSSettings(Context &ctx, const ErrorStack &err) {
+  return APRSSettingsBankElement(data(Offset::aprsSettings(), ImageIndex::aprsSettings()))
+      .link(ctx, err);
+}
+
 
 bool
 OpenUV380Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
