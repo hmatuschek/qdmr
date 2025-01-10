@@ -111,5 +111,32 @@ OpenGD77Test::testChannelPowerSettings() {
 }
 
 
+void
+OpenGD77Test::testOverrideChannelRadioId() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  // add another DMR ID and assign it to two channels
+  auto id2 = new DMRRadioID("Test", 1234567);
+  config.radioIDs()->add(id2);
+  config.channelList()->channel(0)->as<DMRChannel>()->setRadioIdObj(id2);
+  config.channelList()->channel(1)->as<DMRChannel>()->setRadioIdObj(id2);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.radioIDs()->count(), 2);
+  QVERIFY(! decoded.channelList()->channel(0)->as<DMRChannel>()->radioId()->isNull());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->radioId()->isNull());
+  QCOMPARE(decoded.channelList()->channel(1)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+}
+
+
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
