@@ -222,6 +222,5 @@ AnytoneSatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
     }
   }
 
-  this->write("debug_satellite_d878uv.dfu");
   return true;
 }
