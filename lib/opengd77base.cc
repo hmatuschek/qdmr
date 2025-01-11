@@ -12,7 +12,7 @@ RadioLimits *OpenGD77Base::_limits = nullptr;
 OpenGD77Base::OpenGD77Base(OpenGD77Interface *device, QObject *parent)
   : Radio(parent), _dev(device), _config(nullptr), _satelliteConfig(nullptr)
 {
-  _satelliteConfig = new OpenGD77SatelliteConfig(this);
+  // pass...
 }
 
 OpenGD77Base::~OpenGD77Base() {
@@ -426,20 +426,20 @@ OpenGD77Base::uploadSatellites()
 
   size_t totb = _satelliteConfig->memSize();
 
-  if (! _dev->write_start(OpenGD77SatelliteConfig::FLASH, 0, _errorStack)) {
+  if (! _dev->write_start(OpenGD77BaseSatelliteConfig::FLASH, 0, _errorStack)) {
     errMsg(_errorStack) << "Cannot start satellite config upload.";
     return false;
   }
 
   unsigned bcount = 0;
   // Then upload config
-  for (int n=0; n<_satelliteConfig->image(OpenGD77SatelliteConfig::FLASH).numElements(); n++) {
-    unsigned addr = _satelliteConfig->image(OpenGD77SatelliteConfig::FLASH).element(n).address();
-    unsigned size = _satelliteConfig->image(OpenGD77SatelliteConfig::FLASH).element(n).data().size();
+  for (int n=0; n<_satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).numElements(); n++) {
+    unsigned addr = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).address();
+    unsigned size = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).data().size();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
       if (! _dev->write(OpenGD77BaseCodeplug::FLASH, (b0+b)*BSIZE,
-                        _satelliteConfig->data((b0+b)*BSIZE, OpenGD77SatelliteConfig::FLASH),
+                        _satelliteConfig->data((b0+b)*BSIZE, OpenGD77BaseSatelliteConfig::FLASH),
                         BSIZE, _errorStack))
       {
         errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";

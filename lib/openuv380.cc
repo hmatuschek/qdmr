@@ -7,7 +7,7 @@
 OpenUV380::OpenUV380(OpenGD77Interface *device, QObject *parent)
   : OpenGD77Base(device, parent), _name("Open MD-UV380"), _codeplug(), _callsigns()
 {
-  // pass...
+  _satelliteConfig = new OpenGD77SatelliteConfig(this);
 }
 
 

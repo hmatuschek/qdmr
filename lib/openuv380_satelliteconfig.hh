@@ -1,16 +1,16 @@
-#ifndef OPENGD77_SATELLITECONFIG_HH
-#define OPENGD77_SATELLITECONFIG_HH
+#ifndef OPENUV380_SATELLITECONFIG_HH
+#define OPENUV380_SATELLITECONFIG_HH
 
 #include "opengd77base_satelliteconfig.hh"
 
 
-class OpenGD77SatelliteConfig : public OpenGD77BaseSatelliteConfig
+class OpenUV380SatelliteConfig : public OpenGD77BaseSatelliteConfig
 {
   Q_OBJECT
 
 public:
   /** Default constructor. */
-  explicit OpenGD77SatelliteConfig(QObject *parent = nullptr);
+  explicit OpenUV380SatelliteConfig(QObject *parent = nullptr);
 
   /** Encodes the given satellite database. */
   virtual bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack());
@@ -28,9 +28,9 @@ protected:
   /** Some internal offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int satellites()        { return 0x000000; }
+    static constexpr unsigned int satellites()        { return 0x020000; }
     /// @endcond
   };
 };
 
-#endif // OPENGD77_SATELLITECONFIG_HH
+#endif // OPENUV380_SATELLITECONFIG_HH

@@ -60,7 +60,7 @@ protected:
   /** The generic configuration. */
 	Config *_config;
   /** The encoded eatellite configuraiton. */
-  OpenGD77SatelliteConfig *_satelliteConfig;
+  OpenGD77BaseSatelliteConfig *_satelliteConfig;
 
 private:
   /** Holds the singleton instance. */
