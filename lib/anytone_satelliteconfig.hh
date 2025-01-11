@@ -115,7 +115,7 @@ public:
 public:
   /** Some limits for the satellite config. */
   struct Limit {
-    static constexpr unsigned int satellites() { return 80; }
+    static constexpr unsigned int satellites() { return 200; }
   };
 
 protected:

@@ -199,7 +199,6 @@ AnytoneSatelliteConfig::AnytoneSatelliteConfig(QObject *parent)
   : SatelliteConfig{parent}
 {
   addImage("AnyTone Satellite Configuration");
-  image(0).addElement(Offset::satellites(), 0xa000);
 }
 
 
@@ -212,6 +211,7 @@ AnytoneSatelliteConfig::satellite(unsigned int idx) {
 bool
 AnytoneSatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
   unsigned int numSat = std::min(Limit::satellites(), db->count());
+  image(0).addElement(Offset::satellites(), numSat*SatelliteElement::size());
 
   for (unsigned int i=0; i<numSat; i++) {
     logDebug() << "Encode sat '" << db->getAt(i).name() << "' at index " << i << ".";
