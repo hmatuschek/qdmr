@@ -4,6 +4,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+
+/* ********************************************************************************************* *
+ * SelectiveCallBox
+ * ********************************************************************************************* */
 SelectiveCallBox::SelectiveCallBox(QWidget *parent)
   : QWidget{parent}, _typeSelection(nullptr), _stack(nullptr), _ctcss(nullptr), _dcs(nullptr),
     _inverted(nullptr)
@@ -14,20 +18,29 @@ SelectiveCallBox::SelectiveCallBox(QWidget *parent)
   _typeSelection->addItem(tr("DCS"));
 
   _stack = new QStackedWidget();
+  _stack->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  _stack->setContentsMargins(0,0,0,0);
   auto emptyLayout = new QHBoxLayout();
+  emptyLayout->setContentsMargins(0,0,0,0);
   auto emptyLabel = new QLabel("None");
+  emptyLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   emptyLayout->addWidget(emptyLabel);
   auto emptyWidget = new QWidget();
   emptyWidget->setLayout(emptyLayout);
+  emptyWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  emptyWidget->setContentsMargins(0,0,0,0);
   _stack->addWidget(emptyWidget);
 
   // CTCSS settings
   _ctcss = new QComboBox();
   _ctcss->setEditable(true);
   auto ctcssLayout = new QHBoxLayout();
+  ctcssLayout->setContentsMargins(0,0,0,0);
   ctcssLayout->addWidget(_ctcss);
   ctcssLayout->addWidget(new QLabel(tr("Hz")));
   auto ctcssWidget = new QWidget();
+  ctcssWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  ctcssWidget->setContentsMargins(0,0,0,0);
   ctcssWidget->setLayout(ctcssLayout);
   _stack->addWidget(ctcssWidget);
 
@@ -36,10 +49,13 @@ SelectiveCallBox::SelectiveCallBox(QWidget *parent)
   _dcs->setEditable(true);
   _inverted = new QCheckBox(tr("Inverted"));
   auto dscLayout = new QHBoxLayout();
+  dscLayout->setContentsMargins(0,0,0,0);
   dscLayout->addWidget(_dcs);
   dscLayout->addWidget(_inverted);
   auto dcsWidget = new QWidget();
   dcsWidget->setLayout(dscLayout);
+  dcsWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  dcsWidget->setContentsMargins(0,0,0,0);
   _stack->addWidget(dcsWidget);
 
   connect(_typeSelection, &QComboBox::currentTextChanged, [=]() {
@@ -60,8 +76,9 @@ SelectiveCallBox::SelectiveCallBox(QWidget *parent)
   auto layout = new QHBoxLayout();
   layout->addWidget(_typeSelection,0);
   layout->addWidget(_stack, 1);
-
-  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+  layout->setContentsMargins(0,0,0,0);
+  setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  setContentsMargins(0,0,0,0);
   setLayout(layout);
 }
 
@@ -106,3 +123,41 @@ SelectiveCallBox::selectiveCall() const {
 
   return SelectiveCall();
 }
+
+
+/* ********************************************************************************************* *
+ * SelectiveCallDelegate
+ * ********************************************************************************************* */
+SelectiveCallDelegate::SelectiveCallDelegate(QObject *parent)
+  : QStyledItemDelegate(parent)
+{
+  // pass...
+}
+
+
+QWidget *
+SelectiveCallDelegate::createEditor(
+    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+  Q_UNUSED(option); Q_UNUSED(index);
+  auto seditor = new SelectiveCallBox(parent);
+  seditor->setSelectiveCall(index.data(Qt::EditRole).value<SelectiveCall>());
+  return seditor;
+}
+
+
+void
+SelectiveCallDelegate::setEditorData(QWidget *editor, const QModelIndex index) {
+  auto seditor = qobject_cast<SelectiveCallBox*>(editor);
+  seditor->setSelectiveCall(index.data(Qt::EditRole).value<SelectiveCall>());
+}
+
+
+void
+SelectiveCallDelegate::setModelData(
+    QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+  auto seditor = qobject_cast<SelectiveCallBox*>(editor);
+  model->setData(index, QVariant::fromValue(seditor->selectiveCall()));
+}
+
