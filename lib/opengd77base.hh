@@ -7,6 +7,7 @@
 
 #include "radio.hh"
 #include "opengd77_interface.hh"
+#include "opengd77_satelliteconfig.hh"
 
 
 /** Implements an common USB interface to Open GD-77(S) type devices.
@@ -50,12 +51,16 @@ protected:
   bool upload();
   /** Implements the actual callsign DB upload process. */
   bool uploadCallsigns();
+  /** Implements the actual satellite config upload process. */
+  bool uploadSatellites();
 
 protected:
   /** The interface to the radio. */
   OpenGD77Interface *_dev;
   /** The generic configuration. */
 	Config *_config;
+  /** The encoded eatellite configuraiton. */
+  OpenGD77SatelliteConfig *_satelliteConfig;
 
 private:
   /** Holds the singleton instance. */

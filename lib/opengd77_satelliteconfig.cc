@@ -52,7 +52,7 @@ OpenGD77SatelliteConfig::SatelliteElement::writeInteger(const Offset::Bit &offse
     writeDigit(offset + o, 0xb); // blank
 
   o += 4*(dec-1);
-  for (int i=dec; i>0; i++, o = o - 4) {
+  for (int i=dec; i>0; i--, o = o - 4) {
     if (value)
       writeDigit(offset + o, value % 10);
     else
@@ -233,12 +233,12 @@ OpenGD77SatelliteConfig::OpenGD77SatelliteConfig(QObject *parent)
 {
   addImage("OpenGD77 satellite configuration EEPROM");
   addImage("OpenGD77 satellite configuration FLASH");
-  image(1).addElement(0x00000214, 0x1000);
+  image(FLASH).addElement(0x00000000, 0x11a0);
 }
 
 OpenGD77SatelliteConfig::SatelliteElement
 OpenGD77SatelliteConfig::satellite(unsigned int idx) {
-  return SatelliteElement(data(Offset::satellites() + idx*Offset::betweenSatellites()));
+  return SatelliteElement(data(Offset::satellites() + idx*Offset::betweenSatellites(), FLASH));
 }
 
 bool
@@ -246,7 +246,7 @@ OpenGD77SatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::satellites(); i++) {
     SatelliteElement el = satellite(i);
     el.clear();
-    if (i < db->count())
+    if (db->count() <= i)
       continue;
     if (! el.encode(db->getAt(i), err)) {
       errMsg(err) << "Cannot encode satellite '" << db->getAt(i).name()

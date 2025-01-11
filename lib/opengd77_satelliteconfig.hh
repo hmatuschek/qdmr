@@ -9,9 +9,15 @@
 #include <codeplug.hh>
 
 
+/** Implements the satellite tracking configuration for the OpenGD77 type radios.
+ * @ingroup ogd77 */
 class OpenGD77SatelliteConfig : public SatelliteConfig
 {
   Q_OBJECT
+
+public:
+  /** Possible image types. */
+  enum ImageType { EEPROM = 0, FLASH = 1 };
 
 public:
   /** Encodes a satellite for the  OpenGD77 devices.
@@ -133,14 +139,18 @@ public:
 
 
 public:
+  /** Default constructor. */
   explicit OpenGD77SatelliteConfig(QObject *parent = nullptr);
 
+  /** Returns the i-th satellite. */
   SatelliteElement satellite(unsigned int idx);
+  /** Encodes the given satellite database. */
   bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack());
 
 public:
   /** Some limits for the satellite config. */
   struct Limit {
+    /** The maximum number of satellites. */
     static constexpr unsigned int satellites() { return 25; }
   };
 
@@ -148,7 +158,8 @@ protected:
   /** Some internal offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int satellites() { return 0x0008; }
+    static constexpr unsigned int unknownSegment()    { return 0x0214; }
+    static constexpr unsigned int satellites()        { return 0x021c; }
     static constexpr unsigned int betweenSatellites() { return SatelliteElement::size(); }
     /// @endcond
   };
