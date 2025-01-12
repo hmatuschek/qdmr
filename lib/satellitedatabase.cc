@@ -25,7 +25,7 @@ Satellite::Satellite()
 }
 
 Satellite::Satellite(const OrbitalElement &orbit)
-  : OrbitalElement(orbit), _name(),
+  : OrbitalElement(orbit), _name(orbit.name()),
     _fmUplink(), _fmDownlink(), _fmUplinkTone(), _fmDownlinkTone(),
     _aprsUplink(), _aprsDownlink(), _aprsUplinkTone(), _aprsDownlinkTone(), _beacon()
 {
@@ -54,6 +54,7 @@ Satellite::setFMUplink(const Frequency &f) {
   _fmUplink = f;
 }
 
+
 const Frequency &
 Satellite::fmDownlink() const {
   return _fmDownlink;
@@ -70,9 +71,20 @@ Satellite::fmUplinkTone() const {
   return _fmUplinkTone;
 }
 
+void
+Satellite::setFMUplinkTone(const SelectiveCall &tone) {
+  _fmUplinkTone = tone;
+}
+
+
 const SelectiveCall &
 Satellite::fmDownlinkTone() const {
   return _fmDownlinkTone;
+}
+
+void
+Satellite::setFMDownlinkTone(const SelectiveCall &tone) {
+  _fmDownlinkTone = tone;
 }
 
 
@@ -102,9 +114,19 @@ Satellite::aprsUplinkTone() const {
   return _aprsUplinkTone;
 }
 
+void
+Satellite::setAPRSUplinkTone(const SelectiveCall &tone) {
+  _aprsUplinkTone = tone;
+}
+
 const SelectiveCall &
 Satellite::aprsDownlinkTone() const {
   return _aprsDownlinkTone;
+}
+
+void
+Satellite::setAPRSDownlinkTone(const SelectiveCall &tone) {
+  _aprsDownlinkTone = tone;
 }
 
 const Frequency &
@@ -302,10 +324,22 @@ Qt::ItemFlags
 SatelliteDatabase::flags(const QModelIndex &index) const {
   Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
 
+  // Name
+  if (1 == index.column())
+    f |= Qt::ItemIsEditable;
+  // FM up/downlink frequencies
   if ((2 == index.column()) || (3 == index.column()))
     f |= Qt::ItemIsEditable;
+  // FM up/downlink sub tones
+  if ((4 == index.column()) || (5 == index.column()))
+    f |= Qt::ItemIsEditable;
+  // APRS up/downlink frequencies
   if ((6 == index.column()) || (7 == index.column()))
     f |= Qt::ItemIsEditable;
+  // APRS up/downlink sub tones
+  if ((8 == index.column()) || (9 == index.column()))
+    f |= Qt::ItemIsEditable;
+  // Beacon
   if (10 == index.column())
     f |= Qt::ItemIsEditable;
 
@@ -373,8 +407,12 @@ SatelliteDatabase::setData(const QModelIndex &index, const QVariant &value, int 
   case 1: _satellites[index.row()].setName(value.toString().simplified()); return true;
   case 2: _satellites[index.row()].setFMDownlink(value.value<Frequency>()); return true;
   case 3: _satellites[index.row()].setFMUplink(value.value<Frequency>()); return true;
+  case 4: _satellites[index.row()].setFMDownlinkTone(value.value<SelectiveCall>()); return true;
+  case 5: _satellites[index.row()].setFMUplinkTone(value.value<SelectiveCall>()); return true;
   case 6: _satellites[index.row()].setAPRSDownlink(value.value<Frequency>()); return true;
   case 7: _satellites[index.row()].setAPRSUplink(value.value<Frequency>()); return true;
+  case 8: _satellites[index.row()].setAPRSDownlinkTone(value.value<SelectiveCall>()); return true;
+  case 9: _satellites[index.row()].setAPRSUplinkTone(value.value<SelectiveCall>()); return true;
   case 10: _satellites[index.row()].setBeacon(value.value<Frequency>()); return true;
   }
 

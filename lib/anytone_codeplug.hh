@@ -20,7 +20,7 @@ class AnytoneCodeplug : public Codeplug
 {
   Q_OBJECT
 
-protected:
+public:
   /** Implements encoding of CTCSS tones. */
   struct CTCSS {
   public:
@@ -34,8 +34,6 @@ protected:
     static SelectiveCall _codeTable[52];
   };
 
-
-public:
   /** Represents the base class for bitmaps in all AnyTone codeplugs. */
   class BitmapElement: public Element
   {

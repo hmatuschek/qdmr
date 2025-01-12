@@ -18,6 +18,7 @@ D878UV::D878UV(AnytoneInterface *device, QObject *parent)
   _codeplug = new D878UVCodeplug(this);
   _codeplug->clear();
   _callsigns = new D868UVCallsignDB(this);
+  _satellites = new AnytoneSatelliteConfig(this);
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioVariant info;

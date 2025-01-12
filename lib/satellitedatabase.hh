@@ -41,8 +41,12 @@ public:
   void setFMDownlink(const Frequency &f);
   /** Returns the FM uplink tone (i.e., TX tone). */
   const SelectiveCall &fmUplinkTone() const;
+  /** Sets the FM uplink sub tone. */
+  void setFMUplinkTone(const SelectiveCall &tone);
   /** Returns the FM downlink tone (i.e., RX tone). */
   const SelectiveCall &fmDownlinkTone() const;
+  /** Sets the FM downlink sub tone. */
+  void setFMDownlinkTone(const SelectiveCall &tone);
 
   /** Returns the APRS uplink frequency. */
   const Frequency &aprsUplink() const;
@@ -54,9 +58,12 @@ public:
   void setAPRSDownlink(const Frequency &f);
   /** Returns the APRS uplink tone (i.e., TX tone). */
   const SelectiveCall &aprsUplinkTone() const;
+  /** Sets the APRS uplink sub tone. */
+  void setAPRSUplinkTone(const SelectiveCall &tone);
   /** Returns the APRS downlink tone (i.e., RX tone). */
   const SelectiveCall &aprsDownlinkTone() const;
-
+  /** Sets the APRS downlink sub tone. */
+  void setAPRSDownlinkTone(const SelectiveCall &tone);
   /** Returns a beacon frequency. */
   const Frequency &beacon() const;
   /** Sets a beacon frequency. */

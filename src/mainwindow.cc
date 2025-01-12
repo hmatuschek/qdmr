@@ -38,6 +38,8 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   ui->statusbar->addPermanentWidget(progress);
   progress->setVisible(false);
 
+  ui->actionWriteSatellites->setIcon(QIcon::fromTheme("device-write-satellite"));
+
   connect(ui->actionNewCodeplug, SIGNAL(triggered()), app, SLOT(newCodeplug()));
   connect(ui->actionOpenCodeplug, SIGNAL(triggered()), app, SLOT(loadCodeplug()));
   connect(ui->actionSaveCodeplug, SIGNAL(triggered()), app, SLOT(saveCodeplug()));
@@ -58,6 +60,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionDownload, SIGNAL(triggered()), app, SLOT(downloadCodeplug()));
   connect(ui->actionUpload, SIGNAL(triggered()), app, SLOT(uploadCodeplug()));
   connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
+  connect(ui->actionWriteSatellites, SIGNAL(triggered()), app, SLOT(uploadSatellites()));
 
   // Wire-up "General Settings" view
   _generalSettings = new GeneralSettingsView(config);

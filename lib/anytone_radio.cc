@@ -11,7 +11,7 @@
 
 AnytoneRadio::AnytoneRadio(const QString &name, AnytoneInterface *device, QObject *parent)
   : Radio(parent), _name(name), _dev(device), _codeplugFlags(), _config(nullptr),
-    _codeplug(nullptr), _callsigns(nullptr)
+    _codeplug(nullptr), _callsigns(nullptr), _satellites(nullptr)
 {
   // Check if device is open
   if ((nullptr==_dev) || (! _dev->isOpen())) {
@@ -100,11 +100,9 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   return true;
 }
 
+
 bool
 AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
-  Q_UNUSED(db);
-  Q_UNUSED(blocking);
-
   _callsigns->encode(db, selection);
 
   _task = StatusUploadCallsigns;
@@ -122,6 +120,31 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 
   return true;
 }
+
+
+bool
+AnytoneRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  if (! _satellites->encode(db, err)) {
+    errMsg(err) << "Cannot encode satellite config for AnyTone device.";
+    return false;
+  }
+
+  _task = StatusUploadSatellites;
+  _errorStack = err;
+
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  // If non-blocking -> move device to this thread
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
+  start();
+
+  return true;
+}
+
 
 void
 AnytoneRadio::run() {
@@ -177,6 +200,27 @@ AnytoneRadio::run() {
     emit uploadStarted();
 
     if (! uploadCallsigns()) {
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit uploadComplete(this);
+  } else if (StatusUploadSatellites == _task) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
+    emit uploadStarted();
+
+    if (! uploadSatellites()) {
       _dev->reboot();
       _dev->close();
       _task = StatusError;
@@ -313,6 +357,33 @@ AnytoneRadio::uploadCallsigns() {
     for (unsigned i=0; i<nblks; i++) {
       if (! _dev->write(0, addr+i*WBSIZE, _callsigns->data(addr)+i*WBSIZE, WBSIZE, _errorStack)) {
         errMsg(_errorStack) << "Cannot write callsign db.";
+        _task = StatusError;
+        return false;
+      }
+      blkWritten++;
+      emit uploadProgress(float(blkWritten*100)/totalBlocks);
+    }
+  }
+
+  return true;
+}
+
+
+bool
+AnytoneRadio::uploadSatellites() {
+  // Sort all elements before uploading
+  _satellites->image(0).sort();
+
+  size_t totalBlocks = _satellites->memSize()/WBSIZE;
+  size_t blkWritten  = 0;
+  // Upload all elements back to the device
+  for (int n=0; n<_satellites->image(0).numElements(); n++) {
+    unsigned addr = _satellites->image(0).element(n).address();
+    unsigned size = _satellites->image(0).element(n).data().size();
+    unsigned nblks = size/WBSIZE;
+    for (unsigned i=0; i<nblks; i++) {
+      if (! _dev->write(0, addr+i*WBSIZE, _satellites->data(addr)+i*WBSIZE, WBSIZE, _errorStack)) {
+        errMsg(_errorStack) << "Cannot write satellite config.";
         _task = StatusError;
         return false;
       }

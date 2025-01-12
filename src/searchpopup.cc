@@ -46,17 +46,15 @@ SearchPopup::SearchPopup(QAbstractItemView *parent)
   layout->addWidget(close);
   setLayout(layout);
 
+  move(parent->mapToGlobal(QPoint(parent->width()-width()-5, parent->height()-height()+5)));
   this->hide();
 }
 
 void
 SearchPopup::showPopup() {
   show();
-  QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(parent());
-  QPoint parentPos = itemView->mapToGlobal(itemView->pos());
-  int x = parentPos.x();
-  int y = parentPos.y()+itemView->height()-height();
-  move(x,y);
+  auto itemView = qobject_cast<QAbstractItemView *>(parent());
+  move(itemView->mapToGlobal(QPoint(itemView->width()-width()-5, itemView->height()-height()+5)));
   _search->clear();
   _search->setFocus();
 }

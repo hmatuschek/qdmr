@@ -38,6 +38,7 @@ public:
   bool startDownload(bool blocking, const ErrorStack &err);
   bool startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err);
   bool startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err);
+  bool startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

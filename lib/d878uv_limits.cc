@@ -7,7 +7,7 @@
 #include "scanlist.hh"
 #include "gpssystem.hh"
 #include "roamingzone.hh"
-
+#include "anytone_satelliteconfig.hh"
 
 D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
                            const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
@@ -18,6 +18,11 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
   _hasCallSignDB          = true;
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 200000;
+
+  // Define limits for satellite config
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = AnytoneSatelliteConfig::Limit::satellites();
 
   /* Define limits for the general settings. */
   add("settings",

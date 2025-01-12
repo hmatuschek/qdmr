@@ -98,6 +98,17 @@ DR1801UV::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
   return false;
 }
 
+
+bool
+DR1801UV::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(blocking);
+
+  errMsg(err) << "Satellite config upload is not implemented yet.";
+
+  return false;
+}
+
+
 void
 DR1801UV::run() {
   if (StatusDownload == _task) {

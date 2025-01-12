@@ -76,6 +76,17 @@ RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Ca
   return false;
 }
 
+
+bool
+RadioddityRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(blocking);
+
+  errMsg(err) << "Satellite config upload is not implemented yet.";
+
+  return false;
+}
+
+
 void
 RadioddityRadio::run() {
   if (StatusDownload == _task) {

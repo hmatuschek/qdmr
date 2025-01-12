@@ -6,6 +6,8 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "roamingzone.hh"
+#include "opengd77_satelliteconfig.hh"
+
 
 
 OpenGD77Limits::OpenGD77Limits(QObject *parent)
@@ -15,6 +17,11 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   _hasCallSignDB          = true;
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 15796;
+
+  // Define limits for satellite config
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = OpenGD77SatelliteConfig::Limit::satellites();
 
   /* Define limits for the general settings. */
   add("settings",

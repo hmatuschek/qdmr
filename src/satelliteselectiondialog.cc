@@ -3,6 +3,7 @@
 #include "orbitalelementsdatabase.hh"
 #include "logger.hh"
 #include "settings.hh"
+#include "searchpopup.hh"
 
 
 SatelliteSelectionDialog::SatelliteSelectionDialog(OrbitalElementsDatabase *db, QWidget *parent)
@@ -11,6 +12,7 @@ SatelliteSelectionDialog::SatelliteSelectionDialog(OrbitalElementsDatabase *db, 
   ui->setupUi(this);
   ui->satellites->setModel(_database);
   ui->satellites->setModelColumn(1);
+  SearchPopup::attach(ui->satellites);
   this->restoreGeometry(Settings().headerState(objectName()));
 }
 
