@@ -16,5 +16,6 @@ OpenUV380SatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
     errMsg(err) << "Cannot encode satellite config for OpenUV380.";
     return false;
   }
+
   return true;
 }

@@ -26,7 +26,7 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::clear() {
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::writeDigit(const Offset::Bit &offset, uint8_t digit) {
-  // Must be bit 0 or 4 (BCD)
+  // Must be bit 0 or 3 (BCD)
   if (offset.bit % 4)
     return;
 
@@ -53,10 +53,7 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::writeInteger(const Offset::Bit &o
 
   o += 4*(dec-1);
   for (int i=dec; i>0; i--, o = o - 4) {
-    if (value)
-      writeDigit(offset + o, value % 10);
-    else
-      writeDigit(offset + o, 0xb);
+    writeDigit(offset + o, value % 10);
     value /= 10;
   }
 }
@@ -71,11 +68,13 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::writeFractional(const Offset::Bit
   if (0 == frac)
     return;
 
-  if (sign && (0 > value))
-    writeDigit(offset + o, 0xc);
-  else
-    writeDigit(offset + o, 0xb);
-  o += 4;
+  if (sign) {
+    if (0 > value)
+      writeDigit(offset + o, 0xc);
+    else
+      writeDigit(offset + o, 0xb);
+    o += 4;
+  }
 
   value -= int(value);
   for (unsigned int i=0; i<frac; i++, o += 4) {
@@ -155,12 +154,12 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::setRevolutionNumber(unsigned int 
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::setFMDownlink(const Frequency &f) {
-  setUInt32_le(Offset::fmDownlink(), f.inHz()/10);
+  setUInt32_le(Offset::fmDownlink(), f.inHz());
 }
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::setFMUplink(const Frequency &f) {
-  setUInt32_le(Offset::fmUplink(), f.inHz()/10);
+  setUInt32_le(Offset::fmUplink(), f.inHz());
 }
 
 void
@@ -172,18 +171,18 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::setCTCSS(const SelectiveCall &cal
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::setAPRSDownlink(const Frequency &f) {
-  setUInt32_le(Offset::aprsDownlink(), f.inHz()/10);
+  setUInt32_le(Offset::aprsDownlink(), f.inHz());
 }
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::setAPRSUplink(const Frequency &f) {
-  setUInt32_le(Offset::aprsUplink(), f.inHz()/10);
+  setUInt32_le(Offset::aprsUplink(), f.inHz());
 }
 
 
 void
 OpenGD77BaseSatelliteConfig::SatelliteElement::setBeacon(const Frequency &f) {
-  setUInt32_le(Offset::beacon(), f.inHz()/10);
+  setUInt32_le(Offset::beacon(), f.inHz());
 }
 
 
@@ -201,6 +200,7 @@ OpenGD77BaseSatelliteConfig::SatelliteElement::encode(const Satellite &sat, cons
   setName(sat.name());
 
   // orbital elements
+  setEpoch(sat.epoch());
   setMeanMotion(sat.meanMotion());
   setMeanMotionDerivative(sat.meanMotionDerivative());
   setInclination(sat.inclination());
@@ -258,6 +258,8 @@ OpenGD77BaseSatelliteConfig::SatelliteBankElement::satellite(unsigned int idx) {
 
 bool
 OpenGD77BaseSatelliteConfig::SatelliteBankElement::encode(SatelliteDatabase *db, const ErrorStack &err) {
+  clear();
+
   for (unsigned int i=0; i<Limit::satellites(); i++) {
     SatelliteElement el = satellite(i);
     el.clear();
