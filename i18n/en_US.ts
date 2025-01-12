@@ -543,9 +543,9 @@
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="123"/>
-        <location filename="../src/analogchanneldialog.ui" line="154"/>
-        <location filename="../src/analogchanneldialog.ui" line="182"/>
-        <location filename="../src/analogchanneldialog.ui" line="311"/>
+        <location filename="../src/analogchanneldialog.ui" line="160"/>
+        <location filename="../src/analogchanneldialog.ui" line="194"/>
+        <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
@@ -555,88 +555,88 @@
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="141"/>
-        <location filename="../src/analogchanneldialog.ui" line="172"/>
+        <location filename="../src/analogchanneldialog.ui" line="147"/>
+        <location filename="../src/analogchanneldialog.ui" line="184"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="163"/>
+        <location filename="../src/analogchanneldialog.ui" line="169"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="191"/>
+        <location filename="../src/analogchanneldialog.ui" line="203"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="201"/>
+        <location filename="../src/analogchanneldialog.ui" line="213"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="221"/>
+        <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="229"/>
+        <location filename="../src/analogchanneldialog.ui" line="241"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="234"/>
+        <location filename="../src/analogchanneldialog.ui" line="246"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="239"/>
+        <location filename="../src/analogchanneldialog.ui" line="251"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="247"/>
+        <location filename="../src/analogchanneldialog.ui" line="259"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="254"/>
+        <location filename="../src/analogchanneldialog.ui" line="266"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="261"/>
+        <location filename="../src/analogchanneldialog.ui" line="273"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="268"/>
+        <location filename="../src/analogchanneldialog.ui" line="280"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="276"/>
+        <location filename="../src/analogchanneldialog.ui" line="288"/>
         <source>Narrow (12.5 kHz)</source>
         <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="281"/>
+        <location filename="../src/analogchanneldialog.ui" line="293"/>
         <source>Wide (25 kHz)</source>
         <translation>Wide (25 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="289"/>
+        <location filename="../src/analogchanneldialog.ui" line="301"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="301"/>
+        <location filename="../src/analogchanneldialog.ui" line="313"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="343"/>
+        <location filename="../src/analogchanneldialog.ui" line="355"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -1770,95 +1770,95 @@
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="150"/>
-        <location filename="../src/digitalchanneldialog.ui" line="177"/>
-        <location filename="../src/digitalchanneldialog.ui" line="202"/>
+        <location filename="../src/digitalchanneldialog.ui" line="183"/>
+        <location filename="../src/digitalchanneldialog.ui" line="214"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="161"/>
+        <location filename="../src/digitalchanneldialog.ui" line="167"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
         <translation>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="164"/>
-        <location filename="../src/digitalchanneldialog.ui" line="195"/>
+        <location filename="../src/digitalchanneldialog.ui" line="170"/>
+        <location filename="../src/digitalchanneldialog.ui" line="207"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="186"/>
+        <location filename="../src/digitalchanneldialog.ui" line="192"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="215"/>
+        <location filename="../src/digitalchanneldialog.ui" line="227"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="223"/>
+        <location filename="../src/digitalchanneldialog.ui" line="235"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="228"/>
+        <location filename="../src/digitalchanneldialog.ui" line="240"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="233"/>
-        <location filename="../src/digitalchanneldialog.ui" line="241"/>
+        <location filename="../src/digitalchanneldialog.ui" line="245"/>
+        <location filename="../src/digitalchanneldialog.ui" line="253"/>
         <source>Color Code</source>
         <translation>Color Code</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="258"/>
+        <location filename="../src/digitalchanneldialog.ui" line="270"/>
         <source>Time Slot</source>
         <translation>Time Slot</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="269"/>
+        <location filename="../src/digitalchanneldialog.ui" line="281"/>
         <source>TS 1</source>
         <translation>TS 1</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="274"/>
+        <location filename="../src/digitalchanneldialog.ui" line="286"/>
         <source>TS 2</source>
         <translation>TS 2</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="282"/>
+        <location filename="../src/digitalchanneldialog.ui" line="294"/>
         <source>Rx Group List</source>
         <translation>Group List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="292"/>
+        <location filename="../src/digitalchanneldialog.ui" line="304"/>
         <source>Tx Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="302"/>
+        <location filename="../src/digitalchanneldialog.ui" line="314"/>
         <source>Positioning System</source>
         <translation>Positioning System</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="312"/>
+        <location filename="../src/digitalchanneldialog.ui" line="324"/>
         <source>Roaming Zone</source>
         <translation>Roaming Zone</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="322"/>
+        <location filename="../src/digitalchanneldialog.ui" line="334"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="335"/>
+        <location filename="../src/digitalchanneldialog.ui" line="347"/>
         <source>Extended</source>
         <translation>Extended</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="338"/>
+        <location filename="../src/digitalchanneldialog.ui" line="350"/>
         <source>Device specific settings</source>
         <translation>Device specific settings</translation>
     </message>
