@@ -149,7 +149,7 @@ OpenGD77Test::testChannelSubTones() {
   }
 
   config.channelList()->channel(0)->as<FMChannel>()->setTXTone(SelectiveCall(67.0));
-  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(71.9));
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(123.0));
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
@@ -163,7 +163,7 @@ OpenGD77Test::testChannelSubTones() {
 
   QVERIFY(rxTone.isValid());
   QVERIFY(rxTone.isCTCSS());
-  QCOMPARE(rxTone.Hz(), 71.9);
+  QCOMPARE(rxTone.Hz(), 123.0);
 }
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
