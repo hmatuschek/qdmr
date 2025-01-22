@@ -40,7 +40,10 @@ OpenGD77BaseCodeplug::encodeSelectiveCall(const SelectiveCall &call) {
     toneCode = call.mHz()/100;
   }
 
-  return (dcs<<15) | (inverted << 14) | (toneCode & 0x3fff);
+  uint16_t bcd = (((toneCode/100) % 10 ) << 8) |
+      (((toneCode/10) % 10 ) << 4) |
+      (((toneCode/1) % 10 )  << 0);
+  return (dcs<<15) | (inverted << 14) | (bcd & 0x3fff);
 }
 
 SelectiveCall
@@ -50,7 +53,9 @@ OpenGD77BaseCodeplug::decodeSelectiveCall(uint16_t code) {
 
   bool dcs = ((code >> 15) & 1),
       inverted = ((code >> 14) & 1);
-  code &= 0x3fff;
+
+  uint16_t bcd = (code & 0x3fff);
+  code = 100 * ((bcd >> 8) & 0xf) + 10 * ((bcd >> 4) & 0xf) + 1 * ((bcd >> 0) & 0xf);
 
   if (! dcs)
     return SelectiveCall(double(code)/10);
