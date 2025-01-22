@@ -91,6 +91,14 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
   return true;
 }
 
+
+bool
+TyTRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  errMsg(err) << "Satellite config upload is not implemented yet.";
+  return false;
+}
+
+
 void
 TyTRadio::run() {
   if (StatusDownload == _task) {

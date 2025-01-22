@@ -10,7 +10,7 @@
 RadioLimits *OpenGD77Base::_limits = nullptr;
 
 OpenGD77Base::OpenGD77Base(OpenGD77Interface *device, QObject *parent)
-  : Radio(parent), _dev(device), _config(nullptr)
+  : Radio(parent), _dev(device), _config(nullptr), _satelliteConfig(nullptr)
 {
   // pass...
 }
@@ -128,6 +128,37 @@ OpenGD77Base::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 }
 
 
+bool
+OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  logDebug() << "Start upload to " << name() << "...";
+
+  if (StatusIdle != _task) {
+    logError() << "Cannot upload to radio, radio is not idle.";
+    return false;
+  }
+
+  // Assemble call-sign db from user DB
+  logDebug() << "Encode satellite config..";
+  if (! _satelliteConfig->encode(db, err))
+    return false;
+
+  _task = StatusUploadSatellites;
+  _errorStack = err;
+  if (blocking) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  // If non-blocking -> move device to this thread
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
+  // start thread for upload
+  start();
+
+  return true;
+}
+
+
 void
 OpenGD77Base::run() {
   if (StatusDownload == _task) {
@@ -178,6 +209,26 @@ OpenGD77Base::run() {
     }
 
     if (! uploadCallsigns()) {
+      _task = StatusError;
+      _dev->write_finish();
+      _dev->reboot();
+      _dev->close();
+      emit uploadError(this);
+      return;
+    }
+
+    _dev->write_finish();
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+    emit uploadComplete(this);
+  } else if (StatusUploadSatellites == _task) {
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
+      emit uploadError(this);
+      return;
+    }
+
+    if (! uploadSatellites()) {
       _task = StatusError;
       _dev->write_finish();
       _dev->reboot();
@@ -360,4 +411,46 @@ OpenGD77Base::uploadCallsigns()
   _dev->write_finish();
   return true;
 }
+
+
+bool
+OpenGD77Base::uploadSatellites()
+{
+  emit uploadStarted();
+
+  // Check every segment in the codeplug
+  if (! _satelliteConfig->isAligned(BSIZE)) {
+    errMsg(_errorStack) << "Cannot upload satellite config: Not aligned with block-size " << BSIZE << "!";
+    return false;
+  }
+
+  size_t totb = _satelliteConfig->memSize();
+
+  if (! _dev->write_start(OpenGD77BaseSatelliteConfig::FLASH, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start satellite config upload.";
+    return false;
+  }
+
+  unsigned bcount = 0;
+  // Then upload config
+  for (int n=0; n<_satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).numElements(); n++) {
+    unsigned addr = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).address();
+    unsigned size = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).data().size();
+    unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+    for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
+      if (! _dev->write(OpenGD77BaseCodeplug::FLASH, (b0+b)*BSIZE,
+                        _satelliteConfig->data((b0+b)*BSIZE, OpenGD77BaseSatelliteConfig::FLASH),
+                        BSIZE, _errorStack))
+      {
+        errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
+        return false;
+      }
+      emit uploadProgress(float(bcount*100)/totb);
+    }
+  }
+
+  _dev->write_finish();
+  return true;
+}
+
 

@@ -4,6 +4,7 @@
 #include "satelliteselectiondialog.hh"
 #include "transponderfrequencydelegate.hh"
 #include "settings.hh"
+#include "selectivecallbox.hh"
 
 
 SatelliteDatabaseDialog::SatelliteDatabaseDialog(SatelliteDatabase *db, QWidget *parent) :
@@ -16,16 +17,24 @@ SatelliteDatabaseDialog::SatelliteDatabaseDialog(SatelliteDatabase *db, QWidget 
 
   ui->satellitesView->setModel(_database);
 
-  ui->satellitesView->setItemDelegateForColumn(
-        2, new TransponderFrequencyDelegate(false, Transponder::Mode::FM));
-  ui->satellitesView->setItemDelegateForColumn(
-        3, new TransponderFrequencyDelegate(true, Transponder::Mode::FM));
-  ui->satellitesView->setItemDelegateForColumn(
-        6, new TransponderFrequencyDelegate(false, Transponder::Mode::APRS));
-  ui->satellitesView->setItemDelegateForColumn(
-        7, new TransponderFrequencyDelegate(true, Transponder::Mode::APRS));
-  ui->satellitesView->setItemDelegateForColumn(
-        10, new TransponderFrequencyDelegate(false, Transponder::Mode::CW));
+  // FM downlink
+  ui->satellitesView->setItemDelegateForColumn(2, new TransponderFrequencyDelegate(false, Transponder::Mode::FM));
+  // FM uplink
+  ui->satellitesView->setItemDelegateForColumn(3, new TransponderFrequencyDelegate(true, Transponder::Mode::FM));
+  // FM downlink sub tone
+  ui->satellitesView->setItemDelegateForColumn(4, new SelectiveCallDelegate());
+  // FM uplink sub tone
+  ui->satellitesView->setItemDelegateForColumn(5, new SelectiveCallDelegate());
+  // APRS downlink
+  ui->satellitesView->setItemDelegateForColumn(6, new TransponderFrequencyDelegate(false, Transponder::Mode::APRS));
+  // APRS uplink
+  ui->satellitesView->setItemDelegateForColumn(7, new TransponderFrequencyDelegate(true, Transponder::Mode::APRS));
+  // APRS downlink sub tone
+  ui->satellitesView->setItemDelegateForColumn(8, new SelectiveCallDelegate());
+  // APRS uplink sub tone
+  ui->satellitesView->setItemDelegateForColumn(9, new SelectiveCallDelegate());
+  // Beacon
+  ui->satellitesView->setItemDelegateForColumn(10, new TransponderFrequencyDelegate(false, Transponder::Mode::CW));
 
   this->restoreGeometry(Settings().headerState(objectName()));
   ui->satellitesView->horizontalHeader()->restoreState(

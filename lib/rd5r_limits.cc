@@ -17,6 +17,11 @@ RD5RLimits::RD5RLimits(QObject *parent)
   _callSignDBImplemented  = false;
   _numCallSignDBEntries   = 0;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = false;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{

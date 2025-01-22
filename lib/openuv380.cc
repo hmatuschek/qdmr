@@ -1,5 +1,6 @@
 #include "openuv380.hh"
 #include "opengd77_limits.hh"
+#include "openuv380_satelliteconfig.hh"
 #include "logger.hh"
 #include "config.hh"
 
@@ -7,7 +8,7 @@
 OpenUV380::OpenUV380(OpenGD77Interface *device, QObject *parent)
   : OpenGD77Base(device, parent), _name("Open MD-UV380"), _codeplug(), _callsigns()
 {
-  // pass...
+  _satelliteConfig = new OpenUV380SatelliteConfig(this);
 }
 
 

@@ -6,7 +6,7 @@
 OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
   : OpenGD77Base(device, parent), _name("Open GD-77"), _codeplug(), _callsigns()
 {
-  // pass...
+  _satelliteConfig = new OpenGD77SatelliteConfig(this);
 }
 
 

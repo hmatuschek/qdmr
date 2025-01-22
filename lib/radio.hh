@@ -35,11 +35,12 @@ class Radio : public QThread
 public:
   /** Possible states of the radio object. */
 	typedef enum {
-    StatusIdle,            ///< Idle, nothing to do.
-    StatusDownload,        ///< Downloading codeplug.
-    StatusUpload,          ///< Uploading codeplug.
-    StatusUploadCallsigns, ///< Uploading codeplug.
-    StatusError            ///< An error occurred.
+    StatusIdle,             ///< Idle, nothing to do.
+    StatusDownload,         ///< Downloading codeplug.
+    StatusUpload,           ///< Uploading codeplug.
+    StatusUploadCallsigns,  ///< Uploading codeplug.
+    StatusUploadSatellites, ///< Uploading satellite config.
+    StatusError             ///< An error occurred.
   } Status;
 
 public:
@@ -86,16 +87,22 @@ public slots:
    * Once the download finished, the codeplug can be accessed and decoded using
    * the @c codeplug() method. */
   virtual bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack()) = 0;
+
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   virtual bool startUpload(
       Config *config, bool blocking=false,
       const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack()) = 0;
+
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(
       UserDatabase *db, bool blocking=false,
       const CallsignDB::Selection &selection=CallsignDB::Selection(),
       const ErrorStack &err=ErrorStack()) = 0;
+
+  /** Assembles the satellite config and writes it to the device. */
+  virtual bool startUploadSatelliteConfig(
+      SatelliteDatabase *db, bool blocking=false, const ErrorStack &err=ErrorStack()) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */
