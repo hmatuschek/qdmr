@@ -138,5 +138,22 @@ OpenGD77Test::testOverrideChannelRadioId() {
 }
 
 
+void
+OpenGD77Test::testAPRSSourceCall() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  auto sys = decoded.posSystems()->gpsSystem(0)->as<APRSSystem>();
+  QCOMPARE(sys->source(), "DM3MAT");
+}
+
 QTEST_GUILESS_MAIN(OpenGD77Test)
 

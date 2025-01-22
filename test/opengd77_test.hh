@@ -25,6 +25,8 @@ private slots:
   void testChannelPowerSettings();
   /** Regression test for #541. */
   void testOverrideChannelRadioId();
+  /** Regression test for #554. */
+  void testAPRSSourceCall();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());
