@@ -139,6 +139,34 @@ OpenGD77Test::testOverrideChannelRadioId() {
 
 
 void
+OpenGD77Test::testChannelSubTones() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  config.channelList()->channel(0)->as<FMChannel>()->setTXTone(SelectiveCall(67.0));
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(71.9));
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  SelectiveCall txTone = decoded.channelList()->channel(0)->as<FMChannel>()->txTone(),
+      rxTone = decoded.channelList()->channel(0)->as<FMChannel>()->rxTone();
+
+  QVERIFY(txTone.isValid());
+  QVERIFY(txTone.isCTCSS());
+  QCOMPARE(txTone.Hz(), 67.0);
+
+  QVERIFY(rxTone.isValid());
+  QVERIFY(rxTone.isCTCSS());
+  QCOMPARE(rxTone.Hz(), 71.9);
+}
+
+void
 OpenGD77Test::testAPRSSourceCall() {
   ErrorStack err;
   Config config, decoded;
@@ -154,6 +182,9 @@ OpenGD77Test::testAPRSSourceCall() {
   QCOMPARE(decoded.posSystems()->count(), 1);
   auto sys = decoded.posSystems()->aprsSystem(0);
   QCOMPARE(sys->source(), "DM3MAT");
+
+  // OpenGD77 cannot encode revert channel
+  QVERIFY(decoded.posSystems()->aprsSystem(0)->revert()->isNull());
 }
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
