@@ -151,7 +151,8 @@ OpenGD77Test::testAPRSSourceCall() {
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
-  auto sys = decoded.posSystems()->gpsSystem(0)->as<APRSSystem>();
+  QCOMPARE(decoded.posSystems()->count(), 1);
+  auto sys = decoded.posSystems()->aprsSystem(0);
   QCOMPARE(sys->source(), "DM3MAT");
 }
 
