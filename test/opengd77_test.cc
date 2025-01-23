@@ -186,6 +186,11 @@ OpenGD77Test::testChannelFixedLocation() {
 
   QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
   QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl");
+
+  ext->setLocator("JO59gw");
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw");
 }
 
 
