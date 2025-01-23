@@ -955,6 +955,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr)
 void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
+
   setName("");
   clearFixedPosition();
   // Likely the future APRS system transmit frequency
@@ -1113,6 +1114,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setBaudRate(BaudRate rate) {
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
+  clear();
 
   setName(sys->name());
   setSourceSSID(sys->srcSSID());
