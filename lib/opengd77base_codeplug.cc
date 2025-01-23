@@ -14,7 +14,7 @@ OpenGD77BaseCodeplug::encodeAngle(double angle) {
   uint32_t sign = (angle < 0) ? 1 : 0;
   uint32_t decimals = std::abs(int(angle * 10000));
   uint32_t deg  = decimals/10000; decimals = decimals % 10000;
-  return (sign << 23) | (deg <<15) | decimals;
+  return (sign << 23) | (deg << 15) | decimals;
 }
 
 double
@@ -956,6 +956,7 @@ void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
   setName("");
+  clearFixedPosition();
 }
 
 
