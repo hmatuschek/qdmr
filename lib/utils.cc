@@ -490,7 +490,8 @@ loc2deg(const QString &loc) {
   if (4 > loc.size()) {
     lon = lon - 180;
     lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+5.0, lon+10.0);
   }
 
   l = loc[2].toUpper();
@@ -501,7 +502,8 @@ loc2deg(const QString &loc) {
   if (6 > loc.size()){
     lon = lon - 180;
     lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+0.5, lon+1.0);
   }
 
   l = loc[4].toUpper();
@@ -511,7 +513,8 @@ loc2deg(const QString &loc) {
 
   lon = lon - 180;
   lat = lat - 90;
-  return QGeoCoordinate(lat, lon);
+  // Offset places coordinate in the middle of the square
+  return QGeoCoordinate(lat+1./48, lon+1./24);
 }
 
 QString

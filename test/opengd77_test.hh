@@ -29,6 +29,8 @@ private slots:
   void testAPRSSourceCall();
   /** Regression test for #549. */
   void testChannelSubTones();
+  /** Regression test for #556. */
+  void testChannelFixedLocation();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());
