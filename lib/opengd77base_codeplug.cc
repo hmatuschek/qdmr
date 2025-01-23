@@ -949,6 +949,11 @@ void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
   setName("");
+
+  // Likely the future APRS system transmit frequency
+  setUInt32_le(Offset::unknownInteger(), 12700000);
+  // Some random data, appears to be important
+  writeASCII(Offset::unknownBytes(), "RA", 2);
 }
 
 

@@ -588,9 +588,11 @@ public:
       static constexpr unsigned int iconTable() { return 0x001d; }
       static constexpr unsigned int iconIndex() { return 0x001e; }
       static constexpr unsigned int comment() { return 0x001f; }
+      static constexpr unsigned int unknownInteger() { return 0x0037; }
       static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
       static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
       static constexpr Bit baudRate() { return { 0x003d, 0}; }
+      static constexpr unsigned int unknownBytes() { return 0x003e; }
       /// @endcond
     };
   };
