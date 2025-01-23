@@ -14,13 +14,13 @@ OpenGD77BaseCodeplug::encodeAngle(double angle) {
   uint32_t sign = (angle < 0) ? 1 : 0;
   uint32_t decimals = std::abs(int(angle * 10000));
   uint32_t deg  = decimals/10000; decimals = decimals % 10000;
-  return (sign << 23) | (deg <<15) | decimals;
+  return (sign << 23) | (deg << 15) | decimals;
 }
 
 double
 OpenGD77BaseCodeplug::decodeAngle(uint32_t code) {
   return (((code >> 23) & 1) ? -1 : 1) * (
-        ((code >> 15) & 0xff) + double(code & 0x7ff)/10000
+        ((code >> 15) & 0xff) + double(code & 0x7fff)/10000
         );
 }
 
@@ -211,11 +211,11 @@ OpenGD77BaseCodeplug::ChannelElement::hasFixedPosition() const {
 
 QGeoCoordinate
 OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
-  uint32_t latCode = (((uint32_t)getUInt8(Offset::latitude2())) << 24) +
-      (((uint32_t)getUInt8(Offset::latitude1())) << 16) +
+  uint32_t latCode = (((uint32_t)getUInt8(Offset::latitude2())) << 16) +
+      (((uint32_t)getUInt8(Offset::latitude1())) << 8) +
       ((uint32_t)getUInt8(Offset::latitude0()));
-  uint32_t lonCode = (((uint32_t)getUInt8(Offset::longitude2())) << 24) +
-      (((uint32_t)getUInt8(Offset::longitude1())) << 16) +
+  uint32_t lonCode = (((uint32_t)getUInt8(Offset::longitude2())) << 16) +
+      (((uint32_t)getUInt8(Offset::longitude1())) << 8) +
       ((uint32_t)getUInt8(Offset::longitude0()));
 
   return QGeoCoordinate(decodeAngle(latCode), decodeAngle(lonCode));
@@ -223,7 +223,7 @@ OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setFixedPosition(const QGeoCoordinate &coordinate) {
-  if (!coordinate.isValid()) {
+  if (! coordinate.isValid()) {
     clearFixedPosition();
     return;
   }
@@ -565,7 +565,10 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   ch->openGD77ChannelExtension()->enableScanAllSkip(skipScan());
   ch->openGD77ChannelExtension()->enableBeep(beep());
   ch->openGD77ChannelExtension()->enablePowerSave(powerSave());
-  ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  if (hasFixedPosition())
+    ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  else
+    ch->openGD77ChannelExtension()->setLocation(QGeoCoordinate());
   ch->openGD77ChannelExtension()->setTalkerAliasTS1(aliasTimeSlot1());
   ch->openGD77ChannelExtension()->setTalkerAliasTS2(aliasTimeSlot2());
 
@@ -953,6 +956,7 @@ void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
   setName("");
+  clearFixedPosition();
 }
 
 

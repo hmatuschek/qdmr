@@ -166,5 +166,33 @@ OpenGD77Test::testChannelSubTones() {
   QCOMPARE(rxTone.Hz(), 123.0);
 }
 
+
+void
+OpenGD77Test::testChannelFixedLocation() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  auto ext = new OpenGD77ChannelExtension();
+  ext->setLocator("JO62jl");
+  config.channelList()->channel(0)->setOpenGD77ChannelExtension(ext);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl");
+
+  ext->setLocator("JO59gw");
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw");
+}
+
+
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
