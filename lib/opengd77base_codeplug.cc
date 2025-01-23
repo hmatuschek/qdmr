@@ -1,4 +1,5 @@
 #include "opengd77base_codeplug.hh"
+#include "opengd77_extension.hh"
 #include "radioid.hh"
 #include "config.hh"
 #include "logger.hh"
@@ -1141,6 +1142,12 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   setBaudRate(BaudRate::Baud1200);
   setPositionPrecision(PositionPrecision::Max);
 
+  if (nullptr == sys->openGD77Extension())
+    return true;
+
+  if (sys->openGD77Extension()->location().isValid())
+    setFixedPosition(sys->openGD77Extension()->location());
+
   return true;
 }
 
@@ -1165,6 +1172,12 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
 
   sys->setIcon(icon());
   sys->setMessage(comment());
+
+  auto ext = new OpenGD77APRSSystemExtension();
+  sys->setOpenGD77Extension(ext);
+
+  if (hasFixedPosition())
+    ext->setLocation(fixedPosition());
 
   return sys;
 }
