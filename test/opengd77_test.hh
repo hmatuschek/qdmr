@@ -21,6 +21,8 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
 
+  /** Regression test for #539. */
+  void testChannelGroupList();
   /** Regression test for #507 */
   void testChannelPowerSettings();
   /** Regression test for #541. */

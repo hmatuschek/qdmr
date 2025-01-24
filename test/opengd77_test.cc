@@ -83,6 +83,37 @@ OpenGD77Test::testChannelFrequency() {
 
 
 void
+OpenGD77Test::testChannelGroupList() {
+  ErrorStack err;
+
+  Config config, decoded;
+  if (! config.readYAML(":/data/config_test.yaml", err))
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+
+  config.channelList()->channel(0)->as<DMRChannel>()->setGroupListObj(nullptr);
+  config.channelList()->channel(0)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(1)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(2)->as<DMRChannel>()->setGroupListObj(nullptr);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(1)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(decoded.channelList()->channel(2)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(! decoded.channelList()->channel(2)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(3)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(3)->as<DMRChannel>()->contact()->isNull());
+}
+
+
+void
 OpenGD77Test::testChannelPowerSettings() {
   ErrorStack err;
 
