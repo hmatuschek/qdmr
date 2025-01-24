@@ -209,19 +209,19 @@ OpenGD77Test::testChannelFixedLocation() {
   }
 
   auto ext = new OpenGD77ChannelExtension();
-  ext->setLocator("JO62jl");
+  ext->setLocator("JO62jl24");
   config.channelList()->channel(0)->setOpenGD77ChannelExtension(ext);
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
-  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl");
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl24");
 
-  ext->setLocator("JO59gw");
+  ext->setLocator("JO59gw73");
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
-  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw");
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw73");
 }
 
 

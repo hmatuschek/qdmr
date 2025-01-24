@@ -78,7 +78,7 @@ OpenGD77ChannelExtension::setLocation(const QGeoCoordinate &loc) {
 QString
 OpenGD77ChannelExtension::locator() const {
   if (_location.isValid())
-    return deg2loc(location());
+    return deg2loc(location(), 8);
   return "";
 }
 
@@ -174,7 +174,7 @@ OpenGD77APRSSystemExtension::setLocation(const QGeoCoordinate &loc) {
 QString
 OpenGD77APRSSystemExtension::locator() const {
   if (_location.isValid())
-    return deg2loc(location());
+    return deg2loc(location(), 8);
   return "";
 }
 
