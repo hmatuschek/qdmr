@@ -103,7 +103,7 @@ OpenGD77BaseCodeplug::ChannelElement::clear() {
   enablePowerSave(false);
   enableBeep(false);
   clearDMRId();
-  setGroupListIndex(0);
+  clearGroupListIndex();
   setColorCode(0);
   clearAPRSIndex();
   clearTXContact();
