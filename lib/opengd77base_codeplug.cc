@@ -1,4 +1,5 @@
 #include "opengd77base_codeplug.hh"
+#include "opengd77_extension.hh"
 #include "radioid.hh"
 #include "config.hh"
 #include "logger.hh"
@@ -955,8 +956,13 @@ OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr)
 void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
+
   setName("");
   clearFixedPosition();
+  // Likely the future APRS system transmit frequency
+  setUInt32_le(Offset::unknownInteger(), 12700000);
+  // Some random data, appears to be important
+  writeASCII(Offset::unknownBytes(), "RA", 2);
 }
 
 
@@ -1109,6 +1115,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setBaudRate(BaudRate rate) {
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
+  clear();
 
   setName(sys->name());
   setSourceSSID(sys->srcSSID());
@@ -1135,6 +1142,12 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   setBaudRate(BaudRate::Baud1200);
   setPositionPrecision(PositionPrecision::Max);
 
+  if (nullptr == sys->openGD77Extension())
+    return true;
+
+  if (sys->openGD77Extension()->location().isValid())
+    setFixedPosition(sys->openGD77Extension()->location());
+
   return true;
 }
 
@@ -1159,6 +1172,12 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
 
   sys->setIcon(icon());
   sys->setMessage(comment());
+
+  auto ext = new OpenGD77APRSSystemExtension();
+  sys->setOpenGD77Extension(ext);
+
+  if (hasFixedPosition())
+    ext->setLocation(fixedPosition());
 
   return sys;
 }

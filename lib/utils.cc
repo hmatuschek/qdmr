@@ -478,59 +478,120 @@ align_addr(uint32_t addr, uint32_t block) {
 
 QGeoCoordinate
 loc2deg(const QString &loc) {
-  double lon = 0, lat = 0;
+  double lon = 0, lat = 0, dlon = 20, dlat = 10;
   if (2 > loc.size())
     return QGeoCoordinate();
-
   QChar l = loc[0].toUpper();
   QChar c = loc[1].toUpper();
-  lon += double(int(l.toLatin1())-'A')*20;
-  lat += double(int(c.toLatin1())-'A')*10;
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
 
   if (4 > loc.size()) {
     lon = lon - 180;
     lat = lat - 90;
     // Offset places coordinate in the middle of the square
-    return QGeoCoordinate(lat+5.0, lon+10.0);
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
   }
 
+  dlon /= 10; dlat /= 10;
   l = loc[2].toUpper();
   c = loc[3].toUpper();
-  lon += double(int(l.toLatin1())-'0')*2;
-  lat += double(int(c.toLatin1())-'0')*1;
+  lon += double(int(l.toLatin1())-'0')*dlon;
+  lat += double(int(c.toLatin1())-'0')*dlat;
 
   if (6 > loc.size()){
     lon = lon - 180;
     lat = lat - 90;
     // Offset places coordinate in the middle of the square
-    return QGeoCoordinate(lat+0.5, lon+1.0);
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
   }
 
+  dlon /= 24; dlat /= 24;
   l = loc[4].toUpper();
   c = loc[5].toUpper();
-  lon += double(int(l.toLatin1())-'A')/12;
-  lat += double(int(c.toLatin1())-'A')/24;
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
+
+  if (8 > loc.size()) {
+    lon = lon - 180;
+    lat = lat - 90;
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
+  }
+
+  dlon /= 10; dlat /= 10;
+  l = loc[6].toUpper();
+  c = loc[7].toUpper();
+  lon += double(int(l.toLatin1())-'0')*dlon;
+  lat += double(int(c.toLatin1())-'0')*dlat;
+
+  if (10 > loc.size()) {
+    lon = lon - 180;
+    lat = lat - 90;
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
+  }
+
+  dlon /= 24; dlat /= 24;
+  l = loc[8].toUpper();
+  c = loc[9].toUpper();
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
 
   lon = lon - 180;
   lat = lat - 90;
   // Offset places coordinate in the middle of the square
-  return QGeoCoordinate(lat+1./48, lon+1./24);
+  return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
 }
 
+
 QString
-deg2loc(const QGeoCoordinate &coor) {
+deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   QString loc;
-  double lon = coor.longitude()+180;
-  double lat = coor.latitude()+90;
-  char l = char(lon/20); lon -= 20*double(l);
-  char c = char(lat/10); lat -= 10*double(c);
+  double lon = (coor.longitude()+180)/360;
+  double lat = (coor.latitude()+90)/180;
+
+  size += (size % 2);
+  if (2 > size)
+    return loc;
+
+  lon *= 18; lat *= 18;
+  char l = lon; lon -= l;
+  char c = lat; lat -= c;
   loc.append(l+'A'); loc.append(c+'A');
-  l = char(lon/2); lon -= 2*double(l);
-  c = char(lat/1); lat -= 1*double(c);
+
+  if (4 > size)
+    return loc;
+
+  lon *= 10; lat *= 10;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
   loc.append(l+'0'); loc.append(c+'0');
-  l = char(lon*12); lon -= double(l)/12;
-  c = char(lat*24); lat -= double(c)/24;
+
+  if (6 > size)
+    return loc;
+
+  lon *= 24; lat *= 24;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
   loc.append(l+'a'); loc.append(c+'a');
+
+  if (8 > size)
+    return loc;
+
+  lon *= 10; lat *= 10;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
+  loc.append(l+'0'); loc.append(c+'0');
+
+  if (10 > size)
+    return loc;
+
+  lon *= 24; lat *= 24;
+  l = lon; //lon -= l;
+  c = lat; //lat -= c;
+  loc.append(l+'a'); loc.append(c+'a');
+
   return loc;
 }
 

@@ -209,19 +209,41 @@ OpenGD77Test::testChannelFixedLocation() {
   }
 
   auto ext = new OpenGD77ChannelExtension();
-  ext->setLocator("JO62jl");
+  ext->setLocator("JO62jl24");
   config.channelList()->channel(0)->setOpenGD77ChannelExtension(ext);
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
-  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl");
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl24");
 
-  ext->setLocator("JO59gw");
+  ext->setLocator("JO59gw73");
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
-  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw");
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw73");
+}
+
+
+void
+OpenGD77Test::testAPRSSourceCall() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.posSystems()->count(), 1);
+  auto sys = decoded.posSystems()->aprsSystem(0);
+  QCOMPARE(sys->source(), "DM3MAT");
+
+  // OpenGD77 cannot encode revert channel
+  QVERIFY(decoded.posSystems()->aprsSystem(0)->revert()->isNull());
 }
 
 

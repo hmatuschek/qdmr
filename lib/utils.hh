@@ -90,6 +90,6 @@ uint32_t align_size(uint32_t size, uint32_t block);
 uint32_t align_addr(uint32_t addr, uint32_t block);
 
 QGeoCoordinate loc2deg(const QString &loc);
-QString deg2loc(const QGeoCoordinate &coor);
+QString deg2loc(const QGeoCoordinate &coor, unsigned int size=6);
 
 #endif // UTILS_HH

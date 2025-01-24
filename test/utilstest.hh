@@ -20,6 +20,7 @@ private slots:
   void testDecodeDMRID_bcd();
   void testEncodeDMRID_bcd();
   void testFrequencyParser();
+  void testLocator();
 };
 
 #endif // UTILSTEST_HH

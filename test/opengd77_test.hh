@@ -27,6 +27,8 @@ private slots:
   void testChannelPowerSettings();
   /** Regression test for #541. */
   void testOverrideChannelRadioId();
+  /** Regression test for #554. */
+  void testAPRSSourceCall();
   /** Regression test for #549. */
   void testChannelSubTones();
   /** Regression test for #556. */

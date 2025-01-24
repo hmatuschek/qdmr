@@ -195,7 +195,8 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(QObject *parent)
   : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
-    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(), _anytone(nullptr)
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
+    _anytone(nullptr), _openGD77(nullptr)
 {
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -205,7 +206,8 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message), _anytone(nullptr)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
+    _anytone(nullptr), _openGD77(nullptr)
 {
   // Set channel reference
   _channel.set(channel);
@@ -356,6 +358,23 @@ APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
   }
   if (ext) {
     _anytone = ext;
+    ext->setParent(this);
+    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
+}
+
+OpenGD77APRSSystemExtension *
+APRSSystem::openGD77Extension() const {
+  return _openGD77;
+}
+void
+APRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
+  if (_openGD77) {
+    _openGD77->deleteLater();
+    _openGD77 = nullptr;
+  }
+  if (ext) {
+    _openGD77 = ext;
     ext->setParent(this);
     connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
   }

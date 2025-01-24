@@ -95,4 +95,26 @@ UtilsTest::testFrequencyParser() {
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
 }
 
+
+void
+UtilsTest::testLocator() {
+  QGeoCoordinate coor;
+
+  coor = loc2deg("JO62");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 4), "JO62");
+
+  coor = loc2deg("JO62jl");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 6), "JO62jl");
+
+  coor = loc2deg("JO62jl55");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 8), "JO62jl55");
+
+  coor = loc2deg("JO62jl55jj");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 10), "JO62jl55jj");
+}
+
 QTEST_GUILESS_MAIN(UtilsTest)

@@ -4,6 +4,7 @@
 #include "configreference.hh"
 #include <QAbstractTableModel>
 #include "anytone_extension.hh"
+#include "opengd77_extension.hh"
 
 class Config;
 class DMRContact;
@@ -151,6 +152,8 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(QString message READ message WRITE setMessage)
   /** Anytone sepecific settings. */
   Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** OpenGD77 sepecific settings. */
+  Q_PROPERTY(OpenGD77APRSSystemExtension *opengd77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -251,6 +254,11 @@ public:
   /** Sets the Anytone settings extension. */
   void setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext);
 
+  /** Returns the OpenGD77 settings extension, if set. */
+  OpenGD77APRSSystemExtension *openGD77Extension() const;
+  /** Sets the OpenGD77 settings extension. */
+  void setOpenGD77Extension(OpenGD77APRSSystemExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -277,6 +285,8 @@ protected:
   QString _message;
   /** Owns the Anytone settings extension. */
   AnytoneFMAPRSSettingsExtension *_anytone;
+  /** Owns the OpenGD77 settings extension. */
+  OpenGD77APRSSystemExtension *_openGD77;
 };
 
 
