@@ -228,6 +228,7 @@ ChirpReader::processLine(const QStringList &header, const QStringList &line, Con
   if ((Mode::FM == mode) || (Mode::NFM == mode)) {
     FMChannel *fm = new FMChannel();
 
+    fm->setBandwidth(Mode::FM == mode ? FMChannel::Bandwidth::Wide : FMChannel::Bandwidth::Narrow);
     fm->setName(name);
     fm->setRXFrequency(rxFrequency);
 
