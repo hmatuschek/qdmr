@@ -748,7 +748,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   // Check counts
   foreach (QString className, _elements.keys()) {
     if ((0 <= _minCount[className]) && (counts[className]<_minCount[className])) {
-      auto &msg = context.newMessage(RadioLimitIssue::Warning);
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "The number of elements of type '" << className << "' " << counts[className]
              << " is less than the required count " << _minCount[className] << ".";
     }
@@ -799,7 +799,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;

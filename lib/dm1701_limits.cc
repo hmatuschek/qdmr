@@ -143,7 +143,7 @@ DM1701Limits::DM1701Limits(QObject *parent)
 
   /* Define limits for scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
