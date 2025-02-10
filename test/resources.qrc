@@ -15,5 +15,6 @@
         <file>data/chirp_dcs.csv</file>
         <file>data/fm_aprs_test.yaml</file>
         <file>data/ctcss_null_test.yaml</file>
+        <file>data/chirp_bandwidth.csv</file>
     </qresource>
 </RCC>
