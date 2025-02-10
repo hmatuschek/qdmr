@@ -147,7 +147,7 @@ RD5RLimits::RD5RLimits(QObject *parent)
   /* Define limits for scan lists. */
   add("scanlists",
       new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

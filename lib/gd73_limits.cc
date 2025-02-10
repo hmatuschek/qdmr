@@ -137,7 +137,7 @@ GD73Limits::GD73Limits(QObject *parent)
 
   /* Check scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, GD73Codeplug::ScanListBankElement::Limit::memberCount(), new RadioLimitObject{
+        ScanList::staticMetaObject, 0, GD73Codeplug::ScanListBankElement::Limit::memberCount(), new RadioLimitObject{
           { "name", new RadioLimitString(1, GD73Codeplug::ScanListElement::Limit::nameLength(), RadioLimitString::Unicode) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

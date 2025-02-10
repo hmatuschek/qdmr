@@ -140,7 +140,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
   /* Define limits for scan lists. */
   add("scanlists",
       new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

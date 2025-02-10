@@ -146,7 +146,7 @@ GD77Limits::GD77Limits(QObject *parent)
 
   /* Ignore scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, 64, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 64, new RadioLimitObject{
           { "name", new RadioLimitString(1, 15, RadioLimitString::ASCII) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
