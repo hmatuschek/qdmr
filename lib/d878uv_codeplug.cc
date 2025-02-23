@@ -314,6 +314,89 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 }
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::ChannelExtensionElement
+ * ******************************************************************************************** */
+D878UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  /// pass...
+}
+
+
+void
+D878UVCodeplug::ChannelExtensionElement::clear() {
+  Element::clear();
+  memset(_data, 0, size());
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::bot5ToneIDIndex() const {
+  return getUInt8(Offset::bot5ToneIDIndex());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setBOT5ToneIDIndex(unsigned int idx) {
+  setUInt8(Offset::bot5ToneIDIndex(), idx);
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::eot5ToneIDIndex() const {
+  return getUInt8(Offset::eot5ToneIDIndex());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setEOT5ToneIDIndex(unsigned int idx) {
+  setUInt8(Offset::eot5ToneIDIndex(), idx);
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::txColorCode() const {
+  return getUInt8(Offset::txColorCode());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setTXColorCode(unsigned int cc) {
+  setUInt8(Offset::txColorCode(), cc);
+}
+
+
+bool
+D878UVCodeplug::ChannelExtensionElement::updateChannelObj(Channel *c, Context &ctx) const {
+  Q_UNUSED(c); Q_UNUSED(ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::ChannelExtensionElement::linkChannelObj(Channel *c, Context &ctx) const {
+  Q_UNUSED(c); Q_UNUSED(ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::ChannelExtensionElement::fromChannelObj(const Channel *c, Context &ctx) {
+  Q_UNUSED(ctx);
+
+  if (c->is<DMRChannel>()) {
+    auto dmr = c->as<DMRChannel>();
+    setTXColorCode(dmr->colorCode());
+  }
+
+  return true;
+}
+
+
+
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::FMAPRSFrequencyNamesElement
  * ******************************************************************************************** */
@@ -3476,9 +3559,9 @@ D878UVCodeplug::allocateChannels() {
     if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, ChannelElement::size());
     }
-    if (!isAllocated(addr+0x2000, 0)) {
-      image(0).addElement(addr+0x2000, ChannelElement::size());
-      memset(data(addr+0x2000), 0x00, ChannelElement::size());
+    if (!isAllocated(addr+Offset::toChannelExtension(), 0)) {
+      image(0).addElement(addr+Offset::toChannelExtension(), ChannelElement::size());
+      memset(data(addr+Offset::toChannelExtension()), 0x00, ChannelElement::size());
     }
   }
 }
@@ -3490,9 +3573,13 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
+    ChannelElement ch(data(addr));
     ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+    ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
 }
@@ -3506,12 +3593,18 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
     if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
+
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ext.updateChannelObj(obj, ctx);
     }
   }
   return true;
@@ -3526,12 +3619,17 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
     if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
-    if (ctx.has<Channel>(i))
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr));
+
+    if (ctx.has<Channel>(i)) {
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ext.linkChannelObj(ctx.get<Channel>(i), ctx);
+    }
   }
   return true;
 }
