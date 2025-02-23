@@ -846,7 +846,8 @@
     <term><token>backlightDuration</token>, <token>backlightDurationRX</token>, 
       <token>backlightDurationTX</token></term>
     <listitem>
-      <para>Specifies the backlight duration. </para>
+      <para>Specifies the backlight duration. While setting the TX backlight duration to 0 disables
+      it during TX, setting the RX backlight duration to that value, enables it continously.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
