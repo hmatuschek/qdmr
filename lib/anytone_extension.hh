@@ -925,7 +925,7 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(Interval backlightDurationTX READ backlightDurationTX WRITE setBacklightDurationTX)
 
   Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
-                                     "A value of 0 means off.")
+                                     "A value of 0 means always on.")
   /** RX backlight duration. */
   Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
 
