@@ -1749,8 +1749,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
              ext->bootSettings()->channelA()->as<Channel>())))
         setDefaultChannelAToVFO();
       else
-        setDefaultChannelAIndex(
-              ctx.index(ext->bootSettings()->channelA()->as<Channel>()));
+        setDefaultChannelAIndex(ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
+                                  ext->bootSettings()->channelA()->as<Channel>()));
 
       setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
       if (ext->bootSettings()->channelB()->isNull() ||
@@ -1758,7 +1758,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
              ext->bootSettings()->channelB()->as<Channel>())))
         setDefaultChannelBToVFO();
       else
-        setDefaultChannelBIndex(ctx.index(ext->bootSettings()->channelB()->as<Channel>()));
+        setDefaultChannelBIndex(ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
+                                  ext->bootSettings()->channelB()->as<Channel>()));
     }
 
     // Encode key settings
@@ -1954,15 +1955,18 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     }
-    ext->bootSettings()->zoneA()->set(ctx.get<Zone>(this->defaultZoneIndexA()));
+
+    Zone *zoneA = ctx.get<Zone>(this->defaultZoneIndexA());
+    ext->bootSettings()->zoneA()->set(zoneA);
     if (this->defaultChannelAIsVFO()) {
       // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
+    } else if (this->defaultChannelAIndex() >= (unsigned int)zoneA->A()->count()) {
       errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelA()->set(ctx.get<Channel>(this->defaultChannelAIndex()));
+      ext->bootSettings()->channelA()->set(
+            zoneA->A()->get(this->defaultChannelAIndex())->as<Channel>());
     }
 
     if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
@@ -1970,15 +1974,17 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     }
-    ext->bootSettings()->zoneB()->set(ctx.get<Zone>(this->defaultZoneIndexB()));
+    Zone *zoneB = ctx.get<Zone>(this->defaultZoneIndexB());
+    ext->bootSettings()->zoneB()->set(zoneB);
     if (this->defaultChannelBIsVFO()) {
       // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {
+    } else if (this->defaultChannelBIndex() >= (unsigned int)zoneB->A()->count()) {
       errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelB()->set(ctx.get<Channel>(this->defaultChannelBIndex()));
+      ext->bootSettings()->channelB()->set(
+            zoneB->A()->get(this->defaultChannelBIndex())->as<Channel>());
     }
   }
 
