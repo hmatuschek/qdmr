@@ -233,5 +233,48 @@ D868UVETest::testRegressionSMSCount() {
 }
 
 
+void
+D868UVETest::testRegressionDefaultChannel() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  config.settings()->anytoneExtension()->bootSettings()->zoneA()->set(config.zones()->zone(0));
+  config.settings()->anytoneExtension()->bootSettings()->channelA()->set(config.zones()->zone(0)->A()->get(0));
+  config.settings()->anytoneExtension()->bootSettings()->zoneB()->set(config.zones()->zone(0));
+  config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(0)->A()->get(1));
+  config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
+
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(decoded.settings()->anytoneExtension());
+  QVERIFY(decoded.settings()->anytoneExtension()->bootSettings()->defaultChannelEnabled());
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneA()->as<Zone>(),
+           decoded.zones()->zone(0));
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelA()->as<Channel>()->name(),
+           decoded.zones()->zone(0)->A()->get(0)->name());
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneB()->as<Zone>(),
+           decoded.zones()->zone(0));
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelB()->as<Channel>()->name(),
+           decoded.zones()->zone(0)->A()->get(1)->name());
+}
+
+
 QTEST_GUILESS_MAIN(D868UVETest)
 
