@@ -7,3 +7,7 @@ if (UNIX AND NOT APPLE)
   install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr72.png DESTINATION share/icons/hicolor/72x72/ RENAME qdmr.png)
   install(FILES ${PROJECT_SOURCE_DIR}/dist/qdmr96.png DESTINATION share/icons/hicolor/96x96/ RENAME qdmr.png)
 endif(UNIX AND NOT APPLE)
+
+if (UNIX AND NOT APPLE AND ${INSTALL_APPSTREAM_DATA})
+  install(FILES ${PROJECT_SOURCE_DIR}/dist/de.darc.dm3mat.qdmr.metainfo.xml DESTINATION share/metainfo/)
+endif(UNIX AND NOT APPLE AND ${INSTALL_APPSTREAM_DATA})
