@@ -1,0 +1,41 @@
+id: de.darc.dm3mat.qdmr
+runtime: org.kde.Platform
+runtime-version: '5.15-24.08'
+sdk: org.kde.Sdk
+command: qdmr
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+    #- --device=usb
+modules:
+  - name: yaml-cpp
+    buildsystem: cmake
+    sources:
+      - type: git
+        url: https://github.com/jbeder/yaml-cpp.git
+        tag: 0.8.0
+    cleanup:
+      - "/include"
+      - "/lib"
+  - name: libusb
+    buildsystem: autotools
+    sources:
+      - type: git
+        url: https://github.com/libusb/libusb.git
+        tag: v1.0.28
+    cleanup:
+      - "/include"
+  - name: qdmr
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
+    sources:
+      - type: git
+        url: https://github.com/hmatuschek/qdmr.git
+        tag: v0.12.1
+    cleanup:
+      - "/include"
