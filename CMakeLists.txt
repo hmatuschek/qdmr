@@ -8,6 +8,7 @@ option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
 option(INSTALL_UDEV_RULES "Install udev rules file." ON)
 option(INSTALL_UDEV_PATH "Install path of udev rules file." "/etc/udev/rules.d")
+option(INSTALL_APPSTREAM_DATA "Install AppStream metainfo file." ON)
 option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
 option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applications")
 

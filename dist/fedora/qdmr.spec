@@ -104,6 +104,7 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_bindir}/qdmr
 %{_udevrulesdir}/99-qdmr.rules
 %{_datadir}/applications/qdmr.desktop
+%{_metainfodir}/de.darc.dm3mat.qdmr.metainfo.xml
 %{_datadir}/icons/hicolor/*/qdmr.png
 %{_mandir}/man1/dmrconf.1%{?ext_man}
 %{_mandir}/man1/qdmr.1%{?ext_man}
