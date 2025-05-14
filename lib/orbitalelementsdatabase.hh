@@ -149,6 +149,8 @@ public:
   int columnCount(const QModelIndex &parent = QModelIndex()) const;
   /** Returns a single cell of the database table. */
   QVariant data(const QModelIndex &index, int role) const;
+  /** Returns a single header of the database table. */
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 signals:
   /** Gets emitted once the satellite orbitals has been loaded. */
