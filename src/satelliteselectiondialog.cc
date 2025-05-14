@@ -11,7 +11,8 @@ SatelliteSelectionDialog::SatelliteSelectionDialog(OrbitalElementsDatabase *db, 
 {
   ui->setupUi(this);
   ui->satellites->setModel(_database);
-  ui->satellites->setModelColumn(1);
+  ui->satellites->hideColumn(2);
+
   SearchPopup::attach(ui->satellites);
   this->restoreGeometry(Settings().headerState(objectName()));
 }
