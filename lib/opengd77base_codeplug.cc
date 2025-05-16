@@ -591,6 +591,7 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
       dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
     if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
       dc->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+
     // Testing dmrId() == 0 fixes a bug in the OpenGD77 firmware. May change in future.
     if (hasDMRId() && (0 != dmrId())) {
       logDebug() << "Channel '" << c->name() << "' overrides default DMR id with "
@@ -1771,7 +1772,7 @@ OpenGD77BaseCodeplug::ContactElement::clear() {
   setName("");
   setNumber(0);
   setType(DMRContact::GroupCall);
-  setTimeSlotOverride(TimeSlotOverride::None);
+  setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride::None);
 }
 
 
@@ -1824,12 +1825,12 @@ OpenGD77BaseCodeplug::ContactElement::setType(DMRContact::Type type) {
 }
 
 
-OpenGD77BaseCodeplug::ContactElement::TimeSlotOverride
+OpenGD77ContactExtension::TimeSlotOverride
 OpenGD77BaseCodeplug::ContactElement::timeSlotOverride() const {
-  return (TimeSlotOverride)getUInt8(Offset::timeSlotOverride());
+  return (OpenGD77ContactExtension::TimeSlotOverride)getUInt8(Offset::timeSlotOverride());
 }
 void
-OpenGD77BaseCodeplug::ContactElement::setTimeSlotOverride(TimeSlotOverride ts) {
+OpenGD77BaseCodeplug::ContactElement::setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride ts) {
   setUInt8(Offset::timeSlotOverride(), (unsigned int) ts);
 }
 
@@ -1845,20 +1846,7 @@ OpenGD77BaseCodeplug::ContactElement::decode(Context &ctx, const ErrorStack &err
   auto contact = new DMRContact(type(), name(), number(), false);
   contact->setOpenGD77ContactExtension(new OpenGD77ContactExtension());
 
-  switch (timeSlotOverride()) {
-  case TimeSlotOverride::None:
-    contact->openGD77ContactExtension()->setTimeSlotOverride(
-          OpenGD77ContactExtension::TimeSlotOverride::None);
-    break;
-  case TimeSlotOverride::TS1:
-    contact->openGD77ContactExtension()->setTimeSlotOverride(
-          OpenGD77ContactExtension::TimeSlotOverride::TS1);
-    break;
-  case TimeSlotOverride::TS2:
-    contact->openGD77ContactExtension()->setTimeSlotOverride(
-          OpenGD77ContactExtension::TimeSlotOverride::TS2);
-    break;
-  }
+  contact->openGD77ContactExtension()->setTimeSlotOverride(timeSlotOverride());
 
   return contact;
 }
@@ -1873,17 +1861,7 @@ OpenGD77BaseCodeplug::ContactElement::encode(const DMRContact *cont, Context &ct
   if (nullptr == cont->openGD77ContactExtension())
     return true;
 
-  switch (cont->openGD77ContactExtension()->timeSlotOverride()) {
-  case OpenGD77ContactExtension::TimeSlotOverride::None:
-    setTimeSlotOverride(TimeSlotOverride::None);
-    break;
-  case OpenGD77ContactExtension::TimeSlotOverride::TS1:
-    setTimeSlotOverride(TimeSlotOverride::TS1);
-    break;
-  case OpenGD77ContactExtension::TimeSlotOverride::TS2:
-    setTimeSlotOverride(TimeSlotOverride::TS2);
-    break;
-  }
+  setTimeSlotOverride(cont->openGD77ContactExtension()->timeSlotOverride());
 
   return true;
 }
