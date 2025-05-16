@@ -205,7 +205,7 @@ OpenUV380Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
 
 bool
 OpenUV380Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++,c++) {
+  for (unsigned int b=0,c=0; b<Limit::channelBanks(); b++) {
     ChannelBankElement bank(nullptr);
     if (0 == b)
       bank = ChannelBankElement(data(Offset::channelBank0(), ImageIndex::channelBank0()));
@@ -217,7 +217,11 @@ OpenUV380Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
         continue;
 
       Channel *obj = ctx.get<Channel>(c);
-      if (! bank.channel(i).link(obj, ctx, err)) {
+      ChannelElement element = bank.channel(i);
+
+      assert(obj->name() == element.name());
+
+      if (! element.link(obj, ctx, err)) {
         errMsg(err) << "Cannot link channel '" << obj->name()
                     << "' from index " << i << " in bank " << b << ".";
         return false;
