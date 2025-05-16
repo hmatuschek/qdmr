@@ -131,7 +131,7 @@ class OpenGD77ContactExtension: public ConfigExtension
 
 public:
   /** Possible values for the time-slot override option.
-   * Encoded values are correct for firmware 2022-02-28 (0118581D). */
+   * Encoded values are correct for firmware 2022-02-28 (0118581D) to 2025-03-23 (1bd23ea). */
   enum class TimeSlotOverride {
     None = 0x01,                  ///< Do not override time-slot of channel.
     TS1  = 0x00,                  ///< Force time-slot to TS1.
