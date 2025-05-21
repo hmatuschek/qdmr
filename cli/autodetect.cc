@@ -6,9 +6,10 @@
 
 QVariant
 parseDeviceHandle(const QString &device) {
-  QRegExp pattern("([0-9]+):([0-9]+)");
-  if (pattern.exactMatch(device.simplified())) {
-    return QVariant::fromValue(USBDeviceHandle(pattern.cap(1).toUInt(), pattern.cap(2).toUInt()));
+  QRegularExpression pattern("([0-9]+):([0-9]+)");
+  auto match = pattern.match(device.simplified());
+  if (match.isValid()) {
+    return QVariant::fromValue(USBDeviceHandle(match.captured(1).toUInt(), match.captured(2).toUInt()));
   }
   return QVariant(device.simplified());
 }

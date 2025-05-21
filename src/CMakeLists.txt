@@ -1,66 +1,70 @@
-SET(qdmr_SOURCES main.cc
-  configitemwrapper.cc
-  application.cc settings.cc dmrcontactdialog.cc dtmfcontactdialog.cc rxgrouplistdialog.cc
-  analogchanneldialog.cc digitalchanneldialog.cc channelvalidator.cc channelcombobox.cc
-  channelselectiondialog.cc zonedialog.cc scanlistdialog.cc
-  verifydialog.cc gpssystemdialog.cc contactselectiondialog.cc searchpopup.cc
-  aprssystemdialog.cc releasenotes.cc roamingzonedialog.cc roamingchannellistview.cc
-  roamingchanneldialog.cc roamingchannelselectiondialog.cc
-  configobjectlistview.cc configobjecttableview.cc
-  generalsettingsview.cc radioidlistview.cc contactlistview.cc grouplistsview.cc channellistview.cc
-  zonelistview.cc scanlistsview.cc positioningsystemlistview.cc roamingzonelistview.cc
-  collapsablewidget.cc extensionview.cc extensionwrapper.cc propertydelegate.cc errormessageview.cc
-  deviceselectiondialog.cc radioselectiondialog.cc dmriddialog.cc configobjecttypeselectiondialog.cc
-  configmergedialog.cc satellitedatabasedialog.cc satelliteselectiondialog.cc
-  repeaterdatabase.cc repeatercompleter.cc repeaterbooksource.cc repeatermapsource.cc
-  hearhamrepeatersource.cc radioidrepeatersource.cc selectivecallbox.cc
-  transponderfrequencydelegate.cc
-  mainwindow.cc)
-SET(qdmr_MOC_HEADERS
-  configitemwrapper.hh
-  application.hh settings.hh dmrcontactdialog.hh dtmfcontactdialog.hh rxgrouplistdialog.hh
-  analogchanneldialog.hh digitalchanneldialog.hh channelvalidator.hh channelcombobox.hh
-  channelselectiondialog.hh zonedialog.hh scanlistdialog.hh
-  verifydialog.hh gpssystemdialog.hh contactselectiondialog.hh
-  aprssystemdialog.hh releasenotes.hh searchpopup.hh
-  roamingzonedialog.hh roamingchannellistview.hh roamingchanneldialog.hh
-  roamingchannelselectiondialog.hh
-  configobjectlistview.hh configobjecttableview.hh
-  generalsettingsview.hh radioidlistview.hh contactlistview.hh grouplistsview.hh channellistview.hh
-  zonelistview.hh scanlistsview.hh positioningsystemlistview.hh roamingzonelistview.hh
-  collapsablewidget.hh extensionview.hh extensionwrapper.hh propertydelegate.hh errormessageview.hh
-  deviceselectiondialog.hh radioselectiondialog.hh dmriddialog.hh configobjecttypeselectiondialog.hh
-  configmergedialog.hh satellitedatabasedialog.hh satelliteselectiondialog.hh
-  repeaterdatabase.hh repeatercompleter.hh repeaterbooksource.hh repeatermapsource.hh
-  hearhamrepeatersource.hh radioidrepeatersource.hh selectivecallbox.hh
-  transponderfrequencydelegate.hh
-  mainwindow.hh)
-SET(qdmr_HEADERS )
-SET(qdmr_UI_FORMS dmrcontactdialog.ui dtmfcontactdialog.ui rxgrouplistdialog.ui
-  analogchanneldialog.ui zonedialog.ui
-  digitalchanneldialog.ui scanlistdialog.ui verifydialog.ui settingsdialog.ui
-  gpssystemdialog.ui aprssystemdialog.ui
-  roamingzonedialog.ui roamingchannellistview.ui roamingchanneldialog.ui
-  configobjectlistview.ui configobjecttableview.ui
-  generalsettingsview.ui radioidlistview.ui contactlistview.ui grouplistsview.ui channellistview.ui
-  zonelistview.ui scanlistsview.ui positioningsystemlistview.ui roamingzonelistview.ui
-  errormessageview.ui extensionview.ui
-  deviceselectiondialog.ui radioselectiondialog.ui dmriddialog.ui configobjecttypeselectiondialog.ui
-  configmergedialog.ui satellitedatabasedialog.ui satelliteselectiondialog.ui
-  mainwindow.ui)
 
-set(qdmr_TS_FILES ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts
-  ../i18n/pl.ts ../i18n/fr.ts)
-qt5_wrap_cpp(qdmr_MOC_SOURCES ${qdmr_MOC_HEADERS})
-qt5_wrap_ui(qdmr_UI_SOURCES ${qdmr_UI_FORMS})
-
-qt5_add_translation(qdmr_QM_FILES ${qdmr_TS_FILES})
-message(STATUS "Translations at: ${qdmr_QM_FILES}")
+set(qdmr_TS_FILES )
 
 qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(qdmr WIN32
-  ${qdmr_SOURCES} ${qdmr_MOC_SOURCES} ${qdmr_RCC_SOURCES} ${qdmr_UI_SOURCES} ${qdmr_QM_FILES})
+  main.cc
+  configitemwrapper.cc configitemwrapper.hh
+  application.cc application.hh
+  settings.cc settings.hh settingsdialog.ui
+  dmrcontactdialog.cc dmrcontactdialog.hh dmrcontactdialog.ui
+  dtmfcontactdialog.cc dtmfcontactdialog.hh dtmfcontactdialog.ui
+  rxgrouplistdialog.cc rxgrouplistdialog.hh rxgrouplistdialog.ui
+  analogchanneldialog.cc analogchanneldialog.hh analogchanneldialog.ui
+  digitalchanneldialog.cc digitalchanneldialog.hh digitalchanneldialog.ui
+  channelvalidator.cc channelvalidator.hh
+  channelcombobox.cc channelcombobox.hh
+  channelselectiondialog.cc channelselectiondialog.hh
+  zonedialog.cc zonedialog.hh zonedialog.ui
+  scanlistdialog.cc scanlistdialog.hh scanlistdialog.ui
+  verifydialog.cc verifydialog.hh verifydialog.ui
+  gpssystemdialog.cc gpssystemdialog.hh gpssystemdialog.ui
+  contactselectiondialog.cc contactselectiondialog.hh
+  searchpopup.cc searchpopup.hh
+  aprssystemdialog.cc aprssystemdialog.hh aprssystemdialog.ui
+  releasenotes.cc releasenotes.hh
+  roamingzonedialog.cc roamingzonedialog.hh roamingzonedialog.ui
+  roamingchannellistview.cc roamingchannellistview.hh roamingchannellistview.ui
+  roamingchanneldialog.cc roamingchanneldialog.hh roamingchanneldialog.ui
+  roamingchannelselectiondialog.cc roamingchannelselectiondialog.hh
+  configobjectlistview.cc configobjectlistview.hh configobjectlistview.ui
+  configobjecttableview.cc configobjecttableview.hh configobjecttableview.ui
+  generalsettingsview.cc generalsettingsview.hh generalsettingsview.ui
+  radioidlistview.cc radioidlistview.hh radioidlistview.ui
+  contactlistview.cc contactlistview.hh contactlistview.ui
+  grouplistsview.cc grouplistsview.hh grouplistsview.ui
+  channellistview.cc channellistview.hh channellistview.ui
+  zonelistview.cc zonelistview.hh zonelistview.ui
+  scanlistsview.cc scanlistsview.hh scanlistsview.ui
+  positioningsystemlistview.cc positioningsystemlistview.hh positioningsystemlistview.ui
+  roamingzonelistview.cc roamingzonelistview.hh roamingzonelistview.ui
+  collapsablewidget.cc collapsablewidget.hh
+  extensionview.cc extensionview.hh extensionview.ui
+  extensionwrapper.cc extensionwrapper.hh
+  propertydelegate.cc propertydelegate.hh
+  errormessageview.cc errormessageview.hh errormessageview.ui
+  deviceselectiondialog.cc deviceselectiondialog.hh deviceselectiondialog.ui
+  radioselectiondialog.cc radioselectiondialog.hh radioselectiondialog.ui
+  dmriddialog.cc dmriddialog.hh dmriddialog.ui
+  configobjecttypeselectiondialog.cc configobjecttypeselectiondialog.hh configobjecttypeselectiondialog.ui
+  configmergedialog.cc configmergedialog.hh configmergedialog.ui
+  satellitedatabasedialog.cc satellitedatabasedialog.hh satellitedatabasedialog.ui
+  satelliteselectiondialog.cc satelliteselectiondialog.hh satelliteselectiondialog.ui
+  repeaterdatabase.cc repeaterdatabase.hh
+  repeatercompleter.cc repeatercompleter.hh
+  repeaterbooksource.cc repeaterbooksource.hh
+  repeatermapsource.cc repeatermapsource.hh
+  hearhamrepeatersource.cc hearhamrepeatersource.hh
+  radioidrepeatersource.cc radioidrepeatersource.hh
+  selectivecallbox.cc selectivecallbox.hh
+  transponderfrequencydelegate.cc transponderfrequencydelegate.hh
+  mainwindow.cc mainwindow.hh mainwindow.ui
+  ${qdmr_RCC_SOURCES})
+
+qt6_add_translation(qdmr TS_FILES
+  ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts ../i18n/pl.ts ../i18n/fr.ts)
+message(STATUS "Translations at: ${qdmr_QM_FILES}")
 
 if (UNIX AND APPLE AND INSTALL_BUNDLE)
 	set_target_properties(qdmr PROPERTIES
@@ -74,7 +78,8 @@ if (UNIX AND APPLE AND INSTALL_BUNDLE)
     RESOURCE "${CMAKE_SOURCE_DIR}/dist/macosx/qdmr.icns" ${qdmr_QM_FILES})
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)
 
-target_link_libraries(qdmr ${LIBS} libdmrconf)
+target_link_libraries(qdmr PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Positioning Qt6::UiTools
+  ${LIBUSB_1_LIBS} libdmrconf)
 target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Install binary only if not a bundle under MacOS X
@@ -84,10 +89,4 @@ if (UNIX AND APPLE AND INSTALL_BUNDLE)
     RESOURCE DESTINATION "${BUNDLE_PATH}/${CMAKE_PROJECT_NAME}.app/Contents/Resources")
 else()
 	install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
-  foreach(QM_FILE ${qdmr_QM_FILES})
-     get_filename_component(QM_LANGUAGE ${QM_FILE} NAME_WE)
-     install(FILES ${QM_FILE}
-       DESTINATION "${LOCALE_DIRECTORY}/${QM_LANGUAGE}/LC_MESSAGES/"
-       RENAME "qdmr_qt.qm")
-  endforeach()
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)

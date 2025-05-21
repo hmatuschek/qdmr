@@ -4,8 +4,6 @@
 #include <QCommandLineParser>
 #include <QFile>
 
-#include <QApplication>
-
 #include "logger.hh"
 #include "radio.hh"
 #include "printprogress.hh"

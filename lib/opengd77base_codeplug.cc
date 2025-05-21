@@ -5,6 +5,7 @@
 #include "logger.hh"
 #include "intermediaterepresentation.hh"
 #include "satellitedatabase.hh"
+#include <QRegularExpression>
 
 
 /* ********************************************************************************************* *
@@ -1123,13 +1124,14 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   QStringList vias = sys->path().split(",");
   unsigned int viaCount = 0;
   for (auto via: vias) {
-    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
-    if (! pattern.exactMatch(via))
+    QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    auto match = pattern.match(via);
+    if (! match.isValid())
       continue;
     if (0 == viaCount)
-      setVia1(pattern.cap(1), pattern.cap(2).toUInt());
+      setVia1(match.captured(1), match.captured(2).toUInt());
     else if (1 == viaCount)
-      setVia2(pattern.cap(1), pattern.cap(2).toUInt());
+      setVia2(match.captured(1), match.captured(2).toUInt());
     else
       break;
     viaCount++;

@@ -2,7 +2,6 @@
 #define APPLICATION_HH
 
 #include <QApplication>
-#include <QGroupBox>
 #include <QIcon>
 #include "config.hh"
 #include <QGeoPositionInfoSource>

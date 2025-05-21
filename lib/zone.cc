@@ -1,14 +1,6 @@
 #include "zone.hh"
 #include "channel.hh"
 #include "config.hh"
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QMessageBox>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QInputDialog>
 
 
 /* ********************************************************************************************* *

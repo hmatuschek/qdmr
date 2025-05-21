@@ -30,6 +30,7 @@
 #define RADIOLIMITS_HH
 
 #include <QObject>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QMetaType>
 #include <QSet>
@@ -224,7 +225,7 @@ public:
 
 protected:
   /** Holds the regular expression pattern. */
-  QRegExp _pattern;
+  QRegularExpression _pattern;
 };
 
 

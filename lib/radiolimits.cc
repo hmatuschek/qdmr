@@ -9,7 +9,7 @@
 // Utility function to check string content for ASCII encoding
 inline bool qstring_is_ascii(const QString &text) {
   foreach (QChar c, text) {
-    if ((c<0x1f) && (0x7f != c))
+    if ((c.unicode() < 0x1f) && (0x7f != c.unicode()))
       return false;
   }
   return true;
@@ -243,7 +243,8 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
   }
 
   QString value = prop.read(item).toString();
-  if (! _pattern.exactMatch(value)) {
+  auto match = _pattern.match(value);
+  if (! match.isValid()) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg << "Value '" << value << "' of property " << prop.name()
         << " does not match pattern '" << _pattern.pattern() << "'.";

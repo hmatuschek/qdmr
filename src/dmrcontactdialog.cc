@@ -6,7 +6,7 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QDialogButtonBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QFormLayout>
 #include <QCompleter>
 #include "contact.hh"
@@ -92,7 +92,7 @@ DMRContactDialog::construct() {
   }
   ui->nameLineEdit->setText(_myContact->name());
   ui->numberLineEdit->setText(QString::number(_myContact->number()));
-  ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+  ui->numberLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
   ui->ringCheckBox->setChecked(_myContact->ring());
 
   ui->extensionView->setObjectName("dmrContactExtension");
@@ -108,11 +108,11 @@ DMRContactDialog::construct() {
 void
 DMRContactDialog::onTypeChanged(int idx) {
   if (0 == idx) {
-    ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+    ui->numberLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
     ui->numberLineEdit->setEnabled(true);
     ui->nameLineEdit->setCompleter(_user_completer);
   } else if (1 == idx) {
-    ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9]+")));
+    ui->numberLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
     ui->numberLineEdit->setEnabled(true);
     ui->nameLineEdit->setCompleter(_tg_completer);
   } else if (2 == idx) {

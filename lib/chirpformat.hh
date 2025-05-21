@@ -13,7 +13,6 @@
 
 class QTextStream;
 class Config;
-class QStringList;
 class FMChannel;
 
 
