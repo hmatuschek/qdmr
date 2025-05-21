@@ -65,5 +65,5 @@ if (${BUILD_DOCS})
     ${CMAKE_SOURCE_DIR}/lib
     COMMENT "Build API documentation")
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
-          DESTINATION ${CMAKE_INSTALL_DOCDIR}/libdmrconf/)
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/libdmrconf)
 endif(${BUILD_DOCS})
