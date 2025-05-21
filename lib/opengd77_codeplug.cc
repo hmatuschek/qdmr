@@ -185,7 +185,7 @@ OpenGD77Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
     else
       bank = ChannelBankElement(data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1()));
 
-    for (unsigned int i=0; i < ChannelBankElement::Limit::channelCount(); i++, c++) {
+    for (unsigned int i=0; i < ChannelBankElement::Limit::channelCount(); i++) {
       if (! bank.isEnabled(i))
         continue;
 
@@ -195,7 +195,7 @@ OpenGD77Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
         return false;
       }
       ctx.config()->channelList()->add(obj);
-      ctx.add(obj, c);
+      ctx.add(obj, c++);
     }
   }
 
@@ -211,7 +211,7 @@ OpenGD77Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     else
       bank = ChannelBankElement(data(Offset::channelBank1() + (b-1)*ChannelBankElement::size(), ImageIndex::channelBank1()));
 
-    for (unsigned int i=0; i < ChannelBankElement::Limit::channelCount(); i++, c++) {
+    for (unsigned int i=0; i < ChannelBankElement::Limit::channelCount(); i++) {
       if (! bank.isEnabled(i))
         continue;
 
@@ -221,6 +221,7 @@ OpenGD77Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
                     << "' from index " << i << " in bank " << b << ".";
         return false;
       }
+      c++;
     }
   }
 
