@@ -4,6 +4,7 @@
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
+#include <QtEndian>
 #include <iostream>
 #include "logger.hh"
 
@@ -173,6 +174,14 @@ void
 OpenGD77Test::testChannelSubTones() {
   ErrorStack err;
   Config config, decoded;
+
+  char enc[] = {0x00, 0x10};
+  uint16_t dec = *(quint16 *)enc;
+  SelectiveCall decTone = OpenGD77BaseCodeplug::decodeSelectiveCall(
+        qFromLittleEndian(dec));
+  QVERIFY(decTone.isValid());
+  QVERIFY(decTone.isCTCSS());
+  QCOMPARE(decTone.Hz(), 100.0);
 
   if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
