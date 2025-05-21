@@ -921,6 +921,15 @@ public:
   /** Implements digital contacts in OpenGD77 codeplugs. */
   class ContactElement: public Element
   {
+  public:
+    /** Possible values for the time-slot override option.
+     * Encoded values are correct for firmware 2022-02-28 (0118581D) to 2025-03-23 (1bd23ea). */
+    enum class TimeSlotOverride {
+      None = 0x01,                  ///< Do not override time-slot of channel.
+      TS1  = 0x00,                  ///< Force time-slot to TS1.
+      TS2  = 0x02                   ///< Force time-slot to TS2.
+    };
+
   protected:
     /** Hidden constructor. */
     ContactElement(uint8_t *ptr, unsigned size);
@@ -956,9 +965,9 @@ public:
     virtual void setType(DMRContact::Type type);
 
     /** Returns the time slot override of the contact. */
-    virtual OpenGD77ContactExtension::TimeSlotOverride timeSlotOverride() const;
+    virtual TimeSlotOverride timeSlotOverride() const;
     /** Sets the time slot override. */
-    virtual void setTimeSlotOverride(OpenGD77ContactExtension::TimeSlotOverride ts);
+    virtual void setTimeSlotOverride(TimeSlotOverride ts);
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
     virtual DMRContact *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;

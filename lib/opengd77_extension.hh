@@ -130,12 +130,11 @@ class OpenGD77ContactExtension: public ConfigExtension
               "channel for that contact that only differs in the time slot.")
 
 public:
-  /** Possible values for the time-slot override option.
-   * Encoded values are correct for firmware 2022-02-28 (0118581D) to 2025-03-23 (1bd23ea). */
+  /** Possible modes of time slot override. */
   enum class TimeSlotOverride {
-    None = 0x01,                  ///< Do not override time-slot of channel.
-    TS1  = 0x00,                  ///< Force time-slot to TS1.
-    TS2  = 0x02                   ///< Force time-slot to TS2.
+    None, ///< Do not override time slot.
+    TS1,  ///< Override with time slot 1.
+    TS2   ///< Override with time slot 2.
   };
   Q_ENUM(TimeSlotOverride)
 
