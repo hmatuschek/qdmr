@@ -198,7 +198,7 @@ ConfigItem::copy(const ConfigItem &other) {
       if (prop.isWritable()) {
         // If the owned item is writeable -> clone if set in other
         if (oprop.read(&other).isNull()) {
-          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr))) {
+          if ((! prop.read(&other).isNull()) && (! prop.write(this, QVariant::fromValue<ConfigItem *>(nullptr)))) {
             logError() << "Cannot delete item '" << prop.name() << "' of "
                        << this->metaObject()->className() << ".";
             return false;
