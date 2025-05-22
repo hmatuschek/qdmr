@@ -138,7 +138,7 @@
           <item row="4" column="0">
            <widget class="QLabel" name="label_18">
             <property name="text">
-             <string notr="true">radioid.com</string>
+             <string notr="true">radioid.net</string>
             </property>
            </widget>
           </item>
