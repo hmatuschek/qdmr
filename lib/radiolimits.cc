@@ -1,10 +1,8 @@
 #include "radiolimits.hh"
 #include "configobject.hh"
-#include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
 #include <QRegularExpression>
-#include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
 inline bool qstring_is_ascii(const QString &text) {
@@ -193,7 +191,7 @@ RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, QObject
 
 bool
 RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString == prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
@@ -236,7 +234,7 @@ RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, QObject *pa
 
 bool
 RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
@@ -265,7 +263,7 @@ RadioLimitStringIgnored::RadioLimitStringIgnored(RadioLimitIssue::Severity sever
 
 bool
 RadioLimitStringIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg = tr("Expected value of '%1' to be string.").arg(prop.name());
     return true;
@@ -294,7 +292,7 @@ bool
 RadioLimitBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   Q_UNUSED(item)
 
-  if (QVariant::Bool != prop.type()) {
+  if (QMetaType::Bool != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected bool.";
     return false;
@@ -315,7 +313,7 @@ RadioLimitIgnoredBool::RadioLimitIgnoredBool(RadioLimitIssue::Severity notify, Q
 
 bool
 RadioLimitIgnoredBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Bool != prop.type()) {
+  if (QMetaType::Bool != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected bool.";
     return false;
@@ -342,7 +340,7 @@ RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, qint64 defValue
 
 bool
 RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::UInt != prop.type()) {
+  if (QMetaType::UInt != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected uint.";
     return false;

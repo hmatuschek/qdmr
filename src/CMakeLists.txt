@@ -1,7 +1,6 @@
 
-set(qdmr_TS_FILES )
 
-qt5_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
+qt6_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(qdmr WIN32
   main.cc
@@ -66,6 +65,7 @@ qt6_add_translation(qdmr TS_FILES
   ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts ../i18n/pl.ts ../i18n/fr.ts)
 message(STATUS "Translations at: ${qdmr_QM_FILES}")
 
+
 if (UNIX AND APPLE AND INSTALL_BUNDLE)
 	set_target_properties(qdmr PROPERTIES
 		MACOSX_BUNDLE ON
@@ -84,9 +84,9 @@ target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Install binary only if not a bundle under MacOS X
 if (UNIX AND APPLE AND INSTALL_BUNDLE)
-	install(TARGETS qdmr
+  install(TARGETS qdmr
     BUNDLE DESTINATION ${BUNDLE_PATH}/
     RESOURCE DESTINATION "${BUNDLE_PATH}/${CMAKE_PROJECT_NAME}.app/Contents/Resources")
 else()
-	install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+  install(TARGETS qdmr DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)

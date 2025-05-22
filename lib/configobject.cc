@@ -4,7 +4,6 @@
 #include "frequency.hh"
 #include "interval.hh"
 #include "signaling.hh"
-#include "commercial_extension.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
@@ -163,14 +162,14 @@ ConfigItem::copy(const ConfigItem &other) {
     }
 
     // true if the property is a basic type
-    bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
-                         (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
-                         (QVariant::Double==prop.type()) || (QVariant::String==prop.type()) ||
+    bool isBasicType = ( prop.isEnumType() || (QMetaType::Bool==prop.typeId()) ||
+                         (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
+                         (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
                          (QString("Frequency")==prop.typeName()) ||
                          (QString("Interval")==prop.typeName()) );
 
     // If a basic type -> simply copy value
-    if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
+    if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
       if (! prop.write(this, oprop.read(&other))) {
         logError() << "Cannot set property '" << prop.name() << "' of "
                    << this->metaObject()->className() << ".";
@@ -254,7 +253,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
 
     // Handle comparison of basic types
-    if ((prop.isEnumType()) || (QVariant::Bool == prop.type()) || (QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+    if ((prop.isEnumType()) || (QMetaType::Bool == prop.typeId()) || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
       int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
       if (a<b)
         return -1;
@@ -263,7 +262,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QVariant::Double == prop.type()) {
+    if (QMetaType::Double == prop.typeId()) {
       double a=prop.read(this).toDouble(), b=oprop.read(&other).toDouble();
       if (a<b)
         return -1;
@@ -272,7 +271,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QVariant::String == prop.type()) {
+    if (QMetaType::QString == prop.typeId()) {
       int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
       if (cmp)
         return cmp;
@@ -676,7 +675,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse '" << prop.name() << "' of '" << meta->className()
                     << "': Expected instance of '"
-                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+                    << QMetaType(prop.typeId()).metaObject()->className() << "'.";
         return false;
       }
       // Get object
@@ -716,7 +715,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className()
                     << ": Expected instance of '"
-                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+                    << QMetaType(prop.typeId()).metaObject()->className() << "'.";
         return false;
       }
       // Get list
