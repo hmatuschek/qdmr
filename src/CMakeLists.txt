@@ -1,5 +1,4 @@
 
-
 qt6_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
 add_executable(qdmr WIN32
@@ -61,9 +60,40 @@ add_executable(qdmr WIN32
   mainwindow.cc mainwindow.hh mainwindow.ui
   ${qdmr_RCC_SOURCES})
 
+#
+# Translations
+#
 qt6_add_translation(qdmr TS_FILES
   ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts ../i18n/pl.ts ../i18n/fr.ts)
 message(STATUS "Translations at: ${qdmr_QM_FILES}")
+
+#
+# Icon generation
+#
+generate_icons(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
+  ICONS application-qdmr
+  THEMES light dark
+  CONTEXT apps
+  SIZES 16 48 64)
+
+generate_icons(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
+  ICONS application-exit
+  THEMES light dark
+  CONTEXT actions
+  SIZES 16)
+
+qt_add_resources(qdmr "icons"
+  PREFIX "icons"
+  BASE "${CMAKE_CURRENT_BINARY_DIR}/icons"
+  FILES ${GENERATE_ICONS_OUTPUT_FILES})
+
+qt_add_resources(qdmr "icons-themes"
+  PREFIX "icons"
+  BASE "${CMAKE_SOURCE_DIR}/shared/icons"
+  FILES "${CMAKE_SOURCE_DIR}/shared/icons/light/index.theme"
+        "${CMAKE_SOURCE_DIR}/shared/icons/dark/index.theme")
 
 
 if (UNIX AND APPLE AND INSTALL_BUNDLE)
