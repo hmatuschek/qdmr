@@ -6,6 +6,11 @@ set(RELEASE_SUFFIX "")
 cmake_policy(SET CMP0100 NEW)
 cmake_policy(SET CMP0140 NEW)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
@@ -20,8 +25,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(GNUInstallDirs)
 include(GenerateIcons)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning LinguistTools Test)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning LinguistTools)
 qt_standard_project_setup()
+
 find_package(LIBUSB_1 REQUIRED)
 find_package(YAMLCPP REQUIRED)
 find_program(CONVERT_CMD rsvg-convert DOC "SVG conversion tool (librsvg)." REQUIRED)
@@ -42,12 +48,12 @@ if (BUILD_DOCS)
 endif()
 
 if (${BUILD_TESTS})
-  find_package(Qt5Test REQUIRED)
+  find_package(Qt6 REQUIRED COMPONENTS Test)
 endif(${BUILD_TESTS})
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+IF (UNIX AND APPLE)
+  SET(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} "-framework IOKit -framework CoreFoundation")
+ENDIF(UNIX AND APPLE)
 
 INCLUDE_DIRECTORIES(${LIBUSB_1_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${YAMLCPP_INCLUDE_DIRS})
@@ -57,16 +63,12 @@ INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/lib)
 
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
-#BUG ignored for now
-IF (UNIX AND APPLE)
- SET(CORE_LIBS ${CORE_LIBS} "-framework IOKit -framework CoreFoundation")
-ENDIF(UNIX AND APPLE)
 
 set(PROJECT_VERSION_STRING "\"${PROJECT_VERSION}\"")
 message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wsign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wextra")
 
@@ -90,8 +92,6 @@ IF(UNIX AND APPLE)
  message(STATUS "RPATH: ${CMAKE_INSTALL_RPATH}")
 ENDIF(UNIX AND APPLE)
 
-# Directory to install translations to
-SET(LOCALE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/locale/")
 
 # Sources...
 add_subdirectory(lib)
