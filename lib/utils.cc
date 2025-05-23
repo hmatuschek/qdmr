@@ -1,5 +1,5 @@
 #include "utils.hh"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVector>
 #include <QHash>
 #include <cmath>
@@ -346,12 +346,12 @@ encode_ctcss_tone_table(const SelectiveCall &code)
 
 bool
 validDMRNumber(const QString &text) {
-  return QRegExp("^[0-9]+$").exactMatch(text);
+  return QRegularExpression("^[0-9]+$").match(text).hasMatch();
 }
 
 bool
 validDTMFNumber(const QString &text) {
-  return QRegExp("^[0-9a-dA-D\\*#]+$").exactMatch(text);
+  return QRegularExpression("^[0-9a-dA-D\\*#]+$").match(text).hasMatch();
 }
 
 QString
@@ -426,8 +426,8 @@ levDist(const QString &source, const QString &target, Qt::CaseSensitivity cs) {
     return 0;
   }
 
-  const int sourceCount = source.count();
-  const int targetCount = target.count();
+  const int sourceCount = source.size();
+  const int targetCount = target.size();
 
   if (source.isEmpty())
     return targetCount;
@@ -558,7 +558,7 @@ deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   lon *= 18; lat *= 18;
   char l = lon; lon -= l;
   char c = lat; lat -= c;
-  loc.append(l+'A'); loc.append(c+'A');
+  loc.append(QChar::fromLatin1(l+'A')); loc.append(QChar::fromLatin1(c+'A'));
 
   if (4 > size)
     return loc;
@@ -566,7 +566,7 @@ deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   lon *= 10; lat *= 10;
   l = lon; lon -= l;
   c = lat; lat -= c;
-  loc.append(l+'0'); loc.append(c+'0');
+  loc.append(QChar::fromLatin1(l+'0')); loc.append(QChar::fromLatin1(c+'0'));
 
   if (6 > size)
     return loc;
@@ -574,7 +574,7 @@ deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   lon *= 24; lat *= 24;
   l = lon; lon -= l;
   c = lat; lat -= c;
-  loc.append(l+'a'); loc.append(c+'a');
+  loc.append(QChar::fromLatin1(l+'a')); loc.append(QChar::fromLatin1(c+'a'));
 
   if (8 > size)
     return loc;
@@ -582,7 +582,7 @@ deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   lon *= 10; lat *= 10;
   l = lon; lon -= l;
   c = lat; lat -= c;
-  loc.append(l+'0'); loc.append(c+'0');
+  loc.append(QChar::fromLatin1(l+'0')); loc.append(QChar::fromLatin1(c+'0'));
 
   if (10 > size)
     return loc;
@@ -590,7 +590,7 @@ deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   lon *= 24; lat *= 24;
   l = lon; //lon -= l;
   c = lat; //lat -= c;
-  loc.append(l+'a'); loc.append(c+'a');
+  loc.append(QChar::fromLatin1(l+'a')); loc.append(QChar::fromLatin1(c+'a'));
 
   return loc;
 }

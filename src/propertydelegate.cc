@@ -8,7 +8,6 @@
 #include "configreference.hh"
 #include "extensionwrapper.hh"
 #include "config.hh"
-#include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
 
@@ -44,23 +43,23 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
   // Dispatch by type
   if (prop.isEnumType()) {
     return new QComboBox(parent);
-  } else if (QVariant::Bool == prop.type()) {
+  } else if (QMetaType::Bool == prop.typeId()) {
     return new QComboBox(parent);
-  } else if (QVariant::Int == prop.type()) {
+  } else if (QMetaType::Int == prop.typeId()) {
     QSpinBox *edit = new QSpinBox(parent);
     edit->setMinimum(std::numeric_limits<int>::min());
     edit->setMaximum(std::numeric_limits<int>::max());
     return edit;
-  } else if (QVariant::UInt == prop.type()) {
+  } else if (QMetaType::UInt == prop.typeId()) {
     QSpinBox *edit = new QSpinBox(parent);
     edit->setMinimum(0);
     edit->setMaximum(std::numeric_limits<int>::max());
     return edit;
-  } else if (QVariant::Double == prop.type()) {
+  } else if (QMetaType::Double == prop.typeId()) {
     QLineEdit *edit = new QLineEdit(parent);
     edit->setValidator(new QDoubleValidator(edit));
     return edit;
-  } else if (QVariant::String == prop.type()) {
+  } else if (QMetaType::QString == prop.typeId()) {
     return new QLineEdit(parent);
   } else if (QString("Frequency") == prop.typeName()) {
     return new QLineEdit(parent);
@@ -92,7 +91,7 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
         if (etype.value(i) == prop.read(obj).toInt())
           box->setCurrentIndex(i);
     }
-  } else if (QVariant::Bool == prop.type()) {
+  } else if (QMetaType::Bool == prop.typeId()) {
     QComboBox *box = dynamic_cast<QComboBox *>(editor);
     box->addItem(tr("False"), false);
     box->addItem(tr("True"), true);
@@ -100,11 +99,11 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
       box->setCurrentIndex(1);
     else
       box->setCurrentIndex(0);
-  } else if ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+  } else if ((QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
     dynamic_cast<QSpinBox *>(editor)->setValue(prop.read(obj).toInt());
-  } else if (QVariant::Double == prop.type()) {
+  } else if (QMetaType::Double == prop.typeId()) {
     dynamic_cast<QLineEdit *>(editor)->setText(QString::number(prop.read(obj).toDouble()));
-  } else if (QVariant::String == prop.type()) {
+  } else if (QMetaType::QString == prop.typeId()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).toString());
   } else if (QString("Frequency") == prop.typeName()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).value<Frequency>().format());
@@ -139,13 +138,13 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
   // Dispatch by type
   if (prop.isEnumType()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());
-  } else if (QVariant::Bool == prop.type()) {
+  } else if (QMetaType::Bool == prop.typeId()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());
-  } else if ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+  } else if ((QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
     prop.write(obj, dynamic_cast<QSpinBox *>(editor)->value());
-  } else if (QVariant::Double == prop.type()) {
+  } else if (QMetaType::Double == prop.typeId()) {
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text().toDouble());
-  } else if (QVariant::String == prop.type()) {
+  } else if (QMetaType::QString == prop.typeId()) {
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text());
   } else if (QString("Frequency") == prop.typeName()) {
     Frequency f;

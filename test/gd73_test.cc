@@ -260,11 +260,12 @@ GD73Test::testEncryptionLimits() {
 
   {
     RadioLimitContext issues;
-    GD73Limits().verifyConfig(&config, issues);
+    QVERIFY(GD73Limits().verifyConfig(&config, issues));
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(1 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QCOMPARE(status.count(), 0);
   }
 
   // Add wrong key type
@@ -278,8 +279,9 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 
   // add a larger key
@@ -295,8 +297,9 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 }
 

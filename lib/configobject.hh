@@ -19,17 +19,12 @@ class ConfigExtension;
 /** Helper function to test property type. */
 template <class T>
 bool propIsInstance(const QMetaProperty &prop) {
-  if (QMetaType::UnknownType == prop.userType())
+  if (QMetaType::UnknownType == prop.typeId())
     return false;
-  QMetaType type(prop.userType());
+  QMetaType type = prop.metaType();
   if (! (QMetaType::PointerToQObject & type.flags()))
     return false;
-  const QMetaObject *propType = type.metaObject();
-  for (; nullptr != propType; propType = propType->superClass()) {
-    if (0==strcmp(T::staticMetaObject.className(), propType->className()))
-      return true;
-  }
-  return false;
+  return type.metaObject()->inherits(&T::staticMetaObject);
 }
 
 

@@ -30,6 +30,7 @@
 #define RADIOLIMITS_HH
 
 #include <QObject>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QMetaType>
 #include <QSet>
@@ -217,14 +218,19 @@ class RadioLimitStringRegEx: public RadioLimitValue
 public:
   /** Constructor.
    * @param pattern Specifies the regular expression pattern, the string must match.
+   * @param severity Specifies the severity of the issue.
    * @param parent Specifies the QObject parent. */
-  RadioLimitStringRegEx(const QString &pattern, QObject *parent=nullptr);
+  RadioLimitStringRegEx(const QString &pattern,
+                        RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                        QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
+  /** Holds the severity of the issue. */
+  RadioLimitIssue::Severity _severity;
   /** Holds the regular expression pattern. */
-  QRegExp _pattern;
+  QRegularExpression _pattern;
 };
 
 

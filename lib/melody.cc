@@ -167,7 +167,7 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
   QRegularExpression rest_pattern("^r(1|2|4|8|16|)(\\.|)$");
   QRegularExpressionMatch note_match = note_pattern.match(note);
 
-  if (note_match.isValid()) {
+  if (note_match.hasMatch()) {
     if ("c" == note_match.captured(1)) tone=Tone::C;
     else if (("cis" == note_match.captured(1)) || ("des" == note_match.captured(1))) tone=Tone::Cis;
     else if ("d" == note_match.captured(1)) tone=Tone::D;
@@ -201,7 +201,7 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
   }
 
   QRegularExpressionMatch rest_match = rest_pattern.match(note);
-  if (rest_match.isValid()) {
+  if (rest_match.hasMatch()) {
     tone = Tone::Rest;
     if (0 == note_match.capturedLength(1)) duration = currentDuration;
     else if ("1" == note_match.captured(1)) duration = Duration::Whole;

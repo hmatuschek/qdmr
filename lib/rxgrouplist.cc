@@ -1,14 +1,4 @@
 #include "rxgrouplist.hh"
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QLabel>
-#include <QInputDialog>
 #include "contact.hh"
 #include "config.hh"
 

@@ -96,7 +96,7 @@ protected:
   /// The current line count
   QString _currentLine;
   /// The list of patterns to match
-  static QVector< QPair<QRegExp, Token::TokenType> > _pattern;
+  static QVector< QPair<QRegularExpression, Token::TokenType> > _pattern;
 };
 
 

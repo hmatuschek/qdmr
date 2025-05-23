@@ -33,7 +33,7 @@ OrbitalElement::Epoch
 OrbitalElement::Epoch::parse(const QString &datetime) {
   QRegularExpression pattern("([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{6})");
   QRegularExpressionMatch match = pattern.match(datetime);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return Epoch();
   return Epoch{
     match.captured(1).toUInt(),

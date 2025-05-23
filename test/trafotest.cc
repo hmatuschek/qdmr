@@ -79,7 +79,9 @@ TrafoTest::testPropertyRemoval() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   // Check filter
-  QCOMPARE(config.settings()->anytoneExtension(), nullptr);
+  auto settings = config.settings();
+  auto anytoneExt = settings->anytoneExtension();
+  QCOMPARE(anytoneExt, nullptr);
 }
 
 QTEST_GUILESS_MAIN(TrafoTest)
