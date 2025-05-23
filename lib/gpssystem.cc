@@ -402,7 +402,7 @@ APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack 
   QRegularExpression pattern("([A-Za-z0-9]+-[0-9]+)");
   int idx = 0;
   auto match = pattern.match(_path, idx);
-  while (match.isValid()) {
+  while (match.hasMatch()) {
     path.append(match.captured(1));
     idx += match.capturedLength(1);
   }
@@ -436,7 +436,7 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
     QString source = QString::fromStdString(sys["source"].as<std::string>());
     QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
     auto match = pattern.match(source);
-    if (! match.isValid()) {
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
       return false;
@@ -452,7 +452,7 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
     QString dest = QString::fromStdString(sys["destination"].as<std::string>());
     QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
     auto match = pattern.match(dest);
-    if (! match.isValid()) {
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
       return false;

@@ -2225,7 +2225,7 @@ AnytoneCodeplug::BootSettingsElement::password() const {
 void
 AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
   QRegularExpression pattern("[0-9]{0,8}");
-  if (pattern.match(txt).isValid())
+  if (pattern.match(txt).hasMatch())
     writeASCII(0x0020, txt, 8, 0x00);
 }
 

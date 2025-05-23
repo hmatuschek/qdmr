@@ -53,7 +53,7 @@ bool
 Frequency::parse(const QString &value) {
   QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return false;
 
   bool hasUnit = match.capturedLength(3);

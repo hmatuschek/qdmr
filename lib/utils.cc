@@ -346,12 +346,12 @@ encode_ctcss_tone_table(const SelectiveCall &code)
 
 bool
 validDMRNumber(const QString &text) {
-  return QRegularExpression("^[0-9]+$").match(text).isValid();
+  return QRegularExpression("^[0-9]+$").match(text).hasMatch();
 }
 
 bool
 validDTMFNumber(const QString &text) {
-  return QRegularExpression("^[0-9a-dA-D\\*#]+$").match(text).isValid();
+  return QRegularExpression("^[0-9a-dA-D\\*#]+$").match(text).hasMatch();
 }
 
 QString

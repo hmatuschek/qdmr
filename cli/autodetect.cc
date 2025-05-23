@@ -8,7 +8,7 @@ QVariant
 parseDeviceHandle(const QString &device) {
   QRegularExpression pattern("([0-9]+):([0-9]+)");
   auto match = pattern.match(device.simplified());
-  if (match.isValid()) {
+  if (match.hasMatch()) {
     return QVariant::fromValue(USBDeviceHandle(match.captured(1).toUInt(), match.captured(2).toUInt()));
   }
   return QVariant(device.simplified());

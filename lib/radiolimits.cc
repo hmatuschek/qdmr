@@ -15,7 +15,7 @@ inline bool qstring_is_ascii(const QString &text) {
 
 // Utility function to check string content for DTMF encoding
 inline bool qstring_is_dtmf(const QString &text) {
-  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).isValid();
+  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).hasMatch();
 }
 
 
@@ -152,7 +152,7 @@ RadioLimitIgnored::RadioLimitIgnored(RadioLimitIssue::Severity notify, QObject *
 
 bool
 RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  ConfigObject *obj = prop.read(item).value<ConfigObject *>();
+  auto obj = prop.read(item).value<const ConfigObject *>();
   if (nullptr != obj)
     return verifyObject(obj, context);
 
@@ -191,7 +191,7 @@ RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, QObject
 
 bool
 RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QMetaType::QString == prop.typeId()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
@@ -226,8 +226,8 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 /* ********************************************************************************************* *
  * Implementation of RadioLimitStringRegEx
  * ********************************************************************************************* */
-RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, QObject *parent)
-  : RadioLimitValue(parent), _pattern(pattern)
+RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(parent), _severity(severity), _pattern(pattern)
 {
   // pass...
 }
@@ -242,8 +242,8 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
 
   QString value = prop.read(item).toString();
   auto match = _pattern.match(value);
-  if (! match.isValid()) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+  if (! match.hasMatch()) {
+    auto &msg = context.newMessage(_severity);
     msg << "Value '" << value << "' of property " << prop.name()
         << " does not match pattern '" << _pattern.pattern() << "'.";
   }

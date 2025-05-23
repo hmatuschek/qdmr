@@ -1126,7 +1126,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   for (auto via: vias) {
     QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
     auto match = pattern.match(via);
-    if (! match.isValid())
+    if (! match.hasMatch())
       continue;
     if (0 == viaCount)
       setVia1(match.captured(1), match.captured(2).toUInt());
