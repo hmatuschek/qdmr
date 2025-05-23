@@ -198,7 +198,7 @@ ConfigItem::copy(const ConfigItem &other) {
       if (prop.isWritable()) {
         // If the owned item is writeable -> clone if set in other
         if (oprop.read(&other).isNull()) {
-          if ((! prop.read(&other).isNull()) && (! prop.write(this, QVariant::fromValue<ConfigItem *>(nullptr)))) {
+          if ((! prop.read(&other).isNull()) && (! prop.write(this, QVariant(prop.metaType())))) {
             logError() << "Cannot delete item '" << prop.name() << "' of "
                        << this->metaObject()->className() << ".";
             return false;
@@ -212,7 +212,7 @@ ConfigItem::copy(const ConfigItem &other) {
             return false;
           }
           // Write clone
-          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(cl))) {
+          if (! prop.write(this, QVariant(prop.metaType(), &cl))) {
             logError() << "Cannot replace item '" << prop.name() << "' of "
                        << this->metaObject()->className() << ".";
             cl->deleteLater();
@@ -380,9 +380,7 @@ ConfigItem::clear() {
     if (! prop.isValid())
       continue;
     if (propIsInstance<ConfigItem>(prop) && prop.isWritable()) {
-      if (ConfigItem *item = prop.read(this).value<ConfigItem*>())
-        item->deleteLater();
-      prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
+      prop.write(this, QVariant(prop.metaType()));
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       lst->clear();
     }

@@ -316,9 +316,8 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
     if (! prop.isWritable())
       return false;
     beginRemoveRows(item, 0, rowCount(item));
-    prop.write(obj, QVariant::fromValue<ConfigItem*>(nullptr));
+    prop.write(obj, QVariant(prop.metaType()));
     endRemoveRows();
-    ext->deleteLater();
     return true;
   }
   return false;
