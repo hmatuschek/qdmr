@@ -26,7 +26,7 @@ jobs:
       run: sudo apt-get update
       
     - name: Install Dependencies
-      run: sudo apt-get install clang-14 qt6-tools-dev qt6-base-dev qt6-base-dev-tools qt6-serialport-dev qt6-positioning-dev libusb-1.0-0-dev libyaml-cpp-dev
+      run: sudo apt-get install clang-14 qt6-tools-dev qt6-base-dev qt6-base-dev-tools qt6-serialport-dev qt6-positioning-dev libusb-1.0-0-dev libyaml-cpp-dev librsvg2-bin
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
