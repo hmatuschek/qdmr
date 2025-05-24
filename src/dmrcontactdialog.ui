@@ -10,6 +10,12 @@
     <height>296</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string notr="true">Dialog</string>
   </property>
@@ -32,7 +38,14 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="typeComboBox"/>
+        <widget class="QComboBox" name="typeComboBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="nameLabel">
