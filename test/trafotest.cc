@@ -81,7 +81,7 @@ TrafoTest::testPropertyRemoval() {
   // Check filter
   auto settings = config.settings();
   auto anytoneExt = settings->anytoneExtension();
-  QCOMPARE(anytoneExt, nullptr);
+  QVERIFY(anytoneExt == nullptr);
 }
 
 QTEST_GUILESS_MAIN(TrafoTest)

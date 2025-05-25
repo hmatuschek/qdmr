@@ -75,14 +75,18 @@ generate_icons(
   ICONS application-qdmr
   THEMES light dark
   CONTEXT apps
-  SIZES 16 48 64)
+  SIZES 16 32 48 64)
 
 generate_icons(
   DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
-  ICONS application-exit
+  ICONS application-exit device-read device-write-callsign device-write document-new
+        document-save-as edit-move-10-down edit-move-bottom edit-move-top help-about
+        application-settings device-search device-write-satellites document-download
+        document-open document-verify edit-move-10-up edit-move-down edit-move-up
+        help-contents
   THEMES light dark
   CONTEXT actions
-  SIZES 16)
+  SIZES 16 32)
 
 qt_add_resources(qdmr "icons"
   PREFIX "icons"
