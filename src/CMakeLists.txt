@@ -79,11 +79,13 @@ generate_icons(
 
 generate_icons(
   DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
-  ICONS application-exit device-read device-write-callsign device-write document-new
-        document-save-as edit-move-10-down edit-move-bottom edit-move-top help-about
-        application-settings device-search device-write-satellites document-download
-        document-open document-verify edit-move-10-up edit-move-down edit-move-up
-        help-contents
+  ICONS application-exit application-settings
+        device-read device-write-callsign device-write device-search device-write-satellites
+        document-new document-open document-verify document-save-as document-download
+        document-import document-export
+        edit-move-10-down edit-move-10-up edit-move-down edit-move-up edit-move-bottom edit-move-top
+        edit-satellites
+        help-contents help-about
   THEMES light dark
   CONTEXT actions
   SIZES 16 32)
