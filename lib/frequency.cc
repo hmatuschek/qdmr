@@ -53,7 +53,7 @@ bool
 Frequency::parse(const QString &value) {
   QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return false;
 
   bool hasUnit = match.capturedLength(3);
@@ -68,7 +68,7 @@ Frequency::parse(const QString &value) {
   if ("kHz" == unit) {
     _frequency *= 1000ULL;
     unsigned long long factor = 100ULL;
-    for (int i=0; i<std::min(3, decimals.size()); i++) {
+    for (int i=0; i<std::min((qsizetype)3, decimals.size()); i++) {
       _frequency += decimals[i].digitValue()*factor;
       factor /= 10;
     }
@@ -78,7 +78,7 @@ Frequency::parse(const QString &value) {
   } else if (("MHz"==unit) || (!hasUnit)) {
     _frequency *= 1000000ULL;
     unsigned long long factor = 100000ULL;
-    for (int i=0; i<std::min(6, decimals.size()); i++) {
+    for (int i=0; i<std::min((qsizetype)6, decimals.size()); i++) {
       _frequency += decimals[i].digitValue()*factor;
       factor /= 10;
     }
@@ -88,7 +88,7 @@ Frequency::parse(const QString &value) {
   } else if ("GHz"==unit) {
     _frequency *= 1000000000ULL;
     unsigned long long factor = 100000000;
-    for (int i=0; i<std::min(9, decimals.size()); i++) {
+    for (int i=0; i<std::min((qsizetype)9, decimals.size()); i++) {
       _frequency += decimals[i].digitValue()*factor;
       factor /= 10;
     }

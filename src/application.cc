@@ -80,7 +80,7 @@ Application::Application(int &argc, char *argv[])
   _translator = new QTranslator(this);
   foreach (QString language, getLanguages()) {
     logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
-    if (_translator->load("qdmr", getLocalePath(language), "", "_qt.qm")) {
+    if (_translator->load("qdmr", ":/i18n", "", "_qt.qm")) {
       this->installTranslator(_translator);
       logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
       break;
@@ -163,7 +163,7 @@ Application::isDarkMode() const {
 bool
 Application::isDarkMode(const QPalette &palette) const {
   int text_hsv_value = palette.color(QPalette::WindowText).value(),
-      bg_hsv_value = palette.color(QPalette::Background).value();
+      bg_hsv_value = palette.color(QPalette::Base).value();
   return text_hsv_value > bg_hsv_value;
 }
 

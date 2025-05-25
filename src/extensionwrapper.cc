@@ -316,9 +316,8 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
     if (! prop.isWritable())
       return false;
     beginRemoveRows(item, 0, rowCount(item));
-    prop.write(obj, QVariant::fromValue<ConfigItem*>(nullptr));
+    prop.write(obj, QVariant(prop.metaType()));
     endRemoveRows();
-    ext->deleteLater();
     return true;
   }
   return false;
@@ -576,14 +575,14 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
         return QVariant();
       }
       return QString(key);
-    } else if ((QVariant::Bool == prop.type()) && (Qt::EditRole == role)) {
+    } else if ((QMetaType::Bool == prop.typeId()) && (Qt::EditRole == role)) {
       return value;
-    } else if ((QVariant::Bool == prop.type()) && (Qt::DisplayRole == role)) {
+    } else if ((QMetaType::Bool == prop.typeId()) && (Qt::DisplayRole == role)) {
       if (value.toBool())
         return tr("true");
       return tr("false");
-    } else if ( ((QVariant::Int == prop.type()) || (QVariant::UInt == prop.type()) ||
-                 (QVariant::Double == prop.type()) || (QVariant::String == prop.type()))
+    } else if ( ((QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId()) ||
+                 (QMetaType::Double == prop.typeId()) || (QMetaType::QString == prop.typeId()))
                 && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
       return value;
     } else if (QString("Frequency") == prop.typeName()) {

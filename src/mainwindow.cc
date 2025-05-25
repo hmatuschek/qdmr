@@ -38,7 +38,14 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   ui->statusbar->addPermanentWidget(progress);
   progress->setVisible(false);
 
-  ui->actionWriteSatellites->setIcon(QIcon::fromTheme("device-write-satellite"));
+  ui->actionExportToCHIRP->setIcon(QIcon::fromTheme("document-export"));
+  ui->actionImport->setIcon(QIcon::fromTheme("document-import"));
+
+  ui->actionRefreshCallsignDB->setIcon(QIcon::fromTheme("document-download"));
+  ui->actionRefreshTalkgroupDB->setIcon(QIcon::fromTheme("document-download"));
+  ui->actionRefreshOrbitalElements->setIcon(QIcon::fromTheme("document-download"));
+  ui->actionWriteSatellites->setIcon(QIcon::fromTheme("device-write-satellites"));
+  ui->actionEditSatellites->setIcon(QIcon::fromTheme("edit-satellites"));
 
   connect(ui->actionNewCodeplug, SIGNAL(triggered()), app, SLOT(newCodeplug()));
   connect(ui->actionOpenCodeplug, SIGNAL(triggered()), app, SLOT(loadCodeplug()));

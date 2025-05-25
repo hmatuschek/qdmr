@@ -94,6 +94,7 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 
 bool
 TyTRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(blocking);
   errMsg(err) << "Satellite config upload is not implemented yet.";
   return false;
 }

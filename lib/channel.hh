@@ -246,8 +246,6 @@ public:
 public:
   /** Constructs a new empty analog channel. */
   Q_INVOKABLE explicit FMChannel(QObject *parent=nullptr);
-  /** Copy constructor. */
-  FMChannel(const FMChannel &other, QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
@@ -395,8 +393,6 @@ public:
 public:
   /** Constructs a new empty digital (DMR) channel. */
   Q_INVOKABLE explicit DMRChannel(QObject *parent=nullptr);
-  /** Copy constructor. */
-  DMRChannel(const DMRChannel &other, QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   void clear();
