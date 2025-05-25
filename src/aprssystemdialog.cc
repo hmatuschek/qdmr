@@ -130,6 +130,7 @@ APRSSystemDialog::construct() {
   ui->name->setText(_myAPRS->name());
 
   // Setup analog channels
+  ui->channel->addItem(tr("[Selected]"), QVariant::fromValue((FMChannel *)nullptr));
   for (int i=0, j=0; i<_config->channelList()->count(); i++) {
     if (! _config->channelList()->channel(i)->is<FMChannel>())
       continue;

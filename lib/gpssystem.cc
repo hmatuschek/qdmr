@@ -198,6 +198,12 @@ APRSSystem::APRSSystem(QObject *parent)
     _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
     _anytone(nullptr), _openGD77(nullptr)
 {
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _channel.allow(SelectedChannel::get()->metaObject());
+
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -211,6 +217,13 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
 {
   // Set channel reference
   _channel.set(channel);
+
+    // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _channel.allow(SelectedChannel::get()->metaObject());
+
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -236,6 +249,11 @@ APRSSystem::clone() const {
     return nullptr;
   }
   return sys;
+}
+
+bool
+APRSSystem::hasRevertChannel() const {
+  return ! _channel.isNull();
 }
 
 FMChannel *

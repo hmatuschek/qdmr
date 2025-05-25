@@ -201,6 +201,7 @@ public:
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
+  bool hasRevertChannel() const;
   /** Returns the transmit channel of the APRS system. */
   FMChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
