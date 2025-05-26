@@ -129,14 +129,16 @@ APRSSystemDialog::construct() {
   // Setup name
   ui->name->setText(_myAPRS->name());
 
-  // Setup analog channels
-  ui->channel->addItem(tr("[Selected]"), QVariant::fromValue((FMChannel *)nullptr));
-  for (int i=0, j=0; i<_config->channelList()->count(); i++) {
+  // Setup analog revert channels
+  ui->channel->addItem(tr("[Selected]"), QVariant::fromValue<FMChannel*>(nullptr));
+  if (! _myAPRS->hasRevertChannel())
+    ui->channel->setCurrentIndex(0);
+  for (int i=0, j=1; i<_config->channelList()->count(); i++) {
     if (! _config->channelList()->channel(i)->is<FMChannel>())
       continue;
     FMChannel *ch = _config->channelList()->channel(i)->as<FMChannel>();
     ui->channel->addItem(ch->name(), QVariant::fromValue(ch));
-    if (_myAPRS->revertChannel() == ch)
+    if (_myAPRS->hasRevertChannel() && (_myAPRS->revertChannel() == ch))
       ui->channel->setCurrentIndex(j);
     j++;
   }
@@ -167,7 +169,10 @@ APRSSystemDialog::construct() {
 APRSSystem *
 APRSSystemDialog::aprsSystem() {
   _myAPRS->setName(ui->name->text().simplified());
-  _myAPRS->setRevertChannel(ui->channel->currentData().value<FMChannel*>());
+  if (ui->channel->currentData().isNull())
+    _myAPRS->resetRevertChannel();
+  else
+    _myAPRS->setRevertChannel(ui->channel->currentData().value<FMChannel*>());
   _myAPRS->setSource(ui->source->text().simplified(), ui->srcSSID->value());
   _myAPRS->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
   _myAPRS->setPath(ui->path->text().simplified());

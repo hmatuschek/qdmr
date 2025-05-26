@@ -3148,10 +3148,9 @@ D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
 
 bool
 D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
-
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
-    sys->setRevertChannel(SelectedChannel::get());
+    sys->resetRevertChannel();
   else if (ctx.has<Channel>(dmrChannelIndex(idx)) && ctx.get<Channel>(dmrChannelIndex(idx))->is<DMRChannel>())
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 

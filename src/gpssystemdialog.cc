@@ -38,13 +38,16 @@ GPSSystemDialog::construct() {
   period->setValue(_myGPSSystem->period());
 
   // setup revert channel
-  revChannel->addItem(tr("[Selected]"), QVariant::fromValue((DMRChannel *)nullptr));
-  for (int i=0,j=0; j<_config->channelList()->count(); j++) {
+  revChannel->addItem(tr("[Selected]"), QVariant::fromValue<DMRChannel *>(nullptr));
+  if (! _myGPSSystem->hasRevertChannel())
+    revChannel->setCurrentIndex(0);
+  for (int i=1,j=0; j<_config->channelList()->count(); j++) {
     if (! _config->channelList()->channel(j)->is<DMRChannel>())
       continue;
     revChannel->addItem(_config->channelList()->channel(j)->name(),
                         QVariant::fromValue(_config->channelList()->channel(j)->as<DMRChannel>()));
-    if (_myGPSSystem->revertChannel()==_config->channelList()->channel(j)->as<DMRChannel>())
+    if (_myGPSSystem->hasRevertChannel() &&
+        (_myGPSSystem->revertChannel() == _config->channelList()->channel(j)->as<DMRChannel>()))
       revChannel->setCurrentIndex(i);
     i++;
   }
@@ -60,7 +63,10 @@ GPSSystemDialog::gpsSystem() {
   _myGPSSystem->setName(name->text().simplified());
   _myGPSSystem->setContactObj(destination->currentData().value<DMRContact*>());
   _myGPSSystem->setPeriod(period->value());
-  _myGPSSystem->setRevertChannel(revChannel->currentData().value<DMRChannel*>());
+  if (revChannel->currentData().isNull())
+    _myGPSSystem->resetRevertChannel();
+  else
+    _myGPSSystem->setRevertChannel(revChannel->currentData().value<DMRChannel*>());
 
   GPSSystem *sys = _myGPSSystem;
   if (_gpsSystem) {

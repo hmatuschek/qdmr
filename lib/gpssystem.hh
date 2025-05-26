@@ -68,7 +68,7 @@ class GPSSystem : public PositioningSystem
   /** References the destination contact. */
   Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** References the revert channel. */
-  Q_PROPERTY(DMRChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(DMRChannelReference* revert READ revert)
 
 public:
   /** Default constructor. */
@@ -108,13 +108,14 @@ public:
   /** Returns the revert channel for the GPS information or @c nullptr if not set. */
   DMRChannel *revertChannel() const;
   /** Sets the revert channel for the GPS information to be sent on. */
-  void setRevertChannel(Channel *channel);
+  void setRevertChannel(DMRChannel *channel);
+  /** Resets the revert channel to the current channel. */
+  void resetRevertChannel();
+
   /** Returns a reference to the revert channel. */
-  const ChannelReference *revert() const;
+  const DMRChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  ChannelReference *revert();
-  /** Sets the revert channel for the GPS information to be sent on. */
-  void setRevert(ChannelReference *channel);
+  DMRChannelReference *revert();
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -134,7 +135,7 @@ class APRSSystem: public PositioningSystem
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(FMChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(FMChannelReference* revert READ revert)
   /** The destination call. */
   Q_PROPERTY(QString destination READ destination WRITE setDestination SCRIPTABLE false)
   /** The destination SSID. */
@@ -201,18 +202,20 @@ public:
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
-  /** Return true if revert channel is set to an FMChannel. False means use currently selected channel. */
+  /** Returns @c true if a revert channel is set. If false, the APRS information is send on the
+   * current channel. */
   bool hasRevertChannel() const;
   /** Returns the transmit channel of the APRS system. */
   FMChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
-  void setRevertChannel(Channel *revertChannel);
+  void setRevertChannel(FMChannel *revertChannel);
+  /** Resets the revert channel to the current one */
+  void resetRevertChannel();
+
   /** Returns a reference to the revert channel. */
-  const ChannelReference *revert() const;
+  const FMChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  ChannelReference *revert();
-  /** Sets the revert channel reference. */
-  void setRevert(ChannelReference *ref);
+  FMChannelReference *revert();
 
   /** Returns the destination call. */
   const QString &destination() const;
