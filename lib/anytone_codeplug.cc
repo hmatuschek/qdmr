@@ -2478,7 +2478,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   setManualInterval(sys->period());
   setAutomaticInterval(sys->period());
   disableTimeSlotOverride();
-  if (SelectedChannel::get() == sys->revertChannel()->as<Channel>()) {
+  if (! sys->hasRevertChannel()) {
     setChannelSelected(0);
   } else if (sys->revert()->is<DMRChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
@@ -2509,6 +2509,8 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DMRChannel>()) {
     DMRChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DMRChannel>();
     ctx.get<GPSSystem>(i)->setRevertChannel(ch);
+  } else {
+    ctx.get<GPSSystem>(i)->resetRevertChannel();
   }
   return true;
 }
