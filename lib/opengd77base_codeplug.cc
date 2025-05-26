@@ -1201,7 +1201,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::link(APRSSystem *sys, const Context &
   Q_UNUSED(err);
 
   if(fmFrequency().inHz() == 0) {
-    sys->setRevertChannel(nullptr);
+    sys->setRevertChannel(SelectedChannel::get());
   } else {
     // First, try to find a matching analog channel in list
     FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());

@@ -152,7 +152,7 @@ GPSSystem::contact() {
 
 bool
 GPSSystem::hasRevertChannel() const {
-  return ! _revertChannel.isNull();
+  return _revertChannel.is<DMRChannel>();
 }
 
 DMRChannel *
@@ -161,22 +161,22 @@ GPSSystem::revertChannel() const {
 }
 
 void
-GPSSystem::setRevertChannel(DMRChannel *channel) {
+GPSSystem::setRevertChannel(Channel *channel) {
   _revertChannel.set(channel);
 }
 
-const DMRChannelReference*
+const ChannelReference*
 GPSSystem::revert() const {
   return &_revertChannel;
 }
 
-DMRChannelReference*
+ChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
 }
 
 void
-GPSSystem::setRevert(DMRChannelReference *channel) {
+GPSSystem::setRevert(ChannelReference *channel) {
   _revertChannel.copy(channel);
 }
 
@@ -253,7 +253,7 @@ APRSSystem::clone() const {
 
 bool
 APRSSystem::hasRevertChannel() const {
-  return ! _channel.isNull();
+  return _channel.is<FMChannel>();
 }
 
 FMChannel *
@@ -262,22 +262,22 @@ APRSSystem::revertChannel() const {
 }
 
 void
-APRSSystem::setRevertChannel(FMChannel *channel) {
+APRSSystem::setRevertChannel(Channel *channel) {
   _channel.set(channel);
 }
 
-const FMChannelReference *
+const ChannelReference *
 APRSSystem::revert() const {
   return &_channel;
 }
 
-FMChannelReference *
+ChannelReference *
 APRSSystem::revert() {
   return &_channel;
 }
 
 void
-APRSSystem::setRevert(FMChannelReference *ref) {
+APRSSystem::setRevert(ChannelReference *ref) {
   _channel.copy(ref);
 }
 

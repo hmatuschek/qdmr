@@ -108,13 +108,13 @@ public:
   /** Returns the revert channel for the GPS information or @c nullptr if not set. */
   DMRChannel *revertChannel() const;
   /** Sets the revert channel for the GPS information to be sent on. */
-  void setRevertChannel(DMRChannel *channel);
+  void setRevertChannel(Channel *channel);
   /** Returns a reference to the revert channel. */
-  const DMRChannelReference *revert() const;
+  const ChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  DMRChannelReference *revert();
+  ChannelReference *revert();
   /** Sets the revert channel for the GPS information to be sent on. */
-  void setRevert(DMRChannelReference *channel);
+  void setRevert(ChannelReference *channel);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -201,17 +201,18 @@ public:
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
+  /** Return true if revert channel is set to an FMChannel. False means use currently selected channel. */
   bool hasRevertChannel() const;
   /** Returns the transmit channel of the APRS system. */
   FMChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
-  void setRevertChannel(FMChannel *revertChannel);
+  void setRevertChannel(Channel *revertChannel);
   /** Returns a reference to the revert channel. */
-  const FMChannelReference *revert() const;
+  const ChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
-  FMChannelReference *revert();
+  ChannelReference *revert();
   /** Sets the revert channel reference. */
-  void setRevert(FMChannelReference *ref);
+  void setRevert(ChannelReference *ref);
 
   /** Returns the destination call. */
   const QString &destination() const;

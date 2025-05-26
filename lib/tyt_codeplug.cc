@@ -1833,7 +1833,7 @@ TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
     sys->setContactObj(ctx.get<DMRContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
-    sys->setRevertChannel(nullptr);
+    sys->setRevertChannel(SelectedChannel::get());
   else if (ctx.has<Channel>(revertChannelIndex()) && ctx.get<Channel>(revertChannelIndex())->is<DMRChannel>())
     sys->setRevertChannel(ctx.get<Channel>(revertChannelIndex())->as<DMRChannel>());
 

@@ -3000,7 +3000,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 {
   Q_UNUSED(ctx)
   clear();
-  if (! sys->revertChannel()) {
+  if (! sys->hasRevertChannel()) {
     errMsg(err) << "Cannot encode APRS settings: "
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
@@ -3130,7 +3130,7 @@ D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSS
     setDMRDestination(idx, sys->contactObj()->number());
     setDMRCallType(idx, sys->contactObj()->type());
   }
-  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+  if (sys->hasRevertChannel()) {
     setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
     clearDMRTimeSlotOverride(idx);
   } else { // no revert channel specified or "selected channel":
@@ -3148,12 +3148,10 @@ D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
 
 bool
 D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
-  // Clear revert channel from GPS system
-  sys->setRevertChannel(nullptr);
 
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
-    sys->setRevertChannel(nullptr);
+    sys->setRevertChannel(SelectedChannel::get());
   else if (ctx.has<Channel>(dmrChannelIndex(idx)) && ctx.get<Channel>(dmrChannelIndex(idx))->is<DMRChannel>())
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
