@@ -180,7 +180,7 @@ GPSSystem::revert() const {
   return &_revertChannel;
 }
 
-ChannelReference*
+DMRChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
 }
@@ -287,7 +287,7 @@ APRSSystem::revert() const {
   return &_channel;
 }
 
-ChannelReference *
+FMChannelReference *
 APRSSystem::revert() {
   return &_channel;
 }

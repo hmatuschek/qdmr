@@ -113,7 +113,7 @@ public:
   void resetRevertChannel();
 
   /** Returns a reference to the revert channel. */
-  const ChannelReference *revert() const;
+  const DMRChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DMRChannelReference *revert();
 
@@ -213,7 +213,7 @@ public:
   void resetRevertChannel();
 
   /** Returns a reference to the revert channel. */
-  const ChannelReference *revert() const;
+  const FMChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   FMChannelReference *revert();
 
