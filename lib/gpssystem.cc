@@ -79,11 +79,12 @@ PositioningSystem::onReferenceModified() {
 GPSSystem::GPSSystem(QObject *parent)
   : PositioningSystem(parent), _contact(), _revertChannel()
 {
-  // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  // By default, selected channel is revert channel
+  resetRevertChannel();
 
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -95,15 +96,14 @@ GPSSystem::GPSSystem(const QString &name, DMRContact *contact,
                      QObject *parent)
   : PositioningSystem(name, period, parent), _contact(), _revertChannel()
 {
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
   Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
 
   // Set references.
   _contact.set(contact);
-  _revertChannel.set(revertChannel);
-
-  // Allow revert channel to take a reference to the SelectedChannel singleton
-  _revertChannel.allow(SelectedChannel::get()->metaObject());
+  setRevertChannel(revertChannel);
 
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -150,6 +150,7 @@ GPSSystem::contact() {
   return &_contact;
 }
 
+
 bool
 GPSSystem::hasRevertChannel() const {
   return _revertChannel.is<DMRChannel>();
@@ -161,11 +162,20 @@ GPSSystem::revertChannel() const {
 }
 
 void
-GPSSystem::setRevertChannel(Channel *channel) {
-  _revertChannel.set(channel);
+GPSSystem::setRevertChannel(DMRChannel *channel) {
+  if (nullptr == channel)
+    resetRevertChannel();
+  else
+    _revertChannel.set(channel);
 }
 
-const ChannelReference*
+void
+GPSSystem::resetRevertChannel() {
+  _revertChannel.set(SelectedChannel::get());
+}
+
+
+const DMRChannelReference*
 GPSSystem::revert() const {
   return &_revertChannel;
 }
@@ -173,11 +183,6 @@ GPSSystem::revert() const {
 ChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
-}
-
-void
-GPSSystem::setRevert(ChannelReference *channel) {
-  _revertChannel.copy(channel);
 }
 
 YAML::Node
@@ -190,6 +195,7 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
  * ********************************************************************************************* */
@@ -198,11 +204,12 @@ APRSSystem::APRSSystem(QObject *parent)
     _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
     _anytone(nullptr), _openGD77(nullptr)
 {
-  // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  // By default, selected channel is revert channel
+  resetRevertChannel();
 
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -215,14 +222,13 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
     _anytone(nullptr), _openGD77(nullptr)
 {
-  // Set channel reference
-  _channel.set(channel);
-
-    // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Set revert channel
+  setRevertChannel(channel);
 
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -251,6 +257,7 @@ APRSSystem::clone() const {
   return sys;
 }
 
+
 bool
 APRSSystem::hasRevertChannel() const {
   return _channel.is<FMChannel>();
@@ -262,11 +269,20 @@ APRSSystem::revertChannel() const {
 }
 
 void
-APRSSystem::setRevertChannel(Channel *channel) {
-  _channel.set(channel);
+APRSSystem::setRevertChannel(FMChannel *channel) {
+  if (nullptr == channel)
+    resetRevertChannel();
+  else
+    _channel.set(channel);
 }
 
-const ChannelReference *
+void
+APRSSystem::resetRevertChannel() {
+  _channel.set(SelectedChannel::get());
+}
+
+
+const FMChannelReference *
 APRSSystem::revert() const {
   return &_channel;
 }
@@ -276,10 +292,6 @@ APRSSystem::revert() {
   return &_channel;
 }
 
-void
-APRSSystem::setRevert(ChannelReference *ref) {
-  _channel.copy(ref);
-}
 
 const QString &
 APRSSystem::destination() const {

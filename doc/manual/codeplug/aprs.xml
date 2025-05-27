@@ -135,7 +135,12 @@
       <para>
         Specifies the revert channel. That is, the channel the APRS information is sent on.
         This must be a reference to an analog channel. Usually a dedicated analog APRS channel is 
-        defined and referenced here.
+        defined and referenced here. 
+      </para>
+      <para>
+        If omitted or set to <token>!selected</token>, the currently active channel will be used to
+        send the position information. This, however, is not supported by all radios. Usually, an 
+        explicit APRS revert channel must be specified.
       </para>
     </listitem>
   </varlistentry>

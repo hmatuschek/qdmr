@@ -10,6 +10,12 @@
     <height>536</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Edit Scan List</string>
   </property>
@@ -44,7 +50,14 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QComboBox" name="priorityChannel1"/>
+          <widget class="QComboBox" name="priorityChannel1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="priorityChannel25Label">
@@ -54,7 +67,14 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QComboBox" name="priorityChannel2"/>
+          <widget class="QComboBox" name="priorityChannel2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="transmitChannelLabel">
@@ -64,7 +84,14 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QComboBox" name="transmitChannel"/>
+          <widget class="QComboBox" name="transmitChannel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
