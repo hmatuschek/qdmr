@@ -198,6 +198,32 @@ GenericTableWrapper::onItemModified(int idx) {
   emit dataChanged(index(idx,0),index(idx,columnCount()-1));
 }
 
+QString
+GenericTableWrapper::formatExtensions(int idx) const {
+  if (idx >= _list->count())
+    return QString();
+
+  ConfigObject *item = _list->get(idx);
+  QStringList extensions;
+  auto metaObj = item->metaObject();
+  for (int i=QObject::staticMetaObject.propertyCount(); i<metaObj->propertyCount(); i++) {
+    auto prop = metaObj->property(i);
+    if (QMetaType::UnknownType == prop.userType())
+      continue;
+    QMetaType type(prop.userType());
+    if (! (QMetaType::PointerToQObject & type.flags()))
+      continue;
+    const QMetaObject *propType = type.metaObject();
+    if (! propType->inherits(&ConfigExtension::staticMetaObject))
+      continue;
+    if (prop.read(item).isNull())
+      continue;
+    extensions.append(prop.name());
+  }
+  return extensions.join(", ");
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of ChannelListWrapper
@@ -211,7 +237,7 @@ ChannelListWrapper::ChannelListWrapper(ChannelList *list, QObject *parent)
 int
 ChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 21;
+  return 22;
 }
 
 QVariant
@@ -411,7 +437,12 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return tr("Narrow");
     }
     break;
-
+  case 21: {
+      auto exts = formatExtensions(index.row());
+      if (exts.isEmpty())
+        return tr("[None]");
+      return exts;
+    }
   default:
     break;
   }
@@ -445,6 +476,7 @@ ChannelListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 18: return tr("Rx Tone");
   case 19: return tr("Tx Tone");
   case 20: return tr("Bandwidth");
+  case 21: return tr("Extensions");
     default:
       break;
   }
