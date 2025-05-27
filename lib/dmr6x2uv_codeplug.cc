@@ -1973,7 +1973,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
   Q_UNUSED(ctx)
   clear();
 
-  if (! sys->revertChannel()) {
+  if (! sys->hasRevertChannel()) {
     errMsg(err) << "Cannot encode APRS settings: "
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
