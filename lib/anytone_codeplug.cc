@@ -670,11 +670,11 @@ AnytoneCodeplug::ChannelElement::clearEncryptionKeyIndex() {
 
 QString
 AnytoneCodeplug::ChannelElement::name() const {
-  return readASCII(0x0023, 16, 0x00);
+  return readGBK(0x0023, 16, 0x00);
 }
 void
 AnytoneCodeplug::ChannelElement::setName(const QString &name) {
-  writeASCII(0x0023, name, 16, 0x00);
+  writeGBK(0x0023, name, 16, 0x00);
 }
 
 
