@@ -459,7 +459,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="133"/>
         <source>[Selected]</source>
-        <translation type="unfinished">[Auswahl]</translation>
+        <translation>[Ausgewählt]</translation>
     </message>
 </context>
 <context>
@@ -868,22 +868,22 @@
         <location filename="../src/application.cc" line="747"/>
         <location filename="../src/application.cc" line="757"/>
         <source>Cannot write satellite config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Satelliteneinstellungen nicht schreiben.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="748"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das erkannte Funkgerät &apos;%1&apos; unterstützt kein Statellitentracking.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="758"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das erkannte Funkgerät bietet zwar Satellitentracking, jedoch ist das Feature noch nicht implementiert.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="775"/>
         <source>Write satellite config ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenkonfiguration schreiben …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="785"/>
@@ -1982,7 +1982,7 @@
     <message>
         <location filename="../src/gpssystemdialog.ui" line="63"/>
         <source>Update period</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisierungsperiode</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="89"/>
