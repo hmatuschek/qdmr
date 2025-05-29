@@ -130,12 +130,11 @@ class OpenGD77ContactExtension: public ConfigExtension
               "channel for that contact that only differs in the time slot.")
 
 public:
-  /** Possible values for the time-slot override option.
-   * Encoded values are correct for firmware 2022-02-28 (0118581D). */
+  /** Possible modes of time slot override. */
   enum class TimeSlotOverride {
-    None = 0x01,                  ///< Do not override time-slot of channel.
-    TS1  = 0x00,                  ///< Force time-slot to TS1.
-    TS2  = 0x02                   ///< Force time-slot to TS2.
+    None, ///< Do not override time slot.
+    TS1,  ///< Override with time slot 1.
+    TS2   ///< Override with time slot 2.
   };
   Q_ENUM(TimeSlotOverride)
 
@@ -155,5 +154,34 @@ protected:
   TimeSlotOverride _timeSlotOverride;
 };
 
+
+class OpenGD77APRSSystemExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("description", "OpenGD77 specific APRS settings.")
+
+  /** Sets a fixed location for the APRS report. */
+  Q_PROPERTY(QString location READ locator WRITE setLocator)
+  Q_CLASSINFO("locationDescription", "Allows to set a fixed location being transmitted.")
+
+public:
+  Q_INVOKABLE explicit OpenGD77APRSSystemExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+
+  /** Returns the fixed location for this APRS system. */
+  const QGeoCoordinate &location() const;
+  /** Returns the fixed location for this system. */
+  QString locator() const;
+  /** Sets the fixed location for this system. */
+  void setLocation(const QGeoCoordinate &loc);
+  /** Sets the fixed location for this system. */
+  void setLocator(const QString &locator);
+
+protected:
+  /** Holds the fixed location, if set. */
+  QGeoCoordinate _location;
+};
 
 #endif // OPENGD77EXTENSION_HH

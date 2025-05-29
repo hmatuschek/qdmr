@@ -19,6 +19,11 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 200000;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = false;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{
@@ -135,7 +140,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
   /* Define limits for scan lists. */
   add("scanlists",
       new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

@@ -17,6 +17,11 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
   _callSignDBImplemented  = false;
   _numCallSignDBEntries   = 0;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = false;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(
           -1, DR1801UVCodeplug::SettingsElement::Limit::bootLineLength(), RadioLimitString::ASCII) },
@@ -147,7 +152,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
 
   /* Define limits for scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, DR1801UVCodeplug::ScanListBankElement::Limit::scanListCount(),
+        ScanList::staticMetaObject, 0, DR1801UVCodeplug::ScanListBankElement::Limit::scanListCount(),
         new RadioLimitObject{
           { "name", new RadioLimitString(
             1, DR1801UVCodeplug::ScanListElement::Limit::nameLength(), RadioLimitString::Unicode) },

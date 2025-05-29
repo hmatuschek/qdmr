@@ -237,6 +237,20 @@ OrbitalElementsDatabase::data(const QModelIndex &index, int role) const {
   return QVariant();
 }
 
+QVariant
+OrbitalElementsDatabase::headerData(int section, Qt::Orientation orientation,
+                                int role) const {
+  if (role != Qt::DisplayRole || orientation != Qt::Horizontal)
+    return QVariant();
+
+  switch (section) {
+      case 0: return QStringLiteral("NORAD");
+      case 1: return QStringLiteral("Name");
+      case 2: return QStringLiteral("Epoch");
+  }
+
+  return QVariant();
+}
 
 unsigned
 OrbitalElementsDatabase::dbAge() const {

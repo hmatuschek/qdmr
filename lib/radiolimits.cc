@@ -748,7 +748,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   // Check counts
   foreach (QString className, _elements.keys()) {
     if ((0 <= _minCount[className]) && (counts[className]<_minCount[className])) {
-      auto &msg = context.newMessage(RadioLimitIssue::Warning);
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "The number of elements of type '" << className << "' " << counts[className]
              << " is less than the required count " << _minCount[className] << ".";
     }
@@ -799,7 +799,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
@@ -921,16 +921,21 @@ RadioLimitSingleZone::verifyItem(const ConfigItem *item, RadioLimitContext &cont
  * Implementation of RadioLimits
  * ********************************************************************************************* */
 RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
-  : RadioLimitItem(parent), _betaWarning(betaWarning)
+  : RadioLimitItem(parent), _betaWarning(betaWarning),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
 
 RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
-  : RadioLimitItem(list, parent)
+  : RadioLimitItem(list, parent),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
+
 
 bool
 RadioLimits::hasCallSignDB() const {
@@ -946,6 +951,23 @@ unsigned
 RadioLimits::numCallSignDBEntries() const {
   return _numCallSignDBEntries;
 }
+
+
+bool
+RadioLimits::hasSatelliteConfig() const {
+  return _hasSatelliteConfig;
+}
+
+bool
+RadioLimits::satelliteConfigImplemented() const {
+  return _satelliteConfigImplemented;
+}
+
+unsigned
+RadioLimits::numSatellites() const {
+  return _numSatellites;
+}
+
 
 bool
 RadioLimits::verifyConfig(const Config *config, RadioLimitContext &context) const {

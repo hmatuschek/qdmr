@@ -4,6 +4,7 @@
 #include "configreference.hh"
 #include <QAbstractTableModel>
 #include "anytone_extension.hh"
+#include "opengd77_extension.hh"
 
 class Config;
 class DMRContact;
@@ -67,7 +68,7 @@ class GPSSystem : public PositioningSystem
   /** References the destination contact. */
   Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** References the revert channel. */
-  Q_PROPERTY(DMRChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(DMRChannelReference* revert READ revert)
 
 public:
   /** Default constructor. */
@@ -108,12 +109,13 @@ public:
   DMRChannel *revertChannel() const;
   /** Sets the revert channel for the GPS information to be sent on. */
   void setRevertChannel(DMRChannel *channel);
+  /** Resets the revert channel to the current channel. */
+  void resetRevertChannel();
+
   /** Returns a reference to the revert channel. */
   const DMRChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   DMRChannelReference *revert();
-  /** Sets the revert channel for the GPS information to be sent on. */
-  void setRevert(DMRChannelReference *channel);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -133,7 +135,7 @@ class APRSSystem: public PositioningSystem
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(FMChannelReference* revert READ revert WRITE setRevert)
+  Q_PROPERTY(FMChannelReference* revert READ revert)
   /** The destination call. */
   Q_PROPERTY(QString destination READ destination WRITE setDestination SCRIPTABLE false)
   /** The destination SSID. */
@@ -151,6 +153,8 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(QString message READ message WRITE setMessage)
   /** Anytone sepecific settings. */
   Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** OpenGD77 sepecific settings. */
+  Q_PROPERTY(OpenGD77APRSSystemExtension *opengd77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -198,16 +202,20 @@ public:
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;
 
+  /** Returns @c true if a revert channel is set. If false, the APRS information is send on the
+   * current channel. */
+  bool hasRevertChannel() const;
   /** Returns the transmit channel of the APRS system. */
   FMChannel *revertChannel() const;
   /** Sets the transmit channel of the APRS system. */
   void setRevertChannel(FMChannel *revertChannel);
+  /** Resets the revert channel to the current one */
+  void resetRevertChannel();
+
   /** Returns a reference to the revert channel. */
   const FMChannelReference *revert() const;
   /** Returns a reference to the revert channel. */
   FMChannelReference *revert();
-  /** Sets the revert channel reference. */
-  void setRevert(FMChannelReference *ref);
 
   /** Returns the destination call. */
   const QString &destination() const;
@@ -251,6 +259,11 @@ public:
   /** Sets the Anytone settings extension. */
   void setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext);
 
+  /** Returns the OpenGD77 settings extension, if set. */
+  OpenGD77APRSSystemExtension *openGD77Extension() const;
+  /** Sets the OpenGD77 settings extension. */
+  void setOpenGD77Extension(OpenGD77APRSSystemExtension *ext);
+
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -277,6 +290,8 @@ protected:
   QString _message;
   /** Owns the Anytone settings extension. */
   AnytoneFMAPRSSettingsExtension *_anytone;
+  /** Owns the OpenGD77 settings extension. */
+  OpenGD77APRSSystemExtension *_openGD77;
 };
 
 

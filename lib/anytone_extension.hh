@@ -925,7 +925,7 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   Q_PROPERTY(Interval backlightDurationTX READ backlightDurationTX WRITE setBacklightDurationTX)
 
   Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
-                                     "A value of 0 means off.")
+                                     "A value of 0 means always on.")
   /** RX backlight duration. */
   Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
 
@@ -2076,18 +2076,21 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** If @c true, the sub-channel is enabled. */
   Q_PROPERTY(bool subChannel READ subChannelEnabled WRITE enableSubChannel)
 
+  Q_CLASSINFO("selectedVFODecription", "Specifies the currently selected VFO (A or B).")
   /** The current active VFO. */
   Q_PROPERTY(VFO selectedVFO READ selectedVFO WRITE setSelectedVFO)
 
+  Q_CLASSINFO("modeADescription", "Specifies the mode (memory or VFO) for VFO A.")
+  Q_CLASSINFO("modeBDescription", "Specifies the mode (memory or VFO) for VFO B.")
   /** The mode of VFO A. */
   Q_PROPERTY(VFOMode modeA READ modeA WRITE setModeA)
-
   /** The mode of VFO B. */
   Q_PROPERTY(VFOMode modeB READ modeB WRITE setModeB)
 
+  Q_CLASSINFO("zoneADescription", "Specifies the current zone for VFO A.")
+  Q_CLASSINFO("zoneBDescription", "Specifies the current zone for VFO B.")
   /** The current zone for VFO A. */
   Q_PROPERTY(ZoneReference* zoneA READ zoneA)
-
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
 
@@ -2111,16 +2114,21 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(Frequency vfoStep READ vfoStep WRITE setVFOStep)
 
   Q_CLASSINFO("steTypeDescription", "Specifies the STE (squelch tail elimination) type.")
+  Q_CLASSINFO("steTypeLongDescription", "Can also be used to disable the STE entirely.")
   /** The STE type. */
   Q_PROPERTY(STEType steType READ steType WRITE setSTEType)
+
   Q_CLASSINFO("steFrequencyDescription", "Specifies the STE (squelch tail elimination) frequency in Hz.")
   /** The STE frequency in Hz. */
   Q_PROPERTY(double steFrequency READ steFrequency WRITE setSTEFrequency)
+
+  Q_CLASSINFO("steDurationDescription", "Specifies the duration of the STE (squelch tail elimination) tone.")
+  Q_CLASSINFO("steDurationLongDescription", "Valid values are usually in the range between 10 and 1000ms.")
   /** The STE duration in ms. */
   Q_PROPERTY(Interval steDuration READ steDuration WRITE setSTEDuration)
 
-  Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz. Should be one of "
-                                          "1000, 1450, 1750 and 2100 Hz. "
+  Q_CLASSINFO("tbstFrequencyDescription", "Specifies the TBST frequency in Hz.")
+  Q_CLASSINFO("tbstFrequencyDescription", "Should be one of 1000, 1450, 1750 and 2100 Hz. "
                                           "D878UV(2), D578UV and DMR-6X2UV only.")
   /** The TBST frequency in Hz. */
   Q_PROPERTY(Frequency tbstFrequency READ tbstFrequency WRITE setTBSTFrequency)

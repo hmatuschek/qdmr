@@ -6,6 +6,8 @@
 #include "zone.hh"
 #include "scanlist.hh"
 #include "roamingzone.hh"
+#include "opengd77_satelliteconfig.hh"
+
 
 
 OpenGD77Limits::OpenGD77Limits(QObject *parent)
@@ -15,6 +17,11 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   _hasCallSignDB          = true;
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 15796;
+
+  // Define limits for satellite config
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = OpenGD77SatelliteConfig::Limit::satellites();
 
   /* Define limits for the general settings. */
   add("settings",
@@ -62,7 +69,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   /* Define limits for group lists. */
   add("groupLists",
       new RadioLimitList(
-            RXGroupList::staticMetaObject, 1, 76, new RadioLimitObject {
+            RXGroupList::staticMetaObject, 0, 76, new RadioLimitObject {
               { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
               // allow for any digital contact reference
               { "contacts", new RadioLimitRefList(1, 32, DMRContact::staticMetaObject) }
@@ -134,7 +141,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
   /* Define limits for zone list. */
   add("zones",
       new RadioLimitList(
-        Zone::staticMetaObject, 1, 68, new RadioLimitSingleZone(
+        Zone::staticMetaObject, 0, 68, new RadioLimitSingleZone(
           80, {
             { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) }, // 16 ASCII chars in name
             { "anytone", new RadioLimitIgnored(RadioLimitIssue::Hint) }     // ignore AnyTone extensions

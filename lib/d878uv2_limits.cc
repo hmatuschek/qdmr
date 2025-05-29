@@ -19,6 +19,11 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
   _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 500000;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = 200;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{
@@ -138,7 +143,7 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
   /* Define limits for scan lists. */
   add("scanlists",
       new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::ASCII) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

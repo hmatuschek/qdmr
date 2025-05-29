@@ -723,12 +723,14 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     return sys->period();
   case 4:
     if (sys->is<GPSSystem>()) {
-      if ((! sys->as<GPSSystem>()->hasRevertChannel()) || sys->as<GPSSystem>()->revert()->is<SelectedChannel>())
+      if (! sys->as<GPSSystem>()->hasRevertChannel())
         return tr("[Selected]");
       return sys->as<GPSSystem>()->revertChannel()->name();
-    } else if (sys->is<APRSSystem>())
-      return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
-                sys->as<APRSSystem>()->revertChannel()->name() : QString("Oops!"));
+    } else if (sys->is<APRSSystem>()) {
+      if (! sys->as<APRSSystem>()->hasRevertChannel())
+        return tr("[Selected]");
+      return sys->as<APRSSystem>()->revertChannel()->name();
+    }
     break;
   case 5:
     if (sys->is<GPSSystem>())

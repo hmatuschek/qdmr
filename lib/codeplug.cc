@@ -321,6 +321,7 @@ Codeplug::Element::getUInt16_be(unsigned offset) const {
   uint16_t *ptr = (uint16_t *)(_data+offset);
   return qFromBigEndian(*ptr);
 }
+
 uint16_t
 Codeplug::Element::getUInt16_le(unsigned offset) const {
   if ((offset+2) > _size) {
@@ -328,9 +329,10 @@ Codeplug::Element::getUInt16_le(unsigned offset) const {
     return 0;
   }
 
-  uint16_t *ptr = (uint16_t *)(_data+offset);
+  quint16 *ptr = (quint16 *)(_data+offset);
   return qFromLittleEndian(*ptr);
 }
+
 void
 Codeplug::Element::setUInt16_be(unsigned offset, uint16_t value) {
   if ((offset+2) > _size) {
@@ -338,9 +340,10 @@ Codeplug::Element::setUInt16_be(unsigned offset, uint16_t value) {
     return;
   }
 
-  uint16_t *ptr = (uint16_t *)(_data+offset);
-  (*ptr) = qToBigEndian(value);
+  quint16 *ptr = (quint16 *)(_data+offset);
+  (*ptr) = qToBigEndian((quint16)value);
 }
+
 void
 Codeplug::Element::setUInt16_le(unsigned offset, uint16_t value) {
   if ((offset+2) > _size) {
@@ -348,7 +351,7 @@ Codeplug::Element::setUInt16_le(unsigned offset, uint16_t value) {
     return;
   }
 
-  uint16_t *ptr = (uint16_t *)(_data+offset);
+  quint16 *ptr = (quint16 *)(_data+offset);
   (*ptr) = qToLittleEndian(value);
 }
 

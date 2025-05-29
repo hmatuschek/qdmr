@@ -1,4 +1,5 @@
 #include "opengd77base_codeplug.hh"
+#include "opengd77_extension.hh"
 #include "radioid.hh"
 #include "config.hh"
 #include "logger.hh"
@@ -14,13 +15,13 @@ OpenGD77BaseCodeplug::encodeAngle(double angle) {
   uint32_t sign = (angle < 0) ? 1 : 0;
   uint32_t decimals = std::abs(int(angle * 10000));
   uint32_t deg  = decimals/10000; decimals = decimals % 10000;
-  return (sign << 23) | (deg <<15) | decimals;
+  return (sign << 23) | (deg << 15) | decimals;
 }
 
 double
 OpenGD77BaseCodeplug::decodeAngle(uint32_t code) {
   return (((code >> 23) & 1) ? -1 : 1) * (
-        ((code >> 15) & 0xff) + double(code & 0x7ff)/10000
+        ((code >> 15) & 0xff) + double(code & 0x7fff)/10000
         );
 }
 
@@ -40,7 +41,11 @@ OpenGD77BaseCodeplug::encodeSelectiveCall(const SelectiveCall &call) {
     toneCode = call.mHz()/100;
   }
 
-  return (dcs<<15) | (inverted << 14) | (toneCode & 0x3fff);
+  uint16_t bcd = (((toneCode/1000) % 10 ) << 12) |
+      (((toneCode/100) % 10 ) << 8) |
+      (((toneCode/10) % 10 ) << 4) |
+      (((toneCode/1) % 10 )  << 0);
+  return (dcs<<15) | (inverted << 14) | (bcd & 0x3fff);
 }
 
 SelectiveCall
@@ -50,7 +55,12 @@ OpenGD77BaseCodeplug::decodeSelectiveCall(uint16_t code) {
 
   bool dcs = ((code >> 15) & 1),
       inverted = ((code >> 14) & 1);
-  code &= 0x3fff;
+
+  uint16_t bcd = (code & 0x3fff);
+  code = 1000 * ((bcd >> 12) & 0xf)
+      + 100 * ((bcd >> 8) & 0xf)
+      + 10 * ((bcd >> 4) & 0xf)
+      + 1 * ((bcd >> 0) & 0xf);
 
   if (! dcs)
     return SelectiveCall(double(code)/10);
@@ -93,7 +103,7 @@ OpenGD77BaseCodeplug::ChannelElement::clear() {
   enablePowerSave(false);
   enableBeep(false);
   clearDMRId();
-  setGroupListIndex(0);
+  clearGroupListIndex();
   setColorCode(0);
   clearAPRSIndex();
   clearTXContact();
@@ -202,11 +212,11 @@ OpenGD77BaseCodeplug::ChannelElement::hasFixedPosition() const {
 
 QGeoCoordinate
 OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
-  uint32_t latCode = (((uint32_t)getUInt8(Offset::latitude2())) << 24) +
-      (((uint32_t)getUInt8(Offset::latitude1())) << 16) +
+  uint32_t latCode = (((uint32_t)getUInt8(Offset::latitude2())) << 16) +
+      (((uint32_t)getUInt8(Offset::latitude1())) << 8) +
       ((uint32_t)getUInt8(Offset::latitude0()));
-  uint32_t lonCode = (((uint32_t)getUInt8(Offset::longitude2())) << 24) +
-      (((uint32_t)getUInt8(Offset::longitude1())) << 16) +
+  uint32_t lonCode = (((uint32_t)getUInt8(Offset::longitude2())) << 16) +
+      (((uint32_t)getUInt8(Offset::longitude1())) << 8) +
       ((uint32_t)getUInt8(Offset::longitude0()));
 
   return QGeoCoordinate(decodeAngle(latCode), decodeAngle(lonCode));
@@ -214,7 +224,7 @@ OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setFixedPosition(const QGeoCoordinate &coordinate) {
-  if (!coordinate.isValid()) {
+  if (! coordinate.isValid()) {
     clearFixedPosition();
     return;
   }
@@ -556,7 +566,10 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   ch->openGD77ChannelExtension()->enableScanAllSkip(skipScan());
   ch->openGD77ChannelExtension()->enableBeep(beep());
   ch->openGD77ChannelExtension()->enablePowerSave(powerSave());
-  ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  if (hasFixedPosition())
+    ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  else
+    ch->openGD77ChannelExtension()->setLocation(QGeoCoordinate());
   ch->openGD77ChannelExtension()->setTalkerAliasTS1(aliasTimeSlot1());
   ch->openGD77ChannelExtension()->setTalkerAliasTS2(aliasTimeSlot2());
 
@@ -943,7 +956,13 @@ OpenGD77BaseCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr)
 void
 OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
+
   setName("");
+  clearFixedPosition();
+  setUInt32_le(Offset::fmFrequency(), 0);
+
+  // Some random data, appears to be important
+  writeASCII(Offset::unknownBytes(), "RA", 2);
 }
 
 
@@ -1093,9 +1112,20 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setBaudRate(BaudRate rate) {
 }
 
 
+Frequency
+OpenGD77BaseCodeplug::APRSSettingsElement::fmFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::fmFrequency())*10);
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
+  setUInt32_le(Offset::fmFrequency(), f.inHz()/10);
+}
+
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
+  clear();
 
   setName(sys->name());
   setSourceSSID(sys->srcSSID());
@@ -1122,6 +1152,16 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   setBaudRate(BaudRate::Baud1200);
   setPositionPrecision(PositionPrecision::Max);
 
+  if(sys->hasRevertChannel()) {
+    setFMFrequency(sys->revertChannel()->txFrequency());
+  }
+
+  if (nullptr == sys->openGD77Extension())
+    return true;
+
+  if (sys->openGD77Extension()->location().isValid())
+    setFixedPosition(sys->openGD77Extension()->location());
+
   return true;
 }
 
@@ -1147,13 +1187,37 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   sys->setIcon(icon());
   sys->setMessage(comment());
 
+  auto ext = new OpenGD77APRSSystemExtension();
+  sys->setOpenGD77Extension(ext);
+
+  if (hasFixedPosition())
+    ext->setLocation(fixedPosition());
+
   return sys;
 }
-
 
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::link(APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  if(fmFrequency().inHz() == 0) {
+    sys->resetRevertChannel();
+  } else {
+    // First, try to find a matching analog channel in list
+    FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());
+    if (! ch) {
+      // If no channel is found, create one with the settings from APRS channel:
+      ch = new FMChannel();
+      ch->setName("APRS Channel");
+      ch->setRXFrequency(fmFrequency());
+      ch->setTXFrequency(fmFrequency());
+      ch->setBandwidth(FMChannel::Bandwidth::Narrow);
+      logInfo() << "No matching APRS channel found for TX frequency " << double(fmFrequency().inHz())/1e6
+                << "MHz, create one as 'APRS Channel'";
+      ctx.config()->channelList()->add(ch);
+    }
+    sys->setRevertChannel(ch);
+  }
 
   if (ctx.config()->settings()->defaultId())
     sys->setSource(ctx.config()->settings()->defaultId()->name());
@@ -1706,272 +1770,6 @@ OpenGD77BaseCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err)
       errMsg(err) << "Cannot link zone '" << obj->name()
                   << "' at index " << i << ".";
       return false;
-    }
-  }
-
-  return true;
-}
-
-
-
-/* ********************************************************************************************* *
- * Implementation of OpenGD77BaseCodeplug::OrbitalElement
- * ********************************************************************************************* */
-OpenGD77BaseCodeplug::OrbitalElement::OrbitalElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-OpenGD77BaseCodeplug::OrbitalElement::OrbitalElement(uint8_t *ptr)
-  : Element(ptr, size())
-{
-  // pass...
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::clear() {
-  memset(_data, 0, size());
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::writeDigit(const Offset::Bit &offset, uint8_t digit) {
-  // Must be bit 0 or 4 (BCD)
-  if (offset.bit % 4)
-    return;
-
-  uint8_t val = getUInt8(offset.byte);
-  val &= ~(0xf << offset.bit);
-  val |= ((digit & 0xf) << offset.bit);
-  setUInt8(offset.byte, val);
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::writeInteger(const Offset::Bit &offset, int value, bool sign, unsigned int dec) {
-  unsigned int o = 0;
-  // Must be bit 0 or 4 (BCD)
-  if (offset.bit % 4)
-    return;
-  if (0 == dec)
-    return;
-
-  if (sign && 0 > value)
-    writeDigit(offset + o, 0xc); // '-' ?!?
-  else
-    writeDigit(offset + o, 0xb); // blank
-
-  o += 4*(dec-1);
-  for (int i=dec; i>0; i++, o = o - 4) {
-    if (value)
-      writeDigit(offset + o, value % 10);
-    else
-      writeDigit(offset + o, 0xb);
-    value /= 10;
-  }
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::writeFractional(const Offset::Bit &offset, double value, bool sign, unsigned int frac) {
-  unsigned int o = 0;
-  if (offset.bit % 4)
-    return;
-
-  if (0 == frac)
-    return;
-
-  if (sign && (0 > value))
-    writeDigit(offset + o, 0xc);
-  else
-    writeDigit(offset + o, 0xb);
-  o += 4;
-
-  value -= int(value);
-  for (unsigned int i=0; i<frac; i++, o += 4) {
-    value *= 10;
-    writeDigit(offset + o, int(value));
-    value -= int(value);
-  }
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::writeFixedPoint(const Offset::Bit &offset, double value, bool sign, unsigned int dec, unsigned int frac) {
-  unsigned int o = 0;
-  writeInteger(offset + o, value, sign, dec);
-  o += 4*dec + (sign ? 4 : 0);
-
-  writeDigit(offset + o, 0xa);
-  o += 4;
-
-  value = std::abs(value);
-  value -= int(value);
-  writeFractional(offset + o, value, false, frac);
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setEpoch(const::OrbitalElement::Epoch &epoch) {
-  writeInteger(Offset::epochYear(), epoch.year%100, false, 2);
-  writeFixedPoint(Offset::epochJulienDay(), epoch.toEpoch(), false, 3, 8);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setMeanMotionDerivative(double dmm) {
-  writeFixedPoint(Offset::meanMotionDerivative(), dmm, true, 0, 8);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setInclination(double incl) {
-  writeFixedPoint(Offset::inclination(), incl, false, 3, 4);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setAscension(double asc) {
-  writeFixedPoint(Offset::ascension(), asc, false, 3, 4);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setEccentricity(double ecc) {
-  writeFractional(Offset::eccentricity(), ecc, false, 7);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setPerigee(double arg) {
-  writeFixedPoint(Offset::perigee(), arg, false, 3, 4);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setMeanAnomaly(double ma) {
-  writeFixedPoint(Offset::meanAnomaly(), ma, false, 3, 4);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setMeanMotion(double mm) {
-  writeFixedPoint(Offset::meanMotion(), mm, false, 2, 8);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setRevolutionNumber(unsigned int num) {
-  writeInteger(Offset::revolutionNumber(), num, false, 5);
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setFMDownlink(const Frequency &f) {
-  setUInt32_le(Offset::fmDownlink(), f.inHz()/10);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setFMUplink(const Frequency &f) {
-  setUInt32_le(Offset::fmUplink(), f.inHz()/10);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setCTCSS(const SelectiveCall &call) {
-  if (! call.isCTCSS())
-    return;
-  setUInt32_le(Offset::ctcss(), call.mHz()/100);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setAPRSDownlink(const Frequency &f) {
-  setUInt32_le(Offset::aprsDownlink(), f.inHz()/10);
-}
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setAPRSUplink(const Frequency &f) {
-  setUInt32_le(Offset::aprsUplink(), f.inHz()/10);
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setBeacon(const Frequency &f) {
-  setUInt32_le(Offset::beacon(), f.inHz()/10);
-}
-
-
-void
-OpenGD77BaseCodeplug::OrbitalElement::setAPRSPath(const QString &path) {
-  writeASCII(Offset::aprsPath(), path, Limit::pathLength(), 0x00);
-}
-
-
-bool
-OpenGD77BaseCodeplug::OrbitalElement::encode(const Satellite &sat, const ErrorStack &err) {
-  Q_UNUSED(err);
-
-  // meta
-  setName(sat.name());
-
-  // orbital elements
-  setMeanMotion(sat.meanMotion());
-  setMeanMotionDerivative(sat.meanMotionDerivative());
-  setInclination(sat.inclination());
-  setAscension(sat.ascension());
-  setEccentricity(sat.eccentricity());
-  setPerigee(sat.perigee());
-  setMeanAnomaly(sat.meanAnomaly());
-  setRevolutionNumber(sat.revolutionNumber());
-
-  // transponder
-  setFMDownlink(sat.fmDownlink());
-  setFMUplink(sat.fmUplink());
-  setCTCSS(sat.fmUplinkTone());
-  setAPRSDownlink(sat.aprsDownlink());
-  setAPRSUplink(sat.aprsUplink());
-  setBeacon(sat.beacon());
-
-  /// @bug set APRS path
-
-  return true;
-}
-
-
-
-/* ********************************************************************************************* *
- * Implementation of OpenGD77BaseCodeplug::OrbitalBankElement
- * ********************************************************************************************* */
-OpenGD77BaseCodeplug::OrbitalBankElement::OrbitalBankElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-OpenGD77BaseCodeplug::OrbitalBankElement::OrbitalBankElement(uint8_t *ptr)
-  : Element(ptr, size())
-{
-  // pass...
-}
-
-
-OpenGD77BaseCodeplug::OrbitalElement
-OpenGD77BaseCodeplug::OrbitalBankElement::element(unsigned int i) const {
-  return OrbitalElement(_data + Offset::elements() + i*Offset::betweenElements());
-}
-
-
-bool
-OpenGD77BaseCodeplug::OrbitalBankElement::encode(Context &ctx, const ErrorStack &err) {
-  const SatelliteDatabase *db = ctx.satellites();
-
-  for (unsigned int i=0; i<Limit::elements(); i++) {
-    if (db && (i<db->count())) {
-      const Satellite &sat = db->getAt(i);
-      if (! element(i).encode(sat)) {
-        errMsg(err) << "Cannot encode satellite '" << sat.name() << "' at index " << i << ".";
-        return false;
-      }
-    } else {
-      element(i).clear();
     }
   }
 

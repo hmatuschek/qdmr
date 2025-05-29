@@ -79,11 +79,12 @@ PositioningSystem::onReferenceModified() {
 GPSSystem::GPSSystem(QObject *parent)
   : PositioningSystem(parent), _contact(), _revertChannel()
 {
-  // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  // By default, selected channel is revert channel
+  resetRevertChannel();
 
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -95,15 +96,14 @@ GPSSystem::GPSSystem(const QString &name, DMRContact *contact,
                      QObject *parent)
   : PositioningSystem(name, period, parent), _contact(), _revertChannel()
 {
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _revertChannel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
   Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
 
   // Set references.
   _contact.set(contact);
-  _revertChannel.set(revertChannel);
-
-  // Allow revert channel to take a reference to the SelectedChannel singleton
-  _revertChannel.allow(SelectedChannel::get()->metaObject());
+  setRevertChannel(revertChannel);
 
   // Connect signals
   connect(&_contact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -150,9 +150,10 @@ GPSSystem::contact() {
   return &_contact;
 }
 
+
 bool
 GPSSystem::hasRevertChannel() const {
-  return ! _revertChannel.isNull();
+  return _revertChannel.is<DMRChannel>();
 }
 
 DMRChannel *
@@ -162,8 +163,17 @@ GPSSystem::revertChannel() const {
 
 void
 GPSSystem::setRevertChannel(DMRChannel *channel) {
-  _revertChannel.set(channel);
+  if (nullptr == channel)
+    resetRevertChannel();
+  else
+    _revertChannel.set(channel);
 }
+
+void
+GPSSystem::resetRevertChannel() {
+  _revertChannel.set(SelectedChannel::get());
+}
+
 
 const DMRChannelReference*
 GPSSystem::revert() const {
@@ -173,11 +183,6 @@ GPSSystem::revert() const {
 DMRChannelReference*
 GPSSystem::revert() {
   return &_revertChannel;
-}
-
-void
-GPSSystem::setRevert(DMRChannelReference *channel) {
-  _revertChannel.copy(channel);
 }
 
 YAML::Node
@@ -190,13 +195,22 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of APRSSystem
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(QObject *parent)
   : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
-    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(), _anytone(nullptr)
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
+    _anytone(nullptr), _openGD77(nullptr)
 {
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _channel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  // By default, selected channel is revert channel
+  resetRevertChannel();
+
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -205,10 +219,17 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message), _anytone(nullptr)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
+    _anytone(nullptr), _openGD77(nullptr)
 {
-  // Set channel reference
-  _channel.set(channel);
+  // Allow revert channel to take a reference to the SelectedChannel singleton
+  _channel.allow(SelectedChannel::get()->metaObject());
+  // Register '!selected' tag for revert channel
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+
+  // Set revert channel
+  setRevertChannel(channel);
+
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -236,6 +257,12 @@ APRSSystem::clone() const {
   return sys;
 }
 
+
+bool
+APRSSystem::hasRevertChannel() const {
+  return _channel.is<FMChannel>();
+}
+
 FMChannel *
 APRSSystem::revertChannel() const {
   return _channel.as<FMChannel>();
@@ -243,8 +270,17 @@ APRSSystem::revertChannel() const {
 
 void
 APRSSystem::setRevertChannel(FMChannel *channel) {
-  _channel.set(channel);
+  if (nullptr == channel)
+    resetRevertChannel();
+  else
+    _channel.set(channel);
 }
+
+void
+APRSSystem::resetRevertChannel() {
+  _channel.set(SelectedChannel::get());
+}
+
 
 const FMChannelReference *
 APRSSystem::revert() const {
@@ -256,10 +292,6 @@ APRSSystem::revert() {
   return &_channel;
 }
 
-void
-APRSSystem::setRevert(FMChannelReference *ref) {
-  _channel.copy(ref);
-}
 
 const QString &
 APRSSystem::destination() const {
@@ -356,6 +388,23 @@ APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
   }
   if (ext) {
     _anytone = ext;
+    ext->setParent(this);
+    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
+}
+
+OpenGD77APRSSystemExtension *
+APRSSystem::openGD77Extension() const {
+  return _openGD77;
+}
+void
+APRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
+  if (_openGD77) {
+    _openGD77->deleteLater();
+    _openGD77 = nullptr;
+  }
+  if (ext) {
+    _openGD77 = ext;
     ext->setParent(this);
     connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
   }

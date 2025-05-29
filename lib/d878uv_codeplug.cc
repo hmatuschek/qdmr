@@ -213,6 +213,20 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // If extension is present, update
   if (nullptr != ext) {
     ext->setFrequencyCorrection(frequenyCorrection());
+    // Decode APRS PTT setting.
+    if (txAnalogAPRS()) {
+      switch(analogAPRSPTTSetting()) {
+      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+    } else if (txDigitalAPRS()) {
+      switch(digitalAPRSPTTSetting()) {
+      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+    }
   }
 
   return ch;
@@ -265,6 +279,8 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! D868UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
+  AnytoneChannelExtension *ch_ext = nullptr;
+
   if (const DMRChannel *dc = c->as<DMRChannel>()) {
     // Set GPS system index
     enableRXAPRS(false);
@@ -280,7 +296,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRoaming(true);
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      setFrequencyCorrection(ext->frequencyCorrection());
+      ch_ext = ext;
       /// Handles bug in AnyTone firmware.
       /// @todo Remove once fixed by AnyTone.
       enableRXAPRS(! ext->sms());
@@ -296,7 +312,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
     // Apply extension settings
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
-      setFrequencyCorrection(ext->frequencyCorrection());
+      ch_ext = ext;
       if (! ext->fmAPRSFrequency()->isNull()) {
         int idx = ctx.index(ext->fmAPRSFrequency()->as<AnytoneAPRSFrequency>());
         if ((0 <= idx) && (7 >= idx))
@@ -310,8 +326,110 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
   }
 
+  // Apply common channel extension
+  if (nullptr != ch_ext) {
+    setFrequencyCorrection(ch_ext->frequencyCorrection());
+
+    if (txDigitalAPRS()) {
+      switch(ch_ext->aprsPTT()) {
+      case AnytoneChannelExtension::APRSPTT::Off: setDigitalAPRSPTTSetting(APRSPTT::Off); break;
+      case AnytoneChannelExtension::APRSPTT::Start: setDigitalAPRSPTTSetting(APRSPTT::Start); break;
+      case AnytoneChannelExtension::APRSPTT::End: setDigitalAPRSPTTSetting(APRSPTT::End); break;
+      }
+    } else if (txAnalogAPRS()) {
+      switch(ch_ext->aprsPTT()) {
+      case AnytoneChannelExtension::APRSPTT::Off: setAnalogAPRSPTTSetting(APRSPTT::Off); break;
+      case AnytoneChannelExtension::APRSPTT::Start: setAnalogAPRSPTTSetting(APRSPTT::Start); break;
+      case AnytoneChannelExtension::APRSPTT::End: setAnalogAPRSPTTSetting(APRSPTT::End); break;
+      }
+    }
+  }
+
   return true;
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::ChannelExtensionElement
+ * ******************************************************************************************** */
+D878UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  /// pass...
+}
+
+
+void
+D878UVCodeplug::ChannelExtensionElement::clear() {
+  Element::clear();
+  memset(_data, 0, size());
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::bot5ToneIDIndex() const {
+  return getUInt8(Offset::bot5ToneIDIndex());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setBOT5ToneIDIndex(unsigned int idx) {
+  setUInt8(Offset::bot5ToneIDIndex(), idx);
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::eot5ToneIDIndex() const {
+  return getUInt8(Offset::eot5ToneIDIndex());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setEOT5ToneIDIndex(unsigned int idx) {
+  setUInt8(Offset::eot5ToneIDIndex(), idx);
+}
+
+
+unsigned int
+D878UVCodeplug::ChannelExtensionElement::txColorCode() const {
+  return getUInt8(Offset::txColorCode());
+}
+
+void
+D878UVCodeplug::ChannelExtensionElement::setTXColorCode(unsigned int cc) {
+  setUInt8(Offset::txColorCode(), cc);
+}
+
+
+bool
+D878UVCodeplug::ChannelExtensionElement::updateChannelObj(Channel *c, Context &ctx) const {
+  Q_UNUSED(c); Q_UNUSED(ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::ChannelExtensionElement::linkChannelObj(Channel *c, Context &ctx) const {
+  Q_UNUSED(c); Q_UNUSED(ctx);
+  return true;
+}
+
+bool
+D878UVCodeplug::ChannelExtensionElement::fromChannelObj(const Channel *c, Context &ctx) {
+  Q_UNUSED(ctx);
+
+  if (c->is<DMRChannel>()) {
+    auto dmr = c->as<DMRChannel>();
+    setTXColorCode(dmr->colorCode());
+  }
+
+  return true;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -2917,7 +3035,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 {
   Q_UNUSED(ctx)
   clear();
-  if (! sys->revertChannel()) {
+  if (! sys->hasRevertChannel()) {
     errMsg(err) << "Cannot encode APRS settings: "
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
@@ -3047,7 +3165,7 @@ D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSS
     setDMRDestination(idx, sys->contactObj()->number());
     setDMRCallType(idx, sys->contactObj()->type());
   }
-  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+  if (sys->hasRevertChannel()) {
     setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
     clearDMRTimeSlotOverride(idx);
   } else { // no revert channel specified or "selected channel":
@@ -3065,12 +3183,9 @@ D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
 
 bool
 D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
-  // Clear revert channel from GPS system
-  sys->setRevertChannel(nullptr);
-
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
-    sys->setRevertChannel(nullptr);
+    sys->resetRevertChannel();
   else if (ctx.has<Channel>(dmrChannelIndex(idx)) && ctx.get<Channel>(dmrChannelIndex(idx))->is<DMRChannel>())
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
@@ -3476,9 +3591,9 @@ D878UVCodeplug::allocateChannels() {
     if (!isAllocated(addr, 0)) {
       image(0).addElement(addr, ChannelElement::size());
     }
-    if (!isAllocated(addr+0x2000, 0)) {
-      image(0).addElement(addr+0x2000, ChannelElement::size());
-      memset(data(addr+0x2000), 0x00, ChannelElement::size());
+    if (!isAllocated(addr+Offset::toChannelExtension(), 0)) {
+      image(0).addElement(addr+Offset::toChannelExtension(), ChannelElement::size());
+      memset(data(addr+Offset::toChannelExtension()), 0x00, ChannelElement::size());
     }
   }
 }
@@ -3490,9 +3605,13 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
+    ChannelElement ch(data(addr));
     ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+    ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
   }
   return true;
 }
@@ -3506,12 +3625,18 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
     if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
+
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+
     if (Channel *obj = ch.toChannelObj(ctx)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ext.updateChannelObj(obj, ctx);
     }
   }
   return true;
@@ -3526,12 +3651,17 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
     // Check if channel is enabled:
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
     if (! channel_bitmap.isEncoded(i))
       continue;
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
-    if (ctx.has<Channel>(i))
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr));
+
+    if (ctx.has<Channel>(i)) {
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ext.linkChannelObj(ctx.get<Channel>(i), ctx);
+    }
   }
   return true;
 }

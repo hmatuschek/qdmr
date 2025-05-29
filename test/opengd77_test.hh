@@ -21,10 +21,18 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
 
+  /** Regression test for #539. */
+  void testChannelGroupList();
   /** Regression test for #507 */
   void testChannelPowerSettings();
   /** Regression test for #541. */
   void testOverrideChannelRadioId();
+  /** Regression test for #554. */
+  void testAPRSSourceCall();
+  /** Regression test for #549. */
+  void testChannelSubTones();
+  /** Regression test for #556. */
+  void testChannelFixedLocation();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());

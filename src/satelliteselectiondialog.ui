@@ -10,6 +10,12 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Select a satellite</string>
   </property>
@@ -22,12 +28,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QListView" name="satellites">
+    <widget class="QTreeView" name="satellites">
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
-     <property name="viewMode">
-      <enum>QListView::IconMode</enum>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="itemsExpandable">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

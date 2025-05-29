@@ -4,6 +4,7 @@
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
+#include <QtEndian>
 #include <iostream>
 #include "logger.hh"
 
@@ -83,6 +84,37 @@ OpenGD77Test::testChannelFrequency() {
 
 
 void
+OpenGD77Test::testChannelGroupList() {
+  ErrorStack err;
+
+  Config config, decoded;
+  if (! config.readYAML(":/data/config_test.yaml", err))
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+
+  config.channelList()->channel(0)->as<DMRChannel>()->setGroupListObj(nullptr);
+  config.channelList()->channel(0)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(1)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(2)->as<DMRChannel>()->setGroupListObj(nullptr);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(1)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(decoded.channelList()->channel(2)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(! decoded.channelList()->channel(2)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(3)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(3)->as<DMRChannel>()->contact()->isNull());
+}
+
+
+void
 OpenGD77Test::testChannelPowerSettings() {
   ErrorStack err;
 
@@ -135,6 +167,92 @@ OpenGD77Test::testOverrideChannelRadioId() {
   QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
   QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->radioId()->isNull());
   QCOMPARE(decoded.channelList()->channel(1)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+}
+
+
+void
+OpenGD77Test::testChannelSubTones() {
+  ErrorStack err;
+  Config config, decoded;
+
+  char enc[] = {0x00, 0x10};
+  uint16_t dec = *(quint16 *)enc;
+  SelectiveCall decTone = OpenGD77BaseCodeplug::decodeSelectiveCall(
+        qFromLittleEndian(dec));
+  QVERIFY(decTone.isValid());
+  QVERIFY(decTone.isCTCSS());
+  QCOMPARE(decTone.Hz(), 100.0);
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  config.channelList()->channel(0)->as<FMChannel>()->setTXTone(SelectiveCall(67.0));
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(123.0));
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  SelectiveCall txTone = decoded.channelList()->channel(0)->as<FMChannel>()->txTone(),
+      rxTone = decoded.channelList()->channel(0)->as<FMChannel>()->rxTone();
+
+  QVERIFY(txTone.isValid());
+  QVERIFY(txTone.isCTCSS());
+  QCOMPARE(txTone.Hz(), 67.0);
+
+  QVERIFY(rxTone.isValid());
+  QVERIFY(rxTone.isCTCSS());
+  QCOMPARE(rxTone.Hz(), 123.0);
+}
+
+
+void
+OpenGD77Test::testChannelFixedLocation() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  auto ext = new OpenGD77ChannelExtension();
+  ext->setLocator("JO62jl24");
+  config.channelList()->channel(0)->setOpenGD77ChannelExtension(ext);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl24");
+
+  ext->setLocator("JO59gw73");
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw73");
+}
+
+
+void
+OpenGD77Test::testAPRSSourceCall() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.posSystems()->count(), 1);
+  auto sys = decoded.posSystems()->aprsSystem(0);
+  QCOMPARE(sys->source(), "DM3MAT");
+
+  FMChannel *channel = decoded.posSystems()->aprsSystem(0)->revert()->as<FMChannel>();
+  QVERIFY(channel->name() == "2m APRS");
 }
 
 

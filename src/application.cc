@@ -734,7 +734,50 @@ Application::uploadCallsignDB() {
 
 void
 Application::uploadSatellites() {
+  // Start upload satellites
+  Radio *radio = autoDetect();
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
+    return;
+  }
 
+  if (! radio->limits().hasSatelliteConfig()) {
+    logDebug() << "Radio " << radio->name() << " does not support satellite tracking.";
+    QMessageBox::information(nullptr, tr("Cannot write satellite config."),
+                             tr("The detected radio '%1' does not support satellite tracking.")
+                             .arg(radio->name()));
+    radio->deleteLater();
+    return;
+  }
+
+  if (! radio->limits().satelliteConfigImplemented()) {
+    logDebug() << "Radio " << radio->name()
+               << " does support satellite tracking but it is not implemented yet.";
+    QMessageBox::critical(nullptr, tr("Cannot write satellite config."),
+                          tr("The detected radio '%1' does support satellite tracking. "
+                             "This feature, however, is not implemented yet.").arg(radio->name()));
+    radio->deleteLater();
+    return;
+  }
+
+  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
+  progress->setRange(0, 100); progress->setValue(0);
+  progress->setVisible(true);
+
+  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
+  connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
+  connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
+
+  ErrorStack err;
+  if (radio->startUploadSatelliteConfig(_satellites, false, err)) {
+    logDebug() << "Start satellite config write...";
+    _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    ErrorMessageView(err).exec();
+    progress->setVisible(false);
+  }
 }
 
 void

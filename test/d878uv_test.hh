@@ -25,6 +25,8 @@ private slots:
 
   void testFMAPRSSettings();
 
+  void testRegressionDefaultChannel();
+
 protected:
   Config _micGainConfig;
   QTextStream _stderr;

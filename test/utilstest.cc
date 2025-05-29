@@ -1,6 +1,7 @@
 #include "utilstest.hh"
 
 #include <QTest>
+#include <QtEndian>
 #include "utils.hh"
 #include "frequency.hh"
 #include "chirpformat.hh"
@@ -94,5 +95,43 @@ UtilsTest::testFrequencyParser() {
   QCOMPARE(Frequency::fromString("100").inHz(), 100000000ULL);
   QCOMPARE(Frequency::fromString("100.0").inHz(), 100000000ULL);
 }
+
+
+void
+UtilsTest::testLocator() {
+  QGeoCoordinate coor;
+
+  coor = loc2deg("JO62");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 4), "JO62");
+
+  coor = loc2deg("JO62jl");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 6), "JO62jl");
+
+  coor = loc2deg("JO62jl55");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 8), "JO62jl55");
+
+  coor = loc2deg("JO62jl55jj");
+  QVERIFY(coor.isValid());
+  QCOMPARE(deg2loc(coor, 10), "JO62jl55jj");
+}
+
+
+void
+UtilsTest::testEndianess() {
+  char val1le[] = {0x34, 0x12}, val1be[] = {0x12,0x34};
+
+  QCOMPARE(qFromLittleEndian(*(quint16 *)val1le), 0x1234);
+  QCOMPARE(qFromBigEndian(*(quint16 *)val1be), 0x1234);
+
+  char val2le[] = {0x78, 0x56, 0x34, 0x12}, val2be[] = {0x12, 0x34, 0x56, 0x78};
+
+  QCOMPARE(qFromLittleEndian(*(quint32 *)val2le), 0x12345678);
+  QCOMPARE(qFromBigEndian(*(quint32 *)val2be), 0x12345678);
+}
+
+
 
 QTEST_GUILESS_MAIN(UtilsTest)

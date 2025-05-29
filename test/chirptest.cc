@@ -143,6 +143,29 @@ ChirpTest::testReaderCross()
 
 
 void
+ChirpTest::testReaderBandwidth() {
+
+  QFile file(":/data/chirp_bandwidth.csv");
+  if (! file.open(QIODevice::ReadOnly)) {
+    QFAIL("Cannot open CHRIP file.");
+  }
+
+  QTextStream stream(&file);
+  Config config;
+  ErrorStack err;
+
+  if (! ChirpReader::read(stream, &config, err)) {
+    QFAIL(QString("Cannot read codeplug file:\n%1").arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->count(), 2);
+  QVERIFY(config.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(config.channelList()->channel(0)->as<FMChannel>()->bandwidth(), FMChannel::Bandwidth::Wide);
+  QCOMPARE(config.channelList()->channel(1)->as<FMChannel>()->bandwidth(), FMChannel::Bandwidth::Narrow);
+}
+
+
+void
 ChirpTest::testWriterBasic() {
   Config orig;
 
@@ -278,6 +301,39 @@ ChirpTest::testWriterDCS() {
 void
 ChirpTest::testWriterCross() {
 
+}
+
+
+void
+ChirpTest::testWriterBandwidth() {
+  Config orig;
+
+  FMChannel *fm0 = new FMChannel();
+  fm0->setName("DB0SP"); fm0->setRXFrequency(Frequency::fromMHz(145.6)); fm0->setTXFrequency(Frequency::fromMHz(145.0));
+  fm0->setBandwidth(FMChannel::Bandwidth::Wide);
+  orig.channelList()->add(fm0);
+
+  FMChannel *fm1 = new FMChannel();
+  fm1->setName("DB0SP"); fm1->setRXFrequency(Frequency::fromMHz(145.6)); fm1->setTXFrequency(Frequency::fromMHz(145.0));
+  fm1->setBandwidth(FMChannel::Bandwidth::Narrow);
+  orig.channelList()->add(fm1);
+
+  QString csv;
+  QTextStream stream(&csv);
+  ErrorStack err;
+  if (! ChirpWriter::write(stream, &orig, err))
+    QFAIL(QString("Cannot serialize codeplug:\n%1").arg(err.format()).toStdString().c_str());
+  qDebug() << csv;
+
+  Config parsed;
+  if (! ChirpReader::read(stream, &parsed, err))
+    QFAIL(QString("Cannot parse CHIRP CSV:\n%1").arg(err.format()).toStdString().c_str());
+
+  FMChannel *pfm0 = parsed.channelList()->channel(0)->as<FMChannel>();
+  QCOMPARE(pfm0->bandwidth(), fm0->bandwidth());
+
+  FMChannel *pfm1 = parsed.channelList()->channel(1)->as<FMChannel>();
+  QCOMPARE(pfm1->bandwidth(), fm1->bandwidth());
 }
 
 
