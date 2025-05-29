@@ -456,6 +456,11 @@
         <source>Edit APRS system</source>
         <translation>Edit APRS system</translation>
     </message>
+    <message>
+        <location filename="../src/aprssystemdialog.cc" line="133"/>
+        <source>[Selected]</source>
+        <translation type="unfinished">[Selected]</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>
@@ -482,161 +487,161 @@
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="14"/>
+        <location filename="../src/analogchanneldialog.ui" line="20"/>
         <source>Edit Analog Channel</source>
         <translation>Edit analog channel</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="23"/>
+        <location filename="../src/analogchanneldialog.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="40"/>
+        <location filename="../src/analogchanneldialog.ui" line="46"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="48"/>
+        <location filename="../src/analogchanneldialog.ui" line="54"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="65"/>
+        <location filename="../src/analogchanneldialog.ui" line="71"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="75"/>
+        <location filename="../src/analogchanneldialog.ui" line="81"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="85"/>
+        <location filename="../src/analogchanneldialog.ui" line="91"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="95"/>
+        <location filename="../src/analogchanneldialog.ui" line="107"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="100"/>
+        <location filename="../src/analogchanneldialog.ui" line="112"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="105"/>
+        <location filename="../src/analogchanneldialog.ui" line="117"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="110"/>
+        <location filename="../src/analogchanneldialog.ui" line="122"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="115"/>
+        <location filename="../src/analogchanneldialog.ui" line="127"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="123"/>
-        <location filename="../src/analogchanneldialog.ui" line="160"/>
-        <location filename="../src/analogchanneldialog.ui" line="194"/>
-        <location filename="../src/analogchanneldialog.ui" line="323"/>
+        <location filename="../src/analogchanneldialog.ui" line="135"/>
+        <location filename="../src/analogchanneldialog.ui" line="172"/>
+        <location filename="../src/analogchanneldialog.ui" line="206"/>
+        <location filename="../src/analogchanneldialog.ui" line="367"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="132"/>
+        <location filename="../src/analogchanneldialog.ui" line="144"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="147"/>
-        <location filename="../src/analogchanneldialog.ui" line="184"/>
+        <location filename="../src/analogchanneldialog.ui" line="159"/>
+        <location filename="../src/analogchanneldialog.ui" line="196"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="169"/>
+        <location filename="../src/analogchanneldialog.ui" line="181"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="203"/>
+        <location filename="../src/analogchanneldialog.ui" line="215"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="213"/>
+        <location filename="../src/analogchanneldialog.ui" line="225"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="233"/>
+        <location filename="../src/analogchanneldialog.ui" line="252"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="241"/>
+        <location filename="../src/analogchanneldialog.ui" line="266"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="246"/>
+        <location filename="../src/analogchanneldialog.ui" line="271"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="251"/>
+        <location filename="../src/analogchanneldialog.ui" line="276"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="259"/>
+        <location filename="../src/analogchanneldialog.ui" line="284"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="266"/>
+        <location filename="../src/analogchanneldialog.ui" line="291"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="273"/>
+        <location filename="../src/analogchanneldialog.ui" line="298"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="280"/>
+        <location filename="../src/analogchanneldialog.ui" line="305"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="288"/>
+        <location filename="../src/analogchanneldialog.ui" line="319"/>
         <source>Narrow (12.5 kHz)</source>
         <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="293"/>
+        <location filename="../src/analogchanneldialog.ui" line="324"/>
         <source>Wide (25 kHz)</source>
         <translation>Wide (25 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="301"/>
+        <location filename="../src/analogchanneldialog.ui" line="332"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="313"/>
+        <location filename="../src/analogchanneldialog.ui" line="357"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="355"/>
+        <location filename="../src/analogchanneldialog.ui" line="399"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -808,6 +813,7 @@
         <location filename="../src/application.cc" line="551"/>
         <location filename="../src/application.cc" line="619"/>
         <location filename="../src/application.cc" line="660"/>
+        <location filename="../src/application.cc" line="740"/>
         <source>No radio found</source>
         <translation>No radio found</translation>
     </message>
@@ -859,6 +865,7 @@
         <location filename="../src/application.cc" line="552"/>
         <location filename="../src/application.cc" line="620"/>
         <location filename="../src/application.cc" line="661"/>
+        <location filename="../src/application.cc" line="741"/>
         <source>No matching device was found.</source>
         <translation>No matching device was found.</translation>
     </message>
@@ -878,17 +885,38 @@
         <translation>Write call-sign DB …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="747"/>
+        <location filename="../src/application.cc" line="757"/>
+        <source>Cannot write satellite config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="748"/>
+        <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="758"/>
+        <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="775"/>
+        <source>Write satellite config ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="785"/>
         <source>Write error</source>
         <translation>Write error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="754"/>
+        <location filename="../src/application.cc" line="797"/>
         <source>Write complete</source>
         <translation>Write complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="810"/>
+        <location filename="../src/application.cc" line="853"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias for %2 %3)</translation>
     </message>
@@ -1573,32 +1601,32 @@
         <translation>All Call</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="24"/>
+        <location filename="../src/dmrcontactdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="30"/>
+        <location filename="../src/dmrcontactdialog.ui" line="36"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="40"/>
+        <location filename="../src/dmrcontactdialog.ui" line="53"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="50"/>
+        <location filename="../src/dmrcontactdialog.ui" line="63"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="60"/>
+        <location filename="../src/dmrcontactdialog.ui" line="73"/>
         <source>Ring</source>
         <translation>Ring</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.ui" line="71"/>
+        <location filename="../src/dmrcontactdialog.ui" line="84"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -1606,22 +1634,22 @@
 <context>
     <name>DMRIDDialog</name>
     <message>
-        <location filename="../src/dmriddialog.ui" line="24"/>
+        <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/dmriddialog.ui" line="30"/>
+        <location filename="../src/dmriddialog.ui" line="36"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/dmriddialog.ui" line="40"/>
+        <location filename="../src/dmriddialog.ui" line="46"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/dmriddialog.ui" line="51"/>
+        <location filename="../src/dmriddialog.ui" line="57"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -1639,27 +1667,27 @@
         <translation>Edit DMR Contact</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="24"/>
+        <location filename="../src/dtmfcontactdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="30"/>
+        <location filename="../src/dtmfcontactdialog.ui" line="36"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="40"/>
+        <location filename="../src/dtmfcontactdialog.ui" line="46"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="50"/>
+        <location filename="../src/dtmfcontactdialog.ui" line="56"/>
         <source>Ring</source>
         <translation>Ring</translation>
     </message>
     <message>
-        <location filename="../src/dtmfcontactdialog.ui" line="61"/>
+        <location filename="../src/dtmfcontactdialog.ui" line="67"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -1694,171 +1722,171 @@
         <translation>[Default]</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="14"/>
+        <location filename="../src/digitalchanneldialog.ui" line="20"/>
         <source>Edit Digital Channel</source>
         <translation>Edit digital channel</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="23"/>
+        <location filename="../src/digitalchanneldialog.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="40"/>
+        <location filename="../src/digitalchanneldialog.ui" line="46"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="48"/>
+        <location filename="../src/digitalchanneldialog.ui" line="54"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="65"/>
+        <location filename="../src/digitalchanneldialog.ui" line="77"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="75"/>
+        <location filename="../src/digitalchanneldialog.ui" line="94"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="85"/>
+        <location filename="../src/digitalchanneldialog.ui" line="111"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="92"/>
+        <location filename="../src/digitalchanneldialog.ui" line="118"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="99"/>
+        <location filename="../src/digitalchanneldialog.ui" line="125"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="109"/>
+        <location filename="../src/digitalchanneldialog.ui" line="135"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="122"/>
+        <location filename="../src/digitalchanneldialog.ui" line="161"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="127"/>
+        <location filename="../src/digitalchanneldialog.ui" line="166"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="132"/>
+        <location filename="../src/digitalchanneldialog.ui" line="171"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="137"/>
+        <location filename="../src/digitalchanneldialog.ui" line="176"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="142"/>
+        <location filename="../src/digitalchanneldialog.ui" line="181"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="150"/>
-        <location filename="../src/digitalchanneldialog.ui" line="183"/>
-        <location filename="../src/digitalchanneldialog.ui" line="214"/>
+        <location filename="../src/digitalchanneldialog.ui" line="189"/>
+        <location filename="../src/digitalchanneldialog.ui" line="222"/>
+        <location filename="../src/digitalchanneldialog.ui" line="253"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="167"/>
+        <location filename="../src/digitalchanneldialog.ui" line="206"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
         <translation>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="170"/>
-        <location filename="../src/digitalchanneldialog.ui" line="207"/>
+        <location filename="../src/digitalchanneldialog.ui" line="209"/>
+        <location filename="../src/digitalchanneldialog.ui" line="246"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="192"/>
+        <location filename="../src/digitalchanneldialog.ui" line="231"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="227"/>
+        <location filename="../src/digitalchanneldialog.ui" line="266"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="235"/>
+        <location filename="../src/digitalchanneldialog.ui" line="280"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="240"/>
+        <location filename="../src/digitalchanneldialog.ui" line="285"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="245"/>
-        <location filename="../src/digitalchanneldialog.ui" line="253"/>
+        <location filename="../src/digitalchanneldialog.ui" line="290"/>
+        <location filename="../src/digitalchanneldialog.ui" line="298"/>
         <source>Color Code</source>
         <translation>Color Code</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="270"/>
+        <location filename="../src/digitalchanneldialog.ui" line="321"/>
         <source>Time Slot</source>
         <translation>Time Slot</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="281"/>
+        <location filename="../src/digitalchanneldialog.ui" line="338"/>
         <source>TS 1</source>
         <translation>TS 1</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="286"/>
+        <location filename="../src/digitalchanneldialog.ui" line="343"/>
         <source>TS 2</source>
         <translation>TS 2</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="294"/>
+        <location filename="../src/digitalchanneldialog.ui" line="351"/>
         <source>Rx Group List</source>
         <translation>Group List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="304"/>
+        <location filename="../src/digitalchanneldialog.ui" line="368"/>
         <source>Tx Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="314"/>
+        <location filename="../src/digitalchanneldialog.ui" line="385"/>
         <source>Positioning System</source>
         <translation>Positioning System</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="324"/>
+        <location filename="../src/digitalchanneldialog.ui" line="402"/>
         <source>Roaming Zone</source>
         <translation>Roaming Zone</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="334"/>
+        <location filename="../src/digitalchanneldialog.ui" line="419"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="347"/>
+        <location filename="../src/digitalchanneldialog.ui" line="439"/>
         <source>Extended</source>
         <translation>Extended</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="350"/>
+        <location filename="../src/digitalchanneldialog.ui" line="442"/>
         <source>Device specific settings</source>
         <translation>Device specific settings</translation>
     </message>
@@ -1932,37 +1960,37 @@
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="14"/>
+        <location filename="../src/gpssystemdialog.ui" line="20"/>
         <source>Edit GPS System</source>
         <translation>Edit GPS System</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="24"/>
+        <location filename="../src/gpssystemdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="30"/>
+        <location filename="../src/gpssystemdialog.ui" line="36"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="43"/>
+        <location filename="../src/gpssystemdialog.ui" line="56"/>
         <source>Destination</source>
         <translation>Destination</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="50"/>
-        <source>Update period [s]</source>
-        <translation>Update period [s]</translation>
+        <location filename="../src/gpssystemdialog.ui" line="63"/>
+        <source>Update period</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="67"/>
+        <location filename="../src/gpssystemdialog.ui" line="89"/>
         <source>Revert Channel</source>
         <translation>Revert Channel</translation>
     </message>
     <message>
-        <location filename="../src/gpssystemdialog.ui" line="78"/>
+        <location filename="../src/gpssystemdialog.ui" line="107"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -2114,7 +2142,7 @@
 <context>
     <name>GroupListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="832"/>
+        <location filename="../src/configitemwrapper.cc" line="834"/>
         <source>Contact</source>
         <translation>Contact</translation>
     </message>
@@ -2171,7 +2199,7 @@
 <context>
     <name>GroupListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="808"/>
+        <location filename="../src/configitemwrapper.cc" line="810"/>
         <source>RX Group Lists</source>
         <translation>Group Lists</translation>
     </message>
@@ -2326,7 +2354,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="64"/>
+        <location filename="../src/mainwindow.cc" line="67"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
@@ -2416,64 +2444,64 @@
         <translation>Writes the orbital elements and transponder information onto the connected device.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="78"/>
-        <location filename="../src/mainwindow.cc" line="120"/>
+        <location filename="../src/mainwindow.cc" line="81"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="80"/>
+        <location filename="../src/mainwindow.cc" line="83"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="82"/>
+        <location filename="../src/mainwindow.cc" line="85"/>
         <source>Group Lists</source>
         <translation>Group Lists</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="84"/>
+        <location filename="../src/mainwindow.cc" line="87"/>
         <source>Channels</source>
         <translation>Channels</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="86"/>
+        <location filename="../src/mainwindow.cc" line="89"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="88"/>
+        <location filename="../src/mainwindow.cc" line="91"/>
         <source>Scan Lists</source>
         <translation>Scan Lists</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="90"/>
+        <location filename="../src/mainwindow.cc" line="93"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="92"/>
+        <location filename="../src/mainwindow.cc" line="95"/>
         <source>Roaming Channels</source>
         <translation>Roaming Channels</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="95"/>
+        <location filename="../src/mainwindow.cc" line="98"/>
         <source>Roaming Zones</source>
         <translation>Roaming Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="99"/>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="137"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="151"/>
+        <location filename="../src/mainwindow.cc" line="154"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="152"/>
+        <location filename="../src/mainwindow.cc" line="155"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
@@ -2590,42 +2618,43 @@
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="716"/>
-        <location filename="../src/configitemwrapper.cc" line="735"/>
+        <location filename="../src/configitemwrapper.cc" line="737"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="727"/>
+        <location filename="../src/configitemwrapper.cc" line="731"/>
         <source>[Selected]</source>
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="751"/>
+        <location filename="../src/configitemwrapper.cc" line="753"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="752"/>
+        <location filename="../src/configitemwrapper.cc" line="754"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="753"/>
+        <location filename="../src/configitemwrapper.cc" line="755"/>
         <source>Destination</source>
         <translation>Destination</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="754"/>
+        <location filename="../src/configitemwrapper.cc" line="756"/>
         <source>Period [s]</source>
         <translation>Period [s]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="755"/>
+        <location filename="../src/configitemwrapper.cc" line="757"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="756"/>
+        <location filename="../src/configitemwrapper.cc" line="758"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
@@ -2728,37 +2757,37 @@
         <translation>Cannot remove group call: You have to select at least one group call first.</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="24"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="32"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="38"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="59"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="65"/>
         <source>Add Contact</source>
         <translation>Add Contact</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="62"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="68"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="69"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="75"/>
         <source>Remove Contact</source>
         <translation>Remove Contact</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="72"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="78"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="82"/>
+        <location filename="../src/rxgrouplistdialog.ui" line="88"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -2814,17 +2843,17 @@
 <context>
     <name>RadioIdListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="904"/>
+        <location filename="../src/configitemwrapper.cc" line="906"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="905"/>
+        <location filename="../src/configitemwrapper.cc" line="907"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="906"/>
+        <location filename="../src/configitemwrapper.cc" line="908"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
@@ -2874,33 +2903,33 @@
 <context>
     <name>RoamingChannelDialog</name>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="22"/>
+        <location filename="../src/roamingchanneldialog.ui" line="28"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="29"/>
+        <location filename="../src/roamingchanneldialog.ui" line="35"/>
         <source>RX Frequency [MHz]</source>
         <translation>RX Frequency [MHz]</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="36"/>
+        <location filename="../src/roamingchanneldialog.ui" line="42"/>
         <source>TX Frequency [MHz]</source>
         <translation>TX Frequency [MHz]</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="43"/>
+        <location filename="../src/roamingchanneldialog.ui" line="49"/>
         <source>Time Slot</source>
         <translation>Time Slot</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="50"/>
+        <location filename="../src/roamingchanneldialog.ui" line="56"/>
         <source>Color Code</source>
         <translation>Color Code</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.ui" line="68"/>
-        <location filename="../src/roamingchanneldialog.ui" line="89"/>
+        <location filename="../src/roamingchanneldialog.ui" line="74"/>
+        <location filename="../src/roamingchanneldialog.ui" line="95"/>
         <source>Selected</source>
         <translation>Selected</translation>
     </message>
@@ -3019,12 +3048,12 @@
 <context>
     <name>RoamingListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="850"/>
+        <location filename="../src/configitemwrapper.cc" line="852"/>
         <source>%1 (containing %2 channels)</source>
         <translation>%1 (containing %2 channels)</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="857"/>
+        <location filename="../src/configitemwrapper.cc" line="859"/>
         <source>Roaming zone</source>
         <translation>Roaming zone</translation>
     </message>
@@ -3052,42 +3081,42 @@
         <translation>Cannot remove channels. Select at least one channel first.</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="24"/>
+        <location filename="../src/roamingzonedialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="32"/>
+        <location filename="../src/roamingzonedialog.ui" line="38"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="56"/>
+        <location filename="../src/roamingzonedialog.ui" line="62"/>
         <source>Add Roaming Channel</source>
         <translation>Add Roaming Channel</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="63"/>
+        <location filename="../src/roamingzonedialog.ui" line="69"/>
         <source>Add DMR Channel</source>
         <translation>Add DMR Channel</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="66"/>
+        <location filename="../src/roamingzonedialog.ui" line="72"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="73"/>
+        <location filename="../src/roamingzonedialog.ui" line="79"/>
         <source>Remove Channel</source>
         <translation>Remove Channel</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="76"/>
+        <location filename="../src/roamingzonedialog.ui" line="82"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.ui" line="86"/>
+        <location filename="../src/roamingzonedialog.ui" line="92"/>
         <source>Extension</source>
         <translation>Extension</translation>
     </message>
@@ -3168,17 +3197,17 @@
 <context>
     <name>SatelliteDatabaseDialog</name>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="14"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="20"/>
         <source>Edit satellite database</source>
         <translation>Edit satellite database</translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="39"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="45"/>
         <source>Add</source>
         <translation>Add</translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="46"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="52"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
@@ -3186,8 +3215,8 @@
 <context>
     <name>SatelliteSelectionDialog</name>
     <message>
-        <location filename="../src/satelliteselectiondialog.ui" line="14"/>
         <location filename="../src/satelliteselectiondialog.ui" line="20"/>
+        <location filename="../src/satelliteselectiondialog.ui" line="26"/>
         <source>Select a satellite</source>
         <translation>Select a satellite</translation>
     </message>
@@ -3195,58 +3224,58 @@
 <context>
     <name>ScanListDialog</name>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="14"/>
+        <location filename="../src/scanlistdialog.ui" line="20"/>
         <location filename="../src/scanlistdialog.cc" line="13"/>
         <source>Edit Scan List</source>
         <translation>Edit scan list</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="24"/>
+        <location filename="../src/scanlistdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="32"/>
+        <location filename="../src/scanlistdialog.ui" line="38"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="42"/>
+        <location filename="../src/scanlistdialog.ui" line="48"/>
         <source>Primary Channel (50%)</source>
         <translation>Primary Channel (50%)</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="52"/>
+        <location filename="../src/scanlistdialog.ui" line="65"/>
         <source>Secondary Channel (25%)</source>
         <translation>Secondary Channel (25%)</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="62"/>
+        <location filename="../src/scanlistdialog.ui" line="82"/>
         <source>Transmit Channel</source>
         <translation>Transmit Channel</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="86"/>
+        <location filename="../src/scanlistdialog.ui" line="113"/>
         <source>Add Channel</source>
         <translation>Add Channel</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="89"/>
+        <location filename="../src/scanlistdialog.ui" line="116"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="96"/>
+        <location filename="../src/scanlistdialog.ui" line="123"/>
         <source>Remove Channel</source>
         <translation>Remove Channel</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="99"/>
+        <location filename="../src/scanlistdialog.ui" line="126"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.ui" line="109"/>
+        <location filename="../src/scanlistdialog.ui" line="136"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -3330,7 +3359,7 @@
 <context>
     <name>ScanListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="784"/>
+        <location filename="../src/configitemwrapper.cc" line="786"/>
         <source>Scan-List</source>
         <translation>Scanlist</translation>
     </message>
@@ -3343,8 +3372,8 @@
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/searchpopup.cc" line="94"/>
-        <location filename="../src/searchpopup.cc" line="109"/>
+        <location filename="../src/searchpopup.cc" line="92"/>
+        <location filename="../src/searchpopup.cc" line="107"/>
         <source>%1/%2</source>
         <translation>%1/%2</translation>
     </message>
@@ -3352,27 +3381,27 @@
 <context>
     <name>SelectiveCallBox</name>
     <message>
-        <location filename="../src/selectivecallbox.cc" line="12"/>
+        <location filename="../src/selectivecallbox.cc" line="16"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="../src/selectivecallbox.cc" line="13"/>
+        <location filename="../src/selectivecallbox.cc" line="17"/>
         <source>CTCSS</source>
         <translation>CTCSS</translation>
     </message>
     <message>
-        <location filename="../src/selectivecallbox.cc" line="14"/>
+        <location filename="../src/selectivecallbox.cc" line="18"/>
         <source>DCS</source>
         <translation>DCS</translation>
     </message>
     <message>
-        <location filename="../src/selectivecallbox.cc" line="29"/>
+        <location filename="../src/selectivecallbox.cc" line="40"/>
         <source>Hz</source>
         <translation>Hz</translation>
     </message>
     <message>
-        <location filename="../src/selectivecallbox.cc" line="37"/>
+        <location filename="../src/selectivecallbox.cc" line="50"/>
         <source>Inverted</source>
         <translation>Inverted</translation>
     </message>
@@ -3385,185 +3414,185 @@
         <translation>Warning!</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="14"/>
+        <location filename="../src/settingsdialog.ui" line="20"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="36"/>
+        <location filename="../src/settingsdialog.ui" line="42"/>
         <source>Location</source>
         <translation>Location</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="42"/>
+        <location filename="../src/settingsdialog.ui" line="48"/>
         <source>System location</source>
         <translation>System location</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="56"/>
+        <location filename="../src/settingsdialog.ui" line="62"/>
         <source>Locator</source>
         <translation>Locator</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="69"/>
+        <location filename="../src/settingsdialog.ui" line="81"/>
         <source>Repeater Info Sources</source>
         <translation>Repeater Info Sources</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="84"/>
-        <location filename="../src/settingsdialog.ui" line="120"/>
-        <location filename="../src/settingsdialog.ui" line="134"/>
-        <location filename="../src/settingsdialog.ui" line="148"/>
+        <location filename="../src/settingsdialog.ui" line="96"/>
+        <location filename="../src/settingsdialog.ui" line="132"/>
+        <location filename="../src/settingsdialog.ui" line="146"/>
+        <location filename="../src/settingsdialog.ui" line="160"/>
         <source>enable</source>
         <translation>enable</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="188"/>
+        <location filename="../src/settingsdialog.ui" line="212"/>
         <source>Radio Programming</source>
         <translation>Radio Programming</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="197"/>
+        <location filename="../src/settingsdialog.ui" line="221"/>
         <source>Update codeplug</source>
         <translation>Update codeplug</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="204"/>
+        <location filename="../src/settingsdialog.ui" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="214"/>
+        <location filename="../src/settingsdialog.ui" line="238"/>
         <source>Auto-enable GPS</source>
         <translation>Auto-enable GPS</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="221"/>
+        <location filename="../src/settingsdialog.ui" line="245"/>
         <source>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</source>
         <translation>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="238"/>
+        <location filename="../src/settingsdialog.ui" line="262"/>
         <source>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</source>
         <translation>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="231"/>
+        <location filename="../src/settingsdialog.ui" line="255"/>
         <source>Auto-enable roaming</source>
         <translation>Auto-enable roaming</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="24"/>
+        <location filename="../src/settingsdialog.ui" line="30"/>
         <source>Data Sources</source>
         <translation>Data Sources</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="98"/>
+        <location filename="../src/settingsdialog.ui" line="110"/>
         <source>World</source>
         <translation>World</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="103"/>
+        <location filename="../src/settingsdialog.ui" line="115"/>
         <source>North America</source>
         <translation>North America</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="159"/>
+        <location filename="../src/settingsdialog.ui" line="171"/>
         <source>Programming</source>
         <translation>Programming</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="165"/>
+        <location filename="../src/settingsdialog.ui" line="183"/>
         <source>Radio Interfaces</source>
         <translation>Radio Interfaces</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="171"/>
+        <location filename="../src/settingsdialog.ui" line="189"/>
         <source>disable auto-detect</source>
         <translation>disable auto-detect</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="248"/>
+        <location filename="../src/settingsdialog.ui" line="272"/>
         <source>Ignore verification warnings</source>
         <translation>Ignore verification warnings</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="255"/>
+        <location filename="../src/settingsdialog.ui" line="279"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="265"/>
+        <location filename="../src/settingsdialog.ui" line="289"/>
         <source>Ignore frequency limits</source>
         <translation>Ignore frequency limits</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="272"/>
+        <location filename="../src/settingsdialog.ui" line="296"/>
         <source>Do not set this option unless you know what you are doing.</source>
         <translation>Do not set this option unless you know what you are doing.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="285"/>
+        <location filename="../src/settingsdialog.ui" line="315"/>
         <source>Call-Sign DB</source>
         <translation>Call-Sign DB</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="291"/>
+        <location filename="../src/settingsdialog.ui" line="321"/>
         <source>Limit number of DB entries</source>
         <translation>Limit number of DB entries</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="298"/>
+        <location filename="../src/settingsdialog.ui" line="328"/>
         <source>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</source>
         <translation>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="308"/>
+        <location filename="../src/settingsdialog.ui" line="338"/>
         <source>Number of DB entries</source>
         <translation>Number of DB entries</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="315"/>
+        <location filename="../src/settingsdialog.ui" line="351"/>
         <source>Specifies the number of DB entries (if enabled above).</source>
         <translation>Specifies the number of DB entries (if enabled above).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="328"/>
+        <location filename="../src/settingsdialog.ui" line="364"/>
         <source>Select using my DMR ID</source>
         <translation>Select using my DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="335"/>
+        <location filename="../src/settingsdialog.ui" line="371"/>
         <source>If enabled, the entries are selected using the users DMR ID.</source>
         <translation>If enabled, the entries are selected using the users DMR ID.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="345"/>
+        <location filename="../src/settingsdialog.ui" line="381"/>
         <source>Select using prefixes</source>
         <translation>Select using prefixes</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="352"/>
+        <location filename="../src/settingsdialog.ui" line="388"/>
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
         <translation>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="363"/>
+        <location filename="../src/settingsdialog.ui" line="399"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="369"/>
+        <location filename="../src/settingsdialog.ui" line="411"/>
         <source>Extended Features</source>
         <translation>Extended Features</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="375"/>
+        <location filename="../src/settingsdialog.ui" line="417"/>
         <source>Show commercial features</source>
         <translation>Show commercial features</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="389"/>
+        <location filename="../src/settingsdialog.ui" line="431"/>
         <source>Show device extensions</source>
         <translation>Show device extensions</translation>
     </message>
@@ -3579,50 +3608,50 @@
 <context>
     <name>ZoneDialog</name>
     <message>
-        <location filename="../src/zonedialog.ui" line="14"/>
+        <location filename="../src/zonedialog.ui" line="20"/>
         <location filename="../src/zonedialog.cc" line="18"/>
         <source>Edit Zone</source>
         <translation>Edit zone</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="24"/>
+        <location filename="../src/zonedialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="33"/>
+        <location filename="../src/zonedialog.ui" line="39"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="48"/>
+        <location filename="../src/zonedialog.ui" line="54"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="65"/>
+        <location filename="../src/zonedialog.ui" line="77"/>
         <source>Channels A</source>
         <translation>Channels A</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="83"/>
-        <location filename="../src/zonedialog.ui" line="120"/>
+        <location filename="../src/zonedialog.ui" line="95"/>
+        <location filename="../src/zonedialog.ui" line="138"/>
         <source>add</source>
         <translation>add</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="90"/>
-        <location filename="../src/zonedialog.ui" line="127"/>
+        <location filename="../src/zonedialog.ui" line="102"/>
+        <location filename="../src/zonedialog.ui" line="145"/>
         <source>remove</source>
         <translation>remove</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="102"/>
+        <location filename="../src/zonedialog.ui" line="120"/>
         <source>Channels B</source>
         <translation>Channels B</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.ui" line="142"/>
+        <location filename="../src/zonedialog.ui" line="160"/>
         <source>Extension</source>
         <translation>Extension</translation>
     </message>
@@ -3708,57 +3737,57 @@
 <context>
     <name>aprssystemdialog</name>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="14"/>
+        <location filename="../src/aprssystemdialog.ui" line="20"/>
         <source>Edit APRS System</source>
         <translation>Edit APRS System</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="24"/>
+        <location filename="../src/aprssystemdialog.ui" line="30"/>
         <source>Basic</source>
         <translation>Basic</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="36"/>
+        <location filename="../src/aprssystemdialog.ui" line="42"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="46"/>
+        <location filename="../src/aprssystemdialog.ui" line="52"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="56"/>
+        <location filename="../src/aprssystemdialog.ui" line="62"/>
         <source>Source</source>
         <translation>Source</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="94"/>
+        <location filename="../src/aprssystemdialog.ui" line="100"/>
         <source>Destination</source>
         <translation>Destination</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="132"/>
+        <location filename="../src/aprssystemdialog.ui" line="138"/>
         <source>Path</source>
         <translation>Path</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="139"/>
+        <location filename="../src/aprssystemdialog.ui" line="145"/>
         <source>Icon</source>
         <translation>Icon</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="146"/>
+        <location filename="../src/aprssystemdialog.ui" line="152"/>
         <source>Update period [s]</source>
         <translation>Update period [s]</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="153"/>
+        <location filename="../src/aprssystemdialog.ui" line="159"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.ui" line="186"/>
+        <location filename="../src/aprssystemdialog.ui" line="192"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
