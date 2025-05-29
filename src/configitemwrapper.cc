@@ -520,7 +520,7 @@ RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, Q
 int
 RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 6;
+  return 7;
 }
 
 QVariant
@@ -557,6 +557,9 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
       return zones.join(", ");
     } break;
 
+  case 6:
+    return formatExtensions(index.row());
+
   default: break;
   }
 
@@ -574,6 +577,7 @@ RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, 
   case 3: return tr("CC");
   case 4: return tr("TS");
   case 5: return tr("Zones");
+  case 6: return tr("Extensions");
   default: break;
   }
   return QVariant();
@@ -616,7 +620,7 @@ ContactListWrapper::ContactListWrapper(ContactList *list, QObject *parent)
 int
 ContactListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 4;
+  return 5;
 }
 
 QVariant
@@ -637,6 +641,8 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
           return dtmf->number();
         case 3:
           return (dtmf->ring() ? tr("On") : tr("Off"));
+        case 4:
+          return formatExtensions(index.row());
         default:
           return QVariant();
       }
@@ -656,6 +662,8 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
           return digi->number();
         case 3:
           return (digi->ring() ? tr("On") : tr("Off"));
+        case 4:
+          return formatExtensions(index.row());
         default:
           return QVariant();
       }
@@ -678,6 +686,8 @@ ContactListWrapper::headerData(int section, Qt::Orientation orientation, int rol
     return tr("Number");
   } else if (3 == section) {
     return tr("RX Tone");
+  } else if (4 == section) {
+    return tr("Extensions");
   }
   return QVariant();
 }
@@ -720,7 +730,7 @@ PositioningSystemListWrapper::PositioningSystemListWrapper(PositioningSystems *l
 int
 PositioningSystemListWrapper::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 6;
+  return 7;
 }
 
 QVariant
@@ -740,8 +750,10 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return tr("APRS");
     else
       return QString("Oops!");
+
   case 1:
     return sys->name();
+
   case 2:
     if (sys->is<GPSSystem>()) {
       if (! sys->as<GPSSystem>()->hasContact())
@@ -751,8 +763,10 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return QString("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
     break;
+
   case 3:
     return sys->period();
+
   case 4:
     if (sys->is<GPSSystem>()) {
       if (! sys->as<GPSSystem>()->hasRevertChannel())
@@ -764,11 +778,15 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return sys->as<APRSSystem>()->revertChannel()->name();
     }
     break;
+
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");
     else if (sys->is<APRSSystem>())
       return sys->as<APRSSystem>()->message();
+
+  case 6:
+    return formatExtensions(index.row());
 
   default:
     break;
@@ -788,6 +806,7 @@ PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientatio
   case 3: return tr("Period [s]");
   case 4: return tr("Channel");
   case 5: return tr("Message");
+  case 6: return tr("Extensions");
   default:
     break;
   }
@@ -904,7 +923,7 @@ RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
 int
 RadioIdListWrapper::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 3;
+  return 4;
 }
 
 QVariant
@@ -923,6 +942,8 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
     return id->name();
   case 2:
     return id->number();
+  case 3:
+    return formatExtensions(index.row());
   default:
     break;
   }
@@ -938,6 +959,7 @@ RadioIdListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 0: return tr("Type");
   case 1: return tr("Name");
   case 2: return tr("Number");
+  case 3: return tr("Extensions");
   default:
     break;
   }
