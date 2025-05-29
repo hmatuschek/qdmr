@@ -26,6 +26,7 @@ private slots:
   void testFMAPRSSettings();
 
   void testRegressionDefaultChannel();
+  void testRegressionAutoRepeater();
 
 protected:
   Config _micGainConfig;
