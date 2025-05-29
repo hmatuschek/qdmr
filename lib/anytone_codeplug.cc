@@ -1752,7 +1752,7 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
         setDefaultChannelAIndex(ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
                                   ext->bootSettings()->channelA()->as<Channel>()));
 
-      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
+      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneB()->as<Zone>()));
       if (ext->bootSettings()->channelB()->isNull() ||
           (! ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
              ext->bootSettings()->channelB()->as<Channel>())))
