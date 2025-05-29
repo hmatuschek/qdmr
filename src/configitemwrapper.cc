@@ -557,8 +557,12 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
       return zones.join(", ");
     } break;
 
-  case 6:
-    return formatExtensions(index.row());
+  case 6: {
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
 
   default: break;
   }
@@ -649,23 +653,27 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
     } else if (contact->is<DMRContact>()) {
       DMRContact *digi = contact->as<DMRContact>();
       switch (index.column()) {
-        case 0:
-          switch (digi->type()) {
-            case DMRContact::PrivateCall: return tr("Private Call");
-            case DMRContact::GroupCall: return tr("Group Call");
-            case DMRContact::AllCall: return tr("All Call");
-          }
-        break;
-        case 1:
-          return digi->name();
-        case 2:
-          return digi->number();
-        case 3:
-          return (digi->ring() ? tr("On") : tr("Off"));
-        case 4:
-          return formatExtensions(index.row());
-        default:
-          return QVariant();
+      case 0:
+        switch (digi->type()) {
+        case DMRContact::PrivateCall: return tr("Private Call");
+        case DMRContact::GroupCall: return tr("Group Call");
+        case DMRContact::AllCall: return tr("All Call");
+        }
+      break;
+      case 1:
+      return digi->name();
+      case 2:
+      return digi->number();
+      case 3:
+      return (digi->ring() ? tr("On") : tr("Off"));
+      case 4: {
+        auto exts = formatExtensions(index.row());
+        if (exts.isEmpty())
+          return tr("[None]");
+        return exts;
+      }
+      default:
+      return QVariant();
       }
     }
   }
@@ -777,16 +785,21 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
         return tr("[Selected]");
       return sys->as<APRSSystem>()->revertChannel()->name();
     }
-    break;
+  break;
 
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");
     else if (sys->is<APRSSystem>())
       return sys->as<APRSSystem>()->message();
+  break;
 
-  case 6:
-    return formatExtensions(index.row());
+  case 6: {
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
 
   default:
     break;
@@ -942,8 +955,12 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
     return id->name();
   case 2:
     return id->number();
-  case 3:
-    return formatExtensions(index.row());
+  case 3:{
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
   default:
     break;
   }
