@@ -19,7 +19,7 @@ TrafoTest::testZoneSplitVisitor() {
   if (! splitter.process(copy, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
-  QCOMPARE(copy->zones()->count(), 2);
+  QCOMPARE(copy->zones()->count(), 4);
   QVERIFY(copy->zones()->get(0)->name().endsWith(" A"));
   QVERIFY(copy->zones()->get(1)->name().endsWith(" B"));
   QCOMPARE(copy->zones()->get(0)->name().chopped(2),

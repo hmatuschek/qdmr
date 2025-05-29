@@ -251,8 +251,8 @@ OpenGD77Test::testAPRSSourceCall() {
   auto sys = decoded.posSystems()->aprsSystem(0);
   QCOMPARE(sys->source(), "DM3MAT");
 
-  // OpenGD77 cannot encode revert channel
-  QVERIFY(decoded.posSystems()->aprsSystem(0)->revert()->isNull());
+  FMChannel *channel = decoded.posSystems()->aprsSystem(0)->revert()->as<FMChannel>();
+  QVERIFY(channel->name() == "2m APRS");
 }
 
 

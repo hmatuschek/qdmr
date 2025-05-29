@@ -960,8 +960,8 @@ OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
 
   setName("");
   clearFixedPosition();
-  // Likely the future APRS system transmit frequency
-  setUInt32_le(Offset::unknownInteger(), 12700000);
+  setUInt32_le(Offset::fmFrequency(), 0);
+
   // Some random data, appears to be important
   writeASCII(Offset::unknownBytes(), "RA", 2);
 }
@@ -1113,6 +1113,16 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setBaudRate(BaudRate rate) {
 }
 
 
+Frequency
+OpenGD77BaseCodeplug::APRSSettingsElement::fmFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::fmFrequency())*10);
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
+  setUInt32_le(Offset::fmFrequency(), f.inHz()/10);
+}
+
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
@@ -1143,6 +1153,10 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
   clearFixedPosition();
   setBaudRate(BaudRate::Baud1200);
   setPositionPrecision(PositionPrecision::Max);
+
+  if(sys->hasRevertChannel()) {
+    setFMFrequency(sys->revertChannel()->txFrequency());
+  }
 
   if (nullptr == sys->openGD77Extension())
     return true;
@@ -1184,10 +1198,28 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   return sys;
 }
 
-
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::link(APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  if(fmFrequency().inHz() == 0) {
+    sys->resetRevertChannel();
+  } else {
+    // First, try to find a matching analog channel in list
+    FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency());
+    if (! ch) {
+      // If no channel is found, create one with the settings from APRS channel:
+      ch = new FMChannel();
+      ch->setName("APRS Channel");
+      ch->setRXFrequency(fmFrequency());
+      ch->setTXFrequency(fmFrequency());
+      ch->setBandwidth(FMChannel::Bandwidth::Narrow);
+      logInfo() << "No matching APRS channel found for TX frequency " << double(fmFrequency().inHz())/1e6
+                << "MHz, create one as 'APRS Channel'";
+      ctx.config()->channelList()->add(ch);
+    }
+    sys->setRevertChannel(ch);
+  }
 
   if (ctx.config()->settings()->defaultId())
     sys->setSource(ctx.config()->settings()->defaultId()->name());

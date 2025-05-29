@@ -92,6 +92,10 @@ zones:
     name: Zu Hause
     A: [ch1, ch2, ch4]
     B: [ch3]
+  - id: zone2
+    name: Zu Hause2
+    A: [ch3, ch2, ch4]
+    B: [ch1]
 
 roamingChannels:
   - id: rc1
