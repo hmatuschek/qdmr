@@ -55,7 +55,7 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.12.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.1)** -- Updated support for OpenGD77.
+ * **[Version 0.12.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.2)** -- Bugfix release
  * **[Version 0.12.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.0)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
  * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
@@ -73,7 +73,7 @@ There are several ways to install qdmr on your system ranging from simple app-pa
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
-Copyright (C) 2019-2020 Hannes Matuschek, DM3MAT
+Copyright (C) 2019-2025 Hannes Matuschek, DM3MAT
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
