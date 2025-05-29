@@ -2143,7 +2143,7 @@ D878UVCodeplug::ExtendedSettingsElement::autoRepeaterVHF2MaxFrequency() const {
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterVHF2MaxFrequency(Frequency hz) {
-  setBCD8_be(Offset::autoRepeaterVHF2MaxFrequency(), hz.inHz()/10);
+  setUInt32_le(Offset::autoRepeaterVHF2MaxFrequency(), hz.inHz()/10);
 }
 Frequency
 D878UVCodeplug::ExtendedSettingsElement::autoRepeaterUHF2MinFrequency() const {

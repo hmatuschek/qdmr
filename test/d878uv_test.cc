@@ -306,8 +306,8 @@ D878UVTest::testRegressionDefaultChannel() {
   config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
   config.settings()->anytoneExtension()->bootSettings()->zoneA()->set(config.zones()->zone(0));
   config.settings()->anytoneExtension()->bootSettings()->channelA()->set(config.zones()->zone(0)->A()->get(0));
-  config.settings()->anytoneExtension()->bootSettings()->zoneB()->set(config.zones()->zone(0));
-  config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(0)->A()->get(1));
+  config.settings()->anytoneExtension()->bootSettings()->zoneB()->set(config.zones()->zone(1));
+  config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(1)->A()->get(0));
   config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
 
   D868UVCodeplug codeplug;
@@ -330,9 +330,43 @@ D878UVTest::testRegressionDefaultChannel() {
   QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelA()->as<Channel>()->name(),
            decoded.zones()->zone(0)->A()->get(0)->name());
   QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneB()->as<Zone>(),
-           decoded.zones()->zone(0));
+           decoded.zones()->zone(1));
   QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelB()->as<Channel>()->name(),
-           decoded.zones()->zone(0)->A()->get(1)->name());
+           decoded.zones()->zone(1)->A()->get(0)->name());
+}
+
+
+
+void
+D878UVTest::testRegressionAutoRepeater() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(decoded.settings()->anytoneExtension());
+  QCOMPARE(decoded.settings()->anytoneExtension()->autoRepeaterSettings()->vhf2Min().inMHz(), 136.0);
+  QCOMPARE(decoded.settings()->anytoneExtension()->autoRepeaterSettings()->vhf2Max().inMHz(), 174.0);
+  QCOMPARE(decoded.settings()->anytoneExtension()->autoRepeaterSettings()->uhf2Min().inMHz(), 400.0);
+  QCOMPARE(decoded.settings()->anytoneExtension()->autoRepeaterSettings()->uhf2Max().inMHz(), 480.0);
 }
 
 

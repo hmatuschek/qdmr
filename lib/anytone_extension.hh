@@ -376,14 +376,19 @@ class AnytoneBootSettingsExtension: public ConfigItem
   /** Holds the boot password. */
   Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
 
-  /** If enables, the default channels are selected at boot. */
+  Q_CLASSINFO("defaultChannelDescription", "If enabled, the default channels are selected at boot.")
+  /** If enabled, the default channels are selected at boot. */
   Q_PROPERTY(bool defaultChannel READ defaultChannelEnabled WRITE enableDefaultChannel)
+  Q_CLASSINFO("zoneADescription", "The default zone for VFO A.")
   /** The default zone for VFO A. */
   Q_PROPERTY(ZoneReference* zoneA READ zoneA)
+  Q_CLASSINFO("channelADescription", "The default channel for VFO A. Must be within zone A.")
   /** The default channel for VFO A. */
   Q_PROPERTY(ChannelReference* channelA READ channelA)
+  Q_CLASSINFO("zoneBDescription", "The default zone for VFO B.")
   /** The current zone for VFO B. */
   Q_PROPERTY(ZoneReference* zoneB READ zoneB)
+  Q_CLASSINFO("channelBDescription", "The default channel for VFO B. Must be within zone B.")
   /** The default channel for VFO B. */
   Q_PROPERTY(ChannelReference* channelB READ channelB)
   /** The priority zone for VFO A. */
