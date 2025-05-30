@@ -154,11 +154,11 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
             { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-            { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) } } },
+            { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
         { APRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
-            { "revert", new RadioLimitObjRef(FMChannel::staticMetaObject, false) },
+            { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },
             { "icon", new RadioLimitEnum{} },
             { "message", new RadioLimitString(0, 60, RadioLimitString::ASCII) }
             ///@todo extend APRSSystem to expose other settings as properties.

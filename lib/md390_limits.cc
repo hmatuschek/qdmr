@@ -154,7 +154,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
+          { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
         } ) );
 
   /* Check encryption keys. */
