@@ -1,7 +1,6 @@
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
 
 name: Flatpak
 

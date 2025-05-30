@@ -83,7 +83,7 @@ UV390Limits::UV390Limits(QObject *parent)
                                                                   Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
-              {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
+              {"scanlist", new RadioLimitObjRef({ScanList::staticMetaObject})},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -159,7 +159,7 @@ UV390Limits::UV390Limits(QObject *parent)
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
+          { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
         } ) );
 
   /* Check encryption keys. */
