@@ -161,7 +161,7 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<Frequency, Freq
         { APRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
-            { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, false) },
+            { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },
             { "icon", new RadioLimitEnum{} },
             { "message", new RadioLimitString(0, 60, RadioLimitString::ASCII) }
             ///@todo extend APRSSystem to expose other settings as properties.

@@ -157,7 +157,7 @@ DM1701Limits::DM1701Limits(QObject *parent)
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
+          { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
         } ) );
 
   /* Check encryption keys. */
