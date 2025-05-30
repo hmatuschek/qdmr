@@ -361,11 +361,20 @@ public:
   /** Clears the VFO A & B. */
   virtual void clearVFOSettings();
 
+public:
+  /** Some limits for the codeplug. */
+  struct Limit: public Element::Limit {
+    /// Number of channels.
+    static constexpr unsigned int channels() { return 3000; }
+  };
+
 protected:
   /** Some internal offsets within the codeplug. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int messages() { return 0x002180; }
+    static constexpr unsigned int channels() { return 0x110000; }
+    static constexpr unsigned int betweenChannels() { return ChannelElement::size(); }
     /// @endcond
   };
 };

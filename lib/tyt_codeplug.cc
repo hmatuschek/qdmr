@@ -13,7 +13,6 @@
 #include <QtEndian>
 #include <QChar>
 
-#define CHANNEL_SIZE      0x000040
 #define SETTINGS_SIZE     0x000090
 #define CONTACT_SIZE      0x000024
 #define MENUSETTINGS_SIZE 0x000010
@@ -29,7 +28,7 @@ TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, CHANNEL_SIZE)
+  : Codeplug::Element(ptr, size())
 {
   // pass...
 }
@@ -40,7 +39,7 @@ TyTCodeplug::ChannelElement::~ChannelElement() {
 
 bool
 TyTCodeplug::ChannelElement::isValid() const {
-  return Element::isValid() && QChar::isPrint(getUInt16_le(0x20));
+  return Element::isValid() && QChar::isPrint(getUInt16_le(Offset::name()));
 }
 
 void
@@ -72,7 +71,7 @@ TyTCodeplug::ChannelElement::clear() {
   setAdmitCriterion(ADMIT_ALWAYS);
   clearBit(5,0);
   setContactIndex(0);
-  setTXTimeOut(0);
+  resetTXTimeOut();
   clearBit(8,6);
   setTXTimeOutRekeyDelay(0);
   setEmergencySystemIndex(0);
@@ -81,8 +80,8 @@ TyTCodeplug::ChannelElement::clear() {
   setPositioningSystemIndex(0);
   for (uint8_t i=0; i<8; i++)
     setDTMFDecode(i, false);
-  setRXFrequency(400000000UL);
-  setTXFrequency(400000000UL);
+  setRXFrequency(Frequency::fromMHz(400));
+  setTXFrequency(Frequency::fromMHz(400));
   setRXSignaling(SelectiveCall());
   setTXSignaling(SelectiveCall());
   setRXSignalingSystemIndex(0);
@@ -97,263 +96,273 @@ TyTCodeplug::ChannelElement::clear() {
 
 TyTCodeplug::ChannelElement::Mode
 TyTCodeplug::ChannelElement::mode() const {
-  return TyTCodeplug::ChannelElement::Mode(getUInt2(0, 0));
+  return TyTCodeplug::ChannelElement::Mode(getUInt2(Offset::mode()));
 }
 void
 TyTCodeplug::ChannelElement::setMode(Mode mode) {
-  setUInt2(0,0, uint8_t(mode));
+  setUInt2(Offset::mode(), uint8_t(mode));
 }
 
 FMChannel::Bandwidth
 TyTCodeplug::ChannelElement::bandwidth() const {
-  if (0 == getUInt2(0, 2))
+  if (0 == getUInt2(Offset::bandwidth()))
     return FMChannel::Bandwidth::Narrow;
   return FMChannel::Bandwidth::Wide;
 }
 void
 TyTCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
   if (FMChannel::Bandwidth::Narrow == bw)
-    setUInt2(0, 2, BW_12_5_KHZ);
+    setUInt2(Offset::bandwidth(), BW_12_5_KHZ);
   else
-    setUInt2(0, 2, BW_25_KHZ);
+    setUInt2(Offset::bandwidth(), BW_25_KHZ);
 }
 
 bool
 TyTCodeplug::ChannelElement::autoScan() const {
-  return getBit(0, 4);
+  return getBit(Offset::autoscan());
 }
 void
 TyTCodeplug::ChannelElement::enableAutoScan(bool enable) {
-  setBit(0, 4, enable);
+  setBit(Offset::autoscan(), enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::loneWorker() const {
-  return getBit(0, 7);
+  return getBit(Offset::loneworker());
 }
 void
 TyTCodeplug::ChannelElement::enableLoneWorker(bool enable) {
-  setBit(0, 7, enable);
+  setBit(Offset::loneworker(), enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::talkaround() const {
-  return ! getBit(1, 0);
+  return ! getBit(Offset::talkaround());
 }
 void
 TyTCodeplug::ChannelElement::enableTalkaround(bool enable) {
-  setBit(1, 0, !enable);
+  setBit(Offset::talkaround(), !enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::rxOnly() const {
-  return getBit(1, 1);
+  return getBit(Offset::rxonly());
 }
 void
 TyTCodeplug::ChannelElement::enableRXOnly(bool enable) {
-  setBit(1, 1, enable);
+  setBit(Offset::rxonly(), enable);
 }
 
 DMRChannel::TimeSlot
 TyTCodeplug::ChannelElement::timeSlot() const {
-  if (2 == getUInt2(1,2))
+  if (2 == getUInt2(Offset::timeslot()))
     return DMRChannel::TimeSlot::TS2;
   return DMRChannel::TimeSlot::TS1;
 }
 void
 TyTCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   if (DMRChannel::TimeSlot::TS1 == ts)
-    setUInt2(1,2,1);
+    setUInt2(Offset::timeslot(), 1);
   else
-    setUInt2(1,2,2);
+    setUInt2(Offset::timeslot(),2);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::colorCode() const {
-  return getUInt4(1,4);
+  return getUInt4(Offset::colorcode());
 }
 void
 TyTCodeplug::ChannelElement::setColorCode(uint8_t cc) {
-  setUInt4(1,4, std::min(uint8_t(16), cc));
+  cc = std::min(uint8_t(16), cc);
+  setUInt4(Offset::colorcode(), cc);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::privacyIndex() const {
-  return getUInt4(2,0);
+  return getUInt4(Offset::privacyIndex());
 }
 void
 TyTCodeplug::ChannelElement::setPrivacyIndex(uint8_t idx) {
-  setUInt4(2,0, idx);
+  setUInt4(Offset::privacyIndex(), idx);
 }
 
 TyTCodeplug::ChannelElement::PrivacyType
 TyTCodeplug::ChannelElement::privacyType() const {
-  return TyTCodeplug::ChannelElement::PrivacyType(getUInt2(2,4));
+  return TyTCodeplug::ChannelElement::PrivacyType(getUInt2(Offset::privacyType()));
 }
 void
 TyTCodeplug::ChannelElement::setPrivacyType(TyTCodeplug::ChannelElement::PrivacyType type) {
-  setUInt2(2,4, uint8_t(type));
+  setUInt2(Offset::privacyType(), uint8_t(type));
 }
 
 bool
 TyTCodeplug::ChannelElement::privateCallConfirm() const {
-  return getBit(2, 6);
+  return getBit(Offset::privateCallConfirm());
 }
 void
 TyTCodeplug::ChannelElement::enablePrivateCallConfirm(bool enable) {
-  setBit(2, 6, enable);
+  setBit(Offset::privateCallConfirm(), enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::dataCallConfirm() const {
-  return getBit(2, 7);
+  return getBit(Offset::dataCallConfirm());
 }
 void
 TyTCodeplug::ChannelElement::enableDataCallConfirm(bool enable) {
-  setBit(2, 7, enable);
+  setBit(Offset::dataCallConfirm(), enable);
 }
 
 TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::rxRefFrequency() const {
-  return TyTChannelExtension::RefFrequency(getUInt2(3,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(Offset::rxRefFrequency()));
 }
 void
 TyTCodeplug::ChannelElement::setRXRefFrequency(TyTChannelExtension::RefFrequency ref) {
-  setUInt2(3,0, uint8_t(ref));
+  setUInt2(Offset::rxRefFrequency(), uint8_t(ref));
 }
 
 bool
 TyTCodeplug::ChannelElement::emergencyAlarmACK() const {
-  return getBit(3,3);
+  return getBit(Offset::emergencyAlarmACK());
 }
 void
 TyTCodeplug::ChannelElement::enableEmergencyAlarmACK(bool enable) {
-  setBit(3,3, enable);
+  setBit(Offset::emergencyAlarmACK(), enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::displayPTTId() const {
-  return ! getBit(3,7);
+  return ! getBit(Offset::displayPTTId());
 }
 void
 TyTCodeplug::ChannelElement::enableDisplayPTTId(bool enable) {
-  setBit(3,7, !enable);
+  setBit(Offset::displayPTTId(), !enable);
 }
 
 TyTChannelExtension::RefFrequency
 TyTCodeplug::ChannelElement::txRefFrequency() const {
-  return TyTChannelExtension::RefFrequency(getUInt2(4,0));
+  return TyTChannelExtension::RefFrequency(getUInt2(Offset::txRefFrequency()));
 }
 void
 TyTCodeplug::ChannelElement::setTXRefFrequency(TyTChannelExtension::RefFrequency ref) {
-  setUInt2(4,0, uint8_t(ref));
+  setUInt2(Offset::txRefFrequency(), uint8_t(ref));
 }
 
 bool
 TyTCodeplug::ChannelElement::vox() const {
-  return getBit(4,4);
+  return getBit(Offset::vox());
 }
 void
 TyTCodeplug::ChannelElement::enableVOX(bool enable) {
-  setBit(4,4, enable);
+  setBit(Offset::vox(), enable);
 }
 
 TyTCodeplug::ChannelElement::Admit
 TyTCodeplug::ChannelElement::admitCriterion() const {
-  return TyTCodeplug::ChannelElement::Admit(getUInt2(4,6));
+  return TyTCodeplug::ChannelElement::Admit(getUInt2(Offset::admitCriterion()));
 }
 void
 TyTCodeplug::ChannelElement::setAdmitCriterion(TyTCodeplug::ChannelElement::Admit admit) {
-  setUInt2(4,6, uint8_t(admit));
+  setUInt2(Offset::admitCriterion(), uint8_t(admit));
 }
 
 uint16_t
 TyTCodeplug::ChannelElement::contactIndex() const {
-  return getUInt16_le(6);
+  return getUInt16_le(Offset::contactIndex());
 }
 void
 TyTCodeplug::ChannelElement::setContactIndex(uint16_t idx) {
-  setUInt16_le(6, idx);
+  setUInt16_le(Offset::contactIndex(), idx);
 }
 
-unsigned TyTCodeplug::ChannelElement::txTimeOut() const {
-  return getUInt6(8, 0)*15;
+bool
+TyTCodeplug::ChannelElement::txTimeOutDisabled() const {
+  return 0 == getUInt6(Offset::txTimeOut());
+}
+Interval
+TyTCodeplug::ChannelElement::txTimeOut() const {
+  return Interval::fromSeconds(getUInt6(Offset::txTimeOut())*15);
 }
 void
-TyTCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
-  return setUInt6(8, 0, tot/15);
+TyTCodeplug::ChannelElement::setTXTimeOut(const Interval &tot) {
+  return setUInt6(Offset::txTimeOut(), tot.seconds()/15);
+}
+void
+TyTCodeplug::ChannelElement::resetTXTimeOut() {
+  setUInt6(Offset::txTimeOut(), 0);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::txTimeOutRekeyDelay() const {
-  return getUInt8(9);
+  return getUInt8(Offset::txTimeOutRekeyDelay());
 }
 void
 TyTCodeplug::ChannelElement::setTXTimeOutRekeyDelay(uint8_t delay) {
-  return setUInt8(9, delay);
+  return setUInt8(Offset::txTimeOutRekeyDelay(), delay);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::emergencySystemIndex() const {
-  return getUInt8(10);
+  return getUInt8(Offset::emergencySystemIndex());
 }
 void
 TyTCodeplug::ChannelElement::setEmergencySystemIndex(uint8_t delay) {
-  return setUInt8(10, delay);
+  return setUInt8(Offset::emergencySystemIndex(), delay);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::scanListIndex() const {
-  return getUInt8(11);
+  return getUInt8(Offset::scanListIndex());
 }
 void
 TyTCodeplug::ChannelElement::setScanListIndex(uint8_t idx) {
-  return setUInt8(11, idx);
+  return setUInt8(Offset::scanListIndex(), idx);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::groupListIndex() const {
-  return getUInt8(12);
+  return getUInt8(Offset::groupListIndex());
 }
 void
 TyTCodeplug::ChannelElement::setGroupListIndex(uint8_t idx) {
-  return setUInt8(12, idx);
+  return setUInt8(Offset::groupListIndex(), idx);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::positioningSystemIndex() const {
-  return getUInt8(13);
+  return getUInt8(Offset::positioningSystemIndex());
 }
 void
 TyTCodeplug::ChannelElement::setPositioningSystemIndex(uint8_t idx) {
-  return setUInt8(13, idx);
+  return setUInt8(Offset::positioningSystemIndex(), idx);
 }
 
 bool
 TyTCodeplug::ChannelElement::dtmfDecode(uint8_t idx) const {
-  return getBit(14, idx);
+  return getBit(Offset::dtmfDecode(), idx);
 }
 void
 TyTCodeplug::ChannelElement::setDTMFDecode(uint8_t idx, bool enable) {
-  setBit(14, idx, enable);
+  setBit(Offset::dtmfDecode(), idx, enable);
 }
 
-uint32_t
+Frequency
 TyTCodeplug::ChannelElement::rxFrequency() const {
-  return getBCD8_le(16)*10;
+  return Frequency::fromHz(getBCD8_le(Offset::rxFrequency())*10);
 }
 void
-TyTCodeplug::ChannelElement::setRXFrequency(uint32_t freq_Hz) {
-  return setBCD8_le(16, freq_Hz/10);
+TyTCodeplug::ChannelElement::setRXFrequency(const Frequency &freq_Hz) {
+  return setBCD8_le(Offset::txFrequency(), freq_Hz.inHz()/10);
 }
 
-uint32_t
+Frequency
 TyTCodeplug::ChannelElement::txFrequency() const {
-  return getBCD8_le(20)*10;
+  return Frequency::fromHz(getBCD8_le(Offset::txFrequency())*10);
 }
 void
-TyTCodeplug::ChannelElement::setTXFrequency(uint32_t freq_Hz) {
-  return setBCD8_le(20, freq_Hz/10);
+TyTCodeplug::ChannelElement::setTXFrequency(const Frequency &freq_Hz) {
+  return setBCD8_le(Offset::txFrequency(), freq_Hz.inHz()/10);
 }
 
 SelectiveCall
@@ -376,47 +385,47 @@ TyTCodeplug::ChannelElement::setTXSignaling(const SelectiveCall &code) {
 
 uint8_t
 TyTCodeplug::ChannelElement::rxSignalingSystemIndex() const {
-  return getUInt8(28);
+  return getUInt8(Offset::rxSignalingSystemIndex());
 }
 void
 TyTCodeplug::ChannelElement::setRXSignalingSystemIndex(uint8_t idx) {
-  setUInt8(28, idx);
+  setUInt8(Offset::rxSignalingSystemIndex(), idx);
 }
 
 uint8_t
 TyTCodeplug::ChannelElement::txSignalingSystemIndex() const {
-  return getUInt8(29);
+  return getUInt8(Offset::txSignalingSystemIndex());
 }
 void
 TyTCodeplug::ChannelElement::setTXSignalingSystemIndex(uint8_t idx) {
-  setUInt8(29, idx);
+  setUInt8(Offset::txSignalingSystemIndex(), idx);
 }
 
 bool
 TyTCodeplug::ChannelElement::txGPSInfo() const {
-  return ! getBit(31, 0);
+  return ! getBit(Offset::txGPSInfo());
 }
 void
 TyTCodeplug::ChannelElement::enableTXGPSInfo(bool enable) {
-  setBit(31,0, !enable);
+  setBit(Offset::txGPSInfo(), !enable);
 }
 
 bool
 TyTCodeplug::ChannelElement::rxGPSInfo() const {
-  return !getBit(31, 1);
+  return !getBit(Offset::rxGPSInfo());
 }
 void
 TyTCodeplug::ChannelElement::enableRXGPSInfo(bool enable) {
-  setBit(31,1, !enable);
+  setBit(Offset::rxGPSInfo(), !enable);
 }
 
 QString
 TyTCodeplug::ChannelElement::name() const {
-  return readUnicode(32, 16, 0x0000);
+  return readUnicode(Offset::name(), Limit::nameLength(), 0x0000);
 }
 void
 TyTCodeplug::ChannelElement::setName(const QString &name) {
-  return writeUnicode(32, name, 16, 0x0000);
+  return writeUnicode(Offset::name(), name, Limit::nameLength(), 0x0000);
 }
 
 Channel *
@@ -472,14 +481,15 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ch = dch;
   } else {
     errMsg(err) << "Cannot decode channel. Channel type " << mode() << " unknown!";
+    delete ex;
     return nullptr;
   }
 
   // Common settings
   ch->setName(name());
-  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
-  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
-  ch->setTimeout(txTimeOut());
+  ch->setRXFrequency(rxFrequency());
+  ch->setTXFrequency(txFrequency());
+  ch->setTimeout(txTimeOut().seconds());
   ch->setRXOnly(rxOnly());
   // Power setting must be overridden by specialized class
   ch->setDefaultPower();
@@ -564,13 +574,13 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
 void
 TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setName(chan->name());
-  setRXFrequency(chan->rxFrequency().inHz());
-  setTXFrequency(chan->txFrequency().inHz());
+  setRXFrequency(chan->rxFrequency());
+  setTXFrequency(chan->txFrequency());
   enableRXOnly(chan->rxOnly());
   if (chan->defaultTimeout())
-    setTXTimeOut(ctx.config()->settings()->tot());
+    setTXTimeOut(Interval::fromSeconds(ctx.config()->settings()->tot()));
   else
-    setTXTimeOut(chan->timeout());
+    setTXTimeOut(Interval::fromSeconds(chan->timeout()));
   if (chan->scanList())
     setScanListIndex(ctx.index(chan->scanList()));
   else

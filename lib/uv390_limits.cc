@@ -70,11 +70,11 @@ UV390Limits::UV390Limits(QObject *parent)
 
   /* Define limits for channel list. */
   add("channels", new RadioLimitList(
-        Channel::staticMetaObject, 1, 3000,
+        Channel::staticMetaObject, 1, UV390Codeplug::Limit::channels(),
         new RadioLimitObjects {
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
-              {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+              {"name", new RadioLimitString(1, UV390Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.),
@@ -102,7 +102,7 @@ UV390Limits::UV390Limits(QObject *parent)
             } },
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
-              {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+              {"name", new RadioLimitString(1, UV390Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
