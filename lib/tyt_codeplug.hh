@@ -432,7 +432,7 @@ public:
     /** Creates a scan list. */
     virtual ScanList *toScanListObj(Context &ctx);
     /** Links the scan list object. */
-    virtual bool linkScanListObj(ScanList *lst, Context &ctx);
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Codeplug representation of the general settings.

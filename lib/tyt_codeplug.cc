@@ -1119,9 +1119,9 @@ TyTCodeplug::ScanListElement::toScanListObj(Context &ctx) {
 }
 
 bool
-TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
+TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx, const ErrorStack &err) {
   if (! isValid()) {
-    logDebug() << "Cannot link invalid scanlist.";
+    errMsg(err) << "Cannot link invalid scanlist.";
     return false;
   }
 
@@ -1157,8 +1157,8 @@ TyTCodeplug::ScanListElement::linkScanListObj(ScanList *lst, Context &ctx) {
 
   for (int i=0; ((i<31) && memberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
-      logDebug() << "Cannot link scanlist to channel idx " << memberIndex(i)
-                    << ". Unknown channel index.";
+      errMsg(err) << "Cannot link scanlist to channel idx " << memberIndex(i)
+                  << ". Unknown channel index.";
       return false;
     }
     lst->addChannel(ctx.get<Channel>(memberIndex(i)));

@@ -66,7 +66,7 @@ UV390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 void
 UV390Codeplug::ChannelElement::clear() {
-  Element::clear();
+  TyTCodeplug::ChannelElement::clear();
 
   clearBit(5,0);
   setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
@@ -651,10 +651,10 @@ UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, 
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
+    chan.clear();
     if (i < config->channelList()->count()) {
+      logDebug() << "Encode channel at index " << i << ".";
       chan.fromChannelObj(config->channelList()->channel(i), ctx);
-    } else {
-      chan.clear();
     }
   }
   return true;
@@ -682,7 +682,7 @@ UV390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       continue;
-    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
+    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }
