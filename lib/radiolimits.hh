@@ -512,11 +512,21 @@ class RadioLimitObjRef: public RadioLimitElement
   Q_OBJECT
 
 public:
+  /** Initializer lists of allowed classes. */
+  typedef std::initializer_list<QMetaObject> MetaObjectList;
+
+public:
   /** Constructor.
    * @param type Specifies the type that might be referenced.
    * @param allowNull If @c true, the reference may be a nullptr.
    * @param parent Specifies the QObject parent. */
   RadioLimitObjRef(const QMetaObject &type, bool allowNull=true, QObject *parent=nullptr);
+
+  /** Constructor.
+   * @param types Specifies the types that might be referenced.
+   * @param allowNull If @c true, the reference may be a nullptr.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitObjRef(const MetaObjectList &types, bool allowNull=true, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
