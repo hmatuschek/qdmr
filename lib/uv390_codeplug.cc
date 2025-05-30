@@ -64,6 +64,7 @@ void
 UV390Codeplug::ChannelElement::clear() {
   TyTCodeplug::ChannelElement::clear();
 
+  enableTalkaround(false);
   clearBit(5,0);
   setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
   setTurnOffFreq(TyTChannelExtension::KillTone::Off);
@@ -72,6 +73,15 @@ UV390Codeplug::ChannelElement::clear() {
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
   enableDCDMLeader(true);
+}
+
+bool
+UV390Codeplug::ChannelElement::talkaround() const {
+  return getBit(Offset::talkaround());
+}
+void
+UV390Codeplug::ChannelElement::enableTalkaround(bool enable) {
+  setBit(Offset::talkaround(), enable);
 }
 
 TyTChannelExtension::InCallCriterion UV390Codeplug::ChannelElement::inCallCriteria() const {

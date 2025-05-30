@@ -353,7 +353,7 @@ TyTCodeplug::ChannelElement::rxFrequency() const {
 }
 void
 TyTCodeplug::ChannelElement::setRXFrequency(const Frequency &freq_Hz) {
-  return setBCD8_le(Offset::txFrequency(), freq_Hz.inHz()/10);
+  return setBCD8_le(Offset::rxFrequency(), freq_Hz.inHz()/10);
 }
 
 Frequency

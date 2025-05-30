@@ -69,6 +69,9 @@ public:
     /** Clears/resets the channel and therefore disables it. */
     void clear();
 
+    bool talkaround() const;
+    void enableTalkaround(bool enable);
+
     /** Returns the in-call criterion for this channel. */
     virtual TyTChannelExtension::InCallCriterion inCallCriteria() const;
     /** Sets the in-call criterion for this channel. */
