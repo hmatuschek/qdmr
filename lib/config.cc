@@ -252,8 +252,10 @@ void
 Config::clear() {
   ConfigItem::clear();
 
-  // Reset lists
+  // Reset settings
   _settings->clear();
+
+  // Reset lists
   _radioIDs->clear();
   _contacts->clear();
   _rxGroupLists->clear();
@@ -263,6 +265,11 @@ Config::clear() {
   _gpsSystems->clear();
   _roamingChannels->clear();
   _roamingZones->clear();
+
+  // Clear extensions
+  commercialExtension()->clear();
+  smsExtension()->clear();
+  setTyTExtension(nullptr);
 
   emit modified(this);
 }
@@ -325,6 +332,7 @@ Config::readCSV(QTextStream &stream, QString &errorMessage)
   return true;
 }
 
+
 bool
 Config::readYAML(const QString &filename, const ErrorStack &err) {
   YAML::Node node;
@@ -357,8 +365,10 @@ Config::readYAML(const QString &filename, const ErrorStack &err) {
   if (! link(node, context, err))
     return false;
 
+  setModified(false);
   return true;
 }
+
 
 bool
 Config::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)

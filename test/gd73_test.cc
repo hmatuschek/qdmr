@@ -100,8 +100,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 1");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::CTCSS_67_0Hz);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(67.0));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -110,8 +110,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 2");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::CTCSS_67_0Hz);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(67.0));
     config.channelList()->add(ch);
   }
 
@@ -120,8 +120,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 3");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::DCS_023N);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(23,false));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -130,8 +130,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 4");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::DCS_023N);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(23, false));
     config.channelList()->add(ch);
   }
 
@@ -140,8 +140,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 5");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::DCS_023I);
-    ch->setTXTone(Signaling::SIGNALING_NONE);
+    ch->setRXTone(SelectiveCall(23, true));
+    ch->setTXTone(SelectiveCall());
     config.channelList()->add(ch);
   }
 
@@ -150,8 +150,8 @@ GD73Test::testFMSignaling() {
     ch->setName("Channel 6");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));
-    ch->setRXTone(Signaling::SIGNALING_NONE);
-    ch->setTXTone(Signaling::DCS_023I);
+    ch->setRXTone(SelectiveCall());
+    ch->setTXTone(SelectiveCall(23, true));
     config.channelList()->add(ch);
   }
 
@@ -171,10 +171,10 @@ GD73Test::testFMSignaling() {
   QCOMPARE(compare.channelList()->count(), 6);
   for (int i=0; i<compare.channelList()->count(); i++) {
     QVERIFY(compare.channelList()->channel(i)->is<FMChannel>());
-    QCOMPARE((unsigned int)compare.channelList()->channel(i)->as<FMChannel>()->rxTone(),
-             (unsigned int)config.channelList()->channel(i)->as<FMChannel>()->rxTone());
-    QCOMPARE((unsigned int)compare.channelList()->channel(i)->as<FMChannel>()->txTone(),
-             (unsigned int)config.channelList()->channel(i)->as<FMChannel>()->txTone());
+    QCOMPARE(compare.channelList()->channel(i)->as<FMChannel>()->rxTone(),
+             config.channelList()->channel(i)->as<FMChannel>()->rxTone());
+    QCOMPARE(compare.channelList()->channel(i)->as<FMChannel>()->txTone(),
+             config.channelList()->channel(i)->as<FMChannel>()->txTone());
   }
 }
 
@@ -260,11 +260,12 @@ GD73Test::testEncryptionLimits() {
 
   {
     RadioLimitContext issues;
-    GD73Limits().verifyConfig(&config, issues);
+    QVERIFY(GD73Limits().verifyConfig(&config, issues));
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(1 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QCOMPARE(status.count(), 0);
   }
 
   // Add wrong key type
@@ -278,8 +279,9 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 
   // add a larger key
@@ -295,8 +297,9 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 }
 

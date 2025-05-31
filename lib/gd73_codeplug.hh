@@ -183,9 +183,12 @@ public:
     /** Possible programmable key function. */
     struct KeyFunction {
     public:
+      /** Encodes the given function. */
       static uint8_t encode(RadioddityButtonSettingsExtension::Function func);
+      /** Decodes the given function code. */
       static RadioddityButtonSettingsExtension::Function decode(uint8_t code);
     protected:
+      /** Possible function codes. */
       enum Code {
         None=0, RadioEnable=1, RadioCheck=2, RadioDisable=3, PowerLevel=4,
         Monitor=5, EmergencyOn=6, EmergencyOff=7, ZoneSwitch=8, ToggleScan=9, ToggleVOX=10,
@@ -622,13 +625,13 @@ public:
     void setAdmit(Admit admit);
 
     /** Returns the RX tone. */
-    Signaling::Code rxTone() const;
+    SelectiveCall rxTone() const;
     /** Sets the RX tone. */
-    void setRXTone(Signaling::Code code);
+    void setRXTone(const SelectiveCall &code);
     /** Returns the TX tone. */
-    Signaling::Code txTone() const;
+    SelectiveCall txTone() const;
     /** Sets the TX tone. */
-    void setTXTone(Signaling::Code code);
+    void setTXTone(const SelectiveCall &code);
 
     /** Returns the time slot. */
     DMRChannel::TimeSlot timeSlot() const;
@@ -1275,7 +1278,9 @@ public:
     /** Sets the key size in bits. */
     void setKeySize(unsigned int size);
 
+    /** Decodes the encryption key. */
     BasicEncryptionKey *createEncryptionKey(const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the encryption key. */
     bool encodeEncryptionKey(BasicEncryptionKey *key, const ErrorStack &err=ErrorStack());
 
   protected:

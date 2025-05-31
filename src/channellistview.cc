@@ -96,7 +96,7 @@ ChannelListView::onCloneChannel() {
   // Dispatch by type
   if (channel->is<FMChannel>()) {
     // clone channel
-    FMChannel *clone = new FMChannel(*(channel->as<FMChannel>()));
+    FMChannel *clone = channel->clone()->as<FMChannel>();
     // open editor
     FMChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
@@ -110,7 +110,7 @@ ChannelListView::onCloneChannel() {
     _config->channelList()->add(clone, row+1);
   } else if (channel->is<DMRChannel>()) {
     // clone channel
-    DMRChannel *clone = new DMRChannel(*(channel->as<DMRChannel>()));
+    DMRChannel *clone = channel->clone()->as<DMRChannel>();
     // open editor
     DMRChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {

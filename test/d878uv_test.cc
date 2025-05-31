@@ -208,14 +208,14 @@ D878UVTest::testKeyFunctions() {
   D878UVCodeplug codeplug;
   Codeplug::Flags flags; flags.updateCodePlug=false;
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   // Decode
   Config comp_config;
   if (! codeplug.decode(&comp_config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UVII: %1")
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -234,6 +234,107 @@ D878UVTest::testKeyFunctions() {
   QCOMPARE(ext->funcKeyBShort(), AnytoneKeySettingsExtension::KeyFunction::Voltage);
   QCOMPARE(ext->funcKeyBLong(), AnytoneKeySettingsExtension::KeyFunction::Call);
 }
+
+
+void
+D878UVTest::testFMAPRSSettings() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1\n")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check config
+  QCOMPARE(config.posSystems()->count(), 1);
+  QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
+
+  APRSSystem *aprs = config.posSystems()->get(0)->as<APRSSystem>();
+  QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
+  QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
+  QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
+  QCOMPARE(aprs->period(), 300);
+
+  // Encode
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
+    QFAIL(QString("Cannot prepare codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  if (! codeplug.encode(intermediate, flags, err)) {
+    delete intermediate;
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  delete intermediate;
+
+  // Decode
+  Config comp_config;
+  if (! codeplug.decode(&comp_config, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check config
+  QCOMPARE(comp_config.posSystems()->count(), 1);
+  QVERIFY(comp_config.posSystems()->get(0)->is<APRSSystem>());
+
+  APRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<APRSSystem>();
+  QCOMPARE(comp_aprs->source(), aprs->source()); QCOMPARE(comp_aprs->srcSSID(), aprs->srcSSID());
+  QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
+  QCOMPARE(comp_aprs->path(), aprs->path());
+  QCOMPARE(comp_aprs->period(), aprs->period());
+}
+
+
+
+void
+D878UVTest::testRegressionDefaultChannel() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  config.settings()->anytoneExtension()->bootSettings()->zoneA()->set(config.zones()->zone(0));
+  config.settings()->anytoneExtension()->bootSettings()->channelA()->set(config.zones()->zone(0)->A()->get(0));
+  config.settings()->anytoneExtension()->bootSettings()->zoneB()->set(config.zones()->zone(0));
+  config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(0)->A()->get(1));
+  config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
+
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.updateCodePlug=false;
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(decoded.settings()->anytoneExtension());
+  QVERIFY(decoded.settings()->anytoneExtension()->bootSettings()->defaultChannelEnabled());
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneA()->as<Zone>(),
+           decoded.zones()->zone(0));
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelA()->as<Channel>()->name(),
+           decoded.zones()->zone(0)->A()->get(0)->name());
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneB()->as<Zone>(),
+           decoded.zones()->zone(0));
+  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelB()->as<Channel>()->name(),
+           decoded.zones()->zone(0)->A()->get(1)->name());
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 

@@ -3,7 +3,7 @@
 #include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
-#include "commercial_extension.hh"
+#include "signaling.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
@@ -162,14 +162,14 @@ ConfigItem::copy(const ConfigItem &other) {
     }
 
     // true if the property is a basic type
-    bool isBasicType = ( prop.isEnumType() || (QVariant::Bool==prop.type()) ||
-                         (QVariant::Int==prop.type()) || (QVariant::UInt==prop.type()) ||
-                         (QVariant::Double==prop.type()) || (QVariant::String==prop.type()) ||
+    bool isBasicType = ( prop.isEnumType() || (QMetaType::Bool==prop.typeId()) ||
+                         (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
+                         (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
                          (QString("Frequency")==prop.typeName()) ||
                          (QString("Interval")==prop.typeName()) );
 
     // If a basic type -> simply copy value
-    if (isBasicType && prop.isWritable() && (prop.type()==oprop.type())) {
+    if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
       if (! prop.write(this, oprop.read(&other))) {
         logError() << "Cannot set property '" << prop.name() << "' of "
                    << this->metaObject()->className() << ".";
@@ -198,7 +198,7 @@ ConfigItem::copy(const ConfigItem &other) {
       if (prop.isWritable()) {
         // If the owned item is writeable -> clone if set in other
         if (oprop.read(&other).isNull()) {
-          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr))) {
+          if ((! prop.read(&other).isNull()) && (! prop.write(this, QVariant(prop.metaType())))) {
             logError() << "Cannot delete item '" << prop.name() << "' of "
                        << this->metaObject()->className() << ".";
             return false;
@@ -212,7 +212,7 @@ ConfigItem::copy(const ConfigItem &other) {
             return false;
           }
           // Write clone
-          if (! prop.write(this, QVariant::fromValue<ConfigItem*>(cl))) {
+          if (! prop.write(this, QVariant(prop.metaType(), &cl))) {
             logError() << "Cannot replace item '" << prop.name() << "' of "
                        << this->metaObject()->className() << ".";
             cl->deleteLater();
@@ -253,7 +253,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
 
     // Handle comparison of basic types
-    if ((prop.isEnumType()) || (QVariant::Bool == prop.type()) || (QVariant::Int == prop.type()) || (QVariant::UInt == prop.type())) {
+    if ((prop.isEnumType()) || (QMetaType::Bool == prop.typeId()) || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
       int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
       if (a<b)
         return -1;
@@ -262,7 +262,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QVariant::Double == prop.type()) {
+    if (QMetaType::Double == prop.typeId()) {
       double a=prop.read(this).toDouble(), b=oprop.read(&other).toDouble();
       if (a<b)
         return -1;
@@ -271,7 +271,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QVariant::String == prop.type()) {
+    if (QMetaType::QString == prop.typeId()) {
       int cmp = QString::compare(prop.read(this).toString(), oprop.read(&other).toString());
       if (cmp)
         return cmp;
@@ -380,9 +380,7 @@ ConfigItem::clear() {
     if (! prop.isValid())
       continue;
     if (propIsInstance<ConfigItem>(prop) && prop.isWritable()) {
-      if (ConfigItem *item = prop.read(this).value<ConfigItem*>())
-        item->deleteLater();
-      prop.write(this, QVariant::fromValue<ConfigItem*>(nullptr));
+      prop.write(this, QVariant(prop.metaType()));
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       lst->clear();
     }
@@ -431,6 +429,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).value<Frequency>();
     } else if (QString("Interval") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<Interval>();
+    } else if (QString("SelectiveCall") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
@@ -645,6 +645,20 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
+    } else if (QString("SelectiveCall") == prop.typeName()) {
+      // If property is not set -> skip
+      if ((! node[prop.name()]) || (node[prop.name()].IsNull())) {
+        prop.write(this, QVariant::fromValue(SelectiveCall()));
+        continue;
+      }
+      // parse & check type
+      if ((! node[prop.name()].IsMap()) || (1 != node[prop.name()].size())) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected selective call.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;
@@ -659,7 +673,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse '" << prop.name() << "' of '" << meta->className()
                     << "': Expected instance of '"
-                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+                    << QMetaType(prop.typeId()).metaObject()->className() << "'.";
         return false;
       }
       // Get object
@@ -699,7 +713,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className()
                     << ": Expected instance of '"
-                    << QMetaType::metaObjectForType(prop.userType())->className() << "'.";
+                    << QMetaType(prop.typeId()).metaObject()->className() << "'.";
         return false;
       }
       // Get list
@@ -1306,12 +1320,15 @@ AbstractConfigObjectList::moveDown(int first, int last) {
   return true;
 }
 
+
 bool
 AbstractConfigObjectList::move(int source, int count, int destination) {
   if ((0 == count) || (source == destination))
     return true;
+
   if ((source+count)>_items.size())
     return false;
+
   if (source > destination) {
     // move up
     for (int take=source, put=destination, i=0; i<count; i++, take++, put++)
@@ -1321,8 +1338,13 @@ AbstractConfigObjectList::move(int source, int count, int destination) {
     for (int i=0; i<count; i++)
       _items.insert(destination-1, _items.takeAt(source));
   }
+
+  for (int i=0; i<count; i++)
+    emit elementModified(destination+i);
+
   return true;
 }
+
 
 const QList<QMetaObject> &
 AbstractConfigObjectList::elementTypes() const {
@@ -1341,7 +1363,7 @@ AbstractConfigObjectList::classNames() const {
 void
 AbstractConfigObjectList::onElementModified(ConfigItem *obj) {
   int idx = indexOf(obj->as<ConfigObject>());
-  if (0 >= idx)
+  if (0 <= idx)
     emit elementModified(idx);
 }
 

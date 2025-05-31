@@ -59,16 +59,12 @@ bool encode_dtmf_bin(const QString &number, uint8_t *num, int size=16, uint8_t f
 QString decode_dtmf_bcd_be(const uint8_t *num, int digits);
 bool encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill);
 
-/** Decodes the CTCSS tone or DCS code to @c Signaling::Code. */
-Signaling::Code decode_ctcss_tone_table(uint16_t data);
-/** Encodes the CTCSS tone or DCS code from @c Signaling::Code. */
-uint16_t encode_ctcss_tone_table(Signaling::Code code);
-/** Interprets the given number as octal and returns the decimal representation.
- * @param oct The octal number between 0-7777.*/
-uint16_t oct_to_dec(uint16_t oct);
-/** Returns the given number as octal value.
- * @param dec The decimal number between 0-4095*/
-uint16_t dec_to_oct(uint16_t dec);
+/** Decodes the CTCSS tone or DCS code to @c Signaling::Code.
+ * @todo TyT specific, move to TyT codeplug. */
+SelectiveCall decode_ctcss_tone_table(uint16_t data);
+/** Encodes the CTCSS tone or DCS code from @c Signaling::Code.
+ * @todo TyT specific, move to TyT codeplug. */
+uint16_t encode_ctcss_tone_table(const SelectiveCall &code);
 
 /** Validates a DMR ID number. */
 bool validDMRNumber(const QString &text);
@@ -94,6 +90,6 @@ uint32_t align_size(uint32_t size, uint32_t block);
 uint32_t align_addr(uint32_t addr, uint32_t block);
 
 QGeoCoordinate loc2deg(const QString &loc);
-QString deg2loc(const QGeoCoordinate &coor);
+QString deg2loc(const QGeoCoordinate &coor, unsigned int size=6);
 
 #endif // UTILS_HH

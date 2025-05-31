@@ -44,6 +44,12 @@ RadioSettings::clear() {
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
+  defaultIdRef()->clear();
+
+  // delete extensions
+  setTyTExtension(nullptr);
+  setRadioddityExtension(nullptr);
+  setAnytoneExtension(nullptr);
 }
 
 const QString &
@@ -158,10 +164,12 @@ RadioSettings::setDefaultId(DMRRadioID *id) {
   _defaultId->set(id);
 }
 
+
 TyTSettingsExtension *
 RadioSettings::tytExtension() const {
   return _tytExtension;
 }
+
 void
 RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
   if (_tytExtension) {
@@ -176,10 +184,12 @@ RadioSettings::setTyTExtension(TyTSettingsExtension *ext) {
   emit modified(this);
 }
 
+
 RadiodditySettingsExtension *
 RadioSettings::radioddityExtension() const {
   return _radioddityExtension;
 }
+
 void
 RadioSettings::setRadioddityExtension(RadiodditySettingsExtension *ext) {
   if (_radioddityExtension) {
@@ -194,10 +204,12 @@ RadioSettings::setRadioddityExtension(RadiodditySettingsExtension *ext) {
   emit modified(this);
 }
 
+
 AnytoneSettingsExtension *
 RadioSettings::anytoneExtension() const {
   return _anytoneExtension;
 }
+
 void
 RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
   if (_anytoneExtension) {
@@ -211,6 +223,7 @@ RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
   }
   emit modified(this);
 }
+
 
 void
 RadioSettings::onExtensionModified() {

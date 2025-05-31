@@ -11,7 +11,7 @@
 
 #include "codeplug.hh"
 #include "configmergevisitor.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeaterbooksource.hh"
 
 
 class Settings : public QSettings
@@ -35,8 +35,17 @@ public:
   bool disableAutoDetect() const;
   void setDisableAutoDetect(bool disable);
 
-  RepeaterBookList::Region repeaterBookRegion() const;
-  void setRepeaterBookRegion(RepeaterBookList::Region region);
+  bool repeaterBookSourceEnabled() const;
+  void enableRepeaterBookSource(bool enable);
+  bool repeaterMapSourceEnabled() const;
+  void enableRepeaterMapSource(bool enable);
+  bool hearhamSourceEnabled() const;
+  void enableHearhamSource(bool enable);
+  bool radioIdRepeaterSourceEnabled() const;
+  void enableRadioIdRepeaterSource(bool enable);
+
+  RepeaterBookSource::Region repeaterBookRegion() const;
+  void setRepeaterBookRegion(RepeaterBookSource::Region region);
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);

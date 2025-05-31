@@ -15,56 +15,6 @@
 #include <QSet>
 
 /* ******************************************************************************************** *
- * Implementation of D868UVCodeplug::CTCSS
- * ******************************************************************************************** */
-Signaling::Code
-D868UVCodeplug::CTCSS::_codeTable[] = {
-  Signaling::SIGNALING_NONE, // 62.5 not supported
-  Signaling::CTCSS_67_0Hz,  Signaling::SIGNALING_NONE, // 69.3 not supported
-  Signaling::CTCSS_71_9Hz,  Signaling::CTCSS_74_4Hz,  Signaling::CTCSS_77_0Hz,  Signaling::CTCSS_79_7Hz,  Signaling::CTCSS_82_5Hz,
-  Signaling::CTCSS_85_4Hz,  Signaling::CTCSS_88_5Hz,  Signaling::CTCSS_91_5Hz,  Signaling::CTCSS_94_8Hz,  Signaling::CTCSS_97_4Hz,  Signaling::CTCSS_100_0Hz,
-  Signaling::CTCSS_103_5Hz, Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz, Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz,
-  Signaling::CTCSS_127_3Hz, Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz, Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz,
-  Signaling::CTCSS_156_7Hz,
-  Signaling::SIGNALING_NONE, // 159.8 not supported
-  Signaling::CTCSS_162_2Hz,
-  Signaling::SIGNALING_NONE, // 165.5 not supported
-  Signaling::CTCSS_167_9Hz,
-  Signaling::SIGNALING_NONE, // 171.3 not supported
-  Signaling::CTCSS_173_8Hz,
-  Signaling::SIGNALING_NONE, // 177.3 not supported
-  Signaling::CTCSS_179_9Hz,
-  Signaling::SIGNALING_NONE, // 183.5 not supported
-  Signaling::CTCSS_186_2Hz,
-  Signaling::SIGNALING_NONE, // 189.9 not supported
-  Signaling::CTCSS_192_8Hz,
-  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, // 196.6 & 199.5 not supported
-  Signaling::CTCSS_203_5Hz,
-  Signaling::SIGNALING_NONE, // 206.5 not supported
-  Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz, Signaling::CTCSS_225_7Hz,
-  Signaling::SIGNALING_NONE, // 229.1 not supported
-  Signaling::CTCSS_233_6Hz, Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz,
-  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE // 254.1 and custom CTCSS not supported.
-};
-
-uint8_t
-D868UVCodeplug::CTCSS::encode(Signaling::Code code) {
-  for (uint8_t i=0; i<52; i++) {
-    if (code == _codeTable[i])
-      return i;
-  }
-  return 0;
-}
-
-Signaling::Code
-D868UVCodeplug::CTCSS::decode(uint8_t num) {
-  if (num >= 52)
-    return Signaling::SIGNALING_NONE;
-  return _codeTable[num];
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D868UVCodeplug::Color
  * ******************************************************************************************** */
 AnytoneDisplaySettingsExtension::Color
@@ -2158,10 +2108,10 @@ D868UVCodeplug::allocateSMSMessages() {
 bool
 D868UVCodeplug::encodeSMSMessages(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (unsigned int i=0; i<ctx.count<SMSTemplate>(); i++) {
-    unsigned int addr =
-        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
-        + i*MessageElement::size();
+  unsigned int num_sms_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
+  for (unsigned int i=0; i<num_sms_messages; i++) {
+    unsigned int bank = i/Limit::numMessagePerBank(), msg_idx = i % Limit::numMessagePerBank();
+    unsigned int addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks() + msg_idx*MessageElement::size();
     MessageElement message(data(addr));
     message.setMessage(ctx.get<SMSTemplate>(i)->message());
     MessageListElement listElement(data(Offset::messageIndex() + i*Size::messageIndex()));
@@ -2181,9 +2131,8 @@ D868UVCodeplug::createSMSMessages(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::numMessages(); i++) {
     if (! messages_bytemap.isEncoded(i))
       continue;
-    unsigned int addr =
-        Offset::messageBanks() + (i/Limit::numMessagePerBank())*Offset::betweenMessageBanks()
-        + i*MessageElement::size();
+    unsigned int bank = i/Limit::numMessagePerBank(), msg_idx = i % Limit::numMessagePerBank();
+    unsigned int addr = Offset::messageBanks() + bank*Offset::betweenMessageBanks() + msg_idx*MessageElement::size();
     MessageElement message(data(addr));
     SMSTemplate *temp = new SMSTemplate();
     temp->setName(QString("SMS %1").arg(i+1));

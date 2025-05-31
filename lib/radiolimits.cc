@@ -1,15 +1,13 @@
 #include "radiolimits.hh"
 #include "configobject.hh"
-#include "logger.hh"
 #include "config.hh"
 #include <QMetaProperty>
 #include <QRegularExpression>
-#include <ctype.h>
 
 // Utility function to check string content for ASCII encoding
 inline bool qstring_is_ascii(const QString &text) {
   foreach (QChar c, text) {
-    if ((c<0x1f) && (0x7f != c))
+    if ((c.unicode() < 0x1f) && (0x7f != c.unicode()))
       return false;
   }
   return true;
@@ -17,7 +15,7 @@ inline bool qstring_is_ascii(const QString &text) {
 
 // Utility function to check string content for DTMF encoding
 inline bool qstring_is_dtmf(const QString &text) {
-  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).isValid();
+  return QRegularExpression("^[0-9A-Da-d*#]*$").match(text).hasMatch();
 }
 
 
@@ -154,7 +152,7 @@ RadioLimitIgnored::RadioLimitIgnored(RadioLimitIssue::Severity notify, QObject *
 
 bool
 RadioLimitIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  ConfigObject *obj = prop.read(item).value<ConfigObject *>();
+  auto obj = prop.read(item).value<const ConfigObject *>();
   if (nullptr != obj)
     return verifyObject(obj, context);
 
@@ -193,7 +191,7 @@ RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, QObject
 
 bool
 RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
@@ -228,23 +226,24 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 /* ********************************************************************************************* *
  * Implementation of RadioLimitStringRegEx
  * ********************************************************************************************* */
-RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, QObject *parent)
-  : RadioLimitValue(parent), _pattern(pattern)
+RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(parent), _severity(severity), _pattern(pattern)
 {
   // pass...
 }
 
 bool
 RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected string.";
     return false;
   }
 
   QString value = prop.read(item).toString();
-  if (! _pattern.exactMatch(value)) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+  auto match = _pattern.match(value);
+  if (! match.hasMatch()) {
+    auto &msg = context.newMessage(_severity);
     msg << "Value '" << value << "' of property " << prop.name()
         << " does not match pattern '" << _pattern.pattern() << "'.";
   }
@@ -264,7 +263,7 @@ RadioLimitStringIgnored::RadioLimitStringIgnored(RadioLimitIssue::Severity sever
 
 bool
 RadioLimitStringIgnored::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::String != prop.type()) {
+  if (QMetaType::QString != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
     msg = tr("Expected value of '%1' to be string.").arg(prop.name());
     return true;
@@ -293,7 +292,7 @@ bool
 RadioLimitBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   Q_UNUSED(item)
 
-  if (QVariant::Bool != prop.type()) {
+  if (QMetaType::Bool != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected bool.";
     return false;
@@ -314,7 +313,7 @@ RadioLimitIgnoredBool::RadioLimitIgnoredBool(RadioLimitIssue::Severity notify, Q
 
 bool
 RadioLimitIgnoredBool::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::Bool != prop.type()) {
+  if (QMetaType::Bool != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected bool.";
     return false;
@@ -341,7 +340,7 @@ RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, qint64 defValue
 
 bool
 RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
-  if (QVariant::UInt != prop.type()) {
+  if (QMetaType::UInt != prop.typeId()) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "Cannot check property " << prop.name() << ": Expected uint.";
     return false;
@@ -748,7 +747,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   // Check counts
   foreach (QString className, _elements.keys()) {
     if ((0 <= _minCount[className]) && (counts[className]<_minCount[className])) {
-      auto &msg = context.newMessage(RadioLimitIssue::Warning);
+      auto &msg = context.newMessage(RadioLimitIssue::Critical);
       msg << "The number of elements of type '" << className << "' " << counts[className]
              << " is less than the required count " << _minCount[className] << ".";
     }
@@ -799,7 +798,7 @@ RadioLimitRefList::verify(const ConfigItem *item, const QMetaProperty &prop, Rad
 
   const ConfigObjectRefList *plist = prop.read(item).value<ConfigObjectRefList*>();
   if ((0 <= _minSize) && (_minSize > plist->count())) {
-    auto &msg = context.newMessage(RadioLimitIssue::Warning);
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
     msg << "List '" << prop.name() << "' requires at least " << _minSize
         << " elements, " << plist->count() << " elements found.";
     return false;
@@ -921,16 +920,21 @@ RadioLimitSingleZone::verifyItem(const ConfigItem *item, RadioLimitContext &cont
  * Implementation of RadioLimits
  * ********************************************************************************************* */
 RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
-  : RadioLimitItem(parent), _betaWarning(betaWarning)
+  : RadioLimitItem(parent), _betaWarning(betaWarning),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
 
 RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
-  : RadioLimitItem(list, parent)
+  : RadioLimitItem(list, parent),
+    _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
+    _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
   // pass...
 }
+
 
 bool
 RadioLimits::hasCallSignDB() const {
@@ -946,6 +950,23 @@ unsigned
 RadioLimits::numCallSignDBEntries() const {
   return _numCallSignDBEntries;
 }
+
+
+bool
+RadioLimits::hasSatelliteConfig() const {
+  return _hasSatelliteConfig;
+}
+
+bool
+RadioLimits::satelliteConfigImplemented() const {
+  return _satelliteConfigImplemented;
+}
+
+unsigned
+RadioLimits::numSatellites() const {
+  return _numSatellites;
+}
+
 
 bool
 RadioLimits::verifyConfig(const Config *config, RadioLimitContext &context) const {

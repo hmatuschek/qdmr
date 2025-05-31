@@ -607,7 +607,7 @@ DFUFile::Image::write(QFile &file, CRC32 &crc, QString &errorMessage) const {
   prefix.is_named = qToLittleEndian(uint32_t(_name.isEmpty() ? 0 : 1));
   memset(prefix.name, 0, 255);
   if (! _name.isEmpty())
-    memcpy(prefix.name, _name.toLocal8Bit().constData(), std::min(255, _name.size()));
+    memcpy(prefix.name, _name.toLocal8Bit().constData(), std::min(qsizetype(255), _name.size()));
   prefix.size = qToLittleEndian(uint32_t(size()-sizeof(image_prefix_t)));
   prefix.n_elements = qToLittleEndian(uint32_t(_elements.size()));
 

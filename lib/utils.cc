@@ -1,5 +1,5 @@
 #include "utils.hh"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QVector>
 #include <QHash>
 #include <cmath>
@@ -283,10 +283,10 @@ encode_dtmf_bcd_be(const QString &number, uint8_t *num, int size, uint8_t fill) 
   return true;
 }
 
-Signaling::Code
+SelectiveCall
 decode_ctcss_tone_table(uint16_t data) {
   if (data == 0xffff)
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
 
   unsigned tag = data >> 14;
   unsigned a = (data >> 12) & 3;
@@ -297,48 +297,43 @@ decode_ctcss_tone_table(uint16_t data) {
   switch (tag) {
   case 2:
     // DCS Normal
-    return Signaling::fromDCSNumber(100*b+10*c+1*d, false);
+    return SelectiveCall(100*b+10*c+1*d, false);
   case 3:
     // DCS Inverted
-    return Signaling::fromDCSNumber(100*b+10*c+1*d, true);
+    return SelectiveCall(100*b+10*c+1*d, true);
   default:
     break;
   }
 
   // CTCSS
-  return Signaling::fromCTCSSFrequency(100.0*a+10.0*b+1.0*c+0.1*d);
+  return SelectiveCall(100.0*a+10.0*b+1.0*c+0.1*d);
 }
 
 
 uint16_t
-encode_ctcss_tone_table(Signaling::Code code)
+encode_ctcss_tone_table(const SelectiveCall &code)
 {
   unsigned tag=0xff, a=0xf, b=0xf, c=0xf, d=0xf;
 
   // Disabled
-  if (Signaling::SIGNALING_NONE == code)
+  if (code.isInvalid())
     return 0xffff;
 
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     // CTCSS tone
     tag = 0;
-    unsigned val = Signaling::toCTCSSFrequency(code) * 10.0 + 0.5;
+    unsigned val = code.Hz() * 10.0 + 0.5;
     a = val / 1000;
     b = (val / 100) % 10;
     c = (val / 10) % 10;
     d = val % 10;
-  } else if (Signaling::isDCSNormal(code)) {
+  } else if (code.isDCS()) {
     // DCS normal
-    tag = 2;
-    unsigned val = Signaling::toDCSNumber(code);
-    a = 0;
-    b = (val / 100) % 10;
-    c = (val / 10) % 10;
-    d = val % 10;
-  } else if (Signaling::isDCSInverted(code)) {
-    // DCS inverted
-    tag = 3;
-    unsigned val = Signaling::toDCSNumber(code);
+    if (code.isInverted())
+      tag = 3;
+    else
+      tag = 2;
+    unsigned val = code.octalCode();
     a = 0;
     b = (val / 100) % 10;
     c = (val / 10) % 10;
@@ -349,34 +344,14 @@ encode_ctcss_tone_table(Signaling::Code code)
 }
 
 
-uint16_t oct_to_dec(uint16_t oct) {
-  uint16_t a = oct % 10; oct /= 10;
-  uint16_t b = oct % 10; oct /= 10;
-  uint16_t c = oct % 10; oct /= 10;
-  uint16_t d = oct % 10; oct /= 10;
-  if ((a>7) || (b>7) || (c>6) || (d>7) || (oct>0))
-    return 0;
-  return (((d*8+c)*8 + b)*8 + a);
-}
-
-uint16_t dec_to_oct(uint16_t dec) {
-  uint16_t a = dec % 8; dec /= 8;
-  uint16_t b = dec % 8; dec /= 8;
-  uint16_t c = dec % 8; dec /= 8;
-  uint16_t d = dec % 8; dec /= 8;
-  if (dec>0)
-    return 0;
-  return (((d*10+c)*10 + b)*10 + a);
-}
-
 bool
 validDMRNumber(const QString &text) {
-  return QRegExp("^[0-9]+$").exactMatch(text);
+  return QRegularExpression("^[0-9]+$").match(text).hasMatch();
 }
 
 bool
 validDTMFNumber(const QString &text) {
-  return QRegExp("^[0-9a-dA-D\\*#]+$").exactMatch(text);
+  return QRegularExpression("^[0-9a-dA-D\\*#]+$").match(text).hasMatch();
 }
 
 QString
@@ -451,8 +426,8 @@ levDist(const QString &source, const QString &target, Qt::CaseSensitivity cs) {
     return 0;
   }
 
-  const int sourceCount = source.count();
-  const int targetCount = target.count();
+  const int sourceCount = source.size();
+  const int targetCount = target.size();
 
   if (source.isEmpty())
     return targetCount;
@@ -503,56 +478,120 @@ align_addr(uint32_t addr, uint32_t block) {
 
 QGeoCoordinate
 loc2deg(const QString &loc) {
-  double lon = 0, lat = 0;
+  double lon = 0, lat = 0, dlon = 20, dlat = 10;
   if (2 > loc.size())
     return QGeoCoordinate();
-
   QChar l = loc[0].toUpper();
   QChar c = loc[1].toUpper();
-  lon += double(int(l.toLatin1())-'A')*20;
-  lat += double(int(c.toLatin1())-'A')*10;
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
 
   if (4 > loc.size()) {
     lon = lon - 180;
     lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
   }
 
+  dlon /= 10; dlat /= 10;
   l = loc[2].toUpper();
   c = loc[3].toUpper();
-  lon += double(int(l.toLatin1())-'0')*2;
-  lat += double(int(c.toLatin1())-'0')*1;
+  lon += double(int(l.toLatin1())-'0')*dlon;
+  lat += double(int(c.toLatin1())-'0')*dlat;
 
   if (6 > loc.size()){
     lon = lon - 180;
     lat = lat - 90;
-    return QGeoCoordinate(lat, lon);
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
   }
 
+  dlon /= 24; dlat /= 24;
   l = loc[4].toUpper();
   c = loc[5].toUpper();
-  lon += double(int(l.toLatin1())-'A')/12;
-  lat += double(int(c.toLatin1())-'A')/24;
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
+
+  if (8 > loc.size()) {
+    lon = lon - 180;
+    lat = lat - 90;
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
+  }
+
+  dlon /= 10; dlat /= 10;
+  l = loc[6].toUpper();
+  c = loc[7].toUpper();
+  lon += double(int(l.toLatin1())-'0')*dlon;
+  lat += double(int(c.toLatin1())-'0')*dlat;
+
+  if (10 > loc.size()) {
+    lon = lon - 180;
+    lat = lat - 90;
+    // Offset places coordinate in the middle of the square
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
+  }
+
+  dlon /= 24; dlat /= 24;
+  l = loc[8].toUpper();
+  c = loc[9].toUpper();
+  lon += double(int(l.toLatin1())-'A')*dlon;
+  lat += double(int(c.toLatin1())-'A')*dlat;
 
   lon = lon - 180;
   lat = lat - 90;
-  return QGeoCoordinate(lat, lon);
+  // Offset places coordinate in the middle of the square
+  return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
 }
 
+
 QString
-deg2loc(const QGeoCoordinate &coor) {
+deg2loc(const QGeoCoordinate &coor, unsigned int size) {
   QString loc;
-  double lon = coor.longitude()+180;
-  double lat = coor.latitude()+90;
-  char l = char(lon/20); lon -= 20*double(l);
-  char c = char(lat/10); lat -= 10*double(c);
-  loc.append(l+'A'); loc.append(c+'A');
-  l = char(lon/2); lon -= 2*double(l);
-  c = char(lat/1); lat -= 1*double(c);
-  loc.append(l+'0'); loc.append(c+'0');
-  l = char(lon*12); lon -= double(l)/12;
-  c = char(lat*24); lat -= double(c)/24;
-  loc.append(l+'a'); loc.append(c+'a');
+  double lon = (coor.longitude()+180)/360;
+  double lat = (coor.latitude()+90)/180;
+
+  size += (size % 2);
+  if (2 > size)
+    return loc;
+
+  lon *= 18; lat *= 18;
+  char l = lon; lon -= l;
+  char c = lat; lat -= c;
+  loc.append(QChar::fromLatin1(l+'A')); loc.append(QChar::fromLatin1(c+'A'));
+
+  if (4 > size)
+    return loc;
+
+  lon *= 10; lat *= 10;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
+  loc.append(QChar::fromLatin1(l+'0')); loc.append(QChar::fromLatin1(c+'0'));
+
+  if (6 > size)
+    return loc;
+
+  lon *= 24; lat *= 24;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
+  loc.append(QChar::fromLatin1(l+'a')); loc.append(QChar::fromLatin1(c+'a'));
+
+  if (8 > size)
+    return loc;
+
+  lon *= 10; lat *= 10;
+  l = lon; lon -= l;
+  c = lat; lat -= c;
+  loc.append(QChar::fromLatin1(l+'0')); loc.append(QChar::fromLatin1(c+'0'));
+
+  if (10 > size)
+    return loc;
+
+  lon *= 24; lat *= 24;
+  l = lon; //lon -= l;
+  c = lat; //lat -= c;
+  loc.append(QChar::fromLatin1(l+'a')); loc.append(QChar::fromLatin1(c+'a'));
+
   return loc;
 }
 

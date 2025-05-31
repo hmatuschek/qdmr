@@ -127,12 +127,14 @@ ObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop
     return Visitor::processProperty(item, prop, err);
 
   foreach (const QMetaObject &meta, _filter) {
-    ConfigItem *propItem = prop.read(item).value<ConfigItem*>();
+    ConfigItem *propItem = prop.read(item).value<ConfigItem *>();
     const char *classname = meta.className();
     if (propItem->inherits(classname)) {
-      prop.write(item, QVariant::fromValue<ConfigItem *>(nullptr));
-      delete propItem;
-      return true;
+      if (prop.write(item, QVariant(prop.metaType())))
+        return true;
+      errMsg(err) << "Cannot delete instance of " << meta.className()
+                  << " from property " << prop.name() << ".";
+      return false;
     }
   }
 

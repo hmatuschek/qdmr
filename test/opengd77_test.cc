@@ -4,6 +4,7 @@
 #include "errorstack.hh"
 #include <iostream>
 #include <QTest>
+#include <QtEndian>
 #include <iostream>
 #include "logger.hh"
 
@@ -13,6 +14,7 @@ OpenGD77Test::OpenGD77Test(QObject *parent)
 {
   Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
 }
+
 
 void
 OpenGD77Test::testBasicConfigEncoding() {
@@ -25,38 +27,54 @@ OpenGD77Test::testBasicConfigEncoding() {
   }
 }
 
+
+bool
+OpenGD77Test::encodeDecode(Config &config, Config &decoded, const ErrorStack &err) {
+  OpenGD77Codeplug codeplug;
+  codeplug.clear();
+
+  Config *intermediate = codeplug.preprocess(&config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot encode codeplug for OpenGD77.";
+    return false;
+  }
+
+  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
+    errMsg(err) << "Cannot encode codeplug for OpenGD77.";
+    return false;
+  }
+  delete intermediate;
+
+  if (! codeplug.decode(&decoded, err)) {
+    errMsg(err) << "Cannot decode codeplug for OpenGD77.";
+    return false;
+  }
+
+  if (! codeplug.postprocess(&decoded, err)) {
+    errMsg(err) << "Cannot decode codeplug for OpenGD77.";
+    return false;
+  }
+
+  return true;
+}
+
+
 void
 OpenGD77Test::testBasicConfigDecoding() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
-  codeplug.clear();
-  if (! codeplug.encode(&_basicConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-
-  Config config;
-  if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for OpenGD77: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
+  Config decoded;
+  if (! encodeDecode(_basicConfig, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
 }
+
 
 void
 OpenGD77Test::testChannelFrequency() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
-  codeplug.clear();
-  if (! codeplug.encode(&_channelFrequencyConfig, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for OpenGD77: {}")
-          .arg(err.format()).toStdString().c_str());
-  }
-
   Config config;
-  if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for Radioddity RD5R: {}")
-          .arg(err.format()).toStdString().c_str());
-  }
+
+  if (! encodeDecode(_channelFrequencyConfig, config, err))
+    QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(config.channelList()->channel(0)->rxFrequency(),
            Frequency::fromHz(123456780ULL));
@@ -64,34 +82,177 @@ OpenGD77Test::testChannelFrequency() {
            Frequency::fromHz(999999990ULL));
 }
 
+
 void
-OpenGD77Test::testSMSTemplates() {
-  Config config;
-  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
-  SMSTemplate *sms0 = new SMSTemplate(); sms0->setName("SMS0"); sms0->setMessage("ABC");
-  SMSTemplate *sms1 = new SMSTemplate(); sms1->setName("SMS1"); sms1->setMessage("XYZ");
-  config.smsExtension()->smsTemplates()->add(sms0);
-  config.smsExtension()->smsTemplates()->add(sms1);
-
+OpenGD77Test::testChannelGroupList() {
   ErrorStack err;
-  OpenGD77Codeplug codeplug;
-  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
-    QFAIL(QString("Cannot encode codeplug for OpenGD77: %1")
-          .arg(err.format()).toStdString().c_str());
+
+  Config config, decoded;
+  if (! config.readYAML(":/data/config_test.yaml", err))
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+
+  config.channelList()->channel(0)->as<DMRChannel>()->setGroupListObj(nullptr);
+  config.channelList()->channel(0)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(1)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(2)->as<DMRChannel>()->setGroupListObj(nullptr);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(1)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(decoded.channelList()->channel(2)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(! decoded.channelList()->channel(2)->as<DMRChannel>()->contact()->isNull());
+
+  QVERIFY(! decoded.channelList()->channel(3)->as<DMRChannel>()->groupList()->isNull());
+  QVERIFY(decoded.channelList()->channel(3)->as<DMRChannel>()->contact()->isNull());
+}
+
+
+void
+OpenGD77Test::testChannelPowerSettings() {
+  ErrorStack err;
+
+  Config config, decoded;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
   }
 
-  Config decoded;
-  if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for OpenGD77: %1")
-          .arg(err.format()).toStdString().c_str());
+  config.channelList()->channel(0)->setDefaultPower();
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), true);
+
+  config.channelList()->channel(0)->setPower(Channel::Power::Low);
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
+  QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::Low);
+
+  config.channelList()->channel(0)->setPower(Channel::Power::High);
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->defaultPower(), false);
+  QCOMPARE(decoded.channelList()->channel(0)->power(), Channel::Power::High);
+}
+
+
+void
+OpenGD77Test::testOverrideChannelRadioId() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
   }
 
-  // For now, messages are not encoded
-  QCOMPARE(decoded.smsExtension()->smsTemplates()->count(), 2);
-  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(0)->name(), "SMS0");
-  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(0)->message(), "ABC");
-  //QCOMPARE_NE(decoded.smsExtension()->smsTemplates()->message(1)->name(), "SMS1");
-  QCOMPARE(decoded.smsExtension()->smsTemplates()->message(1)->message(), "XYZ");
+  // add another DMR ID and assign it to two channels
+  auto id2 = new DMRRadioID("Test", 1234567);
+  config.radioIDs()->add(id2);
+  config.channelList()->channel(0)->as<DMRChannel>()->setRadioIdObj(id2);
+  config.channelList()->channel(1)->as<DMRChannel>()->setRadioIdObj(id2);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.radioIDs()->count(), 2);
+  QVERIFY(! decoded.channelList()->channel(0)->as<DMRChannel>()->radioId()->isNull());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->radioId()->isNull());
+  QCOMPARE(decoded.channelList()->channel(1)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+}
+
+
+void
+OpenGD77Test::testChannelSubTones() {
+  ErrorStack err;
+  Config config, decoded;
+
+  char enc[] = {0x00, 0x10};
+  uint16_t dec = *(quint16 *)enc;
+  SelectiveCall decTone = OpenGD77BaseCodeplug::decodeSelectiveCall(
+        qFromLittleEndian(dec));
+  QVERIFY(decTone.isValid());
+  QVERIFY(decTone.isCTCSS());
+  QCOMPARE(decTone.Hz(), 100.0);
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  config.channelList()->channel(0)->as<FMChannel>()->setTXTone(SelectiveCall(67.0));
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(123.0));
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  SelectiveCall txTone = decoded.channelList()->channel(0)->as<FMChannel>()->txTone(),
+      rxTone = decoded.channelList()->channel(0)->as<FMChannel>()->rxTone();
+
+  QVERIFY(txTone.isValid());
+  QVERIFY(txTone.isCTCSS());
+  QCOMPARE(txTone.Hz(), 67.0);
+
+  QVERIFY(rxTone.isValid());
+  QVERIFY(rxTone.isCTCSS());
+  QCOMPARE(rxTone.Hz(), 123.0);
+}
+
+
+void
+OpenGD77Test::testChannelFixedLocation() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  auto ext = new OpenGD77ChannelExtension();
+  ext->setLocator("JO62jl24");
+  config.channelList()->channel(0)->setOpenGD77ChannelExtension(ext);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.channelList()->channel(0)->openGD77ChannelExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO62jl24");
+
+  ext->setLocator("JO59gw73");
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  QCOMPARE(decoded.channelList()->channel(0)->openGD77ChannelExtension()->locator(), "JO59gw73");
+}
+
+
+void
+OpenGD77Test::testAPRSSourceCall() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.posSystems()->count(), 1);
+  auto sys = decoded.posSystems()->aprsSystem(0);
+  QCOMPARE(sys->source(), "DM3MAT");
+
+  // OpenGD77 cannot encode revert channel
+  QVERIFY(decoded.posSystems()->aprsSystem(0)->revert()->isNull());
 }
 
 

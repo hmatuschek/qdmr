@@ -13,6 +13,7 @@
 #include "radio.hh"
 #include "anytone_interface.hh"
 #include "anytone_codeplug.hh"
+#include "anytone_satelliteconfig.hh"
 
 /** Implements an interface to Anytone radios.
  *
@@ -49,13 +50,18 @@ public:
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());
+
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   bool startUpload(Config *config, bool blocking=false,
                    const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack());
+
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Selection &selection=CallsignDB::Selection(), const ErrorStack &err=ErrorStack());
+
+  bool startUploadSatelliteConfig(
+      SatelliteDatabase *db, bool blocking=false, const ErrorStack &err=ErrorStack());
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
@@ -69,6 +75,9 @@ private:
   /** Uploads the encoded callsign database to the radio.
    * This method block until the upload is complete. */
   virtual bool uploadCallsigns();
+  /** Uploads the encoded satellite config to the radio.
+   * This method block until the upload is complete. */
+  virtual bool uploadSatellites();
 
 protected:
   /** The device identifier. */
@@ -86,6 +95,8 @@ protected:
   AnytoneCodeplug *_codeplug;
   /** The actual binary callsign database representation. */
   CallsignDB *_callsigns;
+  /** The actual binary callsign database representation. */
+  AnytoneSatelliteConfig *_satellites;
 };
 
 #endif // __D868UV_HH__

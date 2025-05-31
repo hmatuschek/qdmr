@@ -66,28 +66,87 @@
        <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
-          <string>Repeater Book</string>
+          <string>Repeater Info Sources</string>
          </property>
          <layout class="QFormLayout" name="formLayout_5">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_14">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>Region</string>
+             <string notr="true">repeaterbook.com</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="repeaterBookRegion">
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <property name="text">
-              <string>World</string>
-             </property>
+             <widget class="QCheckBox" name="repeaterBookEnable">
+              <property name="text">
+               <string>enable</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <property name="text">
-              <string>North America</string>
-             </property>
+             <widget class="QComboBox" name="repeaterBookRegion">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <item>
+               <property name="text">
+                <string>World</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>North America</string>
+               </property>
+              </item>
+             </widget>
             </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string notr="true">repeatermap.de</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="repeaterMapEnable">
+            <property name="text">
+             <string>enable</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string notr="true">hearham.com</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="hearhamEnable">
+            <property name="text">
+             <string>enable</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string notr="true">radioid.net</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QCheckBox" name="radioIdEnable">
+            <property name="text">
+             <string>enable</string>
+            </property>
            </widget>
           </item>
          </layout>

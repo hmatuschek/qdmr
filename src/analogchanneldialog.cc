@@ -1,10 +1,11 @@
 #include "analogchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
-#include "ctcssbox.hh"
 #include "utils.hh"
 #include "settings.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeatercompleter.hh"
+#include "repeaterdatabase.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of AnalogChannelDialog
@@ -38,7 +39,7 @@ FMChannelDialog::construct() {
   Application *app = qobject_cast<Application *>(qApp);
   FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new RepeaterBookCompleter(2, app->repeater(), this);
+  QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
@@ -65,8 +66,10 @@ FMChannelDialog::construct() {
   txAdmit->setItemData(1, unsigned(FMChannel::Admit::Free));
   txAdmit->setItemData(2, unsigned(FMChannel::Admit::Tone));
   squelchDefault->setChecked(true); squelchValue->setValue(1); squelchValue->setEnabled(false);
-  populateCTCSSBox(rxTone, (nullptr != _myChannel ? _myChannel->rxTone() : Signaling::SIGNALING_NONE));
-  populateCTCSSBox(txTone, (nullptr != _myChannel ? _myChannel->txTone() : Signaling::SIGNALING_NONE));
+  if (_myChannel) {
+    rxTone->setSelectiveCall(_myChannel->rxTone());
+    txTone->setSelectiveCall(_myChannel->txTone());
+  }
   bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
   aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
@@ -151,8 +154,8 @@ FMChannelDialog::channel()
     _myChannel->setSquelchDefault();
   else
     _myChannel->setSquelch(squelchValue->value());
-  _myChannel->setRXTone(Signaling::Code(rxTone->currentData().toUInt()));
-  _myChannel->setTXTone(Signaling::Code(txTone->currentData().toUInt()));
+  _myChannel->setRXTone(rxTone->selectiveCall());
+  _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
@@ -169,6 +172,7 @@ FMChannelDialog::channel()
     _channel->copy(*_myChannel);
     channel = _channel;
   }
+
   return channel;
 }
 
@@ -180,16 +184,12 @@ FMChannelDialog::onRepeaterSelected(const QModelIndex &index) {
         channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
         channelName->completer()->model())->mapToSource(src);
-  double rx = app->repeater()->repeater(src.row())->rxFrequency();
-  double tx = app->repeater()->repeater(src.row())->txFrequency();
-  int idx = rxTone->findData(app->repeater()->repeater(src.row())->rxTone());
-  if (0 <= idx)
-    rxTone->setCurrentIndex(idx);
-  idx = txTone->findData(app->repeater()->repeater(src.row())->txTone());
-  if (0 <= idx)
-    txTone->setCurrentIndex(idx);
-  txFrequency->setText(QString::number(tx, 'f'));
-  rxFrequency->setText(QString::number(rx, 'f'));
+  Frequency rx = app->repeater()->get(src.row()).rxFrequency();
+  Frequency tx = app->repeater()->get(src.row()).txFrequency();
+  rxTone->setSelectiveCall(app->repeater()->get(src.row()).rxTone());
+  txTone->setSelectiveCall(app->repeater()->get(src.row()).txTone());
+  txFrequency->setText(tx.format());
+  rxFrequency->setText(rx.format());
 }
 
 void

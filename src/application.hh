@@ -2,18 +2,18 @@
 #define APPLICATION_HH
 
 #include <QApplication>
-#include <QGroupBox>
 #include <QIcon>
 #include "config.hh"
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
 #include "radio.hh"
 
-class QMainWindow;
+class MainWindow;
 class QTranslator;
-class RepeaterBookList;
+class RepeaterDatabase;
 class UserDatabase;
 class TalkGroupDatabase;
+class SatelliteDatabase;
 class RadioIDListView;
 class GeneralSettingsView;
 class ContactListView;
@@ -26,6 +26,8 @@ class RoamingChannelListView;
 class RoamingZoneListView;
 class ExtensionView;
 
+
+
 class Application : public QApplication
 {
   Q_OBJECT
@@ -34,11 +36,14 @@ public:
   Application(int &argc, char *argv[]);
   virtual ~Application();
 
-  QMainWindow *mainWindow();
+  MainWindow *mainWindow();
+
+  bool isModified() const;
 
   UserDatabase *user() const;
-  RepeaterBookList *repeater() const;
+  RepeaterDatabase *repeater() const;
   TalkGroupDatabase *talkgroup() const;
+  SatelliteDatabase *satellite() const;
 
   bool hasPosition() const;
   QGeoCoordinate position() const;
@@ -54,7 +59,6 @@ public slots:
   void saveCodeplug();
   void exportCodeplugToChirp();
   void importCodeplug();
-  void quitApplication();
 
   void detectRadio();
   bool verifyCodeplug(Radio *radio=nullptr, bool showSuccess=true);
@@ -62,14 +66,15 @@ public slots:
   void downloadCodeplug();
   void uploadCodeplug();
   void uploadCallsignDB();
+  void uploadSatellites();
 
   void showSettings();
   void showAbout();
   void showHelp();
 
-private slots:
-  QMainWindow *createMainWindow();
+  void editSatellites();
 
+private slots:
   void onCodeplugDownloadError(Radio *radio);
   void onCodeplugDownloaded(Radio *radio, Codeplug *codeplug);
 
@@ -84,24 +89,13 @@ private slots:
 
 protected:
   Config *_config;
-  QMainWindow *_mainWindow;
+  MainWindow *_mainWindow;
   QTranslator *_translator;
 
-  GeneralSettingsView *_generalSettings;
-  RadioIDListView *_radioIdTab;
-  ContactListView *_contactList;
-  GroupListsView *_groupLists;
-  ChannelListView *_channelList;
-  ZoneListView *_zoneList;
-  ScanListsView *_scanLists;
-  PositioningSystemListView *_posSysList;
-  RoamingChannelListView *_roamingChannelList;
-  RoamingZoneListView *_roamingZoneList;
-  ExtensionView *_extensionView;
-
-  RepeaterBookList *_repeater;
+  RepeaterDatabase *_repeater;
   UserDatabase *_users;
   TalkGroupDatabase *_talkgroups;
+  SatelliteDatabase *_satellites;
 
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;

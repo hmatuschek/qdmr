@@ -30,6 +30,7 @@
 #define RADIOLIMITS_HH
 
 #include <QObject>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QMetaType>
 #include <QSet>
@@ -217,14 +218,19 @@ class RadioLimitStringRegEx: public RadioLimitValue
 public:
   /** Constructor.
    * @param pattern Specifies the regular expression pattern, the string must match.
+   * @param severity Specifies the severity of the issue.
    * @param parent Specifies the QObject parent. */
-  RadioLimitStringRegEx(const QString &pattern, QObject *parent=nullptr);
+  RadioLimitStringRegEx(const QString &pattern,
+                        RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                        QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
+  /** Holds the severity of the issue. */
+  RadioLimitIssue::Severity _severity;
   /** Holds the regular expression pattern. */
-  QRegExp _pattern;
+  QRegularExpression _pattern;
 };
 
 
@@ -700,6 +706,13 @@ public:
   /** Returns the maximum number of entries in the call-sign DB. */
   unsigned numCallSignDBEntries() const;
 
+  /** Returns @c true if the radio supports satellite config. */
+  bool hasSatelliteConfig() const;
+  /** Returns @c true if satellite config is implemented. */
+  bool satelliteConfigImplemented() const;
+  /** Returns the maximum number of satellites. */
+  unsigned numSatellites() const;
+
 protected:
   /** If @c true, a warning is issued that the radio is still under development and not well
    * tested yet. */
@@ -710,6 +723,12 @@ protected:
   bool _callSignDBImplemented;
   /** Holds the number of possible call-sign DB entries. */
   unsigned _numCallSignDBEntries;
+  /** If @c true, the radio supports satellite config. */
+  bool _hasSatelliteConfig;
+  /** If @c true, satellite config is implemented. */
+  bool _satelliteConfigImplemented;
+  /** Holds the number of possible satellites. */
+  unsigned _numSatellites;
 };
 
 #endif // RADIOLIMITS_HH

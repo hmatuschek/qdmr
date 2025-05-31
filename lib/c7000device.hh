@@ -32,11 +32,17 @@ public:
     /** Returns @c true, if the packet is valid. */
     bool isValid() const;
 
+    /** Returns the flags field. */
     uint8_t flags() const;
+    /** Returns the command field. */
     uint8_t command() const;
+    /** Returns the sub-command field. */
     uint8_t subcommand() const;
+    /** Returns the payload size. */
     uint16_t payloadSize() const;
+    /** Returns the payload field. */
     QByteArray payload() const;
+    /** Returns the encoded packet. */
     const QByteArray &encoded() const;
 
   protected:

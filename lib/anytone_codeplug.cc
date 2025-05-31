@@ -10,55 +10,48 @@
 
 #define CUSTOM_CTCSS_TONE 0x33
 
-Signaling::Code
-_anytone_ctcss_num2code[52] = {
-  Signaling::SIGNALING_NONE, // 62.5 not supported
-  Signaling::CTCSS_67_0Hz,  Signaling::SIGNALING_NONE, // 69.3 not supported
-  Signaling::CTCSS_71_9Hz,  Signaling::CTCSS_74_4Hz,  Signaling::CTCSS_77_0Hz,  Signaling::CTCSS_79_7Hz,  Signaling::CTCSS_82_5Hz,
-  Signaling::CTCSS_85_4Hz,  Signaling::CTCSS_88_5Hz,  Signaling::CTCSS_91_5Hz,  Signaling::CTCSS_94_8Hz,  Signaling::CTCSS_97_4Hz,  Signaling::CTCSS_100_0Hz,
-  Signaling::CTCSS_103_5Hz, Signaling::CTCSS_107_2Hz, Signaling::CTCSS_110_9Hz, Signaling::CTCSS_114_8Hz, Signaling::CTCSS_118_8Hz, Signaling::CTCSS_123_0Hz,
-  Signaling::CTCSS_127_3Hz, Signaling::CTCSS_131_8Hz, Signaling::CTCSS_136_5Hz, Signaling::CTCSS_141_3Hz, Signaling::CTCSS_146_2Hz, Signaling::CTCSS_151_4Hz,
-  Signaling::CTCSS_156_7Hz,
-  Signaling::SIGNALING_NONE, // 159.8 not supported
-  Signaling::CTCSS_162_2Hz,
-  Signaling::SIGNALING_NONE, // 165.5 not supported
-  Signaling::CTCSS_167_9Hz,
-  Signaling::SIGNALING_NONE, // 171.3 not supported
-  Signaling::CTCSS_173_8Hz,
-  Signaling::SIGNALING_NONE, // 177.3 not supported
-  Signaling::CTCSS_179_9Hz,
-  Signaling::SIGNALING_NONE, // 183.5 not supported
-  Signaling::CTCSS_186_2Hz,
-  Signaling::SIGNALING_NONE, // 189.9 not supported
-  Signaling::CTCSS_192_8Hz,
-  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE, // 196.6 & 199.5 not supported
-  Signaling::CTCSS_203_5Hz,
-  Signaling::SIGNALING_NONE, // 206.5 not supported
-  Signaling::CTCSS_210_7Hz, Signaling::CTCSS_218_1Hz, Signaling::CTCSS_225_7Hz,
-  Signaling::SIGNALING_NONE, // 229.1 not supported
-  Signaling::CTCSS_233_6Hz, Signaling::CTCSS_241_8Hz, Signaling::CTCSS_250_3Hz,
-  Signaling::SIGNALING_NONE, Signaling::SIGNALING_NONE // 254.1 and custom CTCSS not supported.
+
+QVector<char> _anytone_bin_dtmf_tab = {
+  '0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'
 };
 
-inline uint8_t
-ctcss_code2num(Signaling::Code code) {
+
+/* ******************************************************************************************** *
+ * Implementation of AnytoneCodeplug::CTCSS
+ * ******************************************************************************************** */
+SelectiveCall
+AnytoneCodeplug::CTCSS::_codeTable[] = {
+  SelectiveCall(62.5),  SelectiveCall(67.0),  SelectiveCall(69.3),  SelectiveCall(71.9),
+  SelectiveCall(74.4),  SelectiveCall(77.0),  SelectiveCall(79.7),  SelectiveCall(82.5),
+  SelectiveCall(85.4),  SelectiveCall(88.5),  SelectiveCall(91.5),  SelectiveCall(94.8),
+  SelectiveCall(97.4), SelectiveCall(100.0), SelectiveCall(103.5), SelectiveCall(107.2),
+ SelectiveCall(110.9), SelectiveCall(114.8), SelectiveCall(118.8), SelectiveCall(123.0),
+ SelectiveCall(127.3), SelectiveCall(131.8), SelectiveCall(136.5), SelectiveCall(141.3),
+ SelectiveCall(146.2), SelectiveCall(151.4), SelectiveCall(156.7), SelectiveCall(159.8),
+ SelectiveCall(162.2), SelectiveCall(165.5), SelectiveCall(167.9), SelectiveCall(171.3),
+ SelectiveCall(173.8), SelectiveCall(177.3), SelectiveCall(179.9), SelectiveCall(183.5),
+ SelectiveCall(186.2), SelectiveCall(189.9), SelectiveCall(192.8), SelectiveCall(196.6),
+ SelectiveCall(199.5), SelectiveCall(203.5), SelectiveCall(206.5), SelectiveCall(210.7),
+ SelectiveCall(218.1), SelectiveCall(225.7), SelectiveCall(229.1), SelectiveCall(233.6),
+ SelectiveCall(241.8), SelectiveCall(250.3), SelectiveCall(254.1), SelectiveCall()
+};
+
+uint8_t
+AnytoneCodeplug::CTCSS::encode(const SelectiveCall &code) {
   for (uint8_t i=0; i<52; i++) {
-    if (code == _anytone_ctcss_num2code[i])
+    if (code == _codeTable[i])
       return i;
   }
   return 0;
 }
 
-inline Signaling::Code
-ctcss_num2code(uint8_t num) {
+SelectiveCall
+AnytoneCodeplug::CTCSS::decode(uint8_t num) {
   if (num >= 52)
-    return Signaling::SIGNALING_NONE;
-  return _anytone_ctcss_num2code[num];
+    return SelectiveCall();
+  return _codeTable[num];
 }
 
-QVector<char> _anytone_bin_dtmf_tab = {
-  '0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'
-};
 
 
 /* ********************************************************************************************* *
@@ -199,8 +192,8 @@ AnytoneCodeplug::ChannelElement::clear() {
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
   setBandwidth(FMChannel::Bandwidth::Narrow);
-  setRXTone(Signaling::SIGNALING_NONE);
-  setTXTone(Signaling::SIGNALING_NONE);
+  setRXTone(SelectiveCall());
+  setTXTone(SelectiveCall());
   setBit(0x0008, 5, false); // Unused set to 0
 }
 
@@ -313,24 +306,24 @@ AnytoneCodeplug::ChannelElement::setRXSignalingMode(SignalingMode mode) {
   setUInt2(0x0009, 0, (unsigned)mode);
 }
 
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::rxTone() const {
   if (SignalingMode::None == rxSignalingMode())
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   else if (SignalingMode::CTCSS == rxSignalingMode())
     return rxCTCSS();
   else if (SignalingMode::DCS == rxSignalingMode())
     return rxDCS();
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
-AnytoneCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
+AnytoneCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
+  if (code.isInvalid()) {
     setRXSignalingMode(SignalingMode::None);
-  } else if (Signaling::isCTCSS(code)) {
+  } else if (code.isCTCSS()) {
     setRXSignalingMode(SignalingMode::CTCSS);
     setRXCTCSS(code);
-  } else if (Signaling::isDCSInverted(code) || Signaling::isDCSNormal(code)) {
+  } else if (code.isDCS()) {
     setRXSignalingMode(SignalingMode::DCS);
     setRXDCS(code);
   }
@@ -345,24 +338,24 @@ AnytoneCodeplug::ChannelElement::setTXSignalingMode(SignalingMode mode) {
   setUInt2(0x0009, 2, (unsigned)mode);
 }
 
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::txTone() const {
   if (SignalingMode::None == txSignalingMode())
-    return Signaling::SIGNALING_NONE;
+    return SelectiveCall();
   else if (SignalingMode::CTCSS == txSignalingMode())
     return txCTCSS();
   else if (SignalingMode::DCS == txSignalingMode())
     return txDCS();
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
-AnytoneCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
-  if (Signaling::SIGNALING_NONE == code) {
+AnytoneCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
+  if (code.isInvalid()) {
     setTXSignalingMode(SignalingMode::None);
-  } else if (Signaling::isCTCSS(code)) {
+  } else if (code.isCTCSS()) {
     setTXSignalingMode(SignalingMode::CTCSS);
     setTXCTCSS(code);
-  } else if (Signaling::isDCSInverted(code) || Signaling::isDCSNormal(code)) {
+  } else if (code.isDCS()) {
     setTXSignalingMode(SignalingMode::DCS);
     setTXDCS(code);
   }
@@ -405,13 +398,13 @@ bool
 AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
   return CUSTOM_CTCSS_TONE == getUInt8(0x000a);
 }
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::txCTCSS() const {
-  return ctcss_num2code(getUInt8(0x000a));
+  return CTCSS::decode(getUInt8(0x000a));
 }
 void
-AnytoneCodeplug::ChannelElement::setTXCTCSS(Signaling::Code tone) {
-  setUInt8(0x000a, ctcss_code2num(tone));
+AnytoneCodeplug::ChannelElement::setTXCTCSS(const SelectiveCall &tone) {
+  setUInt8(0x000a, CTCSS::encode(tone));
 }
 void
 AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
@@ -421,49 +414,45 @@ bool
 AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
   return CUSTOM_CTCSS_TONE == getUInt8(0x000b);
 }
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::rxCTCSS() const {
-  return ctcss_num2code(getUInt8(0x000b));
+  return CTCSS::decode(getUInt8(0x000b));
 }
 void
-AnytoneCodeplug::ChannelElement::setRXCTCSS(Signaling::Code tone) {
-  setUInt8(0x000b, ctcss_code2num(tone));
+AnytoneCodeplug::ChannelElement::setRXCTCSS(const SelectiveCall &tone) {
+  setUInt8(0x000b, CTCSS::encode(tone));
 }
 void
 AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
   setUInt8(0x000b, CUSTOM_CTCSS_TONE);
 }
 
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::txDCS() const {
   uint16_t code = getUInt16_le(0x000c);
   if (512 > code)
-    return Signaling::fromDCSNumber(dec_to_oct(code), false);
-  return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
+    return SelectiveCall::fromBinaryDCS(code, false);
+  return SelectiveCall::fromBinaryDCS(code-512, true);
 }
 void
-AnytoneCodeplug::ChannelElement::setTXDCS(Signaling::Code code) {
-  if (Signaling::isDCSNormal(code))
-    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code)));
-  else if (Signaling::isDCSInverted(code))
-    setUInt16_le(0x000c, oct_to_dec(Signaling::toDCSNumber(code))+512);
+AnytoneCodeplug::ChannelElement::setTXDCS(const SelectiveCall &code) {
+  if (code.isDCS())
+    setUInt16_le(0x000c, code.binCode() + (code.isInverted() ? 512 : 0));
   else
     setUInt16_le(0x000c, 0);
 }
 
-Signaling::Code
+SelectiveCall
 AnytoneCodeplug::ChannelElement::rxDCS() const {
   uint16_t code = getUInt16_le(0x000e);
   if (512 > code)
-    return Signaling::fromDCSNumber(dec_to_oct(code), false);
-  return Signaling::fromDCSNumber(dec_to_oct(code-512), true);
+    return SelectiveCall::fromBinaryDCS(code, false);
+  return SelectiveCall::fromBinaryDCS(code-512, true);
 }
 void
-AnytoneCodeplug::ChannelElement::setRXDCS(Signaling::Code code) {
-  if (Signaling::isDCSNormal(code))
-    setUInt16_le(0x000e, oct_to_dec(Signaling::toDCSNumber(code)));
-  else if (Signaling::isDCSInverted(code))
-    setUInt16_le(0x000e, oct_to_dec(Signaling::toDCSNumber(code))+512);
+AnytoneCodeplug::ChannelElement::setRXDCS(const SelectiveCall &code) {
+  if (code.isDCS())
+    setUInt16_le(0x000e, code.binCode() + (code.isInverted() ? 512 : 0));
   else
     setUInt16_le(0x000e, 0);
 }
@@ -852,7 +841,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // squelch mode
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
-    if (Signaling::SIGNALING_NONE != ac->rxTone())
+    if (ac->rxTone().isValid())
       setSquelchMode(AnytoneFMChannelExtension::SquelchMode::SubTone);
     else
       setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
@@ -1760,8 +1749,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
              ext->bootSettings()->channelA()->as<Channel>())))
         setDefaultChannelAToVFO();
       else
-        setDefaultChannelAIndex(
-              ctx.index(ext->bootSettings()->channelA()->as<Channel>()));
+        setDefaultChannelAIndex(ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
+                                  ext->bootSettings()->channelA()->as<Channel>()));
 
       setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
       if (ext->bootSettings()->channelB()->isNull() ||
@@ -1769,7 +1758,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
              ext->bootSettings()->channelB()->as<Channel>())))
         setDefaultChannelBToVFO();
       else
-        setDefaultChannelBIndex(ctx.index(ext->bootSettings()->channelB()->as<Channel>()));
+        setDefaultChannelBIndex(ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
+                                  ext->bootSettings()->channelB()->as<Channel>()));
     }
 
     // Encode key settings
@@ -1965,15 +1955,18 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     }
-    ext->bootSettings()->zoneA()->set(ctx.get<Zone>(this->defaultZoneIndexA()));
+
+    Zone *zoneA = ctx.get<Zone>(this->defaultZoneIndexA());
+    ext->bootSettings()->zoneA()->set(zoneA);
     if (this->defaultChannelAIsVFO()) {
       // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelAIndex())) {
+    } else if (this->defaultChannelAIndex() >= (unsigned int)zoneA->A()->count()) {
       errMsg(err) << "Cannot link default channel A. Index " << this->defaultChannelAIndex()
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelA()->set(ctx.get<Channel>(this->defaultChannelAIndex()));
+      ext->bootSettings()->channelA()->set(
+            zoneA->A()->get(this->defaultChannelAIndex())->as<Channel>());
     }
 
     if (! ctx.has<Zone>(this->defaultZoneIndexB())) {
@@ -1981,15 +1974,17 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     }
-    ext->bootSettings()->zoneB()->set(ctx.get<Zone>(this->defaultZoneIndexB()));
+    Zone *zoneB = ctx.get<Zone>(this->defaultZoneIndexB());
+    ext->bootSettings()->zoneB()->set(zoneB);
     if (this->defaultChannelBIsVFO()) {
       // pass...
-    } else if (! ctx.has<Channel>(this->defaultChannelBIndex())) {
+    } else if (this->defaultChannelBIndex() >= (unsigned int)zoneB->A()->count()) {
       errMsg(err) << "Cannot link default channel B. Index " << this->defaultChannelBIndex()
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelB()->set(ctx.get<Channel>(this->defaultChannelBIndex()));
+      ext->bootSettings()->channelB()->set(
+            zoneB->A()->get(this->defaultChannelBIndex())->as<Channel>());
     }
   }
 
@@ -2230,7 +2225,7 @@ AnytoneCodeplug::BootSettingsElement::password() const {
 void
 AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
   QRegularExpression pattern("[0-9]{0,8}");
-  if (pattern.match(txt).isValid())
+  if (pattern.match(txt).hasMatch())
     writeASCII(0x0020, txt, 8, 0x00);
 }
 
@@ -4076,7 +4071,7 @@ AnytoneCodeplug::DTMFSettingsElement::id() const {
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setID(const QString &id) {
-  int len = std::min(3, id.length());
+  int len = std::min((qsizetype)3, id.length());
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0006+i, id.mid(i,1).toUInt(&ok, 16));
@@ -4137,7 +4132,7 @@ AnytoneCodeplug::DTMFSettingsElement::botID() const {
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setBOTID(const QString &id) {
-  int len = std::min(16, id.length());
+  int len = std::min(qsizetype(16), id.length());
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0010+i, id.mid(i,1).toUInt(&ok, 16));
@@ -4153,7 +4148,7 @@ AnytoneCodeplug::DTMFSettingsElement::eotID() const {
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setEOTID(const QString &id) {
-  int len = std::min(16, id.length());
+  int len = std::min(qsizetype(16), id.length());
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0020+i, id.mid(i,1).toUInt(&ok, 16));
@@ -4169,7 +4164,7 @@ AnytoneCodeplug::DTMFSettingsElement::remoteKillID() const {
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setRemoteKillID(const QString &id) {
-  int len = std::min(16, id.length());
+  int len = std::min(qsizetype(16), id.length());
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0030+i, id.mid(i,1).toUInt(&ok, 16));
@@ -4186,7 +4181,7 @@ AnytoneCodeplug::DTMFSettingsElement::remoteStunID() const {
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
-  int len = std::min(16, id.length());
+  int len = std::min(qsizetype(16), id.length());
   bool ok;
   for (int i=0; i<len; i++)
     setUInt8(0x0040+i, id.mid(i,1).toUInt(&ok, 16));

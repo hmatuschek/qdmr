@@ -1,0 +1,49 @@
+app-id: de.darc.dm3mat.qdmr
+runtime: org.kde.Platform
+runtime-version: '6.8'
+sdk: org.kde.Sdk
+command: qdmr
+rename-desktop-file: qdmr.desktop
+rename-icon: qdmr
+finish-args:
+  - --device=all
+  - --share=network
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/aclocal
+  - /share/doc
+  - /share/man
+  - /man
+  - "*.a"
+  - "*.la"
+
+modules:
+  - name: yaml-cpp
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DBUILD_SHARED_LIBS=ON
+    sources:
+      - type: git
+        url: https://github.com/jbeder/yaml-cpp
+        commit: f7320141120f720aecc4c32be25586e7da9eb978 # tag 0.8.0
+
+  - name: libusb1
+    buildsystem: autotools
+    config-opts:
+      - --disable-static
+    sources:
+      - type: git
+        url: https://github.com/libusb/libusb.git
+        tag: v1.0.28
+        commit: a61afe5f75d969c4561a1d0ad753aa23cee6329a
+
+  - name: qdmr
+    buildsystem: cmake-ninja
+    sources:
+      - type: dir
+        path: .

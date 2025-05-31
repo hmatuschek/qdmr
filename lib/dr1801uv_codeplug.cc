@@ -353,60 +353,60 @@ DR1801UVCodeplug::ChannelElement::clearScanListIndex() {
   setUInt8(Offset::scanListIndex(), 0);
 }
 
-Signaling::Code
+SelectiveCall
 DR1801UVCodeplug::ChannelElement::rxTone() const {
   uint16_t ctcss_dcs = getUInt16_le(Offset::rxSubtoneCode());
   SubToneType type = (SubToneType)getUInt8(Offset::rxSubtoneType());
   DCSMode dcsMode = (DCSMode)getUInt8(Offset::rxDCSMode());
   switch (type) {
-  case SubToneType::None: return Signaling::SIGNALING_NONE;
-  case SubToneType::CTCSS: return Signaling::fromCTCSSFrequency(float(ctcss_dcs)/10);
-  case SubToneType::DCS: return Signaling::fromDCSNumber(ctcss_dcs, DCSMode::Inverted == dcsMode);
+  case SubToneType::None: return SelectiveCall();
+  case SubToneType::CTCSS: return SelectiveCall(float(ctcss_dcs)/10);
+  case SubToneType::DCS: return SelectiveCall(ctcss_dcs, DCSMode::Inverted == dcsMode);
   }
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
-DR1801UVCodeplug::ChannelElement::setRXTone(Signaling::Code code) {
+DR1801UVCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
   uint16_t ctcss_dcs = 0;
   SubToneType type = SubToneType::None;
   DCSMode dcsMode = DCSMode::Normal;
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     type = SubToneType::CTCSS;
-    ctcss_dcs = Signaling::toCTCSSFrequency(code)*10;
-  } else if (Signaling::isDCSNormal(code) || Signaling::isDCSInverted(code)) {
+    ctcss_dcs = code.Hz()*10;
+  } else if (code.isDCS()) {
     type = SubToneType::DCS;
-    ctcss_dcs = Signaling::toDCSNumber(code);
-    dcsMode = Signaling::isDCSInverted(code) ? DCSMode::Inverted : DCSMode::Normal;
+    ctcss_dcs = code.octalCode();
+    dcsMode = code.isInverted() ? DCSMode::Inverted : DCSMode::Normal;
   }
   setUInt16_le(Offset::rxSubtoneCode(), ctcss_dcs);
   setUInt8(Offset::rxSubtoneType(), (uint8_t)type);
   setUInt8(Offset::rxDCSMode(), (uint8_t)dcsMode);
 }
 
-Signaling::Code
+SelectiveCall
 DR1801UVCodeplug::ChannelElement::txTone() const {
   uint16_t ctcss_dcs = getUInt16_le(Offset::txSubtoneCode());
   SubToneType type = (SubToneType)getUInt8(Offset::txSubtoneType());
   DCSMode dcsMode = (DCSMode)getUInt8(Offset::txDCSMode());
   switch (type) {
-  case SubToneType::None: return Signaling::SIGNALING_NONE;
-  case SubToneType::CTCSS: return Signaling::fromCTCSSFrequency(float(ctcss_dcs)/10);
-  case SubToneType::DCS: return Signaling::fromDCSNumber(ctcss_dcs, DCSMode::Inverted == dcsMode);
+  case SubToneType::None: return SelectiveCall();
+  case SubToneType::CTCSS: return SelectiveCall(float(ctcss_dcs)/10);
+  case SubToneType::DCS: return SelectiveCall(ctcss_dcs, DCSMode::Inverted == dcsMode);
   }
-  return Signaling::SIGNALING_NONE;
+  return SelectiveCall();
 }
 void
-DR1801UVCodeplug::ChannelElement::setTXTone(Signaling::Code code) {
+DR1801UVCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
   uint16_t ctcss_dcs = 0;
   SubToneType type = SubToneType::None;
   DCSMode dcsMode = DCSMode::Normal;
-  if (Signaling::isCTCSS(code)) {
+  if (code.isCTCSS()) {
     type = SubToneType::CTCSS;
-    ctcss_dcs = Signaling::toCTCSSFrequency(code)*10;
-  } else if (Signaling::isDCSNormal(code) || Signaling::isDCSInverted(code)) {
+    ctcss_dcs = code.Hz()*10;
+  } else if (code.isDCS()) {
     type = SubToneType::DCS;
-    ctcss_dcs = Signaling::toDCSNumber(code);
-    dcsMode = Signaling::isDCSInverted(code) ? DCSMode::Inverted : DCSMode::Normal;
+    ctcss_dcs = code.octalCode();
+    dcsMode = code.isInverted() ? DCSMode::Inverted : DCSMode::Normal;
   }
   setUInt16_le(Offset::txSubtoneCode(), ctcss_dcs);
   setUInt8(Offset::txSubtoneType(), (uint8_t)type);
@@ -1145,7 +1145,7 @@ DR1801UVCodeplug::ZoneElement::name() const {
 }
 void
 DR1801UVCodeplug::ZoneElement::setName(const QString &name) {
-  uint8_t n = std::min(32, name.length());
+  uint8_t n = std::min(qsizetype(32), name.length());
   setUInt8(Offset::nameLength(), n);
   writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }

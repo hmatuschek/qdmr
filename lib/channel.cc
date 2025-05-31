@@ -1,22 +1,12 @@
 #include "channel.hh"
 #include "contact.hh"
-#include "ctcssbox.hh"
 #include "rxgrouplist.hh"
 #include "config.hh"
 #include "scanlist.hh"
 #include "logger.hh"
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QMessageBox>
-#include <QDialogButtonBox>
-#include <QDoubleValidator>
-#include <QIntValidator>
 #include <cmath>
 #include "utils.hh"
-#include "application.hh"
-#include <QCompleter>
+//#include "application.hh"
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 #include <QRegularExpression>
@@ -67,29 +57,33 @@ Channel::copy(const ConfigItem &other) {
 void
 Channel::clear() {
   ConfigObject::clear();
-  _rxFreq = Frequency::fromHz(0); _txFreq = Frequency::fromHz(0);
+
+  setRXFrequency(Frequency::fromHz(0));
+  setTXFrequency(Frequency::fromHz(0));
   setDefaultPower();
   setDefaultTimeout();
-  _rxOnly = false;
+  setRXOnly(false);
   setVOXDefault();
+
   _scanlist.clear();
-  if (_openGD77ChannelExtension)
-    _openGD77ChannelExtension->deleteLater();
-  _openGD77ChannelExtension = nullptr;
-  if (_tytChannelExtension)
-    _tytChannelExtension->deleteLater();
-  _tytChannelExtension = nullptr;
+
+  setOpenGD77ChannelExtension(nullptr);
+  setTyTChannelExtension(nullptr);
 }
+
 
 Frequency Channel::rxFrequency() const {
   return _rxFreq;
 }
+
 bool
 Channel::setRXFrequency(Frequency freq) {
   if (freq == _rxFreq)
     return true;
+
   _rxFreq = freq;
   emit modified(this);
+
   return true;
 }
 
@@ -97,60 +91,88 @@ Frequency
 Channel::txFrequency() const {
   return _txFreq;
 }
+
 bool
 Channel::setTXFrequency(Frequency freq) {
   if (freq == _txFreq)
     return true;
+
   _txFreq = freq;
   emit modified(this);
+
   return true;
 }
+
 
 bool
 Channel::defaultPower() const {
   return _defaultPower;
 }
+
 Channel::Power
 Channel::power() const {
   return _power;
 }
+
 void
 Channel::setPower(Power power) {
+  if ((power == _power) && (! _defaultPower))
+    return;
   _power = power;
   _defaultPower = false;
   emit modified(this);
 }
+
 void
 Channel::setDefaultPower() {
+  if (defaultPower())
+    return;
+
   _defaultPower = true;
+  emit modified(this);
 }
+
 
 bool
 Channel::defaultTimeout() const {
   return std::numeric_limits<unsigned>::max() == timeout();
 }
+
 bool
 Channel::timeoutDisabled() const {
   return 0 == timeout();
 }
+
 unsigned
 Channel::timeout() const {
   return _txTimeOut;
 }
+
 bool
 Channel::setTimeout(unsigned dur) {
+  if (dur == _txTimeOut)
+    return true;
+
   _txTimeOut = dur;
   emit modified(this);
+
   return true;
 }
+
 void
 Channel::setDefaultTimeout() {
+  if (defaultTimeout())
+    return;
+
   setTimeout(std::numeric_limits<unsigned>::max());
+  emit modified(this);
 }
+
 void
 Channel::disableTimeout() {
   setTimeout(0);
 }
+
 
 bool
 Channel::rxOnly() const {
@@ -368,17 +390,9 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
 FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
     _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
-    _rxTone(Signaling::SIGNALING_NONE), _txTone(Signaling::SIGNALING_NONE), _bw(Bandwidth::Narrow),
+    _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
     _aprsSystem(), _anytoneExtension(nullptr)
 {
-  // Link APRS system reference
-  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-FMChannel::FMChannel(const FMChannel &other, QObject *parent)
-  : AnalogChannel(parent), _aprsSystem(), _anytoneExtension(nullptr)
-{
-  copy(other);
   // Link APRS system reference
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -410,8 +424,8 @@ FMChannel::clear() {
   AnalogChannel::clear();
   setAdmit(Admit::Always);
   setSquelchDefault();
-  setRXTone(Signaling::SIGNALING_NONE);
-  setTXTone(Signaling::SIGNALING_NONE);
+  setRXTone(SelectiveCall());
+  setTXTone(SelectiveCall());
   setBandwidth(Bandwidth::Narrow);
   setAPRSSystem(nullptr);
   setAnytoneChannelExtension(nullptr);
@@ -454,23 +468,23 @@ FMChannel::setSquelchDefault() {
   setSquelch(std::numeric_limits<unsigned>::max());
 }
 
-Signaling::Code
+SelectiveCall
 FMChannel::rxTone() const {
   return _rxTone;
 }
 bool
-FMChannel::setRXTone(Signaling::Code code) {
+FMChannel::setRXTone(SelectiveCall code) {
   _rxTone = code;
   emit modified(this);
   return true;
 }
 
-Signaling::Code
+SelectiveCall
 FMChannel::txTone() const {
   return _txTone;
 }
 bool
-FMChannel::setTXTone(Signaling::Code code) {
+FMChannel::setTXTone(SelectiveCall code) {
   _txTone = code;
   emit modified(this);
   return true;
@@ -546,30 +560,6 @@ FMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &
   if (! AnalogChannel::populate(node, context, err))
     return false;
 
-  if (Signaling::SIGNALING_NONE != _rxTone) {
-    YAML::Node tone;
-    if (Signaling::isCTCSS(_rxTone))
-      tone["ctcss"] = Signaling::toCTCSSFrequency(_rxTone);
-    else if (Signaling::isDCSNormal(_rxTone))
-      tone["dcs"] = Signaling::toDCSNumber(_rxTone);
-    else if (Signaling::isDCSInverted(_rxTone))
-      tone["dcs"] = -Signaling::toDCSNumber(_rxTone);
-    tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["rxTone"] = tone;
-  }
-
-  if (Signaling::SIGNALING_NONE != _txTone) {
-    YAML::Node tone;
-    if (Signaling::isCTCSS(_txTone))
-      tone["ctcss"] = Signaling::toCTCSSFrequency(_txTone);
-    else if (Signaling::isDCSNormal(_txTone))
-      tone["dcs"] = Signaling::toDCSNumber(_txTone);
-    else if (Signaling::isDCSInverted(_txTone))
-      tone["dcs"] = -Signaling::toDCSNumber(_txTone);
-    tone.SetStyle(YAML::EmitterStyle::Flow);
-    node["txTone"] = tone;
-  }
-
   if (defaultSquelch()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["squelch"] = def;
@@ -592,28 +582,6 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   }
 
   YAML::Node ch = node.begin()->second;
-
-  setRXTone(Signaling::SIGNALING_NONE);
-  if (ch["rxTone"] && ch["rxTone"].IsMap()) {
-    if (ch["rxTone"]["ctcss"] && ch["rxTone"]["ctcss"].IsScalar()) {
-      setRXTone(Signaling::fromCTCSSFrequency(ch["rxTone"]["ctcss"].as<double>()));
-    } else if (ch["rxTone"]["dcs"] && ch["rxTone"]["dcs"].IsScalar()) {
-      int code = ch["rxTone"]["dcs"].as<int>();
-      bool inverted = (code < 0); code = std::abs(code);
-      setRXTone(Signaling::fromDCSNumber(code, inverted));
-    }
-  }
-
-  setTXTone(Signaling::SIGNALING_NONE);
-  if (ch["txTone"] && ch["txTone"].IsMap()) {
-    if (ch["txTone"]["ctcss"] && ch["txTone"]["ctcss"].IsScalar()) {
-      setTXTone(Signaling::fromCTCSSFrequency(ch["txTone"]["ctcss"].as<double>()));
-    } else if (ch["txTone"]["dcs"] && ch["txTone"]["dcs"].IsScalar()) {
-      int code = ch["txTone"]["dcs"].as<int>();
-      bool inverted = (code < 0); code = std::abs(code);
-      setTXTone(Signaling::fromDCSNumber(code, inverted));
-    }
-  }
 
   if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
     setSquelchDefault();
@@ -658,26 +626,6 @@ DMRChannel::DMRChannel(QObject *parent)
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
-
-  // Connect signals of references
-  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-DMRChannel::DMRChannel(const DMRChannel &other, QObject *parent)
-  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
-  _commercialExtension(nullptr), _anytoneExtension(nullptr)
-{
-  // Register default tags
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
-
-  copy(other);
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));

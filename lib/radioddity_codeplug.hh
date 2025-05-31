@@ -61,6 +61,9 @@ public:
     /** Destructor. */
     virtual ~ChannelElement();
 
+    /** The size of the channel. */
+    static constexpr unsigned int size() { return 0x0038; }
+
     /** Resets the channel. */
     virtual void clear();
 
@@ -105,13 +108,13 @@ public:
     virtual void setScanListIndex(unsigned index);
 
     /** Returns the RX subtone. */
-    virtual Signaling::Code rxTone() const;
+    virtual SelectiveCall rxTone() const;
     /** Sets the RX subtone. */
-    virtual void setRXTone(Signaling::Code code);
+    virtual void setRXTone(const SelectiveCall &code);
     /** Returns the TX subtone. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the TX subtone. */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns TX signaling index (+1). */
     virtual unsigned txSignalingIndex() const;
@@ -213,11 +216,55 @@ public:
     virtual void setPower(Channel::Power pwr);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx) const;
+    virtual Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+    virtual bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      /** The maximum length of the name. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the channel element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int rxFrequency() { return 0x0010; }
+      static constexpr unsigned int txFrequency() { return 0x0014; }
+      static constexpr unsigned int mode() { return 0x0018; }
+      static constexpr unsigned int txTimeout() { return 0x001b; }
+      static constexpr unsigned int txTimeoutRekeyDelay() { return 0x001c; }
+      static constexpr unsigned int admitCriterion() { return 0x001d; }
+      static constexpr unsigned int scanList() { return 0x001f; }
+      static constexpr unsigned int rxTone() { return 0x0020; }
+      static constexpr unsigned int txTone() { return 0x0022; }
+      static constexpr unsigned int txSignaling() { return 0x0025; }
+      static constexpr unsigned int rxSignaling() { return 0x0027; }
+      static constexpr unsigned int privacyGroup() { return 0x0029; }
+      static constexpr unsigned int txColorCode() { return 0x002a; }
+      static constexpr unsigned int groupList() { return 0x002b; }
+      static constexpr unsigned int rxColorCode() { return 0x002c; }
+      static constexpr unsigned int emergencySystem() { return 0x002d; }
+      static constexpr unsigned int transmitContact() { return 0x002e; }
+      static constexpr Bit dataCallConfirm() { return {0x0030, 7}; }
+      static constexpr Bit emergencyAlarmACK() { return {0x0030, 6}; }
+      static constexpr Bit privateCallConfirm() { return {0x0031, 0}; }
+      static constexpr Bit privacyEnabled() { return {0x0031, 4}; }
+      static constexpr Bit timeSlot() { return {0x0031, 6}; }
+      static constexpr Bit dualCapacityDirectMode() { return {0x0032, 0}; }
+      static constexpr Bit nonSTEFrequency() { return {0x0032, 5}; }
+      static constexpr Bit bandwidth() { return {0x0033, 1}; }
+      static constexpr Bit rxOnly() { return {0x0033, 2}; }
+      static constexpr Bit talkaround() { return {0x0033, 3}; }
+      static constexpr Bit vox() { return {0x0033, 6}; }
+      static constexpr Bit power() { return {0x0033, 7}; }
+      /// @endcond
+    };
   };
 
   /** Implements the base for channel banks in Radioddity codeplugs.
@@ -236,6 +283,9 @@ public:
     /** Destructor. */
     virtual ~ChannelBankElement();
 
+    /** The size of the channel bank. */
+    static constexpr unsigned int size() { return 0x1c10; }
+
     /** Clears the bank. */
     void clear();
 
@@ -245,6 +295,24 @@ public:
     virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
+    /** Retunrs the n-th channel. */
+    ChannelElement channel(unsigned int n);
+
+  public:
+    /** Some limits for the channel bank. */
+    struct Limit {
+      /** The maximum number of channels. */
+      static constexpr unsigned int channelCount() { return 128; }
+    };
+
+  protected:
+    /** Some internal offset within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmask() { return 0x0000; }
+      static constexpr unsigned int channels() { return 0x0010; }
+      /// @endcond
+    };
   };
 
   /** VFO Channel representation within the binary codeplug.
@@ -301,6 +369,15 @@ public:
     virtual void setTXOffset(double f);
     /** Sets the transmit frequency offset mode. */
     virtual void setOffsetMode(OffsetMode mode);
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public ChannelElement::Offset {
+      static constexpr Bit stepSize()                         { return {0x0036, 4} ; }
+      static constexpr Bit offsetMode()                       { return {0x0036, 2} ; }
+      static constexpr unsigned int txOffset()                { return 0x0034; }
+    };
+    /// @endcond
   };
 
 
@@ -319,6 +396,9 @@ public:
     explicit ContactElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ContactElement();
+
+    /** The size of the contact element. */
+    static constexpr unsigned int size() { return 0x0018; }
 
     /** Resets the contact. */
     void clear();
@@ -351,10 +431,32 @@ public:
     virtual void setRingStyle(unsigned style);
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DMRContact *toContactObj(Context &ctx) const;
+    virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DMRContact *obj, Context &ctx);
+    virtual bool fromContactObj(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the contact. */
+    struct Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** Number of possible ring-styles [0,10]. */
+      static constexpr unsigned int ringStyle() { return 10; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int number() { return 0x0010; }
+      static constexpr unsigned int type() { return 0x0014; }
+      static constexpr unsigned int ring() { return 0x0015; }
+      static constexpr unsigned int ringStyle() { return 0x0016; }
+      /// @endcond
+    };
   };
+
 
   /** Implements a base DTMF (analog) contact for Radioddity codeplugs.
    *
@@ -373,6 +475,9 @@ public:
     /** Destructor. */
     virtual ~DTMFContactElement();
 
+    /** The size of the contact element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Resets the contact. */
     void clear();
     /** Returns @c true if the contact is valid. */
@@ -389,9 +494,27 @@ public:
     virtual void setNumber(const QString &number);
 
     /** Constructs a @c DTMFContact instance from this codeplug contact. */
-    virtual DTMFContact *toContactObj(Context &ctx) const;
+    virtual DTMFContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DTMFContact. */
-    virtual void fromContactObj(const DTMFContact *obj, Context &ctx);
+    virtual bool fromContactObj(const DTMFContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit {
+      /** The maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** The maximum number length. */
+      static constexpr unsigned int numberLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name() { return 0x0000; }
+      static constexpr unsigned int number() { return 0x0010; }
+      /// @endcond
+    };
   };
 
   /** Represents a zone within Radioddity codeplugs.
@@ -409,6 +532,9 @@ public:
     /** Constructor. */
     explicit ZoneElement(uint8_t *ptr);
     virtual ~ZoneElement();
+
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the zone. */
     void clear();
@@ -431,14 +557,34 @@ public:
     virtual void clearMember(unsigned n);
 
     /** Constructs a generic @c Zone object from this codeplug zone. */
-    virtual Zone *toZoneObj(Context &ctx) const;
+    virtual Zone *toZoneObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed @c Zone object to the rest of the configuration. That is
      * linking to the referred channels. */
-    virtual bool linkZoneObj(Zone *zone, Context &ctx) const;
+    virtual bool linkZoneObj(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
-    virtual void fromZoneObjA(const Zone *zone, Context &ctx);
+    virtual bool fromZoneObjA(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
     /** Resets this codeplug zone representation from the given generic @c Zone object. */
-    virtual void fromZoneObjB(const Zone *zone, Context &ctx);
+    virtual bool fromZoneObjB(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for zone elements. */
+    struct Limit {
+      /** The maximum length of the zone name. */
+      static constexpr unsigned int nameLength() { return 16; }
+      /** The maximum number of members. */
+      static constexpr unsigned int memberCount() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()  { return 0x0000; }
+      static constexpr unsigned int channels() { return 0x0010; }
+      static constexpr unsigned int betweenChannels() { return 0x0002; }
+      /// @endcond
+    };
+
   };
 
   /** Implements the base class for all zone banks of Radioddity codeplugs.
@@ -458,6 +604,9 @@ public:
     /** Destructor. */
     ~ZoneBankElement();
 
+    /** The size of the zone element. */
+    static constexpr unsigned int size() { return 0x2f00; }
+
     /** Resets the bank. */
     void clear();
 
@@ -465,8 +614,27 @@ public:
     virtual bool isEnabled(unsigned idx) const ;
     /** Enable/disable a channel in the bank. */
     virtual void enable(unsigned idx, bool enabled);
+
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
+    /** Retunrs the n-th zone. */
+    ZoneElement zone(unsigned int n);
+
+  public:
+    /** Some limits for the zone bank. */
+    struct Limit {
+      /** The maximum number of zones in this bank. */
+      static constexpr unsigned int zoneCount() { return 250; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bitmap() { return 0x0000; }
+      static constexpr unsigned int zones()  { return 0x0020; }
+      /// @endcond
+    };
   };
 
   /** Represents a base class for all group lists within Radioddity codeplugs.
@@ -486,7 +654,7 @@ public:
     /** Destructor. */
     virtual ~GroupListElement();
 
-    /** Size of the element. */
+    /** Size of the group list element. */
     static constexpr unsigned int size() { return 0x0030; }
 
     /** Resets the group list. */
@@ -508,23 +676,21 @@ public:
     virtual void clearMember(unsigned n);
 
     /** Constructs a @c RXGroupList object from the codeplug representation. */
-    virtual RXGroupList *toRXGroupListObj(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual RXGroupList *toRXGroupListObj(Context &ctx, const ErrorStack &err = ErrorStack());
     /** Links a previously constructed @c RXGroupList to the rest of the generic configuration. */
-    virtual bool linkRXGroupListObj(int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual bool linkRXGroupListObj(unsigned int ncnt, RXGroupList *lst, Context &ctx, const ErrorStack &err = ErrorStack()) const;
     /** Reset this codeplug representation from a @c RXGroupList object. */
-    virtual void fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool fromRXGroupListObj(const RXGroupList *lst, Context &ctx, const ErrorStack &err = ErrorStack());
 
   public:
-    /** Some limits for the group list. */
+    /** Some limits for group lists. */
     struct Limit {
-      /** Maximum name length. */
-      static constexpr unsigned int nameLength() { return 16; }
-      /** Maximum member count. */
-      static constexpr unsigned int memberCount() { return 16; }
+      static constexpr unsigned int nameLength()  { return 16; }   ///< Maximum name length.
+      static constexpr unsigned int memberCount() { return 16; }  ///< Maximum number of entries.
     };
 
   protected:
-    /** Some internal offsets within the element. */
+    /** Internal offsets within the element. */
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()           { return 0x0000; }
@@ -551,7 +717,7 @@ public:
     /** Destructor. */
     virtual ~GroupListBankElement();
 
-    /** Returns the size of the element. */
+    /** The size of the group list bank element. */
     static constexpr unsigned int size() { return 0x0c80; }
 
     /** Resets the bank. */
@@ -573,16 +739,14 @@ public:
   public:
     /** Some limits for the group list bank. */
     struct Limit {
-      /** Maximum number of members. */
-      static constexpr unsigned int memberCount() { return 64; }
+      static constexpr unsigned int groupListCount() { return 64; }   ///< Maximum number of group lists.
     };
 
   protected:
-    /** Internal used offset within the element. */
+    /** Internal offsets within the element. */
     struct Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int contactCount() { return 0x0000; }
-      static constexpr unsigned int betweenContactCounts() { return 0x0000; }
+      static constexpr unsigned int contactCounts() { return 0x0000; }
       static constexpr unsigned int groupLists() { return 0x0080; }
       /// @endcond
     };
@@ -613,6 +777,9 @@ public:
     explicit ScanListElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~ScanListElement();
+
+    /** The size of the scan list. */
+    static constexpr unsigned int size() { return 0x0058; }
 
     /** Resets the scan list. */
     void clear();
@@ -701,11 +868,37 @@ public:
     virtual void setPrioritySampleTime(unsigned ms);
 
     /** Constructs a @c ScanList object from this codeplug representation. */
-    virtual ScanList *toScanListObj(Context &ctx) const;
+    virtual ScanList *toScanListObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links a previously constructed @c ScanList object to the rest of the generic configuration. */
-    virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug representation from the given @c ScanList object. */
-    virtual void fromScanListObj(const ScanList *lst, Context &ctx);
+    virtual bool fromScanListObj(const ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the scan list. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name()                    { return 15; }
+      /// Maximum number of members.
+      static constexpr unsigned int members()                 { return 32; }
+    };
+
+  protected:
+    /// @cond DO_NOT_DOCUMENT
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int name()                    { return 0x0000; }
+      static constexpr Bit channelMark()                      { return {0x000f, 4}; }
+      static constexpr Bit mode()                             { return {0x000f, 6}; }
+      static constexpr Bit talkback()                         { return {0x000f, 7}; }
+      static constexpr unsigned int members()                 { return 0x0010; }
+      static constexpr unsigned int betweenMembers()          { return 0x0002; }
+      static constexpr unsigned int primary()                 { return 0x0050; }
+      static constexpr unsigned int secondary()               { return 0x0052; }
+      static constexpr unsigned int revert()                  { return 0x0054; }
+      static constexpr unsigned int holdTime()                { return 0x0056; }
+      static constexpr unsigned int primaryHoldTime()         { return 0x0057; }
+    };
+    /// @endcond
   };
 
   /** Implements the base class of scan lists banks for all Radioddity codeplugs.
@@ -725,6 +918,9 @@ public:
     /** Destructor. */
     virtual ~ScanListBankElement();
 
+    /** The size of the scan list bank. */
+    static constexpr unsigned int size() { return 0x56f0; }
+
     /** Resets the scan list bank. */
     void clear();
 
@@ -734,7 +930,23 @@ public:
     virtual void enable(unsigned n, bool enabled);
     /** Returns a pointer to the n-th scan list. */
     virtual uint8_t *get(unsigned n) const;
+
+  public:
+    /** Some limits for the scan list bank. */
+    struct Limit {
+      static constexpr unsigned int scanListCount() { return 250; } ///< Maximum number of scan lists.
+    };
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bytemap()   { return 0x0000; }
+      static constexpr unsigned int scanLists() { return 0x0040; }
+      /// @endcond
+    };
   };
+
 
   /** Implements the base class of general settings for all Radioddity codeplugs.
    *
@@ -760,6 +972,9 @@ public:
     explicit GeneralSettingsElement(uint8_t *ptr);
     /** Destructor. */
     virtual ~GeneralSettingsElement();
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0028; }
 
     /** Resets the general settings. */
     void clear();
@@ -912,9 +1127,9 @@ public:
     virtual void clearProgPassword();
 
     /** Encodes the general setting from the given config. */
-    virtual bool fromConfig(const Config *conf, Context &ctx);
+    virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Updates the given config from this settings. */
-    virtual bool updateConfig(Config *conf, Context &ctx);
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Implements the base class of button settings for all Radioddity codeplugs.
@@ -1287,6 +1502,9 @@ public:
     /** Destructor. */
     virtual ~BootTextElement();
 
+    /** The size of the boot text element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
     /** Resets the intro text. */
     void clear();
 
@@ -1300,9 +1518,24 @@ public:
     virtual void setLine2(const QString &text);
 
     /** Encodes boot text settings from configuration. */
-    virtual void fromConfig(Config *conf);
+    virtual bool fromConfig(Context &ctx, const ErrorStack &err = ErrorStack());
     /** Updates the configuration with the boot text settings. */
-    virtual void updateConfig(Config *conf);
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err = ErrorStack());
+
+  public:
+    /** Some limits for this element. */
+    struct Limit {
+      static constexpr unsigned int lineLength() { return 16; }  ///< The maximum length of the boot text line.
+    };
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int line1() { return 0x0000;}
+      static constexpr unsigned int line2() { return 0x0010;}
+      /// @endcond
+    };
   };
 
   /** Implements the base class of a message bank for all Radioddity message banks.
@@ -1357,7 +1590,6 @@ public:
     };
   };
 
-
   /** Represents all encryption keys and settings within the codeplug on the device.
    *
    * Memory representation of encryption settings:
@@ -1382,6 +1614,9 @@ public:
     /** Destructor. */
     virtual ~EncryptionElement();
 
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0088; }
+
     void clear();
 
     /** Returns the privacy type set. */
@@ -1400,19 +1635,31 @@ public:
     virtual void clearBasicKey(unsigned n);
 
     /** Encodes given encryption extension. */
-    virtual bool fromCommercialExt(CommercialExtension *ext, Context &ctx);
+    virtual bool fromCommercialExt(CommercialExtension *ext, Context &ctx, const ErrorStack &err=ErrorStack());
     /** Constructs the encryption extension. */
-    virtual bool updateCommercialExt(Context &ctx);
+    virtual bool updateCommercialExt(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given encryption extension. */
-    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx);
+    virtual bool linkCommercialExt(CommercialExtension *ext, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
-    /** Some limits for the encryption element. */
+    /** Some limits for this element. */
     struct Limit {
-      /** The maximum number of (basic) encryption keys. */
-      static constexpr unsigned int basicEncryptionKeys() { return 16; }
+      /** The maximum number of keys. */
+      static constexpr unsigned int keyCount() { return 16; }
+      /** The required key size. */
+      static constexpr unsigned int keySize() { return 4; }
     };
 
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int privacyType() { return 0x0000; }
+      static constexpr unsigned int bitmap() { return 0x0002; }
+      static constexpr unsigned int keys() { return 0x0008; }         ///< Offset of the first key.
+      static constexpr unsigned int key() { return 0x0008;}           ///< Offset between keys.
+      /// @endcond
+    };
   };
 
 protected:
@@ -1444,9 +1691,9 @@ public:
   /** Clears the general settings in the codeplug. */
   virtual void clearGeneralSettings() = 0;
   /** Updates the general settings from the given configuration. */
-  virtual bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the general settings. */
-  virtual bool decodeGeneralSettings(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the button settings. */
   virtual void clearButtonSettings() = 0;
@@ -1465,25 +1712,25 @@ public:
   /** Clears all contacts in the codeplug. */
   virtual void clearContacts() = 0;
   /** Encodes all digital contacts in the configuration into the codeplug. */
-  virtual bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds a digital contact to the configuration for each one in the codeplug. */
-  virtual bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all DTMF contacts in the codeplug. */
   virtual void clearDTMFContacts() = 0;
   /** Encodes all DTMF contacts. */
-  virtual bool encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all DTMF contacts to the configuration. */
-  virtual bool createDTMFContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createDTMFContacts(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear all channels. */
   virtual void clearChannels() = 0;
   /** Encode all channels. */
-  virtual bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds all defined channels to the configuration. */
-  virtual bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all channels. */
-  virtual bool linkChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clear boot settings. */
   virtual void clearBootSettings() = 0;
@@ -1494,9 +1741,9 @@ public:
   /** Clears boot text. */
   virtual void clearBootText() = 0;
   /** Encodes boot text. */
-  virtual bool encodeBootText(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the boot text settings. */
-  virtual bool decodeBootText(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the VFO settings. */
   virtual void clearVFOSettings() = 0;
@@ -1504,38 +1751,38 @@ public:
   /** Clears all zones. */
   virtual void clearZones() = 0;
   /** Encodes zones. */
-  virtual bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Adds zones to the configuration. */
-  virtual bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all zones within the configuration. */
-  virtual bool linkZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all scan lists. */
   virtual void clearScanLists() = 0;
   /** Encodes all scan lists. */
-  virtual bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all scan lists. */
-  virtual bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all scan lists. */
-  virtual bool linkScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all group lists. */
   virtual void clearGroupLists() = 0;
   /** Encodes all group lists. */
-  virtual bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all group lists. */
-  virtual bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all group lists. */
-  virtual bool linkGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears all encryption keys. */
   virtual void clearEncryption() = 0;
   /** Encodes all encryption keys defined. */
-  virtual bool encodeEncryption(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeEncryption(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Creates all encryption keys. */
-  virtual bool createEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool createEncryption(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Links all encryption keys. */
-  virtual bool linkEncryption(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool linkEncryption(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 };
 
 #endif // RADIODDITYCODEPLUG_HH

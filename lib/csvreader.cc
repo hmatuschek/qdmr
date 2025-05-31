@@ -3,23 +3,23 @@
 #include "utils.hh"
 #include "logger.hh"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDebug>
 
-QVector< QPair<QRegExp, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
-  { QRegExp("^n([0-9]{3})"),                     CSVLexer::Token::T_DCS_N },
-  { QRegExp("^i([0-9]{3})"),                     CSVLexer::Token::T_DCS_I },
-  { QRegExp("^([a-zA-Z0-9]{1,6}-[0-9]{1,2})"),   CSVLexer::Token::T_APRSCALL },
-  { QRegExp("^([a-zA-Z_][a-zA-Z0-9_]*)"),        CSVLexer::Token::T_KEYWORD },
-  { QRegExp("^\"([^\"\r\n]*)\""),                CSVLexer::Token::T_STRING },
-  { QRegExp("^([+-]?[0-9]+(\\.[0-9]*)?)"),       CSVLexer::Token::T_NUMBER },
-  { QRegExp("^(:)"),                             CSVLexer::Token::T_COLON },
-  { QRegExp("^(-)"),                             CSVLexer::Token::T_NOT_SET },
-  { QRegExp("^(\\+)"),                           CSVLexer::Token::T_ENABLED },
-  { QRegExp("^(,)"),                             CSVLexer::Token::T_COMMA },
-  { QRegExp("^([ \t]+)"),                        CSVLexer::Token::T_WHITESPACE },
-  { QRegExp("^(\r?\n)"),                         CSVLexer::Token::T_NEWLINE},
-  { QRegExp("^(#[^\n\r]*)"),                     CSVLexer::Token::T_COMMENT},
+QVector< QPair<QRegularExpression, CSVLexer::Token::TokenType> > CSVLexer::_pattern = {
+  { QRegularExpression("^n([0-9]{3})"),                     CSVLexer::Token::T_DCS_N },
+  { QRegularExpression("^i([0-9]{3})"),                     CSVLexer::Token::T_DCS_I },
+  { QRegularExpression("^([a-zA-Z0-9]{1,6}-[0-9]{1,2})"),   CSVLexer::Token::T_APRSCALL },
+  { QRegularExpression("^([a-zA-Z_][a-zA-Z0-9_]*)"),        CSVLexer::Token::T_KEYWORD },
+  { QRegularExpression("^\"([^\"\r\n]*)\""),                CSVLexer::Token::T_STRING },
+  { QRegularExpression("^([+-]?[0-9]+(\\.[0-9]*)?)"),       CSVLexer::Token::T_NUMBER },
+  { QRegularExpression("^(:)"),                             CSVLexer::Token::T_COLON },
+  { QRegularExpression("^(-)"),                             CSVLexer::Token::T_NOT_SET },
+  { QRegularExpression("^(\\+)"),                           CSVLexer::Token::T_ENABLED },
+  { QRegularExpression("^(,)"),                             CSVLexer::Token::T_COMMA },
+  { QRegularExpression("^([ \t]+)"),                        CSVLexer::Token::T_WHITESPACE },
+  { QRegularExpression("^(\r?\n)"),                         CSVLexer::Token::T_NEWLINE},
+  { QRegularExpression("^(#[^\n\r]*)"),                     CSVLexer::Token::T_COMMENT},
 };
 
 
@@ -61,11 +61,12 @@ CSVLexer::lex() {
     return token;
   }
   foreach (auto pattern, _pattern) {
-    if (0 == pattern.first.indexIn(_currentLine)) {
-      Token token = {pattern.second, pattern.first.cap(1), _stack.back().line, _stack.back().column};
-      _stack.back().offset += pattern.first.matchedLength();
+    auto match = pattern.first.match(_currentLine);
+    if (0 == match.capturedStart()) {
+      Token token = {pattern.second, match.captured(1), _stack.back().line, _stack.back().column};
+      _stack.back().offset += match.capturedLength();
       _stack.back().column += token.value.size();
-      _currentLine = _currentLine.mid(pattern.first.matchedLength());
+      _currentLine = _currentLine.mid(match.capturedLength());
       return token;
     }
   }
@@ -226,7 +227,7 @@ CSVHandler::handleDigitalChannel(qint64 idx, const QString &name, double rx, dou
 
 bool
 CSVHandler::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
     FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   Q_UNUSED(idx);
@@ -1174,15 +1175,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   qint64 squelch = token.value.toInt();
 
   token = lexer.next();
-  Signaling::Code rxTone;
+  SelectiveCall rxTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    rxTone = Signaling::SIGNALING_NONE;
+    rxTone = SelectiveCall();
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    rxTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+    rxTone = SelectiveCall(token.value.toFloat());
   } else if (CSVLexer::Token::T_DCS_N == token.type) {
-    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+    rxTone = SelectiveCall(token.value.toUInt(), false);
   } else if (CSVLexer::Token::T_DCS_I == token.type) {
-    rxTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
+    rxTone = SelectiveCall(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1190,15 +1191,15 @@ CSVParser::_parse_analog_channel(qint64 idx, CSVLexer &lexer) {
   }
 
   token = lexer.next();
-  Signaling::Code txTone;
+  SelectiveCall txTone;
   if (CSVLexer::Token::T_NOT_SET == token.type) {
-    txTone = Signaling::SIGNALING_NONE;
+    txTone = SelectiveCall();
   } else if (CSVLexer::Token::T_NUMBER == token.type) {
-    txTone = Signaling::fromCTCSSFrequency(token.value.toFloat());
+    txTone = SelectiveCall(token.value.toFloat());
   } else if (CSVLexer::Token::T_DCS_N == token.type) {
-    txTone = Signaling::fromDCSNumber(token.value.toUInt(), false);
+    txTone = SelectiveCall(token.value.toUInt(), false);
   } else if (CSVLexer::Token::T_DCS_I == token.type) {
-    txTone = Signaling::fromDCSNumber(token.value.toUInt(), true);
+    txTone = SelectiveCall(token.value.toUInt(), true);
   } else {
     _errorMessage = QString("Parse error @ %1,%2: Unexpected token %3 '%4' expected number or '-'.")
         .arg(token.line).arg(token.column).arg(token.type).arg(token.value);
@@ -1999,7 +2000,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
 
 bool
 CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, double tx, Channel::Power power, qint64 scan,
-    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, Signaling::Code rxTone, Signaling::Code txTone,
+    qint64 aprs, qint64 tot, bool ro, FMChannel::Admit admit, qint64 squelch, const SelectiveCall &rxTone, const SelectiveCall &txTone,
     FMChannel::Bandwidth bw, qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {

@@ -17,6 +17,11 @@ GD73Limits::GD73Limits(QObject *parent)
   _callSignDBImplemented  = false;
   _numCallSignDBEntries   = 0;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = false;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   /* Define limits for the general settings. */
   add("settings",
       new RadioLimitItem{
@@ -132,7 +137,7 @@ GD73Limits::GD73Limits(QObject *parent)
 
   /* Check scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, GD73Codeplug::ScanListBankElement::Limit::memberCount(), new RadioLimitObject{
+        ScanList::staticMetaObject, 0, GD73Codeplug::ScanListBankElement::Limit::memberCount(), new RadioLimitObject{
           { "name", new RadioLimitString(1, GD73Codeplug::ScanListElement::Limit::nameLength(), RadioLimitString::Unicode) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, false) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
@@ -147,7 +152,7 @@ GD73Limits::GD73Limits(QObject *parent)
          0, GD73Codeplug::EncryptionKeyBankElement::Limit::keys(),
          new RadioLimitObject {
            {"name", new RadioLimitIgnored()},
-           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{2,8}")}
+           {"key", new RadioLimitStringRegEx("^[0-9a-fA-F]{2,8}$", RadioLimitIssue::Critical)}
          })}
       });
 

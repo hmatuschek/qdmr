@@ -44,6 +44,7 @@ public:
   /** Constructor of the merge visitor.
    * @param destination Specifies the destination configuration, the additional configurations are
    *        merged into.
+   * @param translation Specifies the translation table to fill of objects being replaced.
    * @param itemStrategy Specifies the item merge strategy.
    * @param setStrategy Specifies the set merge strategy. */
   ConfigMergeVisitor(Config *destination, QHash<ConfigObject *, ConfigObject *> &translation,

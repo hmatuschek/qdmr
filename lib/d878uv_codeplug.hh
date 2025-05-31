@@ -373,6 +373,63 @@ public:
     };
   };
 
+
+  /** Starting from AT-D878UV, all AnyTone devices encode an channel settings extension element
+   * at an offset 0x2000 to the original channel. Also the size of the extension element is
+   * identical to the channel element itself. This is weird. Anyway. This class encodes/decodes
+   * these settings.
+   *
+   * This implementation is compatible with firmware version 3.06 */
+  class ChannelExtensionElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelExtensionElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Default constructor. */
+    ChannelExtensionElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return ChannelElement::size(); }
+
+    /** Resets the channel extension. */
+    void clear();
+
+    /** Returns the BOT 5-tone ID index. */
+    virtual unsigned int bot5ToneIDIndex() const;
+    /** Sets the BOT 5-tone ID index. */
+    virtual void setBOT5ToneIDIndex(unsigned int idx);
+
+    /** Returns the EOT 5-tone ID index. */
+    virtual unsigned int eot5ToneIDIndex() const;
+    /** Sets the EOT 5-tone ID index. */
+    virtual void setEOT5ToneIDIndex(unsigned int idx);
+
+    /** Returns the transmit color code. */
+    virtual unsigned int txColorCode() const;
+    /** Sets the transmit color code. */
+    virtual void setTXColorCode(unsigned int cc);
+
+    /** Constructs a Channel object from this element. */
+    virtual bool updateChannelObj(Channel *c, Context &ctx) const;
+    /** Links a previously created channel object. */
+    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
+    /** Encodes the given channel object. */
+    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Some internal used offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bot5ToneIDIndex() { return 0x0000; }
+      static constexpr unsigned int eot5ToneIDIndex() { return 0x0001; }
+      static constexpr unsigned int txColorCode()     { return 0x0003; }
+      /// @endcond
+    };
+  };
+
+
   /** Represents the general config of the radio within the D878UV binary codeplug.
    *
    * This class implements only the differences to the generic
@@ -1176,8 +1233,7 @@ public:
   };
 
 
-  /** Implements some storage to hold the names for the FM APRS frequencies.
-   * @verbinclude d878uv_fm_aprs_frequency_names.txt */
+  /** Implements some storage to hold the names for the FM APRS frequencies. */
   class FMAPRSFrequencyNamesElement: public Element
   {
   protected:
@@ -1247,9 +1303,9 @@ public:
     virtual void setFMTXDelay(Interval ms);
 
     /** Returns the sub tone settings. */
-    virtual Signaling::Code txTone() const;
+    virtual SelectiveCall txTone() const;
     /** Sets the sub tone settings. */
-    virtual void setTXTone(Signaling::Code code);
+    virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns the manual TX interval in seconds. */
     virtual Interval manualTXInterval() const;
@@ -1936,6 +1992,7 @@ protected:
   /** Internal offsets within the codeplug. */
   struct Offset: public D868UVCodeplug::Offset {
     /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int toChannelExtension()          { return 0x00002000; }
     static constexpr unsigned int settingsExtension()           { return 0x02501400; }
     static constexpr unsigned int aprsSettings()                { return 0x02501000; }
     static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }

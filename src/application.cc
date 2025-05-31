@@ -12,20 +12,18 @@
 #include "settings.hh"
 #include "radiolimits.hh"
 #include "verifydialog.hh"
-#include "analogchanneldialog.hh"
-#include "digitalchanneldialog.hh"
 #include "rxgrouplistdialog.hh"
 #include "zonedialog.hh"
 #include "scanlistdialog.hh"
-#include "gpssystemdialog.hh"
 #include "roamingzonedialog.hh"
-#include "aprssystemdialog.hh"
-#include "repeaterbookcompleter.hh"
+#include "repeaterdatabase.hh"
+#include "repeaterbooksource.hh"
+#include "repeatermapsource.hh"
+#include "hearhamrepeatersource.hh"
+#include "radioidrepeatersource.hh"
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
-#include "searchpopup.hh"
-#include "contactselectiondialog.hh"
-#include "configitemwrapper.hh"
+#include "satellitedatabase.hh"
 #include "generalsettingsview.hh"
 #include "radioidlistview.hh"
 #include "contactlistview.hh"
@@ -43,6 +41,9 @@
 #include "chirpformat.hh"
 #include "configmergedialog.hh"
 #include "configmergevisitor.hh"
+#include "satellitedatabasedialog.hh"
+#include "mainwindow.hh"
+
 
 
 inline QStringList getLanguages() {
@@ -59,7 +60,7 @@ inline QString getLocalePath(const QString &language) {
 
 Application::Application(int &argc, char *argv[])
   : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _translator(nullptr),
-    _repeater(nullptr), _lastDevice()
+    _repeater(nullptr), _satellites(nullptr), _lastDevice()
 {
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
@@ -79,7 +80,7 @@ Application::Application(int &argc, char *argv[])
   _translator = new QTranslator(this);
   foreach (QString language, getLanguages()) {
     logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
-    if (_translator->load("qdmr", getLocalePath(language), "", "_qt.qm")) {
+    if (_translator->load("qdmr", ":/i18n", "", "_qt.qm")) {
       this->installTranslator(_translator);
       logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
       break;
@@ -89,9 +90,19 @@ Application::Application(int &argc, char *argv[])
   // load settings
   Settings settings;
   // load databases
-  _repeater   = new RepeaterBookList(this);
+  _repeater   = new RepeaterDatabase(this);
+  if (settings.repeaterBookSourceEnabled())
+    _repeater->addSource(new RepeaterBookSource());
+  if (settings.repeaterMapSourceEnabled())
+    _repeater->addSource(new RepeaterMapSource());
+  if (settings.hearhamSourceEnabled())
+    _repeater->addSource(new HearhamRepeaterSource());
+  if (settings.radioIdRepeaterSourceEnabled())
+    _repeater->addSource(new RadioidRepeaterSource());
   _users      = new UserDatabase(30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
+  _satellites = new SatelliteDatabase(7, this);
+
   // create empty codeplug
   _config     = new Config(this);
 
@@ -152,17 +163,21 @@ Application::isDarkMode() const {
 bool
 Application::isDarkMode(const QPalette &palette) const {
   int text_hsv_value = palette.color(QPalette::WindowText).value(),
-      bg_hsv_value = palette.color(QPalette::Background).value();
+      bg_hsv_value = palette.color(QPalette::Base).value();
   return text_hsv_value > bg_hsv_value;
 }
 
 
-QMainWindow *
-Application::mainWindow() {
-  if (0 == _mainWindow)
-    return createMainWindow();
+bool
+Application::isModified() const {
+  return _config->isModified();
+}
 
-  return _mainWindow;
+MainWindow *
+Application::mainWindow() {
+  if (_mainWindow)
+    return _mainWindow;
+  return (_mainWindow = new MainWindow(_config));
 }
 
 UserDatabase *
@@ -175,138 +190,14 @@ Application::talkgroup() const {
   return _talkgroups;
 }
 
-RepeaterBookList *Application::repeater() const{
+RepeaterDatabase *
+Application::repeater() const{
   return _repeater;
 }
 
-
-QMainWindow *
-Application::createMainWindow() {
-  if (_mainWindow)
-    return _mainWindow;
-
-  Settings settings;
-  logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
-
-  QUiLoader loader;
-  QFile uiFile("://ui/mainwindow.ui");
-  uiFile.open(QIODevice::ReadOnly);
-
-  QWidget *window = loader.load(&uiFile);
-  _mainWindow = qobject_cast<QMainWindow *>(window);
-
-  QProgressBar *progress = new QProgressBar();
-  progress->setObjectName("progress");
-  _mainWindow->statusBar()->addPermanentWidget(progress);
-  progress->setVisible(false);
-
-  QAction *newCP   = _mainWindow->findChild<QAction*>("actionNewCodeplug");
-  QAction *loadCP  = _mainWindow->findChild<QAction*>("actionOpenCodeplug");
-  QAction *saveCP  = _mainWindow->findChild<QAction*>("actionSaveCodeplug");
-  QAction *exportCP = _mainWindow->findChild<QAction*>("actionExportToCHIRP");
-  QAction *importCP = _mainWindow->findChild<QAction*>("actionImport");
-
-  QAction *findDev = _mainWindow->findChild<QAction*>("actionDetectDevice");
-  QAction *verCP   = _mainWindow->findChild<QAction*>("actionVerifyCodeplug");
-  QAction *downCP  = _mainWindow->findChild<QAction*>("actionDownload");
-  QAction *upCP    = _mainWindow->findChild<QAction*>("actionUpload");
-  QAction *upCDB   = _mainWindow->findChild<QAction*>("actionUploadCallsignDB");
-
-  QAction *refreshCallsignDB  = _mainWindow->findChild<QAction*>("actionRefreshCallsignDB");
-  QAction *refreshTalkgroupDB  = _mainWindow->findChild<QAction*>("actionRefreshTalkgroupDB");
-
-  QAction *about   = _mainWindow->findChild<QAction*>("actionAbout");
-  QAction *sett    = _mainWindow->findChild<QAction*>("actionSettings");
-  QAction *help    = _mainWindow->findChild<QAction*>("actionHelp");
-  QAction *quit    = _mainWindow->findChild<QAction*>("actionQuit");
-
-  connect(newCP, SIGNAL(triggered()), this, SLOT(newCodeplug()));
-  connect(loadCP, SIGNAL(triggered()), this, SLOT(loadCodeplug()));
-  connect(saveCP, SIGNAL(triggered()), this, SLOT(saveCodeplug()));
-  connect(exportCP, SIGNAL(triggered()), this, SLOT(exportCodeplugToChirp()));
-  connect(importCP, SIGNAL(triggered()), this, SLOT(importCodeplug()));
-  connect(quit, SIGNAL(triggered()), this, SLOT(quitApplication()));
-  connect(about, SIGNAL(triggered()), this, SLOT(showAbout()));
-  connect(sett, SIGNAL(triggered()), this, SLOT(showSettings()));
-  connect(help, SIGNAL(triggered()), this, SLOT(showHelp()));
-
-  connect(refreshCallsignDB, SIGNAL(triggered()), _users, SLOT(download()));
-  connect(refreshTalkgroupDB, SIGNAL(triggered()), _talkgroups, SLOT(download()));
-
-  connect(findDev, SIGNAL(triggered()), this, SLOT(detectRadio()));
-  connect(verCP, SIGNAL(triggered()), this, SLOT(verifyCodeplug()));
-  connect(downCP, SIGNAL(triggered()), this, SLOT(downloadCodeplug()));
-  connect(upCP, SIGNAL(triggered()), this, SLOT(uploadCodeplug()));
-  connect(upCDB, SIGNAL(triggered()), this, SLOT(uploadCallsignDB()));
-
-  QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
-
-  // Wire-up "General Settings" view
-  _generalSettings = new GeneralSettingsView(_config);
-  tabs->addTab(_generalSettings, tr("Settings"));
-  if (settings.showCommercialFeatures()) {
-    _generalSettings->hideDMRID(true);
-  } else {
-    _generalSettings->hideDMRID(false);
-  }
-  if (settings.showExtensions()) {
-    _generalSettings->hideExtensions(false);
-  } else {
-    _generalSettings->hideExtensions(true);
-  }
-
-  // Wire-up "Radio IDs" view
-  _radioIdTab = new RadioIDListView(_config);
-  tabs->addTab(_radioIdTab, tr("Radio IDs"));
-
-  // Wire-up "Contact List" view
-  _contactList = new ContactListView(_config);
-  tabs->addTab(_contactList, tr("Contacts"));
-
-  // Wire-up "RX Group List" view
-  _groupLists = new GroupListsView(_config);
-  tabs->addTab(_groupLists, tr("Group Lists"));
-
-  // Wire-up "Channel List" view
-  _channelList = new ChannelListView(_config);
-  tabs->addTab(_channelList, tr("Channels"));
-
-  // Wire-up "Zone List" view
-  _zoneList = new ZoneListView(_config);
-  tabs->addTab(_zoneList, tr("Zones"));
-
-  // Wire-up "Scan List" view
-  _scanLists = new ScanListsView(_config);
-  tabs->addTab(_scanLists, tr("Scan Lists"));
-
-  // Wire-up "GPS System List" view
-  _posSysList = new PositioningSystemListView(_config);
-  tabs->addTab(_posSysList, tr("GPS/APRS"));
-
-  // Wire-up "Roaming Zone List" view
-  _roamingChannelList = new RoamingChannelListView(_config);
-  tabs->addTab(_roamingChannelList, tr("Roaming Channels"));
-
-  // Wire-up "Roaming Zone List" view
-  _roamingZoneList = new RoamingZoneListView(_config);
-  tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
-
-  // Wire-up "extension view"
-  _extensionView = new ExtensionView();
-  _extensionView->setObject(_config, _config);
-  tabs->addTab(_extensionView, tr("Extensions"));
-
-  if (! settings.showCommercialFeatures()) {
-    tabs->removeTab(tabs->indexOf(_radioIdTab));
-    _radioIdTab->setHidden(true);
-  }
-  if (! settings.showExtensions()) {
-    tabs->removeTab(tabs->indexOf(_extensionView));
-    _extensionView->setHidden(true);
-  }
-
-  _mainWindow->restoreGeometry(settings.mainWindowState());
-  return _mainWindow;
+SatelliteDatabase *
+Application::satellite() const {
+  return _satellites;
 }
 
 
@@ -329,6 +220,7 @@ void
 Application::loadCodeplug() {
   if (! _mainWindow)
     return;
+
   if (_config->isModified()) {
     if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
                                                  tr("There are unsaved changes to the current codeplug. "
@@ -378,6 +270,9 @@ Application::loadCodeplug() {
       _config->clear();
     }
   }
+
+  processEvents();
+  _config->setModified(false);
 }
 
 
@@ -525,23 +420,6 @@ Application::importCodeplug() {
   }
 
   _config->setModified(true);
-}
-
-void
-Application::quitApplication() {
-  if (_config->isModified()) {
-    if (QMessageBox::Ok != QMessageBox::question(nullptr, tr("Unsaved changes to codeplug."),
-                                                 tr("There are unsaved changes to the current codeplug. "
-                                                    "These changes are lost if you proceed."),
-                                                 QMessageBox::Cancel|QMessageBox::Ok))
-      return;
-  }
-
-  Settings settings;
-  if (_mainWindow)
-    settings.setMainWindowState(_mainWindow->saveGeometry());
-
-  quit();
 }
 
 
@@ -855,6 +733,54 @@ Application::uploadCallsignDB() {
 
 
 void
+Application::uploadSatellites() {
+  // Start upload satellites
+  Radio *radio = autoDetect();
+  if (nullptr == radio) {
+    QMessageBox::warning(nullptr, tr("No radio found"),
+                         tr("No matching device was found."));
+    return;
+  }
+
+  if (! radio->limits().hasSatelliteConfig()) {
+    logDebug() << "Radio " << radio->name() << " does not support satellite tracking.";
+    QMessageBox::information(nullptr, tr("Cannot write satellite config."),
+                             tr("The detected radio '%1' does not support satellite tracking.")
+                             .arg(radio->name()));
+    radio->deleteLater();
+    return;
+  }
+
+  if (! radio->limits().satelliteConfigImplemented()) {
+    logDebug() << "Radio " << radio->name()
+               << " does support satellite tracking but it is not implemented yet.";
+    QMessageBox::critical(nullptr, tr("Cannot write satellite config."),
+                          tr("The detected radio '%1' does support satellite tracking. "
+                             "This feature, however, is not implemented yet.").arg(radio->name()));
+    radio->deleteLater();
+    return;
+  }
+
+  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
+  progress->setRange(0, 100); progress->setValue(0);
+  progress->setVisible(true);
+
+  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
+  connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
+  connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
+
+  ErrorStack err;
+  if (radio->startUploadSatelliteConfig(_satellites, false, err)) {
+    logDebug() << "Start satellite config write...";
+    _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
+    _mainWindow->setEnabled(false);
+  } else {
+    ErrorMessageView(err).exec();
+    progress->setVisible(false);
+  }
+}
+
+void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
   ErrorMessageView(radio->errorStack()).exec();
@@ -882,48 +808,24 @@ Application::onCodeplugUploaded(Radio *radio) {
 void
 Application::showSettings() {
   SettingsDialog dialog;
-  if (QDialog::Accepted == dialog.exec()) {
-    Settings settings;
-    // Handle positioning
-    if (! settings.queryPosition()) {
-      if (_source)
-        _source->stopUpdates();
-      _currentPosition = settings.position();
-    } else {
-      if (_source)
-        _source->startUpdates();
-    }
-    // Handle commercial features
-    QTabWidget *tabs = _mainWindow->findChild<QTabWidget*>("tabs");
-    if (settings.showCommercialFeatures()) {
-      if (-1 == tabs->indexOf(_radioIdTab)) {
-        tabs->insertTab(tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
-        _mainWindow->update();
-      }
-      _generalSettings->hideDMRID(true);
-    } else if (! settings.showCommercialFeatures()) {
-      if (-1 != tabs->indexOf(_radioIdTab)) {
-        tabs->removeTab(tabs->indexOf(_radioIdTab));
-        _mainWindow->update();
-      }
-      _generalSettings->hideDMRID(false);
-    }
-    // Handle extensions
-    if (settings.showExtensions()) {
-      if (-1 == tabs->indexOf(_extensionView)) {
-        tabs->insertTab(tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
-        _mainWindow->update();
-      }
-      _generalSettings->hideExtensions(false);
-    } else {
-      if (-1 != tabs->indexOf(_extensionView)) {
-        tabs->removeTab(tabs->indexOf(_extensionView));
-        _mainWindow->update();
-      }
-      _generalSettings->hideExtensions(true);
-    }
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+
+  Settings settings;
+  // Handle positioning
+  if (! settings.queryPosition()) {
+    if (_source)
+      _source->stopUpdates();
+    _currentPosition = settings.position();
+  } else {
+    if (_source)
+      _source->startUpdates();
   }
+
+  _mainWindow->applySettings();
 }
+
 
 void
 Application::showAbout() {
@@ -964,6 +866,17 @@ Application::showAbout() {
 void
 Application::showHelp() {
   QDesktopServices::openUrl(QUrl("https://dm3mat.darc.de/qdmr/manual"));
+}
+
+
+void
+Application::editSatellites() {
+  SatelliteDatabaseDialog dialog(_satellites);
+  if (QDialog::Accepted == dialog.exec()) {
+    _satellites->save();
+  } else {
+    _satellites->load();
+  }
 }
 
 

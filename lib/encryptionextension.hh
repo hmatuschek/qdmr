@@ -139,6 +139,7 @@ public:
 
   int add(ConfigObject *obj, int row=-1, bool unique=true);
 
+  /** Returns the key the given index. */
   EncryptionKey *key(int index) const;
 
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

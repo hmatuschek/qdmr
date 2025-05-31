@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>579</width>
-    <height>472</height>
+    <width>677</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -137,6 +137,12 @@
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
             <widget class="QSpinBox" name="totValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string>Off</string>
              </property>
@@ -168,6 +174,12 @@
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
             <widget class="QSpinBox" name="voxValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string>Off</string>
              </property>
@@ -209,6 +221,12 @@
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_4">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="txAdmitLabel">
            <property name="text">
@@ -218,6 +236,12 @@
          </item>
          <item row="0" column="1">
           <widget class="QComboBox" name="txAdmit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
             <property name="text">
              <string>Always</string>
@@ -249,18 +273,12 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="rxTone"/>
-         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="txToneLabel">
            <property name="text">
             <string>Tx Tone</string>
            </property>
           </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="txTone"/>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="bandwidthLabel">
@@ -297,6 +315,12 @@
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
             <widget class="QSpinBox" name="squelchValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string>Open</string>
              </property>
@@ -313,6 +337,26 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item row="2" column="1">
+          <widget class="SelectiveCallBox" name="rxTone" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="SelectiveCallBox" name="txTone" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -347,6 +391,12 @@
    <class>ExtensionView</class>
    <extends>QWidget</extends>
    <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SelectiveCallBox</class>
+   <extends>QWidget</extends>
+   <header location="global">selectivecallbox.hh</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

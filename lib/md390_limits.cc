@@ -19,6 +19,11 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
   _callSignDBImplemented  = false;
   _numCallSignDBEntries   = 0;
 
+  // Define limits for satellite config
+  _hasSatelliteConfig          = false;
+  _satelliteConfigImplemented  = false;
+  _numSatellites               = 0;
+
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
@@ -135,7 +140,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
 
   /* Define limits for scan lists. */
   add("scanlists", new RadioLimitList(
-        ScanList::staticMetaObject, 1, 250, new RadioLimitObject{
+        ScanList::staticMetaObject, 0, 250, new RadioLimitObject{
           { "name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
           { "primary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },

@@ -408,20 +408,14 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->rxTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->rxTone());
+      return analog->rxTone().format();
     }
     break;
   case 19:
     if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (Signaling::SIGNALING_NONE == analog->txTone()) {
-        return tr("Off");
-      } else
-        return Signaling::codeLabel(analog->txTone());
+      return analog->txTone().format();
     }
     break;
   case 20:

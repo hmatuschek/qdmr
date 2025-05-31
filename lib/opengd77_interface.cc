@@ -36,7 +36,7 @@ OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
   this->type = 'R';
   this->command = READ_FIRMWARE_INFO;
   this->address = 0;
-  this->length = 0;
+  this->length = qToBigEndian((uint16_t)sizeof(FirmwareInfo));
   return true;
 }
 
@@ -44,10 +44,10 @@ OpenGD77Interface::ReadRequest::initReadFirmwareInfo() {
  * Implementation of OpenGD77Interface::WriteRequest
  * ********************************************************************************************* */
 bool
-OpenGD77Interface::WriteRequest::initWriteEEPROM(uint32_t addr, const uint8_t *data, uint16_t size) {
+OpenGD77Interface::WriteRequest::initWriteEEPROM(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_EEPROM;
   this->payload.address = qToBigEndian(addr);
   this->payload.length = qToBigEndian(size);
@@ -56,9 +56,9 @@ OpenGD77Interface::WriteRequest::initWriteEEPROM(uint32_t addr, const uint8_t *d
 }
 
 bool
-OpenGD77Interface::WriteRequest::initSetFlashSector(uint32_t addr) {
+OpenGD77Interface::WriteRequest::initSetFlashSector(Variant variant, uint32_t addr) {
   uint32_t sec = addr/SECTOR_SIZE;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = SET_FLASH_SECTOR;
   this->sector[0] = ((sec>>16) & 0xff);
   this->sector[1] = ((sec>>8) & 0xff);
@@ -67,10 +67,10 @@ OpenGD77Interface::WriteRequest::initSetFlashSector(uint32_t addr) {
 }
 
 bool
-OpenGD77Interface::WriteRequest::initWriteFlash(uint32_t addr, const uint8_t *data, uint16_t size) {
+OpenGD77Interface::WriteRequest::initWriteFlash(Variant variant, uint32_t addr, const uint8_t *data, uint16_t size) {
   if (size > 32)
     size = 32;
-  this->type = 'W';
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_SECTOR_BUFFER;
   this->payload.address = qToBigEndian(addr);
   this->payload.length = qToBigEndian(size);
@@ -79,8 +79,8 @@ OpenGD77Interface::WriteRequest::initWriteFlash(uint32_t addr, const uint8_t *da
 }
 
 bool
-OpenGD77Interface::WriteRequest::initFinishWriteFlash() {
-  this->type = 'W';
+OpenGD77Interface::WriteRequest::initFinishWriteFlash(Variant variant) {
+  this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_FLASH_SECTOR;
   return true;
 }
@@ -95,7 +95,7 @@ OpenGD77Interface::CommandRequest::initShowCPSScreen() {
   this->command = SHOW_CPS_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -107,7 +107,7 @@ OpenGD77Interface::CommandRequest::initClearScreen() {
   this->command = CLEAR_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -115,16 +115,17 @@ OpenGD77Interface::CommandRequest::initClearScreen() {
 
 void
 OpenGD77Interface::CommandRequest::initDisplay(uint8_t x, uint8_t y,
-                                               const char *message, uint8_t iSize,
-                                               uint8_t alignment, uint8_t inverted) {
+                                               const char *message, unsigned int iSize,
+                                               uint8_t font, uint8_t alignment, uint8_t inverted) {
   this->type = 'C';
   this->command = DISPLAY;
   this->x = x;
   this->y = y;
-  this->size = std::min(iSize, uint8_t(16));
+  this->font = font;
   this->alignment = alignment;
   this->inverted = inverted;
-  strcpy(this->message, message);
+  memset(this->message, 0, 16);
+  strncpy(this->message, message, std::min(16u, iSize));
 }
 
 void
@@ -133,7 +134,7 @@ OpenGD77Interface::CommandRequest::initRenderCPS() {
   this->command = RENDER_CPS;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -145,7 +146,7 @@ OpenGD77Interface::CommandRequest::initCloseScreen() {
   this->command = CLOSE_CPS_SCREEN;
   this->x = 0;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -157,7 +158,7 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
   this->command = COMMAND;
   this->option = option;
   this->y = 0;
-  this->size = 0;
+  this->font = 0;
   this->alignment = 0;
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
@@ -197,10 +198,43 @@ OpenGD77Interface::close() {
 RadioInfo
 OpenGD77Interface::identifier(const ErrorStack &err) {
   Q_UNUSED(err);
-  if (isOpen())
-    return RadioInfo::byID(RadioInfo::OpenGD77);
-  else
+  if (! isOpen())
     return RadioInfo();
+
+  FirmwareInfo info;
+  if (! readFirmwareInfo(info, err)) {
+    errMsg(err) << "Cannot identify OpenGD77 variant.";
+    return RadioInfo();
+  }
+
+  logDebug() << "Got type=" << info.radioType << ".";
+  switch ((FirmwareInfo::RadioType)info.radioType) {
+  case FirmwareInfo::RadioType::GD77:
+  case FirmwareInfo::RadioType::GD77S:
+  case FirmwareInfo::RadioType::RD5R:
+  case FirmwareInfo::RadioType::DM1801:
+  case FirmwareInfo::RadioType::DM1801A:
+    _protocolVariant = Variant::GD77;
+  return RadioInfo::byID(RadioInfo::OpenGD77);
+
+  case FirmwareInfo::RadioType::MDUV380:
+  case FirmwareInfo::RadioType::MD380:
+  case FirmwareInfo::RadioType::DM1701:
+  case FirmwareInfo::RadioType::DM1701RGB:
+    _protocolVariant = Variant::UV380;
+  return RadioInfo::byID(RadioInfo::OpenUV380);
+
+  case FirmwareInfo::RadioType::MD9600:
+    logInfo() << "OpenGD77 variant MD9600 not supported (yet).";
+  return RadioInfo();
+
+  case FirmwareInfo::RadioType::MD2017:
+    logInfo() << "OpenGD77 variant MD2017 not supported (yet).";
+  return RadioInfo();
+  }
+
+  errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
+  return RadioInfo();
 }
 
 bool
@@ -213,11 +247,11 @@ OpenGD77Interface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &e
   if (! sendClearScreen(err))
     return false;
   //logDebug() << "Send display text ...";
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
+  if (! sendDisplay(0, 0, "qDMR", 4, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Writing", 3, 1, 0, err))
+  if (! sendDisplay(0, 16, "Writing", 7, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
+  if (! sendDisplay(0, 32, "Codeplug", 8, 1, 0, err))
     return false;
   //logDebug() << "Send 'render CPS' ...";
   if (! sendRenderCPS(err))
@@ -308,11 +342,11 @@ OpenGD77Interface::read_start(uint32_t bank, uint32_t addr, const ErrorStack &er
     return false;
   if (! sendClearScreen(err))
     return false;
-  if (! sendDisplay(0, 0, "qDMR", 3, 1, 0, err))
+  if (! sendDisplay(0, 0, "qDMR", 4, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 16, "Reading", 3, 1, 0, err))
+  if (! sendDisplay(0, 16, "Reading", 7, 1, 0, err))
     return false;
-  if (! sendDisplay(0, 32, "Codeplug", 3, 1, 0, err))
+  if (! sendDisplay(0, 32, "Codeplug", 8, 1, 0, err))
     return false;
   if (! sendRenderCPS(err))
     return false;
@@ -412,7 +446,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const 
 
 bool
 OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
-  WriteRequest req; req.initWriteEEPROM(addr, data, len);
+  WriteRequest req; req.initWriteEEPROM(_protocolVariant, addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
@@ -497,7 +531,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len, const E
 
 bool
 OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
-  WriteRequest req; req.initSetFlashSector(addr);
+  WriteRequest req; req.initSetFlashSector(_protocolVariant, addr);
   WriteResponse resp;
 
   if (5 != QSerialPort::write((const char *)&req, 5)) {
@@ -533,7 +567,7 @@ OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
 
 bool
 OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, const ErrorStack &err) {
-  WriteRequest req; req.initWriteFlash(addr, data, len);
+  WriteRequest req; req.initWriteFlash(_protocolVariant, addr, data, len);
   WriteResponse resp;
 
   if ((8+len) != QSerialPort::write((const char *)&req, 8+len)) {
@@ -572,7 +606,7 @@ bool
 OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
   //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
-  req.initFinishWriteFlash();
+  req.initFinishWriteFlash(_protocolVariant);
   WriteResponse resp;
 
   if ((2) != QSerialPort::write((const char *)&req, 2)) {
@@ -599,6 +633,43 @@ OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
     errMsg(err) << "Cannot write to flash: Device returned error " << resp.type << ".";
     return false;
   }
+
+  return true;
+}
+
+bool
+OpenGD77Interface::readFirmwareInfo(OpenGD77Interface::FirmwareInfo &radioInfo, const ErrorStack &err) {
+  logDebug() << "Request radio info.";
+  ReadRequest req; req.initReadFirmwareInfo();
+
+  if (sizeof(ReadRequest) != QSerialPort::write((const char *)&req, sizeof(ReadRequest))) {
+    errMsg(err) << "Serial port error: " << QSerialPort::errorString();
+    errMsg(err) << "Cannot send read request.";
+    return false;
+  }
+
+  if (! waitForReadyRead(1000)) {
+    errMsg(err) << "Cannot read from serial port: Timeout!";
+    return false;
+  }
+
+  ReadResponse resp;
+  int retlen = QSerialPort::read((char *)&resp, sizeof(ReadResponse));
+
+  if (0 > retlen) {
+    errMsg(err) << "Cannot read from serial port.";
+    return false;
+  } else if (0 == retlen) {
+    errMsg(err) << "Cannot read radio info: Device returned empty message.";
+    return false;
+  }
+
+  if (req.type != resp.type) {
+    errMsg(err) << "Cannot read radio info: Device returned error " << resp.type << ", expected 'R'.";
+    return false;
+  }
+
+  memcpy(&radioInfo, &(resp.info), sizeof(FirmwareInfo));
 
   return true;
 }
@@ -671,7 +742,7 @@ OpenGD77Interface::sendClearScreen(const ErrorStack &err) {
 bool
 OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_t iSize, uint8_t alignment, uint8_t inverted, const ErrorStack &err) {
   CommandRequest req;
-  req.initDisplay(x,y, message, iSize, alignment, inverted);
+  req.initDisplay(x,y, message, iSize, 3, alignment, inverted);
   uint8_t resp;
 
   if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {

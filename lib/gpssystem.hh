@@ -4,6 +4,7 @@
 #include "configreference.hh"
 #include <QAbstractTableModel>
 #include "anytone_extension.hh"
+#include "opengd77_extension.hh"
 
 class Config;
 class DMRContact;
@@ -134,12 +135,25 @@ class APRSSystem: public PositioningSystem
 
   /** The transmit channel. */
   Q_PROPERTY(FMChannelReference* revert READ revert WRITE setRevert)
+  /** The destination call. */
+  Q_PROPERTY(QString destination READ destination WRITE setDestination SCRIPTABLE false)
+  /** The destination SSID. */
+  Q_PROPERTY(unsigned int destSSID READ destSSID WRITE setDestSSID SCRIPTABLE false)
+  /** The source call. */
+  Q_PROPERTY(QString source READ source WRITE setSource SCRIPTABLE false)
+  /** The source SSID. */
+  Q_PROPERTY(unsigned int srcSSID READ srcSSID WRITE setSrcSSID SCRIPTABLE false)
+  /** The APRS path as a string. */
+  Q_PROPERTY(QString path READ path WRITE setPath SCRIPTABLE false)
+
   /** The APRS icon. */
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
   Q_PROPERTY(QString message READ message WRITE setMessage)
   /** Anytone sepecific settings. */
   Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** OpenGD77 sepecific settings. */
+  Q_PROPERTY(OpenGD77APRSSystemExtension *opengd77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:
   static const unsigned PRIMARY_TABLE   = (0<<8);   ///< Primary icon table flag.
@@ -204,6 +218,10 @@ public:
   unsigned destSSID() const;
   /** Sets the destination call and SSID. */
   void setDestination(const QString &call, unsigned ssid);
+  /** Sets the destination call. */
+  void setDestination(const QString &call);
+  /** Sets the destination SSID. */
+  void setDestSSID(unsigned ssid);
 
   /** Returns the source call. */
   const QString &source() const;
@@ -211,6 +229,10 @@ public:
   unsigned srcSSID() const;
   /** Sets the source call and SSID. */
   void setSource(const QString &call, unsigned ssid);
+  /** Sets the source call. */
+  void setSource(const QString &call);
+  /** Sets the source SSID. */
+  void setSrcSSID(unsigned ssid);
 
   /** Returns the APRS path. */
   const QString &path() const;
@@ -231,6 +253,11 @@ public:
   AnytoneFMAPRSSettingsExtension *anytoneExtension() const;
   /** Sets the Anytone settings extension. */
   void setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext);
+
+  /** Returns the OpenGD77 settings extension, if set. */
+  OpenGD77APRSSystemExtension *openGD77Extension() const;
+  /** Sets the OpenGD77 settings extension. */
+  void setOpenGD77Extension(OpenGD77APRSSystemExtension *ext);
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -258,6 +285,8 @@ protected:
   QString _message;
   /** Owns the Anytone settings extension. */
   AnytoneFMAPRSSettingsExtension *_anytone;
+  /** Owns the OpenGD77 settings extension. */
+  OpenGD77APRSSystemExtension *_openGD77;
 };
 
 

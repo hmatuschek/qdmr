@@ -3,6 +3,7 @@
 #include "channel.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include <QRegularExpressionMatch>
 
 
 /* ********************************************************************************************* *
@@ -59,7 +60,7 @@ PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack 
               << ": Positioning system has no period.";
   }
 
-  return ConfigObject::parse(pos, ctx);
+  return ConfigObject::parse(pos, ctx, err);
 }
 
 bool
@@ -195,7 +196,8 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
  * ********************************************************************************************* */
 APRSSystem::APRSSystem(QObject *parent)
   : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
-    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(), _anytone(nullptr)
+    _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
+    _anytone(nullptr), _openGD77(nullptr)
 {
   // Connect to channel reference
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
@@ -205,7 +207,8 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
   : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
-    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message), _anytone(nullptr)
+    _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
+    _anytone(nullptr), _openGD77(nullptr)
 {
   // Set channel reference
   _channel.set(channel);
@@ -265,29 +268,55 @@ const QString &
 APRSSystem::destination() const {
   return _destination;
 }
+
 unsigned
 APRSSystem::destSSID() const {
   return _destSSID;
 }
+
 void
 APRSSystem::setDestination(const QString &call, unsigned ssid) {
   _destination = call;
   _destSSID = ssid;
 }
 
+void
+APRSSystem::setDestination(const QString &call) {
+  _destination = call;
+}
+
+void
+APRSSystem::setDestSSID(unsigned int ssid) {
+  _destSSID = ssid;
+}
+
+
 const QString &
 APRSSystem::source() const {
   return _source;
 }
+
 unsigned
 APRSSystem::srcSSID() const {
   return _srcSSID;
 }
+
 void
 APRSSystem::setSource(const QString &call, unsigned ssid) {
   _source = call;
   _srcSSID = ssid;
 }
+
+void
+APRSSystem::setSource(const QString &call) {
+  _source = call;
+}
+
+void
+APRSSystem::setSrcSSID(unsigned ssid) {
+  _srcSSID = ssid;
+}
+
 
 const QString &
 APRSSystem::path() const {
@@ -335,6 +364,23 @@ APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
   }
 }
 
+OpenGD77APRSSystemExtension *
+APRSSystem::openGD77Extension() const {
+  return _openGD77;
+}
+void
+APRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
+  if (_openGD77) {
+    _openGD77->deleteLater();
+    _openGD77 = nullptr;
+  }
+  if (ext) {
+    _openGD77 = ext;
+    ext->setParent(this);
+    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
+}
+
 YAML::Node
 APRSSystem::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node = PositioningSystem::serialize(context, err);
@@ -353,11 +399,12 @@ APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack 
   node["source"] = QString("%1-%2").arg(_source).arg(_srcSSID).toStdString();
 
   QStringList path;
-  QRegExp pattern("([A-Za-z0-9]+-[0-9]+)");
+  QRegularExpression pattern("([A-Za-z0-9]+-[0-9]+)");
   int idx = 0;
-  while (0 <= (idx = pattern.indexIn(_path, idx))) {
-    path.append(pattern.cap(1));
-    idx += pattern.matchedLength();
+  auto match = pattern.match(_path, idx);
+  while (match.hasMatch()) {
+    path.append(match.captured(1));
+    idx += match.capturedLength(1);
   }
 
   if (path.count()) {
@@ -387,13 +434,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   YAML::Node sys = node.begin()->second;
   if (sys["source"] && sys["source"].IsScalar()) {
     QString source = QString::fromStdString(sys["source"].as<std::string>());
-    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
-    if (! pattern.exactMatch(source)) {
+    QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    auto match = pattern.match(source);
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
       return false;
     }
-    setSource(pattern.cap(1), pattern.cap(2).toUInt());
+    setSource(match.captured(1), match.captured(2).toUInt());
   } else {
     errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                 << ": Cannot parse APRS system: No source call+SSID specified.";
@@ -402,13 +450,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
   if (sys["destination"] && sys["destination"].IsScalar()) {
     QString dest = QString::fromStdString(sys["destination"].as<std::string>());
-    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
-    if (! pattern.exactMatch(dest)) {
+    QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    auto match = pattern.match(dest);
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
       return false;
     }
-    setDestination(pattern.cap(1), pattern.cap(2).toUInt());
+    setDestination(match.captured(1), match.captured(2).toUInt());
   } else {
     errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                 << ": Cannot parse APRS system: No destination call+SSID specified.";
@@ -421,7 +470,7 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
       if (it->IsScalar())
         path.append(QString::fromStdString(it->as<std::string>()));
     }
-    setPath(path.join(""));
+    setPath(path.join(","));
   }
 
   return PositioningSystem::parse(node, ctx, err);

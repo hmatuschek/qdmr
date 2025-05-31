@@ -15,11 +15,13 @@ private slots:
   void testReaderCTCSS();
   void testReaderDCS();
   void testReaderCross();
+  void testReaderBandwidth();
 
   void testWriterBasic();
   void testWriterCTCSS();
   void testWriterDCS();
   void testWriterCross();
+  void testWriterBandwidth();
 };
 
 #endif // CHIRPTEST_HH
