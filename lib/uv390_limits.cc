@@ -70,11 +70,11 @@ UV390Limits::UV390Limits(QObject *parent)
 
   /* Define limits for channel list. */
   add("channels", new RadioLimitList(
-        Channel::staticMetaObject, 1, 3000,
+        Channel::staticMetaObject, 1, UV390Codeplug::Limit::channels(),
         new RadioLimitObjects {
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
-              {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+              {"name", new RadioLimitString(1, UV390Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.),
@@ -83,7 +83,7 @@ UV390Limits::UV390Limits(QObject *parent)
                                                                   Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
-              {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
+              {"scanlist", new RadioLimitObjRef({ScanList::staticMetaObject})},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -102,7 +102,7 @@ UV390Limits::UV390Limits(QObject *parent)
             } },
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
-              {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
+              {"name", new RadioLimitString(1, UV390Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
@@ -154,13 +154,14 @@ UV390Limits::UV390Limits(QObject *parent)
         }) );
 
   /* Define limits for positioning systems in case, this is a MD-380G/MD-390G. */
-  add("positioning", new RadioLimitList(
-        GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
+  add("positioning", new RadioLimitList({
+        { GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
-        } ) );
+          { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
+          } },
+        { APRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } }) );
 
   /* Check encryption keys. */
   add("commercial", new RadioLimitItem {

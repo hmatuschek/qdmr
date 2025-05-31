@@ -609,6 +609,13 @@ RadioLimitObjRef::RadioLimitObjRef(const QMetaObject &type, bool allowNull, QObj
   _types.insert(type.className());
 }
 
+RadioLimitObjRef::RadioLimitObjRef(const MetaObjectList &types, bool allowNull, QObject *parent)
+  : RadioLimitElement(parent), _allowNull(allowNull), _types()
+{
+  for (auto type=types.begin(); type!=types.end(); type++)
+    _types.insert(type->className());
+}
+
 bool
 RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
   ConfigObjectReference *ref = prop.read(item).value<ConfigObjectReference *>();
