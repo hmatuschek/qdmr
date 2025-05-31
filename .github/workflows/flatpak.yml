@@ -18,3 +18,12 @@ jobs:
         bundle: qdmr.flatpak
         manifest-path: de.darc.dm3mat.qdmr.yaml
         cache-key: flatpak-builder-${{ github.sha }}
+    - name: upload linux artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: qdmr-x86_64.flatpak.zip 
+        asset_name: qdmr-x86_64.flatpak.zip 
+        asset_content_type: application/zip
