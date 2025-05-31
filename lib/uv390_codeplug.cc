@@ -5,10 +5,6 @@
 #include <QTimeZone>
 
 
-#define NUM_CHANNELS                3000
-#define ADDR_CHANNELS           0x110000
-#define CHANNEL_SIZE            0x000040
-
 #define NUM_CONTACTS               10000
 #define ADDR_CONTACTS           0x140000
 #define CONTACT_SIZE            0x000024
@@ -59,15 +55,16 @@ UV390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr, size_t size)
 }
 
 UV390Codeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : TyTCodeplug::ChannelElement(ptr, CHANNEL_SIZE)
+  : TyTCodeplug::ChannelElement(ptr, size())
 {
   // pass...
 }
 
 void
 UV390Codeplug::ChannelElement::clear() {
-  Element::clear();
+  TyTCodeplug::ChannelElement::clear();
 
+  enableTalkaround(false);
   clearBit(5,0);
   setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
   setTurnOffFreq(TyTChannelExtension::KillTone::Off);
@@ -76,6 +73,15 @@ UV390Codeplug::ChannelElement::clear() {
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
   enableDCDMLeader(true);
+}
+
+bool
+UV390Codeplug::ChannelElement::talkaround() const {
+  return getBit(Offset::talkaround());
+}
+void
+UV390Codeplug::ChannelElement::enableTalkaround(bool enable) {
+  setBit(Offset::talkaround(), enable);
 }
 
 TyTChannelExtension::InCallCriterion UV390Codeplug::ChannelElement::inCallCriteria() const {
@@ -233,7 +239,7 @@ UV390Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr, size_t size)
 }
 
 UV390Codeplug::VFOChannelElement::VFOChannelElement(uint8_t *ptr)
-  : ChannelElement(ptr, CHANNEL_SIZE)
+  : ChannelElement(ptr, size())
 {
   // pass...
 }
@@ -594,7 +600,7 @@ UV390Codeplug::UV390Codeplug(QObject *parent)
   image(0).addElement(0x110000, 0x90000);
 
   // Clear entire codeplug
-  clear();
+  UV390Codeplug::clear();
 }
 
 UV390Codeplug::~UV390Codeplug() {
@@ -605,8 +611,8 @@ void
 UV390Codeplug::clear() {
   TyTCodeplug::clear();
 
-  clearBootSettings();
-  clearVFOSettings();
+  UV390Codeplug::clearBootSettings();
+  UV390Codeplug::clearVFOSettings();
 }
 
 void
@@ -641,20 +647,19 @@ UV390Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
 void
 UV390Codeplug::clearChannels() {
   // Clear channels
-  for (int i=0; i<NUM_CHANNELS; i++)
-    ChannelElement(data(ADDR_CHANNELS+i*CHANNEL_SIZE)).clear();
+  for (unsigned int i=0; i<Limit::channels(); i++)
+    ChannelElement(data(Offset::channels()+i*Offset::betweenChannels())).clear();
 }
 
 bool
 UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
-  for (int i=0; i<NUM_CHANNELS; i++) {
-    ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < config->channelList()->count()) {
+  for (unsigned int i=0; i<Limit::channels(); i++) {
+    ChannelElement chan(data(Offset::channels()+i*Offset::betweenChannels()));
+    chan.clear();
+    if (i < (unsigned int)config->channelList()->count()) {
       chan.fromChannelObj(config->channelList()->channel(i), ctx);
-    } else {
-      chan.clear();
     }
   }
   return true;
@@ -662,8 +667,8 @@ UV390Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, 
 
 bool
 UV390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
-  for (int i=0; i<NUM_CHANNELS; i++) {
-    ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
+  for (unsigned int i=0; i<Limit::channels(); i++) {
+    ChannelElement chan(data(Offset::channels()+i*Offset::betweenChannels()));
     if (! chan.isValid())
       continue;
     if (Channel *obj = chan.toChannelObj()) {
@@ -678,11 +683,11 @@ UV390Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &er
 
 bool
 UV390Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  for (int i=0; i<NUM_CHANNELS; i++) {
-    ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
+  for (unsigned int i=0; i<Limit::channels(); i++) {
+    ChannelElement chan(data(Offset::channels()+i*Offset::betweenChannels()));
     if (! chan.isValid())
       continue;
-    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx)) {
+    if (! chan.linkChannelObj(ctx.get<Channel>(i+1), ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
       return false;
     }

@@ -40,13 +40,13 @@ MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
           ((uint8_t *)buffer.data()) + channel_offset + i*CHANNEL_SIZE);
     if (! channel.isValid())
       continue;
-    if (channel.rxFrequency()) {
-      range.first = std::min(range.first, channel.rxFrequency()/1e6);
-      range.second = std::max(range.second, channel.rxFrequency()/1e6);
+    if (channel.rxFrequency().inHz()) {
+      range.first = std::min(range.first, channel.rxFrequency().inMHz());
+      range.second = std::max(range.second, channel.rxFrequency().inMHz());
     }
-    if (channel.txFrequency()) {
-      range.first = std::min(range.first, channel.txFrequency()/1e6);
-      range.second = std::max(range.second, channel.txFrequency()/1e6);
+    if (channel.txFrequency().inHz()) {
+      range.first = std::min(range.first, channel.txFrequency().inMHz());
+      range.second = std::max(range.second, channel.txFrequency().inMHz());
     }
     channelCount++;
   }
