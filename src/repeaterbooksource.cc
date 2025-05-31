@@ -120,7 +120,7 @@ RepeaterBookSource::onRequestFinished(QNetworkReply *reply) {
     }
 
     if (obj["DMR"].toString() == "Yes") {
-      type = RepeaterDatabaseEntry::Type::FM;
+      type = RepeaterDatabaseEntry::Type::DMR;
       if (obj.contains("DMR Color Code"))
         colorCode = obj["DMR Color Code"].toString().toInt();
     }
