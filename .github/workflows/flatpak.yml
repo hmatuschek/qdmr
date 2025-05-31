@@ -1,7 +1,6 @@
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
 
 name: Flatpak
 
@@ -17,5 +16,5 @@ jobs:
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: qdmr.flatpak
-        manifest-path: de.darc.dm3mat.qdmr.yml
+        manifest-path: de.darc.dm3mat.qdmr.yaml
         cache-key: flatpak-builder-${{ github.sha }}
