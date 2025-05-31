@@ -1957,7 +1957,7 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
         <source>[Selected]</source>
-        <translation>[Auswahl]</translation>
+        <translation>[Ausgewählt]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="20"/>
