@@ -2643,7 +2643,7 @@ TyTCodeplug::EncryptionElement::clear() {
 bool
 TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
   QByteArray key = enhancedKey(n);
-  for (int i=0; i<16; i++) {
+  for (unsigned int i=1; i<Offset::betweenAdvancedKeys(); i++) {
     if (key[0] != key[i])
       return true;
   }
@@ -2665,7 +2665,7 @@ TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key
 bool
 TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
   QByteArray key = basicKey(n);
-  for (int i=0; i<2; i++)
+  for (unsigned int i=1; i<Offset::betweenBasicKeys(); i++)
     if (key[0] != key[i])
       return true;
   return ('\xff'!=key[0]) && ('\x00' != key[0]);
@@ -2752,7 +2752,7 @@ TyTCodeplug::MessageElement::clear() {
 
 bool
 TyTCodeplug::MessageElement::isValid() const {
-  return Element::isValid() && (0xffff != getUInt16_le(0));
+  return Element::isValid() && (0xffff != getUInt16_le(0)) && (0x0000 != getUInt16_le(0));
 }
 
 QString
