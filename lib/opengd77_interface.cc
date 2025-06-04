@@ -221,16 +221,10 @@ OpenGD77Interface::identifier(const ErrorStack &err) {
   case FirmwareInfo::RadioType::MD380:
   case FirmwareInfo::RadioType::DM1701:
   case FirmwareInfo::RadioType::DM1701RGB:
+  case FirmwareInfo::RadioType::MD9600:
+  case FirmwareInfo::RadioType::MD2017:
     _protocolVariant = Variant::UV380;
   return RadioInfo::byID(RadioInfo::OpenUV380);
-
-  case FirmwareInfo::RadioType::MD9600:
-    logInfo() << "OpenGD77 variant MD9600 not supported (yet).";
-  return RadioInfo();
-
-  case FirmwareInfo::RadioType::MD2017:
-    logInfo() << "OpenGD77 variant MD2017 not supported (yet).";
-  return RadioInfo();
   }
 
   errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
