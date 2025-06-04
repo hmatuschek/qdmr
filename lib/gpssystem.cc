@@ -435,6 +435,7 @@ APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack 
   while (match.hasMatch()) {
     path.append(match.captured(1));
     idx += match.capturedLength(1);
+    match = pattern.match(_path, idx);
   }
 
   if (path.count()) {
