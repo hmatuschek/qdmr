@@ -5,7 +5,7 @@
 OpenGD77SatelliteConfig::OpenGD77SatelliteConfig(QObject *parent)
   : OpenGD77BaseSatelliteConfig(parent)
 {
-  image(FLASH).addElement(Offset::satellites(), 0x11a0);
+  image(FLASH).addElement(Offset::satellites(), size()); // of 0x11a0 bytes
 }
 
 

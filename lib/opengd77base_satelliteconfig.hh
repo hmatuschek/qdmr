@@ -184,6 +184,9 @@ public:
   /** Default constructor. */
   explicit OpenGD77BaseSatelliteConfig(QObject *parent = nullptr);
 
+  /** Size of the image to write. */
+  static constexpr unsigned int size() { return 0x09c0; }
+
   /** Encodes the given satellite database. */
   virtual bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack()) = 0;
 };
