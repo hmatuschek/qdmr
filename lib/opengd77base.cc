@@ -137,10 +137,7 @@ OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, c
     return false;
   }
 
-  // Assemble call-sign db from user DB
-  logDebug() << "Encode satellite config..";
-  if (! _satelliteConfig->encode(db, err))
-    return false;
+  _satelliteDatabase = db;
 
   _task = StatusUploadSatellites;
   _errorStack = err;
@@ -416,6 +413,11 @@ OpenGD77Base::uploadCallsigns()
 bool
 OpenGD77Base::uploadSatellites()
 {
+  if (! _satelliteDatabase) {
+    errMsg(_errorStack) << "Cannot write satellite config. No config present.";
+    return false;
+  }
+
   emit uploadStarted();
 
   // Check every segment in the codeplug
@@ -425,31 +427,60 @@ OpenGD77Base::uploadSatellites()
   }
 
   size_t totb = _satelliteConfig->memSize();
+  if (! _dev->read_start(OpenGD77BaseSatelliteConfig::FLASH, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot start satellite config download.";
+    return false;
+  }
+
+  // Then download satellite config
+  size_t bcount = 0;
+  for (int n=0; n<_satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).numElements(); n++) {
+    unsigned addr = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).address();
+      unsigned size = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).data().size();
+      unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+      for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
+        if (! _dev->read(OpenGD77BaseSatelliteConfig::FLASH, (b0+b)*BSIZE, _satelliteConfig->data((b0+b)*BSIZE, OpenGD77BaseSatelliteConfig::FLASH), BSIZE, _errorStack)) {
+          errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
+          return false;
+        }
+        QThread::usleep(100);
+        emit uploadProgress(float(bcount*50)/totb);
+      }
+  }
+  logDebug() << "Read " << Qt::hex << bcount << "b of additional settings from device.";
+  _dev->read_finish();
+
+  //if (!_satelliteConfig->isValid())
+  //  _satelliteConfig->initialize();
+
+  // Encode config into codeplug
+  if (! _satelliteConfig->encode(_satelliteDatabase, _errorStack)) {
+    errMsg(_errorStack) << "Cannot encode satellite config.";
+    return false;
+  }
 
   if (! _dev->write_start(OpenGD77BaseSatelliteConfig::FLASH, 0, _errorStack)) {
     errMsg(_errorStack) << "Cannot start satellite config upload.";
     return false;
   }
 
-  unsigned bcount = 0;
-  // Then upload config
+  // Then upload satellite config
   for (int n=0; n<_satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).numElements(); n++) {
     unsigned addr = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).address();
     unsigned size = _satelliteConfig->image(OpenGD77BaseSatelliteConfig::FLASH).element(n).data().size();
     unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+
     for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
-      if (! _dev->write(OpenGD77BaseCodeplug::FLASH, (b0+b)*BSIZE,
-                        _satelliteConfig->data((b0+b)*BSIZE, OpenGD77BaseSatelliteConfig::FLASH),
-                        BSIZE, _errorStack))
-      {
+      if (! _dev->write(OpenGD77BaseSatelliteConfig::FLASH, (b0+b)*BSIZE, _satelliteConfig->data((b0+b)*BSIZE, OpenGD77BaseSatelliteConfig::FLASH), BSIZE, _errorStack)) {
         errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
         return false;
       }
-      emit uploadProgress(float(bcount*100)/totb);
+      QThread::usleep(100);
+      emit uploadProgress(float(bcount*50)/totb);
     }
   }
-
   _dev->write_finish();
+
   return true;
 }
 
