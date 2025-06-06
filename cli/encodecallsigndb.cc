@@ -11,6 +11,7 @@
 #include "uv390_callsigndb.hh"
 #include "md2017_callsigndb.hh"
 #include "opengd77_callsigndb.hh"
+#include "openuv380_callsigndb.hh"
 #include "gd77_callsigndb.hh"
 #include "d868uv_callsigndb.hh"
 #include "d878uv2_callsigndb.hh"
@@ -142,7 +143,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
   } else if (RadioInfo::OpenUV380 == radio) {
-    OpenGD77CallsignDB db;
+    OpenUV380CallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;
