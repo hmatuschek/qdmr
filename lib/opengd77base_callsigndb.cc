@@ -89,7 +89,7 @@ OpenGD77BaseCallsignDB::DatabaseHeaderElement::DatabaseHeaderElement(uint8_t *pt
 void
 OpenGD77BaseCallsignDB::DatabaseHeaderElement::clear() {
   memset(_data, 0, size());
-  writeASCII(Offset::magic(), "ID", 2);
+  writeASCII(Offset::magic(), "Id", 2);
   setUInt8(Offset::format(), (unsigned int)Format::Compressed);
   setUInt8(Offset::entrySize(), 0x59); // = 15 bytes -> 16 chars for text
   writeASCII(Offset::version(),"001", 3);

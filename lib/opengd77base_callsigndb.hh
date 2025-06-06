@@ -93,7 +93,7 @@ public:
     /// Possible formats.
     enum class Format {
       Uncompressed = 45,
-      Compressed   = 89
+      Compressed   = 78
     };
 
   protected:
