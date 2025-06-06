@@ -24,7 +24,8 @@ public:
   /** Constructor. */
   explicit OpenGD77CallsignDB(QObject *parent=nullptr);
 
-  static constexpr unsigned int size() { return 0x40000; }
+  static constexpr unsigned int size0() { return 0x40000; }
+  static constexpr unsigned int size1() { return 0x48000; }
 
   /** Encodes as many entries as possible of the given user-database. */
   bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
@@ -33,9 +34,16 @@ public:
 public:
   /** Some limts of the callsign DB. */
   struct Limit: public OpenGD77BaseCallsignDB::Limit {
-    /// Number of entries.
+    /// Number of entries, segement 0.
+    static constexpr unsigned int entries0() {
+      return (size0()-DatabaseHeaderElement::size())/DatabaseEntryElement::size();
+    }
+    /// Number of entries, segement 1.
+    static constexpr unsigned int entries1() {
+      return size1()/DatabaseEntryElement::size();
+    }
     static constexpr unsigned int entries() {
-      return (size()-DatabaseHeaderElement::size())/DatabaseEntryElement::size();
+      return entries0() + entries1();
     }
   };
 
@@ -43,8 +51,9 @@ protected:
   /** Some internal offsets within the callsign db. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int header()  { return 0x30000; }
-    static constexpr unsigned int entries() { return header() + DatabaseHeaderElement::size(); }
+    static constexpr unsigned int header()   { return 0x030000; }
+    static constexpr unsigned int entries0() { return header() + DatabaseHeaderElement::size(); }
+    static constexpr unsigned int entries1() { return 0x0b8000; }
     /// @endcond
   };
 };
