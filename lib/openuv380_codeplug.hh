@@ -72,36 +72,38 @@ protected:
   /** Internal used image indices. */
   struct ImageIndex {
     /// @cond DO_NOT_DOCUEMNT
-    static constexpr unsigned int settings()     { return FLASH; }
-    static constexpr unsigned int dtmfSettings() { return FLASH; }
-    static constexpr unsigned int aprsSettings() { return FLASH; }
-    static constexpr unsigned int dtmfContacts() { return FLASH; }
-    static constexpr unsigned int channelBank0() { return FLASH; }
-    static constexpr unsigned int bootSettings() { return FLASH; }
-    static constexpr unsigned int vfoA()         { return FLASH; }
-    static constexpr unsigned int vfoB()         { return FLASH; }
-    static constexpr unsigned int zoneBank()     { return FLASH; }
-    static constexpr unsigned int channelBank1() { return FLASH; }
-    static constexpr unsigned int contacts()     { return FLASH; }
-    static constexpr unsigned int groupLists()   { return FLASH; }
+    static constexpr unsigned int settings()           { return FLASH; }
+    static constexpr unsigned int dtmfSettings()       { return FLASH; }
+    static constexpr unsigned int aprsSettings()       { return FLASH; }
+    static constexpr unsigned int dtmfContacts()       { return FLASH; }
+    static constexpr unsigned int channelBank0()       { return FLASH; }
+    static constexpr unsigned int bootSettings()       { return FLASH; }
+    static constexpr unsigned int vfoA()               { return FLASH; }
+    static constexpr unsigned int vfoB()               { return FLASH; }
+    static constexpr unsigned int zoneBank()           { return FLASH; }
+    static constexpr unsigned int additionalSettings() { return FLASH; }
+    static constexpr unsigned int channelBank1()       { return FLASH; }
+    static constexpr unsigned int contacts()           { return FLASH; }
+    static constexpr unsigned int groupLists()         { return FLASH; }
     /// @endcond
   };
 
   /** Some offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUEMNT
-    static constexpr unsigned int settings()     { return 0x00000080; }
-    static constexpr unsigned int dtmfSettings() { return 0x00001470; }
-    static constexpr unsigned int aprsSettings() { return 0x00001588; }
-    static constexpr unsigned int dtmfContacts() { return 0x00002f88; }
-    static constexpr unsigned int channelBank0() { return 0x00003780; } // Channels 1-128
-    static constexpr unsigned int bootSettings() { return 0x00007518; }
-    static constexpr unsigned int vfoA()         { return 0x00007590; }
-    static constexpr unsigned int vfoB()         { return 0x000075c8; }
-    static constexpr unsigned int zoneBank()     { return 0x00008010; }
-    static constexpr unsigned int channelBank1() { return 0x0009b1b0; } // Channels 129-1024
-    static constexpr unsigned int contacts()     { return 0x000a7620; }
-    static constexpr unsigned int groupLists()   { return 0x000ad620; }
+    static constexpr unsigned int settings()           { return 0x00000080; }
+    static constexpr unsigned int dtmfSettings()       { return 0x00001470; }
+    static constexpr unsigned int aprsSettings()       { return 0x00001588; }
+    static constexpr unsigned int dtmfContacts()       { return 0x00002f88; }
+    static constexpr unsigned int channelBank0()       { return 0x00003780; } // Channels 1-128
+    static constexpr unsigned int bootSettings()       { return 0x00007518; }
+    static constexpr unsigned int vfoA()               { return 0x00007590; }
+    static constexpr unsigned int vfoB()               { return 0x000075c8; }
+    static constexpr unsigned int zoneBank()           { return 0x00008010; }
+    static constexpr unsigned int additionalSettings() { return 0x00020000; }
+    static constexpr unsigned int channelBank1()       { return 0x0009b1b0; } // Channels 129-1024
+    static constexpr unsigned int contacts()           { return 0x000a7620; }
+    static constexpr unsigned int groupLists()         { return 0x000ad620; }
     /// @endcond
   };
 };
