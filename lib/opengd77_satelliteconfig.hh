@@ -1,6 +1,7 @@
 #ifndef OPENGD77_SATELLITECONFIG_HH
 #define OPENGD77_SATELLITECONFIG_HH
 
+#include "opengd77base_codeplug.hh"
 #include "opengd77base_satelliteconfig.hh"
 
 
@@ -12,6 +13,9 @@ public:
   /** Default constructor. */
   explicit OpenGD77SatelliteConfig(QObject *parent = nullptr);
 
+  bool isValid() const;
+  void initialize();
+
   /** Encodes the given satellite database. */
   virtual bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack());
 
@@ -20,7 +24,7 @@ public:
   struct Limit {
     /** The maximum number of satellites. */
     static constexpr unsigned int satellites() {
-      return OpenGD77BaseSatelliteConfig::SatelliteBankElement::Limit::satellites();
+      return OpenGD77BaseCodeplug::SatelliteBankElement::Limit::satellites();
     }
   };
 

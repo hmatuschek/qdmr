@@ -18,7 +18,7 @@ OpenUV380Codeplug::OpenUV380Codeplug(QObject *parent)
   addImage("OpenGD77 Codeplug FLASH");
   image(FLASH).addElement(0x00000080, 0x00005fe0);
   image(FLASH).addElement(0x00007500, 0x00003b00);
-  image(FLASH).addElement(0x00020000, 0x000011a0);
+  image(FLASH).addElement(0x00020000, AdditionalSettingsElement::size());
   image(FLASH).addElement(0x0009b000, 0x00013e60);
 }
 
