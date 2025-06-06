@@ -83,6 +83,10 @@ protected slots:
   void onItemModified(int idx);
 
 protected:
+  /** Returns a string containing all extension properties set. */
+  QString formatExtensions(int idx) const;
+
+protected:
   /** Holds a weak reference to the list object. */
   AbstractConfigObjectList *_list;
   /** Insert index for drag & drop move. */

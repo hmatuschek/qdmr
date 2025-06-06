@@ -198,6 +198,32 @@ GenericTableWrapper::onItemModified(int idx) {
   emit dataChanged(index(idx,0),index(idx,columnCount()-1));
 }
 
+QString
+GenericTableWrapper::formatExtensions(int idx) const {
+  if (idx >= _list->count())
+    return QString();
+
+  ConfigObject *item = _list->get(idx);
+  QStringList extensions;
+  auto metaObj = item->metaObject();
+  for (int i=QObject::staticMetaObject.propertyCount(); i<metaObj->propertyCount(); i++) {
+    auto prop = metaObj->property(i);
+    if (QMetaType::UnknownType == prop.userType())
+      continue;
+    QMetaType type(prop.userType());
+    if (! (QMetaType::PointerToQObject & type.flags()))
+      continue;
+    const QMetaObject *propType = type.metaObject();
+    if (! propType->inherits(&ConfigExtension::staticMetaObject))
+      continue;
+    if (prop.read(item).isNull())
+      continue;
+    extensions.append(prop.name());
+  }
+  return extensions.join(", ");
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of ChannelListWrapper
@@ -211,7 +237,7 @@ ChannelListWrapper::ChannelListWrapper(ChannelList *list, QObject *parent)
 int
 ChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 21;
+  return 22;
 }
 
 QVariant
@@ -428,7 +454,12 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return tr("Narrow");
     }
     break;
-
+  case 21: {
+      auto exts = formatExtensions(index.row());
+      if (exts.isEmpty())
+        return tr("[None]");
+      return exts;
+    }
   default:
     break;
   }
@@ -462,6 +493,7 @@ ChannelListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 18: return tr("Rx Tone");
   case 19: return tr("Tx Tone");
   case 20: return tr("Bandwidth");
+  case 21: return tr("Extensions");
     default:
       break;
   }
@@ -505,7 +537,7 @@ RoamingChannelListWrapper::RoamingChannelListWrapper(RoamingChannelList *list, Q
 int
 RoamingChannelListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 6;
+  return 7;
 }
 
 QVariant
@@ -542,6 +574,13 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
       return zones.join(", ");
     } break;
 
+  case 6: {
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
+
   default: break;
   }
 
@@ -559,6 +598,7 @@ RoamingChannelListWrapper::headerData(int section, Qt::Orientation orientation, 
   case 3: return tr("CC");
   case 4: return tr("TS");
   case 5: return tr("Zones");
+  case 6: return tr("Extensions");
   default: break;
   }
   return QVariant();
@@ -601,7 +641,7 @@ ContactListWrapper::ContactListWrapper(ContactList *list, QObject *parent)
 int
 ContactListWrapper::columnCount(const QModelIndex &index) const {
   Q_UNUSED(index);
-  return 4;
+  return 5;
 }
 
 QVariant
@@ -622,27 +662,35 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
           return dtmf->number();
         case 3:
           return (dtmf->ring() ? tr("On") : tr("Off"));
+        case 4:
+          return formatExtensions(index.row());
         default:
           return QVariant();
       }
     } else if (contact->is<DMRContact>()) {
       DMRContact *dmr = contact->as<DMRContact>();
       switch (index.column()) {
-        case 0:
-          switch (dmr->type()) {
-            case DMRContact::PrivateCall: return tr("Private Call");
-            case DMRContact::GroupCall: return tr("Group Call");
-            case DMRContact::AllCall: return tr("All Call");
-          }
-        break;
-        case 1:
-          return dmr->name();
-        case 2:
-          return dmr->number();
-        case 3:
-          return (dmr->ring() ? tr("On") : tr("Off"));
-        default:
-          return QVariant();
+      case 0:
+        switch (digi->type()) {
+        case DMRContact::PrivateCall: return tr("Private Call");
+        case DMRContact::GroupCall: return tr("Group Call");
+        case DMRContact::AllCall: return tr("All Call");
+        }
+      break;
+      case 1:
+      return digi->name();
+      case 2:
+      return digi->number();
+      case 3:
+      return (digi->ring() ? tr("On") : tr("Off"));
+      case 4: {
+        auto exts = formatExtensions(index.row());
+        if (exts.isEmpty())
+          return tr("[None]");
+        return exts;
+      }
+      default:
+      return QVariant();
       }
     } else if (contact->is<M17Contact>()) {
       M17Contact *m17 = contact->as<M17Contact>();
@@ -680,6 +728,8 @@ ContactListWrapper::headerData(int section, Qt::Orientation orientation, int rol
     return tr("Number");
   } else if (3 == section) {
     return tr("RX Tone");
+  } else if (4 == section) {
+    return tr("Extensions");
   }
   return QVariant();
 }
@@ -722,7 +772,7 @@ PositioningSystemListWrapper::PositioningSystemListWrapper(PositioningSystems *l
 int
 PositioningSystemListWrapper::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 6;
+  return 7;
 }
 
 QVariant
@@ -742,8 +792,10 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return tr("APRS");
     else
       return QString("Oops!");
+
   case 1:
     return sys->name();
+
   case 2:
     if (sys->is<GPSSystem>()) {
       if (! sys->as<GPSSystem>()->hasContact())
@@ -753,22 +805,35 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
       return QString("%1-%2").arg(sys->as<APRSSystem>()->destination())
           .arg(sys->as<APRSSystem>()->destSSID());
     break;
+
   case 3:
     return sys->period();
+
   case 4:
     if (sys->is<GPSSystem>()) {
-      if ((! sys->as<GPSSystem>()->hasRevertChannel()) || sys->as<GPSSystem>()->revert()->is<SelectedChannel>())
+      if (! sys->as<GPSSystem>()->hasRevertChannel())
         return tr("[Selected]");
       return sys->as<GPSSystem>()->revertChannel()->name();
-    } else if (sys->is<APRSSystem>())
-      return ((nullptr != sys->as<APRSSystem>()->revertChannel()) ?
-                sys->as<APRSSystem>()->revertChannel()->name() : QString("Oops!"));
-    break;
+    } else if (sys->is<APRSSystem>()) {
+      if (! sys->as<APRSSystem>()->hasRevertChannel())
+        return tr("[Selected]");
+      return sys->as<APRSSystem>()->revertChannel()->name();
+    }
+  break;
+
   case 5:
     if (sys->is<GPSSystem>())
       return tr("[None]");
     else if (sys->is<APRSSystem>())
       return sys->as<APRSSystem>()->message();
+  break;
+
+  case 6: {
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
 
   default:
     break;
@@ -788,6 +853,7 @@ PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientatio
   case 3: return tr("Period [s]");
   case 4: return tr("Channel");
   case 5: return tr("Message");
+  case 6: return tr("Extensions");
   default:
     break;
   }
@@ -904,7 +970,7 @@ RadioIdListWrapper::RadioIdListWrapper(RadioIDList *list, QObject *parent)
 int
 RadioIdListWrapper::columnCount(const QModelIndex &idx) const {
   Q_UNUSED(idx);
-  return 3;
+  return 4;
 }
 
 QVariant
@@ -923,6 +989,12 @@ RadioIdListWrapper::data(const QModelIndex &index, int role) const {
     return id->name();
   case 2:
     return id->number();
+  case 3:{
+    auto exts = formatExtensions(index.row());
+    if (exts.isEmpty())
+      return tr("[None]");
+    return exts;
+  }
   default:
     break;
   }
@@ -938,6 +1010,7 @@ RadioIdListWrapper::headerData(int section, Qt::Orientation orientation, int rol
   case 0: return tr("Type");
   case 1: return tr("Name");
   case 2: return tr("Number");
+  case 3: return tr("Extensions");
   default:
     break;
   }

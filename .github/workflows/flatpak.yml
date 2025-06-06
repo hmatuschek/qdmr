@@ -1,0 +1,30 @@
+on:
+  push:
+    tags: 
+      -"*"
+
+name: Flatpak
+
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-5.15-24.08
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v4
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: qdmr.flatpak
+        manifest-path: de.darc.dm3mat.qdmr.yaml
+        cache-key: flatpak-builder-${{ github.sha }}
+    - name: upload linux artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: qdmr-x86_64.flatpak.zip 
+        asset_name: qdmr-x86_64.flatpak.zip 
+        asset_content_type: application/zip

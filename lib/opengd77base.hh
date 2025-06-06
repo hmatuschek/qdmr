@@ -5,9 +5,12 @@
 #ifndef OPENGD77BASE_HH
 #define OPENGD77BASE_HH
 
+#include <QPointer>
+
 #include "radio.hh"
 #include "opengd77_interface.hh"
 #include "opengd77_satelliteconfig.hh"
+#include "satellitedatabase.hh"
 
 
 /** Implements an common USB interface to Open GD-77(S) type devices.
@@ -59,7 +62,8 @@ protected:
   OpenGD77Interface *_dev;
   /** The generic configuration. */
 	Config *_config;
-  /** The encoded eatellite configuraiton. */
+  /** The satellite configuraiton. */
+  QPointer<SatelliteDatabase> _satelliteDatabase;
   OpenGD77BaseSatelliteConfig *_satelliteConfig;
 
 private:

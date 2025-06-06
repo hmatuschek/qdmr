@@ -213,6 +213,20 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // If extension is present, update
   if (nullptr != ext) {
     ext->setFrequencyCorrection(frequenyCorrection());
+    // Decode APRS PTT setting.
+    if (txAnalogAPRS()) {
+      switch(analogAPRSPTTSetting()) {
+      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+    } else if (txDigitalAPRS()) {
+      switch(digitalAPRSPTTSetting()) {
+      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
+      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
+      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
+      }
+    }
   }
 
   return ch;
@@ -265,6 +279,8 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (! D868UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
+  AnytoneChannelExtension *ch_ext = nullptr;
+
   if (const DMRChannel *dc = c->as<DMRChannel>()) {
     // Set GPS system index
     enableRXAPRS(false);
@@ -280,7 +296,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRoaming(true);
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      setFrequencyCorrection(ext->frequencyCorrection());
+      ch_ext = ext;
       /// Handles bug in AnyTone firmware.
       /// @todo Remove once fixed by AnyTone.
       enableRXAPRS(! ext->sms());
@@ -296,7 +312,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
     // Apply extension settings
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
-      setFrequencyCorrection(ext->frequencyCorrection());
+      ch_ext = ext;
       if (! ext->fmAPRSFrequency()->isNull()) {
         int idx = ctx.index(ext->fmAPRSFrequency()->as<AnytoneAPRSFrequency>());
         if ((0 <= idx) && (7 >= idx))
@@ -306,6 +322,25 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       } else {
         // Use default
         setFMAPRSFrequencyIndex(0);
+      }
+    }
+  }
+
+  // Apply common channel extension
+  if (nullptr != ch_ext) {
+    setFrequencyCorrection(ch_ext->frequencyCorrection());
+
+    if (txDigitalAPRS()) {
+      switch(ch_ext->aprsPTT()) {
+      case AnytoneChannelExtension::APRSPTT::Off: setDigitalAPRSPTTSetting(APRSPTT::Off); break;
+      case AnytoneChannelExtension::APRSPTT::Start: setDigitalAPRSPTTSetting(APRSPTT::Start); break;
+      case AnytoneChannelExtension::APRSPTT::End: setDigitalAPRSPTTSetting(APRSPTT::End); break;
+      }
+    } else if (txAnalogAPRS()) {
+      switch(ch_ext->aprsPTT()) {
+      case AnytoneChannelExtension::APRSPTT::Off: setAnalogAPRSPTTSetting(APRSPTT::Off); break;
+      case AnytoneChannelExtension::APRSPTT::Start: setAnalogAPRSPTTSetting(APRSPTT::Start); break;
+      case AnytoneChannelExtension::APRSPTT::End: setAnalogAPRSPTTSetting(APRSPTT::End); break;
       }
     }
   }
@@ -2108,7 +2143,7 @@ D878UVCodeplug::ExtendedSettingsElement::autoRepeaterVHF2MaxFrequency() const {
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterVHF2MaxFrequency(Frequency hz) {
-  setBCD8_be(Offset::autoRepeaterVHF2MaxFrequency(), hz.inHz()/10);
+  setUInt32_le(Offset::autoRepeaterVHF2MaxFrequency(), hz.inHz()/10);
 }
 Frequency
 D878UVCodeplug::ExtendedSettingsElement::autoRepeaterUHF2MinFrequency() const {
@@ -3000,7 +3035,7 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
 {
   Q_UNUSED(ctx)
   clear();
-  if (! sys->revertChannel()) {
+  if (! sys->hasRevertChannel()) {
     errMsg(err) << "Cannot encode APRS settings: "
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
@@ -3130,7 +3165,7 @@ D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSS
     setDMRDestination(idx, sys->contactObj()->number());
     setDMRCallType(idx, sys->contactObj()->type());
   }
-  if (sys->hasRevertChannel() && (SelectedChannel::get() != (Channel *)sys->revertChannel())) {
+  if (sys->hasRevertChannel()) {
     setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
     clearDMRTimeSlotOverride(idx);
   } else { // no revert channel specified or "selected channel":
@@ -3148,12 +3183,9 @@ D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
 
 bool
 D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
-  // Clear revert channel from GPS system
-  sys->setRevertChannel(nullptr);
-
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
-    sys->setRevertChannel(nullptr);
+    sys->resetRevertChannel();
   else if (ctx.has<Channel>(dmrChannelIndex(idx)) && ctx.get<Channel>(dmrChannelIndex(idx))->is<DMRChannel>())
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 

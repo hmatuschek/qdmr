@@ -77,6 +77,9 @@ public:
     /** Clears/resets the channel and therefore disables it. */
     void clear();
 
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
     /** Returns the mode of the channel. */
     virtual Mode mode() const;
     /** Sets the mode of the channel. */
@@ -170,10 +173,14 @@ public:
     /** Sets the transmit contact index (+1) for this channel. */
     virtual void setContactIndex(uint16_t idx);
 
+    /** Returns @c true, if the transmit time out is disabled. */
+    virtual bool txTimeOutDisabled() const;
     /** Returns the transmit time-out in seconds. */
-    virtual unsigned txTimeOut() const;
+    virtual Interval txTimeOut() const;
     /** Sets the transmit time-out in seconds. */
-    virtual void setTXTimeOut(unsigned tot);
+    virtual void setTXTimeOut(const Interval &tot);
+    /** Disables the transmit timeout. */
+    virtual void resetTXTimeOut();
     /** Returns the transmit time-out re-key delay in seconds. */
     virtual uint8_t txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */
@@ -205,13 +212,13 @@ public:
     virtual void setDTMFDecode(uint8_t idx, bool enable);
 
     /** Returns the RX frequency in Hz. */
-    virtual uint32_t rxFrequency() const;
+    virtual Frequency rxFrequency() const;
     /** Sets the RX frequency in Hz. */
-    virtual void setRXFrequency(uint32_t Hz);
+    virtual void setRXFrequency(const Frequency &Hz);
     /** Returns the TX frequency in Hz. */
-    virtual uint32_t txFrequency() const;
+    virtual Frequency txFrequency() const;
     /** Sets the TX frequency in Hz. */
-    virtual void setTXFrequency(uint32_t Hz);
+    virtual void setTXFrequency(const Frequency &Hz);
 
     /** Returns the CTCSS/DSC signaling for RX. */
     virtual SelectiveCall rxSignaling() const;
@@ -250,6 +257,55 @@ public:
     virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
+
+  public:
+    /** Some limits of the element. */
+    struct Limit: public Element::Limit {
+      /** Maximum length of the name. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Offset::Bit mode() { return {0x0000, 0}; }
+      static constexpr Offset::Bit bandwidth() { return {0x0000, 2}; }
+      static constexpr Offset::Bit autoscan() { return {0x0000, 4}; }
+      static constexpr Offset::Bit loneworker() { return {0x0000, 8}; }
+      static constexpr Offset::Bit talkaround() { return {0x0001, 0}; }
+      static constexpr Offset::Bit rxonly() { return {0x0001, 1}; }
+      static constexpr Offset::Bit timeslot() { return {0x0001, 2}; }
+      static constexpr Offset::Bit colorcode() { return {0x0001, 4}; }
+      static constexpr Offset::Bit privacyIndex() { return {0x0002, 0}; }
+      static constexpr Offset::Bit privacyType() { return {0x0002, 4}; }
+      static constexpr Offset::Bit privateCallConfirm() { return {0x0002, 6}; }
+      static constexpr Offset::Bit dataCallConfirm() { return {0x0002, 7}; }
+      static constexpr Offset::Bit rxRefFrequency() { return {0x0003, 0}; }
+      static constexpr Offset::Bit emergencyAlarmACK() { return {0x0003, 3}; }
+      static constexpr Offset::Bit displayPTTId() { return {0x0003, 7}; }
+      static constexpr Offset::Bit txRefFrequency() { return {0x0004, 0}; }
+      static constexpr Offset::Bit vox() { return {0x0004, 4}; }
+      static constexpr Offset::Bit admitCriterion() { return {0x0004, 6}; }
+      static constexpr unsigned int contactIndex() { return 0x0006; }
+      static constexpr Offset::Bit txTimeOut() { return {0x0008, 0}; }
+      static constexpr unsigned int txTimeOutRekeyDelay() { return 0x0009; }
+      static constexpr unsigned int emergencySystemIndex() { return 0x000a; }
+      static constexpr unsigned int scanListIndex() { return 0x000b; }
+      static constexpr unsigned int groupListIndex() { return 0x000c; }
+      static constexpr unsigned int positioningSystemIndex() { return 0x000d; }
+      static constexpr unsigned int dtmfDecode() { return 0x000e; }
+      static constexpr unsigned int rxFrequency() { return 0x0010; }
+      static constexpr unsigned int txFrequency() { return 0x0014; }
+      static constexpr unsigned int rxSignaling() { return 0x018; }
+      static constexpr unsigned int txSignaling() { return 0x01a; }
+      static constexpr unsigned int rxSignalingSystemIndex() { return 0x01c; }
+      static constexpr unsigned int txSignalingSystemIndex() { return 0x01d; }
+      static constexpr Offset::Bit txGPSInfo() { return {0x001f, 0}; }
+      static constexpr Offset::Bit rxGPSInfo() { return {0x001f, 1}; }
+      static constexpr unsigned int name() { return 0x0020; }
+      /// @endcond
+    };
   };
 
   /** Represents a digital (DMR) contact within the codeplug.
@@ -434,7 +490,7 @@ public:
     /** Creates a scan list. */
     virtual ScanList *toScanListObj(Context &ctx);
     /** Links the scan list object. */
-    virtual bool linkScanListObj(ScanList *lst, Context &ctx);
+    virtual bool linkScanListObj(ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
   /** Codeplug representation of the general settings.

@@ -16,7 +16,7 @@
 
 <screenshot>
   <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-positioning.png" width="13cm" align="center"/>></imageobject>
+    <imageobject><imagedata fileref="fig/qdmr-positioning.png" width="13cm" align="center"/></imageobject>
     <textobject>Screen-shot of the GPS or APRS settings.</textobject>
   </mediaobject>
   <title>The list GPS/APRS systems.</title> 

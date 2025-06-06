@@ -3,9 +3,6 @@
 #include "userdatabase.hh"
 #include <QtEndian>
 
-#define USERDB_SIZE         0x40000
-#define USERDB_NUM_ENTRIES  (USERDB_SIZE-sizeof(userdb_t))/sizeof(userdb_entry_t)
-
 
 /* ******************************************************************************************** *
  * Implementation of OpenUV380CallsignDB
@@ -21,13 +18,15 @@ bool
 OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  // Limit entries to USERDB_NUM_ENTRIES
-  qint64 n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
+  // Limit entry count
+  auto n = std::min((unsigned int)calldb->count(), Limit::entries());
   if (selection.hasCountLimit())
-    n = std::min(n, (qint64)selection.countLimit());
+    n = std::min(n, (unsigned int)selection.countLimit());
   // If there are no entries -> done.
   if (0 == n)
     return true;
+  auto n0 = std::min(n, Limit::entries0()),
+      n1 = std::min(n - n0, Limit::entries1());
 
   // Select first n entries and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
@@ -36,16 +35,24 @@ OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, co
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
-  // Allocate segment for user db if requested
-  unsigned size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), Limit::blockSize());
-  this->image(0).addElement(Offset::callsignDB(), size);
+  // Allocate segment0 for user db if requested
+  unsigned size = align_size(DatabaseHeaderElement::size()+n0*DatabaseEntryElement::size(),
+                             Limit::blockSize());
+  this->image(0).addElement(Offset::header(), size);
+  size = align_size(n1*DatabaseEntryElement::size(), Limit::blockSize());
+  if (n1)
+    this->image(0).addElement(Offset::entries1(), size);
 
   // Encode user DB
-  userdb_t *userdb = (userdb_t *)this->data(Offset::callsignDB());
-  userdb->clear(); userdb->setSize(n);
-  userdb_entry_t *db = (userdb_entry_t *)this->data(Offset::callsignDB()+sizeof(userdb_t));
-  for (unsigned i=0; i<n; i++) {
-    db[i].fromEntry(users[i]);
+  DatabaseHeaderElement header(this->data(Offset::header()));
+  header.clear(); header.setEntryCount(n);
+  for (unsigned i=0; i<n0; i++) {
+    DatabaseEntryElement(this->data(Offset::entries0() + i*DatabaseEntryElement::size()))
+        .fromEntry(users[i]);
+  }
+  for (unsigned i=0; i<n1; i++) {
+    DatabaseEntryElement(this->data(Offset::entries1() + i*DatabaseEntryElement::size()))
+        .fromEntry(users[n0+i]);
   }
 
   return true;

@@ -17,7 +17,7 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
   image(EEPROM).addElement(0x07500, 0x03b00);
 
   addImage("OpenGD77 Codeplug FLASH");
-  image(FLASH).addElement(0x00000, 0x011a0);
+  image(FLASH).addElement(0x00000, AdditionalSettingsElement::size());
   image(FLASH).addElement(0x7b000, 0x13e60);
 }
 

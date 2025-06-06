@@ -19,6 +19,13 @@
     features are present in all radios. For example, not all supported devices implement APRS or 
     roaming. These settings are then ignored when generating the device specific binary code plug.
   </para>  
+
+  <para>
+    Some radios provide settings, that are important but also specific to a single model or family
+    of models. <application>qdmr</application> aims at supporting these settings through so-called 
+    extensions. These extensions can be attached to all elements of a codeplug. For example to 
+    channels, contacts, zones, etc. 
+  </para>
 </note>
 
 <xi:include href="radiosettings.xml"/>

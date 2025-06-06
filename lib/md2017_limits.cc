@@ -152,13 +152,13 @@ MD2017Limits::MD2017Limits(QObject *parent)
         }) );
 
   /* Define limits for positioning systems. */
-  add("positioning", new RadioLimitList(
-        GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
+  add("positioning", new RadioLimitList({
+        { GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
-          { "revert", new RadioLimitObjRef(DMRChannel::staticMetaObject, true) }
-        } ) );
+          { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
+        { APRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );
 
   /* Check encryption keys. */
   add("commercial", new RadioLimitItem {
