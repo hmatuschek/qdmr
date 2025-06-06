@@ -3,9 +3,6 @@
 #include "userdatabase.hh"
 #include <QtEndian>
 
-#define USERDB_SIZE         0x40000
-#define USERDB_NUM_ENTRIES  (USERDB_SIZE-sizeof(userdb_t))/sizeof(userdb_entry_t)
-
 
 /* ******************************************************************************************** *
  * Implementation of OpenUV380CallsignDB
@@ -21,8 +18,8 @@ bool
 OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  // Limit entries to USERDB_NUM_ENTRIES
-  qint64 n = std::min(calldb->count(), qint64(USERDB_NUM_ENTRIES));
+  // Limit entry count
+  qint64 n = std::min(calldb->count(), qint64(Limit::entries()));
   if (selection.hasCountLimit())
     n = std::min(n, (qint64)selection.countLimit());
   // If there are no entries -> done.
@@ -37,15 +34,16 @@ OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, co
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
   // Allocate segment for user db if requested
-  unsigned size = align_size(sizeof(userdb_t)+n*sizeof(userdb_entry_t), Limit::blockSize());
-  this->image(0).addElement(Offset::callsignDB(), size);
+  unsigned size = align_size(DatabaseHeaderElement::size()+n*DatabaseEntryElement::size(),
+                             Limit::blockSize());
+  this->image(0).addElement(Offset::header(), size);
 
   // Encode user DB
-  userdb_t *userdb = (userdb_t *)this->data(Offset::callsignDB());
-  userdb->clear(); userdb->setSize(n);
-  userdb_entry_t *db = (userdb_entry_t *)this->data(Offset::callsignDB()+sizeof(userdb_t));
+  DatabaseHeaderElement header(this->data(Offset::header()));
+  header.clear(); header.setEntryCount(n);
   for (unsigned i=0; i<n; i++) {
-    db[i].fromEntry(users[i]);
+    DatabaseEntryElement(this->data(Offset::entries() + i*DatabaseEntryElement::size()))
+        .fromEntry(users[i]);
   }
 
   return true;

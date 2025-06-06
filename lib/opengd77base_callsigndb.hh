@@ -1,6 +1,7 @@
 #ifndef OPENGD77BASECALLSIGNDB_HH
 #define OPENGD77BASECALLSIGNDB_HH
 
+#include "codeplug.hh"
 #include "callsigndb.hh"
 #include "userdatabase.hh"
 
@@ -39,24 +40,94 @@ public:
     void fromEntry(const UserDatabase::User &user);
   };
 
-  /** Represents the binary call-sign database header.
-   *
-   * Memory representation of the call-sign DB header (size: 0x0c bytes):
-   * @verbinclude opengd77_callsign_db_header.txt
-   **/
-  struct __attribute__((packed)) userdb_t {
-    char magic[3];                      ///< Fixed string 'ID-'
-    uint8_t size;                       ///< Fixed to 0x5d for 15 byte names.
-    char version[3];                    ///< Version string? Fixed to '001'
-    uint8_t unused6;                    ///< Unused, set to 0x00.
-    uint32_t count;                     ///< Number of contacts in DB, 32bit little-endian.
 
+  /** Represents a single encoded database entry.
+   * Consists of a DMR ID and compressed text. The text size is fixed to 16 chars. Each
+   * char is encoded using a 6bit table. Thus 16 chars are stored in 12 bytes. */
+  class DatabaseEntryElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    DatabaseEntryElement(uint8_t *ptr, size_t size);
+
+  public:
     /** Constructor. */
-    userdb_t();
-    /** Resets the header. */
+    DatabaseEntryElement(uint8_t *ptr);
+
+    /** The size of the entry. */
+    static constexpr unsigned int size() { return 0x000f; }
+
     void clear();
-    /** Sets the number of DB entries. This number is limited to USERDB_NUM_ENTRIES.*/
-    void setSize(unsigned n);
+
+    /** Encodes the DMR ID. */
+    void setId(unsigned int id);
+    /** Encodes the text. */
+    void setText(const QString &text);
+    /** Encodes the given user. */
+    void fromEntry(const UserDatabase::User &user);
+
+  public:
+    /** Some limits. */
+    struct Limit: public Element::Limit {
+      // The length of the text.
+      static constexpr unsigned int textLength() { return 16; }
+    };
+
+  protected:
+    /** Internal offsets within entry. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int dmrID() { return 0x0000; }
+      static constexpr unsigned int text()  { return 0x0003; }
+      /// @endcond
+    };
+
+    static QVector<QChar> _lut;
+  };
+
+
+  /** Represents the header of the callsign database. */
+  class DatabaseHeaderElement: public Codeplug::Element
+  {
+  public:
+    /// Possible formats.
+    enum class Format {
+      Uncompressed = 45,
+      Compressed   = 89
+    };
+
+  protected:
+    /** Hidden constructor. */
+    DatabaseHeaderElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    DatabaseHeaderElement(uint8_t *ptr);
+
+    /** The size of the header. */
+    static constexpr unsigned int size() { return 0x000c; }
+
+    void clear();
+
+    void setEntryCount(unsigned int count);
+
+  public:
+    /** Some limits for the header. */
+    struct Limit: public Element::Limit {
+      /// None..
+    };
+
+  protected:
+    /** Internal offsets within the header. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int magic()      { return 0x0000; }
+      static constexpr unsigned int format()     { return 0x0002; }
+      static constexpr unsigned int entrySize()  { return 0x0003; }
+      static constexpr unsigned int version()    { return 0x0004; }
+      static constexpr unsigned int entryCount() { return 0x0008; }
+      /// @endcond
+    };
   };
 
 

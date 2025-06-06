@@ -24,15 +24,27 @@ public:
   /** Constructor. */
   explicit OpenUV380CallsignDB(QObject *parent=nullptr);
 
+  static constexpr unsigned int size() { return 0x40000; }
+
   /** Encodes as many entries as possible of the given user-database. */
   bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
               const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some limts of the callsign DB. */
+  struct Limit: public OpenGD77BaseCallsignDB::Limit {
+    /// Number of entries.
+    static constexpr unsigned int entries() {
+      return (size()-DatabaseHeaderElement::size())/DatabaseEntryElement::size();
+    }
+  };
 
 protected:
   /** Some internal offsets within the callsign db. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int callsignDB() { return 0x00050000; }
+    static constexpr unsigned int header()  { return 0x00050000; }
+    static constexpr unsigned int entries() { return header() + DatabaseHeaderElement::size(); }
     /// @endcond
   };
 };
