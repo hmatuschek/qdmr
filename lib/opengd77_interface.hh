@@ -321,7 +321,11 @@ protected:
       REBOOT = 1,
       SAVE_SETTINGS_AND_VFOS = 2,
       FLASH_GREEN_LED = 3,
-      FLASH_RED_LED = 4
+      FLASH_RED_LED = 4,
+      INIT_CODEC = 5,
+      INIT_SOUND = 6,
+      SET_DATETIME = 7,
+      DELAY_10ms = 10
     };
 
     /** Message type, here 'C' for command. */
@@ -335,14 +339,21 @@ protected:
       /** The command option. */
       uint8_t option;
     };
-    /** The y-position on the screen. */
-    uint8_t y;
-    /** The font size. */
-    uint8_t font;
-    /** The text alignment. */
-    uint8_t alignment;
-    /** Is text inverted? */
-    uint8_t inverted;
+    // Either some text options or a timestamp.
+    union {
+      struct __attribute__((packed)) {
+        /** The y-position on the screen. */
+        uint8_t y;
+        /** The font size. */
+        uint8_t font;
+        /** The text alignment. */
+        uint8_t alignment;
+        /** Is text inverted? */
+        uint8_t inverted;
+      };
+      uint32_t timestamp;
+    };
+
     /** Some text message. */
     char message[16];
 
@@ -359,6 +370,8 @@ protected:
     void initCloseScreen();
     /** Construct a command message with the given option. */
     void initCommand(Option option);
+    /** Construct a SET_DATETIME message with the given date time. */
+    void initSetDateTime(const QDateTime &dt);
   };
 
 protected:
@@ -391,6 +404,8 @@ protected:
   bool sendRenderCPS(const ErrorStack &err=ErrorStack());
   /** Send a "close screen" message. */
   bool sendCloseScreen(const ErrorStack &err=ErrorStack());
+  /** Send a "set date time" message. */
+  bool sendSetDateTime(const QDateTime &dt, const ErrorStack &err=ErrorStack());
   /** Sends some command message with the given options. */
   bool sendCommand(CommandRequest::Option option, const ErrorStack &err=ErrorStack());
 

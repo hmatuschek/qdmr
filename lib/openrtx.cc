@@ -110,7 +110,7 @@ OpenRTX::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags
 
 bool
 OpenRTX::startUploadCallsignDB(UserDatabase *db, bool blocking,
-                               const CallsignDB::Selection &selection,const ErrorStack &err)
+                               const CallsignDB::Flags &selection,const ErrorStack &err)
 {
   Q_UNUSED(db); Q_UNUSED(blocking); Q_UNUSED(selection)
   errMsg(err) << "OpenRTX has no call-sign DB implemented.";

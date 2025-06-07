@@ -81,11 +81,11 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
 
   Codeplug::Flags flags;
-  flags.updateCodePlug = false;
+  flags.setUpdateCodeplug(false);
   if (parser.isSet("auto-enable-gps"))
-    flags.autoEnableGPS = true;
+    flags.setAutoEnableGPS(true);
   if (parser.isSet("auto-enable-roaming"))
-    flags.autoEnableRoaming = true;
+    flags.setAutoEnableRoaming(true);
 
   Config config;
   ErrorStack err;

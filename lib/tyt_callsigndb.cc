@@ -152,7 +152,7 @@ TyTCallsignDB::~TyTCallsignDB() {
 }
 
 bool
-TyTCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+TyTCallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Allocate space for callsign db

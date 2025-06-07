@@ -2,6 +2,8 @@
 #define CALLSIGNDB_HH
 
 #include "dfufile.hh"
+#include "transferflags.hh"
+
 
 // Forward decl.
 class UserDatabase;
@@ -17,12 +19,12 @@ class CallsignDB : public DFUFile
 public:
   /** Controls the selection of callsigns from the @c UserDatabase to be encoded into the
    * callsign db. */
-  class Selection {
+  class Flags: public TransferFlags {
   public:
     /** Constructor. */
-    Selection(int64_t count=-1);
+    Flags(int64_t count=-1);
     /** Copy constructor. */
-    Selection(const Selection &other);
+    Flags(const Flags &other);
 
     /** Returns @c true if the selection has a limit on the number of callsigns to encode. */
     bool hasCountLimit() const;
@@ -48,7 +50,7 @@ public:
   virtual ~CallsignDB();
 
   /** Encodes the given user db into the device specific callsign db. */
-  virtual bool encode(UserDatabase *db, const Selection &selection=Selection(),
+  virtual bool encode(UserDatabase *db, const Flags &selection=Flags(),
                       const ErrorStack &err=ErrorStack()) = 0;
 };
 

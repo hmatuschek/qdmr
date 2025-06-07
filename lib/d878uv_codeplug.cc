@@ -2403,7 +2403,7 @@ bool
 D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     this->clear();
 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))

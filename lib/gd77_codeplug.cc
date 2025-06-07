@@ -271,7 +271,7 @@ GD77Codeplug::clearGeneralSettings() {
 bool
 GD77Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   GeneralSettingsElement el(data(Offset::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
   return el.fromConfig(ctx, err);
 }

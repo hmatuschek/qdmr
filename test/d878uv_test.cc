@@ -27,7 +27,7 @@ D878UVTest::initTestCase() {
 void
 D878UVTest::testBasicConfigEncoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
@@ -38,7 +38,7 @@ D878UVTest::testBasicConfigEncoding() {
 void
 D878UVTest::testBasicConfigDecoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
@@ -55,7 +55,7 @@ D878UVTest::testBasicConfigDecoding() {
 void
 D878UVTest::testAnalogMicGain() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_micGainConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
@@ -75,7 +75,7 @@ D878UVTest::testAnalogMicGain() {
 void
 D878UVTest::testChannelFrequency() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
@@ -98,7 +98,7 @@ D878UVTest::testChannelFrequency() {
 void
 D878UVTest::testRoaming() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
   if (! codeplug.encode(&_roamingConfig, flags, err)) {
     QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: {}")
@@ -148,7 +148,7 @@ D878UVTest::testHangTime() {
 
   // Encode
   D878UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     QFAIL(QString("Cannot prepare codeplug for AnyTone AT-D878UVE: %1")
@@ -206,7 +206,7 @@ D878UVTest::testKeyFunctions() {
 
   // Encode
   D878UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UV: %1")
           .arg(err.format()).toStdString().c_str());
@@ -259,7 +259,7 @@ D878UVTest::testFMAPRSSettings() {
 
   // Encode
   D878UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     QFAIL(QString("Cannot prepare codeplug for AnyTone AT-D878UV: %1")
@@ -311,7 +311,7 @@ D878UVTest::testRegressionDefaultChannel() {
   config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
 
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());
@@ -350,7 +350,7 @@ D878UVTest::testRegressionAutoRepeater() {
   config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
 
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
           .arg(err.format()).toStdString().c_str());

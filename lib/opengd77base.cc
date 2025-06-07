@@ -38,7 +38,7 @@ OpenGD77Base::limits() const {
 
 
 bool
-OpenGD77Base::startDownload(bool blocking, const ErrorStack &err) {
+OpenGD77Base::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task) {
     logError() << "Cannot download from radio, radio is not idle.";
     return false;
@@ -47,7 +47,7 @@ OpenGD77Base::startDownload(bool blocking, const ErrorStack &err) {
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -62,7 +62,7 @@ OpenGD77Base::startDownload(bool blocking, const ErrorStack &err) {
 
 
 bool
-OpenGD77Base::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+OpenGD77Base::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   Q_UNUSED(flags)
 
   logDebug() << "Start upload to " << name() << "...";
@@ -84,7 +84,7 @@ OpenGD77Base::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   _task = StatusUpload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -99,7 +99,7 @@ OpenGD77Base::startUpload(Config *config, bool blocking, const Codeplug::Flags &
 }
 
 bool
-OpenGD77Base::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+OpenGD77Base::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
@@ -113,7 +113,7 @@ OpenGD77Base::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 
   _task = StatusUploadCallsigns;
   _errorStack = err;
-  if (blocking) {
+  if (selection.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -129,7 +129,7 @@ OpenGD77Base::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 
 
 bool
-OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
   logDebug() << "Start upload to " << name() << "...";
 
   if (StatusIdle != _task) {
@@ -141,7 +141,7 @@ OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, c
 
   _task = StatusUploadSatellites;
   _errorStack = err;
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }

@@ -127,6 +127,15 @@ Settings::setUpdateCodeplug(bool update) {
 }
 
 bool
+Settings::updateDeviceClock() const {
+  return value("updateDeviceClock", false).toBool();
+}
+void
+Settings::setUpdateDeviceClock(bool update) {
+  setValue("updateDeviceClock", update);
+}
+
+bool
 Settings::autoEnableGPS() const {
   return value("autoEnableGPS", false).toBool();
 }
@@ -156,9 +165,9 @@ Settings::setLastDirectoryDir(const QDir &dir) {
 Codeplug::Flags
 Settings::codePlugFlags() const {
   Codeplug::Flags flags;
-  flags.updateCodePlug = updateCodeplug();
-  flags.autoEnableGPS  = autoEnableGPS();
-  flags.autoEnableRoaming = autoEnableRoaming();
+  flags.setUpdateCodeplug(updateCodeplug());
+  flags.setAutoEnableGPS(autoEnableGPS());
+  flags.setAutoEnableRoaming(autoEnableRoaming());
   return flags;
 }
 
