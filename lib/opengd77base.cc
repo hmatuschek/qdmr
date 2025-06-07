@@ -10,7 +10,7 @@
 RadioLimits *OpenGD77Base::_limits = nullptr;
 
 OpenGD77Base::OpenGD77Base(OpenGD77Interface *device, QObject *parent)
-  : Radio(parent), _dev(device), _config(nullptr), _satelliteConfig(nullptr)
+  : Radio(parent), _dev(device), _flags(), _config(nullptr), _satelliteConfig(nullptr)
 {
   // pass...
 }
@@ -80,11 +80,12 @@ OpenGD77Base::startUpload(Config *config, const Codeplug::Flags &flags, const Er
     return false;
   }
   _config->setParent(this);
+  _flags = flags;
 
   _task = StatusUpload;
   _errorStack = err;
 
-  if (flags.blocking()) {
+  if (_flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -112,8 +113,9 @@ OpenGD77Base::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &s
   callsignDB()->encode(db, selection);
 
   _task = StatusUploadCallsigns;
+  _flags = selection;
   _errorStack = err;
-  if (selection.blocking()) {
+  if (_flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -140,8 +142,9 @@ OpenGD77Base::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFl
   _satelliteDatabase = db;
 
   _task = StatusUploadSatellites;
+  _flags = flags;
   _errorStack = err;
-  if (flags.blocking()) {
+  if (_flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -311,6 +314,12 @@ OpenGD77Base::upload()
 
   size_t totb = codeplug().memSize();
 
+  if (_flags.updateDeviceClock() &&
+      (! _dev->setDateTime(QDateTime::currentDateTimeUtc(), _errorStack))) {
+    errMsg(_errorStack) << "Cannot set device clock.";
+    return false;
+  }
+
   if (! _dev->read_start(0, 0, _errorStack)) {
     errMsg(_errorStack) << "Cannot start codeplug download.";
     return false;
@@ -334,8 +343,8 @@ OpenGD77Base::upload()
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
-    _dev->read_finish();
   }
+  _dev->read_finish();
 
   // Encode config into codeplug
   codeplug().encode(_config);
@@ -382,6 +391,12 @@ OpenGD77Base::uploadCallsigns()
   }
 
   size_t totb = callsignDB()->memSize();
+
+  if (_flags.updateDeviceClock() &&
+      (! _dev->setDateTime(QDateTime::currentDateTimeUtc(), _errorStack))) {
+    errMsg(_errorStack) << "Cannot set device clock.";
+    return false;
+  }
 
   if (! _dev->write_start(OpenGD77BaseCodeplug::FLASH, 0, _errorStack)) {
     errMsg(_errorStack) << "Cannot start callsign DB upload.";
@@ -450,8 +465,11 @@ OpenGD77Base::uploadSatellites()
   logDebug() << "Read " << Qt::hex << bcount << "b of additional settings from device.";
   _dev->read_finish();
 
-  //if (!_satelliteConfig->isValid())
-  //  _satelliteConfig->initialize();
+  if (_flags.updateDeviceClock() &&
+      (! _dev->setDateTime(QDateTime::currentDateTimeUtc(), _errorStack))) {
+    errMsg(_errorStack) << "Cannot set device clock.";
+    return false;
+  }
 
   // Encode config into codeplug
   if (! _satelliteConfig->encode(_satelliteDatabase, _errorStack)) {

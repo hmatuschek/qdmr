@@ -58,6 +58,8 @@ protected:
 protected:
   /** The interface to the radio. */
   OpenGD77Interface *_dev;
+  /** Transfer flags. */
+  TransferFlags _flags;
   /** The generic configuration. */
 	Config *_config;
   /** The satellite configuraiton. */

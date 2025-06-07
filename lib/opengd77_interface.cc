@@ -396,6 +396,11 @@ OpenGD77Interface::read_finish(const ErrorStack &err) {
 }
 
 bool
+OpenGD77Interface::setDateTime(const QDateTime &datetime, const ErrorStack &err) {
+  return sendSetDateTime(datetime, err);
+}
+
+bool
 OpenGD77Interface::reboot(const ErrorStack &err) {
   return sendCommand(CommandRequest::SAVE_SETTINGS_NOT_VFOS, err);
 }

@@ -187,6 +187,8 @@ public:
   bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool write_finish(const ErrorStack &err=ErrorStack());
 
+  bool setDateTime(const QDateTime &datetime, const ErrorStack &err);
+
   bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
