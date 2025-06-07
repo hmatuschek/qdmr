@@ -78,12 +78,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
 
   Codeplug::Flags flags;
   flags.setBlocking(true);
-  if (parser.isSet("init-codeplug"))
-    flags.setUpdateCodeplug(false);
-  if (parser.isSet("auto-enable-gps"))
-    flags.setAutoEnableGPS(true);
-  if (parser.isSet("auto-enable-roaming"))
-    flags.setAutoEnableRoaming(true);
+  flags.setUpdateDeviceClock(parser.isSet("update-device-clock"));
+  flags.setUpdateCodeplug(! parser.isSet("init-codeplug"));
+  flags.setAutoEnableGPS(parser.isSet("auto-enable-gps"));
+  flags.setAutoEnableRoaming(parser.isSet("auto-enable-roaming"));
 
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(intermediate, flags, err)) {

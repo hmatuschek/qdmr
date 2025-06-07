@@ -60,6 +60,7 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   }
 
   CallsignDB::Flags selection;
+  selection.setUpdateDeviceClock(parser.isSet("update-device-clock"));
   if (parser.isSet("limit")) {
     bool ok=true;
     selection.setCountLimit(parser.value("limit").toUInt(&ok));

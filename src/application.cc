@@ -712,6 +712,7 @@ Application::uploadCallsignDB() {
 
   // Assemble flags for callsign DB encoding
   CallsignDB::Flags css;
+  css.setUpdateDeviceClock(settings.updateDeviceClock());
   if (settings.limitCallSignDBEntries()) {
     logDebug() << "Limit callsign DB entries to " << settings.maxCallSignDBEntries() << ".";
     css.setCountLimit(settings.maxCallSignDBEntries());
@@ -767,6 +768,10 @@ Application::uploadSatellites() {
     return;
   }
 
+  Settings settings;
+  TransferFlags flags;
+  flags.setUpdateDeviceClock(settings.updateDeviceClock());
+
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setRange(0, 100); progress->setValue(0);
   progress->setVisible(true);
@@ -775,8 +780,8 @@ Application::uploadSatellites() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  ErrorStack err;
-  TransferFlags flags; flags.setBlocking(false);
+  ErrorStack err;  
+  flags.setBlocking(false);
   if (radio->startUploadSatelliteConfig(_satellites, flags, err)) {
     logDebug() << "Start satellite config write...";
     _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
