@@ -32,7 +32,7 @@ public:
   explicit D878UV2CallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db, const Selection &selection=Selection(),
+  bool encode(UserDatabase *db, const Flags &selection=Flags(),
               const ErrorStack &err=ErrorStack());
 
 public:

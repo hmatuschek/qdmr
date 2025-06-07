@@ -37,18 +37,18 @@ public:
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
-  bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack());
+  bool startDownload(const TransferFlags &flags, const ErrorStack &err=ErrorStack());
 
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
-  bool startUpload(Config *config, bool blocking=false,
-                   const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack());
+  bool startUpload(Config *config, const Codeplug::Flags &flags = Codeplug::Flags(),
+                   const ErrorStack &err=ErrorStack());
 
   /** Encodes the given user-database and uploades it to the device. */
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection(), const ErrorStack &err=ErrorStack());
+  bool startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection=CallsignDB::Flags(),
+                             const ErrorStack &err=ErrorStack());
 
-  bool startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err);
+  bool startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

@@ -16,7 +16,7 @@ DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
 void
 DMR6X2UVTest::testBasicConfigEncoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   DMR6X2UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
@@ -27,7 +27,7 @@ DMR6X2UVTest::testBasicConfigEncoding() {
 void
 DMR6X2UVTest::testBasicConfigDecoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   DMR6X2UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
@@ -44,7 +44,7 @@ DMR6X2UVTest::testBasicConfigDecoding() {
 void
 DMR6X2UVTest::testChannelFrequency() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
@@ -97,7 +97,7 @@ DMR6X2UVTest::testFMAPRSSettings() {
 
   // Encode
   DMR6X2UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     QFAIL(QString("Cannot prepare codeplug for BTECH DMR-6X2UV: %1")

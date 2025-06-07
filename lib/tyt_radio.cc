@@ -27,14 +27,14 @@ TyTRadio::~TyTRadio() {
 }
 
 bool
-TyTRadio::startDownload(bool blocking, const ErrorStack &err) {
+TyTRadio::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -44,7 +44,7 @@ TyTRadio::startDownload(bool blocking, const ErrorStack &err) {
 }
 
 bool
-TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+TyTRadio::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -59,7 +59,7 @@ TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
   _errorStack = err;
   _codeplugFlags = flags;
 
-  if (blocking) {
+  if (flags.blocking()) {
     this->run();
     return (StatusIdle == _task);
   }
@@ -68,7 +68,7 @@ TyTRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
 }
 
 bool
-TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+TyTRadio::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -82,7 +82,7 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
   _task = StatusUploadCallsigns;
   _errorStack = err;
 
-  if (blocking) {
+  if (selection.blocking()) {
     this->run();
     return (StatusIdle == _task);
   }
@@ -93,8 +93,8 @@ TyTRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignD
 
 
 bool
-TyTRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking);
+TyTRadio::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(flags);
   errMsg(err) << "Satellite config upload is not implemented yet.";
   return false;
 }
@@ -212,7 +212,7 @@ TyTRadio::upload() {
 
   size_t bcount = 0;
   // If codeplug gets updated, download codeplug from device first:
-  if (_codeplugFlags.updateCodePlug) {
+  if (_codeplugFlags.updateCodeplug()) {
     for (int n=0; n<codeplug().image(0).numElements(); n++) {
       unsigned addr = codeplug().image(0).element(n).address();
       unsigned size = codeplug().image(0).element(n).data().size();

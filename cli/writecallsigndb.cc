@@ -59,7 +59,8 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
               << "select those entries 'closest' to you. I.e., DMR IDs with the same prefix.";
   }
 
-  CallsignDB::Selection selection;
+  CallsignDB::Flags selection;
+  selection.setUpdateDeviceClock(parser.isSet("update-device-clock"));
   if (parser.isSet("limit")) {
     bool ok=true;
     selection.setCountLimit(parser.value("limit").toUInt(&ok));
@@ -79,7 +80,8 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   showProgress();
   QObject::connect(radio, &Radio::uploadProgress, updateProgress);
 
-  if (! radio->startUploadCallsignDB(&userdb, true, selection, err)) {
+  selection.setBlocking(true);
+  if (! radio->startUploadCallsignDB(&userdb, selection, err)) {
     logError() << "Could not upload call-sign DB to radio: " << err.format();
     return -1;
   }

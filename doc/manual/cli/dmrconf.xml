@@ -261,6 +261,16 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>--update-device-clock</option></term>
+        <listitem>
+          <para>
+            If set, the device clock gets updated with the transfer to the radio. That is,
+            with any codeplug or callsign DB being written to the device. Not all radios support
+            this feature.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>--auto-enable-gps</option></term>
         <listitem>
           <para>

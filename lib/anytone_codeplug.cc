@@ -1690,7 +1690,7 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   setDMRMicGain(ctx.config()->settings()->micLevel());
 
   // If auto-enable GPS is enabled
-  if (flags.autoEnableGPS) {
+  if (flags.autoEnableGPS()) {
     // Check if GPS is required -> enable
     if (ctx.config()->requiresGPS()) {
       enableGPS(true);
@@ -1831,7 +1831,7 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
     // Encode other settings
     enableKeepLastCaller(ext->keepLastCallerEnabled());
-  } else if (! flags.updateCodePlug) {
+  } else if (! flags.updateCodeplug()) {
     clearAutoRepeaterOffsetFrequencyIndexVHF();
     clearAutoRepeaterOffsetFrequencyIndexUHF();
   }
@@ -2047,7 +2047,7 @@ bool
 AnytoneCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     this->clear();
 
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
@@ -4626,7 +4626,7 @@ AnytoneCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
   }
 
   // If codeplug is generated from scratch -> clear and reallocate
-  if (! flags.updateCodePlug) {
+  if (! flags.updateCodeplug()) {
     // Clear codeplug
     this->clear();
     // Then allocate elements

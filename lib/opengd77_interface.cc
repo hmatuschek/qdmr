@@ -2,6 +2,9 @@
 #include "logger.hh"
 #include "radioinfo.hh"
 #include <QtEndian>
+#include <QDateTime>
+#include <QTimeZone>
+
 
 #define USB_VID 0x1fc9
 #define USB_PID 0x0094
@@ -163,6 +166,13 @@ OpenGD77Interface::CommandRequest::initCommand(Option option) {
   this->inverted = 0;
   memset(this->message, 0, sizeof(this->message));
 }
+
+void
+OpenGD77Interface::CommandRequest::initSetDateTime(const QDateTime &dt) {
+  initCommand(SET_DATETIME);
+  this->timestamp = qToLittleEndian(dt.toUTC().toSecsSinceEpoch());
+}
+
 
 
 /* ********************************************************************************************* *
@@ -383,6 +393,11 @@ OpenGD77Interface::read_finish(const ErrorStack &err) {
     return false;
 
   return true;
+}
+
+bool
+OpenGD77Interface::setDateTime(const QDateTime &datetime, const ErrorStack &err) {
+  return sendSetDateTime(datetime, err);
 }
 
 bool
@@ -827,6 +842,39 @@ OpenGD77Interface::sendCloseScreen(const ErrorStack &err) {
 
   return true;
 }
+
+
+bool
+OpenGD77Interface::sendSetDateTime(const QDateTime &dt, const ErrorStack &err) {
+  CommandRequest req; req.initSetDateTime(dt);
+  uint8_t resp;
+
+  if (sizeof(CommandRequest) != QSerialPort::write((const char *) &req, sizeof(CommandRequest))) {
+    errMsg(err) << "Cannot write to serial port.";
+    return false;
+  }
+
+  if (! waitForReadyRead(1000)) {
+    errMsg(err) << "Cannot read from serial port: Timeout!";
+    return false;
+  }
+
+  int retlen = QSerialPort::read((char *)&resp, 1);
+
+  if (0 > retlen) {
+    errMsg(err) << "Cannot read from serial port.";
+    return false;
+  } else if (0 == retlen) {
+    errMsg(err) << "Cannot send command: Device returned empty message.";
+    return false;
+  } else if ('-' != resp) {
+    errMsg(err) << "Cannot send command: Device returned unexpected response '" << (char)resp << "'.";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool
 OpenGD77Interface::sendCommand(CommandRequest::Option option, const ErrorStack &err) {
