@@ -9,6 +9,8 @@
 #include "logger.hh"
 #include "channel.hh"
 
+#include "intermediaterepresentation.hh"
+
 #include <QTimeZone>
 #include <QtEndian>
 
@@ -3545,6 +3547,31 @@ D878UVCodeplug::setBitmaps(Context& ctx)
   unsigned int num_roaming_channel = std::min(Limit::roamingChannels(), ctx.count<RoamingChannel>());
   roaming_ch_bitmap.clear(); roaming_ch_bitmap.enableFirst(num_roaming_channel);
 }
+
+
+Config *
+D878UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for D868UVE.";
+    return nullptr;
+  }
+
+  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  EncryptionKeyFilterVisitor filter(
+        { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
+          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
+          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
 
 bool
 D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)

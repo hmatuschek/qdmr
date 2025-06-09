@@ -91,9 +91,9 @@ public:
 };
 
 
-/** Represents an AES (enhanced) encryption key.
+/** Represents a variable size AES (enhanced) encryption key.
  *
- * This is a 128bit key used for the DMR enhanced encryption method.
+ * This is a 128-256bit key used for the DMR enhanced encryption method.
  *
  * @ingroup conf */
 class AESEncryptionKey: public EncryptionKey

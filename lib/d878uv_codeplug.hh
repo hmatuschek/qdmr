@@ -1941,6 +1941,8 @@ public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);

@@ -632,6 +632,8 @@ public:
   /** Empty constructor. */
   explicit D868UVCodeplug(QObject *parent = nullptr);
 
+  Config* preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   virtual void setBitmaps(Context &ctx);

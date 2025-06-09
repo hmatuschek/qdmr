@@ -8,6 +8,7 @@
 #include "config.h"
 #include "logger.hh"
 #include "utils.hh"
+#include "intermediaterepresentation.hh"
 #include <cmath>
 
 #include <QTimeZone>
@@ -1353,6 +1354,29 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   MessageBytemapElement sms_bytemap(data(Offset::messageBytemap()));
   unsigned int num_messages = std::min(Limit::numMessages(), ctx.count<SMSTemplate>());
   sms_bytemap.clear(); sms_bytemap.enableFirst(num_messages);
+}
+
+
+Config *
+D868UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for D868UVE.";
+    return nullptr;
+  }
+
+  // Remove all but 16bit DMR encryption keys.
+  EncryptionKeyFilterVisitor filter(
+        { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16) });
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  // Remove DMR encryption keys, that are not 16bit wide.
+  return intermediate;
 }
 
 
