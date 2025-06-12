@@ -245,10 +245,15 @@ public:
     /** Sets the DMR APRS system index. */
     virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
+    /** Returns @c true if a DMR encryption key is set. */
+    virtual bool hasDMREncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
     virtual unsigned dmrEncryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
     virtual void setDMREncryptionKeyIndex(unsigned idx);
+    /** Clears the DMR encryption key index. */
+    virtual void clearDMREncryptionKeyIndex();
+
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
     /** Enables/disables multiple key encryption. */
@@ -272,7 +277,9 @@ public:
   protected:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
-      /// @todo Implement
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int dmrEncryptionKey() { return 0x003a; }
+      /// @endcond
     };
   };
 
@@ -761,6 +768,16 @@ protected:
   /** Decodes auto-repeater offset frequencies. */
   virtual bool decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates DMR encryption keys. */
+  virtual void allocatDMREncryptionKeys();
+  /** Encodes DMR encryption keys. */
+  virtual bool encodeDMREncryptionKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decodes DMR encryption keys */
+  virtual bool decodeDMREncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates 'enhanced' encryption keys. */
+  virtual void allocatEnhancedEncryptionKeys();
+
   /** Allocates alarm settings memory section. */
   virtual void allocateAlarmSettings();
   /** Allocates FM broadcast settings memory section. */
@@ -883,8 +900,8 @@ protected:
     static constexpr unsigned int wfmChannels()          { return 0x02480000; }
     static constexpr unsigned int wfmVFO()               { return 0x02480200; }
 
-    static constexpr unsigned int dmrEncryptionIDs()     { return 0x024C1700; }
-    static constexpr unsigned int dmrEncryptionKeys()    { return 0x024C1800; }
+    static constexpr unsigned int dmrEncryptionKeys()      { return 0x024C1700; }
+    static constexpr unsigned int enhancedEncryptionKeys() { return 0x024C1800; }
     /// @endcond
   };
 

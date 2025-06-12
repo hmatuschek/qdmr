@@ -652,20 +652,20 @@ AnytoneCodeplug::ChannelElement::enableLoneWorker(bool enable) {
 }
 
 bool
-AnytoneCodeplug::ChannelElement::hasEncryptionKeyIndex() const {
-  return 0xff != encryptionKeyIndex();
+AnytoneCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
+  return 0xff != aesEncryptionKeyIndex();
 }
 unsigned
-AnytoneCodeplug::ChannelElement::encryptionKeyIndex() const {
+AnytoneCodeplug::ChannelElement::aesEncryptionKeyIndex() const {
   return getUInt8(0x0022);
 }
 void
-AnytoneCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned idx) {
+AnytoneCodeplug::ChannelElement::setAESEncryptionKeyIndex(unsigned idx) {
   setUInt8(0x0022, idx);
 }
 void
-AnytoneCodeplug::ChannelElement::clearEncryptionKeyIndex() {
-  setEncryptionKeyIndex(0xff);
+AnytoneCodeplug::ChannelElement::clearAESEncryptionKeyIndex() {
+  setAESEncryptionKeyIndex(0xff);
 }
 
 QString
@@ -4339,54 +4339,6 @@ AnytoneCodeplug::WFMVFOElement::setFrequency(Frequency freq) {
 }
 
 
-/* ********************************************************************************************* *
- * Implementation of AnytoneCodeplug::DMREncryptionKeyIDListElement
- * ********************************************************************************************* */
-AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-AnytoneCodeplug::DMREncryptionKeyIDListElement::DMREncryptionKeyIDListElement(uint8_t *ptr)
-  : Element(ptr, DMREncryptionKeyIDListElement::size())
-{
-  // pass...
-}
-
-void
-AnytoneCodeplug::DMREncryptionKeyIDListElement::clear() {
-  memset(_data, 0xff, _size);
-}
-
-bool
-AnytoneCodeplug::DMREncryptionKeyIDListElement::hasID(unsigned int n) const {
-  if (n >= Limit::numEntries())
-    return false;
-  return 0xffff == getUInt16_be(n*Offset::betweenIDs());
-}
-
-uint16_t
-AnytoneCodeplug::DMREncryptionKeyIDListElement::id(unsigned int n) const {
-  if (n >= Limit::numEntries())
-    return 0xffff;
-  return getUInt16_be(n*Offset::betweenIDs());
-}
-
-void
-AnytoneCodeplug::DMREncryptionKeyIDListElement::setID(unsigned int n, uint16_t id) {
-  if (n >= Limit::numEntries())
-    return;
-  setUInt16_be(n*Offset::betweenIDs(), id);
-}
-
-void
-AnytoneCodeplug::DMREncryptionKeyIDListElement::clearID(unsigned int n) {
-  if (n >= Limit::numEntries())
-    return;
-  setUInt16_be(n*Offset::betweenIDs(), 0xffff);
-}
-
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::DMREncryptionKeyListElement
@@ -4406,20 +4358,70 @@ AnytoneCodeplug::DMREncryptionKeyListElement::DMREncryptionKeyListElement(uint8_
 void
 AnytoneCodeplug::DMREncryptionKeyListElement::clear() {
   memset(_data, 0x00, _size);
+}
+
+bool
+AnytoneCodeplug::DMREncryptionKeyListElement::hasKey(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return false;
+  return 0 != getUInt16_be(n*Offset::betweenKeys());
+}
+
+QByteArray
+AnytoneCodeplug::DMREncryptionKeyListElement::key(unsigned int n) const {
+  if (n >= Limit::numEntries())
+    return QByteArray::fromHex("0000");
+  return QByteArray((char *)_data + n*Offset::betweenKeys(), 2);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::setKey(unsigned int n, const BasicEncryptionKey &key) {
+  if (n >= Limit::numEntries())
+    return;
+  memcpy(_data + n*Offset::betweenKeys(), key.key().data(), 2);
+}
+
+void
+AnytoneCodeplug::DMREncryptionKeyListElement::clearKey(unsigned int n) {
+  if (n >= Limit::numEntries())
+    return;
+  setUInt16_be(n*Offset::betweenKeys(), 0000);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::EnhancedEncryptionKeyListElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::EnhancedEncryptionKeyListElement::EnhancedEncryptionKeyListElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::EnhancedEncryptionKeyListElement::EnhancedEncryptionKeyListElement(uint8_t *ptr)
+  : Element(ptr, EnhancedEncryptionKeyListElement::size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::EnhancedEncryptionKeyListElement::clear() {
+  memset(_data, 0x00, _size);
   for (unsigned int i=0; i<Limit::numEntries(); i++) {
     setKey(i, QByteArray::fromHex("FFFF"));
   }
 }
 
 QByteArray
-AnytoneCodeplug::DMREncryptionKeyListElement::key(unsigned int n) const {
+AnytoneCodeplug::EnhancedEncryptionKeyListElement::key(unsigned int n) const {
   if (n >= Limit::numEntries())
     return QByteArray();
   return QByteArray::fromRawData((const char *)_data + Offset::keys() + n*Offset::betweenKeys(), 2);
 }
 
 void
-AnytoneCodeplug::DMREncryptionKeyListElement::setKey(unsigned int n, const QByteArray &key) {
+AnytoneCodeplug::EnhancedEncryptionKeyListElement::setKey(unsigned int n, const QByteArray &key) {
   if ((n >= Limit::numEntries()) || (2 != key.size()))
     return;
   memcpy(_data + Offset::keys() + n*Offset::betweenKeys(), key.constData(), 2);
@@ -4571,6 +4573,19 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // Map SMS templates
   for (int i=0; i<config->smsExtension()->smsTemplates()->count(); i++)
     ctx.add(config->smsExtension()->smsTemplates()->get(i)->as<SMSTemplate>(), i);
+
+  if (config->commercialExtension()) {
+    // Map all encryption keys
+    for (int i=0, basic=0, enhanced=0, aes=0; i<config->commercialExtension()->encryptionKeys()->count(); i++) {
+      auto key = config->commercialExtension()->encryptionKeys()->key(i);
+      if (key->is<BasicEncryptionKey>())
+        ctx.add(key->as<BasicEncryptionKey>(), basic++);
+      else if (key->is<EnhancedEncryptionKey>())
+        ctx.add(key->as<EnhancedEncryptionKey>(), enhanced++);
+      else if (key->is<AESEncryptionKey>())
+        ctx.add(key->as<AESEncryptionKey>(), aes++);
+    }
+  }
 
   return true;
 }

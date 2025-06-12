@@ -105,13 +105,21 @@ D868UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
   setUInt8(0x0036, idx);
 }
 
+bool
+D868UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::dmrEncryptionKey());
+}
 unsigned
 D868UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(0x003a);
+  return getUInt8(Offset::dmrEncryptionKey()) - 1;
 }
 void
 D868UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x003a, idx);
+  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+}
+void
+D868UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
+  setUInt8(Offset::dmrEncryptionKey(), 0);
 }
 
 bool
@@ -170,6 +178,18 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
     else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    // Link to encryption key (only basic implemented)
+    if (hasDMREncryptionKeyIndex() && (! enhancedEncryption())) {
+      if (ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
+        auto cex = dc->commercialExtension();
+        if (nullptr == cex)
+          dc->setCommercialExtension(cex = new CommercialChannelExtension());
+        cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
+      } else {
+        logWarn() << "Cannot link DMR encryption: no key with index "
+                  << dmrEncryptionKeyIndex() << " found.";
+      }
+    }
   }
 
   return true;
@@ -190,6 +210,17 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     } else {
       enableTXDigitalAPRS(false);
       enableRXAPRS(false);
+    }
+
+    clearDMREncryptionKeyIndex();
+
+    // Handle commercial extension
+    if (auto cex = dc->commercialExtension()) {
+      if (cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+        auto key = cex->encryptionKey()->as<BasicEncryptionKey>();
+        enableEnhancedEncryption(false);
+        setDMREncryptionKeyIndex(ctx.index(key));
+      }
     }
 
     // Handle extension
@@ -1228,6 +1259,9 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateGPSSystems();
 
+  this->allocatDMREncryptionKeys();
+  this->allocatEnhancedEncryptionKeys();
+
   this->allocateHotKeySettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
@@ -1241,9 +1275,6 @@ D868UVCodeplug::allocateUpdated() {
   this->allocate2ToneSettings();
 
   this->allocateDTMFSettings();
-
-  image(0).addElement(Offset::dmrEncryptionIDs(), DMREncryptionKeyIDListElement::size());
-  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
 }
 
 void
@@ -1419,6 +1450,9 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
   if (! this->encodeGPSSystems(flags, ctx, err))
     return false;
 
+  if (! this->encodeDMREncryptionKeys(flags, ctx, err))
+    return false;
+
   return true;
 }
 
@@ -1438,6 +1472,9 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
     return false;
 
   if (! this->decodeBootSettings(ctx, err))
+    return false;
+
+  if (! this->decodeDMREncryptionKeys(ctx, err))
     return false;
 
   if (! this->createChannels(ctx, err))
@@ -2231,6 +2268,54 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
   }
 
   return true;
+}
+
+
+void
+D868UVCodeplug::allocatDMREncryptionKeys() {
+  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
+}
+
+bool
+D868UVCodeplug::encodeDMREncryptionKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+
+  DMREncryptionKeyListElement keys(data(Offset::dmrEncryptionKeys()));
+  keys.clear();
+
+  for (unsigned int i=0; i<DMREncryptionKeyListElement::Limit::numEntries(); i++) {
+    keys.clearKey(i);
+    if (! ctx.has<BasicEncryptionKey>(i))
+      continue;
+    keys.setKey(i, *ctx.get<BasicEncryptionKey>(i));
+  }
+
+  return true;
+}
+
+
+bool
+D868UVCodeplug::decodeDMREncryptionKeys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  DMREncryptionKeyListElement keys(data(Offset::dmrEncryptionKeys()));
+  for (unsigned int i=0; i<DMREncryptionKeyListElement::Limit::numEntries(); i++) {
+    if (! keys.hasKey(i))
+      continue;
+    auto key = new BasicEncryptionKey();
+    key->setName(QString("Basic Key %1").arg(i));
+    key->setKey(keys.key(i));
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
+
+
+void
+D868UVCodeplug::allocatEnhancedEncryptionKeys() {
+  image(0).addElement(Offset::enhancedEncryptionKeys(), EnhancedEncryptionKeyListElement::size());
 }
 
 
