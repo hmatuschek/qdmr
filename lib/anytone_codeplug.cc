@@ -634,14 +634,7 @@ void
 AnytoneCodeplug::ChannelElement::enableRXAPRS(bool enable) {
   setBit(0x0021, 5, enable);
 }
-bool
-AnytoneCodeplug::ChannelElement::enhancedEncryption() const {
-  return getBit(0x0021, 6);
-}
-void
-AnytoneCodeplug::ChannelElement::enableEnhancedEncryption(bool enable) {
-  setBit(0x0021, 6, enable);
-}
+
 bool
 AnytoneCodeplug::ChannelElement::loneWorker() const {
   return getBit(0x0021, 7);
@@ -649,23 +642,6 @@ AnytoneCodeplug::ChannelElement::loneWorker() const {
 void
 AnytoneCodeplug::ChannelElement::enableLoneWorker(bool enable) {
   setBit(0x0021, 7, enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
-  return 0xff != aesEncryptionKeyIndex();
-}
-unsigned
-AnytoneCodeplug::ChannelElement::aesEncryptionKeyIndex() const {
-  return getUInt8(0x0022);
-}
-void
-AnytoneCodeplug::ChannelElement::setAESEncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x0022, idx);
-}
-void
-AnytoneCodeplug::ChannelElement::clearAESEncryptionKeyIndex() {
-  setAESEncryptionKeyIndex(0xff);
 }
 
 QString

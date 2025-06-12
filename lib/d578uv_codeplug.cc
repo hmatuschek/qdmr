@@ -60,11 +60,11 @@ D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
 }
 
 unsigned
-D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
+D578UVCodeplug::ChannelElement::encryptionKeyIndex() const {
   return 0;
 }
 void
-D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
+D578UVCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned idx) {
   Q_UNUSED(idx)
 }
 

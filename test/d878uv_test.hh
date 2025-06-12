@@ -25,6 +25,8 @@ private slots:
 
   void testFMAPRSSettings();
 
+  void testAESEncryption();
+
   void testRegressionDefaultChannel();
   void testRegressionAutoRepeater();
 

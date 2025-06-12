@@ -215,6 +215,13 @@ public:
    *  @verbinclude d868uv_channel.txt */
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
+  public:
+    /** Possible encryption types. */
+    enum class EncryptionType {
+      Basic = 0,
+      Enhanced = 1
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -245,14 +252,19 @@ public:
     /** Sets the DMR APRS system index. */
     virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
+    /** Returns the encryption type. */
+    EncryptionType encryptionType() const;
+    /** Sets the encryption type. */
+    void setEncryptionType(EncryptionType type);
+
     /** Returns @c true if a DMR encryption key is set. */
-    virtual bool hasDMREncryptionKeyIndex() const;
+    virtual bool hasEncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned dmrEncryptionKeyIndex() const;
+    virtual unsigned encryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    virtual void setEncryptionKeyIndex(unsigned idx);
     /** Clears the DMR encryption key index. */
-    virtual void clearDMREncryptionKeyIndex();
+    virtual void clearEncryptionKeyIndex();
 
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
@@ -278,7 +290,8 @@ public:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int dmrEncryptionKey() { return 0x003a; }
+      static Bit encryptionType()         { return {0x0021, 6}; }
+      static unsigned int encryptionKey() { return 0x0022; }
       /// @endcond
     };
   };

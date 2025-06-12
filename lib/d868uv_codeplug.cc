@@ -61,6 +61,7 @@ D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+
 bool
 D868UVCodeplug::ChannelElement::ranging() const {
   return getBit(0x0034, 0);
@@ -105,21 +106,34 @@ D868UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
   setUInt8(0x0036, idx);
 }
 
+
+D868UVCodeplug::ChannelElement::EncryptionType
+D868UVCodeplug::ChannelElement::encryptionType() const {
+  return getBit(Offset::encryptionType()) ?
+        EncryptionType::Enhanced : EncryptionType::Basic;
+}
+
+void
+D868UVCodeplug::ChannelElement::setEncryptionType(EncryptionType type) {
+  setBit(Offset::encryptionType(), EncryptionType::Enhanced == type);
+}
+
+
 bool
-D868UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
-  return 0 != getUInt8(Offset::dmrEncryptionKey());
+D868UVCodeplug::ChannelElement::hasEncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::encryptionKey());
 }
 unsigned
-D868UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(Offset::dmrEncryptionKey()) - 1;
+D868UVCodeplug::ChannelElement::encryptionKeyIndex() const {
+  return getUInt8(Offset::encryptionKey()) - 1;
 }
 void
-D868UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+D868UVCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::encryptionKey(), idx+1);
 }
 void
-D868UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
-  setUInt8(Offset::dmrEncryptionKey(), 0);
+D868UVCodeplug::ChannelElement::clearEncryptionKeyIndex() {
+  setUInt8(Offset::encryptionKey(), 0);
 }
 
 bool
@@ -179,15 +193,15 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
     // Link to encryption key (only basic implemented)
-    if (hasDMREncryptionKeyIndex() && (! enhancedEncryption())) {
-      if (ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
+    if (hasEncryptionKeyIndex() && (EncryptionType::Basic == encryptionType())) {
+      if (ctx.has<BasicEncryptionKey>(encryptionKeyIndex())) {
         auto cex = dc->commercialExtension();
         if (nullptr == cex)
           dc->setCommercialExtension(cex = new CommercialChannelExtension());
-        cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
+        cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(encryptionKeyIndex()));
       } else {
         logWarn() << "Cannot link DMR encryption: no key with index "
-                  << dmrEncryptionKeyIndex() << " found.";
+                  << encryptionKeyIndex() << " found.";
       }
     }
   }
@@ -212,14 +226,14 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRXAPRS(false);
     }
 
-    clearDMREncryptionKeyIndex();
+    clearEncryptionKeyIndex();
 
     // Handle commercial extension
     if (auto cex = dc->commercialExtension()) {
       if (cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
         auto key = cex->encryptionKey()->as<BasicEncryptionKey>();
-        enableEnhancedEncryption(false);
-        setDMREncryptionKeyIndex(ctx.index(key));
+        setEncryptionType(EncryptionType::Basic);
+        setEncryptionKeyIndex(ctx.index(key));
       }
     }
 

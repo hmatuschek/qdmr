@@ -361,23 +361,10 @@ public:
     virtual bool rxAPRS() const;
     /** Enables/disables RX APRS. */
     virtual void enableRXAPRS(bool enable);
-    /** Returns @c true if enhanced encryption is enabled. */
-    virtual bool enhancedEncryption() const;
-    /** Enables/disables enhanced encryption. */
-    virtual void enableEnhancedEncryption(bool enable);
     /** Returns @c true if lone worker is enabled. */
     virtual bool loneWorker() const;
     /** Enables/disables lone worker. */
     virtual void enableLoneWorker(bool enable);
-
-    /** Returns @c true if an encryption key is set. */
-    virtual bool hasAESEncryptionKeyIndex() const;
-    /** Returns the AES (enhanced) encryption key index (0-based). */
-    virtual unsigned aesEncryptionKeyIndex() const;
-    /** Sets the AES (enahnced) encryption key index (0-based). */
-    virtual void setAESEncryptionKeyIndex(unsigned idx);
-    /** Clears the encryption key index. */
-    virtual void clearAESEncryptionKeyIndex();
 
     /** Returns the channel name. */
     virtual QString name() const;
@@ -393,9 +380,10 @@ public:
 
   protected:
     /** Internal used offsets within the channel element. */
-    struct Offset {
+    struct Offset: public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static unsigned int aesEncrpytionKey() { return 0x0022; }
+
+      /// @endcond
     };
   };
 

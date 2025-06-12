@@ -196,6 +196,16 @@ D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
   setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
 }
 
+D878UVCodeplug::ChannelElement::EncryptionType
+D878UVCodeplug::ChannelElement::encryptionType() const {
+  return getBit(Offset::encryptionType()) ? EncryptionType::ARC4 : EncryptionType::AES;
+}
+
+void
+D878UVCodeplug::ChannelElement::setEncryptionType(EncryptionType type) {
+  setBit(Offset::encryptionType(), EncryptionType::ARC4 == type);
+}
+
 
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
@@ -236,7 +246,7 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! D868UVCodeplug::ChannelElement::linkChannelObj(c, ctx))
+  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -256,6 +266,26 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
       if (0 != fmAPRSFrequencyIndex()) {
         if (ctx.has<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()))
           ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
+      }
+    }
+    if (hasEncryptionKeyIndex()) {
+      auto cex = dc->commercialExtension();
+      if (nullptr == cex)
+        dc->setCommercialExtension(cex = new CommercialChannelExtension());
+      if (EncryptionType::AES == encryptionType()) {
+        if (! ctx.has<AESEncryptionKey>(encryptionKeyIndex())) {
+          logWarn() << "Cannot link encryption key: no AES key with index "
+                    << encryptionKeyIndex() << " defined.";
+        } else {
+          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(encryptionKeyIndex()));
+        }
+      } else if (EncryptionType::ARC4 == encryptionType()) {
+        if (! ctx.has<EnhancedEncryptionKey>(encryptionKeyIndex())) {
+          logWarn() << "Cannot link encryption key: no ARC4 key with index "
+                    << encryptionKeyIndex() << " defined.";
+        } else {
+          cex->setEncryptionKey(ctx.get<EnhancedEncryptionKey>(encryptionKeyIndex()));
+        }
       }
     }
   } else if (c->is<FMChannel>()) {
@@ -278,7 +308,7 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! D868UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
+  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
   AnytoneChannelExtension *ch_ext = nullptr;
@@ -293,15 +323,30 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
       enableTXAnalogAPRS(true);
     }
+
     // Enable roaming
     if (dc->roaming())
       enableRoaming(true);
+
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
       ch_ext = ext;
       /// Handles bug in AnyTone firmware.
       /// @todo Remove once fixed by AnyTone.
       enableRXAPRS(! ext->sms());
+    }
+
+    clearEncryptionKeyIndex();
+
+    // Apply commercial extension
+    if (CommercialChannelExtension *cex = dc->commercialExtension()) {
+      if (cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
+        setEncryptionType(EncryptionType::AES);
+        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+      } else if (cex->encryptionKey() && cex->encryptionKey()->is<EnhancedEncryptionKey>()) {
+        setEncryptionType(EncryptionType::ARC4);
+        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+      }
     }
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
@@ -3278,6 +3323,7 @@ D878UVCodeplug::AnalogAPRSRXEntryElement::setCall(const QString &call, unsigned 
 }
 
 
+
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AESEncryptionKeyElement
  * ******************************************************************************************** */
@@ -3296,36 +3342,61 @@ D878UVCodeplug::AESEncryptionKeyElement::AESEncryptionKeyElement(uint8_t *ptr)
 void
 D878UVCodeplug::AESEncryptionKeyElement::clear() {
   memset(_data, 0x00, _size);
-  setIndex(0xff);
-  setUInt8(0x0022, 0x40);
 }
 
 bool
 D878UVCodeplug::AESEncryptionKeyElement::isValid() const {
-  return Element::isValid() && (0xff != index());
+  return Element::isValid() && (0 != getUInt8(Offset::index()));
 }
 
 unsigned
 D878UVCodeplug::AESEncryptionKeyElement::index() const {
-  return getUInt8(0x0000);
+  return getUInt8(Offset::index())-1;
 }
 void
 D878UVCodeplug::AESEncryptionKeyElement::setIndex(unsigned idx) {
-  setUInt8(0x0000, idx);
+  setUInt8(Offset::index(), idx+1);
 }
 
 QByteArray
 D878UVCodeplug::AESEncryptionKeyElement::key() const {
-  QByteArray ar(32, 0); memcpy(ar.data(), _data+0x0001, 32);
+  unsigned int size = getUInt8(Offset::size());
+  // convert nibble to bytes
+  size += (size%2); size /= 2;
+  // Determine, where the key starts
+  unsigned int o = Limit::keySize() - size;
+  // Copy
+  QByteArray ar(size, 0);
+  memcpy(ar.data(), _data+Offset::key()+o, size);
   return ar;
 }
 
 void
 D878UVCodeplug::AESEncryptionKeyElement::setKey(const QByteArray &key) {
-  if (32 != key.size())
+  if (Limit::keySize() < key.size())
     return;
-  memcpy(_data+0x0001, key.constData(), 32);
+  unsigned int o = Limit::keySize() - key.size();
+  memcpy(_data+Offset::key()+o, key.constData(), key.size());
+  setUInt8(Offset::size(), key.size()*2);
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::AESEncryptionKeyBitmapElement
+ * ******************************************************************************************** */
+D878UVCodeplug::AESEncryptionKeyBitmapElement::AESEncryptionKeyBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::AESEncryptionKeyBitmapElement::AESEncryptionKeyBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, AESEncryptionKeyBitmapElement::size())
+{
+  // pass...
+}
+
 
 
 /* ******************************************************************************************** *
@@ -3495,6 +3566,8 @@ D878UVCodeplug::allocateBitmaps() {
   image(0).addElement(Offset::roamingChannelBitmap(), RoamingChannelBitmapElement::size());
   // Roaming zone bitmaps
   image(0).addElement(Offset::roamingZoneBitmap(), RoamingZoneBitmapElement::size());
+  // AES encryption keys
+  image(0).addElement(Offset::aesKeyBitmap(), AESEncryptionKeyBitmapElement::size());
 
   return true;
 }
@@ -3503,9 +3576,6 @@ void
 D878UVCodeplug::allocateUpdated() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateUpdated();
-
-  // Encryption keys
-  image(0).addElement(Offset::aesKeys(), Limit::aesKeys()*AESEncryptionKeyElement::size());
 
   // allocate APRS RX list
   image(0).addElement(Offset::analogAPRSRXEntries(),
@@ -3520,6 +3590,7 @@ D878UVCodeplug::allocateForEncoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForEncoding();
   this->allocateRoaming();
+  this->allocateAESKeys();
 }
 
 void
@@ -3527,6 +3598,7 @@ D878UVCodeplug::allocateForDecoding() {
   // First allocate everything common between D868UV and D878UV codeplugs.
   D868UVCodeplug::allocateForDecoding();
   this->allocateRoaming();
+  this->allocateAESKeys();
   // allocate FM APRS frequency names
   image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
@@ -3546,6 +3618,11 @@ D878UVCodeplug::setBitmaps(Context& ctx)
   RoamingChannelBitmapElement roaming_ch_bitmap(data(Offset::roamingChannelBitmap()));
   unsigned int num_roaming_channel = std::min(Limit::roamingChannels(), ctx.count<RoamingChannel>());
   roaming_ch_bitmap.clear(); roaming_ch_bitmap.enableFirst(num_roaming_channel);
+
+  // Mark AES keys
+  AESEncryptionKeyBitmapElement aes_key_bitmap(data(Offset::aesKeyBitmap()));
+  unsigned int num_aes_channels = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
+  aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_channels);
 }
 
 
@@ -3583,6 +3660,9 @@ D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
   if (! this->encodeRoaming(flags, ctx, err))
     return false;
 
+  if (! this->encodeAESKeys(flags, ctx, err))
+    return false;
+
   return true;
 }
 
@@ -3590,6 +3670,9 @@ D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
 bool
 D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 {
+  if (! this->createAESKeys(ctx, err))
+    return false;
+
   // Decode everything commong between d868uv and d878uv codeplugs.
   if (! D868UVCodeplug::decodeElements(ctx, err))
     return false;
@@ -3976,4 +4059,63 @@ D878UVCodeplug::linkRoaming(Context &ctx, const ErrorStack &err) {
   // Pass, no need to link roaming channels.
   return true;
 }
+
+
+void
+D878UVCodeplug::allocateAESKeys() {
+  AESEncryptionKeyBitmapElement bitmap(data(Offset::aesKeyBitmap()));
+  for (uint8_t i=0; i<Limit::aesKeys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    // Allocate key
+    uint32_t addr = Offset::aesKeys() + i*AESEncryptionKeyElement::size();
+    if (! isAllocated(addr, 0)) {
+      image(0).addElement(addr, AESEncryptionKeyElement::size());
+    }
+  }
+}
+
+bool
+D878UVCodeplug::encodeAESKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err); Q_UNUSED(flags);
+
+  AESEncryptionKeyBitmapElement bitmap(data(Offset::aesKeyBitmap()));
+  for (uint8_t i=0; i<Limit::aesKeys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    AESEncryptionKeyElement key(data(Offset::aesKeys() + i*AESEncryptionKeyElement::size()));
+    key.setIndex(i);
+    key.setKey(ctx.get<AESEncryptionKey>(i)->key());
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  AESEncryptionKeyBitmapElement bitmap(data(Offset::aesKeyBitmap()));
+  for (uint8_t i=0; i<Limit::aesKeys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    // Decode
+    AESEncryptionKeyElement keyEl(data(Offset::aesKeys() + i*AESEncryptionKeyElement::size()));
+    auto key = new AESEncryptionKey();
+    key->setName(QString("AES Key %1").arg(i+1));
+    if (! key->setKey(keyEl.key(), err)) {
+      delete key;
+      return false;
+    }
+    // Store
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
+
 
