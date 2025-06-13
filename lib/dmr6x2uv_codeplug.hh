@@ -851,6 +851,11 @@ public:
       Off = 0, FM = 1, DMR = 2
     };
 
+    /** Possible encryption types. */
+    enum class DMREncryptionType {
+      Basic = 0, Enhanced = 1
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -858,6 +863,31 @@ public:
   public:
     /** Constructor. */
     ChannelElement(uint8_t *ptr);
+
+    /** Returns @c true, if an AES encryption key index is set. */
+    bool hasAESEncryptionKeyIndex() const;
+    /** Returns the AES encryption key index.
+     * The index is 0-based. */
+    unsigned int aesEncryptionKeyIndex() const;
+    /** Sets the AES encryption key index. */
+    void setAESEncryptionKeyIndex(unsigned int index);
+    /** Clears the AES encryption key index. */
+    void clearAESEncryptionKeyIndex();
+
+    /** Returns the DMR encryption type. */
+    DMREncryptionType dmrEncryptionType() const;
+    /** Sets the DMR encryption type. */
+    void setDMREncryptionType(DMREncryptionType type);
+
+    /** Returns @c true, if an DMR encryption key index is set. */
+    bool hasDMREncryptionKeyIndex() const;
+    /** Returns the DMR encryption key index.
+     * The index is 0-based. */
+    unsigned int dmrEncryptionKeyIndex() const;
+    /** Sets the DMR encryption key index. */
+    void setDMREncryptionKeyIndex(unsigned int index);
+    /** Clears the DMR encryption key index. */
+    void clearDMREncryptionKeyIndex();
 
     /** Returns @c true, if the first scan list index is set. */
     bool hasScanListIndex() const;
@@ -925,6 +955,9 @@ public:
 protected:
     /// @cond DO_NOT_DOCUMENT
     struct Offset: public Element::Offset {
+      static constexpr unsigned int aesEncryptionKeyIndex()        { return 0x0013; }
+      static constexpr Bit dmrEncryptionType()                     { return {0x0021, 6}; }
+      static constexpr unsigned int dmrEncryptionKeyIndex()        { return 0x0022; }
       static constexpr Bit roaming()                               { return {0x001b, 2}; }
       static constexpr Bit ranging()                               { return {0x001b, 0}; }
       static constexpr unsigned int scanListIndices()              { return 0x0036; }
@@ -1156,6 +1189,9 @@ protected:
   /** Reuse roaming zone from D878UV. */
   typedef D878UVCodeplug::RoamingZoneElement RoamingZoneElement;
 
+  /** Reuse AES encryption key from D878UV. */
+  typedef D878UVCodeplug::AESEncryptionKeyElement AESEncryptionKeyElement;
+
 public:
   /** Hidden constructor. */
   explicit DMR6X2UVCodeplug(const QString &label, QObject *parent=nullptr);
@@ -1164,14 +1200,17 @@ public:
   /** Empty constructor. */
   explicit DMR6X2UVCodeplug(QObject *parent=nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);
   void allocateForDecoding();
   void allocateForEncoding();
 
-  bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGeneralSettings();
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1196,6 +1235,13 @@ protected:
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates memory to encode/decode AES keys. */
+  virtual void allocateAESKeys();
+  /** Encode all AES keys. */
+  virtual bool encodeAESKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode AES keys from the codeplug. */
+  virtual bool createAESKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
 public:
   /** Some limits for the codeplug. */
   struct Limit : public D868UVCodeplug::Limit {
@@ -1205,6 +1251,8 @@ public:
     static constexpr unsigned int roamingChannels()               { return 250; }
     /// Maximum number of roaming zones.
     static constexpr unsigned int roamingZones()                  { return 64; }
+    /// Maximum number of AES encryption keys.
+    static constexpr unsigned int aesEncryptionKeys()             { return 255; }
   };
 
 protected:
@@ -1219,6 +1267,8 @@ protected:
     static constexpr unsigned int fmAPRSMessage()                 { return 0x02501200; }
     static constexpr unsigned int fmAPRSFrequencyNames()          { return 0x02502000; }
     static constexpr unsigned int settingsExtension()             { return 0x02501400; }
+
+    static constexpr unsigned int aesEncryptionKeys()             { return 0x025c1000; }
     /// @endcond
   };
 

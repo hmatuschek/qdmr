@@ -2965,8 +2965,6 @@ TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
 
   // Create index<->object table.
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   if (! index(config, ctx))
     return false;
@@ -2978,8 +2976,6 @@ bool
 TyTCodeplug::decode(Config *config, const ErrorStack &err) {
   // Create index<->object table.
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.addTable(&AESEncryptionKey::staticMetaObject);
 
   // Clear config object
   config->clear();

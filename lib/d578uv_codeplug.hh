@@ -233,9 +233,9 @@ public:
 
     // Replaced by analog scrambler settings
     /** The D578UV does not support the weak DMR encryption, hence this function returns always 0. */
-    unsigned dmrEncryptionKeyIndex() const;
+    unsigned encryptionKeyIndex() const;
     /** The D578UV does not support the weak DMR encryption, hence this function has not effect. */
-    void setDMREncryptionKeyIndex(unsigned idx);
+    void setEncryptionKeyIndex(unsigned idx);
 
     /** Returns @c true if the analog scambler is enabled. */
     virtual bool analogScambler() const;

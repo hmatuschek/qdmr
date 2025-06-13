@@ -17,6 +17,8 @@ private slots:
   void testChannelFrequency();
 
   void testFMAPRSSettings();
+
+  void testAESEncryption();
 };
 
 #endif // DMR6X2UVTEST_HH

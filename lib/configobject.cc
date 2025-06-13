@@ -698,7 +698,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
 
       // parse instance
       YAML::Node propNode = node[prop.name()];
-      if (obj && (! obj->parse(propNode, ctx))) {
+      if (obj && (! obj->parse(propNode, ctx, err))) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())

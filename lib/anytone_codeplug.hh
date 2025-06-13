@@ -361,23 +361,10 @@ public:
     virtual bool rxAPRS() const;
     /** Enables/disables RX APRS. */
     virtual void enableRXAPRS(bool enable);
-    /** Returns @c true if enhanced encryption is enabled. */
-    virtual bool enhancedEncryption() const;
-    /** Enables/disables enhanced encryption. */
-    virtual void enableEnhancedEncryption(bool enable);
     /** Returns @c true if lone worker is enabled. */
     virtual bool loneWorker() const;
     /** Enables/disables lone worker. */
     virtual void enableLoneWorker(bool enable);
-
-    /** Returns @c true if an encryption key is set. */
-    virtual bool hasEncryptionKeyIndex() const;
-    /** Returns the AES (enhanced) encryption key index (0-based). */
-    virtual unsigned encryptionKeyIndex() const;
-    /** Sets the AES (enahnced) encryption key index (0-based). */
-    virtual void setEncryptionKeyIndex(unsigned idx);
-    /** Clears the encryption key index. */
-    virtual void clearEncryptionKeyIndex();
 
     /** Returns the channel name. */
     virtual QString name() const;
@@ -393,8 +380,12 @@ public:
 
   protected:
     /** Internal used offsets within the channel element. */
-    struct Offset {
-      /// @todo Implement
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int twoToneIDIndex()  { return 0x001d; }
+      static constexpr unsigned int fiveToneIDIndex() { return 0x001e; }
+      static constexpr unsigned int dtmfIDIndex()     { return 0x001f; }
+      /// @endcond
     };
   };
 
@@ -2840,45 +2831,6 @@ public:
     virtual void setFrequency(Frequency freq);
   };
 
-  /** Represents a list of DMR encryption key IDs. */
-  class DMREncryptionKeyIDListElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    DMREncryptionKeyIDListElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    DMREncryptionKeyIDListElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0040; }
-
-    void clear();
-
-    /** Returns @c true if the n-th id is set. */
-    virtual bool hasID(unsigned int n) const;
-    /** Returns the ID of the encryption key. */
-    virtual uint16_t id(unsigned int n) const;
-    /** Sets the ID of the encryption key. */
-    virtual void setID(unsigned int n, uint16_t id);
-    /** Clears the n-th id. */
-    virtual void clearID(unsigned int n);
-
-  public:
-    /** Some limits for the list. */
-    struct Limit {
-      static constexpr unsigned int numEntries() { return 32; }      ///< Maximum number of DMR encryption key IDs.
-    };
-
-  protected:
-    /** Some internal used offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int betweenIDs() { return 0x0002; }
-      /// @endcond
-    };
-  };
 
   /** Represents a list of DMR encryption keys. */
   class DMREncryptionKeyListElement: public Element
@@ -2890,6 +2842,49 @@ public:
   public:
     /** Constructor. */
     DMREncryptionKeyListElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    /** Returns @c true if the n-th id is set. */
+    virtual bool hasKey(unsigned int n) const;
+    /** Returns the ID of the encryption key. */
+    virtual QByteArray key(unsigned int n) const;
+    /** Sets the ID of the encryption key. */
+    virtual void setKey(unsigned int n, const BasicEncryptionKey &key);
+    /** Clears the n-th id. */
+    virtual void clearKey(unsigned int n);
+
+  public:
+    /** Some limits for the list. */
+    struct Limit {
+      static constexpr unsigned int numEntries() { return 32; }      ///< Maximum number of DMR encryption key IDs.
+    };
+
+  protected:
+    /** Some internal used offsets within the element. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int betweenKeys() { return 0x0002; }
+      /// @endcond
+    };
+  };
+
+
+  /** Represents a list of 'enhanced' DMR encryption keys.
+   * Important, there is no enhancement in this encryption, the
+   * used key is still derived from a 16bit seed. The effective encryption is still only 16bit. */
+  class EnhancedEncryptionKeyListElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    EnhancedEncryptionKeyListElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    EnhancedEncryptionKeyListElement(uint8_t *ptr);
 
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0500; }
@@ -2904,7 +2899,7 @@ public:
   public:
     /** Some limits of the list. */
     struct Limit {
-      static constexpr unsigned numEntries() { return DMREncryptionKeyIDListElement::Limit::numEntries(); } ///< Maximum number of keys.
+      static constexpr unsigned numEntries() { return DMREncryptionKeyListElement::Limit::numEntries(); } ///< Maximum number of keys.
     };
 
   protected:
@@ -2916,6 +2911,7 @@ public:
       /// @endcond
     };
   };
+
 
   /** Represents the base class for entries to the contact indices in all AnyTone codeplugs.
    *
@@ -2987,8 +2983,15 @@ protected:
 
   /** Encodes the given config (via context) to the binary codeplug. */
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
-  /** Decodes the downloaded codeplug. */
-  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the downloaded codeplug.
+   *
+   * Decoding consists of two steps: First, creation of all config objects and in a second step
+   * resolving all references within the codeplug. The latter step is called linking. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Creates all config objects from the downloaded codeplug. */
+  virtual bool createElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all previously created config objects. */
+  virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
 protected:
   /** Holds the image label. */

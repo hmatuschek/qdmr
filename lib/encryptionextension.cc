@@ -95,17 +95,17 @@ BasicEncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack
 
 
 /* ********************************************************************************************* *
- * Implementation of EnhancedEncryptionKey
+ * Implementation of ARC4EncryptionKey
  * ********************************************************************************************* */
-EnhancedEncryptionKey::EnhancedEncryptionKey(QObject *parent)
+ARC4EncryptionKey::ARC4EncryptionKey(QObject *parent)
   : EncryptionKey(parent)
 {
   // pass...
 }
 
 ConfigItem *
-EnhancedEncryptionKey::clone() const {
-  EnhancedEncryptionKey *key = new EnhancedEncryptionKey();
+ARC4EncryptionKey::clone() const {
+  ARC4EncryptionKey *key = new ARC4EncryptionKey();
   if (! key->copy(*this)) {
     key->deleteLater();
     return nullptr;
@@ -114,7 +114,7 @@ EnhancedEncryptionKey::clone() const {
 }
 
 bool
-EnhancedEncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
+ARC4EncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
   if (10 != hex.size()) {
     errMsg(err) << "Cannot set RC4 (enhanced) ecryption key to '" << hex << "': Not a 40bit key.";
     return false;
@@ -123,7 +123,7 @@ EnhancedEncryptionKey::fromHex(const QString &hex, const ErrorStack &err) {
 }
 
 bool
-EnhancedEncryptionKey::setKey(const QByteArray &key, const ErrorStack &err) {
+ARC4EncryptionKey::setKey(const QByteArray &key, const ErrorStack &err) {
   if (5 != key.size()) {
     errMsg(err) << "Cannot set RC4 (enhanced) ecryption key: Not a 40bit key.";
     return false;
@@ -133,7 +133,7 @@ EnhancedEncryptionKey::setKey(const QByteArray &key, const ErrorStack &err) {
 }
 
 YAML::Node
-EnhancedEncryptionKey::serialize(const Context &context, const ErrorStack &err) {
+ARC4EncryptionKey::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node = EncryptionKey::serialize(context, err);
   if (node.IsNull())
     return node;
@@ -144,7 +144,7 @@ EnhancedEncryptionKey::serialize(const Context &context, const ErrorStack &err) 
 }
 
 bool
-EnhancedEncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+ARC4EncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
@@ -218,7 +218,7 @@ AESEncryptionKey::parse(const YAML::Node &node, Context &ctx, const ErrorStack &
  * Implementation of EncryptionKeys
  * ********************************************************************************************* */
 EncryptionKeys::EncryptionKeys(QObject *parent)
-  : ConfigObjectList({BasicEncryptionKey::staticMetaObject, EnhancedEncryptionKey::staticMetaObject, AESEncryptionKey::staticMetaObject}, parent)
+  : ConfigObjectList({BasicEncryptionKey::staticMetaObject, ARC4EncryptionKey::staticMetaObject, AESEncryptionKey::staticMetaObject}, parent)
 {
   // pass...
 }
@@ -255,7 +255,7 @@ EncryptionKeys::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, 
   if (("basic" == type) || ("dmr" == type)) {
     return new BasicEncryptionKey();
   } else if ("rc4" == type) {
-    return new EnhancedEncryptionKey();
+    return new ARC4EncryptionKey();
   } else if ("aes" == type) {
     return new AESEncryptionKey();
   }

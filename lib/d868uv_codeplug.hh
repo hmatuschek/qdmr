@@ -215,6 +215,13 @@ public:
    *  @verbinclude d868uv_channel.txt */
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
+  public:
+    /** Possible encryption types. */
+    enum class EncryptionType {
+      Basic = 0,
+      Enhanced = 1
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -245,10 +252,20 @@ public:
     /** Sets the DMR APRS system index. */
     virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
+    /** Returns the encryption type. */
+    EncryptionType encryptionType() const;
+    /** Sets the encryption type. */
+    void setEncryptionType(EncryptionType type);
+
+    /** Returns @c true if a DMR encryption key is set. */
+    virtual bool hasEncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned dmrEncryptionKeyIndex() const;
+    virtual unsigned encryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    virtual void setEncryptionKeyIndex(unsigned idx);
+    /** Clears the DMR encryption key index. */
+    virtual void clearEncryptionKeyIndex();
+
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
     /** Enables/disables multiple key encryption. */
@@ -272,7 +289,10 @@ public:
   protected:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
-      /// @todo Implement
+      /// @cond DO_NOT_DOCUMENT
+      static Bit encryptionType()         { return {0x0021, 6}; }
+      static unsigned int encryptionKey() { return 0x0022; }
+      /// @endcond
     };
   };
 
@@ -632,6 +652,8 @@ public:
   /** Empty constructor. */
   explicit D868UVCodeplug(QObject *parent = nullptr);
 
+  Config* preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   virtual void setBitmaps(Context &ctx);
@@ -640,7 +662,8 @@ protected:
   virtual void allocateForEncoding();
 
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();
@@ -758,6 +781,16 @@ protected:
   virtual bool encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes auto-repeater offset frequencies. */
   virtual bool decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates DMR encryption keys. */
+  virtual void allocatDMREncryptionKeys();
+  /** Encodes DMR encryption keys. */
+  virtual bool encodeDMREncryptionKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decodes DMR encryption keys */
+  virtual bool decodeDMREncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates 'enhanced' encryption keys. */
+  virtual void allocatEnhancedEncryptionKeys();
 
   /** Allocates alarm settings memory section. */
   virtual void allocateAlarmSettings();
@@ -881,8 +914,8 @@ protected:
     static constexpr unsigned int wfmChannels()          { return 0x02480000; }
     static constexpr unsigned int wfmVFO()               { return 0x02480200; }
 
-    static constexpr unsigned int dmrEncryptionIDs()     { return 0x024C1700; }
-    static constexpr unsigned int dmrEncryptionKeys()    { return 0x024C1800; }
+    static constexpr unsigned int dmrEncryptionKeys()      { return 0x024C1700; }
+    static constexpr unsigned int enhancedEncryptionKeys() { return 0x024C1800; }
     /// @endcond
   };
 

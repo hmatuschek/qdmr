@@ -1,6 +1,7 @@
 #include "gpssystem.hh"
 #include "roamingchannel.hh"
 #include "config.hh"
+#include "intermediaterepresentation.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "utils.hh"
 #include "logger.hh"
@@ -1360,6 +1361,9 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
     return false;
   }
 
+  // By default, use strong encryption
+  setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType::AES);
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1472,6 +1476,61 @@ DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 {
   // pass...
 }
+
+
+bool
+DMR6X2UVCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::aesEncryptionKeyIndex());
+}
+
+unsigned int
+DMR6X2UVCodeplug::ChannelElement::aesEncryptionKeyIndex() const {
+  return getUInt8(Offset::aesEncryptionKeyIndex())-1;
+}
+
+void
+DMR6X2UVCodeplug::ChannelElement::setAESEncryptionKeyIndex(unsigned int index) {
+  setUInt8(Offset::aesEncryptionKeyIndex(), index+1);
+}
+
+void
+DMR6X2UVCodeplug::ChannelElement::clearAESEncryptionKeyIndex() {
+  setUInt8(Offset::aesEncryptionKeyIndex(), 0);
+}
+
+
+DMR6X2UVCodeplug::ChannelElement::DMREncryptionType
+DMR6X2UVCodeplug::ChannelElement::dmrEncryptionType() const {
+  return getBit(Offset::dmrEncryptionType()) ?
+        DMREncryptionType::Enhanced : DMREncryptionType::Basic;
+}
+
+void
+DMR6X2UVCodeplug::ChannelElement::setDMREncryptionType(DMREncryptionType type) {
+  setBit(Offset::dmrEncryptionType(), DMREncryptionType::Enhanced == type);
+}
+
+
+bool
+DMR6X2UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::dmrEncryptionKeyIndex());
+}
+
+unsigned int
+DMR6X2UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
+  return getUInt8(Offset::dmrAPRSChannelIndex())-1;
+}
+
+void
+DMR6X2UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned int index) {
+  setUInt8(Offset::dmrEncryptionKeyIndex(), index+1);
+}
+
+void
+DMR6X2UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
+  setUInt8(Offset::dmrEncryptionKeyIndex(), 0);
+}
+
 
 bool
 DMR6X2UVCodeplug::ChannelElement::hasScanListIndex() const {
@@ -1611,7 +1670,25 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
             enableDMRAPRSPTT(AnytoneChannelExtension::APRSPTT::Off != ext->aprsPTT());
         }
       }
-    }
+
+      // Handle encryption
+      clearAESEncryptionKeyIndex();
+      clearDMREncryptionKeyIndex();
+
+      if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
+        // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+        bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
+            ( ctx.config()->settings()->anytoneExtension() &&
+              (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+               ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
+        if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
+          setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+          setDMREncryptionType(DMREncryptionType::Basic);
+          setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        }
+      }
+    }    
   }
 
   return true;
@@ -1647,6 +1724,26 @@ DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     } else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
       ext->setAPRSPTT(dmrAPRSPTTEnabled() ? AnytoneChannelExtension::APRSPTT::Start : AnytoneChannelExtension::APRSPTT::Off);
       dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
+    }
+
+    // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+    bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
+        ( ctx.config()->settings()->anytoneExtension() &&
+          (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+           ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
+
+    if (hasStrongEncryption && hasAESEncryptionKeyIndex() && ctx.has<AESEncryptionKey>(aesEncryptionKeyIndex())) {
+      auto cex = dmr->commercialExtension();
+      if (nullptr == cex)
+        dmr->setCommercialExtension(cex = new CommercialChannelExtension());
+      cex->setEncryptionKey(ctx.get<AESEncryptionKey>(aesEncryptionKeyIndex()));
+    } else if ((!hasStrongEncryption) && hasDMREncryptionKeyIndex() &&
+               (DMREncryptionType::Basic == dmrEncryptionType()) &&
+               ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
+      auto cex = dmr->commercialExtension();
+      if (nullptr == cex)
+        dmr->setCommercialExtension(cex = new CommercialChannelExtension());
+      cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
     }
   }
 
@@ -2103,6 +2200,31 @@ DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
   // pass...
 }
 
+
+Config *
+DMR6X2UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for DMR-6X2UV.";
+    return nullptr;
+  }
+
+  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  EncryptionKeyFilterVisitor filter(
+        { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
+          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
+          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
 bool
 DMR6X2UVCodeplug::allocateBitmaps() {
   if (! D868UVCodeplug::allocateBitmaps())
@@ -2119,7 +2241,7 @@ DMR6X2UVCodeplug::allocateBitmaps() {
 void
 DMR6X2UVCodeplug::setBitmaps(Context& ctx)
 {
-  // First set everything common between D868UV and D878UV codeplugs.
+  // First set everything common between D868UV and dmr6x2 codeplugs.
   D868UVCodeplug::setBitmaps(ctx);
 
   // Mark roaming zones
@@ -2136,28 +2258,33 @@ DMR6X2UVCodeplug::setBitmaps(Context& ctx)
 
 void
 DMR6X2UVCodeplug::allocateForEncoding() {
-  // First allocate everything common between D868UV and D878UV codeplugs.
+  // First allocate everything common between D868UV and dmr6x2 codeplugs.
   D868UVCodeplug::allocateForEncoding();
 
   this->allocateRoaming();
+  this->allocateAESKeys();
 }
 
 void
 DMR6X2UVCodeplug::allocateForDecoding() {
-  // First allocate everything common between D868UV and D878UV codeplugs.
+  // First allocate everything common between D868UV and dmr6x2 codeplugs.
   D868UVCodeplug::allocateForDecoding();
 
   this->allocateRoaming();
+  this->allocateAESKeys();
 }
 
 bool
 DMR6X2UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  // Encode everything common between d868uv and d878uv radios.
+  // Encode everything common between d868uv and dmr6x2 radios.
   if (! D868UVCodeplug::encodeElements(flags, ctx, err))
     return false;
 
   if (! this->encodeRoaming(flags, ctx, err))
+    return false;
+
+  if (! this->encodeAESKeys(flags, ctx, err))
     return false;
 
   return true;
@@ -2165,13 +2292,24 @@ DMR6X2UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorSt
 
 
 bool
-DMR6X2UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
-{
-  // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decodeElements(ctx, err))
+DMR6X2UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
+  // Create everything commong between d868uv and dmr6x2 codeplugs.
+  if (! D868UVCodeplug::createElements(ctx, err))
     return false;
 
   if (! this->createRoaming(ctx, err))
+    return false;
+
+  if (! this->createAESKeys(ctx, err))
+    return false;
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
+  // Link everything commong between d868uv and dmr6x2 codeplugs.
+  if (! D868UVCodeplug::linkElements(ctx, err))
     return false;
 
   if (! this->linkRoaming(ctx, err))
@@ -2471,5 +2609,55 @@ bool
 DMR6X2UVCodeplug::linkRoaming(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err)
   // Pass, no need to link roaming channels.
+  return true;
+}
+
+
+void
+DMR6X2UVCodeplug::allocateAESKeys() {
+  // Since there is no bitmap indicating, which keys are valid, we need to allocate all 255 for
+  // decoding.
+  if (! isAllocated(Offset::aesEncryptionKeys(), 0))
+    image(0).addElement(Offset::aesEncryptionKeys(),
+                        Limit::aesEncryptionKeys()*AESEncryptionKeyElement::size());
+}
+
+bool
+DMR6X2UVCodeplug::encodeAESKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err); Q_UNUSED(flags);
+
+  for (uint8_t i=0; i<Limit::aesEncryptionKeys(); i++) {
+    // if disabled -> skip
+    if (! ctx.has<AESEncryptionKey>(i))
+      continue;
+    AESEncryptionKeyElement key(data(Offset::aesEncryptionKeys() + i*AESEncryptionKeyElement::size()));
+    key.setIndex(i);
+    key.setKey(ctx.get<AESEncryptionKey>(i)->key());
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  for (uint8_t i=0; i<Limit::aesEncryptionKeys(); i++) {
+    AESEncryptionKeyElement keyEl(data(Offset::aesEncryptionKeys() + i*AESEncryptionKeyElement::size()));
+    // if disabled -> skip
+    if (! keyEl.isValid())
+      continue;
+    // Decode
+    auto key = new AESEncryptionKey();
+    key->setName(QString("AES Key %1").arg(i+1));
+    if (! key->setKey(keyEl.key(), err)) {
+      delete key;
+      return false;
+    }
+    // Store
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
   return true;
 }

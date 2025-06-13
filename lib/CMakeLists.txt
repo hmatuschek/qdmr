@@ -115,41 +115,41 @@ qt_add_library(libdmrconf SHARED
   openrtx.cc openrtx.hh
   openrtx_interface.cc openrtx_interface.hh
   openrtx_codeplug.cc openrtx_codeplug.hh
-  c7000device.cc
-  gd73.cc
-  gd73_interface.cc
-  gd73_codeplug.cc
-  gd73_filereader.cc
-  gd73_limits.cc
-  anytone_interface.cc
-  anytone_radio.cc
-  anytone_codeplug.cc
-  anytone_extension.cc
-  anytone_limits.cc
-  anytone_satelliteconfig.cc
-  d868uv.cc
-  d868uv_codeplug.cc
-  d868uv_callsigndb.cc
-  d868uv_limits.cc
-  d878uv.cc
-  d878uv_codeplug.cc
-  d878uv_limits.cc
-  d578uv.cc
-  d578uv_codeplug.cc
-  d578uv_limits.cc
-  d878uv2.cc
-  d878uv2_codeplug.cc
-  d878uv2_limits.cc
-  d878uv2_callsigndb.cc
-  dmr6x2uv.cc
-  dmr6x2uv_codeplug.cc
-  dmr6x2uv_limits.cc
-  auctus_a6_interface.cc
-  dr1801uv.cc
-  dr1801uv_interface.cc
-  dr1801uv_codeplug.cc
-  dr1801uv_filereader.cc
-  dr1801uv_limits.cc
+  c7000device.cc c7000device.hh
+  gd73.cc gd73.hh
+  gd73_interface.cc gd73_interface.hh
+  gd73_codeplug.cc gd73_codeplug.hh
+  gd73_filereader.cc gd73_filereader.hh
+  gd73_limits.cc gd73_limits.hh
+  anytone_interface.cc anytone_interface.hh
+  anytone_radio.cc anytone_radio.hh
+  anytone_codeplug.cc anytone_codeplug.hh
+  anytone_extension.cc anytone_extension.hh
+  anytone_limits.cc anytone_limits.hh
+  anytone_satelliteconfig.cc anytone_satelliteconfig.hh
+  d868uv.cc d868uv.hh
+  d868uv_codeplug.cc d868uv_codeplug.hh
+  d868uv_callsigndb.cc d868uv_callsigndb.hh
+  d868uv_limits.cc d868uv_limits.hh
+  d878uv.cc d878uv.hh
+  d878uv_codeplug.cc d878uv_codeplug.hh
+  d878uv_limits.cc d878uv_limits.hh
+  d578uv.cc d578uv.hh
+  d578uv_codeplug.cc d578uv_codeplug.hh
+  d578uv_limits.cc d578uv_limits.hh
+  d878uv2.cc d878uv2.hh
+  d878uv2_codeplug.cc d878uv2_codeplug.hh
+  d878uv2_limits.cc d878uv2_limits.hh
+  d878uv2_callsigndb.cc d878uv2_callsigndb.hh
+  dmr6x2uv.cc dmr6x2uv.hh
+  dmr6x2uv_codeplug.cc dmr6x2uv_codeplug.hh
+  dmr6x2uv_limits.cc dmr6x2uv_limits.hh
+  auctus_a6_interface.cc auctus_a6_interface.hh
+  dr1801uv.cc dr1801uv.hh
+  dr1801uv_interface.cc dr1801uv_interface.hh
+  dr1801uv_codeplug.cc dr1801uv_codeplug.hh
+  dr1801uv_filereader.cc dr1801uv_filereader.hh
+  dr1801uv_limits.cc dr1801uv_limits.hh
   transferflags.hh transferflags.cc)
 
 set_target_properties(libdmrconf PROPERTIES
