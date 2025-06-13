@@ -227,10 +227,13 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
 
     clearEncryptionKeyIndex();
+    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+        (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+         ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
 
     // Handle commercial extension
     if (auto cex = dc->commercialExtension()) {
-      if (cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+      if (cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>() && (! hasStrongEncryption)) {
         auto key = cex->encryptionKey()->as<BasicEncryptionKey>();
         setEncryptionType(EncryptionType::Basic);
         setEncryptionKeyIndex(ctx.index(key));
@@ -1182,6 +1185,11 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setRXBacklightDuration(ext->displaySettings()->backlightDuration());
   enableShowCurrentContact(ext->displaySettings()->showContact());
 
+  // Check encryption type
+  if (AnytoneDMRSettingsExtension::EncryptionType::AES == ext->dmrSettings()->encryption()) {
+    logInfo() << "D868UVE does not support AES/ARC4 encryption.";
+  }
+
   return true;
 }
 
@@ -1221,6 +1229,9 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Decode display settings
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
   ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
+
+  // Set encryption type
+  ext->dmrSettings()->setEncryption(AnytoneDMRSettingsExtension::EncryptionType::DMR);
 
   return true;
 }
@@ -1471,7 +1482,7 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
 }
 
 bool
-D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
+D868UVCodeplug::createElements(Context &ctx, const ErrorStack &err)
 {
   if (! this->setRadioID(ctx, err))
     return false;
@@ -1503,22 +1514,28 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
   if (! this->createRXGroupLists(ctx, err))
     return false;
 
-  if (! this->linkRXGroupLists(ctx, err))
-    return false;
-
   if (! this->createZones(ctx, err))
-    return false;
-
-  if (! this->linkZones(ctx, err))
     return false;
 
   if (! this->createScanLists(ctx, err))
     return false;
 
-  if (! this->linkScanLists(ctx, err))
+  if (! this->createGPSSystems(ctx, err))
     return false;
 
-  if (! this->createGPSSystems(ctx, err))
+  return true;
+}
+
+
+bool
+D868UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
+  if (! this->linkRXGroupLists(ctx, err))
+    return false;
+
+  if (! this->linkZones(ctx, err))
+    return false;
+
+  if (! this->linkScanLists(ctx, err))
     return false;
 
   if (! this->linkChannels(ctx, err))

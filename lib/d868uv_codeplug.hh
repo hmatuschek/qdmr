@@ -662,7 +662,8 @@ protected:
   virtual void allocateForEncoding();
 
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();

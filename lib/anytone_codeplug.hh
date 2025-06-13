@@ -382,7 +382,9 @@ public:
     /** Internal used offsets within the channel element. */
     struct Offset: public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
-
+      static constexpr unsigned int twoToneIDIndex()  { return 0x001d; }
+      static constexpr unsigned int fiveToneIDIndex() { return 0x001e; }
+      static constexpr unsigned int dtmfIDIndex()     { return 0x001f; }
       /// @endcond
     };
   };
@@ -2981,8 +2983,15 @@ protected:
 
   /** Encodes the given config (via context) to the binary codeplug. */
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
-  /** Decodes the downloaded codeplug. */
-  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Decodes the downloaded codeplug.
+   *
+   * Decoding consists of two steps: First, creation of all config objects and in a second step
+   * resolving all references within the codeplug. The latter step is called linking. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Creates all config objects from the downloaded codeplug. */
+  virtual bool createElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  /** Links all previously created config objects. */
+  virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
 protected:
   /** Holds the image label. */

@@ -705,7 +705,7 @@ Codeplug::Context::Context(Config *config)
   addTable(&RoamingZone::staticMetaObject);
   addTable(&SMSTemplate::staticMetaObject);
   addTable(&BasicEncryptionKey::staticMetaObject);
-  addTable(&EnhancedEncryptionKey::staticMetaObject);
+  addTable(&ARC4EncryptionKey::staticMetaObject);
   addTable(&AESEncryptionKey::staticMetaObject);
 }
 

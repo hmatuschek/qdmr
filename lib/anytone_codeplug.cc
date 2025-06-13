@@ -556,27 +556,27 @@ AnytoneCodeplug::ChannelElement::clearGroupListIndex() {
 
 unsigned
 AnytoneCodeplug::ChannelElement::twoToneIDIndex() const {
-  return getUInt8(0x001d);
+  return getUInt8(Offset::twoToneIDIndex());
 }
 void
 AnytoneCodeplug::ChannelElement::setTwoToneIDIndex(unsigned idx) {
-  setUInt8(0x001d, idx);
+  setUInt8(Offset::twoToneIDIndex(), idx);
 }
 unsigned
 AnytoneCodeplug::ChannelElement::fiveToneIDIndex() const {
-  return getUInt8(0x001e);
+  return getUInt8(Offset::fiveToneIDIndex());
 }
 void
 AnytoneCodeplug::ChannelElement::setFiveToneIDIndex(unsigned idx) {
-  setUInt8(0x001e, idx);
+  setUInt8(Offset::fiveToneIDIndex(), idx);
 }
 unsigned
 AnytoneCodeplug::ChannelElement::dtmfIDIndex() const {
-  return getUInt8(0x001f);
+  return getUInt8(Offset::dtmfIDIndex());
 }
 void
 AnytoneCodeplug::ChannelElement::setDTMFIDIndex(unsigned idx) {
-  setUInt8(0x001f, idx);
+  setUInt8(Offset::fiveToneIDIndex(), idx);
 }
 
 unsigned
@@ -4556,11 +4556,27 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       auto key = config->commercialExtension()->encryptionKeys()->key(i);
       if (key->is<BasicEncryptionKey>())
         ctx.add(key->as<BasicEncryptionKey>(), basic++);
-      else if (key->is<EnhancedEncryptionKey>())
-        ctx.add(key->as<EnhancedEncryptionKey>(), enhanced++);
+      else if (key->is<ARC4EncryptionKey>())
+        ctx.add(key->as<ARC4EncryptionKey>(), enhanced++);
       else if (key->is<AESEncryptionKey>())
         ctx.add(key->as<AESEncryptionKey>(), aes++);
     }
+  }
+
+  return true;
+}
+
+
+bool
+AnytoneCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! this->createElements(ctx, err)) {
+    errMsg(err) << "Cannot decode AnyTone codeplug: Creation of config objects failed.";
+    return false;
+  }
+
+  if (! this->linkElements(ctx, err)) {
+    errMsg(err) << "Cannot decode AnyTone codeplug: Linking of config objects failed.";
+    return false;
   }
 
   return true;

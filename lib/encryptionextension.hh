@@ -63,12 +63,12 @@ public:
 };
 
 
-/** Represents an (enhanced) RC4 encryption key.
+/** Represents an (enhanced) ARC4 encryption key.
  *
  * This is a 40bit key used for the DMR enhanced encryption method.
  *
  * @ingroup conf */
-class EnhancedEncryptionKey: public EncryptionKey
+class ARC4EncryptionKey: public EncryptionKey
 {
   Q_OBJECT
   Q_CLASSINFO("description", "An enhanced DMR encryption key.")
@@ -78,7 +78,7 @@ class EnhancedEncryptionKey: public EncryptionKey
 
 public:
   /** Empty constructor. */
-  Q_INVOKABLE explicit EnhancedEncryptionKey(QObject *parent=nullptr);
+  Q_INVOKABLE explicit ARC4EncryptionKey(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
   bool fromHex(const QString &hex, const ErrorStack &err=ErrorStack());

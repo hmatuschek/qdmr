@@ -329,6 +329,41 @@ D878UVTest::testAESEncryption() {
 }
 
 
+void
+D878UVTest::testARC4Encryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/arc4_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existance of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("1122334455"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
 
 void
 D878UVTest::testRegressionDefaultChannel() {

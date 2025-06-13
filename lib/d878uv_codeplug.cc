@@ -206,6 +206,23 @@ D878UVCodeplug::ChannelElement::setEncryptionType(EncryptionType type) {
   setBit(Offset::encryptionType(), EncryptionType::ARC4 == type);
 }
 
+bool
+D878UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::dmrEncryptionKey());
+}
+unsigned
+D878UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
+  return getUInt8(Offset::dmrEncryptionKey()) - 1;
+}
+void
+D878UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+}
+void
+D878UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
+  setUInt8(Offset::dmrEncryptionKey(), 0);
+}
+
 
 Channel *
 D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
@@ -268,23 +285,43 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
           ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
       }
     }
+
+    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+        (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+         ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
+
     if (hasEncryptionKeyIndex()) {
       auto cex = dc->commercialExtension();
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
-      if (EncryptionType::AES == encryptionType()) {
+
+      if (hasStrongEncryption && (EncryptionType::AES == encryptionType())) {
         if (! ctx.has<AESEncryptionKey>(encryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no AES key with index "
                     << encryptionKeyIndex() << " defined.";
         } else {
           cex->setEncryptionKey(ctx.get<AESEncryptionKey>(encryptionKeyIndex()));
         }
-      } else if (EncryptionType::ARC4 == encryptionType()) {
-        if (! ctx.has<EnhancedEncryptionKey>(encryptionKeyIndex())) {
+      } else if (hasStrongEncryption && (EncryptionType::ARC4 == encryptionType())) {
+        if (! ctx.has<ARC4EncryptionKey>(encryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no ARC4 key with index "
                     << encryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<EnhancedEncryptionKey>(encryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(encryptionKeyIndex()));
+        }
+      }
+    } else if (hasDMREncryptionKeyIndex()) {
+      auto cex = dc->commercialExtension();
+      if (nullptr == cex)
+        dc->setCommercialExtension(cex = new CommercialChannelExtension());
+
+      if ((! hasStrongEncryption) && (D868UVCodeplug::ChannelElement::EncryptionType::Basic
+                                      == D868UVCodeplug::ChannelElement::encryptionType())){
+        if (! ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
+          logWarn() << "Cannot link encryption key: no basic DMR key with index "
+                    << encryptionKeyIndex() << " defined.";
+        } else {
+          cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
         }
       }
     }
@@ -337,15 +374,26 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
 
     clearEncryptionKeyIndex();
+    clearDMREncryptionKeyIndex();
+
+    // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+    bool hasStrongEncryption = (!ctx.config()->settings()->anytoneExtension()) ||
+        ( ctx.config()->settings()->anytoneExtension() &&
+          (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+           ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
 
     // Apply commercial extension
     if (CommercialChannelExtension *cex = dc->commercialExtension()) {
-      if (cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
+      if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
         setEncryptionType(EncryptionType::AES);
         setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
-      } else if (cex->encryptionKey() && cex->encryptionKey()->is<EnhancedEncryptionKey>()) {
+      } else if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<ARC4EncryptionKey>()) {
         setEncryptionType(EncryptionType::ARC4);
         setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+      } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+        D868UVCodeplug::ChannelElement::setEncryptionType(
+              D868UVCodeplug::ChannelElement::EncryptionType::Basic);
+        setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       }
     }
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
@@ -1993,7 +2041,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMin(this->autoRepeaterMinFrequencyUHF());
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
-  // Encode dmr settings
+  // Decode dmr settings
   ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
   ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
   ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
@@ -2084,6 +2132,7 @@ D878UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
 void
 D878UVCodeplug::ExtendedSettingsElement::clear() {
   memset(_data, 0x00, _size);
+  setEncryption(AnytoneDMRSettingsExtension::EncryptionType::AES);
   clearAutoRepeaterVHF2OffsetIndex();
   clearAutoRepeaterUHF2OffsetIndex();
 }
@@ -3381,7 +3430,6 @@ D878UVCodeplug::AESEncryptionKeyElement::setKey(const QByteArray &key) {
 }
 
 
-
 /* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::AESEncryptionKeyBitmapElement
  * ******************************************************************************************** */
@@ -3393,6 +3441,73 @@ D878UVCodeplug::AESEncryptionKeyBitmapElement::AESEncryptionKeyBitmapElement(uin
 
 D878UVCodeplug::AESEncryptionKeyBitmapElement::AESEncryptionKeyBitmapElement(uint8_t *ptr)
   : BitmapElement(ptr, AESEncryptionKeyBitmapElement::size())
+{
+  // pass...
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::ARC4EncryptionKeyElement
+ * ******************************************************************************************** */
+D878UVCodeplug::ARC4EncryptionKeyElement::ARC4EncryptionKeyElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::ARC4EncryptionKeyElement::ARC4EncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, ARC4EncryptionKeyElement::size())
+{
+  // pass...
+}
+
+void
+D878UVCodeplug::ARC4EncryptionKeyElement::clear() {
+  memset(_data, 0x00, _size);
+}
+
+bool
+D878UVCodeplug::ARC4EncryptionKeyElement::isValid() const {
+  return Element::isValid() && (0 != getUInt8(Offset::index()));
+}
+
+unsigned
+D878UVCodeplug::ARC4EncryptionKeyElement::index() const {
+  return getUInt8(Offset::index())-1;
+}
+void
+D878UVCodeplug::ARC4EncryptionKeyElement::setIndex(unsigned idx) {
+  setUInt8(Offset::index(), idx+1);
+}
+
+QByteArray
+D878UVCodeplug::ARC4EncryptionKeyElement::key() const {
+  QByteArray ar(Limit::keySize(), 0);
+  memcpy(ar.data(), _data+Offset::key(), Limit::keySize());
+  return ar;
+}
+
+void
+D878UVCodeplug::ARC4EncryptionKeyElement::setKey(const QByteArray &key) {
+  if (Limit::keySize() < key.size())
+    return;
+  unsigned int o = Limit::keySize() - key.size();
+  memcpy(_data+Offset::key()+o, key.constData(), key.size());
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of D878UVCodeplug::ARC4EncryptionKeyBitmapElement
+ * ******************************************************************************************** */
+D878UVCodeplug::ARC4EncryptionKeyBitmapElement::ARC4EncryptionKeyBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+D878UVCodeplug::ARC4EncryptionKeyBitmapElement::ARC4EncryptionKeyBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, ARC4EncryptionKeyBitmapElement::size())
 {
   // pass...
 }
@@ -3568,6 +3683,8 @@ D878UVCodeplug::allocateBitmaps() {
   image(0).addElement(Offset::roamingZoneBitmap(), RoamingZoneBitmapElement::size());
   // AES encryption keys
   image(0).addElement(Offset::aesKeyBitmap(), AESEncryptionKeyBitmapElement::size());
+  // ARC4 encryption keys
+  image(0).addElement(Offset::arc4KeyBitmap(), ARC4EncryptionKeyBitmapElement::size());
 
   return true;
 }
@@ -3591,6 +3708,7 @@ D878UVCodeplug::allocateForEncoding() {
   D868UVCodeplug::allocateForEncoding();
   this->allocateRoaming();
   this->allocateAESKeys();
+  this->allocateARC4Keys();
 }
 
 void
@@ -3599,6 +3717,7 @@ D878UVCodeplug::allocateForDecoding() {
   D868UVCodeplug::allocateForDecoding();
   this->allocateRoaming();
   this->allocateAESKeys();
+  this->allocateARC4Keys();
   // allocate FM APRS frequency names
   image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
@@ -3623,6 +3742,11 @@ D878UVCodeplug::setBitmaps(Context& ctx)
   AESEncryptionKeyBitmapElement aes_key_bitmap(data(Offset::aesKeyBitmap()));
   unsigned int num_aes_channels = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
   aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_channels);
+
+  // Mark ARC4 keys
+  ARC4EncryptionKeyBitmapElement arc4_key_bitmap(data(Offset::arc4KeyBitmap()));
+  unsigned int num_arc4_channels = std::min(Limit::arc4Keys(), ctx.count<ARC4EncryptionKey>());
+  arc4_key_bitmap.clear(); arc4_key_bitmap.enableFirst(num_arc4_channels);
 }
 
 
@@ -3663,21 +3787,35 @@ D878UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
   if (! this->encodeAESKeys(flags, ctx, err))
     return false;
 
+  if (! this->encodeARC4Keys(flags, ctx, err))
+    return false;
+
   return true;
 }
 
 
 bool
-D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
-{
+D878UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
+  // Create everything commong between d868uv and d878uv codeplugs.
+  if (! D868UVCodeplug::createElements(ctx, err))
+    return false;
+
   if (! this->createAESKeys(ctx, err))
     return false;
 
-  // Decode everything commong between d868uv and d878uv codeplugs.
-  if (! D868UVCodeplug::decodeElements(ctx, err))
+  if (! this->createARC4Keys(ctx, err))
     return false;
 
   if (! this->createRoaming(ctx, err))
+    return false;
+
+  return true;
+}
+
+bool
+D878UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
+  // Link all common elements
+  if (! D868UVCodeplug::linkElements(ctx, err))
     return false;
 
   if (! this->linkRoaming(ctx, err))
@@ -3685,6 +3823,7 @@ D878UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
 
   return true;
 }
+
 
 void
 D878UVCodeplug::allocateChannels() {
@@ -4118,4 +4257,61 @@ D878UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
+
+void
+D878UVCodeplug::allocateARC4Keys() {
+  ARC4EncryptionKeyBitmapElement bitmap(data(Offset::arc4KeyBitmap()));
+  for (uint8_t i=0; i<Limit::arc4Keys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    // Allocate key
+    uint32_t addr = Offset::arc4Keys() + i*ARC4EncryptionKeyElement::size();
+    if (! isAllocated(addr, 0)) {
+      image(0).addElement(addr, ARC4EncryptionKeyElement::size());
+    }
+  }
+}
+
+bool
+D878UVCodeplug::encodeARC4Keys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err); Q_UNUSED(flags);
+
+  ARC4EncryptionKeyBitmapElement bitmap(data(Offset::arc4KeyBitmap()));
+  for (uint8_t i=0; i<Limit::arc4Keys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    ARC4EncryptionKeyElement key(data(Offset::arc4Keys() + i*ARC4EncryptionKeyElement::size()));
+    key.setIndex(i);
+    key.setKey(ctx.get<ARC4EncryptionKey>(i)->key());
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::createARC4Keys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  ARC4EncryptionKeyBitmapElement bitmap(data(Offset::arc4KeyBitmap()));
+  for (uint8_t i=0; i<Limit::arc4Keys(); i++) {
+    // if disabled -> skip
+    if (! bitmap.isEncoded(i))
+      continue;
+    // Decode
+    ARC4EncryptionKeyElement keyEl(data(Offset::arc4Keys() + i*ARC4EncryptionKeyElement::size()));
+    auto key = new ARC4EncryptionKey();
+    key->setName(QString("ARC4 Key %1").arg(i+1));
+    if (! key->setKey(keyEl.key(), err)) {
+      delete key;
+      return false;
+    }
+    // Store
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
 

@@ -18,5 +18,6 @@
         <file>data/chirp_bandwidth.csv</file>
         <file>data/basic_encryption.yaml</file>
         <file>data/aes_encryption.yaml</file>
+        <file>data/arc4_encryption.yaml</file>
     </qresource>
 </RCC>
