@@ -18,6 +18,8 @@ private slots:
   void testAutoRepeaterOffset();
   void testDTMFContacts();
   void testSMSTemplates();
+  void testBasicEncryption();
+
   void testRegressionSMSTemplateOffset();
   void testRegressionSMSCount();
   void testRegressionDefaultChannel();

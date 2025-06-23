@@ -290,6 +290,11 @@ public:
       End   = 2                   ///< Send APRS at end of transmission.
     };
 
+    /** Possible encryption types. */
+    enum class EncryptionType {
+      AES, ARC4
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -349,6 +354,20 @@ public:
     /** Sets the FM APRS frequency index [0,7]. */
     virtual void setFMAPRSFrequencyIndex(unsigned int idx);
 
+    /** Returns the encryption type. */
+    virtual EncryptionType encryptionType() const;
+    /** Sets the encryptionType. */
+    virtual void setEncryptionType(EncryptionType type);
+
+    /** Returns @c true if a DMR encryption key is set. */
+    virtual bool hasDMREncryptionKeyIndex() const;
+    /** Returns the DMR encryption key index (+1), 0=Off. */
+    virtual unsigned dmrEncryptionKeyIndex() const;
+    /** Sets the DMR encryption key index (+1), 0=Off. */
+    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    /** Clears the DMR encryption key index. */
+    virtual void clearDMREncryptionKeyIndex();
+
     /** Constructs a Channel object from this element. */
     Channel *toChannelObj(Context &ctx) const;
     /** Links a previously created channel object. */
@@ -368,6 +387,7 @@ public:
       static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
       static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
       static constexpr unsigned int frequenyCorrection()   { return 0x0039; }
+      static constexpr unsigned int dmrEncryptionKey()     { return 0x003a; }
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
       /// @endcond
     };
@@ -1790,10 +1810,10 @@ public:
     static constexpr unsigned int size() { return 0x0010; }
   };
 
+
   /** Represents an AES encryption key.
    *
-   * Binary representation of the key (size 0x0040 bytes):
-   * @verbinclude d878uv_aeskey.txt */
+   * Binary representation of a variable size AES key. The key size is between 4 and 256 bits. */
   class AESEncryptionKeyElement: public Element
   {
   protected:
@@ -1822,7 +1842,106 @@ public:
     virtual QByteArray key() const;
     /** Sets the key. */
     virtual void setKey(const QByteArray &key);
+
+  public:
+    /** Some limits of the key element. */
+    struct Limit: public Element::Limit {
+      /// The maximum index.
+      static constexpr unsigned int maxIndex() { return 254; }
+      /// The maximum key length in bytes.
+      static constexpr unsigned int keySize() { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int key()   { return 0x0001; }
+      static constexpr unsigned int size()  { return 0x0022; }
+      /// @endcond
+    };
   };
+
+  /** Represents the bitmap, indicating which AES key is valid. */
+  class AESEncryptionKeyBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    AESEncryptionKeyBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AESEncryptionKeyBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+
+  /** Represents an ARC4 encryption key.
+   *
+   * Encodes a 8bit ID and 40bit key. A smaller key might be encoded right-aligned. */
+  class ARC4EncryptionKeyElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ARC4EncryptionKeyElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ARC4EncryptionKeyElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the key index. */
+    virtual unsigned index() const;
+    /** Sets the key index. */
+    virtual void setIndex(unsigned idx);
+
+    /** Returns the actual key. */
+    virtual QByteArray key() const;
+    /** Sets the key. */
+    virtual void setKey(const QByteArray &key);
+
+  public:
+    /** Some limits of the key element. */
+    struct Limit: public Element::Limit {
+      /// The maximum index.
+      static constexpr unsigned int maxIndex() { return 254; }
+      /// The maximum key length in bytes.
+      static constexpr unsigned int keySize() { return 5; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int key()   { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which ARC4 key is valid. */
+  class ARC4EncryptionKeyBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ARC4EncryptionKeyBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ARC4EncryptionKeyBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
 
   /** Encodes the bitmap, indicating which zone is hidden. */
   class HiddenZoneBitmapElement: public BitmapElement
@@ -1941,6 +2060,8 @@ public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);
@@ -1948,8 +2069,9 @@ protected:
   void allocateUpdated();
   void allocateForEncoding();
 
-  bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateChannels();
   bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1979,13 +2101,29 @@ protected:
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates memory to encode/decode AES keys. */
+  virtual void allocateAESKeys();
+  /** Encode all AES keys. */
+  virtual bool encodeAESKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode AES keys from the codeplug. */
+  virtual bool createAESKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates memory to encode/decode ARC4 keys. */
+  virtual void allocateARC4Keys();
+  /** Encode all ARC4 keys. */
+  virtual bool encodeARC4Keys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode ARC4 keys from the codeplug. */
+  virtual bool createARC4Keys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
 public:
   /** Some limits. */
   struct Limit: public D868UVCodeplug::Limit {
     static constexpr unsigned int analogAPRSRXEntries() { return 32; }   ///< Maximum number of analog APRS RX entries.
     static constexpr unsigned int roamingChannels()     { return 250; }  ///< Maximum number of roaming channels.
     static constexpr unsigned int roamingZones()        { return 64; }   ///< Maximum number of roaming zones.
-    static constexpr unsigned int aesKeys()             { return 256; }  ///< Maximum number of AES keys.
+    static constexpr unsigned int aesKeys()             { return 255; }  ///< Maximum number of AES keys.
+    static constexpr unsigned int arc4Keys()            { return 255; }  ///< Maximum number of ARC4 keys.
   };
 
 protected:
@@ -2004,6 +2142,9 @@ protected:
     static constexpr unsigned int roamingZoneBitmap()           { return 0x01042080; }
     static constexpr unsigned int roamingZones()                { return 0x01043000; }
     static constexpr unsigned int aesKeys()                     { return 0x024C4000; }
+    static constexpr unsigned int aesKeyBitmap()                { return 0x024C8000; }
+    static constexpr unsigned int arc4Keys()                    { return 0x025C0C00; }
+    static constexpr unsigned int arc4KeyBitmap()               { return 0x025C1C00; }
     /// @endcond
   };
 };
