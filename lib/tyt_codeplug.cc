@@ -2689,9 +2689,9 @@ TyTCodeplug::EncryptionElement::fromCommercialExt(CommercialExtension *encr, Con
 
   // Encode each key type separately
   for (unsigned int i=0; i<ctx.count<BasicEncryptionKey>() && i<Limit::basicKeys(); i++)
-    setBasicKey(i, ctx.get<BasicEncryptionKey>(i+1)->key());
+    setBasicKey(i, ctx.get<BasicEncryptionKey>(i)->key());
   for (unsigned int i=0; i<ctx.count<AESEncryptionKey>() && i<Limit::advancedKeys(); i++)
-    setEnhancedKey(i, ctx.get<AESEncryptionKey>(i+1)->key());
+    setEnhancedKey(i, ctx.get<AESEncryptionKey>(i)->key());
 
   return true;
 }
@@ -2911,7 +2911,7 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
 
   // Index basic (DMR) and AES keys
   if (CommercialExtension *ext = config->commercialExtension()) {
-    unsigned int basicIndex = 1, aesIndex = 1;
+    unsigned int basicIndex = 0, aesIndex = 0;
     for (int i=0; i<ext->encryptionKeys()->count(); i++) {
       if (ext->encryptionKeys()->key(i)->is<BasicEncryptionKey>()) {
         ctx.add(ext->encryptionKeys()->key(i)->as<BasicEncryptionKey>(), basicIndex++);
