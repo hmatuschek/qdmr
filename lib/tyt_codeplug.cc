@@ -2651,15 +2651,19 @@ TyTCodeplug::EncryptionElement::isEnhancedKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::enhancedKey(unsigned n) const {
-  return QByteArray((char *)(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys()),
-                    Offset::betweenAdvancedKeys());
+  QByteArray dest(Offset::betweenAdvancedKeys(), 0);
+  const uint8_t *src = _data + Offset::advancedKeys() + n*Offset::betweenAdvancedKeys();
+  for (unsigned i=0,j=(Offset::betweenAdvancedKeys()-1); i<Offset::betweenAdvancedKeys(); i++,j--)
+    dest[i] = src[j];
+  return dest;
 }
 void
 TyTCodeplug::EncryptionElement::setEnhancedKey(unsigned n, const QByteArray &key) {
   if (Offset::betweenAdvancedKeys() != key.size())
     return;
-  memcpy(_data+Offset::advancedKeys()+n*Offset::betweenAdvancedKeys(),
-         key.constData(), Offset::betweenAdvancedKeys());
+  uint8_t *dest = _data + Offset::advancedKeys() + n*Offset::betweenAdvancedKeys();
+  for (unsigned i=0,j=(Offset::betweenAdvancedKeys()-1); i<Offset::betweenAdvancedKeys(); i++,j--)
+    dest[i] = key[j];
 }
 
 bool
@@ -2672,13 +2676,20 @@ TyTCodeplug::EncryptionElement::isBasicKeySet(unsigned n) const {
 }
 QByteArray
 TyTCodeplug::EncryptionElement::basicKey(unsigned n) const {
-  return QByteArray((char *)(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys()), Offset::betweenBasicKeys());
+  QByteArray dest(Offset::betweenBasicKeys(), 0);
+  const uint8_t *src = _data + Offset::basicKeys() + n*Offset::betweenBasicKeys();
+  for (unsigned i=0,j=(Offset::betweenBasicKeys()-1); i<Offset::betweenBasicKeys(); i++,j--)
+    dest[i] = src[j];
+  return dest;
 }
 void
 TyTCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) {
   if (Offset::betweenBasicKeys() != key.size())
     return;
-  memcpy(_data+Offset::basicKeys()+n*Offset::betweenBasicKeys(), key.constData(), Offset::betweenBasicKeys());
+
+  uint8_t *dest = _data + Offset::basicKeys() + n*Offset::betweenBasicKeys();
+  for (unsigned i=0,j=(Offset::betweenBasicKeys()-1); i<Offset::betweenBasicKeys(); i++,j--)
+    dest[i] = key[j];
 }
 
 bool
