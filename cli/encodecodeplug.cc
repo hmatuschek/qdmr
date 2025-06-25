@@ -125,6 +125,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     if (! encode<MD2017Codeplug>(config, flags, parser))
       return -1;
     break;
+  case RadioInfo::DM1701:
+    if (! encode<DM1701Codeplug>(config, flags, parser))
+      return -1;
+    break;
   case RadioInfo::RD5R:
     if (! encode<RD5RCodeplug>(config, flags, parser))
       return -1;
