@@ -2704,8 +2704,8 @@ TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     if (! isEnhancedKeySet(i))
       continue;
     AESEncryptionKey *key = new AESEncryptionKey();
-    key->setName(QString("Enhanced Key %1").arg(i+1));
-    ctx.add(key,i+1);
+    key->setName(QString("Enhanced Key %1").arg(i));
+    ctx.add(key,i); // 0-based key indices
     key->fromHex(enhancedKey(i).toHex());
     ext->encryptionKeys()->add(key);
   }
@@ -2714,8 +2714,8 @@ TyTCodeplug::EncryptionElement::updateCommercialExt(Context &ctx) {
     if (! isBasicKeySet(i))
       continue;
     BasicEncryptionKey *key = new BasicEncryptionKey();
-    key->setName(QString("Basic Key %1").arg(i+1));
-    ctx.add(key,i+1);
+    key->setName(QString("Basic Key %1").arg(i));
+    ctx.add(key,i); // 0-based key indices
     key->fromHex(basicKey(i).toHex());
     ext->encryptionKeys()->add(key);
   }
