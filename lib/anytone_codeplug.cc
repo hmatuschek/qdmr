@@ -2721,11 +2721,11 @@ AnytoneCodeplug::AnalogQuickCallElement::clear() {
 
 AnytoneCodeplug::AnalogQuickCallElement::Type
 AnytoneCodeplug::AnalogQuickCallElement::type() const {
-  return (Type)getUInt8(0x0000);
+  return (Type)getUInt8(Offset::type());
 }
 void
 AnytoneCodeplug::AnalogQuickCallElement::setType(Type type) {
-  setUInt8(0x0000, (unsigned)type);
+  setUInt8(Offset::type(), (unsigned)type);
 }
 
 bool
@@ -2734,11 +2734,11 @@ AnytoneCodeplug::AnalogQuickCallElement::hasContactIndex() const {
 }
 unsigned
 AnytoneCodeplug::AnalogQuickCallElement::contactIndex() const {
-  return getUInt8(0x0001);
+  return getUInt8(Offset::contactIndex());
 }
 void
 AnytoneCodeplug::AnalogQuickCallElement::setContactIndex(unsigned idx) {
-  setUInt8(0x0001, idx);
+  setUInt8(Offset::contactIndex(), idx);
 }
 void
 AnytoneCodeplug::AnalogQuickCallElement::clearContactIndex() {
@@ -2849,38 +2849,38 @@ AnytoneCodeplug::HotKeyElement::clear() {
 
 AnytoneCodeplug::HotKeyElement::Type
 AnytoneCodeplug::HotKeyElement::type() const {
-  return (Type)getUInt8(0x0000);
+  return (Type)getUInt8(Offset::type());
 }
 void
 AnytoneCodeplug::HotKeyElement::setType(Type type) {
-  setUInt8(0x0000, (unsigned)type);
+  setUInt8(Offset::type(), (unsigned)type);
 }
 
 AnytoneCodeplug::HotKeyElement::MenuItem
 AnytoneCodeplug::HotKeyElement::menuItem() const {
-  return (MenuItem) getUInt8(0x0001);
+  return (MenuItem) getUInt8(Offset::menuItem());
 }
 void
 AnytoneCodeplug::HotKeyElement::setMenuItem(MenuItem item) {
-  setUInt8(0x0001, (unsigned)item);
+  setUInt8(Offset::menuItem(), (unsigned)item);
 }
 
 AnytoneCodeplug::HotKeyElement::CallType
 AnytoneCodeplug::HotKeyElement::callType() const {
-  return (CallType)getUInt8(0x0002);
+  return (CallType)getUInt8(Offset::callType());
 }
 void
 AnytoneCodeplug::HotKeyElement::setCallType(CallType type) {
-  setUInt8(0x0002, (unsigned)type);
+  setUInt8(Offset::callType(), (unsigned)type);
 }
 
 AnytoneCodeplug::HotKeyElement::DigiCallType
 AnytoneCodeplug::HotKeyElement::digiCallType() const {
-  return (DigiCallType)getUInt8(0x0003);
+  return (DigiCallType)getUInt8(Offset::digiCallType());
 }
 void
 AnytoneCodeplug::HotKeyElement::setDigiCallType(DigiCallType type) {
-  setUInt8(0x0003, (unsigned)type);
+  setUInt8(Offset::digiCallType(), (unsigned)type);
 }
 
 bool
@@ -2889,11 +2889,11 @@ AnytoneCodeplug::HotKeyElement::hasContactIndex() const {
 }
 unsigned
 AnytoneCodeplug::HotKeyElement::contactIndex() const {
-  return getUInt32_le(0x0004);
+  return getUInt32_le(Offset::contactIndex());
 }
 void
 AnytoneCodeplug::HotKeyElement::setContactIndex(unsigned idx) {
-  setUInt32_le(0x0004, idx);
+  setUInt32_le(Offset::contactIndex(), idx);
 }
 void
 AnytoneCodeplug::HotKeyElement::clearContactIndex() {
@@ -2906,16 +2906,17 @@ AnytoneCodeplug::HotKeyElement::hasMessageIndex() const {
 }
 unsigned
 AnytoneCodeplug::HotKeyElement::messageIndex() const {
-  return getUInt8(0x0008);
+  return getUInt8(Offset::messageIndex());
 }
 void
 AnytoneCodeplug::HotKeyElement::setMessageIndex(unsigned idx) {
-  setUInt8(0x0008, idx);
+  setUInt8(Offset::messageIndex(), idx);
 }
 void
 AnytoneCodeplug::HotKeyElement::clearMessageIndex() {
   setMessageIndex(0xff);
 }
+
 
 
 /* ********************************************************************************************* *
@@ -2970,74 +2971,74 @@ AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::clear() {
 
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::Action
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::action() const {
-  return (Action) getUInt8(0x0000);
+  return (Action) getUInt8(Offset::action());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setAction(Action action) {
-  setUInt8(0x0000, (unsigned)action);
+  setUInt8(Offset::action(), (unsigned)action);
 }
 
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::ENIType
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::encodingType() const {
-  return (ENIType) getUInt8(0x0001);
+  return (ENIType) getUInt8(Offset::encodingType());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setEncodingType(ENIType type) {
-  setUInt8(0x0001, (unsigned)type);
+  setUInt8(Offset::encodingType(), (unsigned)type);
 }
 
 unsigned
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::emergencyIndex() const {
-  return getUInt8(0x0002);
+  return getUInt8(Offset::emergencyIndex());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setEmergencyIndex(unsigned idx) {
-  setUInt8(0x0002, idx);
+  setUInt8(Offset::emergencyIndex(), idx);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::duration() const {
-  return getUInt8(0x0003);
+  return Interval::fromSeconds(getUInt8(0x0003));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setDuration(unsigned sec) {
-  setUInt8(0x0003, sec);
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setDuration(const Interval &sec) {
+  setUInt8(Offset::duration(), sec.seconds());
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::txDuration() const {
-  return getUInt8(0x0004);
+  return Interval::fromSeconds(getUInt8(Offset::txDuration()));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setTXDuration(unsigned sec) {
-  setUInt8(0x0004, sec);
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setTXDuration(const Interval &sec) {
+  setUInt8(Offset::txDuration(), sec.seconds());
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::rxDuration() const {
-  return getUInt8(0x0005);
+  return Interval::fromSeconds(getUInt8(Offset::rxDuration()));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRXDuration(unsigned sec) {
-  setUInt8(0x0005, sec);
+AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRXDuration(const Interval &sec) {
+  setUInt8(Offset::rxDuration(), sec.seconds());
 }
 
 bool
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::channelIsSelected() const {
-  return getUInt8(0x0008);
+  return getUInt8(Offset::channelIsSelected());
 }
 unsigned
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::channelIndex() const {
-  return getUInt16_le(0x0006);
+  return getUInt16_le(Offset::channelIndex());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setChannelIndex(unsigned idx) {
-  setUInt16_le(0x0006, idx);
-  setUInt8(0x0008, 0x00);
+  setUInt16_le(Offset::channelIndex(), idx);
+  setUInt8(Offset::channelIsSelected(), 0x00);
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setChannelSelected() {
-  setUInt8(0x0008, 0x01);
+  setUInt8(Offset::channelIsSelected(), 0x01);
 }
 
 bool
@@ -3046,16 +3047,18 @@ AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::repeatContinuously() const {
 }
 unsigned
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::repetitions() const {
-  return getUInt8(0x0009);
+  return getUInt8(Offset::repetitions());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRepetitions(unsigned num) {
-  setUInt8(0x0009, num);
+  setUInt8(Offset::repetitions(), num);
 }
 void
 AnytoneCodeplug::AlarmSettingElement::AnalogAlarm::setRepatContinuously() {
   setRepetitions(0x00);
 }
+
+
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::AlarmSettingElement::DigitalAlarm
@@ -3080,56 +3083,56 @@ AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::clear() {
 
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::Action
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::action() const {
-  return (Action) getUInt8(0x0000);
+  return (Action) getUInt8(Offset::action());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setAction(Action action) {
-  setUInt8(0x0000, (unsigned)action);
+  setUInt8(Offset::action(), (unsigned)action);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::duration() const {
-  return getUInt8(0x0001);
+  return Interval::fromSeconds(getUInt8(Offset::duration()));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setDuration(unsigned sec) {
-  setUInt8(0x0001, sec);
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setDuration(const Interval &sec) {
+  setUInt8(Offset::duration(), sec.seconds());
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::txDuration() const {
-  return getUInt8(0x0002);
+  return Interval::fromSeconds(getUInt8(Offset::txDuration()));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setTXDuration(unsigned sec) {
-  setUInt8(0x0002, sec);
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setTXDuration(const Interval &sec) {
+  setUInt8(Offset::txDuration(), sec.seconds());
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::rxDuration() const {
-  return getUInt8(0x0003);
+  return Interval::fromSeconds(getUInt8(Offset::rxDuration()));
 }
 void
-AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRXDuration(unsigned sec) {
-  setUInt8(0x0003, sec);
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRXDuration(const Interval &sec) {
+  setUInt8(Offset::rxDuration(), sec.seconds());
 }
 
 bool
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::channelIsSelected() const {
-  return getUInt8(0x0006);
+  return getUInt8(Offset::channelIsSelected());
 }
 unsigned
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::channelIndex() const {
-  return getUInt16_le(0x0004);
+  return getUInt16_le(Offset::channelIndex());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setChannelIndex(unsigned idx) {
-  setUInt16_le(0x0004, idx);
-  setUInt8(0x0006, 0x00);
+  setUInt16_le(Offset::channelIndex(), idx);
+  setUInt8(Offset::channelIsSelected(), 0x00);
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setChannelSelected() {
-  setUInt8(0x0006, 0x01);
+  setUInt8(Offset::channelIsSelected(), 0x01);
 }
 
 bool
@@ -3138,54 +3141,57 @@ AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::repeatContinuously() const {
 }
 unsigned
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::repetitions() const {
-  return getUInt8(0x0007);
+  return getUInt8(Offset::repetitions());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRepetitions(unsigned num) {
-  setUInt8(0x0007, num);
+  setUInt8(Offset::repetitions(), num);
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setRepatContinuously() {
   setRepetitions(0x00);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::voiceBroadcastDuration() const {
-  return getUInt8(0x0008)+1;
+  return Interval::fromMinutes(getUInt8(Offset::voiceBroadcastDuration())+1);
 }
 void
-AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setVoiceBroadcastDuration(unsigned min) {
-  if (1 > min) min = 1;
-  setUInt8(0x0008, min-1);
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setVoiceBroadcastDuration(const Interval &min) {
+  unsigned int m = min.minutes();
+  if (1 > m) m = 1;
+  setUInt8(Offset::voiceBroadcastDuration(), m-1);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::areaBroadcastDuration() const {
-  return getUInt8(0x0009)+1;
+  return Interval::fromMinutes(getUInt8(Offset::areaBroadcastDuration())+1);
 }
 void
-AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setAreaBroadcastDuration(unsigned min) {
-  if (1 > min) min = 1;
-  setUInt8(0x0009, min-1);
+AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::setAreaBroadcastDuration(const Interval &min) {
+  unsigned int m = min.minutes();
+  if (1 > m) m = 1;
+  setUInt8(Offset::areaBroadcastDuration(), m-1);
 }
 
 bool
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::vox() const {
-  return getUInt8(0x000a);
+  return getUInt8(Offset::vox());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::enableVOX(bool enable) {
-  setUInt8(0x000a, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::vox(), (enable ? 0x01 : 0x00));
 }
 
 bool
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::rxAlarm() const {
-  return getUInt8(0x000b);
+  return getUInt8(Offset::rxAlarm());
 }
 void
 AnytoneCodeplug::AlarmSettingElement::DigitalAlarm::enableRXAlarm(bool enable) {
-  setUInt8(0x000b, (enable ? 0x01 : 0x00));
+  setUInt8(Offset::rxAlarm(), (enable ? 0x01 : 0x00));
 }
+
 
 
 /* ********************************************************************************************* *
@@ -3289,28 +3295,28 @@ AnytoneCodeplug::FiveToneIDElement::clear() {
 
 AnytoneCodeplug::FiveToneIDElement::Standard
 AnytoneCodeplug::FiveToneIDElement::standard() const {
-  return (Standard) getUInt8(0x0001);
+  return (Standard) getUInt8(Offset::standard());
 }
 void
 AnytoneCodeplug::FiveToneIDElement::setStandard(Standard std) {
-  setUInt8(0x0001, (unsigned)std);
+  setUInt8(Offset::standard(), (unsigned)std);
 }
 
-unsigned
+Interval
 AnytoneCodeplug::FiveToneIDElement::toneDuration() const {
-  return getUInt8(0x0003);
+  return Interval::fromMilliseconds(getUInt8(Offset::toneDuration()));
 }
 void
-AnytoneCodeplug::FiveToneIDElement::setToneDuration(unsigned ms) {
-  setUInt8(0x0003, ms);
+AnytoneCodeplug::FiveToneIDElement::setToneDuration(const Interval &ms) {
+  setUInt8(Offset::toneDuration(), ms.milliseconds());
 }
 
 QString
 AnytoneCodeplug::FiveToneIDElement::id() const {
-  unsigned len = getUInt8(0x0002);
+  unsigned len = getUInt8(Offset::idLength());
   QString id;
   for (unsigned i=0; i<len; i++) {
-    uint8_t b = getUInt8(0x0004+(i/2));
+    uint8_t b = getUInt8(Offset::id()+(i/2));
     if (0 == (i%2))
       id.append(QString::number((b>>4)&0xf,16));
     else
@@ -3324,22 +3330,22 @@ AnytoneCodeplug::FiveToneIDElement::setID(const QString &id) {
   for (int i=0; i<id.length(); i++) {
     bool ok;
     if (0 == (len%2)) {
-      setUInt4(0x0004+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
+      setUInt4(Offset::id()+len/2, 4, id.mid(i, 1).toUInt(&ok, 16));
     } else {
-      setUInt4(0x0004+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
+      setUInt4(Offset::id()+len/2, 0, id.mid(i, 1).toUInt(&ok, 16));
     }
     len++;
   }
-  setUInt8(0x0002, len);
+  setUInt8(Offset::idLength(), len);
 }
 
 QString
 AnytoneCodeplug::FiveToneIDElement::name() const {
-  return readASCII(0x0018, 7, 0x00);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 void
 AnytoneCodeplug::FiveToneIDElement::setName(const QString &name) {
-  writeASCII(0x0018, name, 7, 0x00);
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 
