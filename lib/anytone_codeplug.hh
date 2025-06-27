@@ -3099,6 +3099,10 @@ public:
       static constexpr unsigned int botIdLength() { return 16; }
       /** Maximum EOT ID length. */
       static constexpr unsigned int eotIdLength() { return 16; }
+      /** Maximum remote kill ID length. */
+      static constexpr unsigned int remoteKillIdLength() { return 16; }
+      /** Maximum remote stun ID length. */
+      static constexpr unsigned int remteStunIdLength() { return 16; }
     };
 
   protected:
@@ -3119,6 +3123,8 @@ public:
       static constexpr unsigned int sidetone() { return 0x000d; }
       static constexpr unsigned int botID() { return 0x0010; }
       static constexpr unsigned int eotID() { return 0x0020; }
+      static constexpr unsigned int remoteKillID() { return 0x0030; }
+      static constexpr unsigned int remoteStunID() { return 0x0040; }
       /// @endcond
     };
   };
@@ -3158,6 +3164,7 @@ public:
       static constexpr unsigned int numberLength() { return 16; }      ///< The maximum length of the numbers.
     };
   };
+
 
   /** Represents a list of 100 FM broad cast channels.
    *
@@ -3353,7 +3360,17 @@ public:
     virtual unsigned index() const;
     /** Sets the index. */
     virtual void setIndex(unsigned idx);
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int id()    { return 0x0000; }
+      static constexpr unsigned int index() { return 0x0000; }
+      /// @endcond
+    };
   };
+
 
 protected:
   /** Hidden constructor. */

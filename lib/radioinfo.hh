@@ -31,7 +31,7 @@ public:
     MD2017, RT82 = MD2017,
     // Anytone devices
     D868UVE,
-    D868UV = D868UVE, // Actually a different device. Implement!
+    D868UV = D868UVE,
     DMR6X2UV,
     D878UV,
     D878UVII,

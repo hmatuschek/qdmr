@@ -64,46 +64,46 @@ D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 bool
 D868UVCodeplug::ChannelElement::ranging() const {
-  return getBit(0x0034, 0);
+  return getBit(Offset::ranging());
 }
 void
 D868UVCodeplug::ChannelElement::enableRanging(bool enable) {
-  setBit(0x0034, 0, enable);
+  setBit(Offset::ranging(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::throughMode() const {
-  return getBit(0x0034, 1);
+  return getBit(Offset::throughMode());
 }
 void
 D868UVCodeplug::ChannelElement::enableThroughMode(bool enable) {
-  setBit(0x0034, 1, enable);
+  setBit(Offset::throughMode(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::dataACK() const {
-  return !getBit(0x0034, 2);
+  return !getBit(Offset::dataACK());
 }
 void
 D868UVCodeplug::ChannelElement::enableDataACK(bool enable) {
-  setBit(0x0034, 2, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(0x0035, 0);
+  return getBit(Offset::txDigitalAPRS());
 }
 void
 D868UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(0x0035, 0, enable);
+  setBit(Offset::txDigitalAPRS(), enable);
 }
 unsigned
 D868UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0036);
+  return getUInt8(Offset::digitalAPRSSystemIndex());
 }
 void
 D868UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0036, idx);
+  setUInt8(Offset::digitalAPRSSystemIndex(), idx);
 }
 
 
@@ -138,28 +138,28 @@ D868UVCodeplug::ChannelElement::clearEncryptionKeyIndex() {
 
 bool
 D868UVCodeplug::ChannelElement::multipleKeyEncryption() const {
-  return getBit(0x003b, 0);
+  return getBit(Offset::multipleKeyEncryption());
 }
 void
 D868UVCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
-  setBit(0x003b, 0, enable);
+  setBit(Offset::multipleKeyEncryption(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::randomKey() const {
-  return getBit(0x003b, 1);
+  return getBit(Offset::randomKey());
 }
 void
 D868UVCodeplug::ChannelElement::enableRandomKey(bool enable) {
-  setBit(0x003b, 1, enable);
+  setBit(Offset::randomKey(), enable);
 }
 bool
 D868UVCodeplug::ChannelElement::sms() const {
-  return !getBit(0x003b, 2);
+  return !getBit(Offset::sms());
 }
 void
 D868UVCodeplug::ChannelElement::enableSMS(bool enable) {
-  setBit(0x003b, 0, !enable);
+  setBit(Offset::sms(), !enable);
 }
 
 Channel *

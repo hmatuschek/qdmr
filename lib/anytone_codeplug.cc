@@ -4055,7 +4055,7 @@ AnytoneCodeplug::DTMFSettingsElement::setAutoResetTime(const Interval &sec) {
 QString
 AnytoneCodeplug::DTMFSettingsElement::id() const {
   QString id;
-  for (int i=0; (i<Limit::idLength())&&(0xff!=getUInt8(Offset::id()+i)); i++) {
+  for (unsigned int i=0; (i<Limit::idLength())&&(0xff!=getUInt8(Offset::id()+i)); i++) {
     id.append(QString::number(getUInt8(Offset::id()+i),16));
   }
   return id;
@@ -4116,7 +4116,7 @@ AnytoneCodeplug::DTMFSettingsElement::enableSidetone(bool enable) {
 QString
 AnytoneCodeplug::DTMFSettingsElement::botID() const {
   QString id;
-  for (int i=0; (i<Limit::botIdLength())&&(0xff!=getUInt8(Offset::botID()+i)); i++) {
+  for (unsigned int i=0; (i<Limit::botIdLength())&&(0xff!=getUInt8(Offset::botID()+i)); i++) {
     id.append(QString::number(getUInt8(Offset::botID()+i),16));
   }
   return id;
@@ -4132,7 +4132,7 @@ AnytoneCodeplug::DTMFSettingsElement::setBOTID(const QString &id) {
 QString
 AnytoneCodeplug::DTMFSettingsElement::eotID() const {
   QString id;
-  for (int i=0; (i<Limit::eotIdLength())&&(0xff!=getUInt8(Offset::eotID()+i)); i++) {
+  for (unsigned int i=0; (i<Limit::eotIdLength())&&(0xff!=getUInt8(Offset::eotID()+i)); i++) {
     id.append(QString::number(getUInt8(Offset::eotID()+i),16));
   }
   return id;
@@ -4148,35 +4148,36 @@ AnytoneCodeplug::DTMFSettingsElement::setEOTID(const QString &id) {
 QString
 AnytoneCodeplug::DTMFSettingsElement::remoteKillID() const {
   QString id;
-  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0030+i)); i++) {
-    id.append(QString::number(getUInt8(0x0030+i),16));
+  for (unsigned int i=0; (i<Limit::remoteKillIdLength()) && (0xff!=getUInt8(Offset::remoteKillID()+i)); i++) {
+    id.append(QString::number(getUInt8(Offset::remoteKillID()+i),16));
   }
   return id;
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setRemoteKillID(const QString &id) {
-  int len = std::min(qsizetype(16), id.length());
+  int len = std::min(qsizetype(Limit::remoteKillIdLength()), id.length());
   bool ok;
   for (int i=0; i<len; i++)
-    setUInt8(0x0030+i, id.mid(i,1).toUInt(&ok, 16));
+    setUInt8(Offset::remoteKillID()+i, id.mid(i,1).toUInt(&ok, 16));
 }
 
 
 QString
 AnytoneCodeplug::DTMFSettingsElement::remoteStunID() const {
   QString id;
-  for (int i=0; (i<16)&&(0xff!=getUInt8(0x0040+i)); i++) {
-    id.append(QString::number(getUInt8(0x0040+i),16));
+  for (unsigned int i=0; (i<Limit::remteStunIdLength()) && (0xff!=getUInt8(Offset::remoteStunID()+i)); i++) {
+    id.append(QString::number(getUInt8(Offset::remoteStunID()+i),16));
   }
   return id;
 }
 void
 AnytoneCodeplug::DTMFSettingsElement::setRemoteStunID(const QString &id) {
-  int len = std::min(qsizetype(16), id.length());
+  int len = std::min(qsizetype(Limit::remteStunIdLength()), id.length());
   bool ok;
   for (int i=0; i<len; i++)
-    setUInt8(0x0040+i, id.mid(i,1).toUInt(&ok, 16));
+    setUInt8(Offset::remoteStunID()+i, id.mid(i,1).toUInt(&ok, 16));
 }
+
 
 
 /* ********************************************************************************************* *
@@ -4439,35 +4440,37 @@ AnytoneCodeplug::ContactMapElement::clear() {
 
 bool
 AnytoneCodeplug::ContactMapElement::isValid() const {
-  return (0xffffffff!=getUInt32_le(0x0000)) && (0xffffffff!=getUInt32_le(0x0004));
+  return (0xffffffff!=getUInt32_le(Offset::id()))
+      && (0xffffffff!=getUInt32_le(Offset::index()));
 }
 
 bool
 AnytoneCodeplug::ContactMapElement::isGroup() const {
-  uint32_t tmp = getUInt32_le(0x0000);
+  uint32_t tmp = getUInt32_le(Offset::id());
   return tmp & 0x01;
 }
 unsigned
 AnytoneCodeplug::ContactMapElement::id() const {
-  uint32_t tmp = getUInt32_le(0x0000);
-  tmp = tmp>>1;
+  uint32_t tmp = getUInt32_le(Offset::id());
+  tmp = tmp >> 1;
   return decode_dmr_id_bcd_le((uint8_t *)&tmp);
 }
 void
 AnytoneCodeplug::ContactMapElement::setID(unsigned id, bool group) {
   uint32_t tmp; encode_dmr_id_bcd_le((uint8_t *)&tmp, id);
   tmp = ( (tmp << 1) | (group ? 1 : 0) );
-  setUInt32_le(0x0000, tmp);
+  setUInt32_le(Offset::id(), tmp);
 }
 
 unsigned
 AnytoneCodeplug::ContactMapElement::index() const {
-  return getUInt32_le(0x0004);
+  return getUInt32_le(Offset::index());
 }
 void
 AnytoneCodeplug::ContactMapElement::setIndex(unsigned idx) {
-  setUInt32_le(0x0004, idx);
+  setUInt32_le(Offset::index(), idx);
 }
+
 
 
 /* ********************************************************************************************* *
