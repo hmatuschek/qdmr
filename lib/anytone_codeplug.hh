@@ -378,13 +378,53 @@ public:
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual bool fromChannelObj(const Channel *c, Context &ctx);
 
+  public:
+    /** Some limits for the channel element. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
   protected:
     /** Internal used offsets within the channel element. */
     struct Offset: public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int twoToneIDIndex()  { return 0x001d; }
-      static constexpr unsigned int fiveToneIDIndex() { return 0x001e; }
-      static constexpr unsigned int dtmfIDIndex()     { return 0x001f; }
+      static constexpr unsigned int rxFrequency()       { return 0x0000; }
+      static constexpr unsigned int txFrequencyOffset() { return 0x0004; }
+      static constexpr Bit channelMode()                { return {0x0008, 0}; }
+      static constexpr Bit power()                      { return {0x0008, 2}; }
+      static constexpr Bit bandwidth()                  { return {0x0008, 4}; }
+      static constexpr Bit repeaterMode()               { return {0x0008, 6}; }
+      static constexpr Bit rxSignalingMode()            { return {0x0009, 0}; }
+      static constexpr Bit txSignalingMode()            { return {0x0009, 2}; }
+      static constexpr Bit ctcssPhaseReversal()         { return {0x0009, 4}; }
+      static constexpr Bit rxOnly()                     { return {0x0009, 5}; }
+      static constexpr Bit callConfirm()                { return {0x0009, 6}; }
+      static constexpr Bit talkaround()                 { return {0x0009, 7}; }
+      static constexpr unsigned int txCTCSS()           { return 0x000a; }
+      static constexpr unsigned int rxCTCSS()           { return 0x000b; }
+      static constexpr unsigned int txDCS()             { return 0x000c; }
+      static constexpr unsigned int rxDCS()             { return 0x000e; }
+      static constexpr unsigned int customCTCSS()       { return 0x0010; }
+      static constexpr unsigned int twoFunctionIndex()  { return 0x0012; }
+      static constexpr unsigned int contactIndex()      { return 0x0014; }
+      static constexpr unsigned int radioIdIndex()      { return 0x0018; }
+      static constexpr Bit squelchMode()                { return {0x0019, 4}; }
+      static constexpr Bit admitCriterion()             { return {0x001a, 0}; }
+      static constexpr Bit optionalSingnaling()         { return {0x001a, 4}; }
+      static constexpr unsigned int scanListIndex()     { return 0x001b; }
+      static constexpr unsigned int groupListIndex()    { return 0x001c; }
+      static constexpr unsigned int twoToneIDIndex()    { return 0x001d; }
+      static constexpr unsigned int fiveToneIDIndex()   { return 0x001e; }
+      static constexpr unsigned int dtmfIDIndex()       { return 0x001f; }
+      static constexpr unsigned int colorCode()         { return 0x0020; }
+      static constexpr Bit timeSlot()                   { return {0x0021, 0}; }
+      static constexpr Bit smsConfirm()                 { return {0x0021, 1}; }
+      static constexpr Bit simplexTDMA()                { return {0x0021, 2}; }
+      static constexpr Bit adaptiveTDMA()               { return {0x0021, 4}; }
+      static constexpr Bit rxAPRS()                     { return {0x0021, 5}; }
+      static constexpr Bit loneWorker()                 { return {0x0021, 7}; }
+      static constexpr unsigned int name()              { return 0x0023; }
       /// @endcond
     };
   };
@@ -403,6 +443,7 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0200; }
   };
+
 
   /** Represents the base class for conacts in all AnyTone codeplugs.
    *
@@ -453,6 +494,24 @@ public:
     virtual DMRContact *toContactObj(Context &ctx) const;
     /** Constructs this contact from the give @c DigitalContact. */
     virtual bool fromContactObj(const DMRContact *contact, Context &ctx);
+
+  public:
+    /** Some limits for the contact. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int type()         { return 0x0000; }
+      static constexpr unsigned int name()         { return 0x0001; }
+      static constexpr unsigned int number()       { return 0x0023; }
+      static constexpr unsigned int alertType()    { return 0x0027; }
+      /// @endcond
+    };
   };
 
   /** Represents the contact bitmaps in all AnyTone codeplugs. */
@@ -469,6 +528,7 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0500; }
   };
+
 
   /** Represents the base class for analog (DTMF) contacts in all AnyTone codeplugs.
    *
@@ -540,6 +600,7 @@ public:
     static constexpr unsigned int size() { return 0x0100; }
   };
 
+
   /** Represents the base class for group lists in all AnyTone codeplugs.
    *
    * Encoding of a group list (0x120 bytes):
@@ -585,6 +646,25 @@ public:
     virtual bool linkGroupList(RXGroupList *lst, Context &ctx) const;
     /** Constructs this group list from the given @c RXGroupList. */
     virtual bool fromGroupListObj(const RXGroupList *lst, Context &ctx);
+
+  public:
+    /** Some limits for the group list. */
+    struct Limit: public Element::Limit {
+      /** Maximum number of members. */
+      static constexpr unsigned int members() { return 64; }
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int members()          { return 0x0000; }
+      static constexpr unsigned int betweenMembers()   { return 0x0004; }
+      static constexpr unsigned int name()             { return 0x0100; }
+      /// @endcond
+    };
   };
 
   /** Represents the bitmap indicating which group list element is valid. */
@@ -601,6 +681,7 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0020; }
   };
+
 
   /** Represents the base class for scan lists in all AnyTone codeplugs.
    *
@@ -675,21 +756,21 @@ public:
     virtual void clearSecondaryChannel();
 
     /** Returns the look back time A in seconds. */
-    virtual unsigned lookBackTimeA() const;
+    virtual Interval lookBackTimeA() const;
     /** Sets the look back time A in seconds. */
-    virtual void setLookBackTimeA(unsigned sec);
+    virtual void setLookBackTimeA(const Interval &sec);
     /** Returns the look back time B in seconds. */
-    virtual unsigned lookBackTimeB() const;
+    virtual Interval lookBackTimeB() const;
     /** Sets the look back time B in seconds. */
-    virtual void setLookBackTimeB(unsigned sec);
+    virtual void setLookBackTimeB(const Interval& sec);
     /** Returns the drop out delay in seconds. */
-    virtual unsigned dropOutDelay() const;
+    virtual Interval dropOutDelay() const;
     /** Sets the drop out delay in seconds. */
-    virtual void setDropOutDelay(unsigned sec);
+    virtual void setDropOutDelay(const Interval& sec);
     /** Returns the dwell time in seconds. */
-    virtual unsigned dwellTime() const;
+    virtual Interval dwellTime() const;
     /** Sets the dwell time in seconds. */
-    virtual void setDwellTime(unsigned sec);
+    virtual void setDwellTime(const Interval& sec);
 
     /** Returns the revert channel type. */
     virtual RevertChannel revertChannel() const;
@@ -717,6 +798,33 @@ public:
     virtual bool linkScanListObj(ScanList *lst, Context &ctx) const;
     /** Constructs the binary representation from the give config. */
     virtual bool fromScanListObj(ScanList *lst, Context &ctx);
+
+  public:
+    /** Some limits for the scan list. */
+    struct Limit: public Element::Limit {
+      /// Maximum number of members.
+      static constexpr unsigned int members() { return 50; }
+      /// Maximum name length.
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int priorityChannel()              { return 0x0001; }
+      static constexpr unsigned int primaryChannel()               { return 0x0002; }
+      static constexpr unsigned int secondaryChannel()             { return 0x0004; }
+      static constexpr unsigned int lookBackTimeA()                { return 0x0006; }
+      static constexpr unsigned int lookBackTimeB()                { return 0x0008; }
+      static constexpr unsigned int dropOutDelay()                 { return 0x000a; }
+      static constexpr unsigned int dwellTime()                    { return 0x000c; }
+      static constexpr unsigned int revertChannel()                { return 0x000e; }
+      static constexpr unsigned int name()                         { return 0x000f; }
+      static constexpr unsigned int members()                      { return 0x0020; }
+      static constexpr unsigned int betweenMembers()               { return 0x0002; }
+      /// @endcond
+    };
   };
 
   /** Represents the bitmap indicating which scanlist elements are valid. */
@@ -733,6 +841,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x00000020; }
   };
+
 
   /** Represents the base class for radio IDs in all AnyTone codeplugs.
    *
@@ -768,6 +877,22 @@ public:
     virtual bool fromRadioID(DMRRadioID *id);
     /** Constructs a new radio id. */
     virtual DMRRadioID *toRadioID() const;
+
+  public:
+    /** Some limits for the radio ID element. */
+    struct Limit: public Element::Limit {
+      /// Maximum name length
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int number() { return 0x0000; }
+      static constexpr unsigned int name()   { return 0x0005; }
+      /// @endcond
+    };
   };
 
   /** Represents the bitmap indicating which radio IDs are valid. */
@@ -784,6 +909,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0020; }
   };
+
 
   /** Represents the base class for the settings elements in all AnyTone codeplugs.
    * This class only implements those few settings, common to all devices and encoded the same way.
@@ -1181,6 +1307,7 @@ public:
     };
   };
 
+
   /** Represents the base class for the extended settings element in many AnyTone codeplugs. That
    *  is, every device after the D868UVE. It provides additional settings to the
    *  @c AnytoneGeneralSettingsElement.
@@ -1232,6 +1359,7 @@ public:
     virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
   };
 
+
   /** Represents the base class for zone channel list for all AnyTone codeplugs.
    * Zone channel lists assign a default channel to each zone for VFO A and B.
    *
@@ -1270,6 +1398,23 @@ public:
     virtual void setChannelIndexB(unsigned n, unsigned idx);
     /** Clears the channel index (0-based) for VFO B for the n-th zone. */
     virtual void clearChannelIndexB(unsigned n);
+
+  public:
+    /** Some limits for the channel lists. */
+    struct Limit: public Element::Limit {
+      /// Maximum number of channels per VFO.
+      static constexpr unsigned int zones() { return 250; }
+    };
+
+  protected:
+    /** Internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channelsA()       { return 0x0000;}
+      static constexpr unsigned int channelsB()       { return 0x0200;}
+      static constexpr unsigned int betweenChannels() { return 0x0002;}
+      /// @endcond
+    };
   };
 
   /** Represents the bitmap indcating which zones are valid. */
@@ -1286,6 +1431,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0020; }
   };
+
 
   /** Represents the base class of the boot settings for all AnyTone codeplug.
    *
@@ -1325,7 +1471,27 @@ public:
     virtual bool fromConfig(const Flags &flags, Context &ctx);
     /** Updates the abstract configuration from this general settings. */
     virtual bool updateConfig(Context &ctx);
+
+  public:
+    /** Some limits for boot settings. */
+    struct Limit: public Element::Limit {
+      /** Maximum intro line length. */
+      static constexpr unsigned int introLineLength() { return 16; }
+      /** Maximum password length. */
+      static constexpr unsigned int passwordLength()  { return 8; }
+    };
+
+  protected:
+    /** Some internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int introLine1() { return 0x0000; }
+      static constexpr unsigned int introLine2() { return 0x0010; }
+      static constexpr unsigned int password()   { return 0x0020; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base class of DMR APRS settings for all AnyTone codeplugs.
    *
@@ -1348,16 +1514,16 @@ public:
     void clear();
 
     /** Returns the Manual TX interval in seconds. */
-    virtual unsigned manualInterval() const;
+    virtual Interval manualInterval() const;
     /** Sets the manual TX interval in seconds. */
-    virtual void setManualInterval(unsigned sec);
+    virtual void setManualInterval(const Interval& sec);
 
     /** Returns @c true if the automatic APRS is enabled. */
     virtual bool automatic() const;
     /** Returns the automatic transmit interval in seconds. */
-    virtual unsigned automaticInterval() const;
+    virtual Interval automaticInterval() const;
     /** Sets the automatic transmit interval in seconds. */
-    virtual void setAutomaticInterval(unsigned sec);
+    virtual void setAutomaticInterval(const Interval& sec);
     /** Disables the automatic APRS. To enable it, set an interval. */
     virtual void disableAutomatic();
 
@@ -1421,7 +1587,32 @@ public:
     virtual bool createGPSSystem(uint8_t i, Context &ctx);
     /** Links GPS system from this GPS settings. */
     virtual bool linkGPSSystem(uint8_t i, Context &ctx);
+
+  protected:
+    /** Internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int manualInterval()        { return 0x0000; }
+      static constexpr unsigned int automaticInterval()     { return 0x0001; }
+      static constexpr unsigned int fixedLocation()         { return 0x0002; }
+      static constexpr unsigned int latitudeDeg()           { return 0x0003; }
+      static constexpr unsigned int latitudeMin()           { return 0x0004; }
+      static constexpr unsigned int latitudeSec()           { return 0x0005; }
+      static constexpr unsigned int latitudeHemi()          { return 0x0006; }
+      static constexpr unsigned int longitudeDeg()          { return 0x0007; }
+      static constexpr unsigned int longitudeMin()          { return 0x0008; }
+      static constexpr unsigned int longitudeSec()          { return 0x0009; }
+      static constexpr unsigned int longitudeHemi()         { return 0x000a; }
+      static constexpr unsigned int power()                 { return 0x000b; }
+      static constexpr unsigned int channelIndices()        { return 0x000c; }
+      static constexpr unsigned int betweenChannelIndices() { return 0x0002; }
+      static constexpr unsigned int destinationId()         { return 0x001c; }
+      static constexpr unsigned int callType()              { return 0x0020; }
+      static constexpr unsigned int timeSlot()              { return 0x0021; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base class of a DMR APRS message for all AnyTone codeplugs. */
   class DMRAPRSMessageElement: public Element
@@ -1547,7 +1738,15 @@ public:
     virtual void setIndex(unsigned idx);
     /** Clears the index of the message. */
     virtual void clearIndex();
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      static constexpr unsigned int next()  { return 0x0002; }
+      static constexpr unsigned int index() { return 0x0003; }
+    };
   };
+
 
   /** Represents base class of a preset message for all AnyTone codeplugs.
    *
@@ -1573,6 +1772,21 @@ public:
     virtual QString message() const;
     /** Sets the message text. */
     virtual void setMessage(const QString &msg);
+
+  public:
+    /** Some limits for the message. */
+    struct Limit: public Element::Limit {
+      /** Maximum message length. */
+      static constexpr unsigned int messageLength() { return 99; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int message() { return 0x0000; }
+      /// @endcond
+    };
   };
 
   /** Represents the bytemap indicating which message is valid. */
@@ -1632,7 +1846,17 @@ public:
     virtual void setContactIndex(unsigned idx);
     /** Clears the contact index. */
     virtual void clearContactIndex();
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int type()         { return 0x0000; }
+      static constexpr unsigned int contactIndex() { return 0x0001; }
+      /// @endcond
+    };
   };
+
 
   /** Implements the list of analog quick-call settings for all AnyTone codeplugs.
    *
@@ -1671,6 +1895,7 @@ public:
       /// @endcond
     };
   };
+
 
   /** Implements the list of status messages for all AnyTone codeplugs.
    *
@@ -1727,6 +1952,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0010; }
   };
+
 
   /** Represents the base class of a hot-key setting entry for all AnyTone codeplugs.
    *
@@ -1829,7 +2055,21 @@ public:
     virtual void setMessageIndex(unsigned idx);
     /** Clears the message index. */
     virtual void clearMessageIndex();
+
+  protected:
+    /** Some internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int type()         { return 0x0000; }
+      static constexpr unsigned int menuItem()     { return 0x0001; }
+      static constexpr unsigned int callType()     { return 0x0002; }
+      static constexpr unsigned int digiCallType() { return 0x0003; }
+      static constexpr unsigned int contactIndex() { return 0x0004; }
+      static constexpr unsigned int messageIndex() { return 0x0008; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the list of hot-key settings for all AnyTone codeplugs.
    *
@@ -1930,17 +2170,17 @@ public:
       virtual void setEmergencyIndex(unsigned idx);
 
       /** Returns the alarm duration in seconds. */
-      virtual unsigned duration() const;
+      virtual Interval duration() const;
       /** Sets the alarm duration in seconds. */
-      virtual void setDuration(unsigned sec);
+      virtual void setDuration(const Interval &sec);
       /** Returns the TX duration in seconds. */
-      virtual unsigned txDuration() const;
+      virtual Interval txDuration() const;
       /** Sets the TX duration in seconds. */
-      virtual void setTXDuration(unsigned sec);
+      virtual void setTXDuration(const Interval &sec);
       /** Returns the RX duration in seconds. */
-      virtual unsigned rxDuration() const;
+      virtual Interval rxDuration() const;
       /** Sets the RX duration in seconds. */
-      virtual void setRXDuration(unsigned sec);
+      virtual void setRXDuration(const Interval &sec);
 
       /** Returns @c true if the alarm channel is the selected channel. */
       virtual bool channelIsSelected() const;
@@ -1959,7 +2199,24 @@ public:
       virtual void setRepetitions(unsigned num);
       /** Sets the alarm to be repeated continuously. */
       virtual void setRepatContinuously();
+
+    protected:
+      /** Some internal offsets within element. */
+      struct Offset: public Element::Offset {
+        /// @cond DO_NOT_DOCUMENT
+        static constexpr unsigned int action()            { return 0x0000; }
+        static constexpr unsigned int encodingType()      { return 0x0001; }
+        static constexpr unsigned int emergencyIndex()    { return 0x0002; }
+        static constexpr unsigned int duration()          { return 0x0003; }
+        static constexpr unsigned int txDuration()        { return 0x0004; }
+        static constexpr unsigned int rxDuration()        { return 0x0005; }
+        static constexpr unsigned int channelIndex()      { return 0x0006; }
+        static constexpr unsigned int channelIsSelected() { return 0x0008; }
+        static constexpr unsigned int repetitions()       { return 0x0009; }
+        /// @endcond
+      };
     };
+
 
     /** Represents the base class of an digital alarm setting for all AnyTone codeplugs.
      *
@@ -1996,17 +2253,17 @@ public:
       virtual void setAction(Action action);
 
       /** Returns the alarm duration in seconds. */
-      virtual unsigned duration() const;
+      virtual Interval duration() const;
       /** Sets the alarm duration in seconds. */
-      virtual void setDuration(unsigned sec);
+      virtual void setDuration(const Interval &sec);
       /** Returns the TX duration in seconds. */
-      virtual unsigned txDuration() const;
+      virtual Interval txDuration() const;
       /** Sets the TX duration in seconds. */
-      virtual void setTXDuration(unsigned sec);
+      virtual void setTXDuration(const Interval &sec);
       /** Returns the RX duration in seconds. */
-      virtual unsigned rxDuration() const;
+      virtual Interval rxDuration() const;
       /** Sets the RX duration in seconds. */
-      virtual void setRXDuration(unsigned sec);
+      virtual void setRXDuration(const Interval &sec);
 
       /** Returns @c true if the alarm channel is the selected channel. */
       virtual bool channelIsSelected() const;
@@ -2027,13 +2284,13 @@ public:
       virtual void setRepatContinuously();
 
       /** Returns voice broadcast duration in minutes. */
-      virtual unsigned voiceBroadcastDuration() const;
+      virtual Interval voiceBroadcastDuration() const;
       /** Sets voice broadcast duration in minutes. */
-      virtual void setVoiceBroadcastDuration(unsigned min);
+      virtual void setVoiceBroadcastDuration(const Interval &min);
       /** Returns area broadcast duration in minutes. */
-      virtual unsigned areaBroadcastDuration() const;
+      virtual Interval areaBroadcastDuration() const;
       /** Sets area broadcast duration in minutes. */
-      virtual void setAreaBroadcastDuration(unsigned min);
+      virtual void setAreaBroadcastDuration(const Interval &min);
 
       /** Returns @c true if the VOX gets enabled. */
       virtual bool vox() const;
@@ -2043,6 +2300,24 @@ public:
       virtual bool rxAlarm() const;
       /** Enables/disables the reception of alarms. */
       virtual void enableRXAlarm(bool enable);
+
+    protected:
+      /** Internal offsets within element. */
+      struct Offset: public Element::Offset {
+        /// @cond DO_NOT_DOCUMENT
+        static constexpr unsigned int action()                 { return 0x0000; }
+        static constexpr unsigned int duration()               { return 0x0001; }
+        static constexpr unsigned int txDuration()             { return 0x0002; }
+        static constexpr unsigned int rxDuration()             { return 0x0003; }
+        static constexpr unsigned int channelIndex()           { return 0x0004; }
+        static constexpr unsigned int channelIsSelected()      { return 0x0006; }
+        static constexpr unsigned int repetitions()            { return 0x0007; }
+        static constexpr unsigned int voiceBroadcastDuration() { return 0x0008; }
+        static constexpr unsigned int areaBroadcastDuration()  { return 0x0009; }
+        static constexpr unsigned int vox()                    { return 0x000a; }
+        static constexpr unsigned int rxAlarm()                { return 0x000b; }
+        /// @endcond
+      };
     };
 
   protected:
@@ -2073,6 +2348,7 @@ public:
       /// @endcond
     };
   };
+
 
   /** Represents the base class of digital alarm setting extension for all AnyTone codeplugs.
    *
@@ -2114,6 +2390,7 @@ public:
     };
   };
 
+
   /** Represents the base-class for 5Tone IDs for all AnyTone codeplugs.
    *
    * Memory encoding of the ID (size 0x0020 bytes):
@@ -2147,9 +2424,9 @@ public:
     virtual void setStandard(Standard std);
 
     /** Returns the tone duration in ms. */
-    virtual unsigned toneDuration() const;
+    virtual Interval toneDuration() const;
     /** Sets the tone duration in ms. */
-    virtual void setToneDuration(unsigned ms);
+    virtual void setToneDuration(const Interval &ms);
 
     /** Returns the ID. */
     virtual QString id() const;
@@ -2160,6 +2437,27 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits of the element. */
+    struct Limit: public Element::Limit {
+      /** Maximum ID length. */
+      static constexpr unsigned int idLength() { return 80; }
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 7; }
+    };
+
+  protected:
+    /** Some internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int standard()     { return 0x0001; }
+      static constexpr unsigned int idLength()     { return 0x0002; }
+      static constexpr unsigned int toneDuration() { return 0x0003; }
+      static constexpr unsigned int id()           { return 0x0004; }
+      static constexpr unsigned int name()         { return 0x0018; }
+      /// @endcond
+    };
   };
 
   /** Represents the bitmap indicating which five-tone IDs are valid. */
@@ -2256,6 +2554,27 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits for the function element. */
+    struct Limit: public Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int idLength()   { return 24; }
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 7; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int function() { return 0x0000; }
+      static constexpr unsigned int response() { return 0x0001; }
+      static constexpr unsigned int idLength() { return 0x0002; }
+      static constexpr unsigned int id()       { return 0x0003; }
+      static constexpr unsigned int name()     { return 0x000f; }
+      /// @endcond
+    };
   };
 
   /** Represents the list of five-tone functions for all AnyTone codeplugs.
@@ -2286,6 +2605,7 @@ public:
       static constexpr unsigned int numFunctions() { return 16; }     ///< The max number of functions.
     };
   };
+
 
   /** Represents the base-class for 5Tone settings for all AnyTone codeplugs.
    *
@@ -2326,9 +2646,9 @@ public:
     virtual void setDecodingStandard(Standard standard);
 
     /** Returns the decoding tone duration in ms. */
-    virtual unsigned decodingToneDuration() const;
+    virtual Interval decodingToneDuration() const;
     /** Sets the decoding tone duration in ms. */
-    virtual void setDecodingToneDuration(unsigned ms);
+    virtual void setDecodingToneDuration(const Interval &ms);
 
     /** Returns the 5tone radio ID. */
     virtual QString id() const;
@@ -2336,9 +2656,9 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post-encode delay in ms. */
-    virtual unsigned postEncodeDelay() const;
+    virtual Interval postEncodeDelay() const;
     /** Sets the post-encode delay in ms. */
-    virtual void setPostEncodeDelay(unsigned ms);
+    virtual void setPostEncodeDelay(const Interval &ms);
 
     /** Returns @c true if the PTT ID is set. */
     virtual bool hasPTTID() const;
@@ -2350,14 +2670,14 @@ public:
     virtual void clearPTTID();
 
     /** Returns the auto-reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(unsigned s);
+    virtual void setAutoResetTime(const Interval &s);
 
     /** Returns the first delay in ms. */
-    virtual unsigned firstDelay() const;
+    virtual Interval firstDelay() const;
     /** Sets the first delay in ms. */
-    virtual void setFirstDelay(unsigned ms);
+    virtual void setFirstDelay(const Interval &ms);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetoneEnabled() const;
@@ -2368,30 +2688,30 @@ public:
     /** Sets the stop code. */
     virtual void setStopCode(unsigned code);
     /** Returns the stop time in ms. */
-    virtual unsigned stopTime() const;
+    virtual Interval stopTime() const;
     /** Sets the stop time in ms. */
-    virtual void setStopTime(unsigned ms);
+    virtual void setStopTime(const Interval &ms);
     /** Returns the decode time in ms. */
-    virtual unsigned decodeTime() const;
+    virtual Interval decodeTime() const;
     /** Sets the decode time in ms. */
-    virtual void setDecodeTime(unsigned ms);
+    virtual void setDecodeTime(const Interval &ms);
     /** Returns the delay after stop in ms. */
-    virtual unsigned delayAfterStop() const;
+    virtual Interval delayAfterStop() const;
     /** Sets the delay after stop in ms. */
-    virtual void setDelayAfterStop(unsigned ms);
+    virtual void setDelayAfterStop(const Interval &ms);
     /** Returns the pre time in ms. */
-    virtual unsigned preTime() const;
+    virtual Interval preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(unsigned ms);
+    virtual void setPreTime(const Interval &ms);
 
     /** Returns the BOT standard. */
     virtual Standard botStandard() const;
     /** Sets the BOT standard. */
     virtual void setBOTStandard(Standard standard);
     /** Returns the BOT tone duration in ms. */
-    virtual unsigned botToneDuration() const;
+    virtual Interval botToneDuration() const;
     /** Sets the BOT tone duration in ms. */
-    virtual void setBOTToneDuration(unsigned ms);
+    virtual void setBOTToneDuration(const Interval &ms);
     /** Returns the 5tone BOT ID. */
     virtual QString botID() const;
     /** Sets the 5tone BOT ID. */
@@ -2402,14 +2722,56 @@ public:
     /** Sets the EOT standard. */
     virtual void setEOTStandard(Standard standard);
     /** Returns the EOT tone duration in ms. */
-    virtual unsigned eotToneDuration() const;
+    virtual Interval eotToneDuration() const;
     /** Sets the EOT tone duration in ms. */
-    virtual void setEOTToneDuration(unsigned ms);
+    virtual void setEOTToneDuration(const Interval &ms);
     /** Returns the 5tone EOT ID. */
     virtual QString eotID() const;
     /** Sets the 5tone EOT ID. */
     virtual void setEOTID(const QString &id);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: public Element::Limit {
+      /** Maximum ID length. */
+      static constexpr unsigned int idLength() { return 14; }
+      /** Maximum BOT ID length. */
+      static constexpr unsigned int botIdLength() { return 24; }
+      /** Maximum EOT ID length. */
+      static constexpr unsigned int eotIdLength() { return 24; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int decodingResponse()     { return 0x0021; }
+      static constexpr unsigned int decodingStandard()     { return 0x0022; }
+      static constexpr unsigned int idLength()             { return 0x0023; }
+      static constexpr unsigned int decodingToneDuration() { return 0x0024; }
+      static constexpr unsigned int id()                   { return 0x0025; }
+      static constexpr unsigned int postDecodeDelay()      { return 0x002c; }
+      static constexpr unsigned int pttId()                { return 0x002d; }
+      static constexpr unsigned int autoResetTime()        { return 0x002e; }
+      static constexpr unsigned int firstDelay()           { return 0x002f; }
+      static constexpr unsigned int sidetoneEnabled()      { return 0x0030; }
+      static constexpr unsigned int stopCode()             { return 0x0032; }
+      static constexpr unsigned int stopTime()             { return 0x0033; }
+      static constexpr unsigned int decodeTime()           { return 0x0034; }
+      static constexpr unsigned int delayAfterStop()       { return 0x0035; }
+      static constexpr unsigned int preTime()              { return 0x0036; }
+      static constexpr unsigned int botStandard()          { return 0x0041; }
+      static constexpr unsigned int botIdLength()          { return 0x0042; }
+      static constexpr unsigned int botToneDuration()      { return 0x0043; }
+      static constexpr unsigned int botId()                { return 0x0044; }
+      static constexpr unsigned int eotStandard()          { return 0x0061; }
+      static constexpr unsigned int eotIdLength()          { return 0x0062; }
+      static constexpr unsigned int eotToneDuration()      { return 0x0063; }
+      static constexpr unsigned int eotId()                { return 0x0064; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base-class for a 2-tone ID for all AnyTone codeplugs.
    *
@@ -2578,35 +2940,49 @@ public:
     void clear();
 
     /** Returns the first tone duration in ms. */
-    virtual unsigned firstToneDuration() const;
+    virtual Interval firstToneDuration() const;
     /** Sets the first tone duration in ms. */
-    virtual void setFirstToneDuration(unsigned ms);
+    virtual void setFirstToneDuration(const Interval &ms);
 
     /** Returns the second tone duration in ms. */
-    virtual unsigned secondToneDuration() const;
+    virtual Interval secondToneDuration() const;
     /** Sets the second tone duration in ms. */
-    virtual void setSecondToneDuration(unsigned ms);
+    virtual void setSecondToneDuration(const Interval &ms);
 
     /** Returns the long tone duration in ms. */
-    virtual unsigned longToneDuration() const;
+    virtual Interval longToneDuration() const;
     /** Sets the long tone duration in ms. */
-    virtual void setLongToneDuration(unsigned ms);
+    virtual void setLongToneDuration(const Interval &ms);
 
     /** Returns the gap duration in ms. */
-    virtual unsigned gapDuration() const;
+    virtual Interval gapDuration() const;
     /** Sets the gap duration in ms. */
-    virtual void setGapDuration(unsigned ms);
+    virtual void setGapDuration(const Interval &ms);
 
     /** Returns the auto-reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(unsigned sec);
+    virtual void setAutoResetTime(const Interval &sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
     /** Enables/disables the sidetone. */
     virtual void enableSidetone(bool enable);
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstToneDuration()  { return 0x0009; }
+      static constexpr unsigned int secondToneDuration() { return 0x000a; }
+      static constexpr unsigned int longToneDuration()   { return 0x000b; }
+      static constexpr unsigned int gapDuration()        { return 0x000c; }
+      static constexpr unsigned int autoResetTime()      { return 0x000d; }
+      static constexpr unsigned int sidetone()           { return 0x000e; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base class of DTMF settings for all AnyTone codeplugs.
    *
@@ -2650,19 +3026,19 @@ public:
     virtual void setResponse(Response resp);
 
     /** Returns the pre time in ms. */
-    virtual unsigned preTime() const;
+    virtual Interval preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(unsigned ms);
+    virtual void setPreTime(const Interval &ms);
 
     /** Returns the first digit duration in ms. */
-    virtual unsigned firstDigitDuration() const;
+    virtual Interval firstDigitDuration() const;
     /** Sets the first digit duration in ms. */
-    virtual void setFirstDigitDuration(unsigned ms);
+    virtual void setFirstDigitDuration(const Interval &ms);
 
     /** Returns the auto reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto reset time in seconds. */
-    virtual void setAutoResetTime(unsigned sec);
+    virtual void setAutoResetTime(const Interval &sec);
 
     /** Returns the radio ID. */
     virtual QString id() const;
@@ -2670,14 +3046,14 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post encoding delay in ms. */
-    virtual unsigned postEncodingDelay() const;
+    virtual Interval postEncodingDelay() const;
     /** Sets the post encoding delay in ms. */
-    virtual void setPostEncodingDelay(unsigned ms);
+    virtual void setPostEncodingDelay(const Interval &ms);
 
     /** Returns the PTT ID pause in seconds. */
-    virtual unsigned pttIDPause() const;
+    virtual Interval pttIDPause() const;
     /** Sets the PTT ID pause in seconds. */
-    virtual void setPTTIDPause(unsigned sec);
+    virtual void setPTTIDPause(const Interval &sec);
 
     /** Returns @c true if the PTT ID is enabled. */
     virtual bool pttIDEnabled() const;
@@ -2685,9 +3061,9 @@ public:
     virtual void enablePTTID(bool enable);
 
     /** Returns the D-code pause in seconds. */
-    virtual unsigned dCodePause() const;
+    virtual Interval dCodePause() const;
     /** Sets the D-code pause in seconds. */
-    virtual void setDCodePause(unsigned sec);
+    virtual void setDCodePause(const Interval &sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
@@ -2713,6 +3089,44 @@ public:
     virtual QString remoteStunID() const;
     /** Sets the remote stun ID. */
     virtual void setRemoteStunID(const QString &id);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: public Element::Limit {
+      /** Maximum ID length. */
+      static constexpr unsigned int idLength() { return 3; }
+      /** Maximum BOT ID length. */
+      static constexpr unsigned int botIdLength() { return 16; }
+      /** Maximum EOT ID length. */
+      static constexpr unsigned int eotIdLength() { return 16; }
+      /** Maximum remote kill ID length. */
+      static constexpr unsigned int remoteKillIdLength() { return 16; }
+      /** Maximum remote stun ID length. */
+      static constexpr unsigned int remteStunIdLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int intervalSymbol() { return 0x0000; }
+      static constexpr unsigned int groupCode() { return 0x0001; }
+      static constexpr unsigned int response() { return 0x0002; }
+      static constexpr unsigned int preTime() { return 0x0003; }
+      static constexpr unsigned int firstDigitDuration() { return 0x0004; }
+      static constexpr unsigned int autoResetTime() { return 0x0005; }
+      static constexpr unsigned int id() { return 0x0006; }
+      static constexpr unsigned int postEncodingDelay() { return 0x0009; }
+      static constexpr unsigned int pttIDPause() { return 0x000a; }
+      static constexpr unsigned int pttIDEnabled() { return 0x000b; }
+      static constexpr unsigned int dCodePause() { return 0x000c; }
+      static constexpr unsigned int sidetone() { return 0x000d; }
+      static constexpr unsigned int botID() { return 0x0010; }
+      static constexpr unsigned int eotID() { return 0x0020; }
+      static constexpr unsigned int remoteKillID() { return 0x0030; }
+      static constexpr unsigned int remoteStunID() { return 0x0040; }
+      /// @endcond
+    };
   };
 
   /** Represents a list of DTMF IDs to be send.
@@ -2750,6 +3164,7 @@ public:
       static constexpr unsigned int numberLength() { return 16; }      ///< The maximum length of the numbers.
     };
   };
+
 
   /** Represents a list of 100 FM broad cast channels.
    *
@@ -2945,7 +3360,17 @@ public:
     virtual unsigned index() const;
     /** Sets the index. */
     virtual void setIndex(unsigned idx);
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int id()    { return 0x0000; }
+      static constexpr unsigned int index() { return 0x0000; }
+      /// @endcond
+    };
   };
+
 
 protected:
   /** Hidden constructor. */

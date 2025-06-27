@@ -290,8 +290,16 @@ public:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static Bit encryptionType()         { return {0x0021, 6}; }
-      static unsigned int encryptionKey() { return 0x0022; }
+      static Bit encryptionType()                  { return {0x0021, 6}; }
+      static unsigned int encryptionKey()          { return 0x0022; }
+      static Bit ranging()                         { return {0x0034, 0}; }
+      static Bit throughMode()                     { return {0x0034, 1}; }
+      static Bit dataACK()                         { return {0x0034, 2}; }
+      static Bit txDigitalAPRS()                   { return {0x0035, 0}; }
+      static unsigned int digitalAPRSSystemIndex() { return 0x0036; }
+      static Bit multipleKeyEncryption()           { return {0x003b, 0}; }
+      static Bit randomKey()                       { return {0x003b, 1}; }
+      static Bit sms()                             { return {0x003b, 2}; }
       /// @endcond
     };
   };

@@ -954,12 +954,12 @@ public:
 
 protected:
     /// @cond DO_NOT_DOCUMENT
-    struct Offset: public Element::Offset {
+    struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
       static constexpr unsigned int aesEncryptionKeyIndex()        { return 0x0013; }
-      static constexpr Bit dmrEncryptionType()                     { return {0x0021, 6}; }
-      static constexpr unsigned int dmrEncryptionKeyIndex()        { return 0x0022; }
       static constexpr Bit roaming()                               { return {0x001b, 2}; }
       static constexpr Bit ranging()                               { return {0x001b, 0}; }
+      static constexpr Bit dmrEncryptionType()                     { return {0x0021, 6}; }
+      static constexpr unsigned int dmrEncryptionKeyIndex()        { return 0x0022; }
       static constexpr unsigned int scanListIndices()              { return 0x0036; }
       static constexpr unsigned int betweenScanListIndices()       { return 0x0001; }
       static constexpr unsigned int dmrAPRSChannelIndex()          { return 0x003e; }
