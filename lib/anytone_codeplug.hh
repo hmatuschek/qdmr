@@ -2554,6 +2554,27 @@ public:
     virtual QString name() const;
     /** Sets the name. */
     virtual void setName(const QString &name);
+
+  public:
+    /** Some limits for the function element. */
+    struct Limit: public Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int idLength()   { return 24; }
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 7; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int function() { return 0x0000; }
+      static constexpr unsigned int response() { return 0x0001; }
+      static constexpr unsigned int idLength() { return 0x0002; }
+      static constexpr unsigned int id()       { return 0x0003; }
+      static constexpr unsigned int name()     { return 0x000f; }
+      /// @endcond
+    };
   };
 
   /** Represents the list of five-tone functions for all AnyTone codeplugs.
@@ -2584,6 +2605,7 @@ public:
       static constexpr unsigned int numFunctions() { return 16; }     ///< The max number of functions.
     };
   };
+
 
   /** Represents the base-class for 5Tone settings for all AnyTone codeplugs.
    *
@@ -2624,9 +2646,9 @@ public:
     virtual void setDecodingStandard(Standard standard);
 
     /** Returns the decoding tone duration in ms. */
-    virtual unsigned decodingToneDuration() const;
+    virtual Interval decodingToneDuration() const;
     /** Sets the decoding tone duration in ms. */
-    virtual void setDecodingToneDuration(unsigned ms);
+    virtual void setDecodingToneDuration(const Interval &ms);
 
     /** Returns the 5tone radio ID. */
     virtual QString id() const;
@@ -2634,9 +2656,9 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post-encode delay in ms. */
-    virtual unsigned postEncodeDelay() const;
+    virtual Interval postEncodeDelay() const;
     /** Sets the post-encode delay in ms. */
-    virtual void setPostEncodeDelay(unsigned ms);
+    virtual void setPostEncodeDelay(const Interval &ms);
 
     /** Returns @c true if the PTT ID is set. */
     virtual bool hasPTTID() const;
@@ -2648,14 +2670,14 @@ public:
     virtual void clearPTTID();
 
     /** Returns the auto-reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(unsigned s);
+    virtual void setAutoResetTime(const Interval &s);
 
     /** Returns the first delay in ms. */
-    virtual unsigned firstDelay() const;
+    virtual Interval firstDelay() const;
     /** Sets the first delay in ms. */
-    virtual void setFirstDelay(unsigned ms);
+    virtual void setFirstDelay(const Interval &ms);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetoneEnabled() const;
@@ -2666,30 +2688,30 @@ public:
     /** Sets the stop code. */
     virtual void setStopCode(unsigned code);
     /** Returns the stop time in ms. */
-    virtual unsigned stopTime() const;
+    virtual Interval stopTime() const;
     /** Sets the stop time in ms. */
-    virtual void setStopTime(unsigned ms);
+    virtual void setStopTime(const Interval &ms);
     /** Returns the decode time in ms. */
-    virtual unsigned decodeTime() const;
+    virtual Interval decodeTime() const;
     /** Sets the decode time in ms. */
-    virtual void setDecodeTime(unsigned ms);
+    virtual void setDecodeTime(const Interval &ms);
     /** Returns the delay after stop in ms. */
-    virtual unsigned delayAfterStop() const;
+    virtual Interval delayAfterStop() const;
     /** Sets the delay after stop in ms. */
-    virtual void setDelayAfterStop(unsigned ms);
+    virtual void setDelayAfterStop(const Interval &ms);
     /** Returns the pre time in ms. */
-    virtual unsigned preTime() const;
+    virtual Interval preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(unsigned ms);
+    virtual void setPreTime(const Interval &ms);
 
     /** Returns the BOT standard. */
     virtual Standard botStandard() const;
     /** Sets the BOT standard. */
     virtual void setBOTStandard(Standard standard);
     /** Returns the BOT tone duration in ms. */
-    virtual unsigned botToneDuration() const;
+    virtual Interval botToneDuration() const;
     /** Sets the BOT tone duration in ms. */
-    virtual void setBOTToneDuration(unsigned ms);
+    virtual void setBOTToneDuration(const Interval &ms);
     /** Returns the 5tone BOT ID. */
     virtual QString botID() const;
     /** Sets the 5tone BOT ID. */
@@ -2700,14 +2722,56 @@ public:
     /** Sets the EOT standard. */
     virtual void setEOTStandard(Standard standard);
     /** Returns the EOT tone duration in ms. */
-    virtual unsigned eotToneDuration() const;
+    virtual Interval eotToneDuration() const;
     /** Sets the EOT tone duration in ms. */
-    virtual void setEOTToneDuration(unsigned ms);
+    virtual void setEOTToneDuration(const Interval &ms);
     /** Returns the 5tone EOT ID. */
     virtual QString eotID() const;
     /** Sets the 5tone EOT ID. */
     virtual void setEOTID(const QString &id);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: public Element::Limit {
+      /** Maximum ID length. */
+      static constexpr unsigned int idLength() { return 14; }
+      /** Maximum BOT ID length. */
+      static constexpr unsigned int botIdLength() { return 24; }
+      /** Maximum EOT ID length. */
+      static constexpr unsigned int eotIdLength() { return 24; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int decodingResponse()     { return 0x0021; }
+      static constexpr unsigned int decodingStandard()     { return 0x0022; }
+      static constexpr unsigned int idLength()             { return 0x0023; }
+      static constexpr unsigned int decodingToneDuration() { return 0x0024; }
+      static constexpr unsigned int id()                   { return 0x0025; }
+      static constexpr unsigned int postDecodeDelay()      { return 0x002c; }
+      static constexpr unsigned int pttId()                { return 0x002d; }
+      static constexpr unsigned int autoResetTime()        { return 0x002e; }
+      static constexpr unsigned int firstDelay()           { return 0x002f; }
+      static constexpr unsigned int sidetoneEnabled()      { return 0x0030; }
+      static constexpr unsigned int stopCode()             { return 0x0032; }
+      static constexpr unsigned int stopTime()             { return 0x0033; }
+      static constexpr unsigned int decodeTime()           { return 0x0034; }
+      static constexpr unsigned int delayAfterStop()       { return 0x0035; }
+      static constexpr unsigned int preTime()              { return 0x0036; }
+      static constexpr unsigned int botStandard()          { return 0x0041; }
+      static constexpr unsigned int botIdLength()          { return 0x0042; }
+      static constexpr unsigned int botToneDuration()      { return 0x0043; }
+      static constexpr unsigned int botId()                { return 0x0044; }
+      static constexpr unsigned int eotStandard()          { return 0x0061; }
+      static constexpr unsigned int eotIdLength()          { return 0x0062; }
+      static constexpr unsigned int eotToneDuration()      { return 0x0063; }
+      static constexpr unsigned int eotId()                { return 0x0064; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base-class for a 2-tone ID for all AnyTone codeplugs.
    *
@@ -2876,35 +2940,49 @@ public:
     void clear();
 
     /** Returns the first tone duration in ms. */
-    virtual unsigned firstToneDuration() const;
+    virtual Interval firstToneDuration() const;
     /** Sets the first tone duration in ms. */
-    virtual void setFirstToneDuration(unsigned ms);
+    virtual void setFirstToneDuration(const Interval &ms);
 
     /** Returns the second tone duration in ms. */
-    virtual unsigned secondToneDuration() const;
+    virtual Interval secondToneDuration() const;
     /** Sets the second tone duration in ms. */
-    virtual void setSecondToneDuration(unsigned ms);
+    virtual void setSecondToneDuration(const Interval &ms);
 
     /** Returns the long tone duration in ms. */
-    virtual unsigned longToneDuration() const;
+    virtual Interval longToneDuration() const;
     /** Sets the long tone duration in ms. */
-    virtual void setLongToneDuration(unsigned ms);
+    virtual void setLongToneDuration(const Interval &ms);
 
     /** Returns the gap duration in ms. */
-    virtual unsigned gapDuration() const;
+    virtual Interval gapDuration() const;
     /** Sets the gap duration in ms. */
-    virtual void setGapDuration(unsigned ms);
+    virtual void setGapDuration(const Interval &ms);
 
     /** Returns the auto-reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto-reset time in seconds. */
-    virtual void setAutoResetTime(unsigned sec);
+    virtual void setAutoResetTime(const Interval &sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
     /** Enables/disables the sidetone. */
     virtual void enableSidetone(bool enable);
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int firstToneDuration()  { return 0x0009; }
+      static constexpr unsigned int secondToneDuration() { return 0x000a; }
+      static constexpr unsigned int longToneDuration()   { return 0x000b; }
+      static constexpr unsigned int gapDuration()        { return 0x000c; }
+      static constexpr unsigned int autoResetTime()      { return 0x000d; }
+      static constexpr unsigned int sidetone()           { return 0x000e; }
+      /// @endcond
+    };
   };
+
 
   /** Represents the base class of DTMF settings for all AnyTone codeplugs.
    *
@@ -2948,19 +3026,19 @@ public:
     virtual void setResponse(Response resp);
 
     /** Returns the pre time in ms. */
-    virtual unsigned preTime() const;
+    virtual Interval preTime() const;
     /** Sets the pre time in ms. */
-    virtual void setPreTime(unsigned ms);
+    virtual void setPreTime(const Interval &ms);
 
     /** Returns the first digit duration in ms. */
-    virtual unsigned firstDigitDuration() const;
+    virtual Interval firstDigitDuration() const;
     /** Sets the first digit duration in ms. */
-    virtual void setFirstDigitDuration(unsigned ms);
+    virtual void setFirstDigitDuration(const Interval &ms);
 
     /** Returns the auto reset time in seconds. */
-    virtual unsigned autoResetTime() const;
+    virtual Interval autoResetTime() const;
     /** Sets the auto reset time in seconds. */
-    virtual void setAutoResetTime(unsigned sec);
+    virtual void setAutoResetTime(const Interval &sec);
 
     /** Returns the radio ID. */
     virtual QString id() const;
@@ -2968,14 +3046,14 @@ public:
     virtual void setID(const QString &id);
 
     /** Returns the post encoding delay in ms. */
-    virtual unsigned postEncodingDelay() const;
+    virtual Interval postEncodingDelay() const;
     /** Sets the post encoding delay in ms. */
-    virtual void setPostEncodingDelay(unsigned ms);
+    virtual void setPostEncodingDelay(const Interval &ms);
 
     /** Returns the PTT ID pause in seconds. */
-    virtual unsigned pttIDPause() const;
+    virtual Interval pttIDPause() const;
     /** Sets the PTT ID pause in seconds. */
-    virtual void setPTTIDPause(unsigned sec);
+    virtual void setPTTIDPause(const Interval &sec);
 
     /** Returns @c true if the PTT ID is enabled. */
     virtual bool pttIDEnabled() const;
@@ -2983,9 +3061,9 @@ public:
     virtual void enablePTTID(bool enable);
 
     /** Returns the D-code pause in seconds. */
-    virtual unsigned dCodePause() const;
+    virtual Interval dCodePause() const;
     /** Sets the D-code pause in seconds. */
-    virtual void setDCodePause(unsigned sec);
+    virtual void setDCodePause(const Interval &sec);
 
     /** Returns @c true if the sidetone is enabled. */
     virtual bool sidetone() const;
@@ -3011,6 +3089,38 @@ public:
     virtual QString remoteStunID() const;
     /** Sets the remote stun ID. */
     virtual void setRemoteStunID(const QString &id);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: public Element::Limit {
+      /** Maximum ID length. */
+      static constexpr unsigned int idLength() { return 3; }
+      /** Maximum BOT ID length. */
+      static constexpr unsigned int botIdLength() { return 16; }
+      /** Maximum EOT ID length. */
+      static constexpr unsigned int eotIdLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int intervalSymbol() { return 0x0000; }
+      static constexpr unsigned int groupCode() { return 0x0001; }
+      static constexpr unsigned int response() { return 0x0002; }
+      static constexpr unsigned int preTime() { return 0x0003; }
+      static constexpr unsigned int firstDigitDuration() { return 0x0004; }
+      static constexpr unsigned int autoResetTime() { return 0x0005; }
+      static constexpr unsigned int id() { return 0x0006; }
+      static constexpr unsigned int postEncodingDelay() { return 0x0009; }
+      static constexpr unsigned int pttIDPause() { return 0x000a; }
+      static constexpr unsigned int pttIDEnabled() { return 0x000b; }
+      static constexpr unsigned int dCodePause() { return 0x000c; }
+      static constexpr unsigned int sidetone() { return 0x000d; }
+      static constexpr unsigned int botID() { return 0x0010; }
+      static constexpr unsigned int eotID() { return 0x0020; }
+      /// @endcond
+    };
   };
 
   /** Represents a list of DTMF IDs to be send.
