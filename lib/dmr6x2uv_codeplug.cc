@@ -153,8 +153,10 @@ DMR6X2UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettings
   case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
   case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
   case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch:    return (uint8_t)KeyFunction::APRSType;
   case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
-  case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
+  case AnytoneKeySettingsExtension::KeyFunction::DIMShut:           return (uint8_t)KeyFunction::DIMShut;
+  case AnytoneKeySettingsExtension::KeyFunction::SatPredict:        return (uint8_t)KeyFunction::SatPredict;
   default:                                                          return (uint8_t)KeyFunction::Off;
   }
 }
@@ -208,8 +210,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
   case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
   case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
   case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
+  case KeyFunction::APRSType:          return AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch;
   case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
-  case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
+  case KeyFunction::DIMShut:           return AnytoneKeySettingsExtension::KeyFunction::DIMShut;
+  case KeyFunction::GPSToggle:         return AnytoneKeySettingsExtension::KeyFunction::GPS;
+  case KeyFunction::SatPredict:        return AnytoneKeySettingsExtension::KeyFunction::SatPredict;
   default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
   }
 }
