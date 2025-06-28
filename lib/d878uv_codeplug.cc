@@ -3905,7 +3905,7 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     if (! channel_bitmap.isEncoded(i))
       continue;
     ChannelElement ch(data(addr));
-    ChannelExtensionElement ext(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
     if (ctx.has<Channel>(i)) {
       ch.linkChannelObj(ctx.get<Channel>(i), ctx);

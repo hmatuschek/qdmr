@@ -589,7 +589,7 @@
   </varlistentry>
   <varlistentry>
     <term><token>APRSSet</token></term>
-    <listitem><para>???</para></listitem>
+    <listitem><para>Opens APRS settings. Applicable to <productname>DMR-6X2UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>Mute</token></term>
@@ -633,7 +633,8 @@
   <varlistentry>
     <term><token>GPS</token></term>
     <listitem><para>Enables/disables GPS. Applicable to <productname>AT-D878UV</productname>, 
-      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname>.</para></listitem>
+      <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and
+      <productname>DMR-6X2UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>ChannelName</token></term>
@@ -650,9 +651,8 @@
   <varlistentry>
     <term><token>APRSSend</token></term>
     <listitem><para>Transmits the positioning information. Applicable to 
-      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>,
-      <productname>AT-D578UV</productname> and 
-      <productname>DMR-6X2UV</productname>.</para></listitem>
+      <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname> and
+      <productname>AT-D578UV</productname>.</para></listitem>
   </varlistentry>
   <varlistentry>
     <term><token>APRSInfo</token></term>
@@ -668,6 +668,15 @@
   <varlistentry>
     <term><token>NoiseReductionTX</token></term>
     <listitem><para>Applicable to <productname>AT-D578UV</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>DIMShut</token></term>
+    <listitem><para>Unknown function. Applicable to <productname>DMR-6X2</productname>.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>SatPredict</token></term>
+    <listitem><para>Starts the prediction of passes of programmed satellites. Applicable to
+      <productname>DMR-6X2</productname>.</para></listitem>
   </varlistentry>
 </variablelist>
 

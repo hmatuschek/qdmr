@@ -19,6 +19,8 @@ private slots:
   void testFMAPRSSettings();
 
   void testAESEncryption();
+  void testARC4Encryption();
+
 };
 
 #endif // DMR6X2UVTEST_HH
