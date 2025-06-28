@@ -22,6 +22,7 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
 #include "crc32.hh"
 
@@ -171,6 +172,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::DMR6X2UV:
     if (! encode<DMR6X2UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DMR6X2UV2:
+    if (! encode<DMR6X2UV2Codeplug>(config, flags, parser))
       return -1;
     break;
   case RadioInfo::DR1801UV:
