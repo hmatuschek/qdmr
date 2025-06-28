@@ -144,6 +144,9 @@ qt_add_library(libdmrconf SHARED
   dmr6x2uv.cc dmr6x2uv.hh
   dmr6x2uv_codeplug.cc dmr6x2uv_codeplug.hh
   dmr6x2uv_limits.cc dmr6x2uv_limits.hh
+  dmr6x2uv2.cc dmr6x2uv2.hh
+  dmr6x2uv2_codeplug.cc dmr6x2uv2_codeplug.hh
+  dmr6x2uv2_limits.cc dmr6x2uv2_limits.hh
   auctus_a6_interface.cc auctus_a6_interface.hh
   dr1801uv.cc dr1801uv.hh
   dr1801uv_interface.cc dr1801uv_interface.hh
