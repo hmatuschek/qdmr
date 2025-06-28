@@ -10,7 +10,10 @@
 // Forward declarations
 class Satellite;
 
-/** Implementation of satellite confifuration for all AnyTone devices.
+/** Implementation of satellite configuration for all AnyTone devices.
+ *
+ * For now only the D878UV, D878UV2 and the DMR6X2 support sat tracking.
+ *
  * @ingroup anytone */
 class AnytoneSatelliteConfig : public SatelliteConfig
 {

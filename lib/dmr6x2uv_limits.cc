@@ -7,6 +7,7 @@
 #include "scanlist.hh"
 #include "gpssystem.hh"
 #include "roamingzone.hh"
+#include "anytone_satelliteconfig.hh"
 
 
 DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
@@ -20,9 +21,9 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
   _numCallSignDBEntries   = 200000;
 
   // Define limits for satellite config
-  _hasSatelliteConfig          = false;
-  _satelliteConfigImplemented  = false;
-  _numSatellites               = 0;
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = AnytoneSatelliteConfig::Limit::satellites();
 
   /* Define limits for the general settings. */
   add("settings",
