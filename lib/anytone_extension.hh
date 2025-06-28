@@ -613,7 +613,8 @@ public:
     SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
     Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
     APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
-    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch, NoiseReductionTX
+    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
+    NoiseReductionTX, DIMShut, SatPredict
   };
   Q_ENUM(KeyFunction)
 
