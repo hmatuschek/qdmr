@@ -45,7 +45,9 @@ public:
         PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
         ChannelType = 0x22, SimplexRepeater = 0x23, Ranging = 0x24, ChannelRanging = 0x25,
         MaxVolume = 0x26, Slot = 0x27, Squelch = 0x28, Roaming = 0x29, Zone = 0x2a, RoamingSet = 0x2b,
-        Mute = 0x02c, CtcssDcsSet=0x2d, APRSSet = 0x2e, APRSSend = 0x2f
+        Mute = 0x02c, CtcssDcsSet=0x2d, APRSType = 0x2e, APRSSet = 0x2f, TBSTSend = 0x30,
+        BluetoothToggle = 0x31, GPSToggle = 0x32, ChannelName = 0x33, APRSSend = 0x34,
+        APRSInfo = 0x35, GPSRoaming = 0x36, CTCSSScan = 0x37, DIMShut = 0x38, SatellitePredict = 0x39
       } KeyFunctionCode;
     };
 

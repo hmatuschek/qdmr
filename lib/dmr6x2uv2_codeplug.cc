@@ -59,8 +59,18 @@ DMR6X2UV2Codeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySetting
   case AnytoneKeySettingsExtension::KeyFunction::RoamingSet:        return (uint8_t)KeyFunction::RoamingSet;
   case AnytoneKeySettingsExtension::KeyFunction::Mute:              return (uint8_t)KeyFunction::Mute;
   case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch:    return (uint8_t)KeyFunction::APRSType;
   case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
+  case AnytoneKeySettingsExtension::KeyFunction::TBSTSend:          return (uint8_t)KeyFunction::TBSTSend;
+  case AnytoneKeySettingsExtension::KeyFunction::Bluetooth:         return (uint8_t)KeyFunction::BluetoothToggle;
+  case AnytoneKeySettingsExtension::KeyFunction::GPS:               return (uint8_t)KeyFunction::GPSToggle;
+  case AnytoneKeySettingsExtension::KeyFunction::ChannelName:       return (uint8_t)KeyFunction::ChannelName;
   case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
+  case AnytoneKeySettingsExtension::KeyFunction::APRSInfo:          return (uint8_t)KeyFunction::APRSInfo;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSRoaming:        return (uint8_t)KeyFunction::GPSRoaming;
+  case AnytoneKeySettingsExtension::KeyFunction::CDTScan:           return (uint8_t)KeyFunction::CTCSSScan;
+  case AnytoneKeySettingsExtension::KeyFunction::DIMShut:           return (uint8_t)KeyFunction::DIMShut;
+  case AnytoneKeySettingsExtension::KeyFunction::SatPredict:        return (uint8_t)KeyFunction::SatellitePredict;
   default:                                                          return (uint8_t)KeyFunction::Off;
   }
 }
@@ -114,8 +124,18 @@ DMR6X2UV2Codeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
   case KeyFunction::RoamingSet:        return AnytoneKeySettingsExtension::KeyFunction::RoamingSet;
   case KeyFunction::Mute:              return AnytoneKeySettingsExtension::KeyFunction::Mute;
   case KeyFunction::CtcssDcsSet:       return AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet;
+  case KeyFunction::APRSType:          return AnytoneKeySettingsExtension::KeyFunction::APRSTypeSwitch;
   case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
+  case KeyFunction::TBSTSend:          return AnytoneKeySettingsExtension::KeyFunction::TBSTSend;
+  case KeyFunction::BluetoothToggle:   return AnytoneKeySettingsExtension::KeyFunction::Bluetooth;
+  case KeyFunction::GPSToggle:         return AnytoneKeySettingsExtension::KeyFunction::GPS;
+  case KeyFunction::ChannelName:       return AnytoneKeySettingsExtension::KeyFunction::ChannelName;
   case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
+  case KeyFunction::APRSInfo:          return AnytoneKeySettingsExtension::KeyFunction::APRSInfo;
+  case KeyFunction::GPSRoaming:        return AnytoneKeySettingsExtension::KeyFunction::GPSRoaming;
+  case KeyFunction::CTCSSScan:         return AnytoneKeySettingsExtension::KeyFunction::CDTScan;
+  case KeyFunction::DIMShut:           return AnytoneKeySettingsExtension::KeyFunction::DIMShut;
+  case KeyFunction::SatellitePredict:  return AnytoneKeySettingsExtension::KeyFunction::SatPredict;
   default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
   }
 }
