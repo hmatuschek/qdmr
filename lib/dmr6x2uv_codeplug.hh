@@ -796,6 +796,51 @@ protected:
     /// @endcond
   };
 
+  /** Starting from FW version 2.21, all devices encode an channel settings extension element
+   * at an offset 0x2000 to the original channel. Also the size of the extension element is
+   * identical to the channel element itself. This is weird. Anyway. This class encodes/decodes
+   * these settings.
+   *
+   * This implementation is compatible with firmware version 2.21 */
+  class ChannelExtensionElement: public Codeplug::Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelExtensionElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Default constructor. */
+    ChannelExtensionElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return ChannelElement::size(); }
+
+    /** Resets the channel extension. */
+    void clear();
+
+    /** Returns @c true, if the channel has an ARC4 key index assigned. */
+    virtual bool hasARC4KeyIndex() const;
+    /** Returns the 0-based ARC4 key index. */
+    virtual unsigned int arc4KeyIndex() const;
+    /** Sets the ARC4 key index. */
+    virtual void setARC4KeyIndex(unsigned int idx);
+    /** Clears the ARC4 key index. */
+    virtual void clearARC4KeyIndex();
+
+    /** Links a previously created channel object. */
+    virtual bool linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the given channel object. */
+    virtual bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  protected:
+    /** Some internal used offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int arc4KeyIndex() { return 0x0000; }
+      /// @endcond
+    };
+  };
+
   /** Represents the APRS settings within the binary DMR-6X2UV codeplug.
    *
    * Memory layout of APRS settings (size 0x00a0 bytes):
@@ -1016,6 +1061,8 @@ protected:
 
   /** Reuse AES encryption key from D878UV. */
   typedef D878UVCodeplug::AESEncryptionKeyElement AESEncryptionKeyElement;
+  /** Reuse ARC4 encryption key from D878UV. */
+  typedef D878UVCodeplug::ARC4EncryptionKeyElement ARC4EncryptionKeyElement;
 
 public:
   /** Hidden constructor. */
@@ -1042,9 +1089,10 @@ protected:
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  virtual bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  void allocateChannels();
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateGPSSystems();
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1067,6 +1115,14 @@ protected:
   /** Decode AES keys from the codeplug. */
   virtual bool createAESKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates memory to encode/decode ARC4 keys. */
+  virtual void allocateARC4Keys();
+  /** Encode all ARC4 keys. */
+  virtual bool encodeARC4Keys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode ARC4 keys from the codeplug. */
+  virtual bool createARC4Keys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
 public:
   /** Some limits for the codeplug. */
   struct Limit : public D868UVCodeplug::Limit {
@@ -1077,13 +1133,16 @@ public:
     /// Maximum number of roaming zones.
     static constexpr unsigned int roamingZones()                  { return 64; }
     /// Maximum number of AES encryption keys.
-    static constexpr unsigned int aesEncryptionKeys()             { return 255; }
+    static constexpr unsigned int aesEncryptionKeys()             { return 254; }
+    /// Maximum number of ARC4 encryption keys.
+    static constexpr unsigned int arc4EncryptionKeys()            { return 254; }
   };
 
 protected:
   /** Some internal used offsets within the codeplug. */
   struct Offset: public D868UVCodeplug::Offset {
     ///@cond DO_NOT_DOCUMENT
+    static constexpr unsigned int toChannelExtension()            { return 0x00002000; }
     static constexpr unsigned int roamingChannelBitmap()          { return 0x01042000; }
     static constexpr unsigned int roamingChannels()               { return 0x01040000; }
     static constexpr unsigned int roamingZoneBitmap()             { return 0x01042080; }
@@ -1094,6 +1153,7 @@ protected:
     static constexpr unsigned int settingsExtension()             { return 0x02501400; }
 
     static constexpr unsigned int aesEncryptionKeys()             { return 0x025c1000; }
+    static constexpr unsigned int arc4EncryptionKeys()            { return 0x025c5000; }
     /// @endcond
   };
 

@@ -1756,6 +1756,96 @@ DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
 }
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of DMR6X2UVCodeplug::ChannelExtensionElement
+ * ******************************************************************************************** */
+DMR6X2UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+DMR6X2UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+DMR6X2UVCodeplug::ChannelExtensionElement::clear() {
+  Element::clear();
+  memset(_data, 0, _size);
+}
+
+
+bool
+DMR6X2UVCodeplug::ChannelExtensionElement::hasARC4KeyIndex() const {
+  return 0 != getUInt8(Offset::arc4KeyIndex());
+}
+
+unsigned int
+DMR6X2UVCodeplug::ChannelExtensionElement::arc4KeyIndex() const {
+  return getUInt8(Offset::arc4KeyIndex())-1;
+}
+
+void
+DMR6X2UVCodeplug::ChannelExtensionElement::setARC4KeyIndex(unsigned int idx) {
+  setUInt8(Offset::arc4KeyIndex(), idx+1);
+}
+
+void
+DMR6X2UVCodeplug::ChannelExtensionElement::clearARC4KeyIndex() {
+  setUInt8(Offset::arc4KeyIndex(), 0);
+}
+
+
+bool
+DMR6X2UVCodeplug::ChannelExtensionElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err) const {
+  if (auto dc = c->as<DMRChannel>()) {
+    if (! hasARC4KeyIndex())
+      return true;
+
+    if (! ctx.has<ARC4EncryptionKey>(arc4KeyIndex())) {
+      errMsg(err) << "Cannot link channel '" << c->name()
+                  << "': Cannot resolve ARC4 key index " << arc4KeyIndex() << ".";
+      return false;
+    }
+
+    auto cc = dc->commercialExtension();
+    if (nullptr == cc)
+      dc->setCommercialExtension(cc = new CommercialChannelExtension());
+    if (cc->encryptionKeyRef()->isNull())
+      cc->setEncryptionKey(ctx.get<ARC4EncryptionKey>(arc4KeyIndex()));
+  }
+
+  return true;
+}
+
+
+bool
+DMR6X2UVCodeplug::ChannelExtensionElement::fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (auto dc = c->as<DMRChannel>()) {
+    clearARC4KeyIndex();
+
+    if (nullptr == dc->commercialExtension())
+      return true;
+    auto cc = dc->commercialExtension();
+
+    if (cc->encryptionKeyRef()->isNull())
+      return true;
+
+    if (auto key = cc->encryptionKey()->as<ARC4EncryptionKey>())
+      setARC4KeyIndex(ctx.index(key));
+  }
+
+  return true;
+}
+
+
+
 /* ******************************************************************************************** *
  * Implementation of DMR6X2UVCodeplug::AnalogAPRSSettingsElement
  * ******************************************************************************************** */
@@ -2215,11 +2305,12 @@ DMR6X2UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  // Keep 16bit DMR, ARC4 40bit, 128 bit AES and 256 bit AES keys.
   EncryptionKeyFilterVisitor filter(
         { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
           EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
-          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
+          EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),
+          EncryptionKeyFilterVisitor::Filter(ARC4EncryptionKey::staticMetaObject, 40, 40)});
   if (! filter.process(intermediate, err)) {
     errMsg(err) << "Cannot remove unsupported exncryption.";
     delete intermediate;
@@ -2268,6 +2359,7 @@ DMR6X2UVCodeplug::allocateForEncoding() {
 
   this->allocateRoaming();
   this->allocateAESKeys();
+  this->allocateARC4Keys();
 }
 
 void
@@ -2277,6 +2369,7 @@ DMR6X2UVCodeplug::allocateForDecoding() {
 
   this->allocateRoaming();
   this->allocateAESKeys();
+  this->allocateARC4Keys();
 }
 
 bool
@@ -2290,6 +2383,9 @@ DMR6X2UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorSt
     return false;
 
   if (! this->encodeAESKeys(flags, ctx, err))
+    return false;
+
+  if (! this->encodeARC4Keys(flags, ctx, err))
     return false;
 
   return true;
@@ -2306,6 +2402,9 @@ DMR6X2UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
     return false;
 
   if (! this->createAESKeys(ctx, err))
+    return false;
+
+  if (! this->createARC4Keys(ctx, err))
     return false;
 
   return true;
@@ -2365,17 +2464,40 @@ DMR6X2UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
 }
 
 
+void
+DMR6X2UVCodeplug::allocateChannels() {
+  /* Allocate channels */
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
+    // if disabled -> skip
+    if (! channel_bitmap.isEncoded(i))
+      continue;
+    // compute address for channel
+    uint16_t bank = i/Limit::channelsPerBank(), idx=i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx * ChannelElement::size();
+    if (!isAllocated(addr, 0)) {
+      image(0).addElement(addr, ChannelElement::size());
+      image(0).addElement(addr+Offset::toChannelExtension(), ChannelElement::size());
+      memset(data(addr+Offset::toChannelExtension()), 0, ChannelElement::size());
+    }
+  }
+}
+
 bool
 DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags);
 
   // Encode channels
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
-    ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
-                           + idx * ChannelElement::size()));
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()+ idx*ChannelElement::size();
+    ChannelElement ch(data(addr));
     if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+      return false;
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+    if (! ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx, err))
       return false;
   }
   return true;
@@ -2411,10 +2533,17 @@ DMR6X2UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     if (! channel_bitmap.isEncoded(i))
       continue;
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
-    if (ctx.has<Channel>(i))
-      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+
+    if (ctx.has<Channel>(i)) {
+      if (! ch.linkChannelObj(ctx.get<Channel>(i), ctx))
+        return false;
+      if (! ext.linkChannelObj(ctx.get<Channel>(i), ctx, err))
+        return false;
+    }
   }
 
   return true;
@@ -2655,6 +2784,56 @@ DMR6X2UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
     // Decode
     auto key = new AESEncryptionKey();
     key->setName(QString("AES Key %1").arg(i+1));
+    if (! key->setKey(keyEl.key(), err)) {
+      delete key;
+      return false;
+    }
+    // Store
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
+
+
+void
+DMR6X2UVCodeplug::allocateARC4Keys() {
+  // Since there is no bitmap indicating, which keys are valid, we need to allocate all 255 for
+  // decoding.
+  if (! isAllocated(Offset::arc4EncryptionKeys(), 0))
+    image(0).addElement(Offset::arc4EncryptionKeys(),
+                        Limit::arc4EncryptionKeys()*ARC4EncryptionKeyElement::size());
+}
+
+bool
+DMR6X2UVCodeplug::encodeARC4Keys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err); Q_UNUSED(flags);
+
+  for (uint8_t i=0; i<Limit::arc4EncryptionKeys(); i++) {
+    // if disabled -> skip
+    if (! ctx.has<ARC4EncryptionKey>(i))
+      continue;
+    ARC4EncryptionKeyElement key(data(Offset::arc4EncryptionKeys() + i*ARC4EncryptionKeyElement::size()));
+    key.setIndex(i);
+    key.setKey(ctx.get<ARC4EncryptionKey>(i)->key());
+  }
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::createARC4Keys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  for (uint8_t i=0; i<Limit::arc4EncryptionKeys(); i++) {
+    ARC4EncryptionKeyElement keyEl(data(Offset::arc4EncryptionKeys() + i*ARC4EncryptionKeyElement::size()));
+    // if disabled -> skip
+    if (! keyEl.isValid())
+      continue;
+    // Decode
+    auto key = new ARC4EncryptionKey();
+    key->setName(QString("ARC4 Key %1").arg(i+1));
     if (! key->setKey(keyEl.key(), err)) {
       delete key;
       return false;
