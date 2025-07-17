@@ -39,14 +39,34 @@ typedef struct __attribute((packed)) {
 } element_prefix_t;
 
 
+
 /* ********************************************************************************************* *
  * Implementation of DFUFile
  * ********************************************************************************************* */
 DFUFile::DFUFile(QObject *parent)
-  : QObject(parent)
+  : QObject(parent), _deviceId(0xffff), _productId(0xffff), _vendorId(0xffff)
 {
   // pass...
 }
+
+
+bool
+DFUFile::hasRadioId() const {
+  return (0xffff != _deviceId) && (0xffff!=_productId) && (0xffff != _vendorId);
+}
+
+RadioInfo::Radio
+DFUFile::radioId() const {
+  return (RadioInfo::Radio)_productId;
+}
+
+void
+DFUFile::setRadioId(RadioInfo::Radio radio) {
+  _deviceId = 0xffff;
+  _productId = (uint16_t)radio;
+  _vendorId = 0xffff;
+}
+
 
 uint32_t
 DFUFile::size() const {
@@ -65,6 +85,7 @@ DFUFile::memSize() const {
   }
   return size;
 }
+
 
 int
 DFUFile::numImages() const {
