@@ -15,6 +15,11 @@ UV390::~UV390() {
   // pass...
 }
 
+RadioInfo
+UV390::info() const {
+  return RadioInfo::byID(RadioInfo::UV390);
+}
+
 const QString &
 UV390::name() const {
   return _name;

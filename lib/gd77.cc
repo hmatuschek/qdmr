@@ -16,6 +16,11 @@ GD77::GD77(RadioddityInterface *device, QObject *parent)
   // pass...
 }
 
+RadioInfo
+GD77::info() const {
+  return RadioInfo::byID(RadioInfo::GD77);
+}
+
 const QString &
 GD77::name() const {
   return _name;

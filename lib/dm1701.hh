@@ -37,11 +37,13 @@
  * @ingroup dm1701 */
 class DM1701: public TyTRadio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit DM1701(TyTInterface *device=nullptr, QObject *parent=nullptr);
+
+  RadioInfo info() const;
 
   const QString &name() const;
   const RadioLimits &limits() const;

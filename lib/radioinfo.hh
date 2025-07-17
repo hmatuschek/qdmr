@@ -81,7 +81,7 @@ public:
   /** Returns the radio info by key. */
   static RadioInfo byKey(const QString &key);
   /** Returns the radio info by id. */
-  static RadioInfo byID(Radio radio);
+  static const RadioInfo &byID(Radio radio);
 
   /** Returns the list of all known radios. */
   static QList<RadioInfo> allRadios(bool flat=true);

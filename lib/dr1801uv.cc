@@ -1,6 +1,6 @@
 #include "dr1801uv.hh"
 #include "dr1801uv_interface.hh"
-#include "logger.hh"
+#include "dr1801uv_limits.hh"
 
 
 RadioLimits * DR1801UV::_limits = nullptr;
@@ -22,6 +22,11 @@ DR1801UV::defaultRadioInfo() {
                    DR1801UVInterface::interfaceInfo());
 }
 
+
+RadioInfo
+DR1801UV::info() const {
+  return RadioInfo::byID(RadioInfo::DR1801UV);
+}
 
 const QString &
 DR1801UV::name() const {

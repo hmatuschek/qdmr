@@ -45,6 +45,8 @@ public:
   /** Desturctor. */
   virtual ~UV390();
 
+  RadioInfo info() const;
+
   const QString &name() const;
   const RadioLimits &limits() const;
 

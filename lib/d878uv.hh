@@ -34,12 +34,13 @@
  * @ingroup d878uv */
 class D878UV: public AnytoneRadio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit D878UV(AnytoneInterface *device=nullptr, QObject *parent=nullptr);
 
+  RadioInfo info() const;
   const RadioLimits &limits() const;
 
   /** Returns the default radio information. The actual instance may have different properties

@@ -14,6 +14,11 @@ MD2017::~MD2017() {
   // pass...
 }
 
+RadioInfo
+MD2017::info() const {
+  return RadioInfo::byID(RadioInfo::MD2017);
+}
+
 const QString &
 MD2017::name() const {
   return _name;

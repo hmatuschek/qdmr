@@ -15,13 +15,14 @@
  * @ingroup ogd77 */
 class OpenUV380 : public OpenGD77Base
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	/** Do not construct this class directly, rather use @c Radio::detect. */
+  /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit OpenUV380(OpenGD77Interface *device=nullptr, QObject *parent=nullptr);
 
-	const QString &name() const;
+  RadioInfo info() const;
+  const QString &name() const;
 
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

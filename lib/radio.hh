@@ -10,7 +10,6 @@
 
 #include <QThread>
 #include "radioinfo.hh"
-#include "radiointerface.hh"
 #include "codeplug.hh"
 #include "userdatabase.hh"
 #include "callsigndb.hh"
@@ -30,11 +29,11 @@ class RadioLimits;
  */
 class Radio : public QThread
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Possible states of the radio object. */
-	typedef enum {
+  typedef enum {
     StatusIdle,             ///< Idle, nothing to do.
     StatusDownload,         ///< Downloading codeplug.
     StatusUpload,           ///< Uploading codeplug.
@@ -45,12 +44,15 @@ public:
 
 public:
   /** Default constructor. */
-	explicit Radio(QObject *parent = nullptr);
+  explicit Radio(QObject *parent = nullptr);
 
   virtual ~Radio();
 
+  /** Returns the radio information. */
+  virtual RadioInfo info() const = 0;
+
   /** Returns the name of the radio (e.g., device identifier). */
-	virtual const QString &name() const = 0;
+  virtual const QString &name() const = 0;
 
   /** Returns the limits for this radio.
    *
@@ -105,22 +107,22 @@ public slots:
 
 signals:
   /** Gets emitted once the codeplug download has been started. */
-	void downloadStarted();
+  void downloadStarted();
   /** Gets emitted on download progress (e.g., for progress bars). */
-	void downloadProgress(int percent);
+  void downloadProgress(int percent);
   /** Gets emitted once the codeplug download has been finished. */
   void downloadFinished(Radio *radio, Codeplug *codeplug);
   /** Gets emitted if there was an error during the codeplug download. */
-	void downloadError(Radio *radio);
+  void downloadError(Radio *radio);
 
   /** Gets emitted once the codeplug upload has been started. */
-	void uploadStarted();
+  void uploadStarted();
   /** Gets emitted on upload progress (e.g., for progress bars). */
-	void uploadProgress(int percent);
+  void uploadProgress(int percent);
   /** Gets emitted if there was an error during the upload. */
-	void uploadError(Radio *radio);
+  void uploadError(Radio *radio);
   /** Gets emitted once the codeplug upload has been completed successfully. */
-	void uploadComplete(Radio *radio);
+  void uploadComplete(Radio *radio);
 
 protected:
   /** The current state/task. */

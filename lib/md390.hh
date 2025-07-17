@@ -39,6 +39,8 @@ public:
    * @param parent The QObject parent. */
   MD390(TyTInterface *device=nullptr, const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
+  RadioInfo info() const;
+
   const QString &name() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;

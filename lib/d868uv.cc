@@ -112,6 +112,11 @@ D868UV::D868UV(AnytoneInterface *device, QObject *parent)
   }
 }
 
+RadioInfo
+D868UV::info() const {
+  return RadioInfo::byID(RadioInfo::D868UVE);
+}
+
 const RadioLimits &
 D868UV::limits() const {
   return *_limits;

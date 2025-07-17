@@ -79,6 +79,7 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
     stream.flush();
     file.close();
   } else if (parser.isSet("bin") || filename.endsWith(".bin") || filename.endsWith(".dfu")) {
+
     // otherwise write binary code-plug
     if (! radio->codeplug().write(filename, err)) {
       logError() << "Cannot dump codplug into file '" << filename << "': " << err.format();

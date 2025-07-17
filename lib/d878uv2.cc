@@ -137,6 +137,11 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
   }
 }
 
+RadioInfo
+D878UV2::info() const {
+  return RadioInfo::byID(RadioInfo::D878UVII);
+}
+
 const RadioLimits &
 D878UV2::limits() const {
   return *_limits;

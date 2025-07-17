@@ -18,6 +18,11 @@ RD5R::~RD5R() {
   // pass...
 }
 
+RadioInfo
+RD5R::info() const {
+  return RadioInfo::byID(RadioInfo::RD5R);
+}
+
 const QString &
 RD5R::name() const {
   return _name;

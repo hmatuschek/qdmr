@@ -16,13 +16,14 @@
  * @ingroup ogd77 */
 class OpenGD77 : public OpenGD77Base
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
   explicit OpenGD77(OpenGD77Interface *device=nullptr, QObject *parent=nullptr);
 
-	const QString &name() const;
+  RadioInfo info() const;
+  const QString &name() const;
 
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
@@ -36,7 +37,7 @@ public:
 
 protected:
   /** The device identifier. */
-	QString _name;
+  QString _name;
   /** The actual binary codeplug representation. */
   OpenGD77Codeplug _codeplug;
   /** The actual binary callsign DB representation. */

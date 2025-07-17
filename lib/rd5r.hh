@@ -35,7 +35,7 @@
  * @ingroup rd5r */
 class RD5R: public RadioddityRadio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   /** Constructor.
@@ -45,7 +45,9 @@ public:
 
   virtual ~RD5R();
 
-	const QString &name() const;
+  RadioInfo info() const;
+
+  const QString &name() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

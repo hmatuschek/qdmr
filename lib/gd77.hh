@@ -20,13 +20,15 @@
  * @ingroup gd77 */
 class GD77 : public RadioddityRadio
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
 	/** Do not construct this class directly, rather use @c Radio::detect. */
   explicit GD77(RadioddityInterface *device=nullptr, QObject *parent=nullptr);
 
-	const QString &name() const;
+  RadioInfo info() const;
+
+  const QString &name() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;
   Codeplug &codeplug();

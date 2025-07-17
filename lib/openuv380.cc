@@ -11,6 +11,10 @@ OpenUV380::OpenUV380(OpenGD77Interface *device, QObject *parent)
   _satelliteConfig = new OpenUV380SatelliteConfig(this);
 }
 
+RadioInfo
+OpenUV380::info() const {
+  return RadioInfo::byID(RadioInfo::OpenUV380);
+}
 
 const QString &
 OpenUV380::name() const {

@@ -26,6 +26,8 @@ public:
   /** Do not construct this class directly, rather use @c Radio::detect. */
   explicit GD73(GD73Interface *device=nullptr, QObject *parent=nullptr);
 
+  RadioInfo info() const;
+
   const QString &name() const;
   const RadioLimits &limits() const;
   const Codeplug &codeplug() const;

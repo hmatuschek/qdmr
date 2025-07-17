@@ -10,11 +10,15 @@ OpenGD77::OpenGD77(OpenGD77Interface *device, QObject *parent)
 }
 
 
+RadioInfo
+OpenGD77::info() const {
+  return RadioInfo::byID(RadioInfo::OpenGD77);
+}
+
 const QString &
 OpenGD77::name() const {
   return _name;
 }
-
 
 
 const Codeplug &

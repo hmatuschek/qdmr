@@ -18,6 +18,11 @@ GD73::GD73(GD73Interface *device, QObject *parent)
     _dev->setParent(this);
 }
 
+RadioInfo
+GD73::info() const {
+  return RadioInfo::byID(RadioInfo::GD73);
+}
+
 const QString &
 GD73::name() const {
   return _name;

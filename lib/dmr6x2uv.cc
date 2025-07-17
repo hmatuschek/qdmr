@@ -1,5 +1,3 @@
-#include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "dmr6x2uv.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "dmr6x2uv_limits.hh"
@@ -103,6 +101,11 @@ DMR6X2UV::DMR6X2UV(AnytoneInterface *device, QObject *parent)
     _limits = new DMR6X2UVLimits({}, {}, info.version, this);
     break;
   }
+}
+
+RadioInfo
+DMR6X2UV::info() const {
+  return RadioInfo::byID(RadioInfo::DMR6X2UV);
 }
 
 const RadioLimits &

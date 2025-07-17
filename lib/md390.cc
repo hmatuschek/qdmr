@@ -75,6 +75,11 @@ MD390::MD390(TyTInterface *device, const ErrorStack &err, QObject *parent)
   }
 }
 
+RadioInfo
+MD390::info() const {
+  return RadioInfo::byID(RadioInfo::MD390);
+}
+
 const QString &
 MD390::name() const {
   return _name;

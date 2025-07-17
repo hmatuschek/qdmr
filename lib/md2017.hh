@@ -44,6 +44,8 @@ public:
   /** Desturctor. */
   virtual ~MD2017();
 
+  RadioInfo info() const;
+
   const QString &name() const;
   const RadioLimits &limits() const;
 

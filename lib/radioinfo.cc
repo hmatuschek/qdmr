@@ -144,7 +144,7 @@ RadioInfo::byKey(const QString &key) {
   return byID(_radiosByName[key]);
 }
 
-RadioInfo
+const RadioInfo &
 RadioInfo::byID(Radio radio) {
   return _radiosById[radio];
 }

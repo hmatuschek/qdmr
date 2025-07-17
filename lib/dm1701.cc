@@ -1,10 +1,6 @@
 #include "dm1701.hh"
 #include "dm1701_limits.hh"
 
-#include "config.hh"
-#include "logger.hh"
-#include "utils.hh"
-
 RadioLimits *DM1701::_limits = nullptr;
 
 
@@ -12,6 +8,11 @@ DM1701::DM1701(TyTInterface *device, QObject *parent)
   : TyTRadio(device, parent), _name("Baofeng DM-1701"), _codeplug()
 {
   // pass...
+}
+
+RadioInfo
+DM1701::info() const {
+  return RadioInfo::byID(RadioInfo::DM1701);
 }
 
 const QString &

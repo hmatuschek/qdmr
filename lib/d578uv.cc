@@ -145,6 +145,11 @@ D578UV::D578UV(AnytoneInterface *device, QObject *parent)
   }
 }
 
+RadioInfo
+D578UV::info() const {
+  return RadioInfo::byID(RadioInfo::D578UV);
+}
+
 const RadioLimits &
 D578UV::limits() const {
   return *_limits;
