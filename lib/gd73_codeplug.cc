@@ -2219,6 +2219,8 @@ GD73Codeplug::ScanListElement::encode(ScanList *lst, Context &ctx, const ErrorSt
 GD73Codeplug::GD73Codeplug(QObject *parent)
   : Codeplug{parent}
 {
+  setRadioId(RadioInfo::GD73);
+
   addImage("Radioddity GD-73A/E codeplug");
   image(0).addElement(0x000000, 0x22014);
 }

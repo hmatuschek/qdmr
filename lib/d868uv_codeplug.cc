@@ -1268,7 +1268,7 @@ D868UVCodeplug::D868UVCodeplug(const QString &label, QObject *parent)
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
   : AnytoneCodeplug("AnyTone AT-D868UV Codeplug", parent)
 {
-  // pass...
+  setRadioId(RadioInfo::D868UVE);
 }
 
 void

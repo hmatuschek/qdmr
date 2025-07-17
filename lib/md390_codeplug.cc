@@ -160,6 +160,8 @@ MD390Codeplug::MenuSettingsElement::updateConfig(Config *config) {
 MD390Codeplug::MD390Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
+  setRadioId(RadioInfo::MD390);
+
   addImage("TYT MD-390 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   // Clear entire codeplug

@@ -11,6 +11,8 @@
 OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
   : OpenGD77BaseCodeplug(parent)
 {
+  setRadioId(RadioInfo::OpenGD77);
+
   // Delete allocated image by GD77 codeplug
   addImage("OpenGD77 Codeplug EEPROM");
   image(EEPROM).addElement(0x00080, 0x05fe0);

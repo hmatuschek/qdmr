@@ -67,6 +67,8 @@ MD2017Codeplug::ContactElement::isValid() const {
 MD2017Codeplug::MD2017Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
+  setRadioId(RadioInfo::MD2017);
+
   addImage("TYT MD-2017 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   image(0).addElement(0x110000, 0x90000);

@@ -24,7 +24,7 @@ D878UV2Codeplug::D878UV2Codeplug(const QString &label, QObject *parent)
 D878UV2Codeplug::D878UV2Codeplug(QObject *parent)
   : D878UVCodeplug("AnyTone AT-D868UVII Codeplug", parent)
 {
-  // pass...
+  setRadioId(RadioInfo::D878UV);
 }
 
 /* The address of the contact ID<->Index table has changed hence allocation and encoding must

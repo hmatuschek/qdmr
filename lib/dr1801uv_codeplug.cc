@@ -3220,6 +3220,8 @@ DR1801UVCodeplug::OneTouchSettingElement::clearDTMFIDIndex() {
 DR1801UVCodeplug::DR1801UVCodeplug(QObject *parent)
   : Codeplug(parent)
 {
+  setRadioId(RadioInfo::DR1801UV);
+
   addImage("BTECH DR-1801UV Codeplug");
   image(0).addElement(0, Offset::size());
 }

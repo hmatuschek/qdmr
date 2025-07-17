@@ -14,6 +14,8 @@
 OpenUV380Codeplug::OpenUV380Codeplug(QObject *parent)
   : OpenGD77BaseCodeplug(parent)
 {
+  setRadioId(RadioInfo::OpenUV380);
+
   addImage("OpenGD77 Codeplug EEPROM");
   addImage("OpenGD77 Codeplug FLASH");
   image(FLASH).addElement(0x00000080, 0x00005fe0);

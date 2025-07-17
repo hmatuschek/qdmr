@@ -258,6 +258,8 @@ GD77Codeplug::GroupListBankElement::get(unsigned n) const {
 GD77Codeplug::GD77Codeplug(QObject *parent)
   : RadioddityCodeplug(parent)
 {
+  setRadioId(RadioInfo::GD77);
+
   addImage("Radioddity GD77 Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16b00);

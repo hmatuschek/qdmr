@@ -1878,7 +1878,7 @@ D578UVCodeplug::D578UVCodeplug(const QString &label, QObject *parent)
 D578UVCodeplug::D578UVCodeplug(QObject *parent)
   : D878UVCodeplug("AnyTone AT-D578UV Codeplug", parent)
 {
-  // pass...
+  setRadioId(RadioInfo::D878UV);
 }
 
 bool D578UVCodeplug::allocateBitmaps() {

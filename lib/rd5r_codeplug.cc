@@ -1,7 +1,6 @@
 #include "rd5r_codeplug.hh"
 #include "config.hh"
 #include "channel.hh"
-#include "utils.hh"
 #include "logger.hh"
 #include <QDateTime>
 
@@ -165,6 +164,8 @@ RD5RCodeplug::EncryptionElement::setBasicKey(unsigned n, const QByteArray &key) 
 RD5RCodeplug::RD5RCodeplug(QObject *parent)
   : RadioddityCodeplug(parent)
 {
+  setRadioId(RadioInfo::RD5R);
+
   addImage("Radioddity RD5R Codeplug");
   image(0).addElement(0x00080, 0x07b80);
   image(0).addElement(0x08000, 0x16300);

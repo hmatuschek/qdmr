@@ -2292,7 +2292,7 @@ DMR6X2UVCodeplug::DMR6X2UVCodeplug(const QString &label, QObject *parent)
 DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
   : D868UVCodeplug("BTECH DMR-6X2UV", parent)
 {
-  // pass...
+  setRadioId(RadioInfo::DMR6X2UV);
 }
 
 

@@ -612,6 +612,8 @@ UV390Codeplug::MenuSettingsElement::enableNewScanList(bool enable) {
 UV390Codeplug::UV390Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
+  setRadioId(RadioInfo::UV390);
+
   addImage("TYT MD-UV390 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   image(0).addElement(0x110000, 0x90000);

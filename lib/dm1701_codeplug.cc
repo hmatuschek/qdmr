@@ -525,6 +525,8 @@ DM1701Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
 DM1701Codeplug::DM1701Codeplug(QObject *parent)
   : TyTCodeplug(parent)
 {
+  setRadioId(RadioInfo::DM1701);
+
   addImage("Baofeng DM-1701 Codeplug");
   image(0).addElement(0x002000, 0x3e000);
   image(0).addElement(0x110000, 0x90000);
