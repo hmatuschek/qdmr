@@ -1446,9 +1446,12 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>hold</token></term>
+    <term><token>hold</token>, <token>holdDelay</token></term>
     <listitem>
-      <para>Specifies the bluetooth hold duration.</para>
+      <para>
+        Specifies the bluetooth hold duration or delay. Unfortunately, I have absolutely no 
+        clue, that this setting is all about.
+      </para>
       <para>
         This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
       </para>

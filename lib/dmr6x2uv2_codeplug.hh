@@ -139,6 +139,21 @@ public:
     /** Sets the hold duration. */
     void setBluetoothHoldDuration(const Interval &dur);
 
+    /** Returns the hold delay. */
+    Interval bluetoothHoldDelay() const;
+    /** Sets the hold duration. */
+    void setBluetoothHoldDelay(const Interval &dur);
+
+    /** Returns @c true, if PTT latches. */
+    bool bluetoothPTTLatchEnabled() const;
+    /** Enable/disable bluetooth PTT latch. */
+    void enableBluetoothPTTLatch(bool enable);
+
+    /** Returns the bluetooth PTT sleep timeout. */
+    Interval bluetoothPTTSleepTimeout() const;
+    /** Sets the bluetooth PTT sleep timeout. */
+    void setBluetoothPTTSleepTimeout(const Interval &dur);
+
     bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -153,6 +168,9 @@ public:
       static constexpr unsigned int bluetoothMicGain()           { return 0x0019; }
       static constexpr unsigned int bluetoothSpeakerGain()       { return 0x001a; }
       static constexpr unsigned int bluetoothHoldDuration()      { return 0x001b; }
+      static constexpr unsigned int bluetoothHoldDelay()         { return 0x001c; }
+      static constexpr unsigned int bluetoothPTTLatch()          { return 0x001d; }
+      static constexpr unsigned int bluetoothPTTSleepTimeout()   { return 0x001e; }
       /// @endcond
     };
   };

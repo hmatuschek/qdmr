@@ -376,6 +376,48 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothHoldDuration(const Inter
 }
 
 
+Interval
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothHoldDelay() const {
+  auto num = getUInt8(Offset::bluetoothHoldDelay());
+  if (0 == num)
+    return Interval::fromMilliseconds(30);
+  return Interval::fromMilliseconds(500*num);
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothHoldDelay(const Interval &dur) {
+  if (dur.milliseconds() <=30)
+    setUInt8(Offset::bluetoothHoldDelay(), 0);
+  else
+    setUInt8(Offset::bluetoothHoldDelay(), dur.milliseconds()/500);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothPTTLatchEnabled() const {
+  return 0 != getUInt8(Offset::bluetoothPTTLatch());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableBluetoothPTTLatch(bool enable) {
+  setUInt8(Offset::bluetoothPTTLatch(), enable ? 0x01 : 0x00);
+}
+
+Interval
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothPTTSleepTimeout() const {
+  auto num = getUInt8(Offset::bluetoothPTTSleepTimeout());
+  return Interval::fromMinutes(num);
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothPTTSleepTimeout(const Interval &dur) {
+  if (dur.isNull() || (4 < dur.minutes()))
+    setUInt8(Offset::bluetoothPTTSleepTimeout(), 0);
+  else
+    setUInt8(Offset::bluetoothPTTSleepTimeout(), dur.minutes());
+}
+
+
 bool
 DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
@@ -395,6 +437,9 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   setBluetoothMicGain(ext->bluetoothSettings()->micGain());
   setBluetoothSpeakerGain(ext->bluetoothSettings()->speakerGain());
   setBluetoothHoldDuration(ext->bluetoothSettings()->holdDuration());
+  setBluetoothHoldDelay(ext->bluetoothSettings()->holdDelay());
+  enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
+  setBluetoothPTTSleepTimeout(ext->bluetoothSettings()->pttSleepTimer());
 
   return true;
 }
@@ -419,6 +464,9 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->setMicGain(bluetoothMicGain());
   ext->bluetoothSettings()->setSpeakerGain(bluetoothSpeakerGain());
   ext->bluetoothSettings()->setHoldDuration(bluetoothHoldDuration());
+  ext->bluetoothSettings()->setHoldDelay(bluetoothHoldDelay());
+  ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
+  ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
 
   return true;
 }

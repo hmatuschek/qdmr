@@ -2000,6 +2000,8 @@ class AnytoneBluetoothSettingsExtension: public ConfigItem
   Q_PROPERTY(unsigned int speakerGain READ speakerGain WRITE setSpeakerGain);
   /** The bluetooth hold duration. */
   Q_PROPERTY(Interval hold READ holdDuration WRITE setHoldDuration)
+  /** The bluetooth hold delay. */
+  Q_PROPERTY(Interval holdDelay READ holdDelay WRITE setHoldDelay)
 
 public:
   /** Default constructor. */
@@ -2047,6 +2049,11 @@ public:
   /** Sets the bluetooth hold duration. */
   void setHoldDuration(const Interval &dur);
 
+  /** Returns the bluetooth hold delay. */
+  const Interval &holdDelay() const;
+  /** Sets the bluetooth hold delay. */
+  void setHoldDelay(const Interval &dur);
+
 protected:
   bool _bluetoothEnabled;      ///< Enables bluetooth.
   bool _pttLatch;              ///< PTT latch flag.
@@ -2056,6 +2063,7 @@ protected:
   unsigned int _micGain;       ///< The bluetooth mic gain.
   unsigned int _speakerGain;   ///< The bluetooth speaker gain.
   Interval _holdDuration;      ///< What ever.
+  Interval _holdDelay;         ///< What ever.
 };
 
 

@@ -2660,7 +2660,7 @@ AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
 AnytoneBluetoothSettingsExtension::AnytoneBluetoothSettingsExtension(QObject *parent)
   : ConfigItem(parent), _bluetoothEnabled(false), _pttLatch(false),
     _pttSleep(Interval::fromMilliseconds(0)), _internalMic(false), _internalSpeaker(false),
-    _micGain(0), _speakerGain(0), _holdDuration()
+    _micGain(0), _speakerGain(0), _holdDuration(), _holdDelay()
 {
   // pass...
 }
@@ -2777,6 +2777,18 @@ AnytoneBluetoothSettingsExtension::setHoldDuration(const Interval &dur) {
   emit modified(this);
 }
 
+const Interval &
+AnytoneBluetoothSettingsExtension::holdDelay() const {
+  return _holdDelay;
+}
+
+void
+AnytoneBluetoothSettingsExtension::setHoldDelay(const Interval &dur) {
+  if (dur == _holdDelay)
+    return;
+  _holdDelay = dur;
+  emit modified(this);
+}
 
 
 /* ********************************************************************************************* *
