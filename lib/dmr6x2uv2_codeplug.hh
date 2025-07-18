@@ -109,6 +109,36 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0030; }
 
+    /** Returns @c true, if bluetooth is enabled. */
+    virtual bool bluetoothEnabled() const;
+    /** Enables/disables bluetooth. */
+    virtual void enableBluetooth(bool enable);
+
+    /** Returns @c true, if the internal mic is enabled additionally to the bluetooth input. */
+    virtual bool internalMicEnabled() const;
+    /** Enables/disables the internal mic additionally to the bluetooth input. */
+    virtual void enableInternalMic(bool enable);
+
+    /** Returns @c true, if the internal speaker is enabled additionally to the bluetooth output. */
+    virtual bool internalSpeakerEnabled() const;
+    /** Enables/disables the internal speaker additionally to the bluetooth output. */
+    virtual void enableInternalSpeaker(bool enable);
+
+    /** Returns the bluetooth mic gain. Valid values are 0,...,4. */
+    virtual unsigned int bluetoothMicGain() const;
+    /** Sets the bluetooth mic gain. Valid values are 0,...,4. */
+    virtual void setBluetoothMicGain(unsigned int gain);
+
+    /** Returns the bluetooth speaker gain. Valid values are 0,...,4. */
+    virtual unsigned int bluetoothSpeakerGain() const;
+    /** Sets the bluetooth speaker gain. Valid values are 0,...,4. */
+    virtual void setBluetoothSpeakerGain(unsigned int gain);
+
+    /** Returns the hold duration. */
+    Interval bluetoothHoldDuration() const;
+    /** Sets the hold duration. */
+    void setBluetoothHoldDuration(const Interval &dur);
+
     bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -117,6 +147,12 @@ public:
     /** Some internal offset within the codeplug element. */
     struct Offset {
       /// @cond DO_NOT_DOCUEMNT
+      static constexpr unsigned int bluetoothEnable()            { return 0x0016; }
+      static constexpr unsigned int internalMicEnable()          { return 0x0017; }
+      static constexpr unsigned int internalSpeakerEnable()      { return 0x0018; }
+      static constexpr unsigned int bluetoothMicGain()           { return 0x0019; }
+      static constexpr unsigned int bluetoothSpeakerGain()       { return 0x001a; }
+      static constexpr unsigned int bluetoothHoldDuration()      { return 0x001b; }
       /// @endcond
     };
   };

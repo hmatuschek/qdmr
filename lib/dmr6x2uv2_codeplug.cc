@@ -295,6 +295,87 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr
   // pass...
 }
 
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothEnabled() const {
+  return 0 != getUInt8(Offset::bluetoothEnable());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableBluetooth(bool enable) {
+  setUInt8(Offset::bluetoothEnable(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::internalMicEnabled() const {
+  return 0 != getUInt8(Offset::internalMicEnable());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableInternalMic(bool enable) {
+  setUInt8(Offset::internalMicEnable(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::internalSpeakerEnabled() const {
+  return 0 != getUInt8(Offset::internalSpeakerEnable());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableInternalSpeaker(bool enable) {
+  setUInt8(Offset::internalSpeakerEnable(), enable ? 0x01 : 0x00);
+}
+
+unsigned int
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothMicGain() const {
+  return getUInt8(Offset::bluetoothMicGain());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothMicGain(unsigned int gain) {
+  gain = std::min(4U, gain);
+  setUInt8(Offset::bluetoothMicGain(), gain);
+}
+
+unsigned int
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothSpeakerGain() const {
+  return getUInt8(Offset::bluetoothSpeakerGain());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothSpeakerGain(unsigned int gain) {
+  gain = std::min(4U, gain);
+  setUInt8(Offset::bluetoothSpeakerGain(), gain);
+}
+
+Interval
+DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothHoldDuration() const {
+  auto num = getUInt8(Offset::bluetoothHoldDuration());
+  if (num <= 30)
+    return Interval::fromSeconds(num);
+  else if (31 == num)
+    return Interval::fromMinutes(1);
+  else if (32 == num)
+    return Interval::fromMinutes(2);
+  /// @todo Implement interval=infinite.
+  return Interval();
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothHoldDuration(const Interval &dur) {
+  if (dur.seconds() <=30)
+    setUInt8(Offset::bluetoothHoldDuration(), dur.seconds());
+  else if (dur.seconds() <=60)
+    setUInt8(Offset::bluetoothHoldDuration(), 31);
+  else if (dur.seconds() <=120)
+    setUInt8(Offset::bluetoothHoldDuration(), 32);
+  else
+    setUInt8(Offset::bluetoothHoldDuration(), 33);
+}
+
+
 bool
 DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
@@ -308,8 +389,16 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   if (nullptr == ext)
     return true;
 
+  enableBluetooth(ext->bluetoothSettings()->bluetoothEnabled());
+  enableInternalMic(ext->bluetoothSettings()->internalMicEnabled());
+  enableInternalSpeaker(ext->bluetoothSettings()->internalSpeakerEnabled());
+  setBluetoothMicGain(ext->bluetoothSettings()->micGain());
+  setBluetoothSpeakerGain(ext->bluetoothSettings()->speakerGain());
+  setBluetoothHoldDuration(ext->bluetoothSettings()->holdDuration());
+
   return true;
 }
+
 
 bool
 DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
@@ -324,8 +413,16 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  ext->bluetoothSettings()->enableBluetooth(bluetoothEnabled());
+  ext->bluetoothSettings()->enableInternalMic(internalMicEnabled());
+  ext->bluetoothSettings()->enableInternalSpeaker(internalSpeakerEnabled());
+  ext->bluetoothSettings()->setMicGain(bluetoothMicGain());
+  ext->bluetoothSettings()->setSpeakerGain(bluetoothSpeakerGain());
+  ext->bluetoothSettings()->setHoldDuration(bluetoothHoldDuration());
+
   return true;
 }
+
 
 bool
 DMR6X2UV2Codeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {

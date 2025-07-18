@@ -1984,16 +1984,33 @@ class AnytoneBluetoothSettingsExtension: public ConfigItem
 
   Q_CLASSINFO("Description", "Collects all bluetooth settings for AnyTone devices.")
 
+  /** If @c true, bluetooth is enabled. */
+  Q_PROPERTY(bool enabled READ bluetoothEnabled WRITE enableBluetooth)
   /** If @c true, the PTT latch is enabled. */
   Q_PROPERTY(bool pttLatch READ pttLatch WRITE enablePTTLatch)
   /** The sleep timeout of the PTT button. If 0, sleep timer is disabled. */
   Q_PROPERTY(Interval pttSleepTimer READ pttSleepTimer WRITE setPTTSleepTimer)
+  /** If @c true, the internal mic is enabled additionally to the bluetooth input. */
+  Q_PROPERTY(bool internalMic READ internalMicEnabled WRITE enableInternalMic)
+  /** If @c true, the internal speaker is enabled additionally to the bluetooth output. */
+  Q_PROPERTY(bool internalSpeaker READ internalSpeakerEnabled WRITE enableInternalSpeaker)
+  /** The bluetooth mic gain. */
+  Q_PROPERTY(unsigned int micGain READ micGain WRITE setMicGain);
+  /** The bluetooth speaker gain. */
+  Q_PROPERTY(unsigned int speakerGain READ speakerGain WRITE setSpeakerGain);
+  /** The bluetooth hold duration. */
+  Q_PROPERTY(Interval hold READ holdDuration WRITE setHoldDuration)
 
 public:
   /** Default constructor. */
   explicit AnytoneBluetoothSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
+
+  /** Returns @c true if bluetooth is enabled. */
+  bool bluetoothEnabled() const;
+  /** Enables/disables bluetooth. */
+  void enableBluetooth(bool enable);
 
   /** Returns @c true if the PTT latch is enabled. */
   bool pttLatch() const;
@@ -2005,9 +2022,40 @@ public:
   /** Sets the PTT sleep timeout, 0 means off. */
   void setPTTSleepTimer(Interval intv);
 
+  /** Returns @c true if the internal mic is enabled additionally to the bluetooth input. */
+  bool internalMicEnabled() const;
+  /** Enables/disables internal mic additionally to the bluetooth input. */
+  void enableInternalMic(bool enable);
+
+  /** Returns @c true if the internal speaker is enabled additionally to the bluetooth output. */
+  bool internalSpeakerEnabled() const;
+  /** Enables/disables internal speaker additionally to the bluetooth output. */
+  void enableInternalSpeaker(bool enable);
+
+  /** Returns the bluetooth mic gain. */
+  unsigned int micGain() const;
+  /** Sets the bluetooth mic gain. */
+  void setMicGain(unsigned int gain);
+
+  /** Returns the bluetooth speaker gain. */
+  unsigned int speakerGain() const;
+  /** Sets the bluetooth speaker gain. */
+  void setSpeakerGain(unsigned int gain);
+
+  /** Returns the bluetooth hold duration. */
+  const Interval &holdDuration() const;
+  /** Sets the bluetooth hold duration. */
+  void setHoldDuration(const Interval &dur);
+
 protected:
+  bool _bluetoothEnabled;      ///< Enables bluetooth.
   bool _pttLatch;              ///< PTT latch flag.
   Interval _pttSleep;          ///< PTT sleep timer, 0 is off.
+  bool _internalMic;           ///< Additionally enables internal mic.
+  bool _internalSpeaker;       ///< Additionally enables internal speaker.
+  unsigned int _micGain;       ///< The bluetooth mic gain.
+  unsigned int _speakerGain;   ///< The bluetooth speaker gain.
+  Interval _holdDuration;      ///< What ever.
 };
 
 

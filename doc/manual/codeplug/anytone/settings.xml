@@ -1393,15 +1393,65 @@
 
 <variablelist>
   <varlistentry>
+    <term><token>enabled</token></term>
+    <listitem>
+      <para>If <token>true</token>, the bluetooth feature is enabled.</para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
     <term><token>pttLatch</token></term>
     <listitem>
       <para>If <token>true</token>, the bluetooth PTT button latches.</para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>pttSleepTimer</token></term>
     <listitem>
       <para>Specifies the timeout for the sleep mode of the bluetooth PTT button.</para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>internalSpeaker</token>, <token>internalMic</token></term>
+    <listitem>
+      <para>If <token>true</token>, the internal speaker and or mic stays active, if Bluetooth is 
+        enabled.</para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>micGain</token>, <token>speakerGain</token></term>
+    <listitem>
+      <para>
+        Specifies the bluetooth mic and speaker gain. The actual range may depend on the device.
+        For the DMR-6X2 PRO valid values are 0-4.
+      </para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>hold</token></term>
+    <listitem>
+      <para>Specifies the bluetooth hold duration.</para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>

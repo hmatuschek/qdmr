@@ -2658,7 +2658,9 @@ AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
  * Implementation of AnytoneBluetoothSettingsExtension
  * ********************************************************************************************* */
 AnytoneBluetoothSettingsExtension::AnytoneBluetoothSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _pttLatch(false), _pttSleep(Interval::fromMilliseconds(0))
+  : ConfigItem(parent), _bluetoothEnabled(false), _pttLatch(false),
+    _pttSleep(Interval::fromMilliseconds(0)), _internalMic(false), _internalSpeaker(false),
+    _micGain(0), _speakerGain(0), _holdDuration()
 {
   // pass...
 }
@@ -2685,6 +2687,19 @@ AnytoneBluetoothSettingsExtension::enablePTTLatch(bool enable) {
   emit modified(this);
 }
 
+bool
+AnytoneBluetoothSettingsExtension::bluetoothEnabled() const {
+  return _bluetoothEnabled;
+}
+
+void
+AnytoneBluetoothSettingsExtension::enableBluetooth(bool enable) {
+  if (enable == _bluetoothEnabled)
+    return;
+  _bluetoothEnabled = enable;
+  emit modified(this);
+}
+
 Interval
 AnytoneBluetoothSettingsExtension::pttSleepTimer() const {
   return _pttSleep;
@@ -2696,6 +2711,72 @@ AnytoneBluetoothSettingsExtension::setPTTSleepTimer(Interval intv) {
   _pttSleep = intv;
   emit modified(this);
 }
+
+bool
+AnytoneBluetoothSettingsExtension::internalMicEnabled() const {
+  return _internalMic;
+}
+
+void
+AnytoneBluetoothSettingsExtension::enableInternalMic(bool enable) {
+  if (enable == _internalMic)
+    return;
+  _internalMic = enable;
+  emit modified(this);
+}
+
+bool
+AnytoneBluetoothSettingsExtension::internalSpeakerEnabled() const {
+  return _internalSpeaker;
+}
+
+void
+AnytoneBluetoothSettingsExtension::enableInternalSpeaker(bool enable) {
+  if (enable == _internalSpeaker)
+    return;
+  _internalSpeaker = enable;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneBluetoothSettingsExtension::micGain() const {
+  return _micGain;
+}
+
+void
+AnytoneBluetoothSettingsExtension::setMicGain(unsigned int gain) {
+  if (_micGain == gain)
+    return;
+  _micGain = gain;
+  emit modified(this);
+}
+
+unsigned int
+AnytoneBluetoothSettingsExtension::speakerGain() const {
+  return _speakerGain;
+}
+
+void
+AnytoneBluetoothSettingsExtension::setSpeakerGain(unsigned int gain) {
+  if (_speakerGain == gain)
+    return;
+  _speakerGain = gain;
+  emit modified(this);
+}
+
+const Interval &
+AnytoneBluetoothSettingsExtension::holdDuration() const {
+  return _holdDuration;
+}
+
+void
+AnytoneBluetoothSettingsExtension::setHoldDuration(const Interval &dur) {
+  if (dur == _holdDuration)
+    return;
+  _holdDuration = dur;
+  emit modified(this);
+}
+
 
 
 /* ********************************************************************************************* *
