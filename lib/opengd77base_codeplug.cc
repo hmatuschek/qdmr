@@ -1358,7 +1358,7 @@ OpenGD77BaseCodeplug::DTMFContactElement::number() const {
   QString number;
   uint8_t *ptr = _data + Offset::number();
   const QVector<char> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
-  for (unsigned int i=0; (i<Limit::numberLength()) && (lut.size() < *ptr); i++, ptr++)
+  for (unsigned int i=0; (i<Limit::numberLength()) && (lut.size() > *ptr); i++, ptr++)
     number.append(lut[*ptr]);
   return number;
 }
@@ -1366,9 +1366,10 @@ OpenGD77BaseCodeplug::DTMFContactElement::number() const {
 void
 OpenGD77BaseCodeplug::DTMFContactElement::setNumber(const QString &number) {
   uint8_t *ptr = _data + Offset::number();
+  memset(ptr, 0xff, Limit::numberLength());
   unsigned int n = std::min(Limit::numberLength(), (unsigned int)number.length());
   const QVector<QChar> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
-  for (unsigned int i=0; (i<n) && (lut.contains(number.at(i))); i++, ptr++)
+  for (unsigned int i=0; (i<n) && lut.contains(number.at(i)); i++, ptr++)
     *ptr = lut.indexOf(number.at(i));
 }
 
