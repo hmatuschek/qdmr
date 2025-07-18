@@ -19,5 +19,6 @@
         <file>data/basic_encryption.yaml</file>
         <file>data/aes_encryption.yaml</file>
         <file>data/arc4_encryption.yaml</file>
+        <file>data/dtmf_contact.yaml</file>
     </qresource>
 </RCC>
