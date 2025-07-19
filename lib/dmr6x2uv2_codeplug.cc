@@ -403,6 +403,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableBluetoothPTTLatch(bool enable)
   setUInt8(Offset::bluetoothPTTLatch(), enable ? 0x01 : 0x00);
 }
 
+
 Interval
 DMR6X2UV2Codeplug::ExtendedSettingsElement::bluetoothPTTSleepTimeout() const {
   auto num = getUInt8(Offset::bluetoothPTTSleepTimeout());
@@ -416,6 +417,149 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::setBluetoothPTTSleepTimeout(const In
   else
     setUInt8(Offset::bluetoothPTTSleepTimeout(), dur.minutes());
 }
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::fmIdleToneEnabled() const {
+  return 0x00 != getUInt8(Offset::fmIdleTone());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableFMIdleTone(bool enable) {
+  setUInt8(Offset::fmIdleTone(), enable ? 0x01 : 0x00);
+}
+
+
+unsigned int
+DMR6X2UV2Codeplug::ExtendedSettingsElement::fmMicGain() const {
+  return 2*(1 + getUInt8(Offset::fmMicGain()));
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
+  gain = std::max(1U, std::min(10U, gain));
+  setUInt8(Offset::fmMicGain(), (gain-1)/2);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::totPredictionEnabled() const {
+  return 0x00 != getUInt8(Offset::totPrediction());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableTOTPrediction(bool enable) {
+  setUInt8(Offset::totPrediction(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::txAGCEnabled() const {
+  return 0x00 != getUInt8(Offset::txAGC());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableTXAGC(bool enable) {
+  setUInt8(Offset::txAGC(), enable ? 0x01 : 0x00);
+}
+
+
+DMR6X2UV2Codeplug::ExtendedSettingsElement::GNSS
+DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
+  return (GNSS) getUInt8(Offset::gnss());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(GNSS gnss) {
+  setUInt8(Offset::gnss(), (unsigned int)gnss);
+}
+
+
+DMR6X2UV2Codeplug::ExtendedSettingsElement::ChannelIndexDisplay
+DMR6X2UV2Codeplug::ExtendedSettingsElement::channelIndexDisplay() const {
+  return (ChannelIndexDisplay)getUInt8(Offset::displayChannelIndex());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setChannelIndexDisplay(ChannelIndexDisplay mode) {
+  setUInt8(Offset::displayChannelIndex(), (unsigned int)mode);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::wxAlarmEnabled() const {
+  return 0x00 != getUInt8(Offset::wxAlarm());
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableWXAlarm(bool enable) {
+  setUInt8(Offset::wxAlarm(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+DMR6X2UV2Codeplug::ExtendedSettingsElement::locationSourceGNSS() const {
+  return 0 == getUInt8(Offset::fixedLocationIndex());
+}
+
+unsigned int
+DMR6X2UV2Codeplug::ExtendedSettingsElement::fixedLocationIndex() const {
+  return getUInt8(Offset::fixedLocationIndex())-1;
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setFixedLocationIndex(unsigned int idx) {
+  setUInt8(Offset::fixedLocationIndex(), idx+1);
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setLocationSourceGNSS() {
+  setUInt8(Offset::fixedLocationIndex(), 0);
+}
+
+
+Channel::Power
+DMR6X2UV2Codeplug::ExtendedSettingsElement::satPower() const {
+  switch ((Power)getUInt8(Offset::satPower())) {
+  case Power::Low: return Channel::Power::Low;
+  case Power::Medium: return Channel::Power::Mid;
+  case Power::High: return Channel::Power::High;
+  case Power::Turbo: return Channel::Power::Max;
+  }
+  return Channel::Power::Low;
+}
+
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setSatPower(Channel::Power power) {
+  switch (power) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+    setUInt8(Offset::satPower(), (unsigned int)Power::Low);
+  break;
+  case Channel::Power::Mid:
+    setUInt8(Offset::satPower(), (unsigned int)Power::Medium);
+  break;
+  case Channel::Power::High:
+    setUInt8(Offset::satPower(), (unsigned int)Power::High);
+  break;
+  case Channel::Power::Max:
+    setUInt8(Offset::satPower(), (unsigned int)Power::Turbo);
+  break;
+  }
+}
+
+
+unsigned int
+DMR6X2UV2Codeplug::ExtendedSettingsElement::satSquelchLevel() const {
+  return 2*getUInt8(Offset::satSquelch());
+}
+void
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setSatSquelchLevel(unsigned int level) {
+  level = std::min(10U, level);
+  if (1 == level) level = 2; // otherwise level=1 => open
+  setUInt8(Offset::satSquelch(), level/2);
+}
+
 
 
 bool

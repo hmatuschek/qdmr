@@ -98,6 +98,19 @@ public:
   /** Implements some settings extension for the BTECH DMR-6X2UV PRO. */
   class ExtendedSettingsElement: public DMR6X2UVCodeplug::ExtendedSettingsElement
   {
+  public:
+    enum class GNSS {
+      GPS=0, BeiDou=1, Both=2
+    };
+
+    enum class ChannelIndexDisplay {
+      GlobalIndex = 0, IndexWithinZone = 1
+    };
+
+    enum class Power {
+      Low = 0, Medium = 1, High = 2, Turbo = 3
+    };
+
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -135,24 +148,78 @@ public:
     virtual void setBluetoothSpeakerGain(unsigned int gain);
 
     /** Returns the hold duration. */
-    Interval bluetoothHoldDuration() const;
+    virtual Interval bluetoothHoldDuration() const;
     /** Sets the hold duration. */
-    void setBluetoothHoldDuration(const Interval &dur);
+    virtual void setBluetoothHoldDuration(const Interval &dur);
 
     /** Returns the hold delay. */
-    Interval bluetoothHoldDelay() const;
+    virtual Interval bluetoothHoldDelay() const;
     /** Sets the hold duration. */
-    void setBluetoothHoldDelay(const Interval &dur);
+    virtual void setBluetoothHoldDelay(const Interval &dur);
 
     /** Returns @c true, if PTT latches. */
-    bool bluetoothPTTLatchEnabled() const;
+    virtual bool bluetoothPTTLatchEnabled() const;
     /** Enable/disable bluetooth PTT latch. */
-    void enableBluetoothPTTLatch(bool enable);
+    virtual void enableBluetoothPTTLatch(bool enable);
 
     /** Returns the bluetooth PTT sleep timeout. */
-    Interval bluetoothPTTSleepTimeout() const;
+    virtual Interval bluetoothPTTSleepTimeout() const;
     /** Sets the bluetooth PTT sleep timeout. */
-    void setBluetoothPTTSleepTimeout(const Interval &dur);
+    virtual void setBluetoothPTTSleepTimeout(const Interval &dur);
+
+    /** Returns @c true if the FM channel idle tone is enabled. */
+    virtual bool fmIdleToneEnabled() const;
+    /** Enables/disables FM channel idle tone. */
+    virtual void enableFMIdleTone(bool enable);
+
+    /** Returns the FM mic gain [1-10]. */
+    virtual unsigned int fmMicGain() const;
+    /** Sets the FM mic gain [1-10]. */
+    virtual void setFMMicGain(unsigned int gain);
+
+    /** Retruns @c true, if transmit timeout prediction is enabled. */
+    virtual bool totPredictionEnabled() const;
+    /** Enables/disables transmit timeout prediction. */
+    virtual void enableTOTPrediction(bool enable);
+
+    /** Retruns @c true, if TX AGC is enabled. */
+    virtual bool txAGCEnabled() const;
+    /** Enables/disables TX AGC. */
+    virtual void enableTXAGC(bool enable);
+
+    /** Returns enabled GNSSs */
+    virtual GNSS gnss() const;
+    /** Sets enabled GNSSs */
+    virtual void setGNSS(GNSS gnss);
+
+    /** Returns the channel index display mode. */
+    virtual ChannelIndexDisplay channelIndexDisplay() const;
+    /** Sets the channel index display mode. */
+    virtual void setChannelIndexDisplay(ChannelIndexDisplay mode);
+
+    /** Returns @c true if the weather alarm is enabled. */
+    virtual bool wxAlarmEnabled() const;
+    /** Enables/disables the weather alarm. */
+    virtual void enableWXAlarm(bool enable);
+
+    /** Returns @c true if the location is taken from GNSS, otherwise a fixed location is used. */
+    virtual bool locationSourceGNSS() const;
+    /** Returns the fixed location index. */
+    virtual unsigned int fixedLocationIndex() const;
+    /** Sets the fixed location index. */
+    virtual void setFixedLocationIndex(unsigned int idx);
+    /** Sets the location source to GNSS. */
+    virtual void setLocationSourceGNSS();
+
+    /** Returns the power setting for satellite mode. */
+    virtual Channel::Power satPower() const;
+    /** Sets the power level for satellite mode. */
+    virtual void setSatPower(Channel::Power power);
+
+    /** Retunrs the squelch level for satellite mode [0,1-10], 0=open.*/
+    virtual unsigned int satSquelchLevel() const;
+    /** Sets the squelch level for satellite mode [0,1-10], 0=open. */
+    virtual void setSatSquelchLevel(unsigned int level);
 
     bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -171,6 +238,16 @@ public:
       static constexpr unsigned int bluetoothHoldDelay()         { return 0x001c; }
       static constexpr unsigned int bluetoothPTTLatch()          { return 0x001d; }
       static constexpr unsigned int bluetoothPTTSleepTimeout()   { return 0x001e; }
+      static constexpr unsigned int fmIdleTone()                 { return 0x001f; }
+      static constexpr unsigned int fmMicGain()                  { return 0x0020; }
+      static constexpr unsigned int totPrediction()              { return 0x0021; }
+      static constexpr unsigned int txAGC()                      { return 0x0022; }
+      static constexpr unsigned int gnss()                       { return 0x0023; }
+      static constexpr unsigned int displayChannelIndex()        { return 0x0024; }
+      static constexpr unsigned int wxAlarm()                    { return 0x0026; }
+      static constexpr unsigned int fixedLocationIndex()         { return 0x0027; }
+      static constexpr unsigned int satPower()                   { return 0x0028; }
+      static constexpr unsigned int satSquelch()                 { return 0x0029; }
       /// @endcond
     };
   };
