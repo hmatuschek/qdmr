@@ -8,7 +8,6 @@
 
 #include <QGeoCoordinate>
 #include "configobject.hh"
-#include "opengd77_extension.hh"
 
 
 /** Implements the channel extensions for the OpenGD77 radios.

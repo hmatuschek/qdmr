@@ -818,7 +818,17 @@
   </varlistentry>
   <varlistentry>
     <term><token>tot</token></term>
-    <listitem><para>Transmit time-out warning tone.</para></listitem>
+    <listitem>
+      <para>Transmit time-out warning tone.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>wxAlarm</token></term>
+    <listitem>
+      <para>Enables the weather alarm.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
+    </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>callMelody</token>, <token>idleMelody</token>, <token>resetMelody</token>, 
@@ -877,6 +887,14 @@
       <token>showChannelType</token>, <token>showLastHeard</token></term>
     <listitem>
       <para>Enables/disables various display elements.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>showGlobalChannelNumber</token></term>
+    <listitem>
+      <para>If enabled, the global channel number is shown. If disabled, the channel number within
+      the zone is shown.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -1393,15 +1411,68 @@
 
 <variablelist>
   <varlistentry>
+    <term><token>enabled</token></term>
+    <listitem>
+      <para>If <token>true</token>, the bluetooth feature is enabled.</para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
     <term><token>pttLatch</token></term>
     <listitem>
       <para>If <token>true</token>, the bluetooth PTT button latches.</para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>pttSleepTimer</token></term>
     <listitem>
       <para>Specifies the timeout for the sleep mode of the bluetooth PTT button.</para>
+      <para>
+        This option is applicable to <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>internalSpeaker</token>, <token>internalMic</token></term>
+    <listitem>
+      <para>If <token>true</token>, the internal speaker and or mic stays active, if Bluetooth is 
+        enabled.</para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>micGain</token>, <token>speakerGain</token></term>
+    <listitem>
+      <para>
+        Specifies the bluetooth mic and speaker gain. The actual range may depend on the device.
+        For the DMR-6X2 PRO valid values are 0-4.
+      </para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>hold</token>, <token>holdDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the bluetooth hold duration or delay. Unfortunately, I have absolutely no 
+        clue, that this setting is all about.
+      </para>
+      <para>
+        This option is applicable to <productname>DMR-6X2UV PRO</productname> devices.
+      </para>
     </listitem>
   </varlistentry>
 </variablelist>
@@ -1435,6 +1506,32 @@
     <para>Specifies the time-slot of the repeater. This must be one of <token>TS1</token>, 
     <token>TS2</token> or <token>Channel</token>. The latter implies, that the repeater uses the 
     time-slot of the channel.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Satellite mode settings</title></info>
+<para>
+  Collects all settings related to the satellite mode. This extension is only relevant for the 
+  <productname>DMR-6X2UV</productname> series.
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>power</token></term>
+  <listitem>
+    <para>Specifies the transmit power setting in satellite mode. This must be one of 
+    <token>Min</token>, <token>Low</token>, <token>Mid</token>, <token>High</token> or 
+    <token>Max</token>. </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>squelch</token></term>
+  <listitem>
+    <para>Specifies the FM squelch level in satellite mode. This must be an integer in [0,1-10],
+      where 0 means an open squelch.</para>
   </listitem>
 </varlistentry>
 </variablelist>

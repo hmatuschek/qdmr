@@ -33,6 +33,7 @@ public:
     D868UVE,
     D868UV = D868UVE,
     DMR6X2UV,
+    DMR6X2UV2,
     D878UV,
     D878UVII,
     D578UV,

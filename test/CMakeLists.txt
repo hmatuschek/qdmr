@@ -85,6 +85,9 @@ target_link_libraries(d578uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positionin
 qt_add_executable(dmr6x2uv_test dmr6x2uv_test.cc dmr6x2uv_test.hh ${TESTDATA})
 target_link_libraries(dmr6x2uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
+qt_add_executable(dmr6x2uv2_test dmr6x2uv2_test.cc dmr6x2uv2_test.hh ${TESTDATA})
+target_link_libraries(dmr6x2uv2_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
+
 qt_add_executable(dm1701_test dm1701_test.cc dm1701_test.hh ${TESTDATA})
 target_link_libraries(dm1701_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
@@ -120,6 +123,7 @@ add_test(NAME D878UV2   COMMAND d878uv2_test)
 add_test(NAME D578UV    COMMAND d578uv_test)
 
 add_test(NAME DMR6X2UV  COMMAND dmr6x2uv_test)
+add_test(NAME DMR6X2UV2 COMMAND dmr6x2uv2_test)
 add_test(NAME DM1701    COMMAND dm1701_test)
 add_test(NAME DR1801    COMMAND dr1801_test)
 

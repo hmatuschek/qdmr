@@ -146,6 +146,8 @@ AnytoneInterface::identifier(const ErrorStack &err) {
     return RadioInfo::byID(RadioInfo::D868UVE);
   } else if ("D6X2UV" == _info.name) {
     return RadioInfo::byID(RadioInfo::DMR6X2UV);
+  } else if ("D6X2UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::DMR6X2UV2);
   } else if ("D878UV" == _info.name) {
     return RadioInfo::byID(RadioInfo::D878UV);
   } else if ("D878UV2" == _info.name) {
