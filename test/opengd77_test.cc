@@ -255,6 +255,26 @@ OpenGD77Test::testAPRSSourceCall() {
   QVERIFY(channel->name() == "2m APRS");
 }
 
+void
+OpenGD77Test::testDTMFContacts() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/dtmf_contact.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.contacts()->count(), 1);
+  QVERIFY(decoded.contacts()->contact(0)->is<DTMFContact>());
+  auto cont = decoded.contacts()->contact(0)->as<DTMFContact>();
+  QCOMPARE(cont->name(), "DTMF");
+  QCOMPARE(cont->number(), "*ABC123#");
+}
+
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
