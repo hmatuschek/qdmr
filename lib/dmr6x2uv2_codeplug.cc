@@ -443,35 +443,55 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
 
 
 bool
-DMR6X2UV2Codeplug::ExtendedSettingsElement::totPredictionEnabled() const {
-  return 0x00 != getUInt8(Offset::totPrediction());
+DMR6X2UV2Codeplug::ExtendedSettingsElement::totWarningToneEnabled() const {
+  return 0x00 != getUInt8(Offset::totWarningTone());
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::enableTOTPrediction(bool enable) {
-  setUInt8(Offset::totPrediction(), enable ? 0x01 : 0x00);
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableTOTWarningTone(bool enable) {
+  setUInt8(Offset::totWarningTone(), enable ? 0x01 : 0x00);
 }
 
 
 bool
-DMR6X2UV2Codeplug::ExtendedSettingsElement::txAGCEnabled() const {
-  return 0x00 != getUInt8(Offset::txAGC());
+DMR6X2UV2Codeplug::ExtendedSettingsElement::atpcEnabled() const {
+  return 0x00 != getUInt8(Offset::atpc());
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::enableTXAGC(bool enable) {
-  setUInt8(Offset::txAGC(), enable ? 0x01 : 0x00);
+DMR6X2UV2Codeplug::ExtendedSettingsElement::enableATPC(bool enable) {
+  setUInt8(Offset::atpc(), enable ? 0x01 : 0x00);
 }
 
 
-DMR6X2UV2Codeplug::ExtendedSettingsElement::GNSS
+AnytoneGPSSettingsExtension::GPSMode
 DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
-  return (GNSS) getUInt8(Offset::gnss());
+  switch ((GNSS) getUInt8(Offset::gnss())) {
+  case GNSS::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  case GNSS::BeiDou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
+  case GNSS::Both: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  }
+
+  return AnytoneGPSSettingsExtension::GPSMode::GPS;
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(GNSS gnss) {
-  setUInt8(Offset::gnss(), (unsigned int)gnss);
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss) {
+  switch (gnss) {
+  case AnytoneGPSSettingsExtension::GPSMode::GPS:
+    setUInt8(Offset::gnss(), (unsigned int)GNSS::GPS);
+    break;
+  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
+  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
+  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+    setUInt8(Offset::gnss(), (unsigned int)GNSS::BeiDou);
+    break;
+  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
+  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
+  case AnytoneGPSSettingsExtension::GPSMode::All:
+    setUInt8(Offset::gnss(), (unsigned int)GNSS::Both);
+    break;
+  }
 }
 
 
@@ -575,6 +595,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   if (nullptr == ext)
     return true;
 
+  // Bluetooth settings.
   enableBluetooth(ext->bluetoothSettings()->bluetoothEnabled());
   enableInternalMic(ext->bluetoothSettings()->internalMicEnabled());
   enableInternalSpeaker(ext->bluetoothSettings()->internalSpeakerEnabled());
@@ -584,6 +605,30 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   setBluetoothHoldDelay(ext->bluetoothSettings()->holdDelay());
   enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
   setBluetoothPTTSleepTimeout(ext->bluetoothSettings()->pttSleepTimer());
+
+  // Encode audio settings
+  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
+  if (ext->audioSettings()->fmMicGainEnabled())
+    setFMMicGain(ext->audioSettings()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->micLevel());
+  enableTOTWarningTone(ext->toneSettings()->totNotification());
+  enableWXAlarm(ext->toneSettings()->wxAlarm());
+
+  // Power settings
+  enableATPC(ext->powerSaveSettings()->atpc());
+
+  // GPS settings
+  setGNSS(ext->gpsSettings()->mode());
+
+  // Display settings
+  setChannelIndexDisplay(ext->displaySettings()->showGlobalChannelNumber() ?
+                           ChannelIndexDisplay::GlobalIndex :
+                           ChannelIndexDisplay::IndexWithinZone);
+
+  // Sat settings
+  setSatPower(ext->satelliteSettings()->power());
+  setSatSquelchLevel(ext->satelliteSettings()->squelch());
 
   return true;
 }
@@ -602,6 +647,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
 
+  // Bluetooth settings
   ext->bluetoothSettings()->enableBluetooth(bluetoothEnabled());
   ext->bluetoothSettings()->enableInternalMic(internalMicEnabled());
   ext->bluetoothSettings()->enableInternalSpeaker(internalSpeakerEnabled());
@@ -611,6 +657,29 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->setHoldDelay(bluetoothHoldDelay());
   ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
   ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
+
+  // Store FM mic gain separately
+  ext->toneSettings()->enableFMIdleChannelTone(fmIdleToneEnabled());
+  ext->audioSettings()->setFMMicGain(fmMicGain());
+  // Enable separate mic gain, if it differs from the DMR mic gain:
+  ext->audioSettings()->enableFMMicGain(
+        ctx.config()->settings()->micLevel() != fmMicGain());
+  ext->toneSettings()->enableTOTNotification(totWarningToneEnabled());
+  ext->toneSettings()->enableWXAlarm(wxAlarmEnabled());
+
+  // Power settings
+  ext->powerSaveSettings()->enableATPC(atpcEnabled());
+
+  // Store GPS settings
+  ext->gpsSettings()->setMode(gnss());
+
+  // Display settings
+  ext->displaySettings()->enableShowGlobalChannelNumber(
+        ChannelIndexDisplay::GlobalIndex == channelIndexDisplay());
+
+  // Sattellite settings
+  ext->satelliteSettings()->setPower(satPower());
+  ext->satelliteSettings()->setSquelch(satSquelchLevel());
 
   return true;
 }

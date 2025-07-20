@@ -818,7 +818,17 @@
   </varlistentry>
   <varlistentry>
     <term><token>tot</token></term>
-    <listitem><para>Transmit time-out warning tone.</para></listitem>
+    <listitem>
+      <para>Transmit time-out warning tone.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>wxAlarm</token></term>
+    <listitem>
+      <para>Enables the weather alarm.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
+    </listitem>
   </varlistentry>
   <varlistentry>
     <term><token>callMelody</token>, <token>idleMelody</token>, <token>resetMelody</token>, 
@@ -877,6 +887,14 @@
       <token>showChannelType</token>, <token>showLastHeard</token></term>
     <listitem>
       <para>Enables/disables various display elements.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>showGlobalChannelNumber</token></term>
+    <listitem>
+      <para>If enabled, the global channel number is shown. If disabled, the channel number within
+      the zone is shown.</para>
+      <para> Applicable to <productname>DMR-6X2 PRO</productname>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -1488,6 +1506,32 @@
     <para>Specifies the time-slot of the repeater. This must be one of <token>TS1</token>, 
     <token>TS2</token> or <token>Channel</token>. The latter implies, that the repeater uses the 
     time-slot of the channel.</para>
+  </listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Satellite mode settings</title></info>
+<para>
+  Collects all settings related to the satellite mode. This extension is only relevant for the 
+  <productname>DMR-6X2UV</productname> series.
+</para>
+
+<variablelist>
+<varlistentry>
+  <term><token>power</token></term>
+  <listitem>
+    <para>Specifies the transmit power setting in satellite mode. This must be one of 
+    <token>Min</token>, <token>Low</token>, <token>Mid</token>, <token>High</token> or 
+    <token>Max</token>. </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>squelch</token></term>
+  <listitem>
+    <para>Specifies the FM squelch level in satellite mode. This must be an integer in [0,1-10],
+      where 0 means an open squelch.</para>
   </listitem>
 </varlistentry>
 </variablelist>

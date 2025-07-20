@@ -177,20 +177,20 @@ public:
     /** Sets the FM mic gain [1-10]. */
     virtual void setFMMicGain(unsigned int gain);
 
-    /** Retruns @c true, if transmit timeout prediction is enabled. */
-    virtual bool totPredictionEnabled() const;
-    /** Enables/disables transmit timeout prediction. */
-    virtual void enableTOTPrediction(bool enable);
+    /** Retruns @c true, if transmit timeout warning tone is enabled. */
+    virtual bool totWarningToneEnabled() const;
+    /** Enables/disables transmit timeout warning tone. */
+    virtual void enableTOTWarningTone(bool enable);
 
-    /** Retruns @c true, if TX AGC is enabled. */
-    virtual bool txAGCEnabled() const;
-    /** Enables/disables TX AGC. */
-    virtual void enableTXAGC(bool enable);
+    /** Retruns @c true, if ATPC is enabled. */
+    virtual bool atpcEnabled() const;
+    /** Enables/disables ATPC. */
+    virtual void enableATPC(bool enable);
 
     /** Returns enabled GNSSs */
-    virtual GNSS gnss() const;
+    virtual AnytoneGPSSettingsExtension::GPSMode gnss() const;
     /** Sets enabled GNSSs */
-    virtual void setGNSS(GNSS gnss);
+    virtual void setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss);
 
     /** Returns the channel index display mode. */
     virtual ChannelIndexDisplay channelIndexDisplay() const;
@@ -240,8 +240,8 @@ public:
       static constexpr unsigned int bluetoothPTTSleepTimeout()   { return 0x001e; }
       static constexpr unsigned int fmIdleTone()                 { return 0x001f; }
       static constexpr unsigned int fmMicGain()                  { return 0x0020; }
-      static constexpr unsigned int totPrediction()              { return 0x0021; }
-      static constexpr unsigned int txAGC()                      { return 0x0022; }
+      static constexpr unsigned int totWarningTone()             { return 0x0021; }
+      static constexpr unsigned int atpc()                       { return 0x0022; }
       static constexpr unsigned int gnss()                       { return 0x0023; }
       static constexpr unsigned int displayChannelIndex()        { return 0x0024; }
       static constexpr unsigned int wxAlarm()                    { return 0x0026; }

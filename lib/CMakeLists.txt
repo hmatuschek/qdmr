@@ -153,7 +153,8 @@ qt_add_library(libdmrconf SHARED
   dr1801uv_codeplug.cc dr1801uv_codeplug.hh
   dr1801uv_filereader.cc dr1801uv_filereader.hh
   dr1801uv_limits.cc dr1801uv_limits.hh
-  transferflags.hh transferflags.cc)
+  transferflags.hh transferflags.cc
+  anytone_settingsextension.hh anytone_settingsextension.cc)
 
 set_target_properties(libdmrconf PROPERTIES
 	MACOSX_RPATH TRUE

@@ -5,6 +5,8 @@
 #include <QGeoCoordinate>
 #include "channel.hh"
 #include "contact.hh"
+#include "anytone_settingsextension.hh"
+
 
 class RadioSettings;
 
