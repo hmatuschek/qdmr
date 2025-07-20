@@ -2,7 +2,7 @@
 #define DMR6X2UV2CODEPLUG_HH
 
 #include "dmr6x2uv_codeplug.hh"
-#include "ranges.hh"
+#include "d878uv_codeplug.hh"
 
 
 /** Represents the device specific binary codeplug for BTECH DMR-6X2UV PRO radios.
@@ -94,6 +94,7 @@ public:
     };
 
   };
+
 
   /** Implements some settings extension for the BTECH DMR-6X2UV PRO. */
   class ExtendedSettingsElement: public DMR6X2UVCodeplug::ExtendedSettingsElement
@@ -252,6 +253,109 @@ public:
     };
   };
 
+
+  /** Implements a single APRS RX filter. */
+  class APRSFilterElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    APRSFilterElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    APRSFilterElement(uint8_t *ptr);
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x08; }
+
+    /** Returns the call. */
+    virtual QString call() const;
+    /** Sets the callsign. */
+    virtual void setCall(const QString &call);
+
+    /** Retruns the SSID. */
+    virtual unsigned int ssid() const;
+    /** Sets the SSID. */
+    virtual void setSSID(unsigned int ssid);
+
+  public:
+    /** Some limits for the element. */
+    struct Limit: public Element::Limit {
+      /** Maximum call sign length. */
+      static constexpr unsigned int call() { return 6; }
+    };
+
+  protected:
+    /** Internal Offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int valid() { return 0x0000; }
+      static constexpr unsigned int call()  { return 0x0001; }
+      static constexpr unsigned int ssid()  { return 0x0007; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a GPS roaming zone. */
+  class GPSRoamingZoneElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    GPSRoamingZoneElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    GPSRoamingZoneElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns @c true, if a roaming zone is set. */
+    virtual bool hasRoamingZoneIndex() const;
+    /** Returns the roaming zone index. */
+    virtual unsigned int roamingZoneIndex() const;
+    /** Sets the roaming zone index. */
+    virtual void setRoamingZoneIndex(unsigned int idx);
+    /** Clears the roaming zone index. */
+    virtual void clearRoamingZoneIndex();
+
+    /** Returns the center of the roaming zone. */
+    virtual QGeoCoordinate coordinate() const;
+    /** Sets the center of the roaming zone. */
+    virtual void setCoordinate(const QGeoCoordinate &coor);
+
+    /** Returns the radius in unknown units. */
+    virtual unsigned int radius() const;
+    /** Sets the radius in unknown units. */
+    virtual void setRadius(unsigned int radius);
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int valid()                             { return 0x0000; }
+      static constexpr unsigned int zoneIndex()                         { return 0x0001; }
+      static constexpr unsigned int latDegrees()                        { return 0x0002; }
+      static constexpr unsigned int latMinutes()                        { return 0x0003; }
+      static constexpr unsigned int latSeconds()                        { return 0x0004; }
+      static constexpr unsigned int latHemisphere()                     { return 0x0005; }
+      static constexpr unsigned int lonDegrees()                        { return 0x0006; }
+      static constexpr unsigned int lonMinutes()                        { return 0x0007; }
+      static constexpr unsigned int lonSeconds()                        { return 0x0008; }
+      static constexpr unsigned int lonHemisphere()                     { return 0x0009; }
+      static constexpr unsigned int radius()                            { return 0x000c; }
+      /// @endcond
+    };
+  };
+
+
 public:
   /** Hidden constructor. */
   explicit DMR6X2UV2Codeplug(const QString &label, QObject *parent=nullptr);
@@ -260,11 +364,36 @@ public:
   /** Empty constructor. */
   explicit DMR6X2UV2Codeplug(QObject *parent=nullptr);
 
+public:
+  /** Some limits for the codeplug. */
+  struct Limit: public DMR6X2UVCodeplug::Limit {
+    /** Maximum number of APRS receive filters. */
+    static constexpr unsigned int aprsFilter() { return 32; }
+    /** Maximum number of GPS roaming zones. */
+    static constexpr unsigned int gpsRoamingZones() { return 32; }
+  };
+
 protected:
-  void allocateGeneralSettings();
-  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  void allocateUpdated() override;
+  void allocateForEncoding() override;
+  void allocateForDecoding() override;
+
+  bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+
+  void allocateGeneralSettings() override;
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+
+protected:
+  /** Some offsets within the codeplug. */
+  struct Offset: public DMR6X2UVCodeplug::Offset {
+    /// @cond DO_NOT_DOCUMENT
+    static constexpr unsigned int aprsFilterBank()      { return 0x02501800; }
+    static constexpr unsigned int gpsRoamingZones()     { return 0x02504000; }
+    /// @endcond
+  };
 };
 
 #endif // DMR6X2UV2CODEPLUG_HH

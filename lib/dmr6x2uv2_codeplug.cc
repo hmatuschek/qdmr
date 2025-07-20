@@ -702,6 +702,145 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const Error
 
 
 /* ********************************************************************************************* *
+ * Implementation of DMR6X2UV2Codeplug::APRSFilterElement
+ * ********************************************************************************************* */
+DMR6X2UV2Codeplug::APRSFilterElement::APRSFilterElement(uint8_t *ptr, size_t size)
+  : Element{ptr, size}
+{
+  // pass
+}
+
+DMR6X2UV2Codeplug::APRSFilterElement::APRSFilterElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+
+void
+DMR6X2UV2Codeplug::APRSFilterElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+DMR6X2UV2Codeplug::APRSFilterElement::isValid() const {
+  if (! Element::isValid())
+    return false;
+  return 0 != getUInt8(Offset::valid());
+}
+
+
+QString
+DMR6X2UV2Codeplug::APRSFilterElement::call() const {
+  return readASCII(Offset::call(), Limit::call(), 0x00);
+}
+
+void
+DMR6X2UV2Codeplug::APRSFilterElement::setCall(const QString &call) {
+  writeASCII(Offset::call(), call, Limit::call(), 0x00);
+}
+
+
+unsigned int
+DMR6X2UV2Codeplug::APRSFilterElement::ssid() const {
+  return getUInt8(Offset::ssid());
+}
+
+void
+DMR6X2UV2Codeplug::APRSFilterElement::setSSID(unsigned int ssid) {
+  setUInt8(Offset::ssid(), ssid);
+}
+
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of DMR6X2UV2Codeplug::GPSRoamingZoneElement
+ * ********************************************************************************************* */
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::GPSRoamingZoneElement(uint8_t *ptr, size_t size)
+  : Element{ptr, size}
+{
+  // pass...
+}
+
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::GPSRoamingZoneElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+void
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::clear() {
+  memset(_data, 0, size());
+}
+
+bool
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::isValid() const {
+  return Element::isValid() && (0 != getUInt8(Offset::valid()));
+}
+
+
+bool
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::hasRoamingZoneIndex() const {
+  return 0xff != getUInt8(Offset::zoneIndex());
+}
+
+unsigned int
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::roamingZoneIndex() const {
+  return getUInt8(Offset::zoneIndex());
+}
+
+void
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::setRoamingZoneIndex(unsigned int idx) {
+  setUInt8(Offset::zoneIndex(), idx);
+}
+
+void
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::clearRoamingZoneIndex() {
+  setUInt8(Offset::zoneIndex(), 0xff);
+}
+
+
+QGeoCoordinate
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::coordinate() const {
+  double latDeg = getUInt8(Offset::latDegrees()), latMin = getUInt8(Offset::latMinutes()),
+      latSec = getUInt8(Offset::latSeconds()),
+      lonDeg = getUInt8(Offset::lonDegrees()), lonMin = getUInt8(Offset::lonMinutes()),
+      lonSec = getUInt8(Offset::lonSeconds());
+  double lat = latDeg + (latMin + (latSec/100))/60,
+      lon = lonDeg + (lonMin + (lonSec/100))/60;
+  if (getUInt8(Offset::latHemisphere())) lat *= -1;
+  if (getUInt8(Offset::lonHemisphere())) lon *= -1;
+  return QGeoCoordinate(lat, lon);
+}
+
+void
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::setCoordinate(const QGeoCoordinate &coor) {
+  double lat = coor.latitude(), lon = coor.longitude();
+  setUInt8(Offset::latHemisphere(), (lat<0) ? 1 : 0); lat = std::abs(lat);
+  setUInt8(Offset::lonHemisphere(), (lon<0) ? 1 : 0); lon = std::abs(lon);
+  setUInt8(Offset::latDegrees(), lat); lat -= int(lat); lat *=60;
+  setUInt8(Offset::lonDegrees(), lon); lon -= int(lon); lon *=60;
+  setUInt8(Offset::latMinutes(), lat); lat -= int(lat); lat *=100;
+  setUInt8(Offset::lonMinutes(), lon); lon -= int(lon); lon *=100;
+  setUInt8(Offset::latSeconds(), lat);
+  setUInt8(Offset::lonSeconds(), lon);
+}
+
+
+unsigned int
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::radius() const {
+  return getUInt16_le(Offset::radius());
+}
+
+void
+DMR6X2UV2Codeplug::GPSRoamingZoneElement::setRadius(unsigned int radius) {
+  setUInt16_le(Offset::radius(), radius);
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of DMR6X2UV2Codeplug
  * ********************************************************************************************* */
 DMR6X2UV2Codeplug::DMR6X2UV2Codeplug(const QString &label, QObject *parent)
@@ -714,6 +853,41 @@ DMR6X2UV2Codeplug::DMR6X2UV2Codeplug(QObject *parent)
   : DMR6X2UVCodeplug("BTECH DMR-6X2UV PRO", parent)
 {
   // pass...
+}
+
+
+void
+DMR6X2UV2Codeplug::allocateUpdated() {
+  image(0).addElement(Offset::aprsFilterBank(), Limit::aprsFilter()*APRSFilterElement::size());
+  image(0).addElement(Offset::gpsRoamingZones(), Limit::gpsRoamingZones()*GPSRoamingZoneElement::size());
+}
+
+void
+DMR6X2UV2Codeplug::allocateForEncoding() {
+  DMR6X2UVCodeplug::allocateForEncoding();
+}
+
+void
+DMR6X2UV2Codeplug::allocateForDecoding() {
+  DMR6X2UVCodeplug::allocateForDecoding();
+}
+
+
+bool
+DMR6X2UV2Codeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! DMR6X2UVCodeplug::encodeElements(flags, ctx, err))
+    return false;
+
+  return true;
+}
+
+
+bool
+DMR6X2UV2Codeplug::createElements(Context &ctx, const ErrorStack &err) {
+  if (! DMR6X2UVCodeplug::createElements(ctx, err))
+    return false;
+
+  return true;
 }
 
 
@@ -752,8 +926,10 @@ DMR6X2UV2Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   return true;
 }
+
 bool
 DMR6X2UV2Codeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   return GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err);
 }
+
 
