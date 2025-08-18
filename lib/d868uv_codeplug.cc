@@ -744,7 +744,7 @@ D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x00));
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
