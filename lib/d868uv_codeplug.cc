@@ -1182,7 +1182,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
   // Encode display settings
-  setRXBacklightDuration(ext->displaySettings()->backlightDuration());
+  setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
   enableShowCurrentContact(ext->displaySettings()->showContact());
 
   // Check encryption type
@@ -1228,7 +1228,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode display settings
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
-  ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
+  ext->displaySettings()->setBacklightDurationRX(rxBacklightDuration());
 
   // Set encryption type
   ext->dmrSettings()->setEncryption(AnytoneDMRSettingsExtension::EncryptionType::DMR);

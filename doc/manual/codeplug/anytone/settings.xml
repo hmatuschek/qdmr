@@ -862,11 +862,13 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>backlightDuration</token>, <token>backlightDurationRX</token>, 
+    <term><token>backlightDurationRX</token>, 
       <token>backlightDurationTX</token></term>
     <listitem>
       <para>Specifies the backlight duration. While setting the TX backlight duration to 0 disables
       it during TX, setting the RX backlight duration to that value, enables it continously.</para>
+      <para>Some radios only support the setting for the RX backlight duration. Especially the 
+        <productname>D868UVE</productname> and <productname>DMR-6X2</productname>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>

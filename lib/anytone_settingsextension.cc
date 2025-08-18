@@ -1555,7 +1555,7 @@ AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
  * ********************************************************************************************* */
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
   : ConfigItem(parent), _displayFrequency(false), _brightness(5),
-    _backlightDuration(Interval::fromSeconds(10)), _volumeChangePrompt(true), _callEndPrompt(true),
+    _volumeChangePrompt(true), _callEndPrompt(true),
     _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
     _callColor(Color::Orange), _language(Language::English), _dateFormat(DateFormat::DayFirst),
     _showChannelNumber(true), _showGlobalChannelNumber(false), _showColorCode(true),
@@ -1598,18 +1598,6 @@ AnytoneDisplaySettingsExtension::enableDisplayFrequency(bool enable) {
   if (_displayFrequency == enable)
     return;
   _displayFrequency = enable;
-  emit modified(this);
-}
-
-Interval
-AnytoneDisplaySettingsExtension::backlightDuration() const {
-  return _backlightDuration;
-}
-void
-AnytoneDisplaySettingsExtension::setBacklightDuration(Interval sec) {
-  if (_backlightDuration == sec)
-    return;
-  _backlightDuration = sec;
   emit modified(this);
 }
 
