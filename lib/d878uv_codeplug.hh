@@ -197,7 +197,6 @@ public:
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
       static constexpr unsigned int roamingEnabled()       { return 0x0034; }
       static constexpr unsigned int dataACK()              { return 0x0034; }
-      static constexpr unsigned int aprsType()             { return 0x0035; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
       static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
       static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
