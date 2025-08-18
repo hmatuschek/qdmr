@@ -89,14 +89,15 @@ D868UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   setBit(Offset::dataACK(), !enable);
 }
 
-bool
-D868UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(Offset::txDigitalAPRS());
+D868UVCodeplug::ChannelElement::APRSType
+D868UVCodeplug::ChannelElement::txAPRSType() const {
+  return (APRSType)getUInt8(Offset::txAPRSType());
 }
 void
-D868UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(Offset::txDigitalAPRS(), enable);
+D868UVCodeplug::ChannelElement::setTXAPRSType(APRSType aprsType) {
+  setUInt8(Offset::txAPRSType(), (uint8_t)aprsType);
 }
+
 unsigned
 D868UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
   return getUInt8(Offset::digitalAPRSSystemIndex());
@@ -188,7 +189,7 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+    if ((APRSType::Off != txAPRSType())  && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
     else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
@@ -219,10 +220,10 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Set GPS system index
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXDigitalAPRS(true);
+      setTXAPRSType(APRSType::DMR);
       enableRXAPRS(false);
     } else {
-      enableTXDigitalAPRS(false);
+      setTXAPRSType(APRSType::Off);
       enableRXAPRS(false);
     }
 
@@ -2153,7 +2154,7 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       continue;
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
-    if (ch.txDigitalAPRS())
+    if (ChannelElement::APRSType::Off != ch.txAPRSType())
       systems.insert(ch.digitalAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
