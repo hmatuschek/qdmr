@@ -588,9 +588,6 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   /** The display brightness [1-10]. */
   Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
 
-  /** The backlight duration in seconds. */
-  Q_PROPERTY(Interval backlightDuration READ backlightDuration WRITE setBacklightDuration)
-
   Q_CLASSINFO("backlightDurationTX", "The duration in seconds, the backlight is lit during TX. "
                                      "A value of 0 means off.")
   /** TX backlight duration. */
@@ -698,11 +695,6 @@ public:
   unsigned int brightness() const;
   /** Sets the display brightness [1-10]. */
   void setBrightness(unsigned int level);
-
-  /** Returns the backlight duration in seconds, 0 means permanent. */
-  Interval backlightDuration() const;
-  /** Sets the backlight duration in seconds, 0 means permanent. */
-  void setBacklightDuration(Interval sec);
 
   /** Returns @c true if the volume-change prompt is shown. */
   bool volumeChangePromptEnabled() const;
@@ -819,7 +811,6 @@ public:
 protected:
   bool _displayFrequency;                   ///< Display frequency property.
   unsigned int _brightness;                 ///< The display brightness.
-  Interval _backlightDuration;              ///< Backlight duration in seconds, 0=permanent.
   bool _volumeChangePrompt;                 ///< Volume-change prompt enabled.
   bool _callEndPrompt;                      ///< Call-end prompt enabled.
   LastCallerDisplayMode _lastCallerDisplay; ///< Last-caller display mode.
@@ -837,8 +828,8 @@ protected:
   Color _standbyTextColor;                  ///< Standby text color.
   Color _standbyBackgroundColor;            ///< Standby background color.
   bool _showLastHeard;                      ///< Shows the last caller.
-  Interval _backlightDurationTX;            ///< Backlight duration in seconds during TX.
-  Interval _backlightDurationRX;            ///< Backlight duration in seconds during RX.
+  Interval _backlightDurationTX;            ///< Backlight duration during TX (0=off).
+  Interval _backlightDurationRX;            ///< Backlight duration during RX (0=permanent).
   bool _customChannelBackground;            ///< Custom channel background enabled.
   Color _channelNameColor;                  ///< Color of channel name.
   Color _channelBNameColor;                 ///< Color of channel name for VFO B.
