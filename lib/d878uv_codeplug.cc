@@ -983,6 +983,7 @@ D878UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtens
 
 Frequency
 D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
+  // Directly map enum to frequency
   switch (getUInt8(Offset::vfoFrequencyStep())) {
   case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
   case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
@@ -994,28 +995,25 @@ D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
   case FREQ_STEP_25kHz: return Frequency::fromkHz(25);
   case FREQ_STEP_50kHz: return Frequency::fromkHz(50);
   }
+  // otherwise return default step size (2.5kHz)
   return Frequency::fromkHz(2.5);
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
-  if (freq.inkHz() <= 2.5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_2_5kHz);
-  else if (freq.inkHz() <= 5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_5kHz);
-  else if (freq.inkHz() <= 6.25)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_6_25kHz);
-  else if (freq.inkHz() <= 8.33)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_8_33kHz);
-  else if (freq.inkHz() <= 10)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_10kHz);
-  else if (freq.inkHz() <= 12.5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_12_5kHz);
-  else if (freq.inkHz() <= 20)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_20kHz);
-  else if (freq.inkHz() <= 25)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_25kHz);
-  else
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_50kHz);
+  static auto map = Frequency::MapNearest<FreqStep>(
+        {
+          {Frequency::fromkHz(2.5),  FREQ_STEP_2_5kHz},
+          {Frequency::fromkHz(5),    FREQ_STEP_5kHz},
+          {Frequency::fromkHz(6.25), FREQ_STEP_6_25kHz},
+          {Frequency::fromkHz(8.33), FREQ_STEP_8_33kHz},
+          {Frequency::fromkHz(10),   FREQ_STEP_10kHz},
+          {Frequency::fromkHz(12.5), FREQ_STEP_12_5kHz},
+          {Frequency::fromkHz(20),   FREQ_STEP_20kHz},
+          {Frequency::fromkHz(25),   FREQ_STEP_25kHz},
+          {Frequency::fromkHz(50),   FREQ_STEP_50kHz},
+        });
+
+  setUInt8(Offset::vfoFrequencyStep(), (uint8_t) map.value(freq));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
