@@ -222,6 +222,11 @@ public:
       Enhanced = 1
     };
 
+    /** Possible APRS modes. */
+    enum class APRSType {
+      Off = 0, DMR = 1
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -243,10 +248,10 @@ public:
     /** Enables/disables data ACK. */
     virtual void enableDataACK(bool enable);
 
-    /** Returns @c true if TX APRS is enabled. */
-    virtual bool txDigitalAPRS() const;
-    /** Enables/disables TX APRS. */
-    virtual void enableTXDigitalAPRS(bool enable);
+    /** Returns APRS type for reporting the position. */
+    APRSType txAPRSType() const;
+    /** Sets APRS type for reporting the position. */
+    void setTXAPRSType(APRSType aprsType);
     /** Returns the DMR APRS system index. */
     virtual unsigned digitalAPRSSystemIndex() const;
     /** Sets the DMR APRS system index. */
@@ -295,7 +300,7 @@ public:
       static Bit ranging()                         { return {0x0034, 0}; }
       static Bit throughMode()                     { return {0x0034, 1}; }
       static Bit dataACK()                         { return {0x0034, 2}; }
-      static Bit txDigitalAPRS()                   { return {0x0035, 0}; }
+      static unsigned int txAPRSType()             { return 0x0035; }
       static unsigned int digitalAPRSSystemIndex() { return 0x0036; }
       static Bit multipleKeyEncryption()           { return {0x003b, 0}; }
       static Bit randomKey()                       { return {0x003b, 1}; }

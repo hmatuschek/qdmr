@@ -97,6 +97,11 @@ public:
       Both = 3                    ///< Send PTT-ID at start and end.
     };
 
+    /** Possible APRS modes. */
+    enum class APRSType {
+      Off = 0, FM = 1, DMR = 2
+    };
+
     /** Defines all possible APRS PTT settings. */
     enum class APRSPTT {
       Off   = 0,                  ///< Do not send APRS on PTT.
@@ -135,23 +140,19 @@ public:
     /** Enables/disables data ACK. */
     void enableDataACK(bool enable);
 
-    /** Returns @c true if digital APRS transmission is enabled. */
-    bool txDigitalAPRS() const;
-    /** Enables/disables digital APRS transmission. */
-    void enableTXDigitalAPRS(bool enable);
-    /** Returns @c true if the analog APRS reporting (TX) is enabled. */
-    virtual bool txAnalogAPRS() const;
-    /** Enables/disables analog APRS reporting. */
-    virtual void enableTXAnalogAPRS(bool enable);
+    /** Returns APRS type for reporting the position. */
+    APRSType txAPRSType() const;
+    /** Sets APRS type for reporting the position. */
+    void setTXAPRSType(APRSType aprsType);
 
     /** Returns the analog APRS PTT setting. */
-    virtual APRSPTT analogAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT analogAPRSPTTSetting() const;
     /** Sets the analog APRS PTT setting. */
-    virtual void setAnalogAPRSPTTSetting(APRSPTT ptt);
+    virtual void setAnalogAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
     /** Returns the digital APRS PTT setting. */
-    virtual APRSPTT digitalAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT digitalAPRSPTTSetting() const;
     /** Sets the digital APRS PTT setting. */
-    virtual void setDigitalAPRSPTTSetting(APRSPTT ptt);
+    virtual void setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
     virtual unsigned digitalAPRSSystemIndex() const;
@@ -196,7 +197,6 @@ public:
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
       static constexpr unsigned int roamingEnabled()       { return 0x0034; }
       static constexpr unsigned int dataACK()              { return 0x0034; }
-      static constexpr unsigned int txDMRAPRS()            { return 0x0035; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
       static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
       static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }

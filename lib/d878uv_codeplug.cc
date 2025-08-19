@@ -134,39 +134,48 @@ D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   setBit(Offset::dataACK(), 3, !enable);
 }
 
-bool
-D878UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return 2 == getUInt2(Offset::txDMRAPRS(), 0);
+D878UVCodeplug::ChannelElement::APRSType
+D878UVCodeplug::ChannelElement::txAPRSType() const {
+  return (APRSType)getUInt8(Offset::txAPRSType());
 }
 void
-D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x02 : 0x00));
-}
-bool
-D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
-  return 1 == getUInt2(Offset::txDMRAPRS(), 0);
-}
-void
-D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
-  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x01 : 0x00));
+D878UVCodeplug::ChannelElement::setTXAPRSType(APRSType aprsType) {
+  setUInt8(Offset::txAPRSType(), (uint8_t)aprsType);
 }
 
-D878UVCodeplug::ChannelElement::APRSPTT
+AnytoneChannelExtension::APRSPTT
 D878UVCodeplug::ChannelElement::analogAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(Offset::fmAPRSPTTSetting());
+  switch ((APRSPTT)getUInt8(Offset::fmAPRSPTTSetting())) {
+  case APRSPTT::Off: return AnytoneChannelExtension::APRSPTT::Off;
+  case APRSPTT::Start: return AnytoneChannelExtension::APRSPTT::Start;
+  case APRSPTT::End: return AnytoneChannelExtension::APRSPTT::End;
+  }
+  return AnytoneChannelExtension::APRSPTT::Start;
 }
 void
-D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(Offset::fmAPRSPTTSetting(), (unsigned)ptt);
+D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt) {
+  // There is no start/end option. Either send it or not. If enabled -> encode as "at start".
+  switch (ptt) {
+  case AnytoneChannelExtension::APRSPTT::Off:   setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::Off); break;
+  case AnytoneChannelExtension::APRSPTT::Start: setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::Start); break;
+  case AnytoneChannelExtension::APRSPTT::End:   setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::End); break;
+  }
 }
 
-D878UVCodeplug::ChannelElement::APRSPTT
+AnytoneChannelExtension::APRSPTT
 D878UVCodeplug::ChannelElement::digitalAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(Offset::dmrAPRSPTTSetting());
+  return getUInt8(Offset::dmrAPRSPTTSetting()) ?
+        AnytoneChannelExtension::APRSPTT::Start :
+        AnytoneChannelExtension::APRSPTT::Off;
 }
 void
-D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(Offset::dmrAPRSPTTSetting(), (unsigned)ptt);
+D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt) {
+  // There is no start/end option. Either send it or not. If enabled -> encode as "at start".
+  switch (ptt) {
+  case AnytoneChannelExtension::APRSPTT::Off:   setUInt8(Offset::dmrAPRSPTTSetting(), 0); break;
+  case AnytoneChannelExtension::APRSPTT::Start:
+  case AnytoneChannelExtension::APRSPTT::End:   setUInt8(Offset::dmrAPRSPTTSetting(), 1); break;
+  }
 }
 
 unsigned
@@ -242,20 +251,12 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // If extension is present, update
   if (nullptr != ext) {
     ext->setFrequencyCorrection(frequenyCorrection());
-    // Decode APRS PTT setting.
-    if (txAnalogAPRS()) {
-      switch(analogAPRSPTTSetting()) {
-      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
-      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
-      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
-      }
-    } else if (txDigitalAPRS()) {
-      switch(digitalAPRSPTTSetting()) {
-      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
-      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
-      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
-      }
-    }
+    if (APRSType::FM == txAPRSType())
+      ext->setAPRSPTT(analogAPRSPTTSetting());
+    else if (APRSType::DMR == txAPRSType())
+      ext->setAPRSPTT(digitalAPRSPTTSetting());
+    else
+      ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off);
   }
 
   return ch;
@@ -269,15 +270,17 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if (txDigitalAPRS() && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
+    if ((APRSType::DMR == txAPRSType()) && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
       dc->setAPRSObj(ctx.get<APRSSystem>(0));
+
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
       dc->setRoamingZone(DefaultRoamingZone::get());
+
     if (auto *ext = dc->anytoneChannelExtension()) {
       // If not default FM APRS frequency
       if (0 != fmAPRSFrequencyIndex()) {
@@ -329,8 +332,9 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     FMChannel *ac = c->as<FMChannel>();
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
       ac->setAPRSSystem(ctx.get<APRSSystem>(0));
+
     if (auto *ext = ac->anytoneChannelExtension()) {
       // If not default FM APRS frequency
       if (0 != fmAPRSFrequencyIndex()) {
@@ -352,13 +356,14 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
   if (const DMRChannel *dc = c->as<DMRChannel>()) {
     // Set GPS system index
+    setTXAPRSType(APRSType::Off);
     enableRXAPRS(false);
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       enableRXAPRS(true);
-      enableTXDigitalAPRS(true);
+      setTXAPRSType(APRSType::DMR);
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
     } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      enableTXAnalogAPRS(true);
+      setTXAPRSType(APRSType::FM);
     }
 
     // Enable roaming
@@ -399,8 +404,9 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
     enableRXAPRS(false);
+    setTXAPRSType(APRSType::Off);
     if (nullptr != ac->aprsSystem()) {
-      enableTXAnalogAPRS(true);
+      setTXAPRSType(APRSType::FM);
       if (ac == ac->aprsSystem()->revertChannel()) {
         enableRXAPRS(true);
       }
@@ -425,19 +431,10 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (nullptr != ch_ext) {
     setFrequencyCorrection(ch_ext->frequencyCorrection());
 
-    if (txDigitalAPRS()) {
-      switch(ch_ext->aprsPTT()) {
-      case AnytoneChannelExtension::APRSPTT::Off: setDigitalAPRSPTTSetting(APRSPTT::Off); break;
-      case AnytoneChannelExtension::APRSPTT::Start: setDigitalAPRSPTTSetting(APRSPTT::Start); break;
-      case AnytoneChannelExtension::APRSPTT::End: setDigitalAPRSPTTSetting(APRSPTT::End); break;
-      }
-    } else if (txAnalogAPRS()) {
-      switch(ch_ext->aprsPTT()) {
-      case AnytoneChannelExtension::APRSPTT::Off: setAnalogAPRSPTTSetting(APRSPTT::Off); break;
-      case AnytoneChannelExtension::APRSPTT::Start: setAnalogAPRSPTTSetting(APRSPTT::Start); break;
-      case AnytoneChannelExtension::APRSPTT::End: setAnalogAPRSPTTSetting(APRSPTT::End); break;
-      }
-    }
+    if (APRSType::DMR == txAPRSType())
+      setDigitalAPRSPTTSetting(ch_ext->aprsPTT());
+    else if (APRSType::FM == txAPRSType())
+      setAnalogAPRSPTTSetting(ch_ext->aprsPTT());
   }
 
   return true;
