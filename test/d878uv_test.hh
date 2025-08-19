@@ -30,6 +30,7 @@ private slots:
 
   void testRegressionDefaultChannel();
   void testRegressionAutoRepeater();
+  void testRegressionVFOStep();
 
 protected:
   Config _micGainConfig;
