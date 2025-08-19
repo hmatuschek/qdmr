@@ -987,6 +987,7 @@ D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
   case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
   case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
   case FREQ_STEP_6_25kHz: return Frequency::fromkHz(6.25);
+  case FREQ_STEP_8_33kHz: return Frequency::fromkHz(8.33);
   case FREQ_STEP_10kHz: return Frequency::fromkHz(10);
   case FREQ_STEP_12_5kHz: return Frequency::fromkHz(12.5);
   case FREQ_STEP_20kHz: return Frequency::fromkHz(20);
@@ -1003,6 +1004,8 @@ D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
     setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_5kHz);
   else if (freq.inkHz() <= 6.25)
     setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_6_25kHz);
+  else if (freq.inkHz() <= 8.33)
+    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_8_33kHz);
   else if (freq.inkHz() <= 10)
     setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_10kHz);
   else if (freq.inkHz() <= 12.5)

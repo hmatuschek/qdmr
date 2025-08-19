@@ -318,11 +318,12 @@ public:
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
       FREQ_STEP_5kHz = 1,               ///< 5kHz
       FREQ_STEP_6_25kHz = 2,            ///< 6.25kHz
-      FREQ_STEP_10kHz = 3,              ///< 10kHz
-      FREQ_STEP_12_5kHz = 4,            ///< 12.5kHz
-      FREQ_STEP_20kHz = 5,              ///< 20kHz
-      FREQ_STEP_25kHz = 6,              ///< 25kHz
-      FREQ_STEP_50kHz = 7               ///< 50kHz
+      FREQ_STEP_8_33kHz = 3,            ///< 8.33kHz
+      FREQ_STEP_10kHz = 4,              ///< 10kHz
+      FREQ_STEP_12_5kHz = 5,            ///< 12.5kHz
+      FREQ_STEP_20kHz = 6,              ///< 20kHz
+      FREQ_STEP_25kHz = 7,              ///< 25kHz
+      FREQ_STEP_50kHz = 8               ///< 50kHz
     };
 
     /** DTMF signalling durations. */
