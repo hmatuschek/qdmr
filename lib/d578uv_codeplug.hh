@@ -61,9 +61,9 @@ public:
 
     // Replaced by analog scrambler settings
     /** The D578UV does not support the weak DMR encryption, hence this function returns always 0. */
-    unsigned encryptionKeyIndex() const;
+    unsigned dmrEncryptionKeyIndex() const;
     /** The D578UV does not support the weak DMR encryption, hence this function has not effect. */
-    void setEncryptionKeyIndex(unsigned idx);
+    void setDMREncryptionKeyIndex(unsigned idx);
 
     /** Returns @c true if the analog scambler is enabled. */
     virtual bool analogScambler() const;
@@ -82,11 +82,25 @@ public:
     struct Offset: public D878UVCodeplug::ChannelElement::Offset
     {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr Bit swapRxTx()                   { return {0x0009, 4}; }
-      static constexpr Bit directDuplex()               { return {0x0034, 2}; }
-      static constexpr Bit excludeFromRoaming()         { return {0x0034, 6}; }
+      static constexpr Bit swapRxTx()                      { return {0x0009, 4}; }
+      static constexpr Bit throughMode()                   { return {0x0034, 1}; }
+      static constexpr Bit bluetooth()                     { return {0x0034, 2}; }
+      static constexpr Bit noiseReduction()                { return {0x0034, 3}; }
+      static constexpr Bit interruptPriority()             { return {0x0034, 4}; }
+      static constexpr Bit roaming()                       { return {0x0034, 6}; }
+      static constexpr unsigned int fmScrambler()          { return 0x003a; }
+      static constexpr unsigned int customScrambler()      { return 0x003b; }
+      static constexpr Bit multipleKeyEncryption()         { return {0x003b, 0}; }
+      static constexpr Bit randomKey()                     { return {0x003b, 1}; }
+      static constexpr Bit sms()                           { return {0x003b, 2}; }
+      static constexpr Bit dataACK()                       { return {0x003d, 3}; }
+      static constexpr Bit autoScan()                      { return {0x003d, 4}; }
+      static constexpr Bit talkerAlias()                   { return {0x003d, 5}; }
+      static constexpr Bit advancedEncryptionType()        { return {0x003d, 6}; }
+      static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003e; }
+      static constexpr unsigned int arc4KeyIndex()         { return 0x003f; }
       // Deleted
-      static constexpr Bit ctcssPhaseReversal()         { return {0x0000, 0}; }
+      static constexpr Bit ctcssPhaseReversal()            { return {0x0000, 0}; }
       /// @endcond
     };
   };

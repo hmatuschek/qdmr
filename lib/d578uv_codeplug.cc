@@ -42,24 +42,24 @@ D578UVCodeplug::ChannelElement::enableSwapFrequencies(bool enable) {
 
 bool
 D578UVCodeplug::ChannelElement::directDuplex() const {
-  return getBit(Offset::directDuplex());
+  return getBit(Offset::throughMode());
 }
 void
 D578UVCodeplug::ChannelElement::enableDirectDuplex(bool enable) {
-  setBit(Offset::directDuplex(), enable);
+  setBit(Offset::throughMode(), enable);
 }
 
 
 bool
 D578UVCodeplug::ChannelElement::roamingEnabled() const {
   // inverted!
-  return !getBit(Offset::excludeFromRoaming());
+  return !getBit(Offset::roaming());
 }
 
 void
 D578UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted!
-  setBit(Offset::excludeFromRoaming(), !enable);
+  setBit(Offset::roaming(), !enable);
 }
 
 
@@ -77,12 +77,12 @@ D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
 
 
 unsigned
-D578UVCodeplug::ChannelElement::encryptionKeyIndex() const {
+D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
   return 0;
 }
 
 void
-D578UVCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned idx) {
+D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
   Q_UNUSED(idx)
 }
 

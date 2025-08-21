@@ -217,7 +217,7 @@ public:
   {
   public:
     /** Possible encryption types. */
-    enum class EncryptionType {
+    enum class DMREncryptionType {
       Basic = 0,
       Enhanced = 1
     };
@@ -258,18 +258,17 @@ public:
     virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
     /** Returns the encryption type. */
-    EncryptionType encryptionType() const;
+    virtual DMREncryptionType dmrEncryptionType() const;
     /** Sets the encryption type. */
-    void setEncryptionType(EncryptionType type);
-
+    virtual void setDMREncryptionType(DMREncryptionType type);
     /** Returns @c true if a DMR encryption key is set. */
-    virtual bool hasEncryptionKeyIndex() const;
+    virtual bool hasDMREncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned encryptionKeyIndex() const;
+    virtual unsigned dmrEncryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setEncryptionKeyIndex(unsigned idx);
+    virtual void setDMREncryptionKeyIndex(unsigned idx);
     /** Clears the DMR encryption key index. */
-    virtual void clearEncryptionKeyIndex();
+    virtual void clearDMREncryptionKeyIndex();
 
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
@@ -295,8 +294,8 @@ public:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
-      static Bit encryptionType()                  { return {0x0021, 6}; }
-      static unsigned int encryptionKey()          { return 0x0022; }
+      static Bit dmrEncryptionType()               { return {0x0021, 6}; }
+      static unsigned int dmrEncryptionKey()       { return 0x0022; }
       static Bit ranging()                         { return {0x0034, 0}; }
       static Bit throughMode()                     { return {0x0034, 1}; }
       static Bit dataACK()                         { return {0x0034, 2}; }
