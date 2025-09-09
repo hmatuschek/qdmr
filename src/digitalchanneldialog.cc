@@ -47,8 +47,6 @@ DigitalChannelDialog::construct() {
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
 
-  rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  txFrequency->setValidator(new QDoubleValidator(0,500,5));
   powerValue->setItemData(0, unsigned(Channel::Power::Max));
   powerValue->setItemData(1, unsigned(Channel::Power::High));
   powerValue->setItemData(2, unsigned(Channel::Power::Mid));
@@ -111,6 +109,10 @@ DigitalChannelDialog::construct() {
   channelName->setText(_myChannel->name());
   rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
   txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
+
+  updateOffsetFrequency();
+
+
   if (! _myChannel->defaultPower()) {
     powerDefault->setChecked(false); powerValue->setEnabled(true);
     switch (_myChannel->power()) {
@@ -151,6 +153,11 @@ DigitalChannelDialog::construct() {
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
   connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
+
+  connect(txFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateTxFrequency);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateRxFrequency);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateOffsetFrequency);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DigitalChannelDialog::onOffsetCurrentIndexChanged);
 }
 
 DMRChannel *
@@ -231,3 +238,104 @@ DigitalChannelDialog::onHideChannelHint() {
   hintLabel->setVisible(false);
 }
 
+void
+DigitalChannelDialog::onUpdateTxFrequency() {
+  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
+  txFrequency->setText(_myChannel->txFrequency().format());
+  updateOffsetFrequency();
+}
+
+void
+DigitalChannelDialog::onUpdateRxFrequency() {
+  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
+  rxFrequency->setText(_myChannel->rxFrequency().format());
+
+ if (_myChannel->txFrequency().isZero()) {
+      // If no previous txFrequency set, match rx frequency.
+      _myChannel->setTXFrequency(Frequency::fromString(rxFrequency->text()));
+      txFrequency->setText(_myChannel->txFrequency().format());
+  }
+
+  updateOffsetFrequency();
+}
+
+void
+DigitalChannelDialog::onUpdateOffsetFrequency() {
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
+
+  if (offsetFrequency.isPositive()) {
+    offsetComboBox->setCurrentIndex(1);
+    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
+    txFrequency->setText(txFreq.format());
+    _myChannel->setTXFrequency(txFreq);
+    offsetLineEdit->setText(offsetFrequency.format());
+    updateOffsetLabel();
+    updateComboBox();
+
+  } else if (offsetFrequency.isNegative() || offsetFrequency.isZero()) {
+    offsetComboBox->setCurrentIndex(2);
+    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
+    txFrequency->setText(txFreq.format());
+    _myChannel->setTXFrequency(txFreq);
+    offsetLineEdit->setText(offsetFrequency.format());
+    updateOffsetLabel();
+    updateComboBox();
+  }
+}
+
+void
+DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
+    Frequency txFreq;
+    FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
+
+    switch (index) {
+    case 0: { offsetFrequency = FrequencyOffset(); } break;
+    case 1: { offsetFrequency = offsetFrequency.abs(); } break;
+    case 2: { offsetFrequency = offsetFrequency.abs().invert(); } break;
+    }
+
+    txFreq = _myChannel->rxFrequency() + offsetFrequency;
+    _myChannel->setTXFrequency(txFreq);
+    txFrequency->setText(txFreq.format());
+    offsetLineEdit->setText(offsetFrequency.format());;
+    updateOffsetLabel();
+}
+
+
+void
+DigitalChannelDialog::updateOffsetFrequency() {
+  FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
+  offsetLineEdit->setText(offsetFrequency.format());
+  updateOffsetLabel();
+  updateComboBox();
+}
+
+void
+DigitalChannelDialog::updateOffsetLabel() {
+  switch (_myChannel->offsetShift()) {
+  case Channel::OffsetShift::None:
+    offsetLabel->setText("Offset");
+    break;
+  case Channel::OffsetShift::Positive:
+    offsetLabel->setText("Offset [+]");
+    break;
+  case Channel::OffsetShift::Negative:
+    offsetLabel->setText("Offset [-]");
+    break;
+  }
+}
+
+void
+DigitalChannelDialog::updateComboBox() {
+    switch (_myChannel->offsetShift()) {
+    case Channel::OffsetShift::None:
+        offsetComboBox->setCurrentIndex(0);
+        break;
+    case Channel::OffsetShift::Positive:
+        offsetComboBox->setCurrentIndex(1);
+        break;
+    case Channel::OffsetShift::Negative:
+        offsetComboBox->setCurrentIndex(2);
+        break;
+    }
+}

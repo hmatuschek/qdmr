@@ -71,6 +71,9 @@ public:
   /** Assignment. */
   FrequencyOffset &operator = (const FrequencyOffset &other);
 
+  /** Invert an offset */
+  inline FrequencyOffset invert() const { return FrequencyOffset(this->_frequency * -1); }
+
   /** Returns a positive frequency offset. */
   inline FrequencyOffset abs() const {
     return FrequencyOffset(std::abs(this->_frequency));
