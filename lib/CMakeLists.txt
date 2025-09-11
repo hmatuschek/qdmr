@@ -163,7 +163,7 @@ set_target_properties(libdmrconf PROPERTIES
   SOVERSION "${PROJECT_VERSION_MAJOR}")
 
 target_link_libraries(libdmrconf PRIVATE Qt6::Core Qt6::SerialPort Qt6::Positioning Qt6::Network
-  ${LIBUSB_1_LIBRARIES} ${YAMLCPP_LIBRARIES})
+  ${LIBUSB_1_LIBRARIES} ${YAMLCPP_LIBRARIES} ${ADDITIONAL_LIBS})
 
 install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 
