@@ -43,7 +43,7 @@ FrequencyBase::format(Format f) const {
 
 bool
 FrequencyBase::parse(const QString &value) {
-  QRegularExpression re(R"(\s*(+-|)\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
+  QRegularExpression re(R"(\s*(\+|-)?\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
   QRegularExpressionMatch match = re.match(value);
   if (! match.hasMatch())
     return false;
