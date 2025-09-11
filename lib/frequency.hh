@@ -8,9 +8,9 @@
 #include <QPair>
 
 
-/** Helper type to encode frequencies without any rounding error.
- * @ingroup utils */
-struct Frequency
+/** Common base for all frequencies. That is frequencies (positive) and frequency offsets
+ * (positive and negative). To this end, the type stores frequencies in Hz as a signed value. */
+struct FrequencyBase
 {
 public:
   /** Possible formatting hints. */
@@ -19,8 +19,81 @@ public:
   };
 
 protected:
+  /** Hidden constructor from offset in Hz. */
+  FrequencyBase(qint64 hz) : _frequency(hz) {}
+
+public:
+  /** Copy constructor. */
+  FrequencyBase(const FrequencyBase &other);
+
+  /** Assignment. */
+  FrequencyBase &operator = (const FrequencyBase &other);
+
+  /** Retruns @c true of the frequency is negative. */
+  inline bool isNegative() const { return 0 > _frequency; }
+  /** Retruns @c true of the frequency is positive. */
+  inline bool isPositive() const { return 0 < _frequency; }
+  /** Retruns @c true of the frequency is null. Also considered as "invalid". */
+  inline bool isNull() const { return 0 == _frequency; }
+
+  /** Format the frequency. */
+  QString format(Format f=Format::Automatic) const;
+  /** Parses a frequency. */
+  bool parse(const QString &value);
+
+  inline long long inHz() const { return _frequency; }             ///< Unit conversion.
+  inline double inkHz() const { return double(_frequency)/1e3; }   ///< Unit conversion.
+  inline double inMHz() const { return double(_frequency)/1e6; }   ///< Unit conversion.
+  inline double inGHz() const { return double(_frequency)/1e9; }   ///< Unit conversion.
+
+protected:
+  /** The actual frequency in Hz. */
+  qint64 _frequency;
+};
+
+
+
+/** Helper type to represent frequency differences aka offsets.
+ * @ingroup utils */
+struct FrequencyOffset: public FrequencyBase
+{
+protected:
+  /** Hidden constructor. */
+  FrequencyOffset(qint64 Hz) : FrequencyBase(Hz) { }
+
+public:
+  /** Default constructor. */
+  FrequencyOffset();
+  /** Copy constructor. */
+  FrequencyOffset(const FrequencyOffset &other);
+
+  /** Assignment. */
+  FrequencyOffset &operator = (const FrequencyOffset &other);
+
+  /** Returns a positive frequency offset. */
+  inline FrequencyOffset abs() const {
+    return FrequencyOffset(std::abs(this->_frequency));
+  }
+
+  /** Parses an offset. */
+  static FrequencyOffset fromString(const QString &freq);
+
+  static inline FrequencyOffset fromHz(qint64 Hz)   { return FrequencyOffset(Hz); }             ///< Unit conversion.
+  static inline FrequencyOffset fromkHz(double kHz) { return FrequencyOffset(kHz*1e3); }      ///< Unit conversion.
+  static inline FrequencyOffset fromMHz(double MHz) { return FrequencyOffset(MHz*1e6); }      ///< Unit conversion.
+  static inline FrequencyOffset fromGHz(double GHz) { return FrequencyOffset(GHz*1e6); }      ///< Unit conversion.
+};
+
+
+
+/** Helper type to encode frequencies without any rounding error.
+ * This is a specialization of @c FrequencyBase, enforcing a positive integer.
+ * @ingroup utils */
+struct Frequency: public FrequencyBase
+{
+protected:
   /** Hidden constructor from frequency in Hz. */
-  Frequency(unsigned long long hz);
+  Frequency(quint64 hz);
 
 public:
   /** Default constructor. */
@@ -50,27 +123,25 @@ public:
     return _frequency >= other._frequency;
   }
 
-  /** Format the frequency. */
-  QString format(Format f=Format::Automatic) const;
+  /** Frequency arithmetic. May result in an invalid frequency, if the negative offset is larger
+   * than the frequency. */
+  Frequency operator+(const FrequencyOffset &offset) const;
+  /** Frequency arithmetic. May result in an invalid frequency, if the negative offset is larger
+   * than the frequency. */
+  Frequency &operator+=(const FrequencyOffset &offset);
+  FrequencyOffset operator-(const Frequency &other) const;    ///< Frequency arithmetic.
+
   /** Parses a frequency. */
   bool parse(const QString &value);
   /** Pareses a frequency. */
   static Frequency fromString(const QString &freq);
 
-  inline unsigned long long inHz() const { return _frequency; }    ///< Unit conversion.
-  inline double inkHz() const { return double(_frequency)/1e3; }   ///< Unit conversion.
-  inline double inMHz() const { return double(_frequency)/1e6; }   ///< Unit conversion.
-  inline double inGHz() const { return double(_frequency)/1e9; }   ///< Unit conversion.
+  inline quint64 inHz() const { return _frequency; }    ///< Unit conversion.
 
-  static inline Frequency fromHz(unsigned long long Hz) { return Frequency(Hz); } ///< Unit conversion.
-  static inline Frequency fromkHz(double kHz) { return Frequency(kHz*1e3); }      ///< Unit conversion.
-  static inline Frequency fromMHz(double MHz) { return Frequency(MHz*1e6); }      ///< Unit conversion.
-  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e6); }      ///< Unit conversion.
-
-protected:
-  /** The actual frequency in Hz. */
-  unsigned long long _frequency;
-
+  static inline Frequency fromHz(quint64 Hz)  { return Frequency(Hz); }      ///< Unit conversion.
+  static inline Frequency fromkHz(double kHz) { return Frequency(kHz*1e3); } ///< Unit conversion.
+  static inline Frequency fromMHz(double MHz) { return Frequency(MHz*1e6); } ///< Unit conversion.
+  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e6); } ///< Unit conversion.
 
 public:
   /** Searches for the nearest frequency and returns an associated value. */
