@@ -33,8 +33,8 @@ public:
   inline bool isNegative() const { return 0 > _frequency; }
   /** Retruns @c true of the frequency is positive. */
   inline bool isPositive() const { return 0 < _frequency; }
-  /** Retruns @c true of the frequency is null. Also considered as "invalid". */
-  inline bool isNull() const { return 0 == _frequency; }
+  /** Retruns @c true of the frequency is zero. */
+  inline bool isZero() const { return 0 == _frequency; }
 
   /** Format the frequency. */
   QString format(Format f=Format::Automatic) const;
@@ -51,12 +51,13 @@ protected:
   qint64 _frequency;
 };
 
-
+struct Frequency;
 
 /** Helper type to represent frequency differences aka offsets.
  * @ingroup utils */
 struct FrequencyOffset: public FrequencyBase
 {
+friend struct Frequency;
 protected:
   /** Hidden constructor. */
   FrequencyOffset(qint64 Hz) : FrequencyBase(Hz) { }

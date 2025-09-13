@@ -164,6 +164,11 @@ Frequency::operator+(const FrequencyOffset &offset) const {
   return Frequency(_frequency + offset.inHz());
 }
 
+FrequencyOffset
+Frequency::operator-(const Frequency &other) const {
+  return FrequencyOffset(_frequency - other._frequency);
+}
+
 bool
 Frequency::parse(const QString &value) {
   QRegularExpression re(R"(\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?Hz|)\s*)");
