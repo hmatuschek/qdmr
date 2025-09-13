@@ -33,8 +33,11 @@ AnalogChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
-  if (settings.hideChannelNote())
+  if (settings.hideChannelNote()) {
     hintLabel->setVisible(false);
+    layout()->invalidate();
+    adjustSize();
+  }
 
   Application *app = qobject_cast<Application *>(qApp);
   FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
@@ -223,6 +226,8 @@ AnalogChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
+  layout()->invalidate();
+  adjustSize();
 }
 
 void

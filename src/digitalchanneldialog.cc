@@ -35,8 +35,11 @@ DigitalChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
-  if (settings.hideChannelNote())
+  if (settings.hideChannelNote()) {
     hintLabel->setVisible(false);
+    layout()->invalidate();
+    adjustSize();
+  }
 
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
@@ -236,6 +239,8 @@ DigitalChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
+  layout()->invalidate();
+  adjustSize();
 }
 
 void
