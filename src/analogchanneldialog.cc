@@ -260,7 +260,6 @@ AnalogChannelDialog::onUpdateOffsetFrequency() {
     txFrequency->setText(txFreq.format());
     _myChannel->setTXFrequency(txFreq);
     offsetLineEdit->setText(offsetFrequency.format());
-    updateOffsetLabel();
     updateComboBox();
     return;
   }
@@ -270,7 +269,6 @@ AnalogChannelDialog::onUpdateOffsetFrequency() {
     txFrequency->setText(txFreq.format());
     _myChannel->setTXFrequency(txFreq);
     offsetLineEdit->setText(offsetFrequency.format());
-    updateOffsetLabel();
     updateComboBox();
     return;
   }
@@ -291,30 +289,13 @@ AnalogChannelDialog::onOffsetCurrentIndexChanged(int index) {
     _myChannel->setTXFrequency(txFreq);
     txFrequency->setText(txFreq.format());
     offsetLineEdit->setText(offsetFrequency.format());;
-    updateOffsetLabel();
 }
 
 void
 AnalogChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
   offsetLineEdit->setText(offsetFrequency.format());
-  updateOffsetLabel();
   updateComboBox();
-}
-
-void
-AnalogChannelDialog::updateOffsetLabel() {
-  switch (_myChannel->offsetShift()){
-  case Channel::OffsetShift::None:
-    offsetLabel->setText("Offset");
-    break;
-  case Channel::OffsetShift::Positive:
-    offsetLabel->setText("Offset [+]");
-    break;
-  case Channel::OffsetShift::Negative:
-    offsetLabel->setText("Offset [-]");
-    break;
-  };
 }
 
 void

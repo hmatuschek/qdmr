@@ -34,7 +34,6 @@ protected:
   void construct();
 
 private:
-  void updateOffsetLabel();
   void updateComboBox();
 
 protected:

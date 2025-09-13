@@ -35,7 +35,6 @@ private slots:
   void updateOffsetFrequency();
 
 private:
-  void updateOffsetLabel();
   void updateComboBox();
 
 protected:
