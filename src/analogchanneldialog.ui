@@ -112,32 +112,8 @@
               <string/>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>-1</number>
              </property>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../build/Qt6_6_9_2-Debug/src/.qt/rcc/icons.qrc">
-                <normaloff>:/icons/dark/16x16/actions/symbol-plus.png</normaloff>:/icons/dark/16x16/actions/symbol-plus.png</iconset>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normalon>:/icons/dark/16x16/actions/symbol-minus.png</normalon>
-               </iconset>
-              </property>
-             </item>
             </widget>
            </item>
            <item>
@@ -496,9 +472,7 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../build/Qt6_6_9_2-Debug/src/.qt/rcc/icons.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

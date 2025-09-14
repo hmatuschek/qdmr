@@ -87,6 +87,10 @@ AnalogChannelDialog::construct() {
   rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
   txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
 
+  offsetComboBox->addItem("");
+  offsetComboBox->addItem(QIcon::fromTheme("symbol-plus"), "");
+  offsetComboBox->addItem(QIcon::fromTheme("symbol-minus"), "");
+
   updateOffsetFrequency();
 
   if (! _myChannel->defaultPower()) {

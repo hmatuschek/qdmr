@@ -134,31 +134,6 @@
                <height>16777215</height>
               </size>
              </property>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normalon>:/icons/dark/16x16/actions/symbol-plus.png</normalon>
-               </iconset>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normalon>:/icons/dark/16x16/actions/symbol-minus.png</normalon>
-               </iconset>
-              </property>
-             </item>
             </widget>
            </item>
            <item>
