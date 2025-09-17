@@ -219,8 +219,12 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Frequency rx = app->repeater()->get(src.row()).rxFrequency();
   Frequency tx = app->repeater()->get(src.row()).txFrequency();
   colorCode->setValue(app->repeater()->get(src.row()).colorCode());
-  txFrequency->setText(tx.format());
   rxFrequency->setText(rx.format());
+  txFrequency->setText(tx.format());
+
+  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
+  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
+  updateOffsetFrequency();
 }
 
 void
