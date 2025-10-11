@@ -4,8 +4,6 @@
 #include <QCommandLineParser>
 #include <QFile>
 
-#include <QApplication>
-
 #include "logger.hh"
 #include "radio.hh"
 #include "printprogress.hh"
@@ -34,8 +32,11 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
   showProgress();
   QObject::connect(radio, &Radio::downloadProgress, updateProgress);
 
+  TransferFlags flags;
+  flags.setBlocking(true);
+
   Config config;
-  if (! radio->startDownload(true, err)) {
+  if (! radio->startDownload(flags, err)) {
     logError() << "Codeplug download error: " << err.format();
     return -1;
   }

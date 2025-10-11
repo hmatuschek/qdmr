@@ -2,39 +2,39 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of CallsignDB::Selection
+ * Implementation of CallsignDB::Flags
  * ********************************************************************************************* */
-CallsignDB::Selection::Selection(int64_t count)
-  : _count(count)
+CallsignDB::Flags::Flags(int64_t count)
+  : TransferFlags(), _count(count)
 {
   // pass...
 }
 
-CallsignDB::Selection::Selection(const Selection &other)
-  : _count(other._count)
+CallsignDB::Flags::Flags(const Flags &other)
+  : TransferFlags(other), _count(other._count)
 {
   // pass...
 }
 
 bool
-CallsignDB::Selection::hasCountLimit() const {
+CallsignDB::Flags::hasCountLimit() const {
   return (0 <= _count);
 }
 
 size_t
-CallsignDB::Selection::countLimit() const {
+CallsignDB::Flags::countLimit() const {
   if (0 > _count)
     return std::numeric_limits<size_t>::max();
   return _count;
 }
 
 void
-CallsignDB::Selection::setCountLimit(size_t n) {
+CallsignDB::Flags::setCountLimit(size_t n) {
   _count = n;
 }
 
 void
-CallsignDB::Selection::clearCountLimit() {
+CallsignDB::Flags::clearCountLimit() {
   _count = -1;
 }
 

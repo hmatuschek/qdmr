@@ -16,7 +16,7 @@ D578UVTest::D578UVTest(QObject *parent)
 void
 D578UVTest::testBasicConfigEncoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D578UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D578UV: %1")
@@ -27,7 +27,7 @@ D578UVTest::testBasicConfigEncoding() {
 void
 D578UVTest::testBasicConfigDecoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D578UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D578UV: %1")
@@ -44,7 +44,7 @@ D578UVTest::testBasicConfigDecoding() {
 void
 D578UVTest::testChannelFrequency() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D578UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {

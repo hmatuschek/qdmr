@@ -15,7 +15,7 @@ OpenUV380CallsignDB::OpenUV380CallsignDB(QObject *parent)
 
 
 bool
-OpenUV380CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+OpenUV380CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Limit entry count

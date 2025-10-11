@@ -28,54 +28,85 @@ D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+
 bool
-D578UVCodeplug::ChannelElement::handsFree() const {
-  return getBit(0x0034, 2);
+D578UVCodeplug::ChannelElement::frequenciesSwapped() const {
+  return getBit(Offset::swapRxTx());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableSwapFrequencies(bool enable) {
+  setBit(Offset::swapRxTx(), enable);
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::directDuplex() const {
+  return getBit(Offset::throughMode());
 }
 void
-D578UVCodeplug::ChannelElement::enableHandsFree(bool enable) {
-  setBit(0x0034, 2, enable);
+D578UVCodeplug::ChannelElement::enableDirectDuplex(bool enable) {
+  setBit(Offset::throughMode(), enable);
 }
+
 
 bool
 D578UVCodeplug::ChannelElement::roamingEnabled() const {
   // inverted!
-  return !getBit(0x0034,3);
+  return !getBit(Offset::roaming());
 }
+
 void
 D578UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted!
-  setBit(0x0034, 3, !enable);
+  setBit(Offset::roaming(), !enable);
 }
+
 
 bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
   return !getBit(0x003d,3);
 }
+
 void
 D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted!
   setBit(0x003d, 3, !enable);
 }
 
+
 unsigned
 D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
   return 0;
 }
+
 void
 D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
   Q_UNUSED(idx)
 }
 
+
 bool
 D578UVCodeplug::ChannelElement::analogScambler() const {
   return getUInt8(0x003a);
 }
+
 void
 D578UVCodeplug::ChannelElement::enableAnalogScamber(bool enable) {
   setUInt8(0x003a, (enable ? 0x01 : 0x00));
 }
+
+
+bool
+D578UVCodeplug::ChannelElement::ctcssPhaseReversal() const {
+  return false;
+}
+void
+D578UVCodeplug::ChannelElement::enableCTCSSPhaseReversal(bool enable) {
+  Q_UNUSED(enable);
+}
+
 
 Channel *
 D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
@@ -87,14 +118,14 @@ D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (FMChannel *fch = ch->as<FMChannel>()) {
     if (AnytoneFMChannelExtension *ext = fch->anytoneChannelExtension()) {
       // Common settings
-      ext->enableHandsFree(handsFree());
+      ext->enableHandsFree(directDuplex());
       // FM specific settings
       ext->enableScrambler(analogScambler());
     }
   } else if (DMRChannel *dch = ch->as<DMRChannel>()) {
     if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
       // Common settings
-      ext->enableHandsFree(handsFree());
+      ext->enableHandsFree(directDuplex());
       // DMR specific extensions
     }
   }

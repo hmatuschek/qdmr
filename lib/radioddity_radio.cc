@@ -25,14 +25,14 @@ RadioddityRadio::~RadioddityRadio() {
 }
 
 bool
-RadioddityRadio::startDownload(bool blocking, const ErrorStack &err) {
+RadioddityRadio::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -42,7 +42,7 @@ RadioddityRadio::startDownload(bool blocking, const ErrorStack &err) {
 }
 
 bool
-RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+RadioddityRadio::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -55,7 +55,7 @@ RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flag
 
   _task = StatusUpload;
   _codeplugFlags = flags;
-  if (blocking) {
+  if (flags.blocking()) {
     this->run();
     return (StatusIdle == _task);
   }
@@ -66,9 +66,8 @@ RadioddityRadio::startUpload(Config *config, bool blocking, const Codeplug::Flag
 }
 
 bool
-RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+RadioddityRadio::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
   Q_UNUSED(db);
-  Q_UNUSED(blocking);
   Q_UNUSED(selection);
 
   errMsg(err) << "Radio does not support a callsign DB.";
@@ -78,8 +77,8 @@ RadioddityRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Ca
 
 
 bool
-RadioddityRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking);
+RadioddityRadio::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(flags);
 
   errMsg(err) << "Satellite config upload is not implemented yet.";
 
@@ -190,7 +189,7 @@ RadioddityRadio::upload() {
   }
 
   unsigned bcount = 0;
-  if (_codeplugFlags.updateCodePlug) {
+  if (_codeplugFlags.updateCodeplug()) {
     // If codeplug gets updated, download codeplug from device first:
     for (int n=0; n<codeplug().image(0).numElements(); n++) {
       int b0 = codeplug().image(0).element(n).address()/BSIZE;

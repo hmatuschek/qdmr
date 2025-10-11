@@ -28,7 +28,7 @@ public:
   static constexpr unsigned int size1() { return 0x48000; }
 
   /** Encodes as many entries as possible of the given user-database. */
-  bool encode(UserDatabase *calldb, const Selection &selection=Selection(),
+  bool encode(UserDatabase *calldb, const Flags &selection=Flags(),
               const ErrorStack &err=ErrorStack());
 
 public:

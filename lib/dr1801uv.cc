@@ -46,14 +46,14 @@ DR1801UV::limits() const {
 }
 
 bool
-DR1801UV::startDownload(bool blocking, const ErrorStack &err) {
+DR1801UV::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -68,7 +68,7 @@ DR1801UV::startDownload(bool blocking, const ErrorStack &err) {
 }
 
 bool
-DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+DR1801UV::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -79,7 +79,7 @@ DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
   _task = StatusUpload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -92,16 +92,16 @@ DR1801UV::startUpload(Config *config, bool blocking, const Codeplug::Flags &flag
 }
 
 bool
-DR1801UV::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking); Q_UNUSED(selection);
+DR1801UV::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(selection);
   errMsg(err) << "This device does not support a call-sign DB.";
   return false;
 }
 
 
 bool
-DR1801UV::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking);
+DR1801UV::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(flags);
 
   errMsg(err) << "Satellite config upload is not implemented yet.";
 

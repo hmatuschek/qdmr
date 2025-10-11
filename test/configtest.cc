@@ -6,6 +6,7 @@
 #include <QTest>
 #include "logger.hh"
 #include <iostream>
+#include "gd73_limits.hh"
 
 #include "configcopyvisitor.hh"
 
@@ -167,6 +168,29 @@ ConfigTest::testCTCSSNull() {
   QVERIFY(ctcssConfig.channelList()->channel(1)->is<FMChannel>());
   QCOMPARE(SelectiveCall(37, true), ctcssConfig.channelList()->channel(1)->as<FMChannel>()->rxTone());
   QCOMPARE(SelectiveCall(67.0) ,ctcssConfig.channelList()->channel(1)->as<FMChannel>()->txTone());
+}
+
+
+void
+ConfigTest::testDMRIdVerification() {
+  GD73Limits limits;
+  RadioLimitContext ctx;
+
+  ErrorStack err;
+  Config cfg;
+
+  if (! cfg.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(limits.verifyConfig(&cfg, ctx));
+  QVERIFY(ctx.maxSeverity() < RadioLimitIssue::Severity::Critical);
+
+  cfg.radioIDs()->getId(0)->setNumber(0x12345678);
+
+  QVERIFY(!limits.verifyConfig(&cfg, ctx));
+  QVERIFY(ctx.maxSeverity() == RadioLimitIssue::Severity::Critical);
 }
 
 

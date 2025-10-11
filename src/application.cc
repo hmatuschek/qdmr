@@ -80,7 +80,7 @@ Application::Application(int &argc, char *argv[])
   _translator = new QTranslator(this);
   foreach (QString language, getLanguages()) {
     logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
-    if (_translator->load("qdmr", getLocalePath(language), "", "_qt.qm")) {
+    if (_translator->load("qdmr", ":/i18n", "", "_qt.qm")) {
       this->installTranslator(_translator);
       logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
       break;
@@ -163,7 +163,7 @@ Application::isDarkMode() const {
 bool
 Application::isDarkMode(const QPalette &palette) const {
   int text_hsv_value = palette.color(QPalette::WindowText).value(),
-      bg_hsv_value = palette.color(QPalette::Background).value();
+      bg_hsv_value = palette.color(QPalette::Base).value();
   return text_hsv_value > bg_hsv_value;
 }
 
@@ -559,8 +559,10 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
 
+  TransferFlags flags; flags.setBlocking(false);
+
   ErrorStack err;
-  if (radio->startDownload(false, err)) {
+  if (radio->startDownload(flags, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
@@ -643,7 +645,10 @@ Application::uploadCodeplug() {
     return;
   }
 
-  if (radio->startUpload(intermediate, false, settings.codePlugFlags(), err)) {
+  Codeplug::Flags flags = settings.codePlugFlags();
+  flags.setBlocking(false);
+
+  if (radio->startUpload(intermediate, flags, err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
@@ -706,7 +711,8 @@ Application::uploadCallsignDB() {
   }
 
   // Assemble flags for callsign DB encoding
-  CallsignDB::Selection css;
+  CallsignDB::Flags css;
+  css.setUpdateDeviceClock(settings.updateDeviceClock());
   if (settings.limitCallSignDBEntries()) {
     logDebug() << "Limit callsign DB entries to " << settings.maxCallSignDBEntries() << ".";
     css.setCountLimit(settings.maxCallSignDBEntries());
@@ -721,7 +727,8 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   ErrorStack err;
-  if (radio->startUploadCallsignDB(_users, false, css, err)) {
+  css.setBlocking(false);
+  if (radio->startUploadCallsignDB(_users, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
@@ -761,6 +768,10 @@ Application::uploadSatellites() {
     return;
   }
 
+  Settings settings;
+  TransferFlags flags;
+  flags.setUpdateDeviceClock(settings.updateDeviceClock());
+
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setRange(0, 100); progress->setValue(0);
   progress->setVisible(true);
@@ -769,8 +780,9 @@ Application::uploadSatellites() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  ErrorStack err;
-  if (radio->startUploadSatelliteConfig(_satellites, false, err)) {
+  ErrorStack err;  
+  flags.setBlocking(false);
+  if (radio->startUploadSatelliteConfig(_satellites, flags, err)) {
     logDebug() << "Start satellite config write...";
     _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
     _mainWindow->setEnabled(false);

@@ -260,11 +260,12 @@ GD73Test::testEncryptionLimits() {
 
   {
     RadioLimitContext issues;
-    GD73Limits().verifyConfig(&config, issues);
+    QVERIFY(GD73Limits().verifyConfig(&config, issues));
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(1 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QCOMPARE(status.count(), 0);
   }
 
   // Add wrong key type
@@ -278,8 +279,9 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 
   // add a larger key
@@ -295,10 +297,111 @@ GD73Test::testEncryptionLimits() {
     GD73Limits().verifyConfig(&config, issues);
     QStringList status;
     for (int i=0; i<issues.count(); i++)
-      status.append(issues.message(i).format());
-    QVERIFY2(2 == issues.count(), status.join("\n").toLocal8Bit().constData());
+      if (RadioLimitIssue::Severity::Critical == issues.message(i).severity())
+        status.append(issues.message(i).format());
+    QVERIFY2(1 == status.count(), status.join("\n").toLocal8Bit().constData());
   }
 }
+
+
+void
+GD73Test::testChannelTypeEcoding() {
+  Config config, new_config;
+  GD73Codeplug codeplug;
+  ErrorStack err;
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+
+  {
+    DMRChannel *ch = new DMRChannel();
+    ch->setName("Channel 1");
+    ch->setRXFrequency(Frequency::fromMHz(144.0));
+    ch->setTXFrequency(Frequency::fromMHz(144.6));
+    config.channelList()->add(ch);
+  }
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  new_config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  {
+    FMChannel *ch = new FMChannel();
+    ch->setName("Channel 1");
+    ch->setRXFrequency(Frequency::fromMHz(144.0));
+    ch->setTXFrequency(Frequency::fromMHz(144.6));
+    new_config.channelList()->add(ch);
+  }
+
+  // Reencode in the same binary codeplug
+  if (! codeplug.encode(&new_config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config compare;
+  if (! codeplug.decode(&compare, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(compare.channelList()->count(), 1);
+  QVERIFY(compare.channelList()->channel(0)->is<FMChannel>());
+}
+
+
+void
+GD73Test::testPowerEcoding() {
+  Config config;
+  GD73Codeplug codeplug;
+  ErrorStack err;
+
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  DMRChannel *ch = new DMRChannel();
+  ch->setName("Channel 1");
+  ch->setRXFrequency(Frequency::fromMHz(144.0));
+  ch->setTXFrequency(Frequency::fromMHz(144.6));
+  ch->setPower(Channel::Power::High);
+  config.channelList()->add(ch);
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config compare;
+  if (! codeplug.decode(&compare, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(compare.channelList()->count(), 1);
+  QCOMPARE(compare.channelList()->channel(0)->power(), Channel::Power::High);
+}
+
+void
+GD73Test::testSquelchEcoding() {
+  Config config;
+  GD73Codeplug codeplug;
+  ErrorStack err;
+
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  config.settings()->setSquelch(1);
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config compare;
+  if (! codeplug.decode(&compare, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(compare.settings()->squelch(), 1);
+}
+
 
 QTEST_GUILESS_MAIN(GD73Test)
 

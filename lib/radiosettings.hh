@@ -5,7 +5,7 @@
 #include "channel.hh"
 
 #include "radioddity_extensions.hh"
-#include "anytone_extension.hh"
+#include "anytone_settingsextension.hh"
 #include "tyt_extensions.hh"
 
 

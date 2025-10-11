@@ -133,5 +133,36 @@ UtilsTest::testEndianess() {
 }
 
 
+void
+UtilsTest::testFrequencyNearestMap() {
+  auto map = Frequency::MapNearest<unsigned int>(
+        {
+          {Frequency::fromHz(100), 0},
+          {Frequency::fromHz(200), 1},
+          {Frequency::fromHz(300), 2},
+          {Frequency::fromHz(400), 3},
+        });
+
+  QCOMPARE(map.key(Frequency::fromHz(10)),  Frequency::fromHz(100));
+  QCOMPARE(map.key(Frequency::fromHz(100)), Frequency::fromHz(100));
+  QCOMPARE(map.key(Frequency::fromHz(110)), Frequency::fromHz(100));
+  QCOMPARE(map.key(Frequency::fromHz(160)), Frequency::fromHz(200));
+  QCOMPARE(map.key(Frequency::fromHz(200)), Frequency::fromHz(200));
+  QCOMPARE(map.key(Frequency::fromHz(210)), Frequency::fromHz(200));
+  QCOMPARE(map.key(Frequency::fromHz(360)), Frequency::fromHz(400));
+  QCOMPARE(map.key(Frequency::fromHz(400)), Frequency::fromHz(400));
+  QCOMPARE(map.key(Frequency::fromHz(410)), Frequency::fromHz(400));
+
+  QCOMPARE(map.value(Frequency::fromHz(10)),  0);
+  QCOMPARE(map.value(Frequency::fromHz(100)), 0);
+  QCOMPARE(map.value(Frequency::fromHz(110)), 0);
+  QCOMPARE(map.value(Frequency::fromHz(160)), 1);
+  QCOMPARE(map.value(Frequency::fromHz(200)), 1);
+  QCOMPARE(map.value(Frequency::fromHz(210)), 1);
+  QCOMPARE(map.value(Frequency::fromHz(360)), 3);
+  QCOMPARE(map.value(Frequency::fromHz(400)), 3);
+  QCOMPARE(map.value(Frequency::fromHz(410)), 3);
+}
+
 
 QTEST_GUILESS_MAIN(UtilsTest)

@@ -15,7 +15,7 @@ D868UVETest::D868UVETest(QObject *parent)
 void
 D868UVETest::testBasicConfigEncoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug = false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
@@ -26,7 +26,7 @@ D868UVETest::testBasicConfigEncoding() {
 void
 D868UVETest::testBasicConfigDecoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
@@ -43,7 +43,7 @@ D868UVETest::testBasicConfigDecoding() {
 void
 D868UVETest::testChannelFrequency() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
@@ -89,7 +89,7 @@ D868UVETest::testAutoRepeaterOffset() {
 
   // Encode
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());
@@ -128,7 +128,7 @@ D868UVETest::testDTMFContacts() {
 
   // Encode
   D868UVCodeplug codeplug; ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&base, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());
@@ -162,7 +162,7 @@ D868UVETest::testSMSTemplates() {
 
   ErrorStack err;
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());
@@ -184,6 +184,42 @@ D868UVETest::testSMSTemplates() {
 
 
 void
+D868UVETest::testBasicEncryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/basic_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existance of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("0123"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
+void
 D868UVETest::testRegressionSMSTemplateOffset() {
   // Regression test for issue #469, message index offset error if more than one bank is used
   // (i.e., more than 8 SMS).
@@ -196,7 +232,7 @@ D868UVETest::testRegressionSMSTemplateOffset() {
 
   ErrorStack err;
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());
@@ -225,7 +261,7 @@ D868UVETest::testRegressionSMSCount() {
 
     ErrorStack err;
     D868UVCodeplug codeplug;
-    Codeplug::Flags flags; flags.updateCodePlug=false;
+    Codeplug::Flags flags; flags.setUpdateCodeplug(false);
     if (! codeplug.encode(&config, flags, err)) {
         QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
                   .arg(err.format()).toStdString().c_str());
@@ -251,7 +287,7 @@ D868UVETest::testRegressionDefaultChannel() {
   config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
 
   D868UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
           .arg(err.format()).toStdString().c_str());

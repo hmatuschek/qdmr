@@ -4,9 +4,7 @@
 #include <QObject>
 #include <QHash>
 #include "dfufile.hh"
-
-//#include "userdatabase.hh"
-//#include "config.hh"
+#include "transferflags.hh"
 
 class Config;
 class ConfigItem;
@@ -23,23 +21,38 @@ class Codeplug: public DFUFile
 public:
   /** Certain flags passed to CodePlug::encode to control the transfer and encoding of the
    * codeplug. */
-  class Flags {
+  class Flags: public TransferFlags {
+  public:
+    /** Default constructor, enables code-plug update and disables automatic GPS/APRS and roaming. */
+    Flags();
+
   public:
     /** If @c true, the codeplug will first be downloaded from the device, updated from the
      * abstract config and then written back to the device. This maintains the user-settings
      * made within the device or manufacturer CPS. If @c false, the code-plug gets overridden
      * entirely using some default settings. Default @c true. */
-    bool updateCodePlug;
+    bool updateCodeplug() const;
+    /** Sets if the codeplug gets updated. */
+    void setUpdateCodeplug(bool enable);
+
     /** If @c true enables GPS when there is a GPS or APRS system defined that is used by any
      * channel. This may cause automatic transmissions, hence the default is @c false. */
-    bool autoEnableGPS;
+    bool autoEnableGPS() const;
+    /** Sets if the GPS gets enabled automatically. */
+    void setAutoEnableGPS(bool enable);
+
     /** If @c true enables automatic roaming when there is a roaming zone defined that is used by any
      * channel. This may cause automatic transmissions, hence the default is @c false. */
-    bool autoEnableRoaming;
+    bool autoEnableRoaming() const;
+    /** Sets if roaming gets enabled automatically. */
+    void setAutoEnableRoaming(bool enable);
 
-    /** Default constructor, enables code-plug update and disables automatic GPS/APRS and roaming. */
-    Flags();
+  protected:
+    bool _updateCodeplug;
+    bool _autoEnableGPS;
+    bool _autoEnableRoaming;
   };
+
 
   /** Represents the abstract base class of all codeplug elements.
    *

@@ -218,7 +218,7 @@ bool
 RD5RCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   GeneralSettingsElement el(data(Offset::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
   return el.fromConfig(ctx, err);
 }

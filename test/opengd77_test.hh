@@ -33,6 +33,8 @@ private slots:
   void testChannelSubTones();
   /** Regression test for #556. */
   void testChannelFixedLocation();
+  /** Regression test for #655. */
+  void testDTMFContacts();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());

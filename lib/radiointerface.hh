@@ -90,6 +90,13 @@ public:
    * this function does nothing.
    * @param err Passes an error stack to put error messages on. */
   virtual bool reboot(const ErrorStack &err=ErrorStack());
+
+  /** Some radios allow to set date and time of the internal clock during codeplug upload.
+   * This function might be re-implemented by interfaces for those radios
+   * (e.g., the OpenGD77 one).
+   * @param datetime [in] Specifies the timestamp to set.
+   * @param err Passes an error stack to put error messages on. */
+  virtual bool setDateTime(const QDateTime &datetime, const ErrorStack &err=ErrorStack());
 };
 
 #endif // RADIOINFERFACE_HH

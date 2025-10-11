@@ -16,8 +16,9 @@ int detect(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  logInfo() << "Found: '" << radio->name() << "'.";
-  delete  radio;
+  QTextStream out(stdout);
+  out << "Found: " << radio->name() << Qt::endl;
+  delete radio;
 
   return 0;
 }

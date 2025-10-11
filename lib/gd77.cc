@@ -46,7 +46,7 @@ GD77::defaultRadioInfo() {
 
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Flags &selection, const ErrorStack &err) {
   logDebug() << "Start call-sign DB upload to " << name() << "...";
   _errorStack = err;
 

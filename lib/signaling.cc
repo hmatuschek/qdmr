@@ -149,7 +149,7 @@ SelectiveCall
 SelectiveCall::parseCTCSS(const QString &text) {
   QRegularExpression re(R"(([0-9]+(?:\.[0-9]|))\s*(?:Hz|))");
   QRegularExpressionMatch match = re.match(text);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return SelectiveCall();
   return SelectiveCall(match.captured(1).toDouble());
 }
@@ -159,7 +159,7 @@ SelectiveCall
 SelectiveCall::parseDCS(const QString &text) {
   QRegularExpression re(R"(([\-iInN]?)([0-7]{1,3}))");
   QRegularExpressionMatch match = re.match(text);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return SelectiveCall();
   bool inverted = false;
   if (("-" == match.captured(1)) || ("i" == match.captured(1)) || ("I" == match.captured(1)))

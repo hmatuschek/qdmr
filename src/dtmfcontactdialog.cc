@@ -1,7 +1,7 @@
 #include "dtmfcontactdialog.hh"
 #include "ui_dtmfcontactdialog.h"
 
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include "contact.hh"
 #include "settings.hh"
 
@@ -35,7 +35,7 @@ DTMFContactDialog::construct() {
 
   ui->nameLineEdit->setText(_myContact->name());
   ui->numberLineEdit->setText(_myContact->number());
-  ui->numberLineEdit->setValidator(new QRegExpValidator(QRegExp("[0-9a-dA-D\\*#]+")));
+  ui->numberLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9a-dA-D\\*#]+")));
   ui->ringCheckBox->setChecked(_myContact->ring());
 
   ui->extensionView->setObjectName("dtmfContactExtension");

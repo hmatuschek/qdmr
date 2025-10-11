@@ -1145,7 +1145,7 @@ DR1801UVCodeplug::ZoneElement::name() const {
 }
 void
 DR1801UVCodeplug::ZoneElement::setName(const QString &name) {
-  uint8_t n = std::min(32, name.length());
+  uint8_t n = std::min(qsizetype(32), name.length());
   setUInt8(Offset::nameLength(), n);
   writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
@@ -3308,7 +3308,6 @@ DR1801UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &e
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug.";
     return false;

@@ -1,7 +1,15 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(qdmr VERSION 0.12.3)
+cmake_minimum_required(VERSION 3.20.0)
+project(qdmr VERSION 0.13.0)
 
 set(RELEASE_SUFFIX "")
+
+cmake_policy(SET CMP0100 NEW)
+cmake_policy(SET CMP0140 NEW)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
@@ -14,42 +22,39 @@ option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applica
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5UiTools REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5SerialPort REQUIRED)
-find_package(Qt5Positioning REQUIRED)
-find_package(Qt5LinguistTools REQUIRED)
+include(GNUInstallDirs)
+include(GenerateIcons)
+
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning LinguistTools)
+qt_standard_project_setup()
+
 find_package(LIBUSB_1 REQUIRED)
 find_package(YAMLCPP REQUIRED)
+find_program(CONVERT_CMD rsvg-convert DOC "SVG conversion tool (librsvg)." REQUIRED)
 
-if (${BUILD_MAN})
-  find_program(XSLTPROC_EXECUTABLE xsltproc DOC "xsltproc for man-page generation." REQUIRED)
-endif(${BUILD_MAN})
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+set(USE_FOLDERS ON)
 
-if (${BUILD_DOCS})
+
+if (BUILD_MAN)
+  find_package(DocBookXSL REQUIRED)
+  include(DocBook)
+endif()
+
+if (BUILD_DOCS)
   find_package(Doxygen REQUIRED dot)
-endif(${BUILD_DOCS})
+endif()
 
 if (${BUILD_TESTS})
-  find_package(Qt5Test REQUIRED)
+  find_package(Qt6 REQUIRED COMPONENTS Test)
 endif(${BUILD_TESTS})
 
-ADD_DEFINITIONS(${Qt5Widgets_DEFINITIONS})
-#add_definitions("-DQT_EVENT_DISPATCHER_CORE_FOUNDATION=1")
+IF (UNIX AND APPLE)
+  SET(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} "-framework IOKit -framework CoreFoundation")
+ENDIF(UNIX AND APPLE)
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-INCLUDE_DIRECTORIES(${Qt5Core_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5Widgets_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5UiTools_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5Network_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5SerialPort_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5Positioning_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${Qt5Test_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${LIBUSB_1_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${YAMLCPP_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
@@ -58,24 +63,12 @@ INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR}/lib)
 
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/src)
 
-set(CORE_LIBS ${Qt5Core_LIBRARIES} ${Qt5Core_QTMAIN_LIBRARIES} ${Qt5Network_LIBRARIES}
-  ${Qt5Positioning_LIBRARIES} ${Qt5SerialPort_LIBRARIES} ${LIBUSB_1_LIBRARIES}
-  ${YAMLCPP_LIBRARIES})
-if (${BUILD_TESTS})
-  set(CORE_LIBS ${CORE_LIBS} ${Qt5Test_LIBRARIES})
-endif(${BUILD_TESTS})
-
-set(LIBS ${CORE_LIBS} ${Qt5Widgets_LIBRARIES} ${Qt5UiTools_LIBRARIES})
-
-IF (UNIX AND APPLE)
- SET(CORE_LIBS ${CORE_LIBS} "-framework IOKit -framework CoreFoundation")
-ENDIF(UNIX AND APPLE)
 
 set(PROJECT_VERSION_STRING "\"${PROJECT_VERSION}\"")
 message(STATUS "Build version ${PROJECT_VERSION}")
 
 # Set compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -Wsign-compare")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wsign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}  -O0 -ggdb -fstack-protector -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -Wextra")
 
@@ -99,8 +92,6 @@ IF(UNIX AND APPLE)
  message(STATUS "RPATH: ${CMAKE_INSTALL_RPATH}")
 ENDIF(UNIX AND APPLE)
 
-# Directory to install translations to
-SET(LOCALE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/locale/")
 
 # Sources...
 add_subdirectory(lib)

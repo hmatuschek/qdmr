@@ -42,7 +42,7 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
       new RadioLimitList {
         { DMRRadioID::staticMetaObject, 1, 250, new RadioLimitObject {
             {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
       });
 
@@ -57,7 +57,7 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
                     (unsigned)DMRContact::GroupCall,
                     (unsigned)DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } },
         { DTMFContact::staticMetaObject, 0, 128, new RadioLimitObject {
             { "name", new RadioLimitString(1, 15, RadioLimitString::ASCII) },
@@ -81,7 +81,7 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, true)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
@@ -105,7 +105,7 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, true)},
+              {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},

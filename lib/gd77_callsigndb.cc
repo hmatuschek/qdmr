@@ -83,7 +83,7 @@ GD77CallsignDB::~GD77CallsignDB() {
 }
 
 bool
-GD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+GD77CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Limit entries to USERDB_NUM_ENTRIES

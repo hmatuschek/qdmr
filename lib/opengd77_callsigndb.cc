@@ -15,7 +15,7 @@ OpenGD77CallsignDB::OpenGD77CallsignDB(QObject *parent)
 
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+OpenGD77CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Limit entry count
