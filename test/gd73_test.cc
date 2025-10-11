@@ -326,7 +326,7 @@ GD73Test::testChannelTypeEcoding() {
 
   new_config.radioIDs()->add(new DMRRadioID("ID", 1234567));
   {
-    DMRChannel *ch = new DMRChannel();
+    FMChannel *ch = new FMChannel();
     ch->setName("Channel 1");
     ch->setRXFrequency(Frequency::fromMHz(144.0));
     ch->setTXFrequency(Frequency::fromMHz(144.6));

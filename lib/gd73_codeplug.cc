@@ -1748,6 +1748,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
         setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
+    setType(ChannelElement::Type::FM);
     switch (fm->admit()) {
     case FMChannel::Admit::Always: setAdmit(Admit::Always); break;
     case FMChannel::Admit::Tone: setAdmit(Admit::CC_CTCSS); break;
