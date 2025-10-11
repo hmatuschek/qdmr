@@ -342,29 +342,35 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
           ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
       }
     }
-
-    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+    bool hasExtension = ctx.config()->settings()->anytoneExtension();
+    bool hasStrongEncryption = hasExtension &&
         (AnytoneDMRSettingsExtension::EncryptionType::AES ==
          ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
 
-    if (hasDMREncryptionKeyIndex()) {
+    if (hasAESEncryptionKeyIndex()) {
       auto cex = dc->commercialExtension();
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
 
       if (hasStrongEncryption && (AdvancedEncryptionType::AES == advancedEncryptionType())) {
-        if (! ctx.has<AESEncryptionKey>(dmrEncryptionKeyIndex())) {
+        if (! ctx.has<AESEncryptionKey>(aesEncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no AES key with index "
-                    << dmrEncryptionKeyIndex() << " defined.";
+                    << aesEncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(dmrEncryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(aesEncryptionKeyIndex()));
         }
-      } else if (hasStrongEncryption && (AdvancedEncryptionType::ARC4 == advancedEncryptionType())) {
-        if (! ctx.has<ARC4EncryptionKey>(dmrEncryptionKeyIndex())) {
+      }
+    } else if (hasARC4EncryptionKeyIndex()) {
+      auto cex = dc->commercialExtension();
+      if (nullptr == cex)
+        dc->setCommercialExtension(cex = new CommercialChannelExtension());
+
+      if (hasStrongEncryption && (AdvancedEncryptionType::ARC4 == advancedEncryptionType())) {
+        if (! ctx.has<ARC4EncryptionKey>(arc4EncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no ARC4 key with index "
-                    << dmrEncryptionKeyIndex() << " defined.";
+                    << arc4EncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(dmrEncryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(arc4EncryptionKeyIndex()));
         }
       }
     } else if (hasDMREncryptionKeyIndex()) {
@@ -433,10 +439,11 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     }
 
     clearDMREncryptionKeyIndex();
-    clearDMREncryptionKeyIndex();
+    clearAESEncryptionKeyIndex();
+    clearARC4EncryptionKeyIndex();
 
     // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
-    bool hasStrongEncryption = (!ctx.config()->settings()->anytoneExtension()) ||
+    bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
         ( ctx.config()->settings()->anytoneExtension() &&
           (AnytoneDMRSettingsExtension::EncryptionType::AES ==
            ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
@@ -445,10 +452,10 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     if (CommercialChannelExtension *cex = dc->commercialExtension()) {
       if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
         setEncryptionType(AdvancedEncryptionType::AES);
-        setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<ARC4EncryptionKey>()) {
         setEncryptionType(AdvancedEncryptionType::ARC4);
-        setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setARC4EncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
         D868UVCodeplug::ChannelElement::setDMREncryptionType(
               D868UVCodeplug::ChannelElement::DMREncryptionType::Basic);
