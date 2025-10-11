@@ -41,7 +41,7 @@ public slots:
                    const ErrorStack &err=ErrorStack());
   /** Encodes the given user-database and uploades it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
-                             const CallsignDB::Selection &selection=CallsignDB::Selection(),
+                             const CallsignDB::Flags &selection=CallsignDB::Flags(),
                              const ErrorStack &err=ErrorStack());
 
 protected:

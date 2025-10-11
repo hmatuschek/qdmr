@@ -22,6 +22,7 @@
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
+#include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
 #include "crc32.hh"
 
@@ -81,11 +82,11 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
 
   Codeplug::Flags flags;
-  flags.updateCodePlug = false;
+  flags.setUpdateCodeplug(false);
   if (parser.isSet("auto-enable-gps"))
-    flags.autoEnableGPS = true;
+    flags.setAutoEnableGPS(true);
   if (parser.isSet("auto-enable-roaming"))
-    flags.autoEnableRoaming = true;
+    flags.setAutoEnableRoaming(true);
 
   Config config;
   ErrorStack err;
@@ -123,6 +124,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::MD2017:
     if (! encode<MD2017Codeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DM1701:
+    if (! encode<DM1701Codeplug>(config, flags, parser))
       return -1;
     break;
   case RadioInfo::RD5R:
@@ -167,6 +172,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::DMR6X2UV:
     if (! encode<DMR6X2UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DMR6X2UV2:
+    if (! encode<DMR6X2UV2Codeplug>(config, flags, parser))
       return -1;
     break;
   case RadioInfo::DR1801UV:

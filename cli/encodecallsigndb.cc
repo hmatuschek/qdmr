@@ -70,7 +70,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
               << "select those entries 'closest' to you. I.e., DMR IDs with the same prefix.";
   }
 
-  CallsignDB::Selection selection;
+  CallsignDB::Flags selection;
   if (parser.isSet("limit")) {
     bool ok=true;
     selection.setCountLimit(parser.value("limit").toUInt(&ok));
@@ -164,7 +164,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << err.format();
       return -1;
     }
-  } else if ((RadioInfo::D868UVE == radio) || (RadioInfo::D878UV == radio)){
+  } else if ((RadioInfo::D868UVE == radio) || (RadioInfo::D878UV == radio) || (RadioInfo::DMR6X2UV == radio)){
     D868UVCallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();
@@ -175,7 +175,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << err.format();
       return -1;
     }
-  } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio)){
+  } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio) || (RadioInfo::DMR6X2UV2 == radio)){
     D878UV2CallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();

@@ -152,7 +152,7 @@ GD73Limits::GD73Limits(QObject *parent)
          0, GD73Codeplug::EncryptionKeyBankElement::Limit::keys(),
          new RadioLimitObject {
            {"name", new RadioLimitIgnored()},
-           {"key", new RadioLimitStringRegEx("[0-9a-fA-F]{2,8}")}
+           {"key", new RadioLimitStringRegEx("^[0-9a-fA-F]{2,8}$", RadioLimitIssue::Critical)}
          })}
       });
 

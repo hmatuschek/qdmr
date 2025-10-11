@@ -72,6 +72,15 @@ public:
     bool talkaround() const;
     void enableTalkaround(bool enable);
 
+    /** Returns @c true, if the privacy switch is enabled. */
+    virtual bool privacySwitch() const;
+    /** Enables/disables the privacy switch. */
+    virtual void enablePrivacySwitch(bool enable);
+
+    /** Overrides TyT basic implementation to enable privacy switch, whenever encryption
+     *  is enabled for this channel. */
+    void setPrivacyType(PrivacyType type) override;
+
     /** Returns the in-call criterion for this channel. */
     virtual TyTChannelExtension::InCallCriterion inCallCriteria() const;
     /** Sets the in-call criterion for this channel. */
@@ -111,6 +120,21 @@ public:
     virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
     /** Initializes this codeplug channel from the given generic configuration. */
     virtual void fromChannelObj(const Channel *c, Context &ctx);
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public TyTCodeplug::ChannelElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit privacySwitch()          { return {0x0005, 2}; }
+      static constexpr Bit inCallCriteria()         { return {0x0005, 4}; }
+      static constexpr Bit turnOffFreq()            { return {0x0005, 6}; }
+      static constexpr unsigned int squelch()       { return 0x000f; }
+      static constexpr Bit power()                  { return {0x001e, 0}; }
+      static constexpr Bit allowInterrupt()         { return {0x001f, 2}; }
+      static constexpr Bit dualCapacityDirectMode() { return {0x001f, 3}; }
+      static constexpr Bit dcdmLeader()             { return {0x001f, 4}; }
+      /// @endcond
+    };
   };
 
   /** Implements a VFO channel for TyT radios.

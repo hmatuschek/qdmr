@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>657</width>
-    <height>540</height>
+    <width>655</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
-      <enum>Qt::RichText</enum>
+      <enum>Qt::PlainText</enum>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -86,13 +86,65 @@
           <widget class="QLineEdit" name="txFrequency"/>
          </item>
          <item row="3" column="0">
+          <widget class="QLabel" name="offsetLabel">
+           <property name="text">
+            <string>Tx Offset</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QComboBox" name="offsetComboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>62</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>62</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="currentText">
+              <string notr="true"/>
+             </property>
+             <property name="currentIndex">
+              <number>-1</number>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>
+             </property>
+             <property name="placeholderText">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="offsetLineEdit">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
           <widget class="QLabel" name="powerLabel">
            <property name="text">
             <string>Power</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
             <widget class="QComboBox" name="powerValue">
@@ -138,14 +190,14 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="txTimeoutLabel">
            <property name="text">
             <string>Tx Timeout</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
             <widget class="QSpinBox" name="totValue">
@@ -175,14 +227,14 @@
            </item>
           </layout>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="vOXLevelLabel">
            <property name="text">
             <string>VOX Level</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
             <widget class="QSpinBox" name="voxValue">
@@ -209,24 +261,24 @@
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="rxOnlyLabel">
            <property name="text">
             <string>Rx Only</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <widget class="QCheckBox" name="rxOnly"/>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="scanListLabel">
            <property name="text">
             <string>Scan List</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <widget class="QComboBox" name="scanList">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -244,7 +296,7 @@
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="txAdmitLabel">
@@ -285,6 +337,33 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QSpinBox" name="squelchValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="specialValueText">
+              <string>Open</string>
+             </property>
+             <property name="maximum">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="squelchDefault">
+             <property name="text">
+              <string>Default</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="rxToneLabel">
            <property name="text">
@@ -292,10 +371,30 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="1">
+          <widget class="SelectiveCallBox" name="rxTone" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
          <item row="3" column="0">
           <widget class="QLabel" name="txToneLabel">
            <property name="text">
             <string>Tx Tone</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="SelectiveCallBox" name="txTone" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
           </widget>
          </item>
@@ -343,53 +442,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <item>
-            <widget class="QSpinBox" name="squelchValue">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="specialValueText">
-              <string>Open</string>
-             </property>
-             <property name="maximum">
-              <number>10</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="squelchDefault">
-             <property name="text">
-              <string>Default</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="1">
-          <widget class="SelectiveCallBox" name="rxTone" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="SelectiveCallBox" name="txTone" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
@@ -408,11 +460,8 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::NoButton</set>
      </property>
     </widget>
    </item>

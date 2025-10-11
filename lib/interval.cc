@@ -26,7 +26,7 @@ bool
 Interval::parse(const QString &value) {
   QRegularExpression ex(R"(\s*([0-9]+)\s*(min|s|ms|)\s*)");
   QRegularExpressionMatch match = ex.match(value);
-  if (! match.isValid())
+  if (! match.hasMatch())
     return false;
 
   bool hasUnit = match.capturedLength(2);

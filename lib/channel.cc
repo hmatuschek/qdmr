@@ -4,18 +4,9 @@
 #include "config.hh"
 #include "scanlist.hh"
 #include "logger.hh"
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QMessageBox>
-#include <QDialogButtonBox>
-#include <QDoubleValidator>
-#include <QIntValidator>
 #include <cmath>
 #include "utils.hh"
-#include "application.hh"
-#include <QCompleter>
+//#include "application.hh"
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 #include <QRegularExpression>
@@ -112,6 +103,22 @@ Channel::setTXFrequency(Frequency freq) {
   return true;
 }
 
+FrequencyOffset
+Channel::offsetFrequency() const {
+
+    return _txFreq - _rxFreq;
+}
+
+Channel::OffsetShift
+Channel::offsetShift() const {
+    if (_rxFreq > _txFreq) {
+        return OffsetShift::Negative;
+    } else if (_txFreq > _rxFreq) {
+        return OffsetShift::Positive;
+    } else {
+        return OffsetShift::None;
+    }
+}
 
 bool
 Channel::defaultPower() const {
@@ -406,14 +413,6 @@ FMChannel::FMChannel(QObject *parent)
   connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-FMChannel::FMChannel(const FMChannel &other, QObject *parent)
-  : AnalogChannel(parent), _aprsSystem(), _anytoneExtension(nullptr)
-{
-  copy(other);
-  // Link APRS system reference
-  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
 bool
 FMChannel::copy(const ConfigItem &other) {
   const FMChannel *c = other.as<FMChannel>();
@@ -643,26 +642,6 @@ DMRChannel::DMRChannel(QObject *parent)
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
-
-  // Connect signals of references
-  connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-  connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
-}
-
-DMRChannel::DMRChannel(const DMRChannel &other, QObject *parent)
-  : DigitalChannel(parent), _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
-  _commercialExtension(nullptr), _anytoneExtension(nullptr)
-{
-  // Register default tags
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
-
-  copy(other);
 
   // Connect signals of references
   connect(&_rxGroup, SIGNAL(modified()), this, SLOT(onReferenceModified()));

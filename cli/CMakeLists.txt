@@ -1,16 +1,20 @@
-set(dmrconf_SOURCES main.cc
-	printprogress.cc detect.cc verify.cc readcodeplug.cc writecodeplug.cc encodecodeplug.cc
-  decodecodeplug.cc infofile.cc writecallsigndb.cc encodecallsigndb.cc progressbar.cc autodetect.cc)
-set(dmrconf_MOC_HEADERS )
-set(dmrconf_HEADERS
-	printprogress.hh detect.hh verify.hh readcodeplug.hh writecodeplug.hh encodecodeplug.hh
-  decodecodeplug.hh infofile.hh writecallsigndb.hh encodecallsigndb.hh progressbar.hh autodetect.hh
-	${dmrconf_MOC_HEADERS})
+qt_add_executable(dmrconf WIN32
+  main.cc
+  printprogress.cc printprogress.hh
+  detect.cc detect.hh
+  verify.cc verify.hh
+  readcodeplug.cc readcodeplug.hh
+  writecodeplug.cc writecodeplug.hh
+  encodecodeplug.cc encodecodeplug.hh
+  decodecodeplug.cc decodecodeplug.hh
+  infofile.cc infofile.hh
+  writecallsigndb.cc writecallsigndb.hh
+  encodecallsigndb.cc encodecallsigndb.hh
+  progressbar.cc progressbar.hh
+  autodetect.cc autodetect.hh)
 
-
-qt5_wrap_cpp(dmrconf_MOC_SOURCES ${dmrconf_MOC_HEADERS})
-
-add_executable(dmrconf WIN32 ${dmrconf_SOURCES} ${dmrconf_MOC_SOURCES})
-target_link_libraries(dmrconf ${CORE_LIBS} libdmrconf)
+target_link_libraries(
+  dmrconf PRIVATE Qt6::Core Qt6::SerialPort Qt6::Network Qt6::Positioning
+                  ${LIBUSB_1_LIBRARIES} ${YAMLCPP_LIBRARIES} libdmrconf)
 
 install(TARGETS dmrconf DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})

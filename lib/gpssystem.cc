@@ -3,6 +3,7 @@
 #include "channel.hh"
 #include "logger.hh"
 #include "utils.hh"
+#include <QRegularExpressionMatch>
 
 
 /* ********************************************************************************************* *
@@ -428,11 +429,13 @@ APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack 
   node["source"] = QString("%1-%2").arg(_source).arg(_srcSSID).toStdString();
 
   QStringList path;
-  QRegExp pattern("([A-Za-z0-9]+-[0-9]+)");
+  QRegularExpression pattern("([A-Za-z0-9]+-[0-9]+)");
   int idx = 0;
-  while (0 <= (idx = pattern.indexIn(_path, idx))) {
-    path.append(pattern.cap(1));
-    idx += pattern.matchedLength();
+  auto match = pattern.match(_path, idx);
+  while (match.hasMatch()) {
+    path.append(match.captured(1));
+    idx += match.capturedLength(1);
+    match = pattern.match(_path, idx);
   }
 
   if (path.count()) {
@@ -462,13 +465,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   YAML::Node sys = node.begin()->second;
   if (sys["source"] && sys["source"].IsScalar()) {
     QString source = QString::fromStdString(sys["source"].as<std::string>());
-    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
-    if (! pattern.exactMatch(source)) {
+    QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    auto match = pattern.match(source);
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << source << "' not a valid source call and SSID.";
       return false;
     }
-    setSource(pattern.cap(1), pattern.cap(2).toUInt());
+    setSource(match.captured(1), match.captured(2).toUInt());
   } else {
     errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                 << ": Cannot parse APRS system: No source call+SSID specified.";
@@ -477,13 +481,14 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
   if (sys["destination"] && sys["destination"].IsScalar()) {
     QString dest = QString::fromStdString(sys["destination"].as<std::string>());
-    QRegExp pattern("^([A-Z0-9]+)-(1?[0-9])$");
-    if (! pattern.exactMatch(dest)) {
+    QRegularExpression pattern("^([A-Z0-9]+)-(1?[0-9])$");
+    auto match = pattern.match(dest);
+    if (! match.hasMatch()) {
       errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                   << ": Cannot parse APRS system: '" << dest << "' not a valid destination call and SSID.";
       return false;
     }
-    setDestination(pattern.cap(1), pattern.cap(2).toUInt());
+    setDestination(match.captured(1), match.captured(2).toUInt());
   } else {
     errMsg(err) << sys.Mark().line << ":" << sys.Mark().column
                 << ": Cannot parse APRS system: No destination call+SSID specified.";

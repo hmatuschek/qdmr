@@ -14,6 +14,8 @@
 #include "rd5r.hh"
 #include "uv390.hh"
 #include "md2017.hh"
+#include "dm1701.hh"
+#include "gd73.hh"
 #include "gd77.hh"
 #include "opengd77.hh"
 #include "openuv380.hh"
@@ -95,6 +97,26 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
     } break;
   case RadioInfo::MD2017: {
       MD2017 radio; ErrorStack err;
+      Config *intermediate = radio.codeplug().preprocess(&config, err);
+      if (nullptr == intermediate) {
+        logError() << "Cannot pre-process codeplug: " << err.format();
+        return -1;
+      }
+      radio.limits().verifyConfig(intermediate, ctx);
+      delete intermediate;
+    } break;
+  case RadioInfo::DM1701: {
+      DM1701 radio; ErrorStack err;
+      Config *intermediate = radio.codeplug().preprocess(&config, err);
+      if (nullptr == intermediate) {
+        logError() << "Cannot pre-process codeplug: " << err.format();
+        return -1;
+      }
+      radio.limits().verifyConfig(intermediate, ctx);
+      delete intermediate;
+    } break;
+  case RadioInfo::GD73: {
+      GD73 radio; ErrorStack err;
       Config *intermediate = radio.codeplug().preprocess(&config, err);
       if (nullptr == intermediate) {
         logError() << "Cannot pre-process codeplug: " << err.format();

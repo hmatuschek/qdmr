@@ -31,11 +31,13 @@ public:
     MD2017, RT82 = MD2017,
     // Anytone devices
     D868UVE,
-    D868UV = D868UVE, // Actually a different device. Implement!
+    D868UV = D868UVE,
     DMR6X2UV,
+    DMR6X2UV2,
     D878UV,
     D878UVII,
     D578UV,
+    D578UVII = D578UV,
     // Baofeng/BTECH
     DM1701, RT84 = DM1701,
     DR1801UV

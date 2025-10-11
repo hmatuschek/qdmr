@@ -152,10 +152,6 @@ USBSerial::formatPinoutSignals() {
     return "None";
 
   QStringList res;
-  if (QSerialPort::TransmittedDataSignal & pinoutSignals())
-    res.append("Transitter Detected");
-  if (QSerialPort::ReceivedDataSignal & pinoutSignals())
-    res.append("Received Data");
   if (QSerialPort::DataTerminalReadySignal & pinoutSignals())
     res.append("Data Terminal Ready");
   if (QSerialPort::DataCarrierDetectSignal & pinoutSignals())

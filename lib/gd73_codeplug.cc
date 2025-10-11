@@ -2318,7 +2318,6 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug for Radioddity GD73.";
@@ -2376,7 +2375,6 @@ GD73Codeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
 bool
 GD73Codeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
 
   if (! decodeTimestamp(ctx, err)) {
     errMsg(err) << "Cannot decode codeplug.";

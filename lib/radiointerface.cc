@@ -28,3 +28,9 @@ RadioInterface::reboot(const ErrorStack &err) {
   Q_UNUSED(err)
   return true;
 }
+
+bool
+RadioInterface::setDateTime(const QDateTime &datetime, const ErrorStack &err) {
+  Q_UNUSED(datetime); Q_UNUSED(err);
+  return true;
+}

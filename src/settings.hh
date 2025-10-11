@@ -50,6 +50,9 @@ public:
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
 
+  bool updateDeviceClock() const;
+  void setUpdateDeviceClock(bool update);
+
   bool autoEnableGPS() const;
   void setAutoEnableGPS(bool enable);
 

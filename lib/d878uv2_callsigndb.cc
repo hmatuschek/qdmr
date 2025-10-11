@@ -14,7 +14,7 @@ D878UV2CallsignDB::D878UV2CallsignDB(QObject *parent)
 }
 
 bool
-D878UV2CallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+D878UV2CallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Determine size of call-sign DB in memory

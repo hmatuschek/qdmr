@@ -1,6 +1,8 @@
 #include "intermediaterepresentation.hh"
 #include "configobject.hh"
 #include "zone.hh"
+#include "encryptionextension.hh"
+
 
 
 /* ********************************************************************************************* *
@@ -106,17 +108,18 @@ ZoneMergeVisitor::processItem(ConfigItem *item, const ErrorStack &err) {
 }
 
 
+
 /* ********************************************************************************************* *
- * Implementation of ObjectFilterVisitor
+ * Implementation of AbstractObjectFilterVisitor
  * ********************************************************************************************* */
-ObjectFilterVisitor::ObjectFilterVisitor(const std::initializer_list<QMetaObject> &types)
-  : Visitor(), _filter(types)
+AbstractObjectFilterVisitor::AbstractObjectFilterVisitor()
+  : Visitor()
 {
   // pass...
 }
 
 bool
-ObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
+AbstractObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
   if (! propIsInstance<ConfigItem>(prop))
     return Visitor::processProperty(item, prop, err);
 
@@ -126,21 +129,20 @@ ObjectFilterVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop
   if (! prop.isWritable())
     return Visitor::processProperty(item, prop, err);
 
-  foreach (const QMetaObject &meta, _filter) {
-    ConfigItem *propItem = prop.read(item).value<ConfigItem*>();
-    const char *classname = meta.className();
-    if (propItem->inherits(classname)) {
-      prop.write(item, QVariant::fromValue<ConfigItem *>(nullptr));
-      delete propItem;
+  ConfigItem *propItem = prop.read(item).value<ConfigItem *>();
+  if (toRemove(propItem)) {
+    if (prop.write(item, QVariant(prop.metaType())))
       return true;
-    }
+    errMsg(err) << "Cannot delete instance of " << item->metaObject()->className()
+                << " from property " << prop.name() << ".";
+    return false;
   }
 
   return Visitor::processProperty(item, prop, err);
 }
 
 bool
-ObjectFilterVisitor::processList(AbstractConfigObjectList *list, const ErrorStack &err) {
+AbstractObjectFilterVisitor::processList(AbstractConfigObjectList *list, const ErrorStack &err) {
   if (qobject_cast<ConfigObjectRefList *>(list))
     return Visitor::processList(list, err);
 
@@ -150,15 +152,77 @@ ObjectFilterVisitor::processList(AbstractConfigObjectList *list, const ErrorStac
 
   QList<ConfigObject *> filtered;
   for (int i=0; i<objList->count(); i++) {
-    foreach (const QMetaObject &meta, _filter) {
-      const char *classname = meta.className();
-      if (objList->get(i)->inherits(classname))
-        filtered.append(objList->get(i));
-    }
+    if (toRemove(objList->get(i)))
+      filtered.append(objList->get(i));
   }
 
   foreach (ConfigObject *item, filtered)
     objList->del(item);
 
   return Visitor::processList(list, err);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of ObjectFilterVisitor
+ * ********************************************************************************************* */
+ObjectFilterVisitor::ObjectFilterVisitor(const std::initializer_list<QMetaObject> &types)
+  : AbstractObjectFilterVisitor(), _filter(types)
+{
+  // pass...
+}
+
+bool
+ObjectFilterVisitor::toRemove(ConfigItem *item) {
+  foreach (const QMetaObject &meta, _filter)
+    if (item->inherits(meta.className()))
+      return true;
+  return false;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of EncryptionKeyFilterVisitor::Filter
+ * ********************************************************************************************* */
+EncryptionKeyFilterVisitor::Filter::Filter(const QMetaObject &meta_type, unsigned int bits)
+  : type(meta_type), minBits(bits), maxBits(bits)
+{
+  // pass...
+}
+
+EncryptionKeyFilterVisitor::Filter::Filter(const QMetaObject &meta_type, unsigned int min_bits, unsigned int max_bits)
+  : type(meta_type), minBits(min_bits), maxBits(max_bits)
+{
+  // pass...
+}
+
+bool
+EncryptionKeyFilterVisitor::Filter::accepts(const EncryptionKey *key) const {
+  return key->inherits(type.className()) && (key->key().size()*8>=minBits)
+      && (key->key().size()*8<=maxBits);
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of EncryptionKeyFilterVisitor
+ * ********************************************************************************************* */
+EncryptionKeyFilterVisitor::EncryptionKeyFilterVisitor(const std::initializer_list<Filter> &filter)
+  : AbstractObjectFilterVisitor(), _filter(filter)
+{
+  // pass...
+}
+
+bool
+EncryptionKeyFilterVisitor::toRemove(ConfigItem *item) {
+  if (! item->is<EncryptionKey>())
+    return false;
+
+  auto key = item->as<EncryptionKey>();
+  foreach (const Filter &filter, _filter) {
+    if (filter.accepts(key))
+      return false;
+  }
+  return true;
 }
