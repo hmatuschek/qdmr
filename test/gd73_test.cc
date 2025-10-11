@@ -361,7 +361,7 @@ GD73Test::testPowerEcoding() {
   ch->setName("Channel 1");
   ch->setRXFrequency(Frequency::fromMHz(144.0));
   ch->setTXFrequency(Frequency::fromMHz(144.6));
-  ch->setPower(Channel::Power::Mid);
+  ch->setPower(Channel::Power::High);
   config.channelList()->add(ch);
 
   if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
@@ -376,7 +376,7 @@ GD73Test::testPowerEcoding() {
   }
 
   QCOMPARE(compare.channelList()->count(), 1);
-  QCOMPARE(compare.channelList()->channel(0)->power(), Channel::Power::Mid);
+  QCOMPARE(compare.channelList()->channel(0)->power(), Channel::Power::High);
 }
 
 
