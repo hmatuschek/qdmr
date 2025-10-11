@@ -19,6 +19,8 @@ private slots:
   void testFMSignaling();
   void testEncryption();
   void testEncryptionLimits();
+  void testChannelTypeEcoding(); /// regression test #672
+  void testPowerEcoding();       /// regression test #672
 };
 
 #endif // GD73TEST_HH

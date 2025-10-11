@@ -1662,6 +1662,7 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
   ch->setRXFrequency(rxFrequency());
   ch->setTXFrequency(txFrequency());
   ch->setRXOnly(rxOnly());
+  ch->setPower(power());
 
   return ch;
 }
@@ -1725,6 +1726,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
   enableRXOnly(ch->rxOnly());
   if (! ch->scanListRef()->isNull())
     setScanListIndex(ctx.index(ch->scanList()));
+  setPower(ch->power());
 
   // Dispatch by type
   if (ch->is<DMRChannel>()) {
@@ -1748,6 +1750,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
         setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
+    setType(ChannelElement::Type::FM);
     switch (fm->admit()) {
     case FMChannel::Admit::Always: setAdmit(Admit::Always); break;
     case FMChannel::Admit::Tone: setAdmit(Admit::CC_CTCSS); break;
