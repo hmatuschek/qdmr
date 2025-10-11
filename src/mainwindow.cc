@@ -48,10 +48,12 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   ui->actionWriteSatellites->setIcon(QIcon::fromTheme("device-write-satellites"));
   ui->actionEditSatellites->setIcon(QIcon::fromTheme("edit-satellites"));
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
   connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this, [=](Qt::ColorScheme scheme) {
       bool isDarkTheme = scheme == Qt::ColorScheme::Dark ? true : false;
       QIcon::setThemeName(isDarkTheme ? "dark" : "light");
   });
+#endif
 
   connect(ui->actionNewCodeplug, SIGNAL(triggered()), app, SLOT(newCodeplug()));
   connect(ui->actionOpenCodeplug, SIGNAL(triggered()), app, SLOT(loadCodeplug()));
