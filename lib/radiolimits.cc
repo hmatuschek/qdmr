@@ -173,8 +173,8 @@ RadioLimitIgnored::verifyObject(const ConfigObject *item, RadioLimitContext &con
 /* ********************************************************************************************* *
  * Implementation of RadioLimitValue
  * ********************************************************************************************* */
-RadioLimitValue::RadioLimitValue(QObject *parent)
-  : RadioLimitElement(parent)
+RadioLimitValue::RadioLimitValue(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitElement(parent), _severity(severity)
 {
   // pass...
 }
@@ -183,8 +183,8 @@ RadioLimitValue::RadioLimitValue(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of RadioLimitString
  * ********************************************************************************************* */
-RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, QObject *parent)
-  : RadioLimitValue(parent), _minLen(minLen), _maxLen(maxLen), _encoding(enc)
+RadioLimitString::RadioLimitString(int minLen, int maxLen, Encoding enc, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _minLen(minLen), _maxLen(maxLen), _encoding(enc)
 {
   // pass...
 }
@@ -198,28 +198,33 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
   }
 
   QString value = prop.read(item).toString();
+  bool success = true;
 
   if ((0<_maxLen) && (value.size() > int(_maxLen))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "String length of " << prop.name() << " ('" << value << "', " << value.size()
         << ") exceeds maximum length " << _maxLen << ".";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
   if ((0<_minLen) && (value.size() < int(_minLen))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "String length of " << prop.name() << " ('" << value << "', " << value.size()
         << ") is shorter than minimum size " << _minLen << ".";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
   if ((ASCII == _encoding) && (! qstring_is_ascii(value))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "Cannot encode string '" << value << "' in ASCII.";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   } else if ((DTMF == _encoding) && (! qstring_is_dtmf(value))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "Cannot encode string '" << value << "' in DTMF.";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
@@ -227,7 +232,7 @@ RadioLimitString::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
  * Implementation of RadioLimitStringRegEx
  * ********************************************************************************************* */
 RadioLimitStringRegEx::RadioLimitStringRegEx(const QString &pattern, RadioLimitIssue::Severity severity, QObject *parent)
-  : RadioLimitValue(parent), _severity(severity), _pattern(pattern)
+  : RadioLimitValue(severity, parent), _pattern(pattern)
 {
   // pass...
 }
@@ -240,15 +245,18 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
     return false;
   }
 
+  bool success = true;
+
   QString value = prop.read(item).toString();
   auto match = _pattern.match(value);
   if (! match.hasMatch()) {
     auto &msg = context.newMessage(_severity);
     msg << "Value '" << value << "' of property " << prop.name()
         << " does not match pattern '" << _pattern.pattern() << "'.";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
@@ -256,7 +264,7 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
  * Implementation of RadioLimitStringIgnored
  * ********************************************************************************************* */
 RadioLimitStringIgnored::RadioLimitStringIgnored(RadioLimitIssue::Severity severity, QObject *parent)
-  : RadioLimitValue(parent), _severity(severity)
+  : RadioLimitValue(severity, parent)
 {
   // pass...
 }
@@ -269,13 +277,16 @@ RadioLimitStringIgnored::verify(const ConfigItem *item, const QMetaProperty &pro
     return true;
   }
 
+  bool success = true;
+
   QVariant value = prop.read(item);
   if (! value.toString().isEmpty()) {
     auto &msg = context.newMessage(_severity);
     msg = tr("Value of '%1' is ignored. Not applicable/supported by the radio.").arg(prop.name());
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
@@ -283,7 +294,7 @@ RadioLimitStringIgnored::verify(const ConfigItem *item, const QMetaProperty &pro
  * Implementation of RadioLimitBool
  * ********************************************************************************************* */
 RadioLimitBool::RadioLimitBool(QObject *parent)
-  : RadioLimitValue(parent)
+  : RadioLimitValue(RadioLimitIssue::Severity::Hint, parent)
 {
   // pass...
 }
@@ -319,21 +330,24 @@ RadioLimitIgnoredBool::verify(const ConfigItem *item, const QMetaProperty &prop,
     return false;
   }
 
+  bool success = true;
   bool value = prop.read(item).toBool();
   if (value) {
     auto &msg = context.newMessage(_severity);
     msg << "Setting " << prop.name() << " is ignored.";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioLimitUInt
  * ********************************************************************************************* */
-RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, qint64 defValue, QObject *parent)
-  : RadioLimitValue(parent), _minValue(minValue), _maxValue(maxValue), _defValue(defValue)
+RadioLimitUInt::RadioLimitUInt(qint64 minValue, qint64 maxValue, qint64 defValue,
+                               RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _minValue(minValue), _maxValue(maxValue), _defValue(defValue)
 {
   // pass...
 }
@@ -346,27 +360,30 @@ RadioLimitUInt::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
     return false;
   }
 
+  bool success = true;
   unsigned value = prop.read(item).toUInt();
 
   if ((0<_maxValue) && (value > qint64(_maxValue)) && ((0>_defValue) || (value!=_defValue))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "Value " << value << " of " << prop.name() << " exceeds maximum " << _maxValue << ".";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
   if ((0<_minValue) && (value < qint64(_minValue)) && ((0>_defValue) || (value!=_defValue))) {
-    auto &msg = context.newMessage();
+    auto &msg = context.newMessage(_severity);
     msg << "Value " << value << " of " << prop.name() << " is smaller than minimum " << _minValue << ".";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioLimitDMRId
  * ********************************************************************************************* */
-RadioLimitDMRId::RadioLimitDMRId(QObject *parent)
-  : RadioLimitUInt(1, 16777215, -1, parent)
+RadioLimitDMRId::RadioLimitDMRId(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitUInt(1, 16777215, -1, severity, parent)
 {
   // pass...
 }
@@ -375,8 +392,8 @@ RadioLimitDMRId::RadioLimitDMRId(QObject *parent)
 /* ********************************************************************************************* *
  * Implementation of RadioLimitEnum
  * ********************************************************************************************* */
-RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent)
-  : RadioLimitValue(parent), _values(values)
+RadioLimitEnum::RadioLimitEnum(const std::initializer_list<unsigned> &values, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _values(values)
 {
   // pass...
 }
@@ -389,7 +406,9 @@ RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
     return false;
   }
 
+  bool success = true;
   unsigned value = prop.read(item).toUInt();
+
   if (! _values.contains(value)) {
     QMetaEnum e = prop.enumerator();
     QStringList possible;
@@ -400,23 +419,24 @@ RadioLimitEnum::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
     msg << "The enum value '" << e.valueToKey(value) << "' cannot be encoded. "
         << "Valid values are " << possible.join(", ") << ". "
         << "Another value might be chosen automatically.";
+    success &= (_severity < RadioLimitIssue::Severity::Critical);
   }
 
-  return true;
+  return success;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioLimitFrequencies
  * ********************************************************************************************* */
-RadioLimitFrequencies::RadioLimitFrequencies(QObject *parent)
-  : RadioLimitValue(parent), _frequencyRanges()
+RadioLimitFrequencies::RadioLimitFrequencies(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _frequencyRanges()
 {
   // pass...
 }
 
-RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, bool warnOnly, QObject *parent)
-  : RadioLimitValue(parent), _frequencyRanges(), _warnOnly(warnOnly)
+RadioLimitFrequencies::RadioLimitFrequencies(const RangeList &ranges, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _frequencyRanges()
 {
   for (auto range=ranges.begin(); range!=ranges.end(); range++) {
     _frequencyRanges.append({range->first, range->second});
@@ -443,26 +463,24 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
   if (context.ignoreFrequencyLimits())
     return true;
 
-  auto &msg = context.newMessage(RadioLimitIssue::Warning);
+  auto &msg = context.newMessage(_severity);
   msg << "Frequency " << value.inMHz() << "MHz is outside of allowed frequency ranges.";
 
-  if(_warnOnly)
-    return true;
-  return false;
+  return _severity < RadioLimitIssue::Severity::Critical;
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of RadioLimitTransmitFrequencies
  * ********************************************************************************************* */
-RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(QObject *parent)
-  : RadioLimitFrequencies(parent)
+RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitFrequencies(severity, parent)
 {
   // pass...
 }
 
-RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(const RangeList &ranges, QObject *parent)
-  : RadioLimitFrequencies(ranges, false, parent)
+RadioLimitTransmitFrequencies::RadioLimitTransmitFrequencies(const RangeList &ranges, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitFrequencies(ranges, severity, parent)
 {
   // pass...
 }

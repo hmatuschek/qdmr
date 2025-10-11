@@ -82,7 +82,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
                1, DR1801UVCodeplug::ChannelBankElement::Limit::channelNameLength(),
                RadioLimitString::ASCII)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, true)},
+                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
                                                                  {Frequency::fromHz(400.), Frequency::fromHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
@@ -110,7 +110,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
                1, DR1801UVCodeplug::ChannelBankElement::Limit::channelNameLength(),
                RadioLimitString::ASCII)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, true)},
+                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
                                                                  {Frequency::fromHz(400.), Frequency::fromHz(480.)}})},
               {"power", new RadioLimitEnum {

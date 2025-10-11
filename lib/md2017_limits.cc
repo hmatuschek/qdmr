@@ -76,7 +76,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
-                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
@@ -102,7 +102,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
             new RadioLimitObject {
               {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode)},
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
-                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, true)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
