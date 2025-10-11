@@ -42,7 +42,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
   add("radioIDs", new RadioLimitList{
         { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
             {"name", new RadioLimitString(1, 16, RadioLimitString::Unicode) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
       } );
 
@@ -56,7 +56,7 @@ MD2017Limits::MD2017Limits(QObject *parent)
                 (unsigned) DMRContact::GroupCall,
                 (unsigned) DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } },
         { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
       } );

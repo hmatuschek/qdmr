@@ -43,7 +43,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
         { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
             {"name", new RadioLimitString(
              1, DR1801UVCodeplug::SettingsElement::Limit::radioNameLength(), RadioLimitString::ASCII) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
       } );
 
@@ -59,7 +59,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
                 (unsigned) DMRContact::GroupCall,
                 (unsigned) DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } },
         { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
       } );

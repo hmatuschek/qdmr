@@ -40,7 +40,7 @@ GD73Limits::GD73Limits(QObject *parent)
       new RadioLimitList {
         { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
             {"name", new RadioLimitString(1, GD73Codeplug::SettingsElement::Limit::name(), RadioLimitString::Unicode) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
         /// @todo check default radio ID.
       });
@@ -56,7 +56,7 @@ GD73Limits::GD73Limits(QObject *parent)
                 (unsigned)DMRContact::GroupCall,
                 (unsigned)DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } }
       });
 

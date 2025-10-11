@@ -43,7 +43,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
       new RadioLimitList {
         { DMRRadioID::staticMetaObject, 1, 250, new RadioLimitObject {
             {"name", new RadioLimitString(1,8, RadioLimitString::ASCII) },
-            {"id", new RadioLimitDMRId()}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
       });
 
@@ -58,7 +58,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
                     (unsigned)DMRContact::GroupCall,
                     (unsigned)DMRContact::AllCall
               }},
-            { "number", new RadioLimitDMRId() }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } },
         { DTMFContact::staticMetaObject, -1, -1, new RadioLimitIgnored() }
       });
