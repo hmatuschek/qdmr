@@ -116,22 +116,31 @@ D878UVCodeplug::ChannelElement::setPTTIDSetting(PTTId ptt) {
 bool
 D878UVCodeplug::ChannelElement::roamingEnabled() const {
   // inverted
-  return !getBit(Offset::roamingEnabled(), 2);
+  return !getBit(Offset::roaming());
 }
 void
 D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted
-  setBit(Offset::roamingEnabled(), 2, !enable);
+  setBit(Offset::roaming(), !enable);
 }
 bool
 D878UVCodeplug::ChannelElement::dataACK() const {
   // inverted
-  return !getBit(Offset::dataACK(), 3);
+  return !getBit(Offset::dataACK());
 }
 void
 D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted
-  setBit(Offset::dataACK(), 3, !enable);
+  setBit(Offset::dataACK(),!enable);
+}
+
+bool
+D878UVCodeplug::ChannelElement::autoScan() const {
+  return getBit(Offset::autoScan());
+}
+void
+D878UVCodeplug::ChannelElement::enableAutoScan(bool enable) {
+  setBit(Offset::autoScan(), enable);
 }
 
 D878UVCodeplug::ChannelElement::APRSType
@@ -205,31 +214,76 @@ D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
   setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
 }
 
-D878UVCodeplug::ChannelElement::EncryptionType
-D878UVCodeplug::ChannelElement::encryptionType() const {
-  return getBit(Offset::encryptionType()) ? EncryptionType::ARC4 : EncryptionType::AES;
+D878UVCodeplug::ChannelElement::AdvancedEncryptionType
+D878UVCodeplug::ChannelElement::advancedEncryptionType() const {
+  return getBit(Offset::dmrEncryptionType()) ? AdvancedEncryptionType::ARC4 : AdvancedEncryptionType::AES;
 }
 
 void
-D878UVCodeplug::ChannelElement::setEncryptionType(EncryptionType type) {
-  setBit(Offset::encryptionType(), EncryptionType::ARC4 == type);
+D878UVCodeplug::ChannelElement::setEncryptionType(AdvancedEncryptionType type) {
+  setBit(Offset::dmrEncryptionType(), AdvancedEncryptionType::ARC4 == type);
 }
 
+
+D878UVCodeplug::ChannelElement::DMREncryptionType
+D878UVCodeplug::ChannelElement::dmrEncryptionType() const {
+  return DMREncryptionType::Basic;
+}
+void
+D878UVCodeplug::ChannelElement::setDMREncryptionType(DMREncryptionType type) {
+  Q_UNUSED(type);
+}
 bool
 D878UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
-  return 0 != getUInt8(Offset::dmrEncryptionKey());
+  return false;
 }
 unsigned
 D878UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(Offset::dmrEncryptionKey()) - 1;
+  return 0xff;
 }
 void
 D878UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+  Q_UNUSED(idx);
 }
 void
 D878UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
-  setUInt8(Offset::dmrEncryptionKey(), 0);
+  // pass...
+}
+
+
+bool
+D878UVCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::aesKeyIndex());
+}
+unsigned
+D878UVCodeplug::ChannelElement::aesEncryptionKeyIndex() const {
+  return getUInt8(Offset::aesKeyIndex()) - 1;
+}
+void
+D878UVCodeplug::ChannelElement::setAESEncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::aesKeyIndex(), idx+1);
+}
+void
+D878UVCodeplug::ChannelElement::clearAESEncryptionKeyIndex() {
+  setUInt8(Offset::aesKeyIndex(), 0);
+}
+
+
+bool
+D878UVCodeplug::ChannelElement::hasARC4EncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::arc4KeyIndex());
+}
+unsigned
+D878UVCodeplug::ChannelElement::arc4EncryptionKeyIndex() const {
+  return getUInt8(Offset::arc4KeyIndex()) - 1;
+}
+void
+D878UVCodeplug::ChannelElement::setARC4EncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::arc4KeyIndex(), idx+1);
+}
+void
+D878UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
+  setUInt8(Offset::arc4KeyIndex(), 0);
 }
 
 
@@ -288,29 +342,35 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
           ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
       }
     }
-
-    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+    bool hasExtension = ctx.config()->settings()->anytoneExtension();
+    bool hasStrongEncryption = hasExtension &&
         (AnytoneDMRSettingsExtension::EncryptionType::AES ==
          ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
 
-    if (hasEncryptionKeyIndex()) {
+    if (hasAESEncryptionKeyIndex()) {
       auto cex = dc->commercialExtension();
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
 
-      if (hasStrongEncryption && (EncryptionType::AES == encryptionType())) {
-        if (! ctx.has<AESEncryptionKey>(encryptionKeyIndex())) {
+      if (hasStrongEncryption && (AdvancedEncryptionType::AES == advancedEncryptionType())) {
+        if (! ctx.has<AESEncryptionKey>(aesEncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no AES key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << aesEncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(encryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(aesEncryptionKeyIndex()));
         }
-      } else if (hasStrongEncryption && (EncryptionType::ARC4 == encryptionType())) {
-        if (! ctx.has<ARC4EncryptionKey>(encryptionKeyIndex())) {
+      }
+    } else if (hasARC4EncryptionKeyIndex()) {
+      auto cex = dc->commercialExtension();
+      if (nullptr == cex)
+        dc->setCommercialExtension(cex = new CommercialChannelExtension());
+
+      if (hasStrongEncryption && (AdvancedEncryptionType::ARC4 == advancedEncryptionType())) {
+        if (! ctx.has<ARC4EncryptionKey>(arc4EncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no ARC4 key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << arc4EncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(encryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(arc4EncryptionKeyIndex()));
         }
       }
     } else if (hasDMREncryptionKeyIndex()) {
@@ -318,11 +378,11 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
 
-      if ((! hasStrongEncryption) && (D868UVCodeplug::ChannelElement::EncryptionType::Basic
-                                      == D868UVCodeplug::ChannelElement::encryptionType())){
+      if ((! hasStrongEncryption) && (D868UVCodeplug::ChannelElement::DMREncryptionType::Basic
+                                      == D868UVCodeplug::ChannelElement::dmrEncryptionType())){
         if (! ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no basic DMR key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << dmrEncryptionKeyIndex() << " defined.";
         } else {
           cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
         }
@@ -378,11 +438,12 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRXAPRS(! ext->sms());
     }
 
-    clearEncryptionKeyIndex();
     clearDMREncryptionKeyIndex();
+    clearAESEncryptionKeyIndex();
+    clearARC4EncryptionKeyIndex();
 
     // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
-    bool hasStrongEncryption = (!ctx.config()->settings()->anytoneExtension()) ||
+    bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
         ( ctx.config()->settings()->anytoneExtension() &&
           (AnytoneDMRSettingsExtension::EncryptionType::AES ==
            ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
@@ -390,14 +451,14 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply commercial extension
     if (CommercialChannelExtension *cex = dc->commercialExtension()) {
       if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
-        setEncryptionType(EncryptionType::AES);
-        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setEncryptionType(AdvancedEncryptionType::AES);
+        setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<ARC4EncryptionKey>()) {
-        setEncryptionType(EncryptionType::ARC4);
-        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setEncryptionType(AdvancedEncryptionType::ARC4);
+        setARC4EncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
-        D868UVCodeplug::ChannelElement::setEncryptionType(
-              D868UVCodeplug::ChannelElement::EncryptionType::Basic);
+        D868UVCodeplug::ChannelElement::setDMREncryptionType(
+              D868UVCodeplug::ChannelElement::DMREncryptionType::Basic);
         setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       }
     }
