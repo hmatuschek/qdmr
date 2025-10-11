@@ -379,6 +379,29 @@ GD73Test::testPowerEcoding() {
   QCOMPARE(compare.channelList()->channel(0)->power(), Channel::Power::High);
 }
 
+void
+GD73Test::testSquelchEcoding() {
+  Config config;
+  GD73Codeplug codeplug;
+  ErrorStack err;
+
+  config.radioIDs()->add(new DMRRadioID("ID", 1234567));
+  config.settings()->setSquelch(1);
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config compare;
+  if (! codeplug.decode(&compare, err)) {
+    QFAIL(QString("Cannot decode codeplug for Radioddity GD73: {}")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(compare.settings()->squelch(), 1);
+}
+
 
 QTEST_GUILESS_MAIN(GD73Test)
 

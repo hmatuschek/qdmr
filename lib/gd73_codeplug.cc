@@ -229,7 +229,8 @@ GD73Codeplug::SettingsElement::squelch() const {
 }
 void
 GD73Codeplug::SettingsElement::setSquelch(unsigned int level) {
-  setUInt8(Offset::squelchLevel(), level*9/10);
+  level = std::min(9U, level);
+  setUInt8(Offset::squelchLevel(), level);
 }
 
 bool
