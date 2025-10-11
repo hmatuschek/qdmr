@@ -40,7 +40,7 @@ GD73Limits::GD73Limits(QObject *parent)
       new RadioLimitList {
         { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
             {"name", new RadioLimitString(1, GD73Codeplug::SettingsElement::Limit::name(), RadioLimitString::Unicode) },
-            {"id", new RadioLimitUInt(0, 16777215)}
+            {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
           } }
         /// @todo check default radio ID.
       });
@@ -56,7 +56,7 @@ GD73Limits::GD73Limits(QObject *parent)
                 (unsigned)DMRContact::GroupCall,
                 (unsigned)DMRContact::AllCall
               }},
-            { "number", new RadioLimitUInt(0, 16777215) }
+            { "number", new RadioLimitDMRId(RadioLimitIssue::Severity::Hint) }
           } }
       });
 
@@ -76,7 +76,7 @@ GD73Limits::GD73Limits(QObject *parent)
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, GD73Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, true)},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
@@ -100,7 +100,7 @@ GD73Limits::GD73Limits(QObject *parent)
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, GD73Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, true)},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},

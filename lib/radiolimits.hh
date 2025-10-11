@@ -167,7 +167,12 @@ class RadioLimitValue: public RadioLimitElement
 
 protected:
   /** Hidden constructor. */
-  explicit RadioLimitValue(QObject *parent=nullptr);
+  explicit RadioLimitValue(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint,
+                           QObject *parent=nullptr);
+
+protected:
+  /** The severity of the issue, if the test fails. */
+  RadioLimitIssue::Severity _severity;
 };
 
 
@@ -195,7 +200,9 @@ public:
    * @param maxLen Specifies the maximum length of the string. If -1, check is disabled.
    * @param enc Specifies the allowed string encoding.
    * @param parent Specifies the QObject parent object. */
-  RadioLimitString(int minLen, int maxLen, Encoding enc, QObject *parent=nullptr);
+  RadioLimitString(int minLen, int maxLen, Encoding enc,
+                   RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint,
+                   QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
@@ -227,8 +234,6 @@ public:
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
-  /** Holds the severity of the issue. */
-  RadioLimitIssue::Severity _severity;
   /** Holds the regular expression pattern. */
   QRegularExpression _pattern;
 };
@@ -242,13 +247,9 @@ class RadioLimitStringIgnored: public RadioLimitValue {
 
 public:
   /** Constructor. */
-  RadioLimitStringIgnored(RadioLimitIssue::Severity severity=RadioLimitIssue::Hint, QObject *parent=nullptr);
+  RadioLimitStringIgnored(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint, QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
-
-protected:
-  /** Holds the severity of the message. */
-  RadioLimitIssue::Severity _severity;
 };
 
 
@@ -300,7 +301,9 @@ public:
    * @param maxValue Specifies the maximum value. If -1, no check is performed.
    * @param defValue Specifies the default value. If -1, no default value is set.
    * @param parent Specifies the QObject parent. */
-  RadioLimitUInt(qint64 minValue=-1, qint64 maxValue=-1, qint64 defValue=-1, QObject *parent=nullptr);
+  RadioLimitUInt(qint64 minValue=-1, qint64 maxValue=-1, qint64 defValue=-1,
+                 RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint,
+                 QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
@@ -324,7 +327,8 @@ class RadioLimitDMRId: public RadioLimitUInt
 public:
   /** Constructor.
    * @param parent Specifies the QObject parent. */
-  explicit RadioLimitDMRId(QObject *parent=nullptr);
+  explicit RadioLimitDMRId(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint,
+                           QObject *parent=nullptr);
 };
 
 
@@ -336,7 +340,9 @@ class RadioLimitEnum: public RadioLimitValue
 
 public:
   /** Constructor from initializer list of possible enum values. */
-  RadioLimitEnum(const std::initializer_list<unsigned> &values, QObject *parent=nullptr);
+  RadioLimitEnum(const std::initializer_list<unsigned> &values,
+                 RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Hint,
+                 QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
@@ -358,17 +364,18 @@ public:
 
 public:
   /** Empty constructor. */
-  explicit RadioLimitFrequencies(QObject *parent=nullptr);
+  explicit RadioLimitFrequencies(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                                 QObject *parent=nullptr);
   /** Constructor from initializer list. */
-  RadioLimitFrequencies(const RangeList &ranges, bool warnOnly=false, QObject *parent=nullptr);
+  RadioLimitFrequencies(const RangeList &ranges,
+                        RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                        QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 
 protected:
   /** Holds the frequency ranges for the device. */
   QList<FrequencyRange> _frequencyRanges;
-  /** If @c true, throw only a warning. */
-  bool _warnOnly;
 };
 
 
@@ -381,9 +388,12 @@ class RadioLimitTransmitFrequencies: public RadioLimitFrequencies
 
 public:
   /** Empty constructor. */
-  explicit RadioLimitTransmitFrequencies(QObject *parent=nullptr);
+  explicit RadioLimitTransmitFrequencies(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                                         QObject *parent=nullptr);
   /** Constructor from initializer list. */
-  RadioLimitTransmitFrequencies(const RangeList &ranges, QObject *parent=nullptr);
+  RadioLimitTransmitFrequencies(const RangeList &ranges,
+                                RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                                QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
 };
