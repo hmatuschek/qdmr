@@ -36,7 +36,7 @@ ChannelListView::~ChannelListView() {
 
 void
 ChannelListView::onAddAnalogChannel() {
-  AnalogChannelDialog dialog(_config);
+  AnalogChannelDialog dialog(_config, parentWidget());
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -48,7 +48,7 @@ ChannelListView::onAddAnalogChannel() {
 
 void
 ChannelListView::onAddDigitalChannel() {
-  DigitalChannelDialog dialog(_config);
+  DigitalChannelDialog dialog(_config, parentWidget());
   if (QDialog::Accepted != dialog.exec())
     return;
 

@@ -27,6 +27,16 @@ protected slots:
   void onVOXDefaultToggled(bool checked);
   void onHideChannelHint();
 
+private slots:
+  void onUpdateRxFrequency();
+  void onUpdateTxFrequency();
+  void onUpdateOffsetFrequency();
+  void onOffsetCurrentIndexChanged(int index);
+  void updateOffsetFrequency();
+
+private:
+  void updateComboBox();
+
 protected:
   Config *_config;
   FMChannel *_myChannel;
