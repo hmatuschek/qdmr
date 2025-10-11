@@ -86,7 +86,7 @@ generate_icons(
         edit-move-10-down edit-move-10-up edit-move-down edit-move-up edit-move-bottom edit-move-top
         edit-satellites
         help-contents help-about
-        symbol-minus symbol-plus
+        symbol-minus symbol-plus symbol-none
   THEMES light dark
   CONTEXT actions
   SIZES 16 32)
