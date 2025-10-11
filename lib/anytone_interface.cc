@@ -2,8 +2,10 @@
 #include "logger.hh"
 #include <QtEndian>
 
-#define USB_VID 0x28e9
-#define USB_PID 0x018a
+#define USB_VID_OLD 0x28e9
+#define USB_PID_OLD 0x018a
+#define USB_VID_NEW 0x2e3c
+#define USB_PID_NEW 0x5740
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::ReadRequest
@@ -112,13 +114,14 @@ AnytoneInterface::~AnytoneInterface() {
 
 USBDeviceInfo
 AnytoneInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID_OLD, USB_PID_OLD);
 }
 
 QList<USBDeviceDescriptor>
 AnytoneInterface::detect(bool saveOnly) {
   Q_UNUSED(saveOnly);
-  return USBSerial::detect(USB_VID, USB_PID, true);
+  return USBSerial::detect(USB_VID_OLD, USB_PID_OLD, true)
+      + USBSerial::detect(USB_VID_NEW, USB_PID_NEW, true);
 }
 
 
@@ -154,7 +157,10 @@ AnytoneInterface::identifier(const ErrorStack &err) {
     return RadioInfo::byID(RadioInfo::D878UVII);
   } else if ("D578UV" == _info.name) {
     return RadioInfo::byID(RadioInfo::D578UV);
+  }  else if ("D578UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UVII);
   }
+
 
   errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
                  .arg(_info.name).arg(_info.version);

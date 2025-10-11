@@ -8,8 +8,10 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", MODE="660",
 # Radioddity GD-77
 SUBSYSTEM=="usb", ATTRS{idVendor}=="15a2", ATTRS{idProduct}=="0073", MODE="660", GROUP="dialout"
 
-# Anytone AT-D868UV, AT-D878UV, etc
 # Ignore this device in Modem Manager
+# Anytone AT-D868UV, AT-D878UV, AT-D578UV
 ATTRS{idVendor}=="28e9" ATTRS{idProduct}=="018a", ENV{ID_MM_DEVICE_IGNORE}="1"
+# Anytone AT-D578UVII
+ATTRS{idVendor}=="2e3c" ATTRS{idProduct}=="5740", ENV{ID_MM_DEVICE_IGNORE}="1"
 # also for DR-1801UV
 ATTRS{idVendor}=="067b" ATTRS{idProduct}=="23a3", ENV{ID_MM_DEVICE_IGNORE}="1"
