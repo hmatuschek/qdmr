@@ -35,6 +35,8 @@ private slots:
   void testChannelFixedLocation();
   /** Regression test for #655. */
   void testDTMFContacts();
+  /** Regression test for #697. */
+  void testChannelTransmitTimeout();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());
