@@ -2410,7 +2410,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="82"/>
+        <location filename="../src/mainwindow.cc" line="103"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
@@ -2500,64 +2500,94 @@
         <translation>Schreibt die Bahnelemente und Transponderinformationen auf das angeschlossene Gerät.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="96"/>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="70"/>
+        <source>Cannot update callsign DB: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="73"/>
+        <source>Callsign database updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="78"/>
+        <source>Cannot update talkgroup DB: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="81"/>
+        <source>Talkgroup database updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="86"/>
+        <source>Cannot update orbital elements: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="89"/>
+        <source>Orbital elements updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="117"/>
+        <location filename="../src/mainwindow.cc" line="159"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="98"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Contacts</source>
         <translation>Kontakte</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="100"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
         <source>Group Lists</source>
         <translation>Empfangsgruppen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Channels</source>
         <translation>Kanäle</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="104"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Zones</source>
         <translation>Zonen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="106"/>
+        <location filename="../src/mainwindow.cc" line="127"/>
         <source>Scan Lists</source>
         <translation>Scanlisten</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="108"/>
+        <location filename="../src/mainwindow.cc" line="129"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="110"/>
+        <location filename="../src/mainwindow.cc" line="131"/>
         <source>Roaming Channels</source>
         <translation>Roamingkanäle</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="113"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Zones</source>
         <translation>Roamingzonen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="152"/>
+        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="173"/>
         <source>Extensions</source>
         <translation>Erweiterungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="169"/>
+        <location filename="../src/mainwindow.cc" line="190"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Nicht gespeicherte Änderungen am Codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="170"/>
+        <location filename="../src/mainwindow.cc" line="191"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Es gibt nicht gespeicherte Änderungen am Codeplug. Diese gehen verloren, wenn Sie fortfahren.</translation>
     </message>
@@ -3690,6 +3720,11 @@
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
         <translation>Codeplug verifizieren</translation>
+    </message>
+    <message>
+        <location filename="../src/verifydialog.ui" line="20"/>
+        <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
