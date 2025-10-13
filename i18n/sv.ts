@@ -2409,7 +2409,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="82"/>
+        <location filename="../src/mainwindow.cc" line="103"/>
         <source>Settings</source>
         <translation>Inställningar</translation>
     </message>
@@ -2499,64 +2499,94 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="96"/>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="70"/>
+        <source>Cannot update callsign DB: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="73"/>
+        <source>Callsign database updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="78"/>
+        <source>Cannot update talkgroup DB: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="81"/>
+        <source>Talkgroup database updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="86"/>
+        <source>Cannot update orbital elements: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="89"/>
+        <source>Orbital elements updated &amp; loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="117"/>
+        <location filename="../src/mainwindow.cc" line="159"/>
         <source>Radio IDs</source>
         <translation type="unfinished">Radio ID-nummrar</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="98"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Contacts</source>
         <translation type="unfinished">Kontakter</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="100"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
         <source>Group Lists</source>
         <translation type="unfinished">Grupplistor</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Channels</source>
         <translation type="unfinished">Kanaler</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="104"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Zones</source>
         <translation type="unfinished">Zoner</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="106"/>
+        <location filename="../src/mainwindow.cc" line="127"/>
         <source>Scan Lists</source>
         <translation type="unfinished">Scan Lists</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="108"/>
+        <location filename="../src/mainwindow.cc" line="129"/>
         <source>GPS/APRS</source>
         <translation type="unfinished">GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="110"/>
+        <location filename="../src/mainwindow.cc" line="131"/>
         <source>Roaming Channels</source>
         <translation type="unfinished">Roaming-kanaler</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="113"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Zones</source>
         <translation type="unfinished">Roamingzoner</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="152"/>
+        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="173"/>
         <source>Extensions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="169"/>
+        <location filename="../src/mainwindow.cc" line="190"/>
         <source>Unsaved changes to codeplug.</source>
         <translation type="unfinished">Ej sparade ändringar i codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="170"/>
+        <location filename="../src/mainwindow.cc" line="191"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation type="unfinished">Det finns osparade ändringar av den aktuella kodpluggen. Dessa ändringar går förlorade om du fortsätter.</translation>
     </message>
@@ -3693,6 +3723,11 @@
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
         <translation>Verifiera Codeplug</translation>
+    </message>
+    <message>
+        <location filename="../src/verifydialog.ui" line="20"/>
+        <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

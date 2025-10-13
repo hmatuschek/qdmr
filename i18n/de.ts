@@ -489,17 +489,17 @@
     <message>
         <location filename="../src/analogchanneldialog.cc" line="91"/>
         <source>No offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Ablage (simplex)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.cc" line="93"/>
         <source>Positive offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive Ablage</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.cc" line="95"/>
         <source>Negative offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative Ablage</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="20"/>
@@ -534,7 +534,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="91"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Ablage</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="143"/>
@@ -1237,7 +1237,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="479"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1581,7 +1581,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="672"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="690"/>
@@ -1606,7 +1606,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="698"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -1760,17 +1760,17 @@
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="117"/>
         <source>No offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Ablage (simplex)</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="119"/>
         <source>Positive offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive Ablage</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="121"/>
         <source>Negative offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative Ablage</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="20"/>
@@ -1830,7 +1830,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="111"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Ablage</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="172"/>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="82"/>
+        <location filename="../src/mainwindow.cc" line="103"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
@@ -2500,64 +2500,94 @@
         <translation>Schreibt die Bahnelemente und Transponderinformationen auf das angeschlossene Gerät.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="96"/>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="70"/>
+        <source>Cannot update callsign DB: %1</source>
+        <translation>Kann Rufzeichendatenbank nicht aktualisieren: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="73"/>
+        <source>Callsign database updated &amp; loaded.</source>
+        <translation>Rufzeichendatenbank aktualisiert &amp; geladen.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="78"/>
+        <source>Cannot update talkgroup DB: %1</source>
+        <translation>Kann Sprechgruppendatenbank nicht aktualisieren: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="81"/>
+        <source>Talkgroup database updated &amp; loaded.</source>
+        <translation>Sprechgruppendatenbank aktualisiert &amp; geladen.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="86"/>
+        <source>Cannot update orbital elements: %1</source>
+        <translation>Kann Orbitalelemente nicht aktualisieren: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="89"/>
+        <source>Orbital elements updated &amp; loaded.</source>
+        <translation>Orbitalelemente aktualisiert &amp; geladen.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="117"/>
+        <location filename="../src/mainwindow.cc" line="159"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="98"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Contacts</source>
         <translation>Kontakte</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="100"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
         <source>Group Lists</source>
         <translation>Empfangsgruppen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Channels</source>
         <translation>Kanäle</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="104"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Zones</source>
         <translation>Zonen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="106"/>
+        <location filename="../src/mainwindow.cc" line="127"/>
         <source>Scan Lists</source>
         <translation>Scanlisten</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="108"/>
+        <location filename="../src/mainwindow.cc" line="129"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="110"/>
+        <location filename="../src/mainwindow.cc" line="131"/>
         <source>Roaming Channels</source>
         <translation>Roamingkanäle</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="113"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Zones</source>
         <translation>Roamingzonen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="152"/>
+        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="173"/>
         <source>Extensions</source>
         <translation>Erweiterungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="169"/>
+        <location filename="../src/mainwindow.cc" line="190"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Nicht gespeicherte Änderungen am Codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="170"/>
+        <location filename="../src/mainwindow.cc" line="191"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Es gibt nicht gespeicherte Änderungen am Codeplug. Diese gehen verloren, wenn Sie fortfahren.</translation>
     </message>
@@ -2718,7 +2748,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="822"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -2907,7 +2937,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="961"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Keine]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="976"/>
@@ -2927,7 +2957,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="979"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -3081,7 +3111,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="563"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Keine]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="578"/>
@@ -3106,7 +3136,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="584"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="580"/>
@@ -3616,7 +3646,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="306"/>
         <source>Update Device Clock</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräteuhr stellen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="329"/>
@@ -3690,6 +3720,11 @@
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
         <translation>Codeplug verifizieren</translation>
+    </message>
+    <message>
+        <location filename="../src/verifydialog.ui" line="20"/>
+        <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
+        <translation>Der Codeplug kann nicht geschrieben werden, solange nicht all kritischen Probleme (rot) aufgelöst wurden.</translation>
     </message>
 </context>
 <context>
