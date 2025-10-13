@@ -146,5 +146,5 @@ D878UV::limits() const {
 RadioInfo
 D878UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone", AnytoneInterface::interfaceInfo());
+        RadioInfo::D878UV, "d878uv", "AT-D878UV", "AnyTone", {AnytoneGD32Interface::interfaceInfo()});
 }

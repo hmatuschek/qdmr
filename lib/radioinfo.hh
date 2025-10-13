@@ -46,11 +46,11 @@ public:
 public:
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-            const USBDeviceInfo &interface,
+            const QSet<USBDeviceInfo> &interfaces,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
-            const USBDeviceInfo &interface,
+            const QSet<USBDeviceInfo> &interfaces,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
 
   /** Empty constructor. */
@@ -66,7 +66,7 @@ public:
   /** Returns the manufacturer name. */
   const QString &manufacturer() const;
   /** Returns some information about the interface to the radio. */
-  const USBDeviceInfo &interface() const;
+  bool interfaceMatches(const USBDeviceInfo &other) const;
 
   /** Returns @c true if the radio has aliases.
    * That is other radios that are identical. */
@@ -102,7 +102,7 @@ protected:
   /** Holds possible identical radios from other manufacturers. */
   QList<RadioInfo> _alias;
   /** Holds some information about the interface to the radio. */
-  USBDeviceInfo _interface;
+  QSet<USBDeviceInfo> _interfaces;
 
 protected:
   /** Key->ID map. */
