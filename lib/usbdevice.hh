@@ -237,4 +237,18 @@ protected:
   QVariant _device;
 };
 
+
+namespace std {
+template <> struct hash<USBDeviceInfo>
+{
+  // seed is optional
+  inline size_t operator()(const USBDeviceInfo &key, size_t seed = 0) const {
+    return qHash((unsigned)key.interfaceClass(),
+                 qHash(key.vendorId(),
+                       qHash(key.productId(),
+                             qHash(key.isSave(), seed))));
+  }
+};
+}
+
 #endif // USBDEVICE_HH
