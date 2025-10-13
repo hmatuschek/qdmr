@@ -60,6 +60,11 @@ RadioLimitIssue::message() const {
   return _message;
 }
 
+const QStringList &
+RadioLimitIssue::stack() const {
+  return _stack;
+}
+
 QString
 RadioLimitIssue::format() const {
   QString res; QTextStream stream(&res);
@@ -69,7 +74,7 @@ RadioLimitIssue::format() const {
   case Warning: stream << "Warn: "; break;
   case Critical: stream << "Crit: "; break;
   }
-  stream << "In " << _stack.join(", ") << ": " << _message;
+  stream << _stack.join(", ") << ": " << _message;
   stream.flush();
   return res;
 }
@@ -544,7 +549,7 @@ RadioLimitItem::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   if (prop.read(item).isNull())
     return true;
 
-  context.push(QString("Property '%1'").arg(prop.name()));
+  context.push(QString("In property '%1'").arg(prop.name()));
   bool success = verifyItem(prop.read(item).value<ConfigItem*>(), context);
   context.pop();
   return success;
@@ -587,9 +592,9 @@ RadioLimitObject::RadioLimitObject(const PropList &list, QObject *parent)
 
 bool
 RadioLimitObject::verifyObject(const ConfigObject *item, RadioLimitContext &context) const {
-  //context.push(QString("Object '%1'").arg(item->name()));
+  context.push(QString("In object '%1'").arg(item->name()));
   bool success = verifyItem(item, context);
-  //context.pop();
+  context.pop();
   return success;
 }
 
@@ -743,7 +748,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
   foreach (QString type, _elements.keys())
     counts.insert(type,0);
 
-  context.push(QString("List '%1'").arg(prop.name()));
+  context.push(QString("In list '%1'").arg(prop.name()));
 
   // Check type and structure
   for (int i=0; i<plist->count(); i++) {
@@ -760,7 +765,7 @@ RadioLimitList::verify(const ConfigItem *item, const QMetaProperty &prop, RadioL
 
     counts[className]++;
 
-    context.push(QString("Element %1 ('%2')").arg(i).arg(obj->name()));
+    context.push(QString("In element %1 ('%2')").arg(i).arg(obj->name()));
     if (! _elements[className]->verifyObject(obj, context)) {
       context.pop();
       context.pop();

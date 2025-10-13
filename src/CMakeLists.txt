@@ -91,6 +91,13 @@ generate_icons(
   CONTEXT actions
   SIZES 16 32)
 
+generate_icons(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
+  ICONS symbol-info symbol-warning symbol-error
+  THEMES light dark
+  CONTEXT emblems
+  SIZES 16 32)
+
 qt_add_resources(qdmr "icons"
   PREFIX "icons"
   BASE "${CMAKE_CURRENT_BINARY_DIR}/icons"

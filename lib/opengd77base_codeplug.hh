@@ -96,6 +96,13 @@ public:
     /** Clears the power setting. The global power setting is used. */
     virtual void clearPower();
 
+    /** Returns the transmit timeout.
+     * An invalid interval indicates an infinite timeout. */
+    virtual Interval transmitTimeout() const;
+    /** Sets a transmit timeout.
+     * To disable the timeout, set an invalid interval. */
+    virtual void setTransmitTimeout(const Interval &interval);
+
     /** Returns @c true, if a fixed position is set for the channel. */
     virtual bool hasFixedPosition() const;
     /** Returns the fixed position. */
@@ -239,6 +246,7 @@ public:
       static constexpr unsigned int mode() { return 0x0018; }
       static constexpr unsigned int power() { return 0x0019; }
       static constexpr unsigned int latitude0() { return 0x001a; }
+      static constexpr unsigned int txTimeout() { return 0x001b; }
       static constexpr unsigned int latitude1() { return 0x001c; }
       static constexpr unsigned int latitude2() { return 0x001d; }
       static constexpr unsigned int longitude0() { return 0x001e; }

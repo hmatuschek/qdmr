@@ -1,7 +1,11 @@
 [Icon Theme]
-Name = "Dark Theme"
-Comment = "Icon theme for dark modes."
-Directories = 16x16/actions, 16x16/apps, 32x32/actions, 32x32/apps 48x48/apps, 64x64/apps, scalable/actions, scalable/apps
+Name = "Light Theme"
+Comment = "Default light icon theme."
+Directories = 16x16/emblems 16x16/actions, 16x16/apps, 32x32/emblems 32x32/actions, 32x32/apps 48x48/apps, 64x64/apps, scalable/emblems scalable/actions, scalable/apps
+
+[16x16/emblems]
+Size=16
+Context=Emblems
 
 [16x16/actions]
 Size=16
@@ -10,6 +14,10 @@ Context=Actions
 [16x16/apps]
 Size=16
 Context=Applications
+
+[32x32/emblems]
+Size=32
+Context=Emblems
 
 [32x32/actions]
 Size=32
@@ -26,6 +34,13 @@ Context=Applications
 [64x64/apps]
 Size=64
 Context=Applications
+
+[scalable/emblems]
+Size=8
+Type=Scalable
+MinSize=1
+MaxSize=1024
+Context=Emblems
 
 [scalable/actions]
 Size=8
