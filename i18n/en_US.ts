@@ -489,17 +489,17 @@
     <message>
         <location filename="../src/analogchanneldialog.cc" line="91"/>
         <source>No offset</source>
-        <translation type="unfinished"></translation>
+        <translation>No offset</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.cc" line="93"/>
         <source>Positive offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive offset</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.cc" line="95"/>
         <source>Negative offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative offset</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="20"/>
@@ -534,7 +534,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="91"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tx Offset</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="143"/>
@@ -1227,7 +1227,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="479"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="467"/>
@@ -1581,7 +1581,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="672"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="690"/>
@@ -1606,7 +1606,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="698"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1760,17 +1760,17 @@
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="117"/>
         <source>No offset</source>
-        <translation type="unfinished"></translation>
+        <translation>No offset</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="119"/>
         <source>Positive offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positive offset</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="121"/>
         <source>Negative offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Negative offset</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="20"/>
@@ -1830,7 +1830,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="111"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tx Offset</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="172"/>
@@ -2718,7 +2718,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="822"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -2907,7 +2907,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="961"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="976"/>
@@ -2927,7 +2927,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="979"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -3081,7 +3081,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="563"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="578"/>
@@ -3111,7 +3111,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="584"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="581"/>
@@ -3616,7 +3616,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="306"/>
         <source>Update Device Clock</source>
-        <translation type="unfinished"></translation>
+        <translation>Update Device Clock</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="329"/>
