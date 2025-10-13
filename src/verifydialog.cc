@@ -2,45 +2,65 @@
 #include "radiolimits.hh"
 #include "application.hh"
 #include <QPushButton>
+#include <QLabel>
+
 
 VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget *parent)
     : QDialog(parent)
 {
 	setupUi(this);
+  uploadMessage->setVisible(false);
+
+  // Sort issues by severity
+  QList<RadioLimitIssue> issueList;
+  for (int i=0; i<issues.count(); i++)
+    issueList.append(issues.message(i));
+  std::sort(issueList.begin(), issueList.end(), [](const RadioLimitIssue &a, const RadioLimitIssue &b) {
+    return a.severity() > b.severity();
+  });
 
   Application *app = qobject_cast<Application *>(QApplication::instance());
-
   bool valid = true;
-  for (int i=0; i<issues.count(); i++) {
-    const RadioLimitIssue &issue = issues.message(i);
-    QListWidgetItem *item = new QListWidgetItem(issue.message());
+  foreach(auto issue, issueList) {
+    auto item = new QTreeWidgetItem(treeWidget);
+    auto label = new QLabel(issue.message());
+    label->setMargin(5);
+    label->setWordWrap(true);
+    treeWidget->setItemWidget(item, 0, label);
     // Dispatch by severity
     switch (issue.severity()) {
     case RadioLimitIssue::Silent:
       break;
     case RadioLimitIssue::Hint:
-      item->setForeground(Qt::gray);
+      label->setStyleSheet("color: gray;");
+      item->setIcon(0, QIcon::fromTheme("symbol-info"));
       break;
     case RadioLimitIssue::Warning:
       if (app->isDarkMode())
-        item->setForeground(Qt::white);
+        label->setStyleSheet("color: white;");
       else
-        item->setForeground(Qt::black);
+        label->setStyleSheet("color: black;");
+      item->setIcon(0, QIcon::fromTheme("symbol-warning"));
       break;
     case RadioLimitIssue::Critical:
       if (app->isDarkMode())
-        item->setForeground(Qt::red);
+        label->setStyleSheet("color: red;");
       else
-        item->setForeground(Qt::darkRed);
+        label->setStyleSheet("color: darkred;");
       valid = false;
+      item->setIcon(0, QIcon::fromTheme("symbol-error"));
       break;
     }
-    listWidget->addItem(item);
+    // Add traceback
+    foreach(auto step, issue.stack()) {
+      new QTreeWidgetItem(item, {step});
+    }
   }
 
   if (upload) {
     buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
     QPushButton *ignore = buttonBox->button(QDialogButtonBox::Ok);
     ignore->setEnabled(valid);
+    uploadMessage->setVisible(! valid);
   }
 }
