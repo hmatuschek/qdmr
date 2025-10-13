@@ -74,6 +74,8 @@ public:
   Severity severity() const;
   /** Returns the text message. */
   const QString &message() const;
+  /** Returns the traceback of the issue. */
+  const QStringList &stack() const;
   /** Formats the message. */
   QString format() const;
 
