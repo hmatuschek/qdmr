@@ -51,9 +51,9 @@ VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget
       item->setIcon(0, QIcon::fromTheme("symbol-error"));
       break;
     }
-    // Add traceback
+    // Add traceback (in reverse order)
     foreach(auto step, issue.stack()) {
-      new QTreeWidgetItem(item, {step});
+      item->insertChild(0, new QTreeWidgetItem({step}));
     }
   }
 
