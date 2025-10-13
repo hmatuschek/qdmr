@@ -65,9 +65,30 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionSettings, SIGNAL(triggered()), app, SLOT(showSettings()));
   connect(ui->actionHelp, SIGNAL(triggered()), app, SLOT(showHelp()));
 
-  connect(ui->actionRefreshCallsignDB, SIGNAL(triggered()), app->user(), SLOT(download()));
-  connect(ui->actionRefreshTalkgroupDB, SIGNAL(triggered()), app->talkgroup(), SLOT(download()));
-  connect(ui->actionRefreshOrbitalElements, SIGNAL(triggered()), app->satellite(), SLOT(update()));
+  connect(ui->actionRefreshCallsignDB, &QAction::triggered, app->user(), &UserDatabase::download);
+  QObject::connect(app->user(), &UserDatabase::error, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update callsign DB: %1").arg(msg), 10000);
+  });
+  QObject::connect(app->user(), &UserDatabase::loaded, [this]() {
+    this->ui->statusbar->showMessage(tr("Callsign database updated & loaded."), 10000);
+  });
+
+  connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, app->talkgroup(), &TalkGroupDatabase::download);
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update talkgroup DB: %1").arg(msg), 10000);
+  });
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, [this]() {
+    this->ui->statusbar->showMessage(tr("Talkgroup database updated & loaded."), 10000);
+  });
+
+  connect(ui->actionRefreshOrbitalElements, &QAction::triggered, app->satellite(), &SatelliteDatabase::update);
+  QObject::connect(app->satellite(), &SatelliteDatabase::error, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update orbital elements: %1").arg(msg), 10000);
+  });
+  QObject::connect(app->satellite(), &SatelliteDatabase::loaded, [this]() {
+    this->ui->statusbar->showMessage(tr("Orbital elements updated & loaded."), 10000);
+  });
+
   connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
 
   connect(ui->actionDetectDevice, SIGNAL(triggered()), app, SLOT(detectRadio()));
