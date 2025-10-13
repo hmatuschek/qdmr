@@ -113,6 +113,6 @@ DMR6X2UV2::limits() const {
 RadioInfo
 DMR6X2UV2::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::DMR6X2UV2, "dmr6x2uv2", "DMR-6X2UV PRO", "BTECH", AnytoneInterface::interfaceInfo());
+        RadioInfo::DMR6X2UV2, "dmr6x2uv2", "DMR-6X2UV PRO", "BTECH", {AnytoneGD32Interface::interfaceInfo()});
 }
 

@@ -75,18 +75,18 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
  * Implementation of RadioInfo
  * ********************************************************************************************* */
 RadioInfo::RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-                     const USBDeviceInfo &interface, const QList<RadioInfo> &alias)
+                     const QSet<USBDeviceInfo> &interfaces, const QList<RadioInfo> &alias)
   : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias),
-    _interface(interface)
+    _interfaces(interfaces)
 {
   // pass...
 }
 
 RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name,
-                     const QString manufacturer, const USBDeviceInfo &interface,
+                     const QString manufacturer, const QSet<USBDeviceInfo> &interfaces,
                      const QList<RadioInfo> &alias)
   : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias),
-    _interface(interface)
+    _interfaces(interfaces)
 {
   // pass...
 }
@@ -117,9 +117,12 @@ RadioInfo::manufacturer() const {
   return _manufacturer;
 }
 
-const USBDeviceInfo &
-RadioInfo::interface() const {
-  return _interface;
+bool
+RadioInfo::interfaceMatches(const USBDeviceInfo &other) const {
+  foreach (auto interface, _interfaces)
+    if (interface == other)
+      return true;
+  return false;
 }
 
 bool
@@ -173,7 +176,7 @@ RadioInfo::allRadios(const USBDeviceInfo &interface, bool flat) {
   QList<RadioInfo> radios;
   QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
   for (; it!=_radiosById.constEnd(); it++) {
-    if (it->interface() != interface)
+    if (! it->interfaceMatches(interface))
       continue;
     radios.push_back(*it);
     if (flat)

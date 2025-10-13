@@ -59,8 +59,8 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
   }
   logDebug() << "Try to detect radio at " << descr.description() << ".";
 
-  if (AnytoneInterface::interfaceInfo() == descr) {
-    AnytoneInterface *anytone = new AnytoneInterface(descr, err);
+  if (AnytoneGD32Interface::interfaceInfo() == descr) {
+    auto anytone = new AnytoneGD32Interface(descr, err);
     if (anytone->isOpen()) {
       RadioInfo id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
@@ -73,6 +73,8 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new D578UV(anytone);
       } else if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
         return new DMR6X2UV(anytone);
+      } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+        return new D578UV(anytone);
       } else if (id.isValid()) {
         errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
                        .arg(id.manufacturer())
@@ -85,8 +87,8 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     anytone->deleteLater();
-  } else if (NewAnytoneInterface::interfaceInfo() == descr) {
-    NewAnytoneInterface *anytone = new NewAnytoneInterface(descr, err);
+  } else if (AnytoneSTM32Interface::interfaceInfo() == descr) {
+    auto anytone = new AnytoneSTM32Interface(descr, err);
     if (anytone->isOpen()) {
       RadioInfo id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {

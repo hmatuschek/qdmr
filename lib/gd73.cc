@@ -43,7 +43,7 @@ GD73::codeplug() {
 RadioInfo
 GD73::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::GD73, "gd73", "GD-73", "Radioddity", GD73Interface::interfaceInfo());
+        RadioInfo::GD73, "gd73", "GD-73", "Radioddity", {GD73Interface::interfaceInfo()});
 }
 
 bool

@@ -42,9 +42,6 @@ public:
   /** Closes the interface to the device. */
   void close();
 
-  /** Returns an identifier of the radio. */
-  RadioInfo identifier(const ErrorStack &err=ErrorStack());
-
   /** Reads the radio info from the device and returns it.
    * The information is only read once. */
   bool getInfo(RadioVariant &info);
@@ -58,12 +55,6 @@ public:
   bool write_finish(const ErrorStack &err=ErrorStack());
 
   bool reboot(const ErrorStack &err=ErrorStack());
-
-public:
-  /** Returns some information about this interface. */
-  static USBDeviceInfo interfaceInfo();
-  /** Tries to find all interfaces connected AnyTone radios. */
-  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
 protected:
   /** Send command message to radio to ender program state. */
@@ -141,20 +132,48 @@ protected:
 
 
 
-/** Implements the interface to Anytone newer revisions of DD578UV radios.
+/** Implements the interface to Anytone GD32 revisions of D578UV radios.
  *
  * This interface is identical to the previous ones, except it uses a different VID/PID combo.
  * That is VID @c 0x2e3c and PID @c 0x5740 are used.
  *
  * @ingroup anytone */
-class NewAnytoneInterface: public AnytoneInterface
+class AnytoneGD32Interface: public AnytoneInterface
 {
   Q_OBJECT
 
 public:
   /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
    * returns @c true. */
-  explicit NewAnytoneInterface(const USBDeviceDescriptor &descriptor,
+  explicit AnytoneGD32Interface(const USBDeviceDescriptor &descriptor,
+                               const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+
+  /** Returns an identifier of the radio. */
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
+};
+
+
+
+/** Implements the interface to Anytone SMT32 revisions of D578UV radios.
+ *
+ * This interface is identical to the previous ones, except it uses a different VID/PID combo.
+ * That is VID @c 0x2e3c and PID @c 0x5740 are used.
+ *
+ * @ingroup anytone */
+class AnytoneSTM32Interface: public AnytoneInterface
+{
+  Q_OBJECT
+
+public:
+  /** Constructs a new interface to Anytone radios. If a matching device was found, @c isOpen
+   * returns @c true. */
+  explicit AnytoneSTM32Interface(const USBDeviceDescriptor &descriptor,
                                const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
   /** Returns an identifier of the radio. */
