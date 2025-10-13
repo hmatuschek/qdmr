@@ -13,7 +13,7 @@
 DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency, Frequency> > &rxFreqRanges,
                                  const std::initializer_list<std::pair<Frequency, Frequency> > &txFreqRanges,
                                  const QString &hardwareRevision, QObject *parent)
-  : AnytoneLimits(hardwareRevision, "V102", true, parent)
+  : AnytoneLimits(hardwareRevision, "V100", true, parent)
 {
   // Define limits for call-sign DB
   _hasCallSignDB          = true;
