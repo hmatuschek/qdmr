@@ -2502,32 +2502,32 @@
     <message>
         <location filename="../src/mainwindow.cc" line="70"/>
         <source>Cannot update callsign DB: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot update call-sign DB: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="73"/>
         <source>Callsign database updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Call-sign database updated &amp; loaded.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="78"/>
         <source>Cannot update talkgroup DB: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot update talk-group DB: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="81"/>
         <source>Talkgroup database updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Talk-group database updated &amp; loaded.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="86"/>
         <source>Cannot update orbital elements: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot update orbital elements: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="89"/>
         <source>Orbital elements updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Orbital elements updated &amp; loaded.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="117"/>
@@ -3724,7 +3724,7 @@
     <message>
         <location filename="../src/verifydialog.ui" line="20"/>
         <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
-        <translation type="unfinished"></translation>
+        <translation>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</translation>
     </message>
 </context>
 <context>
