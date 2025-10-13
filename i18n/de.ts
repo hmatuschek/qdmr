@@ -2502,32 +2502,32 @@
     <message>
         <location filename="../src/mainwindow.cc" line="70"/>
         <source>Cannot update callsign DB: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Rufzeichendatenbank nicht aktualisieren: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="73"/>
         <source>Callsign database updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufzeichendatenbank aktualisiert &amp; geladen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="78"/>
         <source>Cannot update talkgroup DB: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Sprechgruppendatenbank nicht aktualisieren: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="81"/>
         <source>Talkgroup database updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprechgruppendatenbank aktualisiert &amp; geladen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="86"/>
         <source>Cannot update orbital elements: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Orbitalelemente nicht aktualisieren: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="89"/>
         <source>Orbital elements updated &amp; loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Orbitalelemente aktualisiert &amp; geladen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="117"/>
@@ -3724,7 +3724,7 @@
     <message>
         <location filename="../src/verifydialog.ui" line="20"/>
         <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Codeplug kann nicht geschrieben werden, solange nicht all kritischen Probleme (rot) aufgelöst wurden.</translation>
     </message>
 </context>
 <context>
