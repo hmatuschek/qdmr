@@ -120,8 +120,7 @@ AnytoneInterface::interfaceInfo() {
 QList<USBDeviceDescriptor>
 AnytoneInterface::detect(bool saveOnly) {
   Q_UNUSED(saveOnly);
-  return USBSerial::detect(USB_VID_OLD, USB_PID_OLD, true)
-      + USBSerial::detect(USB_VID_NEW, USB_PID_NEW, true);
+  return USBSerial::detect(USB_VID_OLD, USB_PID_OLD, true);
 }
 
 
@@ -401,4 +400,42 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen, 
 
   // done
   return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of NewAnytoneInterface
+ * ********************************************************************************************* */
+NewAnytoneInterface::NewAnytoneInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : AnytoneInterface(descriptor, err, parent)
+{
+  // pass...
+}
+
+RadioInfo
+NewAnytoneInterface::identifier(const ErrorStack &err) {
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D578UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UV);
+  }  else if ("D578UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UVII);
+  }
+
+
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
+  return RadioInfo();
+}
+
+USBDeviceInfo
+NewAnytoneInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID_NEW, USB_PID_NEW);
+}
+
+QList<USBDeviceDescriptor>
+NewAnytoneInterface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly);
+  return USBSerial::detect(USB_VID_NEW, USB_PID_NEW, true);
 }

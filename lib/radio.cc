@@ -22,8 +22,6 @@
 #include "d578uv.hh"
 #include "dmr6x2uv.hh"
 
-#include "config.hh"
-#include "configcopyvisitor.hh"
 #include "logger.hh"
 
 #include <QSet>
@@ -75,6 +73,24 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         return new D578UV(anytone);
       } else if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
         return new DMR6X2UV(anytone);
+      } else if (id.isValid()) {
+        errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
+                       .arg(id.manufacturer())
+                       .arg(id.name());
+      } else {
+        errMsg(err) << tr("Unknown AnyTone (or similar) device.");
+      }
+      anytone->close();
+      anytone->deleteLater();
+      return nullptr;
+    }
+    anytone->deleteLater();
+  } else if (NewAnytoneInterface::interfaceInfo() == descr) {
+    NewAnytoneInterface *anytone = new NewAnytoneInterface(descr, err);
+    if (anytone->isOpen()) {
+      RadioInfo id = anytone->identifier(err);
+      if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+        return new D578UV(anytone);
       } else if (id.isValid()) {
         errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
                        .arg(id.manufacturer())
