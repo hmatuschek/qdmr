@@ -1285,7 +1285,6 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateGPSSystems();
 
-  this->allocatDMREncryptionKeys();
   this->allocatEnhancedEncryptionKeys();
 
   this->allocateHotKeySettings();
@@ -1313,6 +1312,9 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateScanLists();
   this->allocateRadioIDs();
   this->allocateSMSMessages();
+
+  // Encryption
+  this->allocatDMREncryptionKeys();
 }
 
 void
@@ -1331,6 +1333,9 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateBootSettings();
   this->allocateRepeaterOffsetFrequencies();
   this->allocateSMSMessages();
+
+  // Encryption
+  this->allocatDMREncryptionKeys();
 
   // GPS settings
   this->allocateGPSSystems();
