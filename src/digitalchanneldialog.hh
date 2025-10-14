@@ -24,9 +24,9 @@ protected slots:
   void onHideChannelHint();
 
 private slots:
-  void onUpdateRxFrequency();
-  void onUpdateTxFrequency();
-  void onUpdateOffsetFrequency();
+  void onRxFrequencyEdited();
+  void onTxFrequencyEdited();
+  void onOffsetFrequencyEdited();
   void onOffsetCurrentIndexChanged(int index);
   void updateOffsetFrequency();
 
