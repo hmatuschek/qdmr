@@ -263,81 +263,67 @@ AnalogChannelDialog::onRxFrequencyEdited() {
 
 void
 AnalogChannelDialog::onOffsetFrequencyEdited() {
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
+  Frequency txFreq = _myChannel->rxFrequency();
 
-  if (offsetComboBox->currentIndex() == 0) {
-    // Default set to minus frequency offset
-    offsetComboBox->setCurrentIndex(2);
+  switch (offsetComboBox->currentIndex()) {
+  case 0: break;
+  case 1: txFreq = _myChannel->rxFrequency() + offsetFrequency; break;
+  case 2: txFreq = _myChannel->rxFrequency() + offsetFrequency.invert(); break;
   }
 
-  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
-
-  if (offsetComboBox->currentIndex() == 1) {
-    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    txFrequency->setText(txFreq.format());
-    _myChannel->setTXFrequency(txFreq);
-    offsetLineEdit->setText(offsetFrequency.format());
-    updateComboBox();
-    return;
-  }
-
-  if (offsetComboBox->currentIndex() == 2) {
-    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    txFrequency->setText(txFreq.format());
-    _myChannel->setTXFrequency(txFreq);
-    offsetLineEdit->setText(offsetFrequency.format());
-    updateComboBox();
-    return;
-  }
+  offsetLineEdit->setText(offsetFrequency.format());
+  txFrequency->setText(txFreq.format());
+  _myChannel->setTXFrequency(txFreq);
 }
 
 void
 AnalogChannelDialog::onOffsetDirectionChanged(int index) {
-    Frequency txFreq;
-    FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
+  Frequency txFreq = _myChannel->rxFrequency();
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
-    switch (index) {
-    case 0:
-      offsetFrequency = FrequencyOffset();
-      offsetLineEdit->setEnabled(false);
-    break;
-    case 1:
-      offsetFrequency = offsetFrequency.abs();
-      offsetLineEdit->setEnabled(true);
-      offsetLineEdit->setText(offsetFrequency.format());
-    break;
-    case 2:
-      offsetFrequency = offsetFrequency.abs().invert();
-      offsetLineEdit->setEnabled(true);
-      offsetLineEdit->setText(offsetFrequency.format());
-    break;
-    }
-
+  switch (index) {
+  case 0:
+    offsetLineEdit->setEnabled(false);
+    txFreq = _myChannel->rxFrequency();
+  break;
+  case 1:
+    offsetLineEdit->setEnabled(true);
     txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    _myChannel->setTXFrequency(txFreq);
-    txFrequency->setText(txFreq.format());
+  break;
+  case 2:
+    offsetLineEdit->setEnabled(true);
+    txFreq = _myChannel->rxFrequency() + offsetFrequency.invert();
+  break;
+  }
+
+  _myChannel->setTXFrequency(txFreq);
+  txFrequency->setText(txFreq.format());
 }
 
 void
 AnalogChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
-  offsetLineEdit->setText(offsetFrequency.format());
+  // Show absolute value
+  offsetLineEdit->setText(offsetFrequency.abs().format());
+  // Use combo box to indicate direction
   updateComboBox();
 }
 
 void
 AnalogChannelDialog::updateComboBox() {
-    switch (_myChannel->offsetShift()) {
-    case Channel::OffsetShift::None:
-        offsetComboBox->setCurrentIndex(0);
-        offsetLineEdit->setEnabled(false);
-        break;
-    case Channel::OffsetShift::Positive:
-        offsetComboBox->setCurrentIndex(1);
-        offsetLineEdit->setEnabled(true);
-        break;
-    case Channel::OffsetShift::Negative:
-        offsetComboBox->setCurrentIndex(2);
-        offsetLineEdit->setEnabled(true);
-        break;
-    }
+  switch (_myChannel->offsetShift()) {
+  case Channel::OffsetShift::None:
+    offsetComboBox->setCurrentIndex(0);
+    offsetLineEdit->setEnabled(false);
+  break;
+  case Channel::OffsetShift::Positive:
+    offsetComboBox->setCurrentIndex(1);
+    offsetLineEdit->setEnabled(true);
+  break;
+  case Channel::OffsetShift::Negative:
+    offsetComboBox->setCurrentIndex(2);
+    offsetLineEdit->setEnabled(true);
+  break;
+  }
 }
