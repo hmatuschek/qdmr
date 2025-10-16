@@ -32,6 +32,8 @@ private slots:
   void testRegressionAutoRepeater();
   void testRegressionVFOStep();
 
+  void testEmptyAESKey();
+
 protected:
   Config _micGainConfig;
   QTextStream _stderr;
