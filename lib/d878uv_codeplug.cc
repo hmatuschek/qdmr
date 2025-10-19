@@ -4307,6 +4307,11 @@ D878UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
       logInfo() << "Skip invalid AES key at index " << i+1 << ".";
       continue;
     }
+    if (keyEl.key().size() < 16) {
+      logInfo() << "Skip AES key at index " << i+1
+                << ": Key size " << keyEl.key().size()*8 << " < 128.";
+      continue;
+    }
     auto key = new AESEncryptionKey();
     key->setName(QString("AES Key %1").arg(i+1));
     if (! key->setKey(keyEl.key(), err)) {
