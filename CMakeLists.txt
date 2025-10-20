@@ -39,8 +39,7 @@ set(USE_FOLDERS ON)
 
 
 if (BUILD_MAN)
-  find_package(DocBookXSL REQUIRED)
-  include(DocBook)
+  find_program(XSLTPROC_EXECUTABLE NAMES xsltproc)
 endif()
 
 if (BUILD_DOCS)
