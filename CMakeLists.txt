@@ -20,6 +20,12 @@ option(INSTALL_APPSTREAM_DATA "Install AppStream metainfo file." ON)
 option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
 option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applications")
 
+if(UNIX AND NOT APPLE)
+  option(DOCBOOK2MAN_XSLT "Man page style sheet." ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.debian.xsl)
+elseif(UNIX AND APPLE)
+  option(DOCBOOK2MAN_XSLT "Man page style sheet." ${CMAKE_CURRENT_SOURCE_DIR}/docbook_man.macports.xsl)
+endif(UNIX AND NOT APPLE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 include(GNUInstallDirs)
