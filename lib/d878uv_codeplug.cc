@@ -3454,7 +3454,8 @@ D878UVCodeplug::AESEncryptionKeyElement::clear() {
 
 bool
 D878UVCodeplug::AESEncryptionKeyElement::isValid() const {
-  return Element::isValid() && (0 != getUInt8(Offset::index()));
+  return Element::isValid() && (0 != getUInt8(Offset::index())) &&
+      (0 != getUInt8(Offset::size()));
 }
 
 unsigned
@@ -3799,8 +3800,8 @@ D878UVCodeplug::setBitmaps(Context& ctx)
 
   // Mark AES keys
   AESEncryptionKeyBitmapElement aes_key_bitmap(data(Offset::aesKeyBitmap()));
-  unsigned int num_aes_channels = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
-  aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_channels);
+  unsigned int num_aes_keys = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
+  aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_keys);
 
   // Mark ARC4 keys
   ARC4EncryptionKeyBitmapElement arc4_key_bitmap(data(Offset::arc4KeyBitmap()));
@@ -4302,6 +4303,15 @@ D878UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
       continue;
     // Decode
     AESEncryptionKeyElement keyEl(data(Offset::aesKeys() + i*AESEncryptionKeyElement::size()));
+    if (! keyEl.isValid()) {
+      logInfo() << "Skip invalid AES key at index " << i+1 << ".";
+      continue;
+    }
+    if (keyEl.key().size() < 16) {
+      logInfo() << "Skip AES key at index " << i+1
+                << ": Key size " << keyEl.key().size()*8 << " < 128.";
+      continue;
+    }
     auto key = new AESEncryptionKey();
     key->setName(QString("AES Key %1").arg(i+1));
     if (! key->setKey(keyEl.key(), err)) {
