@@ -54,10 +54,6 @@ inline QStringList getLanguages() {
   return languages;
 }
 
-inline QString getLocalePath(const QString &language) {
-  return QDir(LOCALE_DIRECTORY "/" + language + "/LC_MESSAGES/").absolutePath();
-}
-
 Application::Application(int &argc, char *argv[])
   : QApplication(argc, argv), _config(nullptr), _mainWindow(nullptr), _translator(nullptr),
     _repeater(nullptr), _satellites(nullptr), _lastDevice()
@@ -79,8 +75,8 @@ Application::Application(int &argc, char *argv[])
   // handle translations
   _translator = new QTranslator(this);
   foreach (QString language, getLanguages()) {
-    logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
-    if (_translator->load("qdmr", ":/i18n", "", "_qt.qm")) {
+    logDebug() << "Search for translation in ':/i18n/" << language << ".qm'.";
+    if (_translator->load(language, ":/i18n/", "", ".qm")) {
       this->installTranslator(_translator);
       logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
       break;
