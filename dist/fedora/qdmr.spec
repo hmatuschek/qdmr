@@ -14,7 +14,7 @@
 
 
 %define sover   0
-%define realver 0.13.0
+%define realver 0.13.1
 Name:           qdmr
 Version:        %{realver}
 Release:        0
@@ -24,12 +24,12 @@ Group:          Productivity/Hamradio/Other
 URL:            https://dm3mat.darc.de/qdmr/
 #Git-Clone:     https://github.com/hmatuschek/qdmr.git
 Source:         https://github.com/hmatuschek/qdmr/archive/refs/tags/v%{realver}.tar.gz
-Patch0:         fix-docbook-xsl-path.patch
 BuildRequires:  cmake
 BuildRequires:  docbook5-style-xsl
 BuildRequires:  xsltproc
 BuildRequires:  gcc-c++
 BuildRequires:  hicolor-icon-theme
+BuildRequires:  librsvg2-tools
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(Qt6Core)
 BuildRequires:  pkgconfig(Qt6Network)
@@ -80,11 +80,10 @@ applications that want to make use of libdmrconf.
 
 %prep
 %setup -q -n %{name}-%{realver}
-%patch 0 -p1
 
 %build
 # with 0.12.1: -DBUILD_MAN=ON -DINSTALL_UDEV_PATH=%{buildroot}%{_udevrulesdir}
-%cmake -DBUILD_MAN=ON
+%cmake -DBUILD_MAN=ON -DDOCBOOK2MAN_XSLT=docbook_man.fedora.xsl
 %cmake_build
 
 %install
@@ -108,10 +107,6 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_datadir}/icons/hicolor/*/apps/qdmr.png
 %{_mandir}/man1/dmrconf.1%{?ext_man}
 %{_mandir}/man1/qdmr.1%{?ext_man}
-%{_datadir}/locale/de/LC_MESSAGES/qdmr_qt.qm
-%{_datadir}/locale/en_US/LC_MESSAGES/qdmr_qt.qm
-%{_datadir}/locale/sv/LC_MESSAGES/qdmr_qt.qm
-%{_datadir}/locale/fr/LC_MESSAGES/qdmr_qt.qm
 
 %files -n libdmrconf%{sover}
 %{_libdir}/libdmrconf.so.*
@@ -121,6 +116,8 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_libdir}/libdmrconf.so
 
 %changelog
+* Sun Oct 21 2025 Hannes Matuschek <dm3mat@darc.de>
+  - Updated to 0.13.1
 * Sun Oct 19 2025 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.13.0
 * Thu Jul 25 2024 Hannes Matuschek <dm3mat@darc.de>
