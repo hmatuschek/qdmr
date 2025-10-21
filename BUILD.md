@@ -100,15 +100,15 @@ brew install \
 
 3. **Configure the project**
 
-   On most systems, use CMake with Qt6:
+   On some systems, you may need to specify the location of your Qt6 installation:
    ```sh
-   cmake .. -DCMAKE_PREFIX_PATH=/path/to/qt6
+   cmake .. -DQt6_ROOT=/path/to/qt6
    ```
-   The `CMAKE_PREFIX_PATH` specifies the base-path for searching dependencies.
+   The `Qt6_ROOT` specifies the base-path for searching Qt6 related dependencies.
 
    > On macOS, you may need to help CMake find Qt6:
    > ```sh
-   > cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix qt@6)
+   > cmake .. -DQt6_ROOT=$(brew --prefix qt@6)
    > ```
 
    If you want to specify an install prefix , run e.g. 
@@ -142,7 +142,7 @@ brew install \
 ## Troubleshooting
 
 - **Missing Packages:** Ensure all dependencies are installed as per your OS section.
-- **CMake Can't Find Qt6:** Double-check your `PATH`, `CMAKE_PREFIX_PATH`, and Qt6 installation.
+- **CMake Can't Find Qt6:** Double-check your `PATH`, `Qt6_ROOT`, and Qt6 installation.
 - **Permission Errors:** Try using `sudo` if needed for installation steps, but not for building the project.
 
 ---
