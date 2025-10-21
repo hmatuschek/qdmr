@@ -6,11 +6,11 @@ ELSE (APPLE)
  SET(hid_HEADERS hid_libusb.hh)
 ENDIF(APPLE)
 
-configure_file(config.h.in ${PROJECT_BINARY_DIR}/lib/config.h)
+configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 qt_add_library(libdmrconf SHARED
   ${hid_SOURCES}
-  ${PROJECT_BINARY_DIR}/lib/config.h
+  ${CMAKE_CURRENT_BINARY_DIR}/config.h
   utils.cc crc32.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
   ranges.cc dummyfilereader.cc chirpformat.cc signaling.cc radio.cc dfu_libusb.cc usbserial.cc
   radioinfo.cc usbdevice.cc radiolimits.cc csvreader.cc dfufile.cc userdatabase.cc logger.cc
@@ -46,7 +46,10 @@ qt_add_library(libdmrconf SHARED
   auctus_a6_interface.cc
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc)
 
-target_sources(libdmrconf PUBLIC FILE_SET HEADERS FILES
+target_sources(libdmrconf PUBLIC FILE_SET HEADERS
+  BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/config.h
   libdmrconf.hh utils.hh ${hid_HEADERS} crc32.hh addressmap.hh radiointerface.hh errorstack.hh
   frequency.hh interval.hh ranges.hh dummyfilereader.hh chirpformat.hh signaling.hh radio.hh
   dfu_libusb.hh usbserial.hh radioinfo.hh usbdevice.hh radiolimits.hh csvreader.hh dfufile.hh
