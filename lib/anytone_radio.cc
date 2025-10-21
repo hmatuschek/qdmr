@@ -259,6 +259,8 @@ AnytoneRadio::download() {
   unsigned nstart = _codeplug->image(0).numElements();
   _codeplug->allocateForDecoding();
 
+  logDebug() << "Download of " << _codeplug->image(0).numElements()-nstart << " discovered elements.";
+
   // Check every segment in the remaining codeplug
   for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
     if (! _codeplug->image(0).element(n).isAligned(RBSIZE)) {
@@ -278,6 +280,8 @@ AnytoneRadio::download() {
       errMsg(_errorStack) << "Cannot download codeplug.";
       return false;
     }
+    logDebug() << "Read " << Qt::hex << size <<
+                  "h bytes from address " << Qt::hex << addr << ".";
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
   }
 

@@ -473,5 +473,35 @@ D878UVTest::testRegressionVFOStep() {
 }
 
 
+void
+D878UVTest::testEmptyAESKey() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // Empty encryption key
+  config.commercialExtension()->encryptionKeys()->add(new AESEncryptionKey());
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 0);
+}
+
+
 QTEST_GUILESS_MAIN(D878UVTest)
 

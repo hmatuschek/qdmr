@@ -164,9 +164,9 @@ DigitalChannelDialog::construct() {
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
   connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 
-  connect(txFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateTxFrequency);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateRxFrequency);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onUpdateOffsetFrequency);
+  connect(txFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onOffsetFrequencyEdited);
   connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DigitalChannelDialog::onOffsetCurrentIndexChanged);
 }
 
@@ -255,97 +255,90 @@ DigitalChannelDialog::onHideChannelHint() {
 }
 
 void
-DigitalChannelDialog::onUpdateTxFrequency() {
+DigitalChannelDialog::onTxFrequencyEdited() {
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
   txFrequency->setText(_myChannel->txFrequency().format());
   updateOffsetFrequency();
 }
 
 void
-DigitalChannelDialog::onUpdateRxFrequency() {
+DigitalChannelDialog::onRxFrequencyEdited() {
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   rxFrequency->setText(_myChannel->rxFrequency().format());
 
- if (_myChannel->txFrequency().isZero()) {
-      // If no previous txFrequency set, match rx frequency.
-      _myChannel->setTXFrequency(Frequency::fromString(rxFrequency->text()));
-      txFrequency->setText(_myChannel->txFrequency().format());
+  if (_myChannel->txFrequency().isZero()) {
+    // If no previous txFrequency set, match rx frequency.
+    _myChannel->setTXFrequency(Frequency::fromString(rxFrequency->text()));
+    txFrequency->setText(_myChannel->txFrequency().format());
   }
 
   updateOffsetFrequency();
 }
 
 void
-DigitalChannelDialog::onUpdateOffsetFrequency() {
-  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
+DigitalChannelDialog::onOffsetFrequencyEdited() {
+  Frequency txFreq = _myChannel->rxFrequency();
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
-  if (offsetFrequency.isPositive()) {
-    offsetComboBox->setCurrentIndex(1);
-    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    txFrequency->setText(txFreq.format());
-    _myChannel->setTXFrequency(txFreq);
-    offsetLineEdit->setText(offsetFrequency.format());
-    updateComboBox();
-
-  } else if (offsetFrequency.isNegative() || offsetFrequency.isZero()) {
-    offsetComboBox->setCurrentIndex(2);
-    Frequency txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    txFrequency->setText(txFreq.format());
-    _myChannel->setTXFrequency(txFreq);
-    offsetLineEdit->setText(offsetFrequency.format());
-    updateComboBox();
+  switch (offsetComboBox->currentIndex()) {
+  case 0: txFreq = _myChannel->rxFrequency(); break;
+  case 1: txFreq = _myChannel->rxFrequency() + offsetFrequency; break;
+  case 2: txFreq = _myChannel->rxFrequency() + offsetFrequency.invert(); break;
   }
+
+  _myChannel->setTXFrequency(txFreq);
+  txFrequency->setText(txFreq.format());
+  offsetLineEdit->setText(offsetFrequency.format());
 }
 
 void
 DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
-    Frequency txFreq;
-    FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text());
+  Frequency txFreq = _myChannel->rxFrequency();
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
-    switch (index) {
-    case 0:
-      offsetFrequency = FrequencyOffset();
-      offsetLineEdit->setEnabled(false);
-    break;
-    case 1:
-      offsetFrequency = offsetFrequency.abs();
-      offsetLineEdit->setEnabled(true);
-      offsetLineEdit->setText(offsetFrequency.format());;
-    break;
-    case 2:
-      offsetFrequency = offsetFrequency.abs().invert();
-      offsetLineEdit->setEnabled(true);
-      offsetLineEdit->setText(offsetFrequency.format());;
-    break;
-    }
-
+  switch (index) {
+  case 0:
+    offsetLineEdit->setEnabled(false);
+    txFreq = _myChannel->rxFrequency();
+  break;
+  case 1:
+    offsetLineEdit->setEnabled(true);
     txFreq = _myChannel->rxFrequency() + offsetFrequency;
-    _myChannel->setTXFrequency(txFreq);
-    txFrequency->setText(txFreq.format());
+  break;
+  case 2:
+    offsetLineEdit->setEnabled(true);
+    txFreq = _myChannel->rxFrequency() + offsetFrequency.invert();
+  break;
+  }
+
+  _myChannel->setTXFrequency(txFreq);
+  txFrequency->setText(txFreq.format());
 }
 
 
 void
 DigitalChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
-  offsetLineEdit->setText(offsetFrequency.format());
+  // Show absolute value
+  offsetLineEdit->setText(offsetFrequency.abs().format());
+  // Use combo box to indicate direction
   updateComboBox();
 }
 
 void
 DigitalChannelDialog::updateComboBox() {
-    switch (_myChannel->offsetShift()) {
-    case Channel::OffsetShift::None:
-        offsetComboBox->setCurrentIndex(0);
-        offsetLineEdit->setEnabled(false);
-        break;
-    case Channel::OffsetShift::Positive:
-        offsetComboBox->setCurrentIndex(1);
-        offsetLineEdit->setEnabled(true);
-        break;
-    case Channel::OffsetShift::Negative:
-        offsetComboBox->setCurrentIndex(2);
-        offsetLineEdit->setEnabled(true);
-        break;
-    }
+  switch (_myChannel->offsetShift()) {
+  case Channel::OffsetShift::None:
+    offsetComboBox->setCurrentIndex(0);
+    offsetLineEdit->setEnabled(false);
+  break;
+  case Channel::OffsetShift::Positive:
+    offsetComboBox->setCurrentIndex(1);
+    offsetLineEdit->setEnabled(true);
+  break;
+  case Channel::OffsetShift::Negative:
+    offsetComboBox->setCurrentIndex(2);
+    offsetLineEdit->setEnabled(true);
+  break;
+  }
 }

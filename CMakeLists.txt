@@ -11,6 +11,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
+set(DOCBOOK2MAN_XSLT_DEFAULT "docbook_man.debian.xsl")
+if(UNIX AND APPLE)
+  set(DOCBOOK2MAN_XSLT_DEFAULT "docbook_man.macports.xsl")
+endif(UNIX AND APPLE)
+
 option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_DOCS  "Build API documentation" OFF)
 option(BUILD_MAN   "Build man page for dmrconf" OFF)
@@ -19,6 +24,7 @@ option(INSTALL_UDEV_PATH "Install path of udev rules file." "/etc/udev/rules.d")
 option(INSTALL_APPSTREAM_DATA "Install AppStream metainfo file." ON)
 option(INSTALL_BUNDLE "Installs QDMR as an AppBundle under MacOS X" OFF)
 option(BUNDLE_PATH "Where to install the MacOS X application bundle." "~/Applications")
+option(DOCBOOK2MAN_XSLT "Man page style sheet." ${DOCBOOK2MAN_XSLT_DEFAULT})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -39,8 +45,7 @@ set(USE_FOLDERS ON)
 
 
 if (BUILD_MAN)
-  find_package(DocBookXSL REQUIRED)
-  include(DocBook)
+  find_program(XSLTPROC_EXECUTABLE NAMES xsltproc)
 endif()
 
 if (BUILD_DOCS)

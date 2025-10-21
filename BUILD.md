@@ -102,13 +102,20 @@ brew install \
 
    On most systems, use CMake with Qt6:
    ```sh
-   cmake .. -DCMAKE_PREFIX_PATH=/path/to/Qt6 # Often not needed if qt6 is in your PATH
+   cmake .. -DCMAKE_PREFIX_PATH=/path/to/qt6
    ```
+   The `CMAKE_PREFIX_PATH` specifies the base-path for searching dependencies.
 
    > On macOS, you may need to help CMake find Qt6:
    > ```sh
    > cmake .. -DCMAKE_PREFIX_PATH=$(brew --prefix qt@6)
    > ```
+
+   If you want to specify an install prefix , run e.g. 
+   ```sh
+   cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/
+   ```
+   The latter will install everything user-local.
 
 4. **Build the project**
 
@@ -121,6 +128,14 @@ brew install \
    ```sh
    ./qdmr
    ```
+
+6. **(Optional) Install**
+
+   ```sh 
+   cmake --install .
+   ```
+
+   This installs everything under the aforementioned install prefix.
 
 ---
 
