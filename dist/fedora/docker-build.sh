@@ -1,20 +1,19 @@
 #!/bin/bash 
 
-# Install dependencies
-dnf -y install fedora-packager rpmdevtools wget \
-        cmake docbook5-style-xsl xsltproc gcc-c++ hicolor-icon-theme librsvg2-tools \
-	pkgconfig qt6-qtbase-devel qt6-qtconnectivity-devel qt6-qtpositioning-devel \
-	qt6-qtserialport-devel qt6-qtbase-devel libusb1-devel yaml-cpp-devel qt6-qttools-devel
-
-# Prepeare RPM build
-rpmdev-setuptree
+cp /mnt/qdmr.spec /root/rpmbuild/SPECS
+VERSION="0.13.1"
+TARBALL="v${VERSION}.tar.gz"
 
 # Download sources
 cd /root/rpmbuild/SOURCES 
-wget https://github.com/hmatuschek/qdmr/archive/refs/tags/v0.13.0.tar.gz
+if  [ ! -f $TARBALL ]; then
+    wget https://github.com/hmatuschek/qdmr/archive/refs/tags/$TARBALL
+fi
 
 # Copy specs and build RPM
-cd /root/rpmbuld/SPECS
-cp /mnt/qdmr.spec .
+cd /root/rpmbuild/SPECS
 rpmbuild -ba qdmr.spec
 
+
+# Extract 
+# cp /root/rpmbuild/RPMS/x86_64/*.rpm /mnt/

@@ -1,7 +1,7 @@
 #
 # spec file for package qdmr
 #
-# Copyright (c) 2021-2023, Martin Hauke <mardnh@gmx.de>
+# Copyright (c) 2021-2025, Martin Hauke <mardnh@gmx.de>
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -13,11 +13,12 @@
 # published by the Open Source Initiative.
 
 
+%define ext_man .gz
 %define sover   0
 %define realver 0.13.1
 Name:           qdmr
 Version:        %{realver}
-Release:        0
+Release:        0fedora
 Summary:        Graphical code-plug programming tool for DMR radios
 License:        GPL-3.0-or-later
 Group:          Productivity/Hamradio/Other
@@ -82,16 +83,11 @@ applications that want to make use of libdmrconf.
 %setup -q -n %{name}-%{realver}
 
 %build
-# with 0.12.1: -DBUILD_MAN=ON -DINSTALL_UDEV_PATH=%{buildroot}%{_udevrulesdir}
-%cmake -DBUILD_MAN=ON -DDOCBOOK2MAN_XSLT=docbook_man.fedora.xsl
+%cmake -DBUILD_MAN=ON -DDOCBOOK2MAN_XSLT=docbook_man.fedora.xsl -DINSTALL_UDEV_PATH=%{_udevrulesdir}
 %cmake_build
 
 %install
 %cmake_install
-install -d %{buildroot}%{_udevrulesdir}
-# FIXME: would be nice to have udev-rules install path configurable via cmake
-#        (will be there with 0.12.1).
-mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrulesdir}
 
 %post -n libdmrconf%{sover} -p /sbin/ldconfig
 %postun -n libdmrconf%{sover} -p /sbin/ldconfig
@@ -116,7 +112,7 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_libdir}/libdmrconf.so
 
 %changelog
-* Sun Oct 21 2025 Hannes Matuschek <dm3mat@darc.de>
+* Tue Oct 21 2025 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.13.1
 * Sun Oct 19 2025 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.13.0
