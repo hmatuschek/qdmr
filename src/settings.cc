@@ -363,6 +363,23 @@ Settings::setHeaderState(const QString &objName, const QByteArray &state) {
   setValue(key, state);
 }
 
+
+bool
+Settings::sortFilterEnabled(const QString &objName) const {
+  if (objName.isEmpty())
+    return false;
+  QString key = QString("sortFilter/%1").arg(objName);
+  return value(key, false).toBool();
+}
+
+void
+Settings::enableSortFilter(const QString &objName, bool enable) {
+  if (objName.isEmpty())
+    return;
+  QString key = QString("sortFilter/%1").arg(objName);
+  setValue(key, enable);
+}
+
 bool
 Settings::isUpdated() const {
   if (! contains("version"))

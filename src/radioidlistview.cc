@@ -13,19 +13,19 @@ RadioIDListView::RadioIDListView(Config *config, QWidget *parent)
 {
   ui->setupUi(this);
 
-  connect(ui->listView->header(), SIGNAL(sectionCountChanged(int,int)),
+  connect(ui->radioIdTableView->header(), SIGNAL(sectionCountChanged(int,int)),
           this, SLOT(loadHeaderState()));
-  connect(ui->listView->header(), SIGNAL(sectionResized(int,int,int)),
+  connect(ui->radioIdTableView->header(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeHeaderState()));
 
-  ui->listView->setModel(new RadioIdListWrapper(_config->radioIDs(), ui->listView));
+  ui->radioIdTableView->setModel(new RadioIdListWrapper(_config->radioIDs(), ui->radioIdTableView));
   ui->defaultID->setModel(new RadioIdListWrapper(_config->radioIDs(), ui->defaultID));
   ui->defaultID->setModelColumn(1);
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->addID, SIGNAL(clicked(bool)), this, SLOT(onAddID()));
   connect(ui->delID, SIGNAL(clicked(bool)), this, SLOT(onDeleteID()));
-  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditID(unsigned)));
+  connect(ui->radioIdTableView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditID(unsigned)));
   connect(ui->defaultID, SIGNAL(currentIndexChanged(int)), this, SLOT(onDefaultIDSelected(int)));
 }
 
@@ -49,21 +49,21 @@ RadioIDListView::onAddID() {
     return;
 
   int row = -1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second;
+  if (ui->radioIdTableView->hasSelection())
+    row = ui->radioIdTableView->selection().second;
   _config->radioIDs()->add(dialog.radioId(), row);
 }
 
 void
 RadioIDListView::onDeleteID() {
-  if (! ui->listView->hasSelection()) {
+  if (! ui->radioIdTableView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete radio IDs"),
           tr("Cannot delete radio IDs: You have to select a radio ID first."));
     return;
   }
   // Get selection and ask for deletion
-  QPair<int,int> rows = ui->listView->selection();
+  QPair<int,int> rows = ui->radioIdTableView->selection();
   int numrows = rows.second-rows.first+1;
   if (rows.first == rows.second) {
     QString name = _config->radioIDs()->getId(rows.first)->name();
@@ -106,11 +106,11 @@ RadioIDListView::onDefaultIDSelected(int idx) {
 
 void
 RadioIDListView::loadHeaderState() {
-  ui->listView->header()->restoreState(Settings().headerState("radioIDList"));
+  ui->radioIdTableView->header()->restoreState(Settings().headerState("radioIDList"));
 }
 void
 RadioIDListView::storeHeaderState() {
-  Settings().setHeaderState("radioIDList", ui->listView->header()->saveState());
+  Settings().setHeaderState("radioIDList", ui->radioIdTableView->header()->saveState());
 }
 
 
