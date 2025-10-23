@@ -86,7 +86,7 @@ generate_icons(
         document-new document-open document-verify document-save-as document-download
         document-import document-export
         edit-move-10-down edit-move-10-up edit-move-down edit-move-up edit-move-bottom edit-move-top
-        edit-satellites
+        edit-satellites edit-clear item-filter
         help-contents help-about
         symbol-minus symbol-plus symbol-none
   THEMES light dark

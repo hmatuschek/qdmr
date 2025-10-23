@@ -5,9 +5,12 @@
 #include "configitemwrapper.hh"
 
 class QHeaderView;
+class QSortFilterProxyModel;
+
 namespace Ui {
   class ConfigObjectTableView;
 }
+
 
 class ConfigObjectTableView : public QWidget
 {
@@ -21,6 +24,7 @@ public:
   void setModel(GenericTableWrapper *model);
 
   bool hasSelection() const;
+  bool isFilteredOrSorted() const;
   QPair<int,int> selection() const;
 
   QHeaderView *header() const;
@@ -36,8 +40,14 @@ protected slots:
   void onMoveItemTenDown();
   void onMoveItemBottom();
   void onDoubleClicked(QModelIndex idx);
+  void toggleSortFilter(bool sortFilter);
+
+protected:
+  QSortFilterProxyModel *proxy() const;
+  bool canMove() const;
 
 private:
+  GenericTableWrapper *_model;
   Ui::ConfigObjectTableView *ui;
 };
 

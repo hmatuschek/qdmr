@@ -15,18 +15,18 @@ ChannelListView::ChannelListView(Config *config, QWidget *parent)
 {
   ui->setupUi(this);
 
-  connect(ui->listView->header(), SIGNAL(sectionCountChanged(int,int)),
+  connect(ui->channelTableView->header(), SIGNAL(sectionCountChanged(int,int)),
           this, SLOT(loadChannelListSectionState()));
-  connect(ui->listView->header(), SIGNAL(sectionResized(int,int,int)),
+  connect(ui->channelTableView->header(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeChannelListSectionState()));
 
-  ui->listView->setModel(new ChannelListWrapper(_config->channelList(), ui->listView));
+  ui->channelTableView->setModel(new ChannelListWrapper(_config->channelList(), ui->channelTableView));
 
   connect(ui->addAnalogChannel, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
   connect(ui->addDigitalChannel, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
   connect(ui->cloneChannel, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
   connect(ui->remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
-  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditChannel(unsigned)));
+  connect(ui->channelTableView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditChannel(unsigned)));
 }
 
 ChannelListView::~ChannelListView() {
@@ -41,8 +41,8 @@ ChannelListView::onAddAnalogChannel() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->channelTableView->hasSelection())
+    row = ui->channelTableView->selection().second+1;
   _config->channelList()->add(dialog.channel(), row);
 }
 
@@ -53,16 +53,16 @@ ChannelListView::onAddDigitalChannel() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->channelTableView->hasSelection())
+    row = ui->channelTableView->selection().second+1;
   _config->channelList()->add(dialog.channel(), row);
 }
 
 void
 ChannelListView::onCloneChannel() {
   // get selection
-  int row = ui->listView->selection().first;
-  if ((! ui->listView->hasSelection()) || (row != ui->listView->selection().second)) {
+  int row = ui->channelTableView->selection().first;
+  if ((! ui->channelTableView->hasSelection()) || (row != ui->channelTableView->selection().second)) {
     QMessageBox::information(nullptr, tr("Select a single channel first"),
                              tr("To clone a channel, please select a single channel to clone."),
                              QMessageBox::Close);
@@ -107,7 +107,7 @@ ChannelListView::onCloneChannel() {
 
 void
 ChannelListView::onRemChannel() {
-  if (! ui->listView->hasSelection()) {
+  if (! ui->channelTableView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete channel"),
           tr("Cannot delete channel: You have to select a channel first."));
@@ -115,7 +115,7 @@ ChannelListView::onRemChannel() {
   }
 
   // Get selection and ask for deletion
-  QPair<int,int> rows = ui->listView->selection();
+  QPair<int,int> rows = ui->channelTableView->selection();
   int rowcount = rows.second-rows.first+1;
   if (rows.first == rows.second) {
     QString name = _config->channelList()->channel(rows.first)->name();
@@ -159,11 +159,11 @@ ChannelListView::onEditChannel(unsigned row) {
 void
 ChannelListView::loadChannelListSectionState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.headerState("channelList"));
+  ui->channelTableView->header()->restoreState(settings.headerState("channelList"));
 }
 void
 ChannelListView::storeChannelListSectionState() {
   Settings settings;
-  settings.setHeaderState("channelList", ui->listView->header()->saveState());
+  settings.setHeaderState("channelList", ui->channelTableView->header()->saveState());
 }
 
