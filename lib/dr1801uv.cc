@@ -19,7 +19,7 @@ RadioInfo
 DR1801UV::defaultRadioInfo() {
   return RadioInfo(RadioInfo::DR1801UV, "dr1801uv",
                    "DR-1801UV", "Baofeng",
-                   DR1801UVInterface::interfaceInfo());
+                   {DR1801UVInterface::interfaceInfo()});
 }
 
 

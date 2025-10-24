@@ -311,7 +311,8 @@ USBDeviceDescriptor::deviceHandle() const {
 QList<USBDeviceDescriptor>
 USBDeviceDescriptor::detect(bool saveOnly) {
   QList<USBDeviceDescriptor> res;
-  res.append(AnytoneInterface::detect(saveOnly));
+  res.append(AnytoneGD32Interface::detect(saveOnly));
+  res.append(AnytoneSTM32Interface::detect(saveOnly));
   res.append(OpenGD77Interface::detect(saveOnly));
   res.append(RadioddityInterface::detect(saveOnly));
   res.append(TyTInterface::detect(saveOnly));

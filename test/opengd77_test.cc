@@ -255,6 +255,47 @@ OpenGD77Test::testAPRSSourceCall() {
   QVERIFY(channel->name() == "2m APRS");
 }
 
+void
+OpenGD77Test::testDTMFContacts() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/dtmf_contact.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.contacts()->count(), 1);
+  QVERIFY(decoded.contacts()->contact(0)->is<DTMFContact>());
+  auto cont = decoded.contacts()->contact(0)->as<DTMFContact>();
+  QCOMPARE(cont->name(), "DTMF");
+  QCOMPARE(cont->number(), "*ABC123#");
+}
+
+
+void
+OpenGD77Test::testChannelTransmitTimeout() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  config.channelList()->channel(0)->setTimeout(60);
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(decoded.channelList()->count(), 2);
+  QVERIFY(! decoded.channelList()->channel(0)->timeoutDisabled());
+  QCOMPARE(decoded.channelList()->channel(0)->timeout(), 60);
+  QVERIFY(decoded.channelList()->channel(1)->timeoutDisabled());
+}
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
 

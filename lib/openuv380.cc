@@ -48,7 +48,7 @@ RadioInfo
 OpenUV380::defaultRadioInfo() {
   return RadioInfo(
         RadioInfo::OpenUV380, "openuv380", "OpenMDUV380", "OpenGD77 Project",
-        OpenGD77Interface::interfaceInfo());
+        {OpenGD77Interface::interfaceInfo()});
 }
 
 

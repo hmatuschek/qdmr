@@ -14,6 +14,7 @@
 #include "d878uv2.hh"
 #include "d578uv.hh"
 #include "dmr6x2uv.hh"
+#include "dmr6x2uv2.hh"
 #include "dm1701.hh"
 #include "dr1801uv.hh"
 
@@ -39,9 +40,11 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"d868uv",    RadioInfo::D868UV},
   {"d868uve",   RadioInfo::D868UVE},
   {"dmr6x2uv",  RadioInfo::DMR6X2UV},
+  {"dmr6x2uv2", RadioInfo::DMR6X2UV2},
   {"d878uv",    RadioInfo::D878UV},
   {"d878uv2",   RadioInfo::D878UVII},
   {"d578uv",    RadioInfo::D578UV},
+  {"d578uv2",   RadioInfo::D578UVII},
   {"dr1801uv",  RadioInfo::DR1801UV}
 };
 
@@ -62,6 +65,7 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::D878UVII,  D878UV2::defaultRadioInfo()},
   {RadioInfo::D578UV,    D578UV::defaultRadioInfo()},
   {RadioInfo::DMR6X2UV,  DMR6X2UV::defaultRadioInfo()},
+  {RadioInfo::DMR6X2UV2, DMR6X2UV2::defaultRadioInfo()},
   {RadioInfo::DR1801UV,  DR1801UV::defaultRadioInfo()}
 };
 
@@ -71,18 +75,18 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
  * Implementation of RadioInfo
  * ********************************************************************************************* */
 RadioInfo::RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-                     const USBDeviceInfo &interface, const QList<RadioInfo> &alias)
+                     const QSet<USBDeviceInfo> &interfaces, const QList<RadioInfo> &alias)
   : _radio(radio), _key(name.toLower()), _name(name), _manufacturer(manufacturer), _alias(alias),
-    _interface(interface)
+    _interfaces(interfaces)
 {
   // pass...
 }
 
 RadioInfo::RadioInfo(Radio radio, const QString &key, const QString &name,
-                     const QString manufacturer, const USBDeviceInfo &interface,
+                     const QString manufacturer, const QSet<USBDeviceInfo> &interfaces,
                      const QList<RadioInfo> &alias)
   : _radio(radio), _key(key), _name(name), _manufacturer(manufacturer), _alias(alias),
-    _interface(interface)
+    _interfaces(interfaces)
 {
   // pass...
 }
@@ -113,9 +117,12 @@ RadioInfo::manufacturer() const {
   return _manufacturer;
 }
 
-const USBDeviceInfo &
-RadioInfo::interface() const {
-  return _interface;
+bool
+RadioInfo::interfaceMatches(const USBDeviceInfo &other) const {
+  foreach (auto interface, _interfaces)
+    if (interface == other)
+      return true;
+  return false;
 }
 
 bool
@@ -169,7 +176,7 @@ RadioInfo::allRadios(const USBDeviceInfo &interface, bool flat) {
   QList<RadioInfo> radios;
   QHash<unsigned, RadioInfo>::const_iterator it = _radiosById.constBegin();
   for (; it!=_radiosById.constEnd(); it++) {
-    if (it->interface() != interface)
+    if (! it->interfaceMatches(interface))
       continue;
     radios.push_back(*it);
     if (flat)

@@ -123,8 +123,8 @@ D868UV::limits() const {
 RadioInfo
 D868UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone", AnytoneInterface::interfaceInfo(),
+        RadioInfo::D868UVE, "d868uve", "AT-D868UVE", "AnyTone", {AnytoneGD32Interface::interfaceInfo()},
         QList<RadioInfo>{
-          RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone", AnytoneInterface::interfaceInfo())
+          RadioInfo(RadioInfo::D868UV, "d868uv", "AT-D868UV", "AnyTone", {AnytoneGD32Interface::interfaceInfo()})
         });
 }

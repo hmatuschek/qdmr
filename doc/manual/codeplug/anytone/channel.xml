@@ -87,7 +87,22 @@
     <term><token>fmAPRSFrequency</token></term>
     <listitem>
       <para>Optional alternative FM APRS frequency specified in the AnyTone extension to the APRS
-      settings.</para>
+        settings.</para>
+    </listitem>
+  </varlistentry>  
+  <varlistentry>
+    <term><token>aprsPTT</token></term>
+    <listitem>
+      <para>Enables/specifies if and when the position is send via APRS whenever the PTT is 
+        pressed. Possible values are <token>Off</token>, <token>Start</token> and 
+        <token>End</token>. </para>
+      <para>If a DMR APRS system is associated with this channel, 
+        <token>Start</token> and <token>End</token> are synonymous. If and FM APRS system is 
+        associated with this channel, the position is send at the beginning 
+        (<token>Start</token>) or end (<token>End</token>) of a transmission. If 
+        <token>Off</token> is set, the position will not be send along with every transmission.
+        In this case, the position might be send periodically, depending on the settings of the
+        position reporting system. </para>
     </listitem>
   </varlistentry>  
 </variablelist>

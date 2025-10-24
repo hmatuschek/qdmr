@@ -29,7 +29,7 @@
     </layout>
    </item>
    <item>
-    <widget class="ConfigObjectTableView" name="listView" native="true">
+    <widget class="ConfigObjectTableView" name="radioIdTableView" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>

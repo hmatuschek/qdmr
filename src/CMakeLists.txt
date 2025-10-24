@@ -1,7 +1,7 @@
 
 qt6_add_resources(qdmr_RCC_SOURCES ../shared/resources.qrc)
 
-add_executable(qdmr WIN32
+qt6_add_executable(qdmr WIN32
   main.cc
   configitemwrapper.cc configitemwrapper.hh
   application.cc application.hh
@@ -63,9 +63,11 @@ add_executable(qdmr WIN32
 #
 # Translations
 #
-qt6_add_translation(qdmr TS_FILES
-  ../i18n/de.ts ../i18n/en_US.ts ../i18n/sv.ts ../i18n/it.ts ../i18n/nl.ts ../i18n/pl.ts ../i18n/fr.ts)
-message(STATUS "Translations at: ${qdmr_QM_FILES}")
+qt6_add_translations(qdmr TS_FILES
+  ${PROJECT_SOURCE_DIR}/i18n/de.ts ${PROJECT_SOURCE_DIR}/i18n/en_US.ts
+  ${PROJECT_SOURCE_DIR}/i18n/sv.ts ${PROJECT_SOURCE_DIR}/i18n/it.ts
+  ${PROJECT_SOURCE_DIR}/i18n/nl.ts ${PROJECT_SOURCE_DIR}/i18n/pl.ts
+  ${PROJECT_SOURCE_DIR}/i18n/fr.ts ${PROJECT_SOURCE_DIR}/i18n/pt_BR.ts)
 
 #
 # Icon generation
@@ -84,10 +86,18 @@ generate_icons(
         document-new document-open document-verify document-save-as document-download
         document-import document-export
         edit-move-10-down edit-move-10-up edit-move-down edit-move-up edit-move-bottom edit-move-top
-        edit-satellites
+        edit-satellites edit-clear item-filter
         help-contents help-about
+        symbol-minus symbol-plus symbol-none
   THEMES light dark
   CONTEXT actions
+  SIZES 16 32)
+
+generate_icons(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/shared/icons
+  ICONS symbol-info symbol-warning symbol-error
+  THEMES light dark
+  CONTEXT emblems
   SIZES 16 32)
 
 qt_add_resources(qdmr "icons"

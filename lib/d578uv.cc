@@ -158,5 +158,10 @@ D578UV::limits() const {
 RadioInfo
 D578UV::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone", AnytoneInterface::interfaceInfo());
+        RadioInfo::D578UV, "d578uv", "AT-D578UV", "AnyTone",
+        { AnytoneGD32Interface::interfaceInfo(),
+          AnytoneSTM32Interface::interfaceInfo() },
+        { RadioInfo(RadioInfo::D578UV, "d578uv2", "AT-D578UVII", "AnyTone",
+          { AnytoneGD32Interface::interfaceInfo(),
+            AnytoneSTM32Interface::interfaceInfo() })});
 }

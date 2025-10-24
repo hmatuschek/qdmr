@@ -36,8 +36,8 @@ RepeaterMapSource::parse(const QByteArray &json) {
 
     auto call = repeater["call"].toString().simplified().toUpper();
     auto mode = repeater["mode"].toString();
-    auto rx = Frequency::fromMHz(repeater["tx"].toDouble());
-    auto tx = Frequency::fromMHz(repeater["rx"].toDouble());
+    auto tx = Frequency::fromMHz(repeater["tx"].toDouble());
+    auto rx = Frequency::fromMHz(repeater["rx"].toDouble());
     auto position = QGeoCoordinate(repeater["lat"].toDouble(), repeater["lon"].toDouble());
     auto qth = repeater["qth"].toString();
 

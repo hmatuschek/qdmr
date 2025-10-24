@@ -30,6 +30,8 @@ private slots:
 
   /** Regression test for #509. */
   void testCTCSSNull();
+  /// Regression test #674.
+  void testDMRIdVerification();
 
 protected:
   QTextStream _stderr;

@@ -382,7 +382,7 @@ D878UVTest::testRegressionDefaultChannel() {
   config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(1)->A()->get(0));
   config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
 
-  D868UVCodeplug codeplug;
+  D878UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
@@ -421,7 +421,7 @@ D878UVTest::testRegressionAutoRepeater() {
   }
   config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
 
-  D868UVCodeplug codeplug;
+  D878UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
@@ -442,6 +442,65 @@ D878UVTest::testRegressionAutoRepeater() {
 }
 
 
+void
+D878UVTest::testRegressionVFOStep() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  config.settings()->anytoneExtension()->setVFOStep(Frequency::fromkHz(8.33));
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(decoded.settings()->anytoneExtension());
+  QCOMPARE(decoded.settings()->anytoneExtension()->vfoStep().inkHz(), 8.33);
+}
+
+
+void
+D878UVTest::testEmptyAESKey() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // Empty encryption key
+  config.commercialExtension()->encryptionKeys()->add(new AESEncryptionKey());
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 0);
+}
 
 
 QTEST_GUILESS_MAIN(D878UVTest)

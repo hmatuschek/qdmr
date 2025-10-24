@@ -67,6 +67,13 @@ public:
   };
   Q_ENUM(Power)
 
+  enum class OffsetShift {
+      None,     ///< No Offset between TX/RX frequencies.
+      Positive,  ///< Positive offset between TX/RX frequencies.
+      Negative  ///< Negative offset between TX/RX frequencies.
+  };
+  Q_ENUM(OffsetShift)
+
 protected:
   /** Hidden constructor.
    * Constructs a new empty channel. */
@@ -86,6 +93,10 @@ public:
   Frequency txFrequency() const;
   /** (Re-)Sets the TX frequency of the channel in Hz. */
   bool setTXFrequency(Frequency freq);
+  /** Returns the offset between tx and rx frequency of the channel in Hz. */
+  FrequencyOffset offsetFrequency() const;
+  /** Returns direction of offset if any.*/
+  OffsetShift offsetShift() const;
 
   /** Returns @c true if the channel uses the global default power setting. */
   bool defaultPower() const;

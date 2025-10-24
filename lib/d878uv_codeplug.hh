@@ -97,6 +97,11 @@ public:
       Both = 3                    ///< Send PTT-ID at start and end.
     };
 
+    /** Possible APRS modes. */
+    enum class APRSType {
+      Off = 0, FM = 1, DMR = 2
+    };
+
     /** Defines all possible APRS PTT settings. */
     enum class APRSPTT {
       Off   = 0,                  ///< Do not send APRS on PTT.
@@ -105,7 +110,7 @@ public:
     };
 
     /** Possible encryption types. */
-    enum class EncryptionType {
+    enum class AdvancedEncryptionType {
       AES, ARC4
     };
 
@@ -134,24 +139,24 @@ public:
     bool dataACK() const;
     /** Enables/disables data ACK. */
     void enableDataACK(bool enable);
+    /** Returns @c true, if auto scan is enabled. */
+    bool autoScan() const;
+    /** Enable/disable auto scan. */
+    void enableAutoScan(bool enable);
 
-    /** Returns @c true if digital APRS transmission is enabled. */
-    bool txDigitalAPRS() const;
-    /** Enables/disables digital APRS transmission. */
-    void enableTXDigitalAPRS(bool enable);
-    /** Returns @c true if the analog APRS reporting (TX) is enabled. */
-    virtual bool txAnalogAPRS() const;
-    /** Enables/disables analog APRS reporting. */
-    virtual void enableTXAnalogAPRS(bool enable);
+    /** Returns APRS type for reporting the position. */
+    APRSType txAPRSType() const;
+    /** Sets APRS type for reporting the position. */
+    void setTXAPRSType(APRSType aprsType);
 
     /** Returns the analog APRS PTT setting. */
-    virtual APRSPTT analogAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT analogAPRSPTTSetting() const;
     /** Sets the analog APRS PTT setting. */
-    virtual void setAnalogAPRSPTTSetting(APRSPTT ptt);
+    virtual void setAnalogAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
     /** Returns the digital APRS PTT setting. */
-    virtual APRSPTT digitalAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT digitalAPRSPTTSetting() const;
     /** Sets the digital APRS PTT setting. */
-    virtual void setDigitalAPRSPTTSetting(APRSPTT ptt);
+    virtual void setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
     virtual unsigned digitalAPRSSystemIndex() const;
@@ -169,10 +174,34 @@ public:
     virtual void setFMAPRSFrequencyIndex(unsigned int idx);
 
     /** Returns the encryption type. */
-    virtual EncryptionType encryptionType() const;
+    virtual AdvancedEncryptionType advancedEncryptionType() const;
     /** Sets the encryptionType. */
-    virtual void setEncryptionType(EncryptionType type);
+    virtual void setEncryptionType(AdvancedEncryptionType type);
 
+    /** Returns @c true, if an AES encryption key index is set. */
+    virtual bool hasAESEncryptionKeyIndex() const;
+    /** Returns the AES encryption key index.
+     * The index is 0-based. */
+    virtual unsigned int aesEncryptionKeyIndex() const;
+    /** Sets the AES encryption key index. */
+    virtual void setAESEncryptionKeyIndex(unsigned int index);
+    /** Clears the AES encryption key index. */
+    virtual void clearAESEncryptionKeyIndex();
+
+    /** Returns @c true, if an ARC4 encryption key index is set. */
+    virtual bool hasARC4EncryptionKeyIndex() const;
+    /** Returns the ARC4 encryption key index.
+     * The index is 0-based. */
+    virtual unsigned int arc4EncryptionKeyIndex() const;
+    /** Sets the ARC4 encryption key index. */
+    virtual void setARC4EncryptionKeyIndex(unsigned int index);
+    /** Clears the ARC4 encryption key index. */
+    virtual void clearARC4EncryptionKeyIndex();
+
+    /** Returns the encryption type. */
+    DMREncryptionType dmrEncryptionType() const;
+    /** Sets the encryption type. */
+    void setDMREncryptionType(DMREncryptionType type);
     /** Returns @c true if a DMR encryption key is set. */
     virtual bool hasDMREncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
@@ -194,15 +223,20 @@ public:
     struct Offset : public D868UVCodeplug::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
-      static constexpr unsigned int roamingEnabled()       { return 0x0034; }
-      static constexpr unsigned int dataACK()              { return 0x0034; }
-      static constexpr unsigned int txDMRAPRS()            { return 0x0035; }
+      static constexpr unsigned int aesKeyIndex()          { return 0x0022; }
+      static constexpr Bit roaming()                       { return {0x034,  2}; }
+      static constexpr Bit dataACK()                       { return {0x0034, 3}; }
+      static constexpr Bit autoScan()                      { return {0x0034, 4}; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
       static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
       static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
       static constexpr unsigned int frequenyCorrection()   { return 0x0039; }
       static constexpr unsigned int dmrEncryptionKey()     { return 0x003a; }
+      static constexpr Bit muteFMAPRS()                    { return {0x003b, 3}; }
+      static constexpr Bit talkerAlias()                   { return {0x003b, 4}; }
+      static constexpr Bit advancedEncryptionType()        { return {0x003b, 5}; }
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
+      static constexpr unsigned int arc4KeyIndex()         { return 0x003d; }
       /// @endcond
     };
   };
@@ -318,11 +352,12 @@ public:
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
       FREQ_STEP_5kHz = 1,               ///< 5kHz
       FREQ_STEP_6_25kHz = 2,            ///< 6.25kHz
-      FREQ_STEP_10kHz = 3,              ///< 10kHz
-      FREQ_STEP_12_5kHz = 4,            ///< 12.5kHz
-      FREQ_STEP_20kHz = 5,              ///< 20kHz
-      FREQ_STEP_25kHz = 6,              ///< 25kHz
-      FREQ_STEP_50kHz = 7               ///< 50kHz
+      FREQ_STEP_8_33kHz = 3,            ///< 8.33kHz
+      FREQ_STEP_10kHz = 4,              ///< 10kHz
+      FREQ_STEP_12_5kHz = 5,            ///< 12.5kHz
+      FREQ_STEP_20kHz = 6,              ///< 20kHz
+      FREQ_STEP_25kHz = 7,              ///< 25kHz
+      FREQ_STEP_50kHz = 8               ///< 50kHz
     };
 
     /** DTMF signalling durations. */

@@ -116,57 +116,75 @@ D878UVCodeplug::ChannelElement::setPTTIDSetting(PTTId ptt) {
 bool
 D878UVCodeplug::ChannelElement::roamingEnabled() const {
   // inverted
-  return !getBit(Offset::roamingEnabled(), 2);
+  return !getBit(Offset::roaming());
 }
 void
 D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted
-  setBit(Offset::roamingEnabled(), 2, !enable);
+  setBit(Offset::roaming(), !enable);
 }
 bool
 D878UVCodeplug::ChannelElement::dataACK() const {
   // inverted
-  return !getBit(Offset::dataACK(), 3);
+  return !getBit(Offset::dataACK());
 }
 void
 D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted
-  setBit(Offset::dataACK(), 3, !enable);
+  setBit(Offset::dataACK(),!enable);
 }
 
 bool
-D878UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return 2 == getUInt2(Offset::txDMRAPRS(), 0);
+D878UVCodeplug::ChannelElement::autoScan() const {
+  return getBit(Offset::autoScan());
 }
 void
-D878UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x02 : 0x00));
-}
-bool
-D878UVCodeplug::ChannelElement::txAnalogAPRS() const {
-  return 1 == getUInt2(Offset::txDMRAPRS(), 0);
-}
-void
-D878UVCodeplug::ChannelElement::enableTXAnalogAPRS(bool enable) {
-  setUInt2(Offset::txDMRAPRS(), 0, (enable ? 0x01 : 0x00));
+D878UVCodeplug::ChannelElement::enableAutoScan(bool enable) {
+  setBit(Offset::autoScan(), enable);
 }
 
-D878UVCodeplug::ChannelElement::APRSPTT
+D878UVCodeplug::ChannelElement::APRSType
+D878UVCodeplug::ChannelElement::txAPRSType() const {
+  return (APRSType)getUInt8(Offset::txAPRSType());
+}
+void
+D878UVCodeplug::ChannelElement::setTXAPRSType(APRSType aprsType) {
+  setUInt8(Offset::txAPRSType(), (uint8_t)aprsType);
+}
+
+AnytoneChannelExtension::APRSPTT
 D878UVCodeplug::ChannelElement::analogAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(Offset::fmAPRSPTTSetting());
+  switch ((APRSPTT)getUInt8(Offset::fmAPRSPTTSetting())) {
+  case APRSPTT::Off: return AnytoneChannelExtension::APRSPTT::Off;
+  case APRSPTT::Start: return AnytoneChannelExtension::APRSPTT::Start;
+  case APRSPTT::End: return AnytoneChannelExtension::APRSPTT::End;
+  }
+  return AnytoneChannelExtension::APRSPTT::Start;
 }
 void
-D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(Offset::fmAPRSPTTSetting(), (unsigned)ptt);
+D878UVCodeplug::ChannelElement::setAnalogAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt) {
+  // There is no start/end option. Either send it or not. If enabled -> encode as "at start".
+  switch (ptt) {
+  case AnytoneChannelExtension::APRSPTT::Off:   setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::Off); break;
+  case AnytoneChannelExtension::APRSPTT::Start: setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::Start); break;
+  case AnytoneChannelExtension::APRSPTT::End:   setUInt8(Offset::fmAPRSPTTSetting(), (unsigned int)APRSPTT::End); break;
+  }
 }
 
-D878UVCodeplug::ChannelElement::APRSPTT
+AnytoneChannelExtension::APRSPTT
 D878UVCodeplug::ChannelElement::digitalAPRSPTTSetting() const {
-  return (APRSPTT)getUInt8(Offset::dmrAPRSPTTSetting());
+  return getUInt8(Offset::dmrAPRSPTTSetting()) ?
+        AnytoneChannelExtension::APRSPTT::Start :
+        AnytoneChannelExtension::APRSPTT::Off;
 }
 void
-D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(APRSPTT ptt) {
-  setUInt8(Offset::dmrAPRSPTTSetting(), (unsigned)ptt);
+D878UVCodeplug::ChannelElement::setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt) {
+  // There is no start/end option. Either send it or not. If enabled -> encode as "at start".
+  switch (ptt) {
+  case AnytoneChannelExtension::APRSPTT::Off:   setUInt8(Offset::dmrAPRSPTTSetting(), 0); break;
+  case AnytoneChannelExtension::APRSPTT::Start:
+  case AnytoneChannelExtension::APRSPTT::End:   setUInt8(Offset::dmrAPRSPTTSetting(), 1); break;
+  }
 }
 
 unsigned
@@ -196,31 +214,76 @@ D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
   setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
 }
 
-D878UVCodeplug::ChannelElement::EncryptionType
-D878UVCodeplug::ChannelElement::encryptionType() const {
-  return getBit(Offset::encryptionType()) ? EncryptionType::ARC4 : EncryptionType::AES;
+D878UVCodeplug::ChannelElement::AdvancedEncryptionType
+D878UVCodeplug::ChannelElement::advancedEncryptionType() const {
+  return getBit(Offset::dmrEncryptionType()) ? AdvancedEncryptionType::ARC4 : AdvancedEncryptionType::AES;
 }
 
 void
-D878UVCodeplug::ChannelElement::setEncryptionType(EncryptionType type) {
-  setBit(Offset::encryptionType(), EncryptionType::ARC4 == type);
+D878UVCodeplug::ChannelElement::setEncryptionType(AdvancedEncryptionType type) {
+  setBit(Offset::dmrEncryptionType(), AdvancedEncryptionType::ARC4 == type);
 }
 
+
+D878UVCodeplug::ChannelElement::DMREncryptionType
+D878UVCodeplug::ChannelElement::dmrEncryptionType() const {
+  return DMREncryptionType::Basic;
+}
+void
+D878UVCodeplug::ChannelElement::setDMREncryptionType(DMREncryptionType type) {
+  Q_UNUSED(type);
+}
 bool
 D878UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
-  return 0 != getUInt8(Offset::dmrEncryptionKey());
+  return false;
 }
 unsigned
 D878UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(Offset::dmrEncryptionKey()) - 1;
+  return 0xff;
 }
 void
 D878UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+  Q_UNUSED(idx);
 }
 void
 D878UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
-  setUInt8(Offset::dmrEncryptionKey(), 0);
+  // pass...
+}
+
+
+bool
+D878UVCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::aesKeyIndex());
+}
+unsigned
+D878UVCodeplug::ChannelElement::aesEncryptionKeyIndex() const {
+  return getUInt8(Offset::aesKeyIndex()) - 1;
+}
+void
+D878UVCodeplug::ChannelElement::setAESEncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::aesKeyIndex(), idx+1);
+}
+void
+D878UVCodeplug::ChannelElement::clearAESEncryptionKeyIndex() {
+  setUInt8(Offset::aesKeyIndex(), 0);
+}
+
+
+bool
+D878UVCodeplug::ChannelElement::hasARC4EncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::arc4KeyIndex());
+}
+unsigned
+D878UVCodeplug::ChannelElement::arc4EncryptionKeyIndex() const {
+  return getUInt8(Offset::arc4KeyIndex()) - 1;
+}
+void
+D878UVCodeplug::ChannelElement::setARC4EncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::arc4KeyIndex(), idx+1);
+}
+void
+D878UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
+  setUInt8(Offset::arc4KeyIndex(), 0);
 }
 
 
@@ -242,20 +305,12 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // If extension is present, update
   if (nullptr != ext) {
     ext->setFrequencyCorrection(frequenyCorrection());
-    // Decode APRS PTT setting.
-    if (txAnalogAPRS()) {
-      switch(analogAPRSPTTSetting()) {
-      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
-      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
-      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
-      }
-    } else if (txDigitalAPRS()) {
-      switch(digitalAPRSPTTSetting()) {
-      case APRSPTT::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
-      case APRSPTT::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
-      case APRSPTT::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
-      }
-    }
+    if (APRSType::FM == txAPRSType())
+      ext->setAPRSPTT(analogAPRSPTTSetting());
+    else if (APRSType::DMR == txAPRSType())
+      ext->setAPRSPTT(digitalAPRSPTTSetting());
+    else
+      ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off);
   }
 
   return ch;
@@ -269,15 +324,17 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if (txDigitalAPRS() && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
+    if ((APRSType::DMR == txAPRSType()) && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
       dc->setAPRSObj(ctx.get<APRSSystem>(0));
+
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
       dc->setRoamingZone(DefaultRoamingZone::get());
+
     if (auto *ext = dc->anytoneChannelExtension()) {
       // If not default FM APRS frequency
       if (0 != fmAPRSFrequencyIndex()) {
@@ -285,29 +342,35 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
           ext->fmAPRSFrequency()->set(ctx.get<AnytoneAPRSFrequency>(fmAPRSFrequencyIndex()));
       }
     }
-
-    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+    bool hasExtension = ctx.config()->settings()->anytoneExtension();
+    bool hasStrongEncryption = hasExtension &&
         (AnytoneDMRSettingsExtension::EncryptionType::AES ==
          ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
 
-    if (hasEncryptionKeyIndex()) {
+    if (hasAESEncryptionKeyIndex()) {
       auto cex = dc->commercialExtension();
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
 
-      if (hasStrongEncryption && (EncryptionType::AES == encryptionType())) {
-        if (! ctx.has<AESEncryptionKey>(encryptionKeyIndex())) {
+      if (hasStrongEncryption && (AdvancedEncryptionType::AES == advancedEncryptionType())) {
+        if (! ctx.has<AESEncryptionKey>(aesEncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no AES key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << aesEncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(encryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<AESEncryptionKey>(aesEncryptionKeyIndex()));
         }
-      } else if (hasStrongEncryption && (EncryptionType::ARC4 == encryptionType())) {
-        if (! ctx.has<ARC4EncryptionKey>(encryptionKeyIndex())) {
+      }
+    } else if (hasARC4EncryptionKeyIndex()) {
+      auto cex = dc->commercialExtension();
+      if (nullptr == cex)
+        dc->setCommercialExtension(cex = new CommercialChannelExtension());
+
+      if (hasStrongEncryption && (AdvancedEncryptionType::ARC4 == advancedEncryptionType())) {
+        if (! ctx.has<ARC4EncryptionKey>(arc4EncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no ARC4 key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << arc4EncryptionKeyIndex() << " defined.";
         } else {
-          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(encryptionKeyIndex()));
+          cex->setEncryptionKey(ctx.get<ARC4EncryptionKey>(arc4EncryptionKeyIndex()));
         }
       }
     } else if (hasDMREncryptionKeyIndex()) {
@@ -315,11 +378,11 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
       if (nullptr == cex)
         dc->setCommercialExtension(cex = new CommercialChannelExtension());
 
-      if ((! hasStrongEncryption) && (D868UVCodeplug::ChannelElement::EncryptionType::Basic
-                                      == D868UVCodeplug::ChannelElement::encryptionType())){
+      if ((! hasStrongEncryption) && (D868UVCodeplug::ChannelElement::DMREncryptionType::Basic
+                                      == D868UVCodeplug::ChannelElement::dmrEncryptionType())){
         if (! ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
           logWarn() << "Cannot link encryption key: no basic DMR key with index "
-                    << encryptionKeyIndex() << " defined.";
+                    << dmrEncryptionKeyIndex() << " defined.";
         } else {
           cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
         }
@@ -329,8 +392,9 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     FMChannel *ac = c->as<FMChannel>();
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if (txAnalogAPRS() && ctx.has<APRSSystem>(0))
+    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
       ac->setAPRSSystem(ctx.get<APRSSystem>(0));
+
     if (auto *ext = ac->anytoneChannelExtension()) {
       // If not default FM APRS frequency
       if (0 != fmAPRSFrequencyIndex()) {
@@ -352,13 +416,14 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
   if (const DMRChannel *dc = c->as<DMRChannel>()) {
     // Set GPS system index
+    setTXAPRSType(APRSType::Off);
     enableRXAPRS(false);
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       enableRXAPRS(true);
-      enableTXDigitalAPRS(true);
+      setTXAPRSType(APRSType::DMR);
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
     } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
-      enableTXAnalogAPRS(true);
+      setTXAPRSType(APRSType::FM);
     }
 
     // Enable roaming
@@ -373,11 +438,12 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRXAPRS(! ext->sms());
     }
 
-    clearEncryptionKeyIndex();
     clearDMREncryptionKeyIndex();
+    clearAESEncryptionKeyIndex();
+    clearARC4EncryptionKeyIndex();
 
     // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
-    bool hasStrongEncryption = (!ctx.config()->settings()->anytoneExtension()) ||
+    bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
         ( ctx.config()->settings()->anytoneExtension() &&
           (AnytoneDMRSettingsExtension::EncryptionType::AES ==
            ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
@@ -385,22 +451,23 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply commercial extension
     if (CommercialChannelExtension *cex = dc->commercialExtension()) {
       if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
-        setEncryptionType(EncryptionType::AES);
-        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setEncryptionType(AdvancedEncryptionType::AES);
+        setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<ARC4EncryptionKey>()) {
-        setEncryptionType(EncryptionType::ARC4);
-        setEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+        setEncryptionType(AdvancedEncryptionType::ARC4);
+        setARC4EncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
-        D868UVCodeplug::ChannelElement::setEncryptionType(
-              D868UVCodeplug::ChannelElement::EncryptionType::Basic);
+        D868UVCodeplug::ChannelElement::setDMREncryptionType(
+              D868UVCodeplug::ChannelElement::DMREncryptionType::Basic);
         setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       }
     }
   } else if (const FMChannel *ac = c->as<FMChannel>()) {
     // Set APRS system
     enableRXAPRS(false);
+    setTXAPRSType(APRSType::Off);
     if (nullptr != ac->aprsSystem()) {
-      enableTXAnalogAPRS(true);
+      setTXAPRSType(APRSType::FM);
       if (ac == ac->aprsSystem()->revertChannel()) {
         enableRXAPRS(true);
       }
@@ -425,19 +492,10 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (nullptr != ch_ext) {
     setFrequencyCorrection(ch_ext->frequencyCorrection());
 
-    if (txDigitalAPRS()) {
-      switch(ch_ext->aprsPTT()) {
-      case AnytoneChannelExtension::APRSPTT::Off: setDigitalAPRSPTTSetting(APRSPTT::Off); break;
-      case AnytoneChannelExtension::APRSPTT::Start: setDigitalAPRSPTTSetting(APRSPTT::Start); break;
-      case AnytoneChannelExtension::APRSPTT::End: setDigitalAPRSPTTSetting(APRSPTT::End); break;
-      }
-    } else if (txAnalogAPRS()) {
-      switch(ch_ext->aprsPTT()) {
-      case AnytoneChannelExtension::APRSPTT::Off: setAnalogAPRSPTTSetting(APRSPTT::Off); break;
-      case AnytoneChannelExtension::APRSPTT::Start: setAnalogAPRSPTTSetting(APRSPTT::Start); break;
-      case AnytoneChannelExtension::APRSPTT::End: setAnalogAPRSPTTSetting(APRSPTT::End); break;
-      }
-    }
+    if (APRSType::DMR == txAPRSType())
+      setDigitalAPRSPTTSetting(ch_ext->aprsPTT());
+    else if (APRSType::FM == txAPRSType())
+      setAnalogAPRSPTTSetting(ch_ext->aprsPTT());
   }
 
   return true;
@@ -986,36 +1044,37 @@ D878UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtens
 
 Frequency
 D878UVCodeplug::GeneralSettingsElement::vfoFrequencyStep() const {
+  // Directly map enum to frequency
   switch (getUInt8(Offset::vfoFrequencyStep())) {
   case FREQ_STEP_2_5kHz: return Frequency::fromkHz(2.5);
   case FREQ_STEP_5kHz: return Frequency::fromkHz(5);
   case FREQ_STEP_6_25kHz: return Frequency::fromkHz(6.25);
+  case FREQ_STEP_8_33kHz: return Frequency::fromkHz(8.33);
   case FREQ_STEP_10kHz: return Frequency::fromkHz(10);
   case FREQ_STEP_12_5kHz: return Frequency::fromkHz(12.5);
   case FREQ_STEP_20kHz: return Frequency::fromkHz(20);
   case FREQ_STEP_25kHz: return Frequency::fromkHz(25);
   case FREQ_STEP_50kHz: return Frequency::fromkHz(50);
   }
+  // otherwise return default step size (2.5kHz)
   return Frequency::fromkHz(2.5);
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setVFOFrequencyStep(Frequency freq) {
-  if (freq.inkHz() <= 2.5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_2_5kHz);
-  else if (freq.inkHz() <= 5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_5kHz);
-  else if (freq.inkHz() <= 6.25)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_6_25kHz);
-  else if (freq.inkHz() <= 10)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_10kHz);
-  else if (freq.inkHz() <= 12.5)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_12_5kHz);
-  else if (freq.inkHz() <= 20)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_20kHz);
-  else if (freq.inkHz() <= 25)
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_25kHz);
-  else
-    setUInt8(Offset::vfoFrequencyStep(), FREQ_STEP_50kHz);
+  static auto map = Frequency::MapNearest<FreqStep>(
+        {
+          {Frequency::fromkHz(2.5),  FREQ_STEP_2_5kHz},
+          {Frequency::fromkHz(5),    FREQ_STEP_5kHz},
+          {Frequency::fromkHz(6.25), FREQ_STEP_6_25kHz},
+          {Frequency::fromkHz(8.33), FREQ_STEP_8_33kHz},
+          {Frequency::fromkHz(10),   FREQ_STEP_10kHz},
+          {Frequency::fromkHz(12.5), FREQ_STEP_12_5kHz},
+          {Frequency::fromkHz(20),   FREQ_STEP_20kHz},
+          {Frequency::fromkHz(25),   FREQ_STEP_25kHz},
+          {Frequency::fromkHz(50),   FREQ_STEP_50kHz},
+        });
+
+  setUInt8(Offset::vfoFrequencyStep(), (uint8_t) map.value(freq));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
@@ -3395,7 +3454,8 @@ D878UVCodeplug::AESEncryptionKeyElement::clear() {
 
 bool
 D878UVCodeplug::AESEncryptionKeyElement::isValid() const {
-  return Element::isValid() && (0 != getUInt8(Offset::index()));
+  return Element::isValid() && (0 != getUInt8(Offset::index())) &&
+      (0 != getUInt8(Offset::size()));
 }
 
 unsigned
@@ -3740,8 +3800,8 @@ D878UVCodeplug::setBitmaps(Context& ctx)
 
   // Mark AES keys
   AESEncryptionKeyBitmapElement aes_key_bitmap(data(Offset::aesKeyBitmap()));
-  unsigned int num_aes_channels = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
-  aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_channels);
+  unsigned int num_aes_keys = std::min(Limit::aesKeys(), ctx.count<AESEncryptionKey>());
+  aes_key_bitmap.clear(); aes_key_bitmap.enableFirst(num_aes_keys);
 
   // Mark ARC4 keys
   ARC4EncryptionKeyBitmapElement arc4_key_bitmap(data(Offset::arc4KeyBitmap()));
@@ -4243,6 +4303,15 @@ D878UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
       continue;
     // Decode
     AESEncryptionKeyElement keyEl(data(Offset::aesKeys() + i*AESEncryptionKeyElement::size()));
+    if (! keyEl.isValid()) {
+      logInfo() << "Skip invalid AES key at index " << i+1 << ".";
+      continue;
+    }
+    if (keyEl.key().size() < 16) {
+      logInfo() << "Skip AES key at index " << i+1
+                << ": Key size " << keyEl.key().size()*8 << " < 128.";
+      continue;
+    }
     auto key = new AESEncryptionKey();
     key->setName(QString("AES Key %1").arg(i+1));
     if (! key->setKey(keyEl.key(), err)) {

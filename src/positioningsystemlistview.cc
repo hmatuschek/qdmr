@@ -16,12 +16,12 @@ PositioningSystemListView::PositioningSystemListView(Config *config, QWidget *pa
 
   ui->setupUi(this);
 
-  connect(ui->listView->header(), SIGNAL(sectionCountChanged(int,int)),
+  connect(ui->aprsTableView->header(), SIGNAL(sectionCountChanged(int,int)),
           this, SLOT(loadPositioningSectionState()));
-  connect(ui->listView->header(), SIGNAL(sectionResized(int,int,int)),
+  connect(ui->aprsTableView->header(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storePositioningSectionState()));
 
-  ui->listView->setModel(new PositioningSystemListWrapper(_config->posSystems(), ui->listView));
+  ui->aprsTableView->setModel(new PositioningSystemListWrapper(_config->posSystems(), ui->aprsTableView));
 
   if (settings.hideGSPNote())
     ui->gpsNote->setVisible(false);
@@ -29,7 +29,7 @@ PositioningSystemListView::PositioningSystemListView(Config *config, QWidget *pa
   connect(ui->addGPS, SIGNAL(clicked()), this, SLOT(onAddGPS()));
   connect(ui->addAPRS, SIGNAL(clicked()), this, SLOT(onAddAPRS()));
   connect(ui->remGPS, SIGNAL(clicked()), this, SLOT(onRemGPS()));
-  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditGPS(unsigned)));
+  connect(ui->aprsTableView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditGPS(unsigned)));
   connect(ui->gpsNote, SIGNAL(linkActivated(QString)), this, SLOT(onHideGPSNote()));
 
 
@@ -48,8 +48,8 @@ PositioningSystemListView::onAddGPS() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->aprsTableView->hasSelection())
+    row = ui->aprsTableView->selection().second+1;
   _config->posSystems()->add(dialog.gpsSystem(), row);
 }
 
@@ -61,21 +61,21 @@ PositioningSystemListView::onAddAPRS() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->aprsTableView->hasSelection())
+    row = ui->aprsTableView->selection().second+1;
   _config->posSystems()->add(dialog.aprsSystem(), row);
 }
 
 void
 PositioningSystemListView::onRemGPS() {
-  if (! ui->listView->hasSelection()) {
+  if (! ui->aprsTableView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete GPS system"),
           tr("Cannot delete GPS system: You have to select a GPS system first."));
     return;
   }
   // Get selection and ask for deletion
-  QPair<int,int> rows = ui->listView->selection();
+  QPair<int,int> rows = ui->aprsTableView->selection();
   int rowcount = rows.second-rows.first+1;
   if (rows.first == rows.second) {
     QString name = _config->posSystems()->system(rows.first)->name();
@@ -124,11 +124,11 @@ PositioningSystemListView::onHideGPSNote() {
 void
 PositioningSystemListView::loadPositioningSectionState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.headerState("positioningList"));
+  ui->aprsTableView->header()->restoreState(settings.headerState("positioningList"));
 }
 void
 PositioningSystemListView::storePositioningSectionState() {
   Settings settings;
-  settings.setHeaderState("positioningList", ui->listView->header()->saveState());
+  settings.setHeaderState("positioningList", ui->aprsTableView->header()->saveState());
 }
 
