@@ -13,10 +13,8 @@
 struct FrequencyBase
 {
 public:
-  /** Possible formatting hints. */
-  enum class Format {
-    Automatic, Hz, kHz, MHz, GHz
-  };
+  /** Frequency units. */
+  enum class Unit { Auto, Hz, kHz, MHz, GHz };
 
 protected:
   /** Hidden constructor from offset in Hz. */
@@ -37,14 +35,26 @@ public:
   inline bool isZero() const { return 0 == _frequency; }
 
   /** Format the frequency. */
-  QString format(Format f=Format::Automatic) const;
+  QString format(Unit unit = Unit::Auto) const;
   /** Parses a frequency. */
-  bool parse(const QString &value);
+  bool parse(const QString &value, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive);
 
   inline long long inHz() const { return _frequency; }             ///< Unit conversion.
   inline double inkHz() const { return double(_frequency)/1e3; }   ///< Unit conversion.
   inline double inMHz() const { return double(_frequency)/1e6; }   ///< Unit conversion.
   inline double inGHz() const { return double(_frequency)/1e9; }   ///< Unit conversion.
+
+  /** Returns the most appropriate unit for the frequency value. */
+  Unit unit() const;
+
+  /** Returns unit as type base on string input */
+  Unit unitFromString(const QString& input) const;
+
+  /** Checks if frequency is a multiple of unit. */
+  bool isMultipleOf(Unit unit) const;
+
+  /** Helper for string conversion of unit. */
+  static QString unitName(Unit unit);
 
 protected:
   /** The actual frequency in Hz. */
@@ -135,8 +145,6 @@ public:
   Frequency &operator+=(const FrequencyOffset &offset);
   FrequencyOffset operator-(const Frequency &other) const;    ///< Frequency arithmetic.
 
-  /** Parses a frequency. */
-  bool parse(const QString &value);
   /** Pareses a frequency. */
   static Frequency fromString(const QString &freq);
 
@@ -229,7 +237,7 @@ namespace YAML
     static bool decode(const Node& node, Frequency& rhs) {
       if (! node.IsScalar())
         return false;
-      return rhs.parse(QString::fromStdString(node.as<std::string>()));
+      return rhs.parse(QString::fromStdString(node.as<std::string>()), Qt::CaseSensitive);
     }
   };
 }
