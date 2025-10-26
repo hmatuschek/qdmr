@@ -161,7 +161,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="38"/>
         <source>HC Future</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Futur HC</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="39"/>
@@ -191,7 +191,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="44"/>
         <source>Grid Square</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grid Square</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="45"/>
@@ -236,12 +236,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="53"/>
         <source>TBD</source>
-        <translation type="unfinished"></translation>
+        <translation>À définir</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="54"/>
         <source>RV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="55"/>
@@ -271,7 +271,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="60"/>
         <source>Helo</source>
-        <translation type="unfinished"></translation>
+        <translation>HELO</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="61"/>
@@ -326,7 +326,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="71"/>
         <source>ICP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ICP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="72"/>
@@ -376,7 +376,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="81"/>
         <source>Mic-E</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mic-e</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="82"/>
@@ -386,12 +386,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="83"/>
         <source>EOC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">EOC</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="84"/>
         <source>Rover</source>
-        <translation type="unfinished"></translation>
+        <translation>Ballade</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="85"/>
@@ -406,7 +406,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="87"/>
         <source>Power boat</source>
-        <translation>Bateau à moteur</translation>
+        <translation>Bateau</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="88"/>
@@ -509,7 +509,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&#xa0;:&lt;/span&gt; qdmr propose la complétion automatique des canaux. Commencer à saisir l&apos;indicatif d&apos;un relai, à partir de 3 caractères saisis, une requête est envoyée vers repeaterbook.com pour récupérer les répéteurs correspondants. Ces requêtes pouvant prendre du temps, les résultats sont stockés localement dans un cache.&lt;/p&gt;&lt;p&gt;Une liste déroulante apparaît permettant la sélection du relai. Une fois le relai sélectionné, les fréquences RX/TX et les codes couleurs sont complétés.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="46"/>
@@ -800,7 +800,7 @@
     <message>
         <location filename="../src/application.cc" line="403"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestion du fichier &apos;%1&apos; inconnue.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="440"/>
@@ -1780,7 +1780,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&#xa0;:&lt;/span&gt; qdmr propose la complétion automatique des canaux. Commencer à saisir l&apos;indicatif d&apos;un relai, à partir de 3 caractères saisis, une requête est envoyée vers repeaterbook.com pour récupérer les répéteurs correspondants. Ces requêtes pouvant prendre du temps, les résultats sont stockés localement dans un cache.&lt;/p&gt;&lt;p&gt;Une liste déroulante apparaît permettant la sélection du relai. Une fois le relai sélectionné, les fréquences RX/TX et les codes couleurs sont complétés.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&#xa0;:&lt;/span&gt; qdmr propose la complétion automatique des canaux. Commencer à saisir l&apos;indicatif d&apos;un relai, à partir de 3 caractères saisis, une requête est envoyée vers repeaterbook.com pour récupérer les répéteurs correspondants. Ces requêtes pouvant prendre du temps, les résultats sont stockés localement dans un cache.&lt;/p&gt;&lt;p&gt;Une liste déroulante apparaît permettant la sélection du relai. Une fois le relai sélectionné, les fréquences RX/TX et les codes couleurs sont complétés.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="46"/>
@@ -2043,7 +2043,7 @@
     <message>
         <location filename="../src/gpssystemdialog.ui" line="89"/>
         <source>Revert Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverser le canal</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="107"/>
@@ -3278,7 +3278,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie de la configuration sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie de la configuration sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="48"/>
@@ -3571,7 +3571,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mettre à jour le codeplug de la radio. Si aucune sélection de paramètres, le codeplug de la radio est écrasé avec potentiellement des valeurs par défaut incomplètes. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si une sélection de paramètres, QDMR télécharge le codeplug actuel de la radio et met à jour uniquement les paramètres sélectionnés. Les paramètres restant de la radio ne sont pas modifiés (recommandé).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="238"/>
@@ -3631,7 +3631,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="279"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comme l&apos;interface de communication avec la radio reste ouverte après la phase de vérification, le délai peut être dépassé et l&apos;écriture du codeplug échouer lorsque le dialogue de vérification s&apos;ouvre. Pour éviter ce comportement, les messages d&apos;information (warnings) de la vérification peuvent être ignorés, supprimant le délai entre la vérification et l&apos;écriture. Les erreurs de vérification continuent à bloquer une écriture de codeplug incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="289"/>
@@ -3743,7 +3743,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="39"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Les zones sont des collections de canaux habituellement valides pour une région particulière.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR gère les zones en permettant l&apos;utilisation de deux listes indépendantes, une par VFO si la radio dispose de deux VFO. Cependant, certaines radios ne permettent pas d&apos;assigner des zones différentes à chaque VFO. Dans ce cas, QDMR découpe la zone en deux (A &amp;amp; B) en les programmant individuellement dans la radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="54"/>
