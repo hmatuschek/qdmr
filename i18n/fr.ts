@@ -732,7 +732,7 @@
     <message>
         <location filename="../src/application.cc" line="294"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
-        <translation>Enregistrer dans l&apos;ancien format de configuration tabulaire est désactivé depuis la version 0.9.0. Lire ces fichiers reste possible.</translation>
+        <translation>Enregistrer dans l&apos;ancien format de paramétrage tabulaire est désactivé depuis la version 0.9.0. Lire ces fichiers reste possible.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="306"/>
@@ -908,7 +908,7 @@
         <location filename="../src/application.cc" line="754"/>
         <location filename="../src/application.cc" line="764"/>
         <source>Cannot write satellite config.</source>
-        <translation>Échec de l’écriture de la configuration des satellites.</translation>
+        <translation>Échec de l’écriture du paramétrage des satellites.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="755"/>
@@ -923,7 +923,7 @@
     <message>
         <location filename="../src/application.cc" line="787"/>
         <source>Write satellite config ...</source>
-        <translation>Écriture de la configuration des satellites …</translation>
+        <translation>Écriture du paramétrage des satellites …</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="797"/>
@@ -1372,7 +1372,7 @@
     <message>
         <location filename="../src/configobjectlistview.ui" line="25"/>
         <source>Move selected item(s) to the top.</source>
-        <translation>Déplacer les éléments sélectionnés en haut.</translation>
+        <translation>Déplacer les éléments sélectionnés tout en haut.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="45"/>
@@ -1397,7 +1397,7 @@
     <message>
         <location filename="../src/configobjectlistview.ui" line="125"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation>Déplacer les éléments sélectionnés en bas.</translation>
+        <translation>Déplacer les éléments sélectionnés tout en bas.</translation>
     </message>
 </context>
 <context>
@@ -1425,7 +1425,7 @@
     <message>
         <location filename="../src/configobjecttableview.ui" line="25"/>
         <source>Move selected item(s) to the top.</source>
-        <translation>Déplacer les éléments sélectionnés en haut.</translation>
+        <translation>Déplacer les éléments sélectionnés tout en haut.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="39"/>
@@ -1450,7 +1450,7 @@
     <message>
         <location filename="../src/configobjecttableview.ui" line="95"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation>Déplacer les éléments sélectionnés en bas.</translation>
+        <translation>Déplacer les éléments sélectionnés tout en bas.</translation>
     </message>
 </context>
 <context>
@@ -1944,7 +1944,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="482"/>
         <source>Device specific settings</source>
-        <translation>Configuration spécifique de la radio</translation>
+        <translation>Paramètres spécifiques de la radio</translation>
     </message>
 </context>
 <context>
@@ -2056,7 +2056,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
         <source>DMR Radio ID</source>
-        <translation>ID Radio DMR</translation>
+        <translation>ID DMR Radio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="28"/>
@@ -2071,7 +2071,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="42"/>
         <source>Enter your name or callsign.</source>
-        <translation>Entrer votre nom ou indicatif.</translation>
+        <translation>Saisir votre nom ou indicatif.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="45"/>
@@ -2081,7 +2081,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Boot Settings</source>
-        <translation>Configuration de démarrage</translation>
+        <translation>Paramètres de démarrage</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="64"/>
@@ -2116,7 +2116,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="104"/>
         <source>Audio Settings</source>
-        <translation>Configuration audio</translation>
+        <translation>Paramètres audio</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
@@ -2182,7 +2182,7 @@
         <location filename="../src/generalsettingsview.ui" line="210"/>
         <location filename="../src/generalsettingsview.ui" line="230"/>
         <source>Off</source>
-        <translation>Inactif</translation>
+        <translation>Désactivé</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="223"/>
@@ -2417,7 +2417,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="295"/>
         <source>Shows settings dialog</source>
-        <translation>Afficher l&apos;écran des paramètres.</translation>
+        <translation>Afficher l&apos;écran de paramétrage.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="304"/>
@@ -2457,7 +2457,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation>Exporte tous les canaux FM vers le format CSV de CHIRP.</translation>
+        <translation type="unfinished">Exporte tous les canaux FM vers le format CSV de CHIRP.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
@@ -2657,7 +2657,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="35"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS or APRS. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne disposent pas du GPS ou de l&apos;APRS. Cette partie de la configuration peut être ignoré lors de l&apos;écriture du code-plug dans la radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne disposent pas du GPS ou de l&apos;APRS. Cette partie du paramétrage peut être ignoré lors de l&apos;écriture du code-plug dans la radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="72"/>
@@ -3061,7 +3061,7 @@
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie de la configuration sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conseil:&lt;/span&gt; Vous n&apos;avez pas besoin d&apos;ajouter des canaux de Roaming explicitement, créez simplement des zones de Roaming et ajoutez leurs des canaux. Ces canaux seront alors automatiquement ajoutés à cette liste.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie du paramétrage sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conseil:&lt;/span&gt; Vous n&apos;avez pas besoin d&apos;ajouter des canaux de Roaming explicitement, créez simplement des zones de Roaming et ajoutez leurs des canaux. Ces canaux seront alors automatiquement ajoutés à cette liste.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="51"/>
@@ -3278,7 +3278,7 @@
     <message>
         <location filename="../src/roamingzonelistview.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie de la configuration sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR est un CPS indépendant des modèles de radios. Cependant, toutes les radios ne prennent pas en charge le Roaming. Cette partie du paramétrage sera peut-être ignorée lors de l&apos;écriture du code-plug dans la radio. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Masquer&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="48"/>
@@ -3681,7 +3681,7 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="385"/>
         <source>If enabled, the entries are selected using the users DMR ID.</source>
-        <translation>Si activé, les entrées sont sélectionnées en utilisant les ID DMR des utilisateurs.</translation>
+        <translation>Si activé, les entrées sont sélectionnées en utilisant les IDs DMR des utilisateurs.</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="395"/>
