@@ -109,9 +109,11 @@ ConfigObjectTableView::hasSelection() const {
 
 QPair<int,int>
 ConfigObjectTableView::selection() const {
-  return getSelectionRowRange(
-        proxy()->mapSelectionToSource(
-          ui->tableView->selectionModel()->selection()).indexes());
+  if (isFilteredOrSorted())
+    return getSelectionRowRange(
+          proxy()->mapSelectionToSource(
+            ui->tableView->selectionModel()->selection()).indexes());
+  return getSelectionRowRange(ui->tableView->selectionModel()->selection().indexes());
 }
 
 QHeaderView *
@@ -234,7 +236,7 @@ ConfigObjectTableView::onMoveItemBottom() {
 void
 ConfigObjectTableView::onDoubleClicked(QModelIndex idx) {
   // Map index if sort/filter is enabled
-  if (ui->actionToggleFilterSort->isChecked())
+  if (isFilteredOrSorted())
     idx = proxy()->mapToSource(idx);
 
   if ((0 > idx.row()) || (idx.row() >= model()->rowCount(QModelIndex())))
