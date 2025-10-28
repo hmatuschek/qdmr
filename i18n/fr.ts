@@ -1810,7 +1810,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="204"/>
         <source>Tx Timeout</source>
-        <translation>Anti-bavard TX</translation>
+        <translation>Anti-bavard</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="275"/>
@@ -1862,7 +1862,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="219"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
-        <translation>Précise le délai de l&apos;anti-bavard TX en secondes. Une valeur de 0 désactive l&apos;anti-bavard.</translation>
+        <translation>Précise le délai de l&apos;anti-bavard en secondes. Une valeur de 0 désactive l&apos;anti-bavard.</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="222"/>
