@@ -1,13 +1,9 @@
 #include "gpssystem.hh"
-#include "userdatabase.hh"
-#include "roamingchannel.hh"
 #include "d578uv_codeplug.hh"
 #include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
 #include "config.h"
-#include "logger.hh"
-#include "roamingchannel.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -41,12 +37,12 @@ D578UVCodeplug::ChannelElement::enableSwapFrequencies(bool enable) {
 
 
 bool
-D578UVCodeplug::ChannelElement::directDuplex() const {
-  return getBit(Offset::throughMode());
+D578UVCodeplug::ChannelElement::bluetoothEnabled() const {
+  return getBit(Offset::bluetooth());
 }
 void
-D578UVCodeplug::ChannelElement::enableDirectDuplex(bool enable) {
-  setBit(Offset::throughMode(), enable);
+D578UVCodeplug::ChannelElement::enableBluetooth(bool enable) {
+  setBit(Offset::bluetooth(), enable);
 }
 
 
@@ -64,6 +60,39 @@ D578UVCodeplug::ChannelElement::enableRoaming(bool enable) {
 
 
 bool
+D578UVCodeplug::ChannelElement::multipleKeyEncryption() const {
+  return getBit(Offset::multipleKeyEncryption());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
+  setBit(Offset::multipleKeyEncryption(), enable);
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::randomKey() const {
+  return getBit(Offset::randomKey());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableRandomKey(bool enable) {
+  setBit(Offset::randomKey(), enable);
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::sms() const {
+  return !getBit(Offset::sms());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableSMS(bool enable) {
+  setBit(Offset::sms(), !enable);
+}
+
+
+bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
   return !getBit(0x003d,3);
@@ -76,25 +105,84 @@ D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
 }
 
 
-unsigned
-D578UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return 0;
+bool
+D578UVCodeplug::ChannelElement::autoScan() const {
+  return getBit(Offset::autoScan());
 }
 
 void
-D578UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  Q_UNUSED(idx)
+D578UVCodeplug::ChannelElement::enableAutoScan(bool enable) {
+  setBit(Offset::autoScan(), enable);
+}
+
+bool
+D578UVCodeplug::ChannelElement::sendTalkerAlias() const {
+  return getBit(Offset::talkerAlias());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableSendTalkerAlias(bool enable) {
+  setBit(Offset::talkerAlias(), enable);
+}
+
+
+D878UVCodeplug::ChannelElement::AdvancedEncryptionType
+D578UVCodeplug::ChannelElement::advancedEncryptionType() const {
+  return getBit(Offset::dmrEncryptionType()) ? AdvancedEncryptionType::ARC4 : AdvancedEncryptionType::AES;
+}
+
+void
+D578UVCodeplug::ChannelElement::setEncryptionType(AdvancedEncryptionType type) {
+  setBit(Offset::dmrEncryptionType(), AdvancedEncryptionType::ARC4 == type);
 }
 
 
 bool
-D578UVCodeplug::ChannelElement::analogScambler() const {
-  return getUInt8(0x003a);
+D578UVCodeplug::ChannelElement::analogScamblerEnabled() const {
+  return FMScramblerFrequency::Off != (FMScramblerFrequency)getUInt8(Offset::fmScrambler());
+}
+
+Frequency
+D578UVCodeplug::ChannelElement::analogScramblerFrequency() const {
+  switch ((FMScramblerFrequency)getUInt8(Offset::fmScrambler())) {
+  case FMScramblerFrequency::Off: return Frequency();
+  case FMScramblerFrequency::Hz3300: return Frequency::fromHz(3300);
+  case FMScramblerFrequency::Hz3200: return Frequency::fromHz(3200);
+  case FMScramblerFrequency::Hz3100: return Frequency::fromHz(3100);
+  case FMScramblerFrequency::Hz3000: return Frequency::fromHz(3000);
+  case FMScramblerFrequency::Hz2900: return Frequency::fromHz(2900);
+  case FMScramblerFrequency::Hz2800: return Frequency::fromHz(2800);
+  case FMScramblerFrequency::Hz2700: return Frequency::fromHz(2700);
+  case FMScramblerFrequency::Hz2600: return Frequency::fromHz(2600);
+  case FMScramblerFrequency::Hz2500: return Frequency::fromHz(2500);
+  case FMScramblerFrequency::Hz4095: return Frequency::fromHz(4095);
+  case FMScramblerFrequency::Hz3458: return Frequency::fromHz(3458);
+  case FMScramblerFrequency::Custom:
+    return Frequency::fromHz(100*getUInt8(Offset::customScrambler())+1500);
+  }
+  return Frequency();
 }
 
 void
-D578UVCodeplug::ChannelElement::enableAnalogScamber(bool enable) {
-  setUInt8(0x003a, (enable ? 0x01 : 0x00));
+D578UVCodeplug::ChannelElement::setAnalogScamberFrequency(Frequency f) {
+  if (4095 == f.inHz()) {
+    setUInt8(Offset::fmScrambler(), (unsigned)FMScramblerFrequency::Hz4095);
+    setUInt8(Offset::customScrambler(), 0);
+  } else if (3458 == f.inHz()) {
+    setUInt8(Offset::fmScrambler(), (unsigned)FMScramblerFrequency::Hz3458);
+    setUInt8(Offset::customScrambler(), 0);
+  } else if ((f.inHz() >= 1500) && (f.inHz() <= 4100)) {
+    setUInt8(Offset::fmScrambler(), (unsigned)FMScramblerFrequency::Custom);
+    setUInt8(Offset::customScrambler(), (f.inHz()-1500)/100);
+  } else {
+    clearAnalogScambler();
+  }
+}
+
+void
+D578UVCodeplug::ChannelElement::clearAnalogScambler() {
+  setUInt8(Offset::fmScrambler(), (unsigned)FMScramblerFrequency::Off);
+  setUInt8(Offset::customScrambler(), 0);
 }
 
 
@@ -118,20 +206,94 @@ D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   if (FMChannel *fch = ch->as<FMChannel>()) {
     if (AnytoneFMChannelExtension *ext = fch->anytoneChannelExtension()) {
       // Common settings
-      ext->enableHandsFree(directDuplex());
+      ext->enableHandsFree(bluetoothEnabled());
       // FM specific settings
-      ext->enableScrambler(analogScambler());
+      ext->setScramblerFrequency(analogScamblerEnabled() ? analogScramblerFrequency() : Frequency());
     }
   } else if (DMRChannel *dch = ch->as<DMRChannel>()) {
     if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
       // Common settings
-      ext->enableHandsFree(directDuplex());
+      ext->enableHandsFree(bluetoothEnabled());
       // DMR specific extensions
     }
   }
 
   // Done.
   return ch;
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::fromChannelObj(const Channel *ch, Context &ctx) {
+  if (! D878UVCodeplug::ChannelElement::fromChannelObj(ch, ctx))
+    return false;
+
+  // Apply extensions
+  if (const FMChannel *fch = ch->as<FMChannel>()) {
+    if (AnytoneFMChannelExtension *ext = fch->anytoneChannelExtension()) {
+      // Common settings
+      enableBluetooth(ext->handsFree());
+      // FM specific settings
+      if (ext->scramblerFrequency().isZero())
+        clearAnalogScambler();
+      else
+        setAnalogScamberFrequency(ext->scramblerFrequency());
+    }
+  } else if (const DMRChannel *dch = ch->as<DMRChannel>()) {
+    if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
+      // Common settings
+      enableBluetooth(ext->handsFree());
+      // DMR specific extensions
+    }
+  }
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of D578UVCodeplug::ChannelExtensionElement
+ * ******************************************************************************************** */
+D578UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *data, unsigned size)
+  : Element(data, size)
+{
+  // pass...
+}
+
+D578UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *data)
+  : Element(data, size())
+{
+  // pass...
+}
+
+
+void
+D578UVCodeplug::ChannelExtensionElement::clear() {
+  Element::clear();
+  std::memset(_data, 0, size());
+}
+
+
+unsigned int
+D578UVCodeplug::ChannelExtensionElement::fiveToneIdIndexBOT() const {
+  return getUInt8(Offset::fiveToneIdIndexBOT());
+}
+
+void
+D578UVCodeplug::ChannelExtensionElement::setFiveToneIdIndexBOT(unsigned int idx) {
+  setUInt8(Offset::fiveToneIdIndexBOT(), idx);
+}
+
+
+unsigned int
+D578UVCodeplug::ChannelExtensionElement::fiveToneIdIndexEOT() const {
+  return getUInt8(Offset::fiveToneIdIndexEOT());
+}
+
+void
+D578UVCodeplug::ChannelExtensionElement::setFiveToneIdIndexEOT(unsigned int idx) {
+  setUInt8(Offset::fiveToneIdIndexEOT(), idx);
 }
 
 
@@ -1942,9 +2104,13 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   for (int i=0; i<ctx.config()->channelList()->count(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
-    ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
-                           + idx*ChannelElement::size()));
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+                    + idx*ChannelElement::size();
+    ChannelElement ch(data(addr));
     ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+    ext.clear();
   }
   return true;
 }

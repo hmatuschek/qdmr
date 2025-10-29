@@ -4,7 +4,6 @@
 #include <QDateTime>
 
 #include "d878uv_codeplug.hh"
-#include "signaling.hh"
 
 class Channel;
 class DMRContact;
@@ -24,13 +23,16 @@ class D578UVCodeplug : public D878UVCodeplug
   Q_OBJECT
 
 public:
-  /** Represents the actual channel encoded within the binary code-plug.
-   *
-   * Memory layout of encoded channel (size 0x40 bytes):
-   * @verbinclude d578uv_channel.txt
-   */
+  /** Represents the actual channel encoded within the binary code-plug. */
   class ChannelElement: public D878UVCodeplug::ChannelElement
   {
+  public:
+    /** Possible FM scrambler carrier frequencies. */
+    enum class FMScramblerFrequency {
+      Off = 0, Hz3300 = 1, Hz3200 = 2, Hz3100 = 3, Hz3000 = 4, Hz2900 = 5, Hz2800 = 6, Hz2700 = 7,
+      Hz2600 = 8, Hz2500 = 9, Hz4095 = 10, Hz3458 = 11, Custom = 12
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -45,37 +47,52 @@ public:
     virtual void enableSwapFrequencies(bool enable);
 
     /** Returns @c true if bluetooth hands-free is enabled. */
-    virtual bool directDuplex() const;
+    virtual bool bluetoothEnabled() const;
     /** Enables/disables hands-free. */
-    virtual void enableDirectDuplex(bool enable);
+    virtual void enableBluetooth(bool enable);
 
     // moved to a different bit
-    bool roamingEnabled() const;
-    void enableRoaming(bool enable);
+    bool roamingEnabled() const override;
+    void enableRoaming(bool enable) override;
 
     // moved to a different bit
-    /** Returns @c true if the data ACK is enabled. */
-    bool dataACK() const;
-    /** Enables data ACK. */
-    void enableDataACK(bool enable);
+    bool multipleKeyEncryption() const override;
+    void enableMultipleKeyEncryption(bool enable) override;
 
-    // Replaced by analog scrambler settings
-    /** The D578UV does not support the weak DMR encryption, hence this function returns always 0. */
-    unsigned dmrEncryptionKeyIndex() const;
-    /** The D578UV does not support the weak DMR encryption, hence this function has not effect. */
-    void setDMREncryptionKeyIndex(unsigned idx);
+    bool randomKey() const override;
+    void enableRandomKey(bool enable) override;
+
+    bool sms() const override;
+    void enableSMS(bool enable) override;
+
+    bool dataACK() const override;
+    void enableDataACK(bool enable) override;
+
+    bool autoScan() const override;
+    void enableAutoScan(bool enable) override;
+
+    bool sendTalkerAlias() const override;
+    void enableSendTalkerAlias(bool enable) override;
+
+    AdvancedEncryptionType advancedEncryptionType() const override;
+    void setEncryptionType(AdvancedEncryptionType type) override;
 
     /** Returns @c true if the analog scambler is enabled. */
-    virtual bool analogScambler() const;
-    /** Enables/disables the analog scambler. */
-    virtual void enableAnalogScamber(bool enable);
+    virtual bool analogScamblerEnabled() const;
+    /** If enabled, returns the analog scrambler frequency. */
+    virtual Frequency analogScramblerFrequency() const;
+    /** Sets the analog scambler frequency and enables the scrambler. */
+    virtual void setAnalogScamberFrequency(Frequency f);
+    /** Disables the scambler*/
+    virtual void clearAnalogScambler();
 
     /// Removed from D578UV codeplug
-    bool ctcssPhaseReversal() const;
+    bool ctcssPhaseReversal() const override;
     /// Removed from D578UV codeplug
-    void enableCTCSSPhaseReversal(bool enable);
+    void enableCTCSSPhaseReversal(bool enable) override;
 
-    Channel *toChannelObj(Context &ctx) const;
+    Channel *toChannelObj(Context &ctx) const override;
+    bool fromChannelObj(const Channel *ch, Context &ctx) override;
 
   protected:
     /** Internal offsets within the channel element. */
@@ -83,7 +100,6 @@ public:
     {
       /// @cond DO_NOT_DOCUMENT
       static constexpr Bit swapRxTx()                      { return {0x0009, 4}; }
-      static constexpr Bit throughMode()                   { return {0x0034, 1}; }
       static constexpr Bit bluetooth()                     { return {0x0034, 2}; }
       static constexpr Bit noiseReduction()                { return {0x0034, 3}; }
       static constexpr Bit interruptPriority()             { return {0x0034, 4}; }
@@ -100,10 +116,49 @@ public:
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003e; }
       static constexpr unsigned int arc4KeyIndex()         { return 0x003f; }
       // Deleted
+      static constexpr Bit muteFMAPRS()                    { return {0x0000, 0}; }
       static constexpr Bit ctcssPhaseReversal()            { return {0x0000, 0}; }
       /// @endcond
     };
   };
+
+
+  /** Represents the a channel extension element within the binary codeplug. */
+  class ChannelExtensionElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelExtensionElement(uint8_t *ptr, unsigned size);
+
+  public:
+    /** Constructor from data. */
+    ChannelExtensionElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear() override;
+
+    /** Returns the index of the 5-tone ID send at the start of the transmission. */
+    virtual unsigned int fiveToneIdIndexBOT() const;
+    /** Sets the index of the 5-tone ID send at the start of the transmission. */
+    virtual void setFiveToneIdIndexBOT(unsigned int idx);
+
+    /** Returns the index of the 5-tone ID send at the end of the transmission. */
+    virtual unsigned int fiveToneIdIndexEOT() const;
+    /** Sets the index of the 5-tone ID send at the end of the transmission. */
+    virtual void setFiveToneIdIndexEOT(unsigned int idx);
+
+  protected:
+    /** Internal offsets within element. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int fiveToneIdIndexBOT() { return 0x0000; }
+      static constexpr unsigned int fiveToneIdIndexEOT() { return 0x0001; }
+      /// @endcond
+    };
+  };
+
 
   /** Represents the general config of the radio within the D578UV binary codeplug.
    *
@@ -808,7 +863,8 @@ public:
       static constexpr unsigned int btRXDelay()           { return 0x00e2; }
       /// @endcond
     };
-};
+  };
+
 
   /** Represents the hot-key settings of the radio within the D578UV binary codeplug.
    *

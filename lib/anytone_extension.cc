@@ -128,7 +128,8 @@ AnytoneChannelExtension::setAPRSPTT(APRSPTT mode) {
  * ********************************************************************************************* */
 AnytoneFMChannelExtension::AnytoneFMChannelExtension(QObject *parent)
   : AnytoneChannelExtension(parent), _reverseBurst(false), _rxCustomCTCSS(false),
-    _txCustomCTCSS(false), _customCTCSS(0), _squelchMode(SquelchMode::Carrier), _scrambler(false)
+    _txCustomCTCSS(false), _customCTCSS(0), _squelchMode(SquelchMode::Carrier),
+    _scramblerFrequency()
 {
   // pass...
 }
@@ -201,15 +202,15 @@ AnytoneFMChannelExtension::setSquelchMode(SquelchMode mode) {
   emit modified(this);
 }
 
-bool
-AnytoneFMChannelExtension::scrambler() const {
-  return _scrambler;
+Frequency
+AnytoneFMChannelExtension::scramblerFrequency() const {
+  return _scramblerFrequency;
 }
 void
-AnytoneFMChannelExtension::enableScrambler(bool enable) {
-  if (enable == _scrambler)
+AnytoneFMChannelExtension::setScramblerFrequency(const Frequency &f) {
+  if (f == _scramblerFrequency)
     return;
-  _scrambler = enable;
+  _scramblerFrequency = f;
   emit modified(this);
 }
 

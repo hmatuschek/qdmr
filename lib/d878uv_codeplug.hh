@@ -123,7 +123,7 @@ public:
     explicit ChannelElement(uint8_t *ptr);
 
     /** Resets the channel. */
-    void clear();
+    void clear()  override;
 
     /** Returns the PTT ID settings. */
     virtual PTTId pttIDSetting() const;
@@ -136,13 +136,13 @@ public:
     virtual void enableRoaming(bool enable);
     // Moved
     /** Returns @c true if the data ACK is enabled. */
-    bool dataACK() const;
+    bool dataACK() const override;
     /** Enables/disables data ACK. */
-    void enableDataACK(bool enable);
+    void enableDataACK(bool enable) override;
     /** Returns @c true, if auto scan is enabled. */
-    bool autoScan() const;
+    virtual bool autoScan() const ;
     /** Enable/disable auto scan. */
-    void enableAutoScan(bool enable);
+    virtual void enableAutoScan(bool enable);
 
     /** Returns APRS type for reporting the position. */
     APRSType txAPRSType() const;
@@ -159,9 +159,9 @@ public:
     virtual void setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
-    virtual unsigned digitalAPRSSystemIndex() const;
+    unsigned digitalAPRSSystemIndex() const override;
     /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(unsigned idx);
+    void setDigitalAPRSSystemIndex(unsigned idx) override;
 
     /** Returns the frequency correction in ???. */
     virtual int frequenyCorrection() const;
@@ -172,6 +172,11 @@ public:
     virtual unsigned int fmAPRSFrequencyIndex() const;
     /** Sets the FM APRS frequency index [0,7]. */
     virtual void setFMAPRSFrequencyIndex(unsigned int idx);
+
+    /** If set, transmission of talker alias for this channel is enabled. */
+    virtual bool sendTalkerAlias() const;
+    /** Enable transmission of talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
     /** Returns the encryption type. */
     virtual AdvancedEncryptionType advancedEncryptionType() const;
@@ -199,24 +204,24 @@ public:
     virtual void clearARC4EncryptionKeyIndex();
 
     /** Returns the encryption type. */
-    DMREncryptionType dmrEncryptionType() const;
+    DMREncryptionType dmrEncryptionType() const override;
     /** Sets the encryption type. */
-    void setDMREncryptionType(DMREncryptionType type);
+    void setDMREncryptionType(DMREncryptionType type) override;
     /** Returns @c true if a DMR encryption key is set. */
-    virtual bool hasDMREncryptionKeyIndex() const;
+    bool hasDMREncryptionKeyIndex() const override;
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned dmrEncryptionKeyIndex() const;
+    unsigned dmrEncryptionKeyIndex() const override;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    void setDMREncryptionKeyIndex(unsigned idx) override;
     /** Clears the DMR encryption key index. */
-    virtual void clearDMREncryptionKeyIndex();
+    void clearDMREncryptionKeyIndex() override;
 
     /** Constructs a Channel object from this element. */
-    Channel *toChannelObj(Context &ctx) const;
+    Channel *toChannelObj(Context &ctx) const override;
     /** Links a previously created channel object. */
-    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const override;
     /** Encodes the given channel object. */
-    bool fromChannelObj(const Channel *c, Context &ctx);
+    bool fromChannelObj(const Channel *c, Context &ctx) override;
 
   protected:
     /** Internal used offsets within the channel element. */

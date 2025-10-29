@@ -214,6 +214,18 @@ D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
   setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
 }
 
+
+bool
+D878UVCodeplug::ChannelElement::sendTalkerAlias() const {
+  return getBit(Offset::talkerAlias());
+}
+
+void
+D878UVCodeplug::ChannelElement::enableSendTalkerAlias(bool enable) {
+  setBit(Offset::talkerAlias(), enable);
+}
+
+
 D878UVCodeplug::ChannelElement::AdvancedEncryptionType
 D878UVCodeplug::ChannelElement::advancedEncryptionType() const {
   return getBit(Offset::dmrEncryptionType()) ? AdvancedEncryptionType::ARC4 : AdvancedEncryptionType::AES;
