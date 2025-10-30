@@ -33,6 +33,11 @@ public:
       Hz2600 = 8, Hz2500 = 9, Hz4095 = 10, Hz3458 = 11, Custom = 12
     };
 
+    /** Possible interrupt priorities. */
+    enum class InterruptPriority {
+      None = 0, Low = 1, High = 2
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -51,11 +56,19 @@ public:
     /** Enables/disables hands-free. */
     virtual void enableBluetooth(bool enable);
 
-    // moved to a different bit
     bool roamingEnabled() const override;
     void enableRoaming(bool enable) override;
 
-    // moved to a different bit
+    /** Returns the interrupt priority. */
+    virtual InterruptPriority interruptPriority() const;
+    /** Sets the interrupt priority. */
+    virtual void setInterruptPriority(InterruptPriority pri);
+
+    /** Returns @c true if noise reduction is enabled. */
+    virtual bool noiseReductionEnabled() const;
+    /** Enables/disables noise reduction. */
+    virtual void enableNoiseReduction(bool enable);
+
     bool multipleKeyEncryption() const override;
     void enableMultipleKeyEncryption(bool enable) override;
 
@@ -85,6 +98,14 @@ public:
     virtual void setAnalogScamberFrequency(Frequency f);
     /** Disables the scambler*/
     virtual void clearAnalogScambler();
+
+    unsigned int fmAPRSFrequencyIndex() const override;
+    void setFMAPRSFrequencyIndex(unsigned int idx) override;
+
+    bool hasARC4EncryptionKeyIndex() const override;
+    unsigned int arc4EncryptionKeyIndex() const override;
+    void setARC4EncryptionKeyIndex(unsigned int index) override;
+    void clearARC4EncryptionKeyIndex() override;
 
     /// Removed from D578UV codeplug
     bool ctcssPhaseReversal() const override;

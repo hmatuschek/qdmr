@@ -59,6 +59,28 @@ D578UVCodeplug::ChannelElement::enableRoaming(bool enable) {
 }
 
 
+D578UVCodeplug::ChannelElement::InterruptPriority
+D578UVCodeplug::ChannelElement::interruptPriority() const {
+  return (InterruptPriority)getUInt2(Offset::interruptPriority());
+}
+
+void
+D578UVCodeplug::ChannelElement::setInterruptPriority(InterruptPriority pri) {
+  setUInt2(Offset::interruptPriority(), (unsigned) pri);
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::noiseReductionEnabled() const {
+  return getBit(Offset::noiseReduction());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableNoiseReduction(bool enable) {
+  setBit(Offset::noiseReduction(), enable);
+}
+
+
 bool
 D578UVCodeplug::ChannelElement::multipleKeyEncryption() const {
   return getBit(Offset::multipleKeyEncryption());
@@ -183,6 +205,38 @@ void
 D578UVCodeplug::ChannelElement::clearAnalogScambler() {
   setUInt8(Offset::fmScrambler(), (unsigned)FMScramblerFrequency::Off);
   setUInt8(Offset::customScrambler(), 0);
+}
+
+
+unsigned int
+D578UVCodeplug::ChannelElement::fmAPRSFrequencyIndex() const {
+  return getUInt8(Offset::fmAPRSFrequencyIndex());
+}
+
+void
+D578UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
+  setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
+}
+
+
+bool
+D578UVCodeplug::ChannelElement::hasARC4EncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::arc4KeyIndex());
+}
+
+unsigned
+D578UVCodeplug::ChannelElement::arc4EncryptionKeyIndex() const {
+  return getUInt8(Offset::arc4KeyIndex()) - 1;
+}
+
+void
+D578UVCodeplug::ChannelElement::setARC4EncryptionKeyIndex(unsigned idx) {
+  setUInt8(Offset::arc4KeyIndex(), idx+1);
+}
+
+void
+D578UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
+  setUInt8(Offset::arc4KeyIndex(), 0);
 }
 
 
