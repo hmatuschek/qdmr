@@ -2035,11 +2035,6 @@ AnytoneCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
-  // Encode DMR settings
-  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
-  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
-
   // Encode display settings
   setChannelBNameColor(ext->displaySettings()->channelBNameColor());
   setZoneANameColor(ext->displaySettings()->zoneNameColor());
@@ -2058,11 +2053,6 @@ AnytoneCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Error
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
-
-  // Store DMR settings
-  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
-  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Store display settings
   ext->displaySettings()->setChannelBNameColor(channelBNameColor());

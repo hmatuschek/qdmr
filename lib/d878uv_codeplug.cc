@@ -2585,6 +2585,11 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
+  // Encode DMR settings
+  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
   // Some general settings
   setSTEDuration(ext->steDuration());
 
@@ -2660,6 +2665,11 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Store DMR settings
+  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());

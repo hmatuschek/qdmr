@@ -896,14 +896,20 @@ public:
     /** Resets the settings. */
     void clear();
 
-    bool sendTalkerAlias() const;
-    void enableSendTalkerAlias(bool enable);
+    /** Returns @c true if the talker alias is sent. */
+    virtual bool sendTalkerAlias() const;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
-    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
-    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
+    /** Returns the talker alias source. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
-    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
-    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    /** Returns the talker alias encoding. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;

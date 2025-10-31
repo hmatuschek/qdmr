@@ -491,15 +491,13 @@ D578UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
  * ******************************************************************************************** */
 QVector<QTimeZone>
 D578UVCodeplug::GeneralSettingsElement::TimeZone::_timeZones = {
-  QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400),
-  QTimeZone(-28800), QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000),
-  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone(- 7200),
-  QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600), QTimeZone(  7200),
-  QTimeZone( 10800), QTimeZone( 12600), QTimeZone(-28800), QTimeZone( 14400),
-  QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700),
-  QTimeZone( 21600), QTimeZone( 25200), QTimeZone( 28600), QTimeZone( 30600),
-  QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600), QTimeZone( 43200),
-  QTimeZone( 46800) };
+  QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400), QTimeZone(-28800),
+  QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000), QTimeZone(-14400), QTimeZone(-12600),
+  QTimeZone(-10800), QTimeZone(- 7200), QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600),
+  QTimeZone(  7200), QTimeZone( 10800), QTimeZone( 12600), QTimeZone( 14400), QTimeZone( 16200),
+  QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700), QTimeZone( 21600), QTimeZone( 25200),
+  QTimeZone( 28600), QTimeZone( 30600), QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600),
+  QTimeZone( 43200), QTimeZone( 46800) };
 
 QTimeZone
 D578UVCodeplug::GeneralSettingsElement::TimeZone::decode(uint8_t code) {
@@ -555,6 +553,41 @@ D578UVCodeplug::GeneralSettingsElement::language() const {
 void
 D578UVCodeplug::GeneralSettingsElement::setLanguage(AnytoneDisplaySettingsExtension::Language lang) {
   setUInt8(Offset::language(), (unsigned)lang);
+}
+
+
+Frequency
+D578UVCodeplug::GeneralSettingsElement::vfoStepSize() const {
+  switch ((VFOStepSize)getUInt8(Offset::vfoStepSize())) {
+  case VFOStepSize::Hz2500:  return Frequency::fromHz(2500);
+  case VFOStepSize::Hz5000:  return Frequency::fromHz(5000);
+  case VFOStepSize::Hz6250:  return Frequency::fromHz(6250);
+  case VFOStepSize::Hz8330:  return Frequency::fromHz(8330);
+  case VFOStepSize::kHz10:   return Frequency::fromkHz(10);
+  case VFOStepSize::Hz12500: return Frequency::fromHz(12500);
+  case VFOStepSize::kHz20:   return Frequency::fromkHz(20);
+  case VFOStepSize::kHz25:   return Frequency::fromkHz(25);
+  case VFOStepSize::kHz30:   return Frequency::fromkHz(30);
+  case VFOStepSize::kHz50:   return Frequency::fromkHz(50);
+  }
+
+  return Frequency::fromHz(2500);
+}
+
+void
+D578UVCodeplug::GeneralSettingsElement::setVFOStepSize(const Frequency &f) {
+  VFOStepSize stepSize = VFOStepSize::Hz2500;
+  if (f.inHz() <= 2500)       stepSize = VFOStepSize::Hz2500;
+  else if (f.inHz() <= 5000)  stepSize = VFOStepSize::Hz5000;
+  else if (f.inHz() <= 6250)  stepSize = VFOStepSize::Hz6250;
+  else if (f.inHz() <= 8330)  stepSize = VFOStepSize::Hz8330;
+  else if (f.inkHz() <= 10)   stepSize = VFOStepSize::kHz10;
+  else if (f.inHz() <= 12500) stepSize = VFOStepSize::Hz12500;
+  else if (f.inkHz() <= 20)   stepSize = VFOStepSize::kHz20;
+  else if (f.inkHz() <= 25)   stepSize = VFOStepSize::kHz25;
+  else if (f.inkHz() <= 30)   stepSize = VFOStepSize::kHz30;
+  else if (f.inkHz() <= 50)   stepSize = VFOStepSize::kHz50;
+  setUInt8(Offset::vfoStepSize(), (unsigned) stepSize);
 }
 
 
@@ -1326,35 +1359,35 @@ D578UVCodeplug::GeneralSettingsElement::enableGPSUnitsImperial(bool enable) {
 
 bool
 D578UVCodeplug::GeneralSettingsElement::knobLock() const {
-  return getBit(Offset::knobLock(), 0);
+  return getBit(Offset::knobLock());
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
-  setBit(Offset::knobLock(), 0, enable);
+  setBit(Offset::knobLock(), enable);
 }
 bool
 D578UVCodeplug::GeneralSettingsElement::keypadLock() const {
-  return getBit(Offset::keypadLock(), 1);
+  return getBit(Offset::keypadLock());
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableKeypadLock(bool enable) {
-  setBit(Offset::keypadLock(), 1, enable);
+  setBit(Offset::keypadLock(), enable);
 }
 bool
 D578UVCodeplug::GeneralSettingsElement::sidekeysLock() const {
-  return getBit(Offset::sideKeyLock(), 3);
+  return getBit(Offset::sideKeyLock());
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableSidekeysLock(bool enable) {
-  setBit(Offset::sideKeyLock(), 3, enable);
+  setBit(Offset::sideKeyLock(), enable);
 }
 bool
 D578UVCodeplug::GeneralSettingsElement::keyLockForced() const {
-  return getBit(Offset::forceKeyLock(), 4);
+  return getBit(Offset::forceKeyLock());
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
-  setBit(Offset::forceKeyLock(), 4, enable);
+  setBit(Offset::forceKeyLock(), enable);
 }
 
 Interval

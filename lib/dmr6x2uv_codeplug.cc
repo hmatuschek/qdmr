@@ -1374,6 +1374,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
   if (nullptr == ext)
     return true;
 
+  // Encode DMR settings
+  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
   // Encode audio settings
   setMuteTimer(ext->audioSettings()->muteDelay());
 
@@ -1415,6 +1420,11 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Store DMR settings
+  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Decode audio settings
   ext->audioSettings()->setMuteDelay(this->muteTimer());
