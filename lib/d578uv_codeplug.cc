@@ -356,7 +356,7 @@ D578UVCodeplug::ChannelExtensionElement::setFiveToneIdIndexEOT(unsigned int idx)
  * Implementation of D578UVCodeplug::GeneralSettingsElement::KeyFunction
  * ******************************************************************************************** */
 uint8_t
-D578UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsExtension::KeyFunction func) {
+D578UVCodeplug::KeyFunction::encode(AnytoneKeySettingsExtension::KeyFunction func) {
   switch (func) {
   case AnytoneKeySettingsExtension::KeyFunction::Off:               return (uint8_t)KeyFunction::Off;
   case AnytoneKeySettingsExtension::KeyFunction::Voltage:           return (uint8_t)KeyFunction::Voltage;
@@ -421,7 +421,7 @@ D578UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsEx
 }
 
 AnytoneKeySettingsExtension::KeyFunction
-D578UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
+D578UVCodeplug::KeyFunction::decode(uint8_t code) {
   switch ((KeyFunctionCode)code) {
   case KeyFunction::Off:               return AnytoneKeySettingsExtension::KeyFunction::Off;
   case KeyFunction::Voltage:           return AnytoneKeySettingsExtension::KeyFunction::Voltage;
@@ -665,6 +665,7 @@ void
 D578UVCodeplug::GeneralSettingsElement::setGroupCallHangTime(Interval intv) {
   setUInt8(Offset::groupCallHangTime(), intv.seconds());
 }
+
 Interval
 D578UVCodeplug::GeneralSettingsElement::privateCallHangTime() const {
   return Interval::fromSeconds(getUInt8(Offset::privateCallHangTime()));
@@ -673,14 +674,7 @@ void
 D578UVCodeplug::GeneralSettingsElement::setPrivateCallHangTime(Interval intv) {
   setUInt8(Offset::privateCallHangTime(), intv.seconds());
 }
-Interval
-D578UVCodeplug::GeneralSettingsElement::preWaveDelay() const {
-  return Interval::fromMilliseconds((unsigned)getUInt8(Offset::preWaveDelay())*20);
-}
-void
-D578UVCodeplug::GeneralSettingsElement::setPreWaveDelay(Interval intv) {
-  setUInt8(Offset::preWaveDelay(), intv.milliseconds()/20);
-}
+
 Interval
 D578UVCodeplug::GeneralSettingsElement::wakeHeadPeriod() const {
   return Interval::fromMilliseconds(((unsigned)getUInt8(Offset::wakeHeadPeriod()))*20);
@@ -698,6 +692,7 @@ void
 D578UVCodeplug::GeneralSettingsElement::setWFMChannelIndex(unsigned idx) {
   setUInt8(Offset::wfmChannelIndex(), idx);
 }
+
 bool
 D578UVCodeplug::GeneralSettingsElement::wfmVFOEnabled() const {
   return getUInt8(Offset::wfmVFOEnabled());
@@ -1795,40 +1790,38 @@ D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigne
   setUInt8(Offset::repCheckNumNotify(), n);
 }
 
-Interval
-D578UVCodeplug::GeneralSettingsElement::transmitTimeoutRekey() const {
-  return Interval::fromSeconds(getUInt8(Offset::totRekey()));
-}
-void
-D578UVCodeplug::GeneralSettingsElement::setTransmitTimeoutRekey(Interval dt) {
-  setUInt8(Offset::totRekey(), dt.seconds());
-}
 
 bool
 D578UVCodeplug::GeneralSettingsElement::btHoldTimeEnabled() const {
   return 0x00 != getUInt8(Offset::btHoldTime());
 }
+
 bool
 D578UVCodeplug::GeneralSettingsElement::btHoldTimeInfinite() const {
   return 121U == getUInt8(Offset::btHoldTime());
 }
+
 Interval
 D578UVCodeplug::GeneralSettingsElement::btHoldTime() const {
   return Interval::fromSeconds(getUInt8(Offset::btHoldTime()));
 }
+
 void
 D578UVCodeplug::GeneralSettingsElement::setBTHoldTime(Interval interval) {
   unsigned int seconds = std::min(120ULL, std::max(1ULL, interval.seconds()));
   setUInt8(Offset::btHoldTime(), seconds);
 }
+
 void
 D578UVCodeplug::GeneralSettingsElement::setBTHoldTimeInfinite() {
   setUInt8(Offset::btHoldTime(), 121);
 }
+
 void
 D578UVCodeplug::GeneralSettingsElement::disableBTHoldTime() {
   setUInt8(Offset::btHoldTime(), 0);
 }
+
 
 Interval
 D578UVCodeplug::GeneralSettingsElement::btRXDelay() const {
@@ -1836,6 +1829,7 @@ D578UVCodeplug::GeneralSettingsElement::btRXDelay() const {
     return Interval::fromMilliseconds(30);
   return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::btRXDelay())+1)*500);
 }
+
 void
 D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
   if (500 >= delay.milliseconds()) {
@@ -1845,6 +1839,7 @@ D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
     setUInt8(Offset::btRXDelay(), (millis-500)/500);
   }
 }
+
 
 bool
 D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
@@ -1915,7 +1910,6 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Encode DMR settings
   setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
   setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
-  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
@@ -2002,7 +1996,6 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // Encode dmr settings
   ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
   ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
-  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
@@ -2066,6 +2059,871 @@ D578UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
 
   return true;
 }
+
+
+/* ******************************************************************************************** *
+ * Implementation of D578UVCodeplug::ExtendedSettingsElement
+ * ******************************************************************************************** */
+D578UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned int size)
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
+{
+  // pass...
+}
+
+D578UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
+  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size())
+{
+  // pass...
+}
+
+
+void
+D578UVCodeplug::ExtendedSettingsElement::clear() {
+  AnytoneCodeplug::ExtendedSettingsElement::clear();
+}
+
+
+AnytoneDMRSettingsExtension::TalkerAliasSource
+D578UVCodeplug::ExtendedSettingsElement::talkerAliasSource() const {
+  return (AnytoneDMRSettingsExtension::TalkerAliasSource)getUInt8(Offset::talkerAliasDisplay());
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode) {
+  setUInt8(Offset::talkerAliasDisplay(), (unsigned)mode);
+}
+
+
+AnytoneDMRSettingsExtension::TalkerAliasEncoding
+D578UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
+  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding enc) {
+  setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::weatherAlarmEnabled() const {
+  return 0 != getUInt8(Offset::weatherAlarm());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableWeatherAlarm(bool enabled) {
+  setUInt8(Offset::weatherAlarm(), enabled ? 0x01 : 0x00);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::repeaterEnabled() const {
+  return 0 != getUInt8(Offset::repeater());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableRepeater(bool enabled) {
+  setUInt8(Offset::repeater(), enabled ? 0x01 : 0x00);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::Speaker
+D578UVCodeplug::ExtendedSettingsElement::speaker() const {
+  return (Speaker) getUInt8(Offset::speakers());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setSpeaker(Speaker speaker) {
+  setUInt8(Offset::speakers(), (unsigned)speaker);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::SpeakerSource
+D578UVCodeplug::ExtendedSettingsElement::micSpeakerSource() const {
+  return (SpeakerSource) getUInt8(Offset::micSpeakerSource());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(SpeakerSource source) {
+  setUInt8(Offset::micSpeakerSource(), (unsigned)source);
+}
+
+
+AnytoneGPSSettingsExtension::GPSMode
+D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+  switch ((GPSMode)getUInt8(Offset::gpsMode())) {
+  case GPSMode::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  case GPSMode::Beidou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
+  case GPSMode::GPS_Beidou: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  }
+  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
+  switch (mode) {
+  case AnytoneGPSSettingsExtension::GPSMode::GPS:
+  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
+  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
+    setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS);
+    break;
+  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
+  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+    setUInt8(Offset::gpsMode(), (unsigned)GPSMode::Beidou);
+    break;
+  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
+  case AnytoneGPSSettingsExtension::GPSMode::All:
+    setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS_Beidou);
+    break;
+  }
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::bluetoothPTTLatch() const {
+  return getUInt8(Offset::btPTTLatch());
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::enableBluetoothPTTLatch(bool enable) {
+  setUInt8(Offset::btPTTLatch(), enable ? 0x01 : 0x00);
+}
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::infiniteBluetoothPTTSleepDelay() const {
+  return  bluetoothPTTSleepDelay().isNull();
+}
+Interval
+D578UVCodeplug::ExtendedSettingsElement::bluetoothPTTSleepDelay() const {
+  return Interval::fromMinutes(getUInt8(Offset::btPTTSleepDelay()));
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setBluetoothPTTSleepDelay(Interval delay) {
+  unsigned int t = std::min(Limit::maxBluetoothPTTSleepDelay(), (unsigned int)delay.minutes());
+  setUInt8(Offset::btPTTSleepDelay(), t);
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setInfiniteBluetoothPTTSleepDelay() {
+  setBluetoothPTTSleepDelay(Interval::fromMinutes(0));
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::FanControl
+D578UVCodeplug::ExtendedSettingsElement::fanControl() const {
+  return (FanControl) getUInt8(Offset::fanControl());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setFanControl(FanControl ctrl) {
+  setUInt8(Offset::fanControl(), (unsigned) ctrl);
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::weatherChannelIndex() const {
+  return getUInt8(Offset::weatherChannelIndex());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setWeatherChannelIndex(unsigned int idx) {
+  setUInt8(Offset::weatherChannelIndex(), std::min(Limit::maxWeatherChannelIndex(), idx));
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::infiniteManDialGroupCallHangTime() const {
+  return manDialGroupCallHangTime().isNull();
+}
+
+Interval
+D578UVCodeplug::ExtendedSettingsElement::manDialGroupCallHangTime() const {
+  unsigned int t = getUInt8(Offset::manGrpCallHangTime())+1;
+  if (t<=30)
+    return Interval::fromSeconds(t);
+  else if (31==t)
+    return Interval::fromMinutes(30);
+  return Interval();
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setManDialGroupCallHangTime(Interval dur) {
+  unsigned int t = dur.seconds();
+  if (t > 30)
+    t = 31;  // = 30min
+  else if (0 == t)
+    t = 32;  // = infinite
+  setUInt8(Offset::manGrpCallHangTime(), t-1);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setManDialGroupCallHangTimeInfinite() {
+  setManDialGroupCallHangTime(Interval::fromSeconds(0));
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::infiniteManDialPrivateCallHangTime() const {
+  return manDialPrivateCallHangTime().isNull();
+}
+
+Interval
+D578UVCodeplug::ExtendedSettingsElement::manDialPrivateCallHangTime() const {
+  unsigned int t = getUInt8(Offset::manPrivCallHangTime())+1;
+  if (t<=30)
+    return Interval::fromSeconds(t);
+  else if (31==t)
+    return Interval::fromMinutes(30);
+  return Interval();
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setManDialPrivateCallHangTime(Interval dur) {
+  unsigned int t = dur.seconds();
+  if (t > 30)
+    t = 31;  // = 30min
+  else if (0 == t)
+    t = 32;  // = infinite
+  setUInt8(Offset::manPrivCallHangTime(), t-1);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setManDialPrivateCallHangTimeInfinite() {
+  setManDialPrivateCallHangTime(Interval::fromSeconds(0));
+}
+
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::chKnobShortPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::chKnobShortPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setChKnobShortPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::chKnobShortPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::chKnobLongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::chKnobLongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setChKnobLongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::chKnobLongPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneDisplaySettingsExtension::Color
+D578UVCodeplug::ExtendedSettingsElement::channelBNameColor() const {
+  return NameColor::decode(getUInt8(Offset::channelBNameColor()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::channelBNameColor(), NameColor::encode(color));
+}
+
+
+AnytoneDMRSettingsExtension::EncryptionType
+D578UVCodeplug::ExtendedSettingsElement::encryption() const {
+  return (AnytoneDMRSettingsExtension::EncryptionType)getUInt8(Offset::encryptionType());
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setEncryption(AnytoneDMRSettingsExtension::EncryptionType mode) {
+  setUInt8(Offset::encryptionType(), (unsigned int)mode);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::professionalMode() const {
+  return 1 == getUInt8(Offset::uiMode());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableProfessionalMode(bool enable) {
+  setUInt8(Offset::uiMode(), enable ? 0x01 : 0x00);
+}
+
+
+Interval
+D578UVCodeplug::ExtendedSettingsElement::steDuration() const {
+  return Interval::fromMilliseconds((getUInt8(Offset::steDuration())+1)*10);
+}
+void
+D578UVCodeplug::ExtendedSettingsElement::setSTEDuration(Interval dur) {
+  unsigned int t = std::max(10U, std::min(1000U, (unsigned int)dur.milliseconds()));
+  setUInt8(Offset::steDuration(), t/10-1);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::MicType
+D578UVCodeplug::ExtendedSettingsElement::micType() const {
+  return (MicType)getUInt8(Offset::micType());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setMicType(MicType type) {
+  setUInt8(Offset::micType(), (unsigned) type);
+}
+
+
+AnytoneDisplaySettingsExtension::Color
+D578UVCodeplug::ExtendedSettingsElement::zoneANameColor() const {
+  return NameColor::decode(getUInt8(Offset::zoneANameColor()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setZoneANameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneANameColor(), NameColor::encode(color));
+}
+
+AnytoneDisplaySettingsExtension::Color
+D578UVCodeplug::ExtendedSettingsElement::zoneBNameColor() const {
+  return NameColor::decode(getUInt8(Offset::zoneBNameColor()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setZoneBNameColor(AnytoneDisplaySettingsExtension::Color color) {
+  setUInt8(Offset::zoneBNameColor(), NameColor::encode(color));
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::resetAutoShutdownOnCall() const {
+  return 0x00 != getUInt8(Offset::autoShutdownMode());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableResetAutoShutdownOnCall(bool enable) {
+  setUInt8(Offset::autoShutdownMode(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::showColorCode() const {
+  return getBit(Offset::displayColorCode());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableShowColorCode(bool enable) {
+  setBit(Offset::displayColorCode(), enable);
+}
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::showTimeSlot() const {
+  return getBit(Offset::displayTimeSlot());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableShowTimeSlot(bool enable) {
+  setBit(Offset::displayTimeSlot(), enable);
+}
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::showChannelType() const {
+  return getBit(Offset::displayChannelType());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableShowChannelType(bool enable) {
+  setBit(Offset::displayChannelType(), enable);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::fmIdleTone() const {
+  return 0x00 != getUInt8(Offset::fmIdleTone());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableFMIdleTone(bool enable) {
+  setUInt8(Offset::fmIdleTone(), enable ? 0x01 : 0x00);
+}
+
+
+AnytoneDisplaySettingsExtension::DateFormat
+D578UVCodeplug::ExtendedSettingsElement::dateFormat() const {
+  return (AnytoneDisplaySettingsExtension::DateFormat)getUInt8(Offset::dateFormat());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format) {
+  setUInt8(Offset::dateFormat(), (unsigned int)format);
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
+  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
+  gain = std::min(10U, std::max(1U, gain));
+  setUInt8(Offset::analogMicGain(), gain*4/10);
+}
+
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK1ShortPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK1ShortPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK1ShortPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK1ShortPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK2ShortPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK2ShortPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK2ShortPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK2ShortPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK3ShortPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK3ShortPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK3ShortPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK3ShortPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK1LongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK1LongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK1LongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK1LongPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK2LongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK2LongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK2LongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK2LongPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK3LongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK3LongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK3LongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK3LongPressFunction(), KeyFunction::encode(func));
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetMicGain() const {
+  return 2*(getUInt8(Offset::btHSMicGain())+1);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetMicGain(unsigned int gain) {
+  gain = std::min(10U, std::max(1U, gain));
+  setUInt8(Offset::btHSMicGain(), (gain-1)/2);
+}
+
+
+Interval
+D578UVCodeplug::ExtendedSettingsElement::btHandsetBacklightDuration() const {
+  unsigned int val = getUInt8(Offset::btHSBacklightDuration());
+
+  if ((1 <= val) && (5 >= val))
+    return Interval::fromSeconds(5 * val);
+  else if ((6 <= val) && (10 >= val))
+    return Interval::fromMinutes(val-5);
+  else if (11 == val)
+    return Interval::fromMinutes(15);
+  else if (12 == val)
+    return Interval::fromMinutes(35);
+  else if (13 == val)
+    return Interval::fromMinutes(45);
+  else if (14 == val)
+    return Interval::fromMinutes(60);
+
+  return Interval::infinity();
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetBacklightDuration(Interval dur) {
+  if (dur.seconds() < 5) setUInt8(Offset::btHSBacklightDuration(), 1);
+  else if (dur.seconds() < 30) setUInt8(Offset::btHSBacklightDuration(), dur.seconds()/5);
+  else if (dur.minutes() < 1) setUInt8(Offset::btHSBacklightDuration(), 6);
+  else if (dur.minutes() < 10) setUInt8(Offset::btHSBacklightDuration(), 5+dur.minutes());
+  else if (dur.minutes() <= 15) setUInt8(Offset::btHSBacklightDuration(), 11);
+  else if (dur.minutes() <= 35) setUInt8(Offset::btHSBacklightDuration(), 12);
+  else if (dur.minutes() <= 45) setUInt8(Offset::btHSBacklightDuration(), 13);
+  else if (dur.minutes() <= 60) setUInt8(Offset::btHSBacklightDuration(), 14);
+  else setUInt8(Offset::btHSBacklightDuration(), 0);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::UpDownKeyFunction
+D578UVCodeplug::ExtendedSettingsElement::micUpDownKeyFunction() const {
+  return (UpDownKeyFunction)getUInt8(Offset::upDownKeyFunction());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setMicUpDownKeyFunction(UpDownKeyFunction func) {
+  setUInt8(Offset::upDownKeyFunction(), (unsigned) func);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::totNotification() const {
+  return 0x00 != getUInt8(Offset::totNotification());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableTOTNotification(bool enable) {
+  setUInt8(Offset::totNotification(), enable ? 0x01 : 0x00);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::gpsRoaming() const {
+  return 0x00 != getUInt8(Offset::gpsRoaming());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableGPSRoaming(bool enable) {
+  setUInt8(Offset::gpsRoaming(), enable ? 0x01 : 0x00);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::RepeaterColorCodeMatch
+D578UVCodeplug::ExtendedSettingsElement::repColorCodeMatch() const {
+  return (RepeaterColorCodeMatch)getUInt8(Offset::repeaterColorCode());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setRepColorCodeMatch(RepeaterColorCodeMatch mode) {
+  setUInt8(Offset::repeaterColorCode(), (unsigned) mode);
+}
+
+
+D578UVCodeplug::ExtendedSettingsElement::RepeaterTimeSlotMatch
+D578UVCodeplug::ExtendedSettingsElement::repTimeSlotAMatch() const {
+  return (RepeaterTimeSlotMatch)getUInt8(Offset::repeaterATimeslot());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotAMatch(RepeaterTimeSlotMatch mode) {
+  setUInt8(Offset::repeaterATimeslot(), (unsigned) mode);
+}
+
+D578UVCodeplug::ExtendedSettingsElement::RepeaterTimeSlotMatch
+D578UVCodeplug::ExtendedSettingsElement::repTimeSlotBMatch() const {
+  return (RepeaterTimeSlotMatch)getUInt8(Offset::repeaterBTimeslot());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotBMatch(RepeaterTimeSlotMatch mode) {
+  setUInt8(Offset::repeaterBTimeslot(), (unsigned) mode);
+}
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetSquelch() const {
+  if (0 == getUInt8(Offset::btHSRxNoiseReduction()))
+    return 0;
+  return (getUInt8(Offset::btHSRxNoiseReduction())*10)/9;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetSquelch(unsigned int level) {
+  level = std::min(10U, level);
+  if (1 >= level)
+    setUInt8(Offset::btHSRxNoiseReduction(), level);
+  else
+    setUInt8(Offset::btHSRxNoiseReduction(), (level*9)/10);
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::btHandsetAutoPowerOffEnabled() const {
+  return 0x01 == getUInt8(Offset::btHSShutDown());
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::enableBtHandsetAutoPowerOff(bool enable) {
+  setUInt8(Offset::btHSShutDown(), enable ? 0x01 : 0x00);
+}
+
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK1VeryLongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK1VeryLongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK1VeryLongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK1VeryLongPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK2VeryLongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK2VeryLongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK2VeryLongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK2VeryLongPressFunction(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D578UVCodeplug::ExtendedSettingsElement::btSK3VeryLongPressFunction() const {
+  return KeyFunction::decode(getUInt8(Offset::btSK3VeryLongPressFunction()));
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtSK3VeryLongPressFunction(AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::btSK3VeryLongPressFunction(), KeyFunction::encode(func));
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetTxNoiseRedLevel() const {
+  if (0 == getUInt8(Offset::btHSTxNoiseReduction()))
+    return 0;
+  return (getUInt8(Offset::btHSTxNoiseReduction())*10)/9;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetTxNoiseRedLevel(unsigned int level) {
+  level = std::min(10U, level);
+  if (1 >= level)
+    setUInt8(Offset::btHSTxNoiseReduction(), level);
+  else
+    setUInt8(Offset::btHSTxNoiseReduction(), (level*9)/10);
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetVOXLevel() const {
+  return ((getUInt8(Offset::btHSVOXLevel())+1)*10)/9;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetVOXLevel(unsigned int level) {
+  level = std::max(1U, std::min(10U, level));
+  setUInt8(Offset::btHSVOXLevel(), ((level-1)*8)/9);
+}
+
+
+Interval
+D578UVCodeplug::ExtendedSettingsElement::btHandsetVOXDelay() const {
+  return Interval::fromMilliseconds((unsigned int)(1+getUInt8(Offset::btHSVOXDelay()))*500);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetVOXDelay(Interval delay) {
+  auto ms = std::max(500ull, delay.milliseconds());
+  setUInt8(Offset::btHSVOXDelay(), (ms/500)-1);
+}
+
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetVolumeA() const {
+  unsigned int val = getUInt8(Offset::btHSVolumeA());
+  if (0 == val)
+    return 0;
+  return 1+((val-1)*9)/31;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetVolumeA(unsigned int vol) {
+  setUInt8(Offset::btHSVolumeA(), (std::min(10u, vol)*32)/10);
+}
+
+unsigned int
+D578UVCodeplug::ExtendedSettingsElement::btHandsetVolumeB() const {
+  unsigned int val = getUInt8(Offset::btHSVolumeB());
+  if (0 == val)
+    return 0;
+  return 1+((val-1)*9)/31;
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setBtHandsetVolumeB(unsigned int vol) {
+  setUInt8(Offset::btHSVolumeB(), (std::min(10u, vol)*32)/10);
+}
+
+
+void
+D578UVCodeplug::ExtendedSettingsElement::callEndToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double freq = getUInt16_le(Offset::callEndTones()+2*i);
+    unsigned int duration = getUInt16_le(Offset::callEndDurations()+2*i);
+    if (duration) tones.append({freq, duration});
+  }
+  melody.infer(tones);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setCallEndToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::callEndTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::callEndDurations()+2*i, tones.at(i).second);
+  }
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::allCallToneMelody(Melody &melody) const {
+  QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
+  for (int i=0; i<5; i++) {
+    double freq = getUInt16_le(Offset::allCallTones()+2*i);
+    unsigned int duration = getUInt16_le(Offset::allCallDurations()+2*i);
+    if (duration) tones.append({freq, duration});
+  }
+  melody.infer(tones);
+}
+
+void
+D578UVCodeplug::ExtendedSettingsElement::setAllCallToneMelody(const Melody &melody) {
+  unsigned int n=std::min(5U, (unsigned int)melody.count());
+  QVector<QPair<double, unsigned int>> tones = melody.toTones();
+  for (unsigned int i=0; i<n; i++) {
+    setUInt16_le(Offset::allCallTones()+2*i, tones.at(i).first);
+    setUInt16_le(Offset::allCallDurations()+2*i, tones.at(i).second);
+  }
+}
+
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (! flags.updateCodeplug())
+    this->clear();
+
+  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
+    return false;
+
+  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
+    // If there is no extension, reuse DMR mic gain setting
+    setFMMicGain(ctx.config()->settings()->micLevel());
+    return true;
+  }
+
+  // Get extension
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+
+  // Encode DMR settings
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
+  // Some general settings
+  setSTEDuration(ext->steDuration());
+
+  // Power save settings
+  enableResetAutoShutdownOnCall(ext->powerSaveSettings()->resetAutoShutdownOnCall());
+
+  // Encode tone settings
+  enableTOTNotification(ext->toneSettings()->totNotification());
+  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
+  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
+
+  // Encode audio settings
+  if (ext->audioSettings()->fmMicGainEnabled())
+    setFMMicGain(ext->audioSettings()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->micLevel());
+
+  // Encode DMR settings
+  setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
+  setManDialPrivateCallHangTime(ext->dmrSettings()->manualPrivateCallHangTime());
+  setEncryption(ext->dmrSettings()->encryption());
+
+  // Encode display settings
+  enableShowColorCode(ext->displaySettings()->showColorCode());
+  enableShowTimeSlot(ext->displaySettings()->showTimeSlot());
+  enableShowChannelType(ext->displaySettings()->showChannelType());
+  setDateFormat(ext->displaySettings()->dateFormat());
+
+  // Encode GPS settings
+  setGPSMode(ext->gpsSettings()->mode());
+
+  // Encode roaming settings
+  enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
+
+  // Encode bluetooth settings
+  enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
+  setBluetoothPTTSleepDelay(ext->bluetoothSettings()->pttSleepTimer());
+
+  return true;
+}
+
+bool
+D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
+    return false;
+
+  // Get or add extension if not present
+  AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneSettingsExtension();
+    ctx.config()->settings()->setAnytoneExtension(ext);
+  }
+
+  // Store DMR settings
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
+
+  // Some general settings
+  ext->setSTEDuration(this->steDuration());
+
+  // Some power-save settings
+  ext->powerSaveSettings()->enableResetAutoShutdownOnCall(this->resetAutoShutdownOnCall());
+
+  // Store tone settings
+  ext->toneSettings()->enableTOTNotification(this->totNotification());
+  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
+  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
+
+  // Store FM mic gain separately
+  ext->audioSettings()->setFMMicGain(fmMicGain());
+  // Enable separate mic gain, if it differs from the DMR mic gain:
+  ext->audioSettings()->enableFMMicGain(
+      ctx.config()->settings()->micLevel() != fmMicGain());
+
+  // Store display settings
+  ext->displaySettings()->enableShowColorCode(this->showColorCode());
+  ext->displaySettings()->enableShowTimeSlot(this->showTimeSlot());
+  ext->displaySettings()->enableShowChannelType(this->showChannelType());
+  ext->displaySettings()->setDateFormat(this->dateFormat());
+
+  // Store some DMR settings
+  ext->dmrSettings()->setManualGroupCallHangTime(this->manDialGroupCallHangTime());
+  ext->dmrSettings()->setManualPrivateCallHangTime(this->manDialPrivateCallHangTime());
+  ext->dmrSettings()->setEncryption(this->encryption());
+
+  // Store GPS settings
+  ext->gpsSettings()->setMode(this->gpsMode());
+
+  // Store roaming settings
+  ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());
+
+  // Store bluetooth settings
+  ext->bluetoothSettings()->enablePTTLatch(this->bluetoothPTTLatch());
+  ext->bluetoothSettings()->setPTTSleepTimer(this->bluetoothPTTSleepDelay());
+
+  return true;
+}
+
 
 
 /* ******************************************************************************************** *

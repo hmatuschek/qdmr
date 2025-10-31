@@ -1073,7 +1073,7 @@ public:
 
   protected:
     /** Internal used offset within the element. */
-    struct Offset {
+    struct Offset: public AnytoneCodeplug::ExtendedSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
@@ -1097,9 +1097,9 @@ public:
       static constexpr unsigned int zoneANameColor()               { return 0x003d; }
       static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
       static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
-      static constexpr unsigned int displayColorCode()             { return 0x0040; }  // bit 2
-      static constexpr unsigned int displayTimeSlot()              { return 0x0040; }  // bit 1
-      static constexpr unsigned int displayChannelType()           { return 0x0040; }  // bit 0
+      static constexpr Bit displayColorCode()                      { return {0x0040, 2}; }
+      static constexpr Bit displayTimeSlot()                       { return {0x0040, 1}; }
+      static constexpr Bit displayChannelType()                    { return {0x0040, 0}; }
       static constexpr unsigned int fmIdleTone()                   { return 0x0041; }
       static constexpr unsigned int dateFormat()                   { return 0x0042; }
       static constexpr unsigned int analogMicGain()                { return 0x0043; }
