@@ -1605,7 +1605,9 @@
 <section>
   <info><title><productname>AT-D578UV</productname> Repeater</title></info>
   <para>
-
+    The AnyTone <productname>AT-D578UV</productname> provides a proper cross-band or 
+    cross-timeslot repeater. That is, in contrast to the <productname>DMr-6X2UV</productname>
+    the received audio is re-transmitted (almost) immediately.
   </para>
 </section>
 </section>
