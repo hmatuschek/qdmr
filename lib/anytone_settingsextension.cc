@@ -503,7 +503,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _gpsSettings(new AnytoneGPSSettingsExtension(this)),
     _roamingSettings(new AnytoneRoamingSettingsExtension(this)),
     _bluetoothSettings(new AnytoneBluetoothSettingsExtension(this)),
-    _simplexRepeaterSettings(new AnytoneSimplexRepeaterSettingsExtension(this)),
+    _repeaterSettings(new AnytoneRepeaterSettingsExtension(this)),
     _satelliteSettings(new AnytoneSatelliteSettingsExtension(this)),
     _vfoScanType(VFOScanType::Time), _modeA(VFOMode::Memory), _modeB(VFOMode::Memory),
     _zoneA(), _zoneB(), _selectedVFO(VFO::A), _subChannel(true),
@@ -531,7 +531,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
           this, &AnytoneSettingsExtension::modified);
   connect(_roamingSettings, &AnytoneRoamingSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
-  connect(_simplexRepeaterSettings, &AnytoneSimplexRepeaterSettingsExtension::modified,
+  connect(_repeaterSettings, &AnytoneRepeaterSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
     connect(_satelliteSettings, &AnytoneSatelliteSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -608,9 +608,9 @@ AnytoneSettingsExtension::bluetoothSettings() const {
   return _bluetoothSettings;
 }
 
-AnytoneSimplexRepeaterSettingsExtension *
-AnytoneSettingsExtension::simplexRepeaterSettings() const {
-  return _simplexRepeaterSettings;
+AnytoneRepeaterSettingsExtension *
+AnytoneSettingsExtension::repeaterSettings() const {
+  return _repeaterSettings;
 }
 
 AnytoneSatelliteSettingsExtension *
@@ -813,10 +813,12 @@ AnytoneSettingsExtension::setTBSTFrequency(Frequency Hz) {
   emit modified(this);
 }
 
+
 bool
 AnytoneSettingsExtension::proModeEnabled() const {
   return _proMode;
 }
+
 void
 AnytoneSettingsExtension::enableProMode(bool enable) {
   if (_proMode == enable)
@@ -825,10 +827,12 @@ AnytoneSettingsExtension::enableProMode(bool enable) {
   emit modified(this);
 }
 
+
 bool
 AnytoneSettingsExtension::maintainCallChannelEnabled() const {
   return _maintainCallChannel;
 }
+
 void
 AnytoneSettingsExtension::enableMaintainCallChannel(bool enable) {
   if (_maintainCallChannel == enable)
@@ -836,6 +840,21 @@ AnytoneSettingsExtension::enableMaintainCallChannel(bool enable) {
   _maintainCallChannel = enable;
   emit modified(this);
 }
+
+
+AnytoneSettingsExtension::FanControl
+AnytoneSettingsExtension::fan() const {
+  return _fan;
+}
+
+void
+AnytoneSettingsExtension::setFan(FanControl ctrl) {
+  if (_fan == ctrl)
+    return;
+  _fan = ctrl;
+  emit modified(this);
+}
+
 
 
 /* ********************************************************************************************* *
@@ -1044,7 +1063,9 @@ AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
     _funcKeyBShort(KeyFunction::Voltage), _funcKeyBLong(KeyFunction::Call),
     _funcKeyCShort(KeyFunction::Power), _funcKeyCLong(KeyFunction::VOX),
     _funcKeyDShort(KeyFunction::Off), _funcKeyDLong(KeyFunction::Off),
-    _longPressDuration(Interval::fromSeconds(1)), _autoKeyLock(false), _knobLock(false), _keypadLock(false),
+    _funcKnobShort(KeyFunction::Off), _funcKnobLong(KeyFunction::Off),
+    _longPressDuration(Interval::fromSeconds(1)), _upDownFunction(UpDownKeyFunction::Channel),
+    _autoKeyLock(false), _knobLock(false), _keypadLock(false),
     _sideKeysLock(false), _forcedKeyLock(false)
 {
   // pass...
@@ -1290,6 +1311,34 @@ AnytoneKeySettingsExtension::setFuncKeyDLong(KeyFunction func) {
   emit modified(this);
 }
 
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKnobShort() const {
+  return _funcKnobShort;
+}
+
+void
+AnytoneKeySettingsExtension::setFuncKnobShort(KeyFunction func) {
+  if (_funcKnobShort == func)
+    return;
+  _funcKnobShort = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKnobLong() const {
+  return _funcKnobLong;
+}
+
+void
+AnytoneKeySettingsExtension::setFuncKnobLong(KeyFunction func) {
+  if (_funcKnobLong == func)
+    return;
+  _funcKnobLong = func;
+  emit modified(this);
+}
+
+
 Interval
 AnytoneKeySettingsExtension::longPressDuration() const {
   return _longPressDuration;
@@ -1301,6 +1350,21 @@ AnytoneKeySettingsExtension::setLongPressDuration(Interval ms) {
   _longPressDuration = ms;
   emit modified(this);
 }
+
+
+AnytoneKeySettingsExtension::UpDownKeyFunction
+AnytoneKeySettingsExtension::upDownKeyFunction() const {
+  return _upDownFunction;
+}
+
+void
+AnytoneKeySettingsExtension::setUpDownKeyFunction(UpDownKeyFunction func) {
+  if (_upDownFunction == func)
+    return;
+  _upDownFunction = func;
+  emit modified(this);
+}
+
 
 bool
 AnytoneKeySettingsExtension::autoKeyLockEnabled() const {
@@ -1890,13 +1954,15 @@ AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneAudioSettingsExtension
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
-    _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
-    _enableAnalogMicGain(false), _analogMicGain(1)
+  _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
+  _enableAnalogMicGain(false), _analogMicGain(1), _speaker(Speaker::Radio),
+  _handsetSpeaker(HandsetSpeakerSource::MainChannel), _handsetType(HandsetType::Anytone)
 {
   // pass...
 }
@@ -2016,6 +2082,49 @@ AnytoneAudioSettingsExtension::setFMMicGain(unsigned int gain) {
   _analogMicGain = gain;
   emit modified(this);
 }
+
+
+AnytoneAudioSettingsExtension::Speaker
+AnytoneAudioSettingsExtension::speaker() const {
+  return _speaker;
+}
+
+void
+AnytoneAudioSettingsExtension::setSpeaker(Speaker speaker) {
+  if (_speaker == speaker)
+    return;
+  _speaker = speaker;
+  emit modified(this);
+}
+
+
+AnytoneAudioSettingsExtension::HandsetSpeakerSource
+AnytoneAudioSettingsExtension::handsetSpeaker() const {
+  return _handsetSpeaker;
+}
+
+void
+AnytoneAudioSettingsExtension::setHandsetSpeaker(HandsetSpeakerSource src) {
+  if (_handsetSpeaker == src)
+    return;
+  _handsetSpeaker = src;
+  emit modified(this);
+}
+
+
+AnytoneAudioSettingsExtension::HandsetType
+AnytoneAudioSettingsExtension::handsetType() const {
+  return _handsetType;
+}
+
+void
+AnytoneAudioSettingsExtension::setHandsetType(HandsetType type) {
+  if (_handsetType == type)
+    return;
+  _handsetType = type;
+  emit modified(this);
+}
+
 
 
 /* ********************************************************************************************* *
@@ -2425,15 +2534,16 @@ AnytoneBluetoothSettingsExtension::setHoldDelay(const Interval &dur) {
 /* ********************************************************************************************* *
  * Implementation of AnytoneSimplexRepeaterSettingsExtension
  * ********************************************************************************************* */
-AnytoneSimplexRepeaterSettingsExtension::AnytoneSimplexRepeaterSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _enabled(false), _monitor(false), _timeSlot(TimeSlot::Channel)
+AnytoneRepeaterSettingsExtension::AnytoneRepeaterSettingsExtension(QObject *parent)
+  : ConfigItem(parent), _enabled(false), _monitor(false), _timeSlot(TimeSlot::Channel),
+  _secTimeSlot(TimeSlot::Channel), _colorCode(ColorCode::Ignored)
 {
   // pass...
 }
 
 ConfigItem *
-AnytoneSimplexRepeaterSettingsExtension::clone() const {
-  AnytoneSimplexRepeaterSettingsExtension *ext = new AnytoneSimplexRepeaterSettingsExtension();
+AnytoneRepeaterSettingsExtension::clone() const {
+  AnytoneRepeaterSettingsExtension *ext = new AnytoneRepeaterSettingsExtension();
   if (! ext->copy(*this)) {
     ext->deleteLater();
     return nullptr;
@@ -2442,11 +2552,11 @@ AnytoneSimplexRepeaterSettingsExtension::clone() const {
 }
 
 bool
-AnytoneSimplexRepeaterSettingsExtension::enabled() const {
+AnytoneRepeaterSettingsExtension::enabled() const {
   return _enabled;
 }
 void
-AnytoneSimplexRepeaterSettingsExtension::enable(bool enable) {
+AnytoneRepeaterSettingsExtension::enable(bool enable) {
   if (_enabled == enable)
     return;
   _enabled = enable;
@@ -2454,26 +2564,53 @@ AnytoneSimplexRepeaterSettingsExtension::enable(bool enable) {
 }
 
 bool
-AnytoneSimplexRepeaterSettingsExtension::monitorEnabled() const {
+AnytoneRepeaterSettingsExtension::monitorEnabled() const {
   return _monitor;
 }
 void
-AnytoneSimplexRepeaterSettingsExtension::enableMonitor(bool enable) {
+AnytoneRepeaterSettingsExtension::enableMonitor(bool enable) {
   if (_monitor == enable)
     return;
   _monitor = enable;
   emit modified(this);
 }
 
-AnytoneSimplexRepeaterSettingsExtension::TimeSlot
-AnytoneSimplexRepeaterSettingsExtension::timeSlot() const {
+AnytoneRepeaterSettingsExtension::TimeSlot
+AnytoneRepeaterSettingsExtension::timeSlot() const {
   return _timeSlot;
 }
 void
-AnytoneSimplexRepeaterSettingsExtension::setTimeSlot(TimeSlot ts) {
+AnytoneRepeaterSettingsExtension::setTimeSlot(TimeSlot ts) {
   if (_timeSlot == ts)
     return;
   _timeSlot = ts;
+  emit modified(this);
+}
+
+
+AnytoneRepeaterSettingsExtension::TimeSlot
+AnytoneRepeaterSettingsExtension::secTimeSlot() const {
+  return _secTimeSlot;
+}
+void
+AnytoneRepeaterSettingsExtension::setSecTimeSlot(TimeSlot ts) {
+  if (_secTimeSlot == ts)
+    return;
+  _secTimeSlot = ts;
+  emit modified(this);
+}
+
+
+AnytoneRepeaterSettingsExtension::ColorCode
+AnytoneRepeaterSettingsExtension::colorCode() const {
+  return _colorCode;
+}
+
+void
+AnytoneRepeaterSettingsExtension::setColorCode(ColorCode code) {
+  if (_colorCode == code)
+    return;
+  _colorCode = code;
   emit modified(this);
 }
 

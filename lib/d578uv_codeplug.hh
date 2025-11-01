@@ -966,14 +966,14 @@ public:
     virtual void enableRepeater(bool enable);
 
     /** Returns the speaker setting. */
-    virtual Speaker speaker() const;
+    virtual AnytoneAudioSettingsExtension::Speaker speaker() const;
     /** Sets the speaker setting. */
-    virtual void setSpeaker(Speaker speaker);
+    virtual void setSpeaker(AnytoneAudioSettingsExtension::Speaker speaker);
 
     /** Returns the microphone-speaker source. */
-    virtual SpeakerSource micSpeakerSource() const;
+    virtual AnytoneAudioSettingsExtension::HandsetSpeakerSource micSpeakerSource() const;
     /** Sets the microphone-speaker source. */
-    virtual void setMicSpeakerSource(SpeakerSource source);
+    virtual void setMicSpeakerSource(AnytoneAudioSettingsExtension::HandsetSpeakerSource source);
 
     /** Returns the GPS mode. */
     virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
@@ -995,9 +995,9 @@ public:
     virtual void setInfiniteBluetoothPTTSleepDelay();
 
     /** Returns the fan-control setting. */
-    virtual FanControl fanControl() const;
+    virtual AnytoneSettingsExtension::FanControl fanControl() const;
     /** Sets the fan-control setting. */
-    virtual void setFanControl(FanControl ctrl);
+    virtual void setFanControl(AnytoneSettingsExtension::FanControl ctrl);
 
     /** Returns the weather channel index. */
     virtual unsigned int weatherChannelIndex() const;
@@ -1050,9 +1050,9 @@ public:
     virtual void setSTEDuration(Interval dur);
 
     /** Returns the microphone type. */
-    virtual MicType micType() const;
+    virtual AnytoneAudioSettingsExtension::HandsetType micType() const;
     /** Sets the microphone type. */
-    virtual void setMicType(MicType type);
+    virtual void setMicType(AnytoneAudioSettingsExtension::HandsetType type);
 
     AnytoneDisplaySettingsExtension::Color zoneANameColor() const;
     void setZoneANameColor(AnytoneDisplaySettingsExtension::Color color);
@@ -1129,9 +1129,9 @@ public:
     virtual void setBtHandsetBacklightDuration(Interval delay);
 
     /** Returns the function of up/down keys on microphone. */
-    virtual UpDownKeyFunction micUpDownKeyFunction() const;
+    virtual AnytoneKeySettingsExtension::UpDownKeyFunction micUpDownKeyFunction() const;
     /** Sets the microphone up/down key function. */
-    virtual void setMicUpDownKeyFunction(UpDownKeyFunction func);
+    virtual void setMicUpDownKeyFunction(AnytoneKeySettingsExtension::UpDownKeyFunction func);
 
     /** Returns @c true if the transmit timeout notification is enabled. */
     virtual bool totNotification() const;
@@ -1144,18 +1144,18 @@ public:
     virtual void enableGPSRoaming(bool enable);
 
     /** Returns the repeater colorcode match mode. */
-    virtual RepeaterColorCodeMatch repColorCodeMatch() const;
+    virtual AnytoneRepeaterSettingsExtension::ColorCode repColorCodeMatch() const;
     /** Sets the repeater colorcode match mode. */
-    virtual void setRepColorCodeMatch(RepeaterColorCodeMatch mode);
+    virtual void setRepColorCodeMatch(AnytoneRepeaterSettingsExtension::ColorCode mode);
 
     /** Returns the repeater timeslots for VFO A. */
-    virtual RepeaterTimeSlotMatch repTimeSlotAMatch() const;
+    virtual AnytoneRepeaterSettingsExtension::TimeSlot repTimeSlotAMatch() const;
     /** Sets the repeater timeslots for VFO A. */
-    virtual void setRepTimeSlotAMatch(RepeaterTimeSlotMatch mode);
+    virtual void setRepTimeSlotAMatch(AnytoneRepeaterSettingsExtension::TimeSlot mode);
     /** Returns the repeater timeslots for VFO B. */
-    virtual RepeaterTimeSlotMatch repTimeSlotBMatch() const;
+    virtual AnytoneRepeaterSettingsExtension::TimeSlot repTimeSlotBMatch() const;
     /** Sets the repeater timeslots for VFO B. */
-    virtual void setRepTimeSlotBMatch(RepeaterTimeSlotMatch mode);
+    virtual void setRepTimeSlotBMatch(AnytoneRepeaterSettingsExtension::TimeSlot mode);
 
     /** Returns the BT handset squelch level [0, 1-10]. */
     virtual unsigned int btHandsetSquelch() const;

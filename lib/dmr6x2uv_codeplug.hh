@@ -124,6 +124,10 @@ public:
       Off = 0, Hz55_2  = 1, Hz259_2 = 2
     };
 
+    /** Encoding of repeater timeslot. */
+    enum class RepeaterTimeSlot {
+      TS1 = 0, TS2 = 1, Channel = 2
+    };
 
   protected:
     /** Hidden Constructor. */
@@ -348,9 +352,9 @@ public:
     void enableKeyLockForced(bool enable);
 
     /** Returns the time-slot in simplex repeater mode. */
-    virtual AnytoneSimplexRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
+    virtual AnytoneRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
     /** Sets the time-slot in simplex repeater mode. */
-    virtual void setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot);
+    virtual void setSimplexRepeaterTimeslot(AnytoneRepeaterSettingsExtension::TimeSlot slot);
 
     bool showLastHeard() const;
     void enableShowLastHeard(bool enable);

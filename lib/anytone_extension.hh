@@ -3,7 +3,6 @@
 
 #include "configobject.hh"
 #include "configreference.hh"
-#include "melody.hh"
 #include "frequency.hh"
 #include "interval.hh"
 

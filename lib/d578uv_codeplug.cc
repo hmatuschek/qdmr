@@ -2125,25 +2125,53 @@ D578UVCodeplug::ExtendedSettingsElement::enableRepeater(bool enabled) {
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::Speaker
+AnytoneAudioSettingsExtension::Speaker
 D578UVCodeplug::ExtendedSettingsElement::speaker() const {
-  return (Speaker) getUInt8(Offset::speakers());
+  switch ((Speaker) getUInt8(Offset::speakers())) {
+  case Speaker::Microphone: return AnytoneAudioSettingsExtension::Speaker::Handset;
+  case Speaker::Radio: return AnytoneAudioSettingsExtension::Speaker::Radio;
+  case Speaker::Both: return AnytoneAudioSettingsExtension::Speaker::Both;
+  }
+  return AnytoneAudioSettingsExtension::Speaker::Radio;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setSpeaker(Speaker speaker) {
-  setUInt8(Offset::speakers(), (unsigned)speaker);
+D578UVCodeplug::ExtendedSettingsElement::setSpeaker(AnytoneAudioSettingsExtension::Speaker speaker) {
+  switch (speaker) {
+  case AnytoneAudioSettingsExtension::Speaker::Handset:
+    setUInt8(Offset::speakers(), (unsigned)Speaker::Microphone);
+    break;
+  case AnytoneAudioSettingsExtension::Speaker::Radio:
+    setUInt8(Offset::speakers(), (unsigned)Speaker::Radio);
+    break;
+  case AnytoneAudioSettingsExtension::Speaker::Both:
+    setUInt8(Offset::speakers(), (unsigned)Speaker::Both);
+    break;
+  }
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::SpeakerSource
+AnytoneAudioSettingsExtension::HandsetSpeakerSource
 D578UVCodeplug::ExtendedSettingsElement::micSpeakerSource() const {
-  return (SpeakerSource) getUInt8(Offset::micSpeakerSource());
+  switch ((SpeakerSource) getUInt8(Offset::micSpeakerSource())) {
+  case SpeakerSource::MainChannel:
+    return AnytoneAudioSettingsExtension::HandsetSpeakerSource::MainChannel;
+  case SpeakerSource::SubChannel:
+    return AnytoneAudioSettingsExtension::HandsetSpeakerSource::SubChannel;
+  }
+  return AnytoneAudioSettingsExtension::HandsetSpeakerSource::MainChannel;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(SpeakerSource source) {
-  setUInt8(Offset::micSpeakerSource(), (unsigned)source);
+D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(AnytoneAudioSettingsExtension::HandsetSpeakerSource source) {
+  switch (source) {
+  case AnytoneAudioSettingsExtension::HandsetSpeakerSource::MainChannel:
+    setUInt8(Offset::micSpeakerSource(), (unsigned) SpeakerSource::MainChannel);
+    break;
+  case AnytoneAudioSettingsExtension::HandsetSpeakerSource::SubChannel:
+    setUInt8(Offset::micSpeakerSource(), (unsigned) SpeakerSource::SubChannel);
+    break;
+  }
 }
 
 
@@ -2205,14 +2233,29 @@ D578UVCodeplug::ExtendedSettingsElement::setInfiniteBluetoothPTTSleepDelay() {
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::FanControl
+AnytoneSettingsExtension::FanControl
 D578UVCodeplug::ExtendedSettingsElement::fanControl() const {
-  return (FanControl) getUInt8(Offset::fanControl());
+  switch ((FanControl) getUInt8(Offset::fanControl())) {
+  case FanControl::PTT: return AnytoneSettingsExtension::FanControl::PTT;
+  case FanControl::Temperature: return AnytoneSettingsExtension::FanControl::Temperature;
+  case FanControl::Both: return AnytoneSettingsExtension::FanControl::Both;
+  }
+  return AnytoneSettingsExtension::FanControl::PTT;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setFanControl(FanControl ctrl) {
-  setUInt8(Offset::fanControl(), (unsigned) ctrl);
+D578UVCodeplug::ExtendedSettingsElement::setFanControl(AnytoneSettingsExtension::FanControl ctrl) {
+  switch (ctrl) {
+  case AnytoneSettingsExtension::FanControl::PTT:
+    setUInt8(Offset::fanControl(), (unsigned) FanControl::PTT);
+    break;
+  case AnytoneSettingsExtension::FanControl::Temperature:
+    setUInt8(Offset::fanControl(), (unsigned) FanControl::Temperature);
+    break;
+  case AnytoneSettingsExtension::FanControl::Both:
+    setUInt8(Offset::fanControl(), (unsigned) FanControl::Both);
+    break;
+  }
 }
 
 
@@ -2352,14 +2395,25 @@ D578UVCodeplug::ExtendedSettingsElement::setSTEDuration(Interval dur) {
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::MicType
+AnytoneAudioSettingsExtension::HandsetType
 D578UVCodeplug::ExtendedSettingsElement::micType() const {
-  return (MicType)getUInt8(Offset::micType());
+  switch ((MicType)getUInt8(Offset::micType())) {
+  case MicType::AnyTone: return AnytoneAudioSettingsExtension::HandsetType::Anytone;
+  case MicType::Generic: return AnytoneAudioSettingsExtension::HandsetType::Generic;
+  }
+  return AnytoneAudioSettingsExtension::HandsetType::Anytone;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setMicType(MicType type) {
-  setUInt8(Offset::micType(), (unsigned) type);
+D578UVCodeplug::ExtendedSettingsElement::setMicType(AnytoneAudioSettingsExtension::HandsetType type) {
+  switch (type) {
+  case AnytoneAudioSettingsExtension::HandsetType::Anytone:
+    setUInt8(Offset::micType(), (unsigned) MicType::AnyTone);
+    break;
+  case AnytoneAudioSettingsExtension::HandsetType::Generic:
+    setUInt8(Offset::micType(), (unsigned) MicType::Generic);
+    break;
+  }
 }
 
 
@@ -2567,14 +2621,25 @@ D578UVCodeplug::ExtendedSettingsElement::setBtHandsetBacklightDuration(Interval 
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::UpDownKeyFunction
+AnytoneKeySettingsExtension::UpDownKeyFunction
 D578UVCodeplug::ExtendedSettingsElement::micUpDownKeyFunction() const {
-  return (UpDownKeyFunction)getUInt8(Offset::upDownKeyFunction());
+  switch ((UpDownKeyFunction)getUInt8(Offset::upDownKeyFunction())) {
+  case UpDownKeyFunction::Channel: return AnytoneKeySettingsExtension::UpDownKeyFunction::Channel;
+  case UpDownKeyFunction::Volume: return AnytoneKeySettingsExtension::UpDownKeyFunction::Volume;
+  }
+  return AnytoneKeySettingsExtension::UpDownKeyFunction::Channel;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setMicUpDownKeyFunction(UpDownKeyFunction func) {
-  setUInt8(Offset::upDownKeyFunction(), (unsigned) func);
+D578UVCodeplug::ExtendedSettingsElement::setMicUpDownKeyFunction(AnytoneKeySettingsExtension::UpDownKeyFunction func) {
+  switch (func) {
+  case AnytoneKeySettingsExtension::UpDownKeyFunction::Channel:
+    setUInt8(Offset::upDownKeyFunction(), (unsigned)UpDownKeyFunction::Channel);
+    break;
+  case AnytoneKeySettingsExtension::UpDownKeyFunction::Volume:
+    setUInt8(Offset::upDownKeyFunction(), (unsigned)UpDownKeyFunction::Volume);
+    break;
+  }
 }
 
 
@@ -2600,36 +2665,84 @@ D578UVCodeplug::ExtendedSettingsElement::enableGPSRoaming(bool enable) {
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::RepeaterColorCodeMatch
+AnytoneRepeaterSettingsExtension::ColorCode
 D578UVCodeplug::ExtendedSettingsElement::repColorCodeMatch() const {
-  return (RepeaterColorCodeMatch)getUInt8(Offset::repeaterColorCode());
+  switch ((RepeaterColorCodeMatch)getUInt8(Offset::repeaterColorCode())) {
+  case RepeaterColorCodeMatch::None: return AnytoneRepeaterSettingsExtension::ColorCode::Ignored;
+  case RepeaterColorCodeMatch::VFO_A: return AnytoneRepeaterSettingsExtension::ColorCode::VFOA;
+  case RepeaterColorCodeMatch::VFO_B: return AnytoneRepeaterSettingsExtension::ColorCode::VFOB;
+  }
+  return AnytoneRepeaterSettingsExtension::ColorCode::Ignored;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setRepColorCodeMatch(RepeaterColorCodeMatch mode) {
-  setUInt8(Offset::repeaterColorCode(), (unsigned) mode);
+D578UVCodeplug::ExtendedSettingsElement::setRepColorCodeMatch(AnytoneRepeaterSettingsExtension::ColorCode mode) {
+  switch (mode) {
+  case AnytoneRepeaterSettingsExtension::ColorCode::Ignored:
+    setUInt8(Offset::repeaterColorCode(), (unsigned) RepeaterColorCodeMatch::None);
+    break;
+  case AnytoneRepeaterSettingsExtension::ColorCode::VFOA:
+    setUInt8(Offset::repeaterColorCode(), (unsigned) RepeaterColorCodeMatch::VFO_A);
+    break;
+  case AnytoneRepeaterSettingsExtension::ColorCode::VFOB:
+    setUInt8(Offset::repeaterColorCode(), (unsigned) RepeaterColorCodeMatch::VFO_B);
+    break;
+  }
 }
 
 
-D578UVCodeplug::ExtendedSettingsElement::RepeaterTimeSlotMatch
+AnytoneRepeaterSettingsExtension::TimeSlot
 D578UVCodeplug::ExtendedSettingsElement::repTimeSlotAMatch() const {
-  return (RepeaterTimeSlotMatch)getUInt8(Offset::repeaterATimeslot());
+  switch ((RepeaterTimeSlotMatch)getUInt8(Offset::repeaterATimeslot())) {
+  case RepeaterTimeSlotMatch::Any: return AnytoneRepeaterSettingsExtension::TimeSlot::Any;
+  case RepeaterTimeSlotMatch::RX1_TX2: return AnytoneRepeaterSettingsExtension::TimeSlot::TS1;
+  case RepeaterTimeSlotMatch::RX2_TX1: return AnytoneRepeaterSettingsExtension::TimeSlot::TS2;
+  }
+  return AnytoneRepeaterSettingsExtension::TimeSlot::Any;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotAMatch(RepeaterTimeSlotMatch mode) {
-  setUInt8(Offset::repeaterATimeslot(), (unsigned) mode);
+D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotAMatch(AnytoneRepeaterSettingsExtension::TimeSlot mode) {
+  switch (mode) {
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS1:
+    setUInt8(Offset::repeaterATimeslot(), (unsigned) RepeaterTimeSlotMatch::RX1_TX2);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS2:
+    setUInt8(Offset::repeaterATimeslot(), (unsigned) RepeaterTimeSlotMatch::RX2_TX1);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::Any:
+  default:
+    setUInt8(Offset::repeaterATimeslot(), (unsigned) RepeaterTimeSlotMatch::Any);
+    break;
+  }
 }
 
-D578UVCodeplug::ExtendedSettingsElement::RepeaterTimeSlotMatch
+AnytoneRepeaterSettingsExtension::TimeSlot
 D578UVCodeplug::ExtendedSettingsElement::repTimeSlotBMatch() const {
-  return (RepeaterTimeSlotMatch)getUInt8(Offset::repeaterBTimeslot());
+  switch ((RepeaterTimeSlotMatch)getUInt8(Offset::repeaterBTimeslot())) {
+  case RepeaterTimeSlotMatch::Any: return AnytoneRepeaterSettingsExtension::TimeSlot::Any;
+  case RepeaterTimeSlotMatch::RX1_TX2: return AnytoneRepeaterSettingsExtension::TimeSlot::TS1;
+  case RepeaterTimeSlotMatch::RX2_TX1: return AnytoneRepeaterSettingsExtension::TimeSlot::TS2;
+  }
+  return AnytoneRepeaterSettingsExtension::TimeSlot::Any;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotBMatch(RepeaterTimeSlotMatch mode) {
-  setUInt8(Offset::repeaterBTimeslot(), (unsigned) mode);
+D578UVCodeplug::ExtendedSettingsElement::setRepTimeSlotBMatch(AnytoneRepeaterSettingsExtension::TimeSlot mode) {
+  switch (mode) {
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS1:
+    setUInt8(Offset::repeaterBTimeslot(), (unsigned) RepeaterTimeSlotMatch::RX1_TX2);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS2:
+    setUInt8(Offset::repeaterBTimeslot(), (unsigned) RepeaterTimeSlotMatch::RX2_TX1);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::Any:
+  default:
+    setUInt8(Offset::repeaterBTimeslot(), (unsigned) RepeaterTimeSlotMatch::Any);
+    break;
+  }
 }
+
 
 unsigned int
 D578UVCodeplug::ExtendedSettingsElement::btHandsetSquelch() const {
@@ -2826,6 +2939,13 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Some general settings
   setSTEDuration(ext->steDuration());
+  enableProfessionalMode(ext->proModeEnabled());
+  setFanControl(ext->fan());
+
+  // Key settings
+  setChKnobShortPressFunction(ext->keySettings()->funcKnobShort());
+  setChKnobLongPressFunction(ext->keySettings()->funcKnobLong());
+  setMicUpDownKeyFunction(ext->keySettings()->upDownKeyFunction());
 
   // Power save settings
   enableResetAutoShutdownOnCall(ext->powerSaveSettings()->resetAutoShutdownOnCall());
@@ -2840,6 +2960,9 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
     setFMMicGain(ext->audioSettings()->fmMicGain());
   else
     setFMMicGain(ctx.config()->settings()->micLevel());
+  setSpeaker(ext->audioSettings()->speaker());
+  setMicSpeakerSource(ext->audioSettings()->handsetSpeaker());
+  setMicType(ext->audioSettings()->handsetType());
 
   // Encode DMR settings
   setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
@@ -2862,8 +2985,15 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
   setBluetoothPTTSleepDelay(ext->bluetoothSettings()->pttSleepTimer());
 
+  // Encode repeater settings
+  enableRepeater(ext->repeaterSettings()->enabled());
+  setRepColorCodeMatch(ext->repeaterSettings()->colorCode());
+  setRepTimeSlotAMatch(ext->repeaterSettings()->timeSlot());
+  setRepTimeSlotBMatch(ext->repeaterSettings()->secTimeSlot());
+
   return true;
 }
+
 
 bool
 D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
@@ -2885,6 +3015,13 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
+  ext->enableProMode(this->professionalMode());
+  ext->setFan(this->fanControl());
+
+  // Some key settings
+  ext->keySettings()->setFuncKnobShort(chKnobShortPressFunction());
+  ext->keySettings()->setFuncKnobLong(chKnobLongPressFunction());
+  ext->keySettings()->setUpDownKeyFunction(micUpDownKeyFunction());
 
   // Some power-save settings
   ext->powerSaveSettings()->enableResetAutoShutdownOnCall(this->resetAutoShutdownOnCall());
@@ -2899,6 +3036,9 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Enable separate mic gain, if it differs from the DMR mic gain:
   ext->audioSettings()->enableFMMicGain(
       ctx.config()->settings()->micLevel() != fmMicGain());
+  ext->audioSettings()->setSpeaker(speaker());
+  ext->audioSettings()->setHandsetSpeaker(micSpeakerSource());
+  ext->audioSettings()->setHandsetType(micType());
 
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());

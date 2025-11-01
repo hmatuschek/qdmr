@@ -788,15 +788,35 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableKeyLockForced(bool enable) {
   setBit(Offset::forceKeyLock(), enable);
 }
 
-AnytoneSimplexRepeaterSettingsExtension::TimeSlot
+
+AnytoneRepeaterSettingsExtension::TimeSlot
 DMR6X2UVCodeplug::GeneralSettingsElement::simplexRepeaterTimeslot() const {
-  return (AnytoneSimplexRepeaterSettingsExtension::TimeSlot)getUInt8(Offset::simplxRepSlot());
+  switch ((RepeaterTimeSlot)getUInt8(Offset::simplxRepSlot())) {
+  case RepeaterTimeSlot::TS1: return AnytoneRepeaterSettingsExtension::TimeSlot::TS1;
+  case RepeaterTimeSlot::TS2: return AnytoneRepeaterSettingsExtension::TimeSlot::TS2;
+  case RepeaterTimeSlot::Channel: return AnytoneRepeaterSettingsExtension::TimeSlot::Channel;
+  }
+  return AnytoneRepeaterSettingsExtension::TimeSlot::Channel;
 }
 
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot) {
-  setUInt8(Offset::simplxRepSlot(), (unsigned int) slot);
+DMR6X2UVCodeplug::GeneralSettingsElement::setSimplexRepeaterTimeslot(AnytoneRepeaterSettingsExtension::TimeSlot slot) {
+  switch (slot) {
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS1:
+    setUInt8(Offset::simplxRepSlot(), (unsigned int) RepeaterTimeSlot::TS1);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::TS2:
+    setUInt8(Offset::simplxRepSlot(), (unsigned int) RepeaterTimeSlot::TS2);
+    break;
+  case AnytoneRepeaterSettingsExtension::TimeSlot::Channel:
+    setUInt8(Offset::simplxRepSlot(), (unsigned int) RepeaterTimeSlot::Channel);
+    break;
+  default:
+    setUInt8(Offset::simplxRepSlot(), (unsigned int) RepeaterTimeSlot::Channel);
+    break;
+  }
 }
+
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::showLastHeard() const {
@@ -1055,9 +1075,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   enableMaintainCallChannel(ext->maintainCallChannelEnabled());
 
   // Apply simplex repeater settings
-  enableSimplexRepeater(ext->simplexRepeaterSettings()->enabled());
-  enableMonitorSimplexRepeater(ext->simplexRepeaterSettings()->monitorEnabled());
-  setSimplexRepeaterTimeslot(ext->simplexRepeaterSettings()->timeSlot());
+  enableSimplexRepeater(ext->repeaterSettings()->enabled());
+  enableMonitorSimplexRepeater(ext->repeaterSettings()->monitorEnabled());
+  setSimplexRepeaterTimeslot(ext->repeaterSettings()->timeSlot());
 
   return true;
 }
@@ -1129,9 +1149,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->enableMaintainCallChannel(this->maintainCallChannel());
 
   // Decode simplex-repeater feature.
-  ext->simplexRepeaterSettings()->enable(this->simplexRepeaterEnabled());
-  ext->simplexRepeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());
-  ext->simplexRepeaterSettings()->setTimeSlot(this->simplexRepeaterTimeslot());
+  ext->repeaterSettings()->enable(this->simplexRepeaterEnabled());
+  ext->repeaterSettings()->enableMonitor(this->monitorSimplexRepeaterEnabled());
+  ext->repeaterSettings()->setTimeSlot(this->simplexRepeaterTimeslot());
 
   return true;
 }
