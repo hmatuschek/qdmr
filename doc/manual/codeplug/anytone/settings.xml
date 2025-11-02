@@ -1609,6 +1609,18 @@
     cross-timeslot repeater. That is, in contrast to the <productname>DMr-6X2UV</productname>
     the received audio is re-transmitted (almost) immediately.
   </para>
+  <para>
+    In principle, the repeater works using VFO A for reception and VFO B for transmission or 
+    vice-versa. If the <productname>AT-D578UV</productname> is set up as an FM repeater, the two 
+    channels must be on different bands. 
+  </para>
+  <para>
+    If set up as a DMR repeater, VFO A and VFO B must be on different time slots. This is 
+    controlled via the <token>timeSlot</token> setting. If set to <token>TS1</token>, the 
+    repeater receives on time slot 1 and transmits on time slot 2. If set set to
+    <token>TS2</token> the reverse it true. If set to <token>Any</token>, the radio switches
+    automatically between the two schemes.
+  </para>
 </section>
 </section>
 
