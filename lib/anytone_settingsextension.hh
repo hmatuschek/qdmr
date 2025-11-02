@@ -1712,6 +1712,166 @@ protected:
 };
 
 
+
+/** Implements the bluetooth handset settings for AnyTone devices.
+ * This extension is part of the @c AnyToneBlueoothSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneBluetoothHandsetSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("Description", "Collects all bluetooth handset settings for AnyTone devices.")
+
+  Q_CLASSINFO("shutdownDescription", "Shuts the handset off too, when the radio is turned off.")
+  Q_PROPERTY(bool shutdown READ shutdownEnabled WRITE enableShutdown)
+
+  Q_CLASSINFO("volumeLevelADescription", "Sets the volume level for VFO A.")
+  Q_PROPERTY(unsigned int volumeLevelA READ volumeLevelA WRITE setVolumeLevelA)
+  Q_CLASSINFO("volumeLevelBDescription", "Sets the volume level for VFO B.")
+  Q_PROPERTY(unsigned int volumeLevelB READ volumeLevelB WRITE setVolumeLevelB)
+
+  Q_CLASSINFO("micGainDescription", "Specifies the microphone gain.")
+  Q_PROPERTY(unsigned int micGain READ micGain WRITE setMicGain)
+
+  Q_PROPERTY(unsigned int squelch READ squelch WRITE setSquelch)
+
+  Q_PROPERTY(unsigned int txNoiseReduction READ txNoiseReduction WRITE setTxNoiseReduction)
+
+  Q_PROPERTY(unsigned int voxLevel READ voxLevel WRITE setVoxLevel)
+  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVoxDelay)
+
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyAShort     READ funcKeyAShort     WRITE setFuncKeyAShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBShort     READ funcKeyBShort     WRITE setFuncKeyBShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCShort     READ funcKeyCShort     WRITE setFuncKeyCShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyALong      READ funcKeyALong      WRITE setFuncKeyALong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBLong      READ funcKeyBLong      WRITE setFuncKeyBLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCLong      READ funcKeyCLong      WRITE setFuncKeyCLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyAVeryLong  READ funcKeyAVeryLong  WRITE setFuncKeyAVeryLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBVeryLong  READ funcKeyBVeryLong  WRITE setFuncKeyBVeryLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCVeryLong  READ funcKeyCVeryLong  WRITE setFuncKeyCVeryLong)
+
+  Q_PROPERTY(Interval backlight READ backlight WRITE setBacklight)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneBluetoothHandsetSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const override;
+
+  /** Returns @c true, if the handset is shutdown along with the radio. */
+  bool shutdownEnabled() const;
+  /** Enables/disables shutting the handset down along with the radio. */
+  void enableShutdown(bool enable);
+
+  /** Retruns the volume level for VFO A. */
+  unsigned int volumeLevelA() const;
+  /** Sets the volume level for VFO A. */
+  void setVolumeLevelA(unsigned int level);
+  /** Retruns the volume level for VFO B. */
+  unsigned int volumeLevelB() const;
+  /** Sets the volume level for VFO B. */
+  void setVolumeLevelB(unsigned int level);
+
+  /** Returns the mic gain. */
+  unsigned int micGain() const;
+  /** Sets the mic gain. */
+  void setMicGain(unsigned int gain);
+
+  /** Returns the squlech level. */
+  unsigned int squelch() const;
+  /** Sets the squelch level. */
+  void setSquelch(unsigned int level);
+
+  /** Returns the transmit noise reduction level. */
+  unsigned int txNoiseReduction() const;
+  /** Sets the transmit noise reduction level. */
+  void setTxNoiseReduction(unsigned int level);
+
+  /** Returns the VOX level. */
+  unsigned int voxLevel() const;
+  /** Set the VOX level. */
+  void setVoxLevel(unsigned int level);
+
+  /** Returns the VOX delay. */
+  Interval voxDelay() const;
+  /** Sets the VOX delay. */
+  void setVoxDelay(Interval delay);
+
+  /** Returns function key A short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
+  /** Set function key A short press function. */
+  void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
+  /** Set function key B short press function. */
+  void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
+  /** Set function key C short press function. */
+  void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key A long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
+  /** Set function key A long press function. */
+  void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
+  /** Set function key B long press function. */
+  void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
+  /** Set function key C long press function. */
+  void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key A very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyAVeryLong() const;
+  /** Set function key A very long press function. */
+  void setFuncKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBVeryLong() const;
+  /** Set function key B very long press function. */
+  void setFuncKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCVeryLong() const;
+  /** Set function key C very long press function. */
+  void setFuncKeyCVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+
+  /** Retruns the backlight duration. */
+  Interval backlight() const;
+  /** Sets the backlight duration. */
+  void setBacklight(Interval dur);
+
+protected:
+  bool _shutdown;                    ///< Shut the handset down alogn with the radio.
+  unsigned int _volumeLevelA;        ///< Specifies the volume level for VFO A.
+  unsigned int _volumeLevelB;        ///< Specifies the volume level for VFO B.
+  unsigned int _micGain;             ///< Specifies the mic gain.
+  unsigned int _squelch;             ///< Specifies the squelch level.
+  unsigned int _txNoiseReduction;    ///< Specifies the transmit noise reduction level.
+  unsigned int _voxLevel;            ///< Specifies the VOX level.
+  Interval _voxDelay;                ///< Specifies the VOX delay.
+  /// Function key A short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyAShort;
+  /// Function key B short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBShort;
+  /// Function key B short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCShort;
+  /// Function key A long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyALong;
+  /// Function key B long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBLong;
+  /// Function key B long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCLong;
+  /// Function key A very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyAVeryLong;
+  /// Function key B very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBVeryLong;
+  /// Function key B very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCVeryLong;
+  Interval _backlight;                ///< Backlight duration.
+};
+
+
+
 /** Implements the bluetooth settings for some AnyTone devices.
  * This extension is part of the @c AnytoneSettingsExtension.
  *
@@ -1740,12 +1900,17 @@ class AnytoneBluetoothSettingsExtension: public ConfigItem
   Q_PROPERTY(Interval hold READ holdDuration WRITE setHoldDuration)
   /** The bluetooth hold delay. */
   Q_PROPERTY(Interval holdDelay READ holdDelay WRITE setHoldDelay)
+  /** The handset settings. */
+  Q_PROPERTY(AnytoneBluetoothHandsetSettingsExtension* handset READ handset)
 
 public:
   /** Default constructor. */
   explicit AnytoneBluetoothSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
+
+  /** Returns the handset settings. */
+  AnytoneBluetoothHandsetSettingsExtension *handset() const;
 
   /** Returns @c true if bluetooth is enabled. */
   bool bluetoothEnabled() const;
@@ -1793,6 +1958,8 @@ public:
   void setHoldDelay(const Interval &dur);
 
 protected:
+  /// Handset settings.
+  AnytoneBluetoothHandsetSettingsExtension *_handset;
   bool _bluetoothEnabled;      ///< Enables bluetooth.
   bool _pttLatch;              ///< PTT latch flag.
   Interval _pttSleep;          ///< PTT sleep timer, 0 is off.

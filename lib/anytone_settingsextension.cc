@@ -2394,15 +2394,301 @@ AnytoneAutoRepeaterOffsetList::AnytoneAutoRepeaterOffsetList(QObject *parent)
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneBluetoothHandsetSettingsExtension
+ * ********************************************************************************************* */
+AnytoneBluetoothHandsetSettingsExtension::AnytoneBluetoothHandsetSettingsExtension(QObject *parent)
+  : ConfigItem{parent}, _shutdown(true), _volumeLevelA(0), _volumeLevelB(0), _micGain(1),
+  _squelch(1), _txNoiseReduction(0), _voxLevel(0), _voxDelay(Interval::null()),
+  _funcKeyAShort(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyBShort(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyCShort(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyALong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyBLong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyCLong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _funcKeyCVeryLong(AnytoneKeySettingsExtension::KeyFunction::Off),
+  _backlight(Interval::fromSeconds(30))
+{
+  // pass...
+}
+
+
+ConfigItem *
+AnytoneBluetoothHandsetSettingsExtension::clone() const {
+  auto obj = new AnytoneBluetoothHandsetSettingsExtension();
+  if (! obj->copy(*this)) {
+    delete obj;
+    return nullptr;
+  }
+  return obj;
+}
+
+
+bool
+AnytoneBluetoothHandsetSettingsExtension::shutdownEnabled() const {
+  return _shutdown;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::enableShutdown(bool enable) {
+  if (_shutdown == enable)
+    return;
+  _shutdown = enable;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::volumeLevelA() const {
+  return _volumeLevelA;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setVolumeLevelA(unsigned int level) {
+  level = std::min(10U, level);
+  if (_volumeLevelA == level)
+    return;
+  _volumeLevelA = level;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::volumeLevelB() const {
+  return _volumeLevelB;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setVolumeLevelB(unsigned int level) {
+  level = std::min(10U, level);
+  if (_volumeLevelB == level)
+    return;
+  _volumeLevelB = level;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::micGain() const {
+  return _micGain;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setMicGain(unsigned int gain) {
+  gain = std::max(1u, std::min(10U, gain));
+  if (_micGain == gain)
+    return;
+  _micGain = gain;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::squelch() const {
+  return _squelch;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setSquelch(unsigned int level) {
+  level = std::min(10U, level);
+  if (_squelch == level)
+    return;
+  _squelch = level;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::txNoiseReduction() const {
+  return _txNoiseReduction;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setTxNoiseReduction(unsigned int level) {
+  level = std::max(10U, level);
+  if (_txNoiseReduction == level)
+    return;
+  _txNoiseReduction = level;
+  emit modified(this);
+}
+
+
+unsigned int
+AnytoneBluetoothHandsetSettingsExtension::voxLevel() const {
+  return _voxLevel;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setVoxLevel(unsigned int level) {
+  level = std::min(10U, level);
+  if (_voxLevel == level)
+    return;
+  _voxLevel = level;
+  emit modified(this);
+}
+
+
+Interval
+AnytoneBluetoothHandsetSettingsExtension::voxDelay() const {
+  return _voxDelay;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setVoxDelay(Interval delay) {
+  if (_voxDelay == delay)
+    return;
+  _voxDelay = delay;
+  emit modified(this);
+}
+
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyAShort() const {
+  return _funcKeyAShort;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyAShort == func)
+    return;
+  _funcKeyAShort = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyBShort() const {
+  return _funcKeyBShort;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyBShort == func)
+    return;
+  _funcKeyBShort = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyCShort() const {
+  return _funcKeyCShort;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyCShort == func)
+    return;
+  _funcKeyCShort = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyALong() const {
+  return _funcKeyALong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyALong == func)
+    return;
+  _funcKeyALong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyBLong() const {
+  return _funcKeyBLong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyBLong == func)
+    return;
+  _funcKeyBLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyCLong() const {
+  return _funcKeyCLong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyCLong == func)
+    return;
+  _funcKeyCLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyAVeryLong() const {
+  return _funcKeyAVeryLong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyAVeryLong == func)
+    return;
+  _funcKeyAVeryLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyBVeryLong() const {
+  return _funcKeyBVeryLong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyBVeryLong == func)
+    return;
+  _funcKeyBVeryLong = func;
+  emit modified(this);
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneBluetoothHandsetSettingsExtension::funcKeyCVeryLong() const {
+  return _funcKeyCVeryLong;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setFuncKeyCVeryLong(AnytoneKeySettingsExtension::KeyFunction func) {
+  if (_funcKeyCVeryLong == func)
+    return;
+  _funcKeyCVeryLong = func;
+  emit modified(this);
+}
+
+Interval
+AnytoneBluetoothHandsetSettingsExtension::backlight() const {
+  return _backlight;
+}
+
+void
+AnytoneBluetoothHandsetSettingsExtension::setBacklight(Interval dur) {
+  if (_backlight == dur)
+    return;
+  _backlight = dur;
+  emit modified(this);
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneBluetoothSettingsExtension
  * ********************************************************************************************* */
 AnytoneBluetoothSettingsExtension::AnytoneBluetoothSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _bluetoothEnabled(false), _pttLatch(false),
-    _pttSleep(Interval::fromMilliseconds(0)), _internalMic(false), _internalSpeaker(false),
-    _micGain(0), _speakerGain(0), _holdDuration(), _holdDelay()
+  : ConfigItem(parent),
+  _handset(new AnytoneBluetoothHandsetSettingsExtension(this)),
+  _bluetoothEnabled(false), _pttLatch(false), _pttSleep(Interval::fromMilliseconds(0)),
+  _internalMic(false), _internalSpeaker(false), _micGain(0), _speakerGain(0), _holdDuration(),
+  _holdDelay()
 {
-  // pass...
+  connect(_handset, &AnytoneBluetoothHandsetSettingsExtension::modified,
+          this, &AnytoneBluetoothSettingsExtension::modified);
 }
 
 ConfigItem *
@@ -2425,6 +2711,11 @@ AnytoneBluetoothSettingsExtension::enablePTTLatch(bool enable) {
     return;
   _pttLatch = enable;
   emit modified(this);
+}
+
+AnytoneBluetoothHandsetSettingsExtension *
+AnytoneBluetoothSettingsExtension::handset() const {
+  return _handset;
 }
 
 bool

@@ -1,5 +1,4 @@
 #include "anytone_extension.hh"
-#include "signaling.hh"
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneAPRSFrequency

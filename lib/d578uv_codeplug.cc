@@ -2985,6 +2985,26 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableBluetoothPTTLatch(ext->bluetoothSettings()->pttLatch());
   setBluetoothPTTSleepDelay(ext->bluetoothSettings()->pttSleepTimer());
 
+  // Encode BT handset settings
+  enableBtHandsetAutoPowerOff(ext->bluetoothSettings()->handset()->shutdownEnabled());
+  setBtHandsetBacklightDuration(ext->bluetoothSettings()->handset()->backlight());
+  setBtHandsetVolumeA(ext->bluetoothSettings()->handset()->volumeLevelA());
+  setBtHandsetVolumeB(ext->bluetoothSettings()->handset()->volumeLevelB());
+  setBtHandsetMicGain(ext->bluetoothSettings()->handset()->micGain());
+  setBtHandsetSquelch(ext->bluetoothSettings()->handset()->squelch());
+  setBtHandsetTxNoiseRedLevel(ext->bluetoothSettings()->handset()->txNoiseReduction());
+  setBtHandsetVOXLevel(ext->bluetoothSettings()->handset()->voxLevel());
+  setBtHandsetVOXDelay(ext->bluetoothSettings()->handset()->voxDelay());
+  setBtSK1ShortPressFunction(ext->bluetoothSettings()->handset()->funcKeyAShort());
+  setBtSK2ShortPressFunction(ext->bluetoothSettings()->handset()->funcKeyBShort());
+  setBtSK3ShortPressFunction(ext->bluetoothSettings()->handset()->funcKeyCShort());
+  setBtSK1LongPressFunction(ext->bluetoothSettings()->handset()->funcKeyALong());
+  setBtSK2LongPressFunction(ext->bluetoothSettings()->handset()->funcKeyBLong());
+  setBtSK3LongPressFunction(ext->bluetoothSettings()->handset()->funcKeyCLong());
+  setBtSK1VeryLongPressFunction(ext->bluetoothSettings()->handset()->funcKeyAVeryLong());
+  setBtSK2VeryLongPressFunction(ext->bluetoothSettings()->handset()->funcKeyBVeryLong());
+  setBtSK3VeryLongPressFunction(ext->bluetoothSettings()->handset()->funcKeyCVeryLong());
+
   // Encode repeater settings
   enableRepeater(ext->repeaterSettings()->enabled());
   setRepColorCodeMatch(ext->repeaterSettings()->colorCode());
@@ -3060,6 +3080,26 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Store bluetooth settings
   ext->bluetoothSettings()->enablePTTLatch(this->bluetoothPTTLatch());
   ext->bluetoothSettings()->setPTTSleepTimer(this->bluetoothPTTSleepDelay());
+
+  // Store BT handset settings
+  ext->bluetoothSettings()->handset()->enableShutdown(this->btHandsetAutoPowerOffEnabled());
+  ext->bluetoothSettings()->handset()->setBacklight(this->btHandsetBacklightDuration());
+  ext->bluetoothSettings()->handset()->setVolumeLevelA(this->btHandsetVolumeA());
+  ext->bluetoothSettings()->handset()->setVolumeLevelB(this->btHandsetVolumeB());
+  ext->bluetoothSettings()->handset()->setMicGain(this->btHandsetMicGain());
+  ext->bluetoothSettings()->handset()->setSquelch(this->btHandsetSquelch());
+  ext->bluetoothSettings()->handset()->setTxNoiseReduction(this->btHandsetTxNoiseRedLevel());
+  ext->bluetoothSettings()->handset()->setVoxLevel(this->btHandsetVOXLevel());
+  ext->bluetoothSettings()->handset()->setVoxDelay(this->btHandsetVOXDelay());
+  ext->bluetoothSettings()->handset()->setFuncKeyAShort(this->btSK1ShortPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyBShort(this->btSK2ShortPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyCShort(this->btSK3ShortPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyALong(this->btSK1LongPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyBLong(this->btSK2LongPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyCLong(this->btSK3LongPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyAVeryLong(this->btSK1VeryLongPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyBVeryLong(this->btSK2VeryLongPressFunction());
+  ext->bluetoothSettings()->handset()->setFuncKeyCVeryLong(this->btSK3VeryLongPressFunction());
 
   return true;
 }
