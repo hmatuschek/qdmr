@@ -124,6 +124,10 @@ public:
       Off = 0, Hz55_2  = 1, Hz259_2 = 2
     };
 
+    /** Encoding of repeater timeslot. */
+    enum class RepeaterTimeSlot {
+      TS1 = 0, TS2 = 1, Channel = 2
+    };
 
   protected:
     /** Hidden Constructor. */
@@ -348,9 +352,9 @@ public:
     void enableKeyLockForced(bool enable);
 
     /** Returns the time-slot in simplex repeater mode. */
-    virtual AnytoneSimplexRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
+    virtual AnytoneRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
     /** Sets the time-slot in simplex repeater mode. */
-    virtual void setSimplexRepeaterTimeslot(AnytoneSimplexRepeaterSettingsExtension::TimeSlot slot);
+    virtual void setSimplexRepeaterTimeslot(AnytoneRepeaterSettingsExtension::TimeSlot slot);
 
     bool showLastHeard() const;
     void enableShowLastHeard(bool enable);
@@ -512,13 +516,20 @@ public:
     /** Resets the general settings. */
     void clear();
 
-    bool sendTalkerAlias() const;
-    void enableSendTalkerAlias(bool enable);
+    /** Returns @c true if the talker alias is sent. */
+    virtual bool sendTalkerAlias() const;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
-    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
-    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource source);
-    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
-    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    /** Returns the talker alias source. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
+
+    /** Returns the talker alias encoding. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
 
     /** Returns the font color. */
     virtual AnytoneDisplaySettingsExtension::Color fontColor() const;

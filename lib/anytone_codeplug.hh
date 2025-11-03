@@ -1323,21 +1323,6 @@ public:
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Returns @c true if the talker alias is sent. */
-    virtual bool sendTalkerAlias() const = 0;
-    /** Enables/disables sending the talker alias. */
-    virtual void enableSendTalkerAlias(bool enable) = 0;
-
-    /** Returns the talker alias source. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const = 0;
-    /** Sets the talker alias source. */
-    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode) = 0;
-
-    /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const = 0;
-    /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) = 0;
-
     /** Returns the color of the channel name for VFO B. */
     virtual AnytoneDisplaySettingsExtension::Color channelBNameColor() const = 0;
     /** Sets the channel name color for the VFO B. */

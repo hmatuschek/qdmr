@@ -163,6 +163,16 @@
     </listitem>
   </varlistentry>
   <varlistentry>
+    <term><token>fan</token></term>
+    <listitem>
+      <para>
+        Specifies, what controls the fan of the <productname>D578UV</productname>. The must be 
+        one of <token>PTT</token> (default), <token>Temperature</token> or 
+        <token>Both</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
     <term><token>bootSettings</token>, <token>powerSaveSettings</token>, <token>keySettings</token>, 
       <token>toneSettings</token>, <token>displaySettings</token>, <token>audioSettings</token>, 
       <token>menuSettings</token>, <token>autoRepeaterSettings</token>, <token>dmrSettings</token>, 
@@ -316,7 +326,7 @@
   buttons. Some function are not available on all devices.
 </para>
 
-<variablelist>
+<variablelist xml:id="extAnytoneSettingsKeyFunctions">
   <title>Key functions</title>
   <varlistentry>
     <term><token>Off</token></term>
@@ -704,7 +714,7 @@
     <term><token>funcKeyAShort</token>, <token>funcKeyALong</token></term>
     <listitem>
       <para>
-        Specifies the function associated with the programmable function key <keycap>PF1</keycap> or 
+        Specifies the functions associated with the programmable function key <keycap>PF1</keycap> or 
         <keycap>A</keycap>. This button is located right below the PTT button (on handheld radios) 
         or labeled <keycap>A</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
       </para>
@@ -714,7 +724,7 @@
     <term><token>funcKeyBShort</token>, <token>funcKeyBLong</token></term>
     <listitem>
       <para>
-        Specifies the function associated with the programmable function key <keycap>PF2</keycap> or 
+        Specifies the functions associated with the programmable function key <keycap>PF2</keycap> or 
         <keycap>B</keycap>. This button is the second one below the PTT button (on handheld radios) 
         or labeled <keycap>B</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
       </para>
@@ -724,7 +734,7 @@
     <term><token>funcKeyCShort</token>, <token>funcKeyCLong</token></term>
     <listitem>
       <para>
-        Specifies the function associated with the programmable function key <keycap>PF3</keycap> or 
+        Specifies the functions associated with the programmable function key <keycap>PF3</keycap> or 
         <keycap>C</keycap>. THis button is the colorful one on the top (on handheld radios) or 
         labeled <keycap>C</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
       </para>
@@ -734,8 +744,17 @@
     <term><token>funcKeyDShort</token>, <token>funcKeyDLong</token></term>
     <listitem>
       <para>
-        Specifies the function associated with the programmable function key <keycap>D</keycap>. 
+        Specifies the functions associated with the programmable function key <keycap>D</keycap>. 
         This button is located on the hand microphone (<productname>AT-D578UV</productname> only).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKnobShort</token>, <token>funcKnobLong</token></term>
+    <listitem>
+      <para>
+        Specifies the functions associated with the programmable channel/frequency knob. 
+        (<productname>AT-D578UV</productname> only).
       </para>
     </listitem>
   </varlistentry>
@@ -745,6 +764,16 @@
       <para>
         Specifies the minimum duration of a <quote>long press</quote> on one of the programmable 
         function keys. 
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>upDownKeys</token></term>
+    <listitem>
+      <para>
+        Specifies the functions associated with the up/down buttons on the top of the handset. This
+        must either be <token>Channel</token> or <token>Volume</token>. 
+        (<productname>AT-D578UV</productname> only).
       </para>
     </listitem>
   </varlistentry>
@@ -1017,6 +1046,35 @@
   <listitem>
     <para>Enables and sets a separate microphone gain for FM. If disabled, the global mic gain 
     is used for both, DMR and FM.</para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>speaker</token></term>
+  <listitem>
+    <para>
+      Specifies, which speaker are enabled. Must be one of <token>Handset</token>, 
+      <token>Radio</token> (default) or <token>Both</token>. This only applies to
+      <productname>AT-D578UV</productname>.
+    </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>handsetSpeaker</token></term>
+  <listitem>
+    <para>
+      Specifies the source for the handset speaker, if it is enabled. Must be one of 
+      <token>MainChannel</token> or <token>SubChannel</token>. This only applies to
+      <productname>AT-D578UV</productname>
+    </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>handsetType</token></term>
+  <listitem>
+    <para>
+      Specifies the type of handset. This must be one of <token>Anytone</token> or 
+      <token>Generic</token>. This only applies to <productname>AT-D578UV</productname>.
+    </para>
   </listitem>
 </varlistentry>
 </variablelist>
@@ -1478,40 +1536,188 @@
     </listitem>
   </varlistentry>
 </variablelist>
+
+<section>
+<info><title>Bluetooth Handset <productname>BT-01</productname></title></info>
+<para>
+  The <productname>AT-D578UV</productname> supports a bluetooth handset, that can control the 
+  radio. It is called <productname>BT-01</productname> and looks a bit like a small
+  <productname>AT-D878UV</productname>. There are plenty of settings for this device, stored in 
+  the <productname>AT-D578UV</productname> codeplug. They are collected as a sub-setting under 
+  <token>handset</token> within the <token>bluetooth</token> settings.
+</para>
+<variablelist>
+  <varlistentry>
+    <term><token>volumeLevelA</token>, <token>volumeLevelB</token></term>
+    <listitem>
+      <para>
+        Specifies the volume for VFO A and B repsectively. Must be a value in [0, 10], where 0 
+        means off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>micGain</token></term>
+    <listitem>
+      <para>
+        Specifies the microphone gain setting for the handset. Must be a value in [1,10].
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>
+        Specifies the squelch sensitivity. Must be a value in [0,10], where 0 means open.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txNoiseReduction</token></term>
+    <listitem>
+      <para>
+        Specifies the transmit noise reduction (whatever that means). Must be a value in [0, 10], 
+        where 0 means disabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>voxLevel</token></term>
+    <listitem>
+      <para>
+        Specifies the VOX sensitivity level. Must be a value in [0,10], where 0 disables the VOX.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>voxDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the VOX delay between triggering the VOX and start of transmission in arbitrary 
+        units. Default 0ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyAShort</token>, <token>funcKeyBShort</token>, <token>funcKeyCShort</token>,
+      <token>funcKeyALong</token>, <token>funcKeyBLong</token>, <token>funcKeyCLong</token>, 
+      <token>funcKeyAVeryLong</token>, <token>funcKeyBVeryLong</token>, 
+      <token>funcKeyCVeryLong</token></term>
+    <listitem>
+      <para>
+        Specifies the functions for the programmable side keys for short, long and very long key 
+        presses. The function must be one of the functions decribed in 
+        <xref linkend="extAnytoneSettingsKeyFunctions"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>shutdown</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the handset will shutdown along with the radio.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlight</token></term>
+    <listitem>
+      <para>
+        Specifies the duration, the backlight remains on after any event (keypress, call, etc.). 
+        This can be set in arbitrary units an also to <token>infinity</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 </section>
 
 <section>
-<info><title>Simplex repeater settings</title></info>
+<info><title>Repeater settings</title></info>
 <para>
-  Collects all settings related to the <productname>DMR-6X2UV</productname> simplex-repeater 
-  feature. These settings are collected under the <token>simplexRepeaterSettings</token> key 
-  within the <token>anytoneSettings</token> entry. This extension is only relevant for the 
-  <productname>DMR-6X2UV</productname> series.
+  Collects all settings related to the <productname>DMR-6X2UV</productname> and 
+  <productname>AT-D578UV</productname> repeater feature. These settings are collected under 
+  the <token>repeaterSettings</token> key within the <token>anytoneSettings</token> entry. 
 </para>
 
 <variablelist>
 <varlistentry>
   <term><token>enabled</token></term>
   <listitem>
-    <para>If <token>true</token>, the simplex repeater function is enabled.</para>
+    <para>
+      If <token>true</token>, the simplex repeater function is enabled.
+    </para>
   </listitem>
 </varlistentry>
 <varlistentry>
   <term><token>monitor</token></term>
   <listitem>
-    <para>If <token>true</token>, the traffic can be monitored on the speaker.</para>
+    <para>
+      If <token>true</token>, the traffic can be monitored on the speaker. This only applies to 
+      <productname>DMR-6X2UV</productname>.
+    </para>
   </listitem>
 </varlistentry>
 <varlistentry>
-  <term><token>timeSlot</token></term>
+  <term><token>timeSlot</token>, <token>secTimeSlot</token></term>
   <listitem>
-    <para>Specifies the time-slot of the repeater. This must be one of <token>TS1</token>, 
-    <token>TS2</token> or <token>Channel</token>. The latter implies, that the repeater uses the 
-    time-slot of the channel.</para>
+    <para>
+      Specifies the time-slot of the repeater. This must be one of <token>Any</token>, 
+      <token>TS1</token>, <token>TS2</token> or <token>Channel</token>. The latter implies, 
+      that the repeater uses the time-slot of the channel.
+    </para>
+  </listitem>
+</varlistentry>
+<varlistentry>
+  <term><token>colorCode</token></term>
+  <listitem>
+    <para>
+      Specifies, how color codes are matched. If <token>Ignore</token> ignores the color code,
+      <token>VFOA</token> and <token>VFOB</token> specifies that the color code must match the one
+      of VFO A or B, respecitvely. This only applies to <productname>AT-D578UV</productname>.
+    </para>
   </listitem>
 </varlistentry>
 </variablelist>
+
+<section>
+  <info><title><productname>DMR-6X2UV</productname> Simplex Repeater Mode</title></info>
+  <para>
+    The BETECH <productname>DMR-6X2UV</productname> series provides a simplex repeater feature. 
+    Enabling the repeater feature, will record any transmission received and retransmit it on 
+    the same channel. Consequently, the record feature must be enabled.
+  </para>
+  <para>
+    The only relevant options for the <productname>DMR-6X2UV</productname> are 
+    <token>enabled</token>, <token>monitor</token> and <token>timeSlot</token>.
+    The latter specifes, which time slot to listen and transmit on. This can either be 
+    <token>TS1</token>, <token>TS2</token> or <token>Channel</token>. The latter requires any 
+    transmission to match the CC of the channel. 
+  </para>
 </section>
+
+<section>
+  <info><title><productname>AT-D578UV</productname> Repeater</title></info>
+  <para>
+    The AnyTone <productname>AT-D578UV</productname> provides a proper cross-band or 
+    cross-timeslot repeater. That is, in contrast to the <productname>DMr-6X2UV</productname>
+    the received audio is re-transmitted (almost) immediately.
+  </para>
+  <para>
+    In principle, the repeater works using VFO A for reception and VFO B for transmission or 
+    vice-versa. If the <productname>AT-D578UV</productname> is set up as an FM repeater, the two 
+    channels must be on different bands. 
+  </para>
+  <para>
+    If set up as a DMR repeater, VFO A and VFO B must be on different time slots. This is 
+    controlled via the <token>timeSlot</token> setting. If set to <token>TS1</token>, the 
+    repeater receives on time slot 1 and transmits on time slot 2. If set set to
+    <token>TS2</token> the reverse it true. If set to <token>Any</token>, the radio switches
+    automatically between the two schemes.
+  </para>
+</section>
+</section>
+
 
 <section>
 <info><title>Satellite mode settings</title></info>

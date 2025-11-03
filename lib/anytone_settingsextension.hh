@@ -233,8 +233,15 @@ class AnytoneKeySettingsExtension: public ConfigItem
   Q_PROPERTY(KeyFunction funcKeyDShort READ funcKeyDShort WRITE setFuncKeyDShort)
   /** Function key D (D on mic, D578UV only), long press function. */
   Q_PROPERTY(KeyFunction funcKeyDLong READ funcKeyDLong WRITE setFuncKeyDLong)
+  /** Function knob (channel/frequency knob, D578UV only), short press function. */
+  Q_PROPERTY(KeyFunction funcKnobShort READ funcKnobShort WRITE setFuncKnobShort)
+  /** Function knob (channel/frequency knob, D578UV only), long press function. */
+  Q_PROPERTY(KeyFunction funcKnobLong READ funcKnobLong WRITE setFuncKnobLong)
   /** The long press duration in ms. */
   Q_PROPERTY(Interval longPressDuration READ longPressDuration WRITE setLongPressDuration)
+
+  /** Up/down key functions (D578UV only). */
+  Q_PROPERTY(UpDownKeyFunction upDownKeys READ upDownKeyFunction WRITE setUpDownKeyFunction);
 
   /** The auto key-lock property. */
   Q_PROPERTY(bool autoKeyLock READ autoKeyLockEnabled WRITE enableAutoKeyLock)
@@ -268,6 +275,12 @@ public:
     NoiseReductionTX, DIMShut, SatPredict
   };
   Q_ENUM(KeyFunction)
+
+  /** Possible up/down key functions. */
+  enum class UpDownKeyFunction {
+    Channel, Volume
+  };
+  Q_ENUM(UpDownKeyFunction)
 
 public:
   /** Empty constructor. */
@@ -365,10 +378,24 @@ public:
   /** Sets the key function for a long press on the function key D. */
   void setFuncKeyDLong(KeyFunction func);
 
+  /** Returns the key function for a short press on the knob. */
+  KeyFunction funcKnobShort() const;
+  /** Sets the key function for a short press on the knob. */
+  void setFuncKnobShort(KeyFunction func);
+  /** Returns the key function for a long press on the knob. */
+  KeyFunction funcKnobLong() const;
+  /** Sets the key function for a long press on the knob. */
+  void setFuncKnobLong(KeyFunction func);
+
   /** Returns the long-press duration in ms. */
   Interval longPressDuration() const;
   /** Sets the long-press duration in ms. */
   void setLongPressDuration(Interval ms);
+
+  /** Returns the up/down key function. */
+  UpDownKeyFunction upDownKeyFunction() const;
+  /** Sets the up/down key function. */
+  void setUpDownKeyFunction(UpDownKeyFunction func);
 
   /** Returns @c true, if the automatic key-lock feature is enabled. */
   bool autoKeyLockEnabled() const;
@@ -413,7 +440,10 @@ protected:
   KeyFunction _funcKeyCLong;           ///< Function of the function key C, long press.
   KeyFunction _funcKeyDShort;          ///< Function of the function key D, short press.
   KeyFunction _funcKeyDLong;           ///< Function of the function key D, long press.
+  KeyFunction _funcKnobShort;          ///< Function of the knob, short press.
+  KeyFunction _funcKnobLong;           ///< Function of the knob, long press.
   Interval _longPressDuration;         ///< The long-press duration in ms.
+  UpDownKeyFunction _upDownFunction;   ///< The up/down key function.
   bool _autoKeyLock;                   ///< Auto key-lock property.
   bool _knobLock;                      ///< Knob locked too.
   bool _keypadLock;                    ///< Key-pad is locked.
@@ -870,12 +900,37 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   /** The FM mic gain [1,10]. */
   Q_PROPERTY(unsigned int fmMicGain READ fmMicGain WRITE setFMMicGain)
 
+  /** The enables speakers. */
+  Q_PROPERTY(Speaker speaker READ speaker WRITE setSpeaker)
+  /** The source for the handset speaker. */
+  Q_PROPERTY(HandsetSpeakerSource handsetSpeaker READ handsetSpeaker WRITE setHandsetSpeaker)
+  /** The handset type. */
+  Q_PROPERTY(HandsetType handsetType READ handsetType WRITE setHandsetType)
+
 public:
   /** Source for the VOX. */
   enum class VoxSource {
     Internal = 0, External = 1, Both = 2
   };
   Q_ENUM(VoxSource)
+
+  /** Possible speaker settings. */
+  enum class Speaker {
+    Handset, Radio, Both
+  };
+  Q_ENUM(Speaker);
+
+  /** Possible handset speaker sources. */
+  enum class HandsetSpeakerSource {
+    MainChannel, SubChannel
+  };
+  Q_ENUM(HandsetSpeakerSource)
+
+  /** Specifies possible handset types. */
+  enum class HandsetType {
+    Anytone, Generic
+  };
+  Q_ENUM(HandsetType)
 
 public:
   /** Default constructor. */
@@ -926,6 +981,21 @@ public:
   /** Sets the FM mic gain. */
   void setFMMicGain(unsigned int gain);
 
+  /** Returns the speaker that are enabled. */
+  Speaker speaker() const;
+  /** Sets, which speacker are enabled. */
+  void setSpeaker(Speaker speaker);
+
+  /** Returns the handset speaker source. */
+  HandsetSpeakerSource handsetSpeaker() const;
+  /** Sets the handset speaker source. */
+  void setHandsetSpeaker(HandsetSpeakerSource src);
+
+  /* Returns the handset type. */
+  HandsetType handsetType() const;
+  /** Sets the handset type. */
+  void setHandsetType(HandsetType type);
+
 protected:
   Interval _voxDelay;               ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
@@ -936,6 +1006,9 @@ protected:
   Interval _muteDelay;              ///< Mute delay in minutes.
   bool _enableAnalogMicGain;        ///< Enables separate analog mic gain.
   unsigned int _analogMicGain;      ///< The FM mic gain.
+  Speaker _speaker;                 ///< Specifies which speaker are enabled.
+  HandsetSpeakerSource _handsetSpeaker; ///< Specifies the handset speaker source.
+  HandsetType _handsetType;         ///< Handset type.
 };
 
 
@@ -1639,6 +1712,166 @@ protected:
 };
 
 
+
+/** Implements the bluetooth handset settings for AnyTone devices.
+ * This extension is part of the @c AnyToneBlueoothSettingsExtension.
+ *
+ * @ingroup anytone */
+class AnytoneBluetoothHandsetSettingsExtension: public ConfigItem
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("Description", "Collects all bluetooth handset settings for AnyTone devices.")
+
+  Q_CLASSINFO("shutdownDescription", "Shuts the handset off too, when the radio is turned off.")
+  Q_PROPERTY(bool shutdown READ shutdownEnabled WRITE enableShutdown)
+
+  Q_CLASSINFO("volumeLevelADescription", "Sets the volume level for VFO A.")
+  Q_PROPERTY(unsigned int volumeLevelA READ volumeLevelA WRITE setVolumeLevelA)
+  Q_CLASSINFO("volumeLevelBDescription", "Sets the volume level for VFO B.")
+  Q_PROPERTY(unsigned int volumeLevelB READ volumeLevelB WRITE setVolumeLevelB)
+
+  Q_CLASSINFO("micGainDescription", "Specifies the microphone gain.")
+  Q_PROPERTY(unsigned int micGain READ micGain WRITE setMicGain)
+
+  Q_PROPERTY(unsigned int squelch READ squelch WRITE setSquelch)
+
+  Q_PROPERTY(unsigned int txNoiseReduction READ txNoiseReduction WRITE setTxNoiseReduction)
+
+  Q_PROPERTY(unsigned int voxLevel READ voxLevel WRITE setVoxLevel)
+  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVoxDelay)
+
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyAShort     READ funcKeyAShort     WRITE setFuncKeyAShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBShort     READ funcKeyBShort     WRITE setFuncKeyBShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCShort     READ funcKeyCShort     WRITE setFuncKeyCShort)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyALong      READ funcKeyALong      WRITE setFuncKeyALong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBLong      READ funcKeyBLong      WRITE setFuncKeyBLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCLong      READ funcKeyCLong      WRITE setFuncKeyCLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyAVeryLong  READ funcKeyAVeryLong  WRITE setFuncKeyAVeryLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyBVeryLong  READ funcKeyBVeryLong  WRITE setFuncKeyBVeryLong)
+  Q_PROPERTY(AnytoneKeySettingsExtension::KeyFunction funcKeyCVeryLong  READ funcKeyCVeryLong  WRITE setFuncKeyCVeryLong)
+
+  Q_PROPERTY(Interval backlight READ backlight WRITE setBacklight)
+
+public:
+  /** Default constructor. */
+  explicit AnytoneBluetoothHandsetSettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const override;
+
+  /** Returns @c true, if the handset is shutdown along with the radio. */
+  bool shutdownEnabled() const;
+  /** Enables/disables shutting the handset down along with the radio. */
+  void enableShutdown(bool enable);
+
+  /** Retruns the volume level for VFO A. */
+  unsigned int volumeLevelA() const;
+  /** Sets the volume level for VFO A. */
+  void setVolumeLevelA(unsigned int level);
+  /** Retruns the volume level for VFO B. */
+  unsigned int volumeLevelB() const;
+  /** Sets the volume level for VFO B. */
+  void setVolumeLevelB(unsigned int level);
+
+  /** Returns the mic gain. */
+  unsigned int micGain() const;
+  /** Sets the mic gain. */
+  void setMicGain(unsigned int gain);
+
+  /** Returns the squlech level. */
+  unsigned int squelch() const;
+  /** Sets the squelch level. */
+  void setSquelch(unsigned int level);
+
+  /** Returns the transmit noise reduction level. */
+  unsigned int txNoiseReduction() const;
+  /** Sets the transmit noise reduction level. */
+  void setTxNoiseReduction(unsigned int level);
+
+  /** Returns the VOX level. */
+  unsigned int voxLevel() const;
+  /** Set the VOX level. */
+  void setVoxLevel(unsigned int level);
+
+  /** Returns the VOX delay. */
+  Interval voxDelay() const;
+  /** Sets the VOX delay. */
+  void setVoxDelay(Interval delay);
+
+  /** Returns function key A short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
+  /** Set function key A short press function. */
+  void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
+  /** Set function key B short press function. */
+  void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C short press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
+  /** Set function key C short press function. */
+  void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key A long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
+  /** Set function key A long press function. */
+  void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
+  /** Set function key B long press function. */
+  void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
+  /** Set function key C long press function. */
+  void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key A very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyAVeryLong() const;
+  /** Set function key A very long press function. */
+  void setFuncKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key B very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyBVeryLong() const;
+  /** Set function key B very long press function. */
+  void setFuncKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+  /** Returns function key C very long press function. */
+  AnytoneKeySettingsExtension::KeyFunction funcKeyCVeryLong() const;
+  /** Set function key C very long press function. */
+  void setFuncKeyCVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+
+  /** Retruns the backlight duration. */
+  Interval backlight() const;
+  /** Sets the backlight duration. */
+  void setBacklight(Interval dur);
+
+protected:
+  bool _shutdown;                    ///< Shut the handset down alogn with the radio.
+  unsigned int _volumeLevelA;        ///< Specifies the volume level for VFO A.
+  unsigned int _volumeLevelB;        ///< Specifies the volume level for VFO B.
+  unsigned int _micGain;             ///< Specifies the mic gain.
+  unsigned int _squelch;             ///< Specifies the squelch level.
+  unsigned int _txNoiseReduction;    ///< Specifies the transmit noise reduction level.
+  unsigned int _voxLevel;            ///< Specifies the VOX level.
+  Interval _voxDelay;                ///< Specifies the VOX delay.
+  /// Function key A short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyAShort;
+  /// Function key B short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBShort;
+  /// Function key B short press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCShort;
+  /// Function key A long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyALong;
+  /// Function key B long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBLong;
+  /// Function key B long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCLong;
+  /// Function key A very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyAVeryLong;
+  /// Function key B very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyBVeryLong;
+  /// Function key B very long press function.
+  AnytoneKeySettingsExtension::KeyFunction _funcKeyCVeryLong;
+  Interval _backlight;                ///< Backlight duration.
+};
+
+
+
 /** Implements the bluetooth settings for some AnyTone devices.
  * This extension is part of the @c AnytoneSettingsExtension.
  *
@@ -1667,12 +1900,17 @@ class AnytoneBluetoothSettingsExtension: public ConfigItem
   Q_PROPERTY(Interval hold READ holdDuration WRITE setHoldDuration)
   /** The bluetooth hold delay. */
   Q_PROPERTY(Interval holdDelay READ holdDelay WRITE setHoldDelay)
+  /** The handset settings. */
+  Q_PROPERTY(AnytoneBluetoothHandsetSettingsExtension* handset READ handset)
 
 public:
   /** Default constructor. */
   explicit AnytoneBluetoothSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
+
+  /** Returns the handset settings. */
+  AnytoneBluetoothHandsetSettingsExtension *handset() const;
 
   /** Returns @c true if bluetooth is enabled. */
   bool bluetoothEnabled() const;
@@ -1720,6 +1958,8 @@ public:
   void setHoldDelay(const Interval &dur);
 
 protected:
+  /// Handset settings.
+  AnytoneBluetoothHandsetSettingsExtension *_handset;
   bool _bluetoothEnabled;      ///< Enables bluetooth.
   bool _pttLatch;              ///< PTT latch flag.
   Interval _pttSleep;          ///< PTT sleep timer, 0 is off.
@@ -1732,36 +1972,50 @@ protected:
 };
 
 
-/** Implements the simplex repeater settings for the BTECH DMR-6X2UV.
+
+/** Implements the repeater settings for the BTECH DMR-6X2UV and AT-D578UV.
  * This extension is part of the @c AnytoneSettingsExtension
  *
  * @ingroup anytone */
-class AnytoneSimplexRepeaterSettingsExtension: public ConfigItem
+class AnytoneRepeaterSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  Q_CLASSINFO("enabledDescription", "If true, the simplex-repeater feature is enabled.")
-  /** Enables/disables the simplex repeater. */
+  Q_CLASSINFO("enabledDescription", "If true, the repeater feature is enabled.")
+  /** Enables/disables the repeater feature. */
   Q_PROPERTY(bool enabled READ enabled WRITE enable)
 
   Q_CLASSINFO("monitorDescription", "If true, the repeater-monitoring is enabled.")
   /** Enables/disables the repeater monitor. */
   Q_PROPERTY(bool monitor READ monitorEnabled WRITE enableMonitor)
 
-  Q_CLASSINFO("timeSlotDescription", "Specifies the time-slot of the repeater.")
-  /** Time-slot of the repeater. */
+  Q_CLASSINFO("timeSlotDescription", "Specifies the time-slot of the primary repeater channel.")
+  /** Time-slot of the primary repeater channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
 
+  Q_CLASSINFO("secTimeSlotDescription", "Specifies the time-slot of the secondary repeater channel.")
+  /** Time-slot of the secondary repeater channel. */
+  Q_PROPERTY(TimeSlot secTimeSlot READ secTimeSlot WRITE setSecTimeSlot)
+
+  Q_CLASSINFO("colorCodeDescription", "Specifies the repeater color code.")
+  Q_PROPERTY(ColorCode colorCode READ colorCode WRITE setColorCode)
+
 public:
-  /** Possible simplex repeater time-slots. */
+  /** Possible repeater time-slots. */
   enum class TimeSlot {
-    TS1 = 0, TS2 = 1, Channel = 2
+    Any, TS1, TS2, Channel
   };
   Q_ENUM(TimeSlot)
 
+  /** Possible color code settings. */
+  enum class ColorCode {
+    Ignored, VFOA, VFOB
+  };
+  Q_ENUM(ColorCode)
+
 public:
   /** Default constructor. */
-  explicit AnytoneSimplexRepeaterSettingsExtension(QObject *parent=nullptr);
+  explicit AnytoneRepeaterSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
 
@@ -1775,15 +2029,27 @@ public:
   /** Enables/disables repeater monitoring. */
   void enableMonitor(bool enable);
 
-  /** Returns the repeater time-slot. */
+  /** Returns the primary (simplex) channel time-slot. */
   TimeSlot timeSlot() const;
-  /** Sets the repeater time-slot. */
+  /** Sets the primary (simplex) channel time-slot. */
   void setTimeSlot(TimeSlot ts);
+
+  /** Returns the secondary channel time-slot. */
+  TimeSlot secTimeSlot() const;
+  /** Sets the secondary channel time-slot. */
+  void setSecTimeSlot(TimeSlot ts);
+
+  /** Returns the color code match mode. */
+  ColorCode colorCode() const;
+  /** Sets the color code match mode. */
+  void setColorCode(ColorCode code);
 
 protected:
   bool _enabled;                ///< If @c true, the simplex repeater is enabled.
   bool _monitor;                ///< If enabled, the radio will monitor the channel.
-  TimeSlot _timeSlot;           ///< The repeater time-slot.
+  TimeSlot _timeSlot;           ///< The primary channel time-slot.
+  TimeSlot _secTimeSlot;        ///< The secondary channel time-slot.
+  ColorCode _colorCode;         ///< The color code match mode.
 };
 
 
@@ -1909,6 +2175,9 @@ class AnytoneSettingsExtension: public ConfigExtension
   /** If @c true, the call-channel is maintained (whatever that means). */
   Q_PROPERTY(bool maintainCallChannel READ maintainCallChannelEnabled WRITE enableMaintainCallChannel)
 
+  /** Specifies, what controls the fan. */
+  Q_PROPERTY(FanControl fan READ fan WRITE setFan);
+
   /** The boot settings. */
   Q_PROPERTY(AnytoneBootSettingsExtension* bootSettings READ bootSettings)
   /** The power-save settings. */
@@ -1937,7 +2206,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_CLASSINFO("simplexRepeaterSettingsDescription",
               "Configuration for the DMR-6X2UV simplex-repeater feature.")
   /** The simplex-repeater settings. DMR-6X2UV only. */
-  Q_PROPERTY(AnytoneSimplexRepeaterSettingsExtension * simplexRepeaterSettings READ simplexRepeaterSettings)
+  Q_PROPERTY(AnytoneRepeaterSettingsExtension * repeaterSettings READ repeaterSettings)
 
   Q_CLASSINFO("satelliteSettingsDescription",
               "Some settings of for satellite mode.")
@@ -1967,6 +2236,11 @@ public:
     Off = 0, Silent = 1, Deg120 = 2, Deg180 = 3, Deg240 = 4
   };
   Q_ENUM(STEType)
+
+  enum class FanControl {
+    PTT, Temperature, Both
+  };
+  Q_ENUM(FanControl)
 
 
 public:
@@ -2000,7 +2274,7 @@ public:
   /** A reference to the bluetooth settings. */
   AnytoneBluetoothSettingsExtension *bluetoothSettings() const;
   /** A reference to the simplex repeater settings. */
-  AnytoneSimplexRepeaterSettingsExtension *simplexRepeaterSettings() const;
+  AnytoneRepeaterSettingsExtension *repeaterSettings() const;
   /** A reference to the satellite settings. */
   AnytoneSatelliteSettingsExtension *satelliteSettings() const;
 
@@ -2095,6 +2369,11 @@ public:
   /** Enables/disables maintaining the call-channel. */
   void enableMaintainCallChannel(bool enable);
 
+  /** Returns the fan control setting. */
+  FanControl fan() const;
+  /** Sets the fan control. */
+  void setFan(FanControl ctlr);
+
   /** Returns power setting for satellite mode. */
   //Channel::Power satPower();
 
@@ -2123,8 +2402,8 @@ protected:
   AnytoneRoamingSettingsExtension *_roamingSettings;
   /** The bluetooth settings. */
   AnytoneBluetoothSettingsExtension *_bluetoothSettings;
-  /** The simplex-repeater settings. */
-  AnytoneSimplexRepeaterSettingsExtension *_simplexRepeaterSettings;
+  /** The repeater settings. */
+  AnytoneRepeaterSettingsExtension *_repeaterSettings;
   /** The satellite settings. */
   AnytoneSatelliteSettingsExtension *_satelliteSettings;
 
@@ -2147,6 +2426,7 @@ protected:
   Frequency _tbstFrequency;        ///< The TBST frequency in Hz.
   bool _proMode;                   ///< The "pro mode" flag.
   bool _maintainCallChannel;       ///< Maintains the call channel.
+  FanControl _fan;
 };
 
 
