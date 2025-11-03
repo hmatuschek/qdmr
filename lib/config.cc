@@ -97,6 +97,7 @@ Config::isModified() const {
 void
 Config::setModified(bool modified) {
   _modified = modified;
+  emit this->modified(this);
 }
 
 bool
@@ -271,7 +272,7 @@ Config::clear() {
   smsExtension()->clear();
   setTyTExtension(nullptr);
 
-  emit modified(this);
+  onConfigModified();
 }
 
 const Config *
@@ -304,6 +305,7 @@ Config::setTyTExtension(TyTConfigExtension *ext) {
   if (_tytExtension) {
     _tytExtension->setParent(this);
     connect(_tytExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
+    onConfigModified();
   }
 }
 
@@ -325,11 +327,7 @@ Config::readCSV(const QString &filename, QString &errorMessage) {
 bool
 Config::readCSV(QTextStream &stream, QString &errorMessage)
 {
-  if (CSVReader::read(this, stream, errorMessage))
-    _modified = false;
-  else
-    return false;
-  return true;
+  return CSVReader::read(this, stream, errorMessage);
 }
 
 
@@ -366,6 +364,8 @@ Config::readYAML(const QString &filename, const ErrorStack &err) {
     return false;
 
   setModified(false);
+  emit modified(this);
+
   return true;
 }
 

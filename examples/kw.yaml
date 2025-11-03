@@ -1,5 +1,5 @@
 ---
-version: 0.12.0
+version: 0.13.1
 settings:
   introLine1: qDMR
   introLine2: DM3MAT
@@ -1289,20 +1289,24 @@ channels:
       name: DB0LDS
       rxOnly: false
       admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 439.5625 MHz
       txFrequency: 431.9625 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      rxTone: {ctcss: 67}
-      txTone: {ctcss: 67}
       squelch: !<!default> ""
   - analog:
       id: ch79
       name: DB0RAG
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.3 MHz
       txFrequency: 431.7 MHz
@@ -1315,20 +1319,24 @@ channels:
       name: DB0LUD
       rxOnly: false
       admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 438.575 MHz
       txFrequency: 430.975 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      rxTone: {ctcss: 67}
-      txTone: {ctcss: 67}
       squelch: !<!default> ""
   - analog:
       id: ch81
       name: DB0SP-2
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.6 MHz
       txFrequency: 145 MHz
@@ -1341,6 +1349,8 @@ channels:
       name: DB0SP-70
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.425 MHz
       txFrequency: 431.825 MHz
@@ -1353,6 +1363,8 @@ channels:
       name: DB0ZOD-2
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.6625 MHz
       txFrequency: 145.0625 MHz
@@ -1365,6 +1377,8 @@ channels:
       name: DB0ZOD-70
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 438.725 MHz
       txFrequency: 431.125 MHz
@@ -1377,6 +1391,8 @@ channels:
       name: DB0BRL
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.725 MHz
       txFrequency: 145.125 MHz
@@ -1389,6 +1405,8 @@ channels:
       name: DB0BLO
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.275 MHz
       txFrequency: 431.675 MHz
@@ -1401,6 +1419,8 @@ channels:
       name: DB0SX
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.05 MHz
       txFrequency: 431.45 MHz
@@ -1413,6 +1433,8 @@ channels:
       name: DB0TA
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.125 MHz
       txFrequency: 431.525 MHz
@@ -1425,6 +1447,8 @@ channels:
       name: DB0PDM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.675 MHz
       txFrequency: 145.075 MHz
@@ -1437,6 +1461,8 @@ channels:
       name: DB0CBS
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 438.85 MHz
       txFrequency: 431.25 MHz
@@ -1449,6 +1475,8 @@ channels:
       name: DB0AF
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 438.6375 MHz
       txFrequency: 431.0375 MHz
@@ -1461,6 +1489,8 @@ channels:
       name: DB0NFL
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 438.95 MHz
       txFrequency: 431.35 MHz
@@ -1473,6 +1503,8 @@ channels:
       name: DB0LMM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.3 MHz
       txFrequency: 431.7 MHz
@@ -1485,6 +1517,8 @@ channels:
       name: DM0LEI
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.15 MHz
       txFrequency: 431.55 MHz
@@ -1497,6 +1531,8 @@ channels:
       name: DB0LEI
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.775 MHz
       txFrequency: 145.175 MHz
@@ -1509,6 +1545,8 @@ channels:
       name: DB0SML
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 439.275 MHz
       txFrequency: 431.675 MHz
@@ -1521,6 +1559,8 @@ channels:
       name: DB0LSA
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.6625 MHz
       txFrequency: 145.0625 MHz
@@ -1533,6 +1573,8 @@ channels:
       name: DB0LE
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 438.7875 MHz
       txFrequency: 431.1875 MHz
@@ -1545,6 +1587,8 @@ channels:
       name: DOK Y07
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 144.675 MHz
       txFrequency: 144.675 MHz
@@ -1557,6 +1601,8 @@ channels:
       name: DOK D20
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 144.65 MHz
       txFrequency: 144.65 MHz
@@ -1569,6 +1615,8 @@ channels:
       name: DOK D23
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.375 MHz
       txFrequency: 145.375 MHz
@@ -1581,6 +1629,8 @@ channels:
       name: DOK S31
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 144.725 MHz
       txFrequency: 144.725 MHz
@@ -1593,6 +1643,8 @@ channels:
       name: S20
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.3 MHz
       txFrequency: 145.3 MHz
@@ -1605,6 +1657,8 @@ channels:
       name: 2m Mobil
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.5 MHz
       txFrequency: 145.5 MHz
@@ -1617,6 +1671,8 @@ channels:
       name: 70cm Mobil
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 433.5 MHz
       txFrequency: 433.5 MHz
@@ -1629,6 +1685,8 @@ channels:
       name: APRS
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       aprs: aprs2
       rxFrequency: 144.8 MHz
@@ -1642,6 +1700,8 @@ channels:
       name: ISS APRS
       rxOnly: false
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.825 MHz
       txFrequency: 145.825 MHz
@@ -1654,19 +1714,23 @@ channels:
       name: ISS FM Rep
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 437.8 MHz
       txFrequency: 145.99 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch109
       name: CAS-3H FM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 437.2 MHz
       txFrequency: 144.35 MHz
@@ -1679,6 +1743,8 @@ channels:
       name: PO-101 FM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 145.9 MHz
       txFrequency: 437.5 MHz
@@ -1691,45 +1757,53 @@ channels:
       name: SO-50 FM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 436.79 MHz
       txFrequency: 145.85 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch112
       name: AO-92 FM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 145.88 MHz
       txFrequency: 435.35 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch113
       name: AO-91 FM
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone:
+        ctcss: 67.0 Hz
       bandwidth: Narrow
       rxFrequency: 145.96 MHz
       txFrequency: 435.25 MHz
       power: High
       timeout: !<!default> ""
       vox: !<!default> ""
-      txTone: {ctcss: 67}
       squelch: 0
   - analog:
       id: ch114
       name: U0
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 430.2 MHz
       txFrequency: 430.2 MHz
@@ -1742,6 +1816,8 @@ channels:
       name: U1
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 430.225 MHz
       txFrequency: 430.225 MHz
@@ -1754,6 +1830,8 @@ channels:
       name: U2
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 430.25 MHz
       txFrequency: 430.25 MHz
@@ -1766,6 +1844,8 @@ channels:
       name: U3
       rxOnly: false
       admit: Always
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 430.275 MHz
       txFrequency: 430.275 MHz
@@ -1779,6 +1859,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.00625 MHz
       txFrequency: 446.00625 MHz
@@ -1792,6 +1874,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.01875 MHz
       txFrequency: 446.01875 MHz
@@ -1805,6 +1889,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.03125 MHz
       txFrequency: 446.03125 MHz
@@ -1818,6 +1904,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.04375 MHz
       txFrequency: 446.04375 MHz
@@ -1831,6 +1919,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.05625 MHz
       txFrequency: 446.05625 MHz
@@ -1844,6 +1934,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.06875 MHz
       txFrequency: 446.06875 MHz
@@ -1857,6 +1949,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.08125 MHz
       txFrequency: 446.08125 MHz
@@ -1870,6 +1964,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.09375 MHz
       txFrequency: 446.09375 MHz
@@ -1883,6 +1979,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.10625 MHz
       txFrequency: 446.10625 MHz
@@ -1896,6 +1994,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.11875 MHz
       txFrequency: 446.11875 MHz
@@ -1909,6 +2009,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.13125 MHz
       txFrequency: 446.13125 MHz
@@ -1922,6 +2024,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.14375 MHz
       txFrequency: 446.14375 MHz
@@ -1935,6 +2039,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.15625 MHz
       txFrequency: 446.15625 MHz
@@ -1948,6 +2054,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.16875 MHz
       txFrequency: 446.16875 MHz
@@ -1961,6 +2069,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.18125 MHz
       txFrequency: 446.18125 MHz
@@ -1974,6 +2084,8 @@ channels:
       rxOnly: false
       scanListRef: scan3
       admit: Free
+      rxTone: ~
+      txTone: ~
       bandwidth: Narrow
       rxFrequency: 446.19375 MHz
       txFrequency: 446.19375 MHz
@@ -2034,6 +2146,7 @@ positioning:
       name: BM ARPS
       period: 300
       contact: cont22
+      revert: !<!selected> ""
   - aprs:
       id: aprs2
       name: APRS APAT81
@@ -2126,11 +2239,6 @@ commercial:
     []
 sms:
   format: DMR
-  smsTemplates:
-    - id: sms1
-      name: signal strength
-      message: rssi
-    - id: sms2
-      name: weather
-      message: wx
+  templates:
+    []
 ...

@@ -147,6 +147,10 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   }
 
   restoreGeometry(settings.mainWindowState());
+
+  connect(config, &ConfigItem::modified, [this, config]() {
+    this->setWindowModified(config->isModified());
+  });
 }
 
 

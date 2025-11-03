@@ -35,7 +35,6 @@
 #include "roamingchannellistview.hh"
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
-#include "extensionview.hh"
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
 #include "chirpformat.hh"
@@ -103,7 +102,7 @@ Application::Application(int &argc, char *argv[])
   _config     = new Config(this);
 
   // Handle args (if there are some)
-  if (argc>1) {
+  if (argc > 1) {
     QFileInfo info(argv[1]);
     QFile file(argv[1]);
     if (! file.open(QIODevice::ReadOnly)) {
@@ -246,9 +245,7 @@ Application::loadCodeplug() {
 
   if ("yaml" == info.suffix()){
     ErrorStack err;
-    if (_config->readYAML(filename, err)) {
-      _mainWindow->setWindowModified(false);
-    } else {
+    if (! _config->readYAML(filename, err)) {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(err.format()));
@@ -257,9 +254,7 @@ Application::loadCodeplug() {
   } else {
     QString errorMessage;
     QTextStream stream(&file);
-    if (_config->readCSV(stream, errorMessage)) {
-      _mainWindow->setWindowModified(false);
-    } else {
+    if (!_config->readCSV(stream, errorMessage)) {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(errorMessage));
@@ -306,7 +301,7 @@ Application::saveCodeplug() {
   QTextStream stream(&file);
   QFileInfo info(filename);
   if (_config->toYAML(stream)) {
-    _mainWindow->setWindowModified(false);
+    _config->setModified(false);
   } else {
     QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
                           tr("Cannot save codeplug to file '%1'.").arg(filename));
@@ -411,11 +406,8 @@ Application::importCodeplug() {
     QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
                           tr("Cannot import codeplug from '%1': %2")
                           .arg(filename).arg(err.format()));
-    _config->setModified(true);
     return;
   }
-
-  _config->setModified(true);
 }
 
 
