@@ -326,7 +326,7 @@
   buttons. Some function are not available on all devices.
 </para>
 
-<variablelist>
+<variablelist xml:id="extAnytoneSettingsKeyFunctions">
   <title>Key functions</title>
   <varlistentry>
     <term><token>Off</token></term>
@@ -1536,6 +1536,100 @@
     </listitem>
   </varlistentry>
 </variablelist>
+
+<section>
+<info><title>Bluetooth Handset <productname>BT-01</productname></title></info>
+<para>
+  The <productname>AT-D578UV</productname> supports a bluetooth handset, that can control the 
+  radio. It is called <productname>BT-01</productname> and looks a bit like a small
+  <productname>AT-D878UV</productname>. There are plenty of settings for this device, stored in 
+  the <productname>AT-D578UV</productname> codeplug. They are collected as a sub-setting under 
+  <token>handset</token> within the <token>bluetooth</token> settings.
+</para>
+<variablelist>
+  <varlistentry>
+    <term><token>volumeLevelA</token>, <token>volumeLevelB</token></term>
+    <listitem>
+      <para>
+        Specifies the volume for VFO A and B repsectively. Must be a value in [0, 10], where 0 
+        means off.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>micGain</token></term>
+    <listitem>
+      <para>
+        Specifies the microphone gain setting for the handset. Must be a value in [1,10].
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>
+        Specifies the squelch sensitivity. Must be a value in [0,10], where 0 means open.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>txNoiseReduction</token></term>
+    <listitem>
+      <para>
+        Specifies the transmit noise reduction (whatever that means). Must be a value in [0, 10], 
+        where 0 means disabled.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>voxLevel</token></term>
+    <listitem>
+      <para>
+        Specifies the VOX sensitivity level. Must be a value in [0,10], where 0 disables the VOX.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>voxDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the VOX delay between triggering the VOX and start of transmission in arbitrary 
+        units. Default 0ms.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>funcKeyAShort</token>, <token>funcKeyBShort</token>, <token>funcKeyCShort</token>,
+      <token>funcKeyALong</token>, <token>funcKeyBLong</token>, <token>funcKeyCLong</token>, 
+      <token>funcKeyAVeryLong</token>, <token>funcKeyBVeryLong</token>, 
+      <token>funcKeyCVeryLong</token></term>
+    <listitem>
+      <para>
+        Specifies the functions for the programmable side keys for short, long and very long key 
+        presses. The function must be one of the functions decribed in 
+        <xref linkend="extAnytoneSettingsKeyFunctions"/>.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>shutdown</token></term>
+    <listitem>
+      <para>
+        If <token>true</token>, the handset will shutdown along with the radio.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>backlight</token></term>
+    <listitem>
+      <para>
+        Specifies the duration, the backlight remains on after any event (keypress, call, etc.). 
+        This can be set in arbitrary units an also to <token>infinity</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 </section>
 
 <section>
