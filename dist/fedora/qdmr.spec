@@ -14,7 +14,7 @@
 
 
 %define sover   0
-%define realver 0.12.0
+%define realver 0.13.0
 Name:           qdmr
 Version:        %{realver}
 Release:        0
@@ -31,19 +31,19 @@ BuildRequires:  xsltproc
 BuildRequires:  gcc-c++
 BuildRequires:  hicolor-icon-theme
 BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Network)
-BuildRequires:  pkgconfig(Qt5Positioning)
-BuildRequires:  pkgconfig(Qt5SerialPort)
-BuildRequires:  pkgconfig(Qt5Test)
-BuildRequires:  pkgconfig(Qt5UiTools)
-BuildRequires:  pkgconfig(Qt5Widgets)
+BuildRequires:  pkgconfig(Qt6Core)
+BuildRequires:  pkgconfig(Qt6Network)
+BuildRequires:  pkgconfig(Qt6Positioning)
+BuildRequires:  pkgconfig(Qt6SerialPort)
+BuildRequires:  pkgconfig(Qt6Test)
+BuildRequires:  pkgconfig(Qt6UiTools)
+BuildRequires:  pkgconfig(Qt6Widgets)
 BuildRequires:  pkgconfig(libusb-1.0)
 BuildRequires:  pkgconfig(yaml-cpp)
 
 
 %description
-qdmr is a Qt5 application to program DMR radios. DMR is a digital modulation
+qdmr is a Qt application to program DMR radios. DMR is a digital modulation
 standard used in amateur and commercial radio. To this end, qdmr is an
 alternative codeplug programming software (CPS) that supports several radios
 across several manufacturers.
@@ -52,9 +52,9 @@ Currently supported devices are:
  * Radioddity/Baofeng RD-5R, GD-73, GD-77
  * TYT MD-380, MD-390, MD-UV380, MD-UV390, MD-2017
  * Retevis RT8, RT3S, RT82
- * Open GD77 firmware (GD77, RD-5R & DM-1801)
- * AnyTone AT-D868UVE, AT-D878UV, AT-878UVII, AT-D578UV
- * BTech DMR-6X2, DM-1701, DR-1801UV
+ * Open GD77 firmware (GD77, RD-5R, DM-1801, MD-UV390, RT-3S & DM1701)
+ * AnyTone AT-D868UVE, AT-D878UV, AT-878UVII, AT-D578UV, AT-D578UVII
+ * BTech DMR-6X2, DMR-6X2PRO, DM-1701, DR-1801UVA6
 
 %package -n libdmrconf%{sover}
 Summary:        Graphical code-plug programming tool for DMR radios
@@ -121,6 +121,8 @@ mv %{buildroot}%{_sysconfdir}/udev/rules.d/99-qdmr.rules %{buildroot}%{_udevrule
 %{_libdir}/libdmrconf.so
 
 %changelog
+* Sun Oct 19 2025 Hannes Matuschek <dm3mat@darc.de>
+  - Updated to 0.13.0
 * Thu Jul 25 2024 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.12.0
   - added translations

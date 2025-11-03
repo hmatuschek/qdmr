@@ -2457,7 +2457,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation>Exportiert alle FM Kanäle als CHIRP CSV.</translation>
+        <translation type="unfinished">Exportiert alle FM Kanäle als CHIRP CSV.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
