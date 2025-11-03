@@ -1424,53 +1424,38 @@
         <translation>Déplacer les éléments sélectionnés tout en haut.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="63"/>
+        <location filename="../src/configobjecttableview.ui" line="64"/>
         <source>Move selected item(s) ten positions up.</source>
         <translation>Déplacer les éléments sélectionnés dix positions vers le haut.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="76"/>
+        <location filename="../src/configobjecttableview.ui" line="78"/>
         <source>Move selected item(s) one position up.</source>
         <translation>Déplacer les éléments sélectionnés une position vers le haut.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="89"/>
+        <location filename="../src/configobjecttableview.ui" line="92"/>
         <source>Move selected item(s) one position down.</source>
         <translation>Déplacer les éléments sélectionnés une position vers le bas.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="102"/>
+        <location filename="../src/configobjecttableview.ui" line="106"/>
         <source>Move selected item(s) ten positions down.</source>
         <translation>Déplacer les éléments sélectionnés dix positions vers le bas.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="115"/>
+        <location filename="../src/configobjecttableview.ui" line="120"/>
         <source>Move selected item(s) to the bottom.</source>
         <translation>Déplacer les éléments sélectionnés tout en bas.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="180"/>
-        <source>toggle Filter and Sorting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="183"/>
+        <location filename="../src/configobjecttableview.ui" line="188"/>
         <source>Toggle Filter and Sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="186"/>
-        <source>Ctrl+Shift+L</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="194"/>
+        <location filename="../src/configobjecttableview.ui" line="199"/>
         <source>Close Sort and Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/configobjecttableview.ui" line="197"/>
-        <source>Esc</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
