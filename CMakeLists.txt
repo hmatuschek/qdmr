@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20.0)
-project(qdmr VERSION 0.13.0)
+project(qdmr VERSION 0.13.1)
 
 set(RELEASE_SUFFIX "")
 
@@ -32,7 +32,7 @@ include(GNUInstallDirs)
 include(GenerateIcons)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning LinguistTools)
-qt_standard_project_setup()
+qt6_standard_project_setup()
 
 find_package(LIBUSB_1 REQUIRED)
 find_package(YAMLCPP REQUIRED)

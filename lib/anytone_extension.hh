@@ -3,7 +3,6 @@
 
 #include "configobject.hh"
 #include "configreference.hh"
-#include "melody.hh"
 #include "frequency.hh"
 #include "interval.hh"
 
@@ -154,7 +153,7 @@ class AnytoneFMChannelExtension: public AnytoneChannelExtension
   /** Holds the squelch mode. */
   Q_PROPERTY(SquelchMode squelchMode READ squelchMode WRITE setSquelchMode)
   /** If @c true, the analog scrabler is enabled. */
-  Q_PROPERTY(bool scrambler READ scrambler WRITE enableScrambler)
+  Q_PROPERTY(Frequency scramblerFrequency READ scramblerFrequency WRITE setScramblerFrequency)
 
 public:
   /** Possible squelch mode settings. */
@@ -196,10 +195,10 @@ public:
   /** Sets the squelch mode. */
   void setSquelchMode(SquelchMode mode);
 
-  /** Reuturns @c true, if the analog scrambler is enabled. */
-  bool scrambler() const;
-  /** Enables/disables the analog scrambler. */
-  void enableScrambler(bool enable);
+  /** Reuturns the FM scrabler carrier frequency. */
+  Frequency scramblerFrequency() const;
+  /** Sets the FM scrambler carrier frequency. */
+  void setScramblerFrequency(const Frequency &freq);
 
 protected:
   /** If @c true, the CTCSS phase-reverse burst at the end of transmission is enabled. */
@@ -212,8 +211,8 @@ protected:
   double _customCTCSS;
   /** Holds the squelch mode. */
   SquelchMode _squelchMode;
-  /** If @c true, the analog scrambler is enabled for this channel. */
-  bool _scrambler;
+  /** Sets the FM scrambler frequency. */
+  Frequency _scramblerFrequency;
 };
 
 

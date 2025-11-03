@@ -115,6 +115,9 @@ public:
   QByteArray headerState(const QString &objName) const;
   void setHeaderState(const QString &objName, const QByteArray &state);
 
+  bool sortFilterEnabled(const QString &objName) const;
+  void enableSortFilter(const QString &objName, bool enable);
+
   bool isUpdated() const;
   void markUpdated();
 };

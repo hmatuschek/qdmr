@@ -4,6 +4,8 @@
 #include <QWidget>
 
 class Config;
+class QSortFilterProxyModel;
+
 namespace Ui {
   class ChannelListView;
 }
@@ -24,8 +26,6 @@ protected slots:
   void onEditChannel(unsigned row);
   void loadChannelListSectionState();
   void storeChannelListSectionState();
-
-
 
 private:
   Ui::ChannelListView *ui;

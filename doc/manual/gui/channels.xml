@@ -64,10 +64,17 @@
 <tip>
   <para>
     The number of channels usually grow fast and it becomes hard to find channels within the list. 
-    To search the list for any channel name or frequency, just hit <accel>Ctrl+F</accel> to open a 
+    To search the list for any channel name or frequency, just hit 
+    <keycombo action="simul"><keycap>Ctrl</keycap>+<keycap>F</keycap></keycombo> to open a 
     search box. This search feature is present in all lists. The channel list, however, is likely 
     the largest.
   </para>  
+  <para>
+    Similar to the search function, all tables have a filter and sort mode. Hit 
+    <keycombo action="simul"><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>L</keycap></keycombo>
+    to toggle modes. Within the filter and sort mode, moving channels around is disabled but you 
+    can sort all channels by any column and also filter channels.
+  </para>
 </tip>
 
 

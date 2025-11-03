@@ -123,7 +123,7 @@ public:
     explicit ChannelElement(uint8_t *ptr);
 
     /** Resets the channel. */
-    void clear();
+    void clear()  override;
 
     /** Returns the PTT ID settings. */
     virtual PTTId pttIDSetting() const;
@@ -136,13 +136,13 @@ public:
     virtual void enableRoaming(bool enable);
     // Moved
     /** Returns @c true if the data ACK is enabled. */
-    bool dataACK() const;
+    bool dataACK() const override;
     /** Enables/disables data ACK. */
-    void enableDataACK(bool enable);
+    void enableDataACK(bool enable) override;
     /** Returns @c true, if auto scan is enabled. */
-    bool autoScan() const;
+    virtual bool autoScan() const ;
     /** Enable/disable auto scan. */
-    void enableAutoScan(bool enable);
+    virtual void enableAutoScan(bool enable);
 
     /** Returns APRS type for reporting the position. */
     APRSType txAPRSType() const;
@@ -159,9 +159,9 @@ public:
     virtual void setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
-    virtual unsigned digitalAPRSSystemIndex() const;
+    unsigned digitalAPRSSystemIndex() const override;
     /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(unsigned idx);
+    void setDigitalAPRSSystemIndex(unsigned idx) override;
 
     /** Returns the frequency correction in ???. */
     virtual int frequenyCorrection() const;
@@ -172,6 +172,11 @@ public:
     virtual unsigned int fmAPRSFrequencyIndex() const;
     /** Sets the FM APRS frequency index [0,7]. */
     virtual void setFMAPRSFrequencyIndex(unsigned int idx);
+
+    /** If set, transmission of talker alias for this channel is enabled. */
+    virtual bool sendTalkerAlias() const;
+    /** Enable transmission of talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
     /** Returns the encryption type. */
     virtual AdvancedEncryptionType advancedEncryptionType() const;
@@ -199,24 +204,24 @@ public:
     virtual void clearARC4EncryptionKeyIndex();
 
     /** Returns the encryption type. */
-    DMREncryptionType dmrEncryptionType() const;
+    DMREncryptionType dmrEncryptionType() const override;
     /** Sets the encryption type. */
-    void setDMREncryptionType(DMREncryptionType type);
+    void setDMREncryptionType(DMREncryptionType type) override;
     /** Returns @c true if a DMR encryption key is set. */
-    virtual bool hasDMREncryptionKeyIndex() const;
+    bool hasDMREncryptionKeyIndex() const override;
     /** Returns the DMR encryption key index (+1), 0=Off. */
-    virtual unsigned dmrEncryptionKeyIndex() const;
+    unsigned dmrEncryptionKeyIndex() const override;
     /** Sets the DMR encryption key index (+1), 0=Off. */
-    virtual void setDMREncryptionKeyIndex(unsigned idx);
+    void setDMREncryptionKeyIndex(unsigned idx) override;
     /** Clears the DMR encryption key index. */
-    virtual void clearDMREncryptionKeyIndex();
+    void clearDMREncryptionKeyIndex() override;
 
     /** Constructs a Channel object from this element. */
-    Channel *toChannelObj(Context &ctx) const;
+    Channel *toChannelObj(Context &ctx) const override;
     /** Links a previously created channel object. */
-    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const override;
     /** Encodes the given channel object. */
-    bool fromChannelObj(const Channel *c, Context &ctx);
+    bool fromChannelObj(const Channel *c, Context &ctx) override;
 
   protected:
     /** Internal used offsets within the channel element. */
@@ -891,14 +896,20 @@ public:
     /** Resets the settings. */
     void clear();
 
-    bool sendTalkerAlias() const;
-    void enableSendTalkerAlias(bool enable);
+    /** Returns @c true if the talker alias is sent. */
+    virtual bool sendTalkerAlias() const;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
-    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
-    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
+    /** Returns the talker alias source. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
-    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
-    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    /** Returns the talker alias encoding. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;
@@ -1062,7 +1073,7 @@ public:
 
   protected:
     /** Internal used offset within the element. */
-    struct Offset {
+    struct Offset: public AnytoneCodeplug::ExtendedSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
@@ -1086,9 +1097,9 @@ public:
       static constexpr unsigned int zoneANameColor()               { return 0x003d; }
       static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
       static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
-      static constexpr unsigned int displayColorCode()             { return 0x0040; }  // bit 2
-      static constexpr unsigned int displayTimeSlot()              { return 0x0040; }  // bit 1
-      static constexpr unsigned int displayChannelType()           { return 0x0040; }  // bit 0
+      static constexpr Bit displayColorCode()                      { return {0x0040, 2}; }
+      static constexpr Bit displayTimeSlot()                       { return {0x0040, 1}; }
+      static constexpr Bit displayChannelType()                    { return {0x0040, 0}; }
       static constexpr unsigned int fmIdleTone()                   { return 0x0041; }
       static constexpr unsigned int dateFormat()                   { return 0x0042; }
       static constexpr unsigned int analogMicGain()                { return 0x0043; }

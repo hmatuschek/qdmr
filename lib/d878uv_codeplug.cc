@@ -214,6 +214,18 @@ D878UVCodeplug::ChannelElement::setFMAPRSFrequencyIndex(unsigned int idx) {
   setUInt8(Offset::fmAPRSFrequencyIndex(), std::min(7U, idx));
 }
 
+
+bool
+D878UVCodeplug::ChannelElement::sendTalkerAlias() const {
+  return getBit(Offset::talkerAlias());
+}
+
+void
+D878UVCodeplug::ChannelElement::enableSendTalkerAlias(bool enable) {
+  setBit(Offset::talkerAlias(), enable);
+}
+
+
 D878UVCodeplug::ChannelElement::AdvancedEncryptionType
 D878UVCodeplug::ChannelElement::advancedEncryptionType() const {
   return getBit(Offset::dmrEncryptionType()) ? AdvancedEncryptionType::ARC4 : AdvancedEncryptionType::AES;
@@ -2454,27 +2466,27 @@ D878UVCodeplug::ExtendedSettingsElement::enableResetAutoShutdownOnCall(bool enab
 
 bool
 D878UVCodeplug::ExtendedSettingsElement::showColorCode() const {
-  return getBit(Offset::displayColorCode(), 2);
+  return getBit(Offset::displayColorCode());
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::enableShowColorCode(bool enable) {
-  setBit(Offset::displayColorCode(), 2, enable);
+  setBit(Offset::displayColorCode(), enable);
 }
 bool
 D878UVCodeplug::ExtendedSettingsElement::showTimeSlot() const {
-  return getBit(Offset::displayTimeSlot(), 1);
+  return getBit(Offset::displayTimeSlot());
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::enableShowTimeSlot(bool enable) {
-  setBit(Offset::displayTimeSlot(), 1, enable);
+  setBit(Offset::displayTimeSlot(), enable);
 }
 bool
 D878UVCodeplug::ExtendedSettingsElement::showChannelType() const {
-  return getBit(Offset::displayChannelType(), 0);
+  return getBit(Offset::displayChannelType());
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::enableShowChannelType(bool enable) {
-  setBit(Offset::displayChannelType(), 0, enable);
+  setBit(Offset::displayChannelType(), enable);
 }
 
 bool
@@ -2573,6 +2585,11 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
+  // Encode DMR settings
+  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
+  setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
+  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
+
   // Some general settings
   setSTEDuration(ext->steDuration());
 
@@ -2648,6 +2665,11 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
     ext = new AnytoneSettingsExtension();
     ctx.config()->settings()->setAnytoneExtension(ext);
   }
+
+  // Store DMR settings
+  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
+  ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
+  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
