@@ -1416,7 +1416,7 @@
     <message>
         <location filename="../src/configobjecttableview.cc" line="261"/>
         <source>Cannot move items as long as there is some filter or sorting applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot move items as long as there is some filter or sorting applied.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="50"/>
@@ -1451,12 +1451,12 @@
     <message>
         <location filename="../src/configobjecttableview.ui" line="188"/>
         <source>Toggle Filter and Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Toggle Filter and Sorting</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="199"/>
         <source>Close Sort and Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Close Sort and Filter</translation>
     </message>
 </context>
 <context>
