@@ -53,7 +53,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-top"/>
+           <iconset theme="edit-move-top">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -66,7 +67,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-10-up"/>
+           <iconset theme="edit-move-10-up">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -79,7 +81,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-up"/>
+           <iconset theme="edit-move-up">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -92,7 +95,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-down"/>
+           <iconset theme="edit-move-down">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -105,7 +109,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-10-down"/>
+           <iconset theme="edit-move-10-down">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -118,7 +123,8 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset theme="edit-move-bottom"/>
+           <iconset theme="edit-move-bottom">
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </widget>
         </item>
@@ -161,7 +167,8 @@
          <string notr="true"/>
         </property>
         <property name="icon">
-         <iconset theme="QIcon::ThemeIcon::EditClear"/>
+         <iconset theme="QIcon::ThemeIcon::EditClear">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -174,19 +181,17 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset theme="item-filter"/>
+    <iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>toggle Filter and Sorting</string>
-   </property>
-   <property name="toolTip">
     <string>Toggle Filter and Sorting</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+L</string>
+    <string notr="true">Ctrl+Shift+L</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionCloseSortFilter">
@@ -194,10 +199,10 @@
     <string>Close Sort and Filter</string>
    </property>
    <property name="shortcut">
-    <string>Esc</string>
+    <string notr="true">Esc</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
  </widget>
