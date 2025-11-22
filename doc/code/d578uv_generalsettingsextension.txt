@@ -100,7 +100,7 @@ Where:
   - Encryption mode: 0=Common, 1=AES (default)
   - HandOpMode: Select hand microphone type. 0=Serial port (common AnyTone hand mic), 1=Voltage Detect (simple PTT mic)
   - Manual dial group/private call hang time in seconds 1=1s, 2=2s, ..., 30=30s, 31=30min, 32=infinity.
-  - Talk permit melody frquencies: 16bit uint little endian in Hz.
+  - Talk permit melody frequencies: 16bit uint little endian in Hz.
   - Channel A/B name/Zone A/B name color: 0=Orange (default), 1=Red, 2=Yellow, 3=Green, 4=Turquoise, 5=Blue, 6=White
   - SCT: Show channel type enable
   - STS: Show time slot enable

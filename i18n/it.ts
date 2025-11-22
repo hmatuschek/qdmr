@@ -1984,7 +1984,7 @@
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation>Impossibile crere un elemento nella lista, puoi provare a segnalare un bug.</translation>
+        <translation>Impossibile creare un elemento nella lista, puoi provare a segnalare un bug.</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>

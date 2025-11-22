@@ -2266,7 +2266,7 @@ GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   // There must be a default DMR radio ID.
   if (nullptr == ctx.config()->settings()->defaultId()) {
     errMsg(err) << "No default DMR radio ID specified.";
-    errMsg(err) << "Cannot index codplug for encoding for the Radioddity GD73.";
+    errMsg(err) << "Cannot index codeplug for encoding for the Radioddity GD73.";
     return false;
   }
 

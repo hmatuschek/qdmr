@@ -491,7 +491,7 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
   } else {
-    errMsg(err) <<  "Unknonwn channel type " << (uint8_t)channelType() << ".";
+    errMsg(err) <<  "Unknown channel type " << (uint8_t)channelType() << ".";
     return nullptr;
   }
 
@@ -3269,7 +3269,7 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   // There must be a default DMR radio ID.
   if (nullptr == ctx.config()->settings()->defaultId()) {
     errMsg(err) << "No default DMR radio ID specified.";
-    errMsg(err) << "Cannot index codplug for encoding for the BTECH DR-1801UV.";
+    errMsg(err) << "Cannot index codeplug for encoding for the BTECH DR-1801UV.";
     return false;
   }
 

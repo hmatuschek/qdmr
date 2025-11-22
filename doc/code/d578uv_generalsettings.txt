@@ -122,7 +122,7 @@ ec | Unknown                                                                    
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Where:
-  Bluethooth settings:
+  Bluetooth settings:
     - BT hold time in seconds, 0=off (default), [off, 1, ..., 30, infinity].
     - BT RX delay stored in multiples of 0.5s, 0=0.5, 1=1.0s, 2=1.5s (default), ..., 10=5.5s.
   STE (squelch tail):

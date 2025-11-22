@@ -24,7 +24,7 @@ class Zone;
  *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
- *  <tr><td>0x00000</td> <td>0x00300</td>  <td>0x00300</td>  <td>Some unkown settings, not
+ *  <tr><td>0x00000</td> <td>0x00300</td>  <td>0x00300</td>  <td>Some unknown settings, not
  *      configurable through the CPS. Likely some sort of calibration data. Must be conserved.</td></tr>
  *  <tr><td>0x00300</td> <td>0x003bc</td>  <td>0x000bc</td>  <td>Some information about the radio.
  *      Like serial number, firmware version, etc and timestamp. </td></tr>

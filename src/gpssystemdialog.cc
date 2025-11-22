@@ -5,14 +5,14 @@
 GPSSystemDialog::GPSSystemDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myGPSSystem(new GPSSystem(this)), _gpsSystem(nullptr)
 {
-  setWindowTitle(tr("Create DMR APRS Sysmtem"));
+  setWindowTitle(tr("Create DMR APRS System"));
   construct();
 }
 
 GPSSystemDialog::GPSSystemDialog(Config *config, GPSSystem *gps, QWidget *parent)
   : QDialog(parent), _config(config), _myGPSSystem(new GPSSystem(this)), _gpsSystem(gps)
 {
-  setWindowTitle(tr("Edit DMR APRS Sysmtem"));
+  setWindowTitle(tr("Edit DMR APRS System"));
   if (_gpsSystem)
     _myGPSSystem->copy(*_gpsSystem);
   construct();

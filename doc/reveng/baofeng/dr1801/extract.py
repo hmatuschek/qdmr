@@ -8,7 +8,7 @@ from abc import ABCMeta
 dev_addr = 1
 
 if len(sys.argv) != 2:
-    print("Usage: exract.py PCAPNG_FILE")
+    print("Usage: extract.py PCAPNG_FILE")
 
 
 def hexDump(s: bytes, prefix: str = "", addr: int = 0) -> str:
