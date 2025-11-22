@@ -13,12 +13,12 @@ public:
 
   /** Returns @c true if the transfer is blocking. */
   bool blocking() const;
-  /** Set if trasfer is blocking. */
+  /** Set if transfer is blocking. */
   void setBlocking(bool enable);
 
   /** Returns @c true if the device clock gets updated during transfer. */
   bool updateDeviceClock() const;
-  /** Sets if the device clock gets updated during the trasfer. */
+  /** Sets if the device clock gets updated during the transfer. */
   void setUpdateDeviceClock(bool enable);
 
 protected:

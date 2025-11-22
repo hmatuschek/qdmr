@@ -331,7 +331,7 @@
     <string>Export to CHIRP ...</string>
    </property>
    <property name="toolTip">
-    <string>Exports all FM channels to CHRIP CSV.</string>
+    <string>Exports all FM channels to CHIRP CSV.</string>
    </property>
   </action>
   <action name="actionImport">

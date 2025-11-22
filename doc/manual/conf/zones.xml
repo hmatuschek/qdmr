@@ -42,7 +42,7 @@
   string. Any string is valid here. The third column specifies the VFO (either A or B) for that
   zone. This allows to specify different channels for the two VFOs of the radio. For example, it
   allows to specify a list of repeater channels for VFO A and some simplex and calling frequencies
-  on VFO B. The fourth column contains the comma-separated list of channel IDs for the zone anc VFO.
+  on VFO B. The fourth column contains the comma-separated list of channel IDs for the zone and VFO.
   A reference to any channel-type can be used here, analog and digital.
 </para>
 

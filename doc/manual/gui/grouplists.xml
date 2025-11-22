@@ -26,7 +26,7 @@
 <para>
   The <guilabel>Group Lists</guilabel> tab is just a simple list of all group lists you created. You 
   may add a group list by clicking on the <guibutton>Add RX Group</guibutton> button at the bottom.
-  You can delete a group list by seleting it in the list and clicking on the 
+  You can delete a group list by selecting it in the list and clicking on the 
   <guibutton>Delete RX Group</guibutton> button there. You can also edit a RX group list by 
   double-clicking on that group in the list.
 </para>

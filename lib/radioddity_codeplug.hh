@@ -295,7 +295,7 @@ public:
     virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
-    /** Retunrs the n-th channel. */
+    /** Returns the n-th channel. */
     ChannelElement channel(unsigned int n);
 
   public:
@@ -485,7 +485,7 @@ public:
 
     /** Returns the name of the contact. */
     virtual QString name() const;
-    /** Sets the name of the conact. */
+    /** Sets the name of the contact. */
     virtual void setName(const QString &name);
 
     /** Returns the number of the contact. */
@@ -617,7 +617,7 @@ public:
 
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
-    /** Retunrs the n-th zone. */
+    /** Returns the n-th zone. */
     ZoneElement zone(unsigned int n);
 
   public:
@@ -1431,7 +1431,7 @@ public:
     /** Sets the keypad lock time in seconds. */
     virtual void setKeypadLockTime(unsigned sec);
 
-    /** Retunrns the backlight time in seconds. */
+    /** Returns the backlight time in seconds. */
     virtual unsigned backlightTime() const;
     /** Sets the backlight time in seconds. */
     virtual void setBacklightTime(unsigned sec);

@@ -94,7 +94,7 @@ AuctusA6Interface::send(uint16_t command,
     return false;
   }
   if (! flush()) {
-    logWarn() << "No data writen to the device, " << bytesToWrite()
+    logWarn() << "No data written to the device, " << bytesToWrite()
               << " of " << total_length << " left in buffer.";
   }
 
@@ -125,7 +125,7 @@ AuctusA6Interface::receive(uint16_t &command,
   // get length
   total_length = buffer[1];
   if (6 > total_length) {
-    errMsg(err) << "Invalid packet: Expected minimum lenght of 6h, got "
+    errMsg(err) << "Invalid packet: Expected minimum length of 6h, got "
                 << QString::number(total_length, 16) << "h.";
     return false;
   }

@@ -895,7 +895,7 @@
       <token>backlightDurationTX</token></term>
     <listitem>
       <para>Specifies the backlight duration. While setting the TX backlight duration to 0 disables
-      it during TX, setting the RX backlight duration to that value, enables it continously.</para>
+      it during TX, setting the RX backlight duration to that value, enables it continuously.</para>
       <para>Some radios only support the setting for the RX backlight duration. Especially the 
         <productname>D868UVE</productname> and <productname>DMR-6X2</productname>.</para>
     </listitem>
@@ -1551,7 +1551,7 @@
     <term><token>volumeLevelA</token>, <token>volumeLevelB</token></term>
     <listitem>
       <para>
-        Specifies the volume for VFO A and B repsectively. Must be a value in [0, 10], where 0 
+        Specifies the volume for VFO A and B respectively. Must be a value in [0, 10], where 0 
         means off.
       </para>
     </listitem>
@@ -1606,7 +1606,7 @@
     <listitem>
       <para>
         Specifies the functions for the programmable side keys for short, long and very long key 
-        presses. The function must be one of the functions decribed in 
+        presses. The function must be one of the functions described in 
         <xref linkend="extAnytoneSettingsKeyFunctions"/>.
       </para>
     </listitem>
@@ -1674,7 +1674,7 @@
     <para>
       Specifies, how color codes are matched. If <token>Ignore</token> ignores the color code,
       <token>VFOA</token> and <token>VFOB</token> specifies that the color code must match the one
-      of VFO A or B, respecitvely. This only applies to <productname>AT-D578UV</productname>.
+      of VFO A or B, respectively. This only applies to <productname>AT-D578UV</productname>.
     </para>
   </listitem>
 </varlistentry>
@@ -1690,7 +1690,7 @@
   <para>
     The only relevant options for the <productname>DMR-6X2UV</productname> are 
     <token>enabled</token>, <token>monitor</token> and <token>timeSlot</token>.
-    The latter specifes, which time slot to listen and transmit on. This can either be 
+    The latter specifies, which time slot to listen and transmit on. This can either be 
     <token>TS1</token>, <token>TS2</token> or <token>Channel</token>. The latter requires any 
     transmission to match the CC of the channel. 
   </para>

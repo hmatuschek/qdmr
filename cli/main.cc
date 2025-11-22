@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
                    });
   parser.addOption({
                      {"n", "limit"},
-                     QCoreApplication::translate("main", "Limits several amonuts, depending on the "
+                     QCoreApplication::translate("main", "Limits several amounts, depending on the "
                      "context. When encoding/writing the callsign db, this option specifies the "
                      "maximum number of callsigns to encode."),
                      QCoreApplication::translate("main", "N")
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
                      "init-codeplug",
                      QCoreApplication::translate(
                        "main", "Initializes the code-plug in the radio. If not present (default) "
-                               "the code-plug gets updated, maintining all settings made earlier.")));
+                               "the code-plug gets updated, maintaining all settings made earlier.")));
   parser.addOption(QCommandLineOption(
                      "update-device-clock",
                      QCoreApplication::translate(

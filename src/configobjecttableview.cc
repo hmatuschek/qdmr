@@ -123,13 +123,13 @@ ConfigObjectTableView::header() const {
 
 void
 ConfigObjectTableView::onMoveItemUp() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -140,13 +140,13 @@ ConfigObjectTableView::onMoveItemUp() {
 
 void
 ConfigObjectTableView::onMoveItemTenUp() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -159,13 +159,13 @@ ConfigObjectTableView::onMoveItemTenUp() {
 
 void
 ConfigObjectTableView::onMoveItemTop() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -177,14 +177,14 @@ ConfigObjectTableView::onMoveItemTop() {
 
 void
 ConfigObjectTableView::onMoveItemDown() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
 
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -197,14 +197,14 @@ ConfigObjectTableView::onMoveItemDown() {
 
 void
 ConfigObjectTableView::onMoveItemTenDown() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
 
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -216,14 +216,14 @@ ConfigObjectTableView::onMoveItemTenDown() {
 
 void
 ConfigObjectTableView::onMoveItemBottom() {
-  // check if we can move items around savely
+  // check if we can move items around safely
   if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
 
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;

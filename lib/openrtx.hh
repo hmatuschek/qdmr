@@ -39,7 +39,7 @@ public slots:
   bool startUpload(Config *config, bool blocking=false,
                    const Codeplug::Flags &flags = Codeplug::Flags(),
                    const ErrorStack &err=ErrorStack());
-  /** Encodes the given user-database and uploades it to the device. */
+  /** Encodes the given user-database and uploads it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Flags &selection=CallsignDB::Flags(),
                              const ErrorStack &err=ErrorStack());

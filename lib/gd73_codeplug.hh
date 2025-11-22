@@ -222,7 +222,7 @@ public:
     /** Sets the radio ID. */
     void setDMRID(unsigned int id);
 
-    /** Retruns the menu language. */
+    /** Returns the menu language. */
     Language language() const;
     /** Sets the menu language. */
     void setLanguage(Language lang);
@@ -531,7 +531,7 @@ public:
 
   /** Implements an FM/DMR channel.
    *
-   * Memory representaion of the channel (size ):
+   * Memory representation of the channel (size ):
    * @verbinclude gd73_channel_element.txt */
   class ChannelElement: public Element
   {
@@ -1077,7 +1077,7 @@ public:
     /** Sets the TX hold time. */
     void setTXHoldTime(const Interval &interval);
 
-    /** Constructs a ScanList from this elemet. */
+    /** Constructs a ScanList from this element. */
     ScanList *toScanList(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links a decoded scan list. */
     bool linkScanList(ScanList *lst, Context&ctx, const ErrorStack &err=ErrorStack());
@@ -1192,12 +1192,12 @@ public:
     Interval activeWaitTime() const;
     /** Sets the active wait time. */
     void setActiveWaitTime(const Interval &interval);
-    /** Retruns the number of active reties. */
+    /** Returns the number of active reties. */
     unsigned int activeRetries() const;
     /** Sets the number of active retries. */
     void setActiveRetries(unsigned int count);
 
-    /** Retruns the number of TX preambles. */
+    /** Returns the number of TX preambles. */
     unsigned int txPreambles() const;
     /** Sets the number of TX preambles. */
     void setTXPreambles(unsigned int count);

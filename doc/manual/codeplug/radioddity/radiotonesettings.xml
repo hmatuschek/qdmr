@@ -47,7 +47,7 @@
     <listitem>
       <para>
         Enables the low battery-charge warning. This can either be a notification on the screen or 
-        a waring tone. The warning interval and tone-volume might be set by 
+        a warning tone. The warning interval and tone-volume might be set by 
         <token>lowBatteryInterval</token> and <token>lowBatteryWarnVolume</token>.
       </para>
     </listitem>

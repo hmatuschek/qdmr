@@ -29,7 +29,7 @@ public:
 protected:
   /** Stack of the current object. */
   QList<QObject *> _stack;
-  /** Reference to the translation table origial -> cloned object. */
+  /** Reference to the translation table original -> cloned object. */
   QHash<ConfigObject *, ConfigObject*> &_map;
 };
 
@@ -48,7 +48,7 @@ public:
   bool processList(AbstractConfigObjectList *list, const ErrorStack &err=ErrorStack());
 
 protected:
-  /** Reference to the translation table origial -> cloned object. */
+  /** Reference to the translation table original -> cloned object. */
   QHash<ConfigObject *, ConfigObject*> &_map;
   /** If false, an unmapped reference is an error. */
   bool _keepUnknown;

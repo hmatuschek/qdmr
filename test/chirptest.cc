@@ -17,7 +17,7 @@ ChirpTest::testReaderBasic() {
 
   QFile file(":/data/chirp_simple.csv");
   if (! file.open(QIODevice::ReadOnly)) {
-    QFAIL("Cannot open CHRIP file.");
+    QFAIL("Cannot open CHIRP file.");
   }
 
   QTextStream stream(&file);
@@ -44,7 +44,7 @@ ChirpTest::testReaderCTCSS() {
 
   QFile file(":/data/chirp_ctcss.csv");
   if (! file.open(QIODevice::ReadOnly)) {
-    QFAIL("Cannot open CHRIP file.");
+    QFAIL("Cannot open CHIRP file.");
   }
 
   QTextStream stream(&file);
@@ -73,7 +73,7 @@ ChirpTest::testReaderDCS() {
 
   QFile file(":/data/chirp_dcs.csv");
   if (! file.open(QIODevice::ReadOnly)) {
-    QFAIL("Cannot open CHRIP file.");
+    QFAIL("Cannot open CHIRP file.");
   }
 
   QTextStream stream(&file);
@@ -103,7 +103,7 @@ ChirpTest::testReaderCross()
 {
   QFile file(":/data/chirp_cross.csv");
   if (! file.open(QIODevice::ReadOnly)) {
-    QFAIL("Cannot open CHRIP file.");
+    QFAIL("Cannot open CHIRP file.");
   }
 
   QTextStream stream(&file);
@@ -147,7 +147,7 @@ ChirpTest::testReaderBandwidth() {
 
   QFile file(":/data/chirp_bandwidth.csv");
   if (! file.open(QIODevice::ReadOnly)) {
-    QFAIL("Cannot open CHRIP file.");
+    QFAIL("Cannot open CHIRP file.");
   }
 
   QTextStream stream(&file);

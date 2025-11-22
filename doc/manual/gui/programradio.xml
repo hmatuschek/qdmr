@@ -17,7 +17,7 @@
 <para>
   In a first step, <application>qdmr</application> will try to detect a connected radio. This will 
   be done automatically (unless disabled in the settings menu) if there is only one radio connected
-  and it is save to access the USB device. Some radios use some generic USB to serial chips in their
+  and it is safe to access the USB device. Some radios use some generic USB to serial chips in their
   cable instead of connecting the micro controller of the radio directly to the computer. This way, 
   it is not possible for qdmr to safely assume, that the found serial port is actually a radio. If 
   such a generic interface is detected, qdmr will ask which interface the radio is connected to.

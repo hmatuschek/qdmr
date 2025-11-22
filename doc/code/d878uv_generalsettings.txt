@@ -22,7 +22,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 28 | Enable GPS                    | Enable SMS alert              | Unused set to 0x00            | WFM monitor enable            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c | Work mode main channel set    | Enable sub channel            | TBST frquency                 | Enable call alert             |
+2c | Work mode main channel set    | Enable sub channel            | TBST frequency                | Enable call alert             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30 | GPS Time zone                 | Talk permit tone              | Digital call reset tone       | VOX source                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -153,7 +153,7 @@ Field description:
     - Transmit timeout in multiples of 30s. 0=Off, 1=30s, ..., 8=240s
     - Language: 0=English, 1=German
     - VFO frequency step: 0=2.5kHz, 1=5kHz, 2=6.25kHz, 3=8.33kHz, 4=10kHz, 5=12.5kHz, 6=20kHz, 7=25kHz
-    - TBST frquency: 0=1000Hz, 1=1450Hz, 2=1750Hz, 3=2100Hz
+    - TBST frequency: 0=1000Hz, 1=1450Hz, 2=1750Hz, 3=2100Hz
     - Analog call hold in seconds [0,...,30s]
     - Maintain call channel: If enabled, allows to answer calls on sub-channel within 5s.
     - Priority zone A/B index: Zone index 0-based, 0xff=Off.

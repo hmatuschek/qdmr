@@ -78,7 +78,7 @@ public:
   /** Sets the SMS format. */
   void setFormat(Format format);
 
-  /** Retunrs a weak reference to the list of SMS templates. */
+  /** Returns a weak reference to the list of SMS templates. */
   SMSTemplates *smsTemplates() const;
 
 protected:

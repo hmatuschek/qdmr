@@ -677,7 +677,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->displaySettings()->enableShowGlobalChannelNumber(
         ChannelIndexDisplay::GlobalIndex == channelIndexDisplay());
 
-  // Sattellite settings
+  // Satellite settings
   ext->satelliteSettings()->setPower(satPower());
   ext->satelliteSettings()->setSquelch(satSquelchLevel());
 

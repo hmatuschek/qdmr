@@ -637,7 +637,7 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     auto fm = c->as<FMChannel>();
     if (hasAPRSIndex()) {
       if (! ctx.has<APRSSystem>(aprsIndex())) {
-        logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unkown index. (ignored)";
+        logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unknown index. (ignored)";
       } else {
         fm->setAPRSSystem(ctx.get<APRSSystem>(aprsIndex()));
       }

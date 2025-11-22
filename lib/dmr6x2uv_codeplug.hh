@@ -412,11 +412,11 @@ public:
 
     /** Returns the group-call hang time, if group call was dialed manually. */
     virtual unsigned int manualDialedGroupCallHangTime() const;
-    /** Sets the group-call hang time, if the group call was dialed maually. */
+    /** Sets the group-call hang time, if the group call was dialed manually. */
     virtual void setManualDialedGroupCallHangTime(unsigned int dur);
     /** Returns the private-call hang time, if private call was dialed manually. */
     virtual unsigned int manualDialedPrivateCallHangTime() const;
-    /** Sets the private-call hang time, if the private call was dialed maually. */
+    /** Sets the private-call hang time, if the private call was dialed manually. */
     virtual void setManualDialedPrivateCallHangTime(unsigned int dur);
 
 
@@ -768,7 +768,7 @@ public:
     /** Enables/disables reporting the position via DMR APRS on PTT. */
     virtual void enableDMRAPRSPTT(bool enable);
 
-    /** Returns teh FM APRS PTT mode. */
+    /** Returns the FM APRS PTT mode. */
     virtual FMAPRSPTTMode fmAPRSPTTMode() const;
     /** Sets the FM APRS PTT mode. */
     virtual void setFMAPRSPTTMode(FMAPRSPTTMode mode);
@@ -983,7 +983,7 @@ protected:
     /** Enables/disables roaming. */
     virtual void enableDMRRoaming(bool enable);
 
-    /** Returns the the repeater activation delay in ms. */
+    /** Returns the repeater activation delay in ms. */
     virtual Interval dmrPreWaveDelay() const;
     /** Sets the repeater activation delay in ms. */
     virtual void setDMRPreWaveDelay(Interval ms);
