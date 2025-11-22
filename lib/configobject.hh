@@ -234,7 +234,7 @@ protected:
 };
 
 
-/** Base class of all device/vendor specific confiuration extensions.
+/** Base class of all device/vendor specific configuration extensions.
  * This class already implements the serialization of all @c QMetaObject
  * properties. */
 class ConfigExtension : public ConfigItem

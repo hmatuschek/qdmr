@@ -58,7 +58,7 @@ private:
   MD390Codeplug _codeplug;
 
 private:
-  /** Instance of limits for this radio. Gets intantiated for every radio as it depends on the
+  /** Instance of limits for this radio. Gets instantiated for every radio as it depends on the
    * radio variant. */
   RadioLimits *_limits;
 };

@@ -514,7 +514,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
     channel->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
-  // Handle DMR specifc references
+  // Handle DMR specific references
   if (DMRChannel *dmr = channel->as<DMRChannel>()) {
     if (hasTransmitContact()) {
       if (! ctx.has<DMRContact>(transmitContactIndex())) {
@@ -3250,7 +3250,7 @@ DR1801UVCodeplug::postprocess(Config *config, const ErrorStack &err) const {
     return false;
   }
 
-  // Merge splitted zones into one.
+  // Merge split zones into one.
   ZoneMergeVisitor merger;
   if (! merger.process(config, err)) {
     errMsg(err) << "Cannot post-process DR1801A6 codeplug.";

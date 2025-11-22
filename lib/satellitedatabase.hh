@@ -159,7 +159,7 @@ signals:
   void error(const QString &msg);
 
 private:
-  /** Holds all sattellites sorted by their catalog number. */
+  /** Holds all satellites sorted by their catalog number. */
   QVector<Satellite>  _satellites;
   /** Holds the orbital element database. */
   OrbitalElementsDatabase _orbitalElements;
