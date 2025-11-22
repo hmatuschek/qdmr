@@ -393,7 +393,7 @@
 
 <para>
   The user interface of the manufacturer CPS where you configure the channels, is usually very 
-  extensiv. There is a huge amount of options that control the behavior of the channel. The 
+  extensive. There is a huge amount of options that control the behavior of the channel. The 
   majority of these options are not used in ham radio applications. Some of these, however, I want
   to describe here briefly.
 </para>
@@ -410,7 +410,7 @@
 </para>
 
 <para>
-  The <glossterm>TOT</glossterm> setting or <quote>transmit timeout</quote> secifies the maximum 
+  The <glossterm>TOT</glossterm> setting or <quote>transmit timeout</quote> specifies the maximum 
   duration of continuous transmission. After that period of continuous transmission, the radio 
   will stop the transmission automatically. The feature is used in commercial applications to avoid
   the blocking of a channel or talk group by a participant. This option has little sense in amateur 

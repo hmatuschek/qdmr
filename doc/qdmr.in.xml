@@ -96,7 +96,7 @@
     <title>Logging</title>
     <para>
       Qdmr writes a lot of debug and error messages to <io>stderr</io>. This 
-      can be used to inspect some issues during reading/writing the a codeplug 
+      can be used to inspect some issues during reading/writing the codeplug 
       to the device. There is also a log file containing these messages usually
       at <file>~/.local/share/DM3MAT/qdmr/qdmr.log</file>.
     </para>

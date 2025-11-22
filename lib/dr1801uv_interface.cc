@@ -318,7 +318,7 @@ DR1801UVInterface::getDeviceInfo(QString &info, const ErrorStack &err) {
 
   // check status byte
   if (1 > respLen) {
-    errMsg(err) << "Invalid response lenght.";
+    errMsg(err) << "Invalid response length.";
     errMsg(err) << "Cannot request device information.";
     _state = ERROR;
     return false;
@@ -469,7 +469,7 @@ DR1801UVInterface::receiveWriteACK(const ErrorStack &err) {
 bool
 DR1801UVInterface::startReading(const ErrorStack &err) {
   if (! send(START_READ_DATA, 0, 0, err)) {
-    errMsg(err) << "Cannot initalize codeplug read.";
+    errMsg(err) << "Cannot initialize codeplug read.";
     return false;
   }
   flush();
