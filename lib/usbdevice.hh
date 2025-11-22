@@ -23,7 +23,7 @@
  *
  *   -# Search for all USB devices with known VID:PID combinations. This can be done using the
  *      @c USBDeviceDescriptor::detect method. It returns a list of matching device descriptors
- *      found. If only one device is found, one may continue with that one if it is save to assume
+ *      found. If only one device is found, one may continue with that one if it is safe to assume
  *      that the device detected is a DMR radio. The latter is not true for radios using generic
  *      USB CDC-ACM chips, as other serial devices may be connected. If several devices are found or
  *      it is not save to assume a DMR radio, the user must select a device.
@@ -113,7 +113,7 @@ Q_DECLARE_METATYPE(USBDeviceHandle)
 /** Generic information about a possible radio interface.
  *
  * This class combines the USB vendor, product ID and some meta information about the interface.
- * In particular if it is save to access the device without user ineraction and if the protocol
+ * In particular if it is safe to access the device without user ineraction and if the protocol
  * implements means for identifying the specific radio.
  *
  * @ingroup detect */
@@ -153,11 +153,11 @@ public:
   /** Returns the interface class. */
   Class interfaceClass() const;
 
-  /** Retunrs @c true, if a vendor ID is set. */
+  /** Returns @c true, if a vendor ID is set. */
   bool hasVendorID() const;
   /** Returns the vendor ID or 0 if not set. */
   uint16_t vendorId() const;
-  /** Retunrs @c true, if a product ID is set. */
+  /** Returns @c true, if a product ID is set. */
   bool hasProductID() const;
   /** Returns the product ID or 0 if not set. */
   uint16_t productId() const;
@@ -168,7 +168,7 @@ public:
   /** Returns a more extensive human readable description of the interface. */
   QString longDescription() const;
 
-  /** Returns @c true if it is save to send commands to this device without user approval.
+  /** Returns @c true if it is safe to send commands to this device without user approval.
    * This is true for radios which use somewhat unique VID:PIDs. Radios with generic USB-serial
    * chips are not save, as other devices may use the same chip and sending data to these devices
    * may be harmful. */
@@ -181,7 +181,7 @@ protected:
   uint16_t _vid;
   /** The USB pid. */
   uint16_t _pid;
-  /** If @c true, it is save to send commands to the device without user approval. */
+  /** If @c true, it is safe to send commands to the device without user approval. */
   bool _save;
 };
 

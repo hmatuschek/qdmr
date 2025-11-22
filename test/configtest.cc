@@ -159,7 +159,7 @@ ConfigTest::testCTCSSNull() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  // Test backward compatability
+  // Test backward compatibility
   QVERIFY(ctcssConfig.channelList()->channel(0)->is<FMChannel>());
   QCOMPARE(SelectiveCall() ,ctcssConfig.channelList()->channel(0)->as<FMChannel>()->rxTone());
   QCOMPARE(SelectiveCall(67.0) ,ctcssConfig.channelList()->channel(0)->as<FMChannel>()->txTone());

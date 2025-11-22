@@ -333,7 +333,7 @@ GD73Test::testChannelTypeEcoding() {
     new_config.channelList()->add(ch);
   }
 
-  // Reencode in the same binary codeplug
+  // Re-encode in the same binary codeplug
   if (! codeplug.encode(&new_config, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for Radioddity GD73: %1")
           .arg(err.format()).toStdString().c_str());

@@ -317,7 +317,7 @@ D878UVTest::testAESEncryption() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  // Verify existance of key
+  // Verify existence of key
   QVERIFY(nullptr != decoded.commercialExtension());
   QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
   QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
@@ -353,7 +353,7 @@ D878UVTest::testARC4Encryption() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  // Verify existance of key
+  // Verify existence of key
   QVERIFY(nullptr != decoded.commercialExtension());
   QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
   QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("1122334455"));

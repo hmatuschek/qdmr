@@ -75,9 +75,9 @@ public:
     /** Constructor. */
     ChannelElement(uint8_t *ptr);
 
-    /** Retruns @c true, if the RX and TX frequencies (and signaling) are swapped. */
+    /** Returns @c true, if the RX and TX frequencies (and signaling) are swapped. */
     virtual bool frequenciesSwapped() const;
-    /** Retruns @c true, if the RX and TX frequencies (and signaling) are swapped. */
+    /** Returns @c true, if the RX and TX frequencies (and signaling) are swapped. */
     virtual void enableSwapFrequencies(bool enable);
 
     /** Returns @c true if bluetooth hands-free is enabled. */
@@ -717,11 +717,11 @@ public:
     virtual bool btHoldTimeInfinite() const;
     /** Returns the bluetooth hold time. */
     virtual Interval btHoldTime() const;
-    /** Sets the bluethooth hold time (1-120s). */
+    /** Sets the Bluetooth hold time (1-120s). */
     virtual void setBTHoldTime(Interval interval);
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void setBTHoldTimeInfinite();
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void disableBTHoldTime();
 
     /** Returns the bluetooth RX delay in ms. */
@@ -1419,7 +1419,7 @@ protected:
   virtual void allocateAirBand();
 
 public:
-  /** Some limtis for the codeplug. */
+  /** Some limits for the codeplug. */
   struct Limit: D878UVCodeplug::Limit {
     /// Maximum number of air-band channels.
     static constexpr unsigned int airBandChannels() { return 100; }

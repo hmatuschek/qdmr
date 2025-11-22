@@ -454,7 +454,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     clearAESEncryptionKeyIndex();
     clearARC4EncryptionKeyIndex();
 
-    // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+    // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
     bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
         ( ctx.config()->settings()->anytoneExtension() &&
           (AnytoneDMRSettingsExtension::EncryptionType::AES ==

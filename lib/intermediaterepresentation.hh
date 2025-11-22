@@ -71,7 +71,7 @@ protected slots:
 
 
 
-/** Fitlers instance by meta object.
+/** Filters instance by meta object.
  *
  * This visitor can be used to remove elements from the abstract codeplug, not supported by the
  * target device. */

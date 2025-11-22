@@ -44,7 +44,7 @@ public slots:
   bool startUpload(Config *config, const Codeplug::Flags &flags = Codeplug::Flags(),
                    const ErrorStack &err=ErrorStack());
 
-  /** Encodes the given user-database and uploades it to the device. */
+  /** Encodes the given user-database and uploads it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection=CallsignDB::Flags(),
                              const ErrorStack &err=ErrorStack());
 
@@ -74,7 +74,7 @@ protected:
   GD73Codeplug _codeplug;
 
 private:
-  /** Holds the signleton instance of the radio limits for this radio. */
+  /** Holds the singleton instance of the radio limits for this radio. */
   static RadioLimits *_limits;
 };
 

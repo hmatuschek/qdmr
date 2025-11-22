@@ -10,7 +10,7 @@
  * The GD-77 & GD-77S codeplugs are almost identical to the Radioddity/Baofeng @c RD5RCodeplug, in fact
  * the memory layout (see below) and almost all of the single components of the codeplug are encoded in
  * exactly the same way. Obviously, when Baofeng and Radioddity joint to create the RD5R,
- * Radioddity provided the firmware. However, there are some small subtile differences between
+ * Radioddity provided the firmware. However, there are some small subtle differences between
  * these two codeplug formats, requiring a separate class for the GD-77. For example, the contacts
  * and scan-lists swapped the addresses and the @c channel_t encoding analog and digital channels
  * for the codeplugs are identical except for the squelch settings. Thanks for that!

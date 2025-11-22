@@ -54,7 +54,7 @@ DR1801Test::testBasicConfigReencoding() {
   }
   // original Config now contains all default values and extensions
 
-  // reencode it
+  // re-encode it
   if (! codeplug.encode(&originalConfig, Codeplug::Flags(), err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DR1801UV: %1")
           .arg(err.format()).toStdString().c_str());

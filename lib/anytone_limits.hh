@@ -3,7 +3,7 @@
 
 #include "radiolimits.hh"
 
-/** Base class of limtis for all AnyTone radios.
+/** Base class of limits for all AnyTone radios.
  * This class extends @c RadioLimits and implements the hardware revision check.
  * @ingroup anytone */
 class AnytoneLimits: public RadioLimits

@@ -56,14 +56,14 @@ public:
   OrbitalElement(unsigned int id);
   /** Copy constructor. */
   OrbitalElement(const OrbitalElement &other) = default;
-  /** Copy assignemnt. */
+  /** Copy assignment. */
   OrbitalElement &operator=(const OrbitalElement &other) = default;
 
   /** Returns @c true, if this represents a valid satellite information. */
   bool isValid() const;
   /** Returns the NORAD catalog id. */
   unsigned int id() const;
-  /** Retunrs the name of the satellite. */
+  /** Returns the name of the satellite. */
   const QString &name() const;
 
   /** Epoch of the orbital elements. */
@@ -92,7 +92,7 @@ public:
 protected:
   /** NORAD id of the satellite. */
   unsigned int _id;
-  /** Desriptive name of the satellite. */
+  /** Descriptive name of the satellite. */
   QString _name;
   /** The epoch. */
   Epoch _epoch;
@@ -131,7 +131,7 @@ public:
 
   /** @c returns @c true if the database contains a satellite with the given NORAD id. */
   bool contains(unsigned int id) const;
-  /** Retunrs the orbital elements for the satellite with the given NORAD id. */
+  /** Returns the orbital elements for the satellite with the given NORAD id. */
   OrbitalElement getById(unsigned int id) const;
   /** Returns the i-th orbital element. */
   const OrbitalElement &getAt(unsigned int idx) const;
@@ -173,7 +173,7 @@ protected:
 private:
   /** Update period in days. */
   unsigned int _updatePeriod;
-  /** Holds all sattellites sorted by their catalog number. */
+  /** Holds all satellites sorted by their catalog number. */
   QVector<OrbitalElement>  _elements;
   /** Maps NORAD id to element. */
   QHash<unsigned int, unsigned int> _idIndexMap;
