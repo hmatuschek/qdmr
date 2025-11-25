@@ -54,13 +54,13 @@ D868UVCallsignDB::EntryElement::setContent(
     const QString &name, const QString &city, const QString &call, const QString &state,
     const QString &country, const QString &comment)
 {
-  unsigned addr = 0x0006;
-  writeASCII(addr, name, 16, 0x00); addr += std::min(qsizetype(16), name.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, city, 15, 0x00); addr += std::min(qsizetype(15), city.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, call, 8, 0x00); addr += std::min(qsizetype(8), call.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, state, 16, 0x00); addr += std::min(qsizetype(16), state.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, country, 16, 0x00); addr += std::min(qsizetype(16), country.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, comment, 16, 0x00); addr += std::min(qsizetype(16), comment.size()); setUInt8(addr, 0); addr++;
+  unsigned addr = 0x0006, flen;
+  flen = std::min(qsizetype(16), name.size()); writeASCII(addr, name, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(15), city.size()); writeASCII(addr, city, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(15), call.size()); writeASCII(addr, call, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(15), state.size()); writeASCII(addr, state, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(15), country.size()); writeASCII(addr, country, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(15), comment.size()); writeASCII(addr, comment, flen+1);
 }
 
 unsigned
