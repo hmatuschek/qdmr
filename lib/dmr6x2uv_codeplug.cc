@@ -1711,7 +1711,7 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
       clearDMREncryptionKeyIndex();
 
       if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
-        // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+        // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
         bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
             ( ctx.config()->settings()->anytoneExtension() &&
               (AnytoneDMRSettingsExtension::EncryptionType::AES ==
@@ -1761,7 +1761,7 @@ DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
       dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
     }
 
-    // By default, we assume we have stong encryption unless otherwise set by AnyTone DMR extension.
+    // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
     bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
         ( ctx.config()->settings()->anytoneExtension() &&
           (AnytoneDMRSettingsExtension::EncryptionType::AES ==

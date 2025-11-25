@@ -772,11 +772,11 @@ public:
     virtual bool btHoldTimeInfinite() const;
     /** Returns the bluetooth hold time. */
     virtual Interval btHoldTime() const;
-    /** Sets the bluethooth hold time (1-120s). */
+    /** Sets the Bluetooth hold time (1-120s). */
     virtual void setBTHoldTime(Interval interval);
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void setBTHoldTimeInfinite();
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void disableBTHoldTime();
 
     /** Returns the bluetooth RX delay in ms. */
@@ -1295,12 +1295,12 @@ public:
     /** Sets the FM APRS channel width. */
     virtual void setFMChannelWidth(AnytoneFMAPRSSettingsExtension::Bandwidth width);
 
-    /** Retruns @c true if the CRC check on received FM APRS messages is disabled. */
+    /** Returns @c true if the CRC check on received FM APRS messages is disabled. */
     virtual bool fmPassAll() const;
     /** Enables/disables "pass all", that is the CRC check on FM APRS messages is disabled. */
     virtual void enableFMPassAll(bool enable);
 
-    /** Retruns @c true if the n-th of 8 FM APRS frequencies is set. */
+    /** Returns @c true if the n-th of 8 FM APRS frequencies is set. */
     virtual bool fmFrequencySet(unsigned int n) const;
     /** Returns the n-th of 8 FM APRS frequencies. */
     virtual Frequency fmFrequency(unsigned int n) const;

@@ -22,7 +22,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 28 | Enable GPS                    | Enable SMS alert              | Unused set to 0x00            | WFM monitor enable            |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-2c | Work mode main channel        | Enable sub channel            | TBST frquency                 | Enable call alert             |
+2c | Work mode main channel        | Enable sub channel            | TBST frequency                | Enable call alert             |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 30 | GPS Time zone                 | Talk permit tone              | Digital call reset tone       | VOX source                    |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -122,7 +122,7 @@ Field description:
  - VOX sensitivity: 0x00=Off, 0x01=1, ..., 0x03=3
  - Work mode A/B: 0x00=VFO, 0x01=MEM
  - Work mode main channel: 0x00=A, 0x01=B
- - TBST frquency: 0x00=1000Hz, 0x01=1450Hz, 0x02=1750Hz, 0x03=2100Hz
+ - TBST frequency: 0x00=1000Hz, 0x01=1450Hz, 0x02=1750Hz, 0x03=2100Hz
  - GPS Time zone: 0x00=GMT-12, ..., 0x0c=GMT, 0x19=GMT+13
  - Boot display: 0x00=Default, 0x01=Custom Text, 0x02=Custom Image
  - VFO scan type: 0x00=TO, 0x01=CO, 0x02=SE

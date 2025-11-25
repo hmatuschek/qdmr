@@ -47,7 +47,7 @@ public:
   /** Returns the uplink frequency, if there is one.
    * An upload frequency is usually missing, if the type is @c Type::Transmitter. */
   const Frequency &uplink() const;
-  /** Retruns the downlink frequency. */
+  /** Returns the downlink frequency. */
   const Frequency &downlink() const;
 
 public:

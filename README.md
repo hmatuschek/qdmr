@@ -46,7 +46,7 @@ A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available.
 
 ## Ecosystem
 As *qdmr* gets more and more popular with Linux HAMs, the ecosystem around it grows too. These are 
-tools, that make your day-to-day useage of *qdmr* easier, by providing features, not covered in 
+tools, that make your day-to-day usage of *qdmr* easier, by providing features, not covered in 
 qdmr or dmrconf.
 
   * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.

@@ -138,7 +138,7 @@ public:
 
     /** Returns @c true if the global DMR ID is overridden. */
     virtual bool hasDMRId() const;
-    /** Retruns the DMR ID for this channel. */
+    /** Returns the DMR ID for this channel. */
     virtual unsigned int dmrId() const;
     /** Sets the DMR ID for this channel. */
     virtual void setDMRId(unsigned int id);
@@ -217,7 +217,7 @@ public:
 
     /** Returns the squelch mode*/
     virtual SquelchMode squelchMode() const;
-    /** Retunrs the squelch level. */
+    /** Returns the squelch level. */
     virtual unsigned int squelchLevel() const;
     /** Set the squelch level and mode. Level is ignored, if mode is not normal.*/
     virtual void setSquelch(SquelchMode mode, unsigned int level);
@@ -306,7 +306,7 @@ public:
     virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
-    /** Retunrs the n-th channel. */
+    /** Returns the n-th channel. */
     ChannelElement channel(unsigned int n);
 
   public:
@@ -522,7 +522,7 @@ public:
     /** Resets the fixed position. */
     virtual void clearFixedPosition();
 
-    /** Retunrs the posiiton reporting precision. */
+    /** Returns the posiiton reporting precision. */
     virtual PositionPrecision positionPrecision() const;
     /** Sets the position reporting precision in degrees. */
     virtual void setPositionPrecision(PositionPrecision prec);
@@ -549,17 +549,17 @@ public:
     /** Clears the second via node. */
     virtual void clearVia2();
 
-    /** Retunrs the icon. */
+    /** Returns the icon. */
     virtual APRSSystem::Icon icon() const;
     /** Sets the icon. */
     virtual void setIcon(APRSSystem::Icon icon);
 
-    /** Retunrs the comment text. */
+    /** Returns the comment text. */
     virtual QString comment() const;
     /** Sets the comment text. */
     virtual void setComment(const QString &text);
 
-    /** Retunrs the baud-rate. */
+    /** Returns the baud-rate. */
     virtual BaudRate baudRate() const;
     /** Sets the baud rate. */
     virtual void setBaudRate(BaudRate rate);
@@ -627,7 +627,7 @@ public:
     /** Clears the bank. */
     void clear();
 
-    /** Retunrs the n-th APRS system. */
+    /** Returns the n-th APRS system. */
     APRSSettingsElement system(unsigned int idx) const;
 
     /** Encodes all FM APRS systems. */
@@ -900,7 +900,7 @@ public:
     /** Enable/disable a zone in the bank. */
     virtual void enable(unsigned idx, bool enabled);
 
-    /** Retunrs the n-th zone. */
+    /** Returns the n-th zone. */
     ZoneElement zone(unsigned int n);
 
     /** Encodes all zones. */

@@ -1764,11 +1764,11 @@ public:
   /** Enables/disables shutting the handset down along with the radio. */
   void enableShutdown(bool enable);
 
-  /** Retruns the volume level for VFO A. */
+  /** Returns the volume level for VFO A. */
   unsigned int volumeLevelA() const;
   /** Sets the volume level for VFO A. */
   void setVolumeLevelA(unsigned int level);
-  /** Retruns the volume level for VFO B. */
+  /** Returns the volume level for VFO B. */
   unsigned int volumeLevelB() const;
   /** Sets the volume level for VFO B. */
   void setVolumeLevelB(unsigned int level);
@@ -1835,13 +1835,13 @@ public:
   /** Set function key C very long press function. */
   void setFuncKeyCVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
 
-  /** Retruns the backlight duration. */
+  /** Returns the backlight duration. */
   Interval backlight() const;
   /** Sets the backlight duration. */
   void setBacklight(Interval dur);
 
 protected:
-  bool _shutdown;                    ///< Shut the handset down alogn with the radio.
+  bool _shutdown;                    ///< Shut the handset down along with the radio.
   unsigned int _volumeLevelA;        ///< Specifies the volume level for VFO A.
   unsigned int _volumeLevelB;        ///< Specifies the volume level for VFO B.
   unsigned int _micGain;             ///< Specifies the mic gain.
@@ -2200,7 +2200,7 @@ class AnytoneSettingsExtension: public ConfigExtension
   Q_PROPERTY(AnytoneGPSSettingsExtension* gpsSettings READ gpsSettings)
   /** The Roaming settings. */
   Q_PROPERTY(AnytoneRoamingSettingsExtension* roamingSettings READ roamingSettings)
-  /** The bluethooth settings. */
+  /** The Bluetooth settings. */
   Q_PROPERTY(AnytoneBluetoothSettingsExtension* bluetoothSettings READ bluetoothSettings)
 
   Q_CLASSINFO("simplexRepeaterSettingsDescription",

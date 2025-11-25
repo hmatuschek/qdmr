@@ -32,13 +32,13 @@ public:
               const ErrorStack &err=ErrorStack());
 
 public:
-  /** Some limts of the callsign DB. */
+  /** Some limits of the callsign DB. */
   struct Limit: public OpenGD77BaseCallsignDB::Limit {
-    /// Number of entries, segement 0.
+    /// Number of entries, segment 0.
     static constexpr unsigned int entries0() {
       return (size0()-DatabaseHeaderElement::size())/DatabaseEntryElement::size();
     }
-    /// Number of entries, segement 1.
+    /// Number of entries, segment 1.
     static constexpr unsigned int entries1() {
       return size1()/DatabaseEntryElement::size();
     }

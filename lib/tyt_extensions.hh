@@ -501,7 +501,7 @@ public:
   /** Enables/disables the remote radio check menu item. */
   void enableRemoteRadioCheck(bool enable);
 
-  /** Returns @c true if the remote montior menu item is enabled. */
+  /** Returns @c true if the remote monitor menu item is enabled. */
   bool remoteMonitor() const;
   /** Enables/disables the remote monitor menu item. */
   void enableRemoteMonitor(bool enable);

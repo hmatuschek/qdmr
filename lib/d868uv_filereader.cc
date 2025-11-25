@@ -527,7 +527,7 @@ bool
 D868UVFileReader::readAnalogContacts() {
   // Read number of scan lists and advance pointer
   uint8_t numContacts = *_data; _data += 1;
-  // Read analog conact
+  // Read analog contact
   for (uint8_t i=0; i<numContacts; i++) {
     this->readAnalogContact();
   }

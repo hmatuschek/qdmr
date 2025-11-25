@@ -111,7 +111,7 @@ dmrconf decode --radio=uv390 codeplug.dfu codeplug.yaml]]></programlisting>
 
 
 <section>
-<info><title>Debugging the codplug decoding</title></info>
+<info><title>Debugging the codeplug decoding</title></info>
 <para>
   Under normal circumstances, it makes no sense to first read the binary codeplug from the device 
   and then decoding it in a separate step as the read command will do that for you.

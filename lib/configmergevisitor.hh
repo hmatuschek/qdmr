@@ -32,7 +32,7 @@ public:
   };
 
   /** Possible strategies to merge sets of references. That is, GroupLists, Zones & ScanLists,
-   * if tehre are two sets with the same name. */
+   * if there are two sets with the same name. */
   enum class SetStrategy {
     Ignore,    ///< Ignore the source set.
     Override,  ///< Override the destination item.

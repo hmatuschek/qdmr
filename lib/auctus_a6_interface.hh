@@ -23,7 +23,7 @@ class AuctusA6Interface : public USBSerial
 public:
   /** Possible states of the interface. */
   enum State {
-    CLOSED,        ///< Conntection to device is closed.
+    CLOSED,        ///< Connection to device is closed.
     IDLE,          ///< Connection is open and device is ready.
     READ_THROUGH,  ///< Read from memory. The device just sends some amount of data.
     WRITE_THROUGH, ///< Write to memory. The device just receives some amount of data.

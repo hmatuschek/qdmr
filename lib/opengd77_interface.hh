@@ -4,7 +4,7 @@
 #include "usbserial.hh"
 #include "errorstack.hh"
 
-/** Implements the interfact to a radio running the Open GD77 firmware.
+/** Implements the interface to a radio running the Open GD77 firmware.
  *
  * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x1fc9 and PID @c 0x0094 are used. Hence no udev rules are
@@ -13,7 +13,7 @@
  *
  *
  * @section ogd77cmd Command requests
- * The overall command requets structure is
+ * The overall command requests structure is
  *
  * @verbinclude opengd77_protocol_command_request.txt
  *
@@ -124,14 +124,14 @@
  *  <tr><td>0ah</td>  <td>FLASH security registers</td></tr>
  * </table>
  *
- * Whenever the read request returns some data, it is tranmitted with the read response
+ * Whenever the read request returns some data, it is transmitted with the read response
  * @verbinclude opengd77_protocol_read_response.txt
  *
  * If not, a simple ACK response is send
  * @verbinclude opengd77_protocol_command_okay_response.txt
  *
  * @subsection ogd77info Radio info struct
- * When reading the radio inforamtion, the information is returned in a binary struct:
+ * When reading the radio information, the information is returned in a binary struct:
  * @verbinclude opengd77_radio_info.txt
  * <table>
  *  <tr><th>Code</th> <th>Radio Variant</th></tr>
@@ -228,7 +228,7 @@ protected:
     bool initReadFirmwareInfo();
   };
 
-  /** Radio inforation struct. */
+  /** Radio information struct. */
   struct __attribute__((packed)) FirmwareInfo {
     /** Possible radio types, returned by the radio_info struct.*/
     enum class RadioType {

@@ -94,7 +94,7 @@ class ChirpReader: public ChirpFormat
 
 public:
   /** Reads a CHIRP CSV file from the given stream and updates the given configuration.
-   * Please note, that the CHRIP generic CSV does not contain a functional DMR codeplug. */
+   * Please note, that the CHIRP generic CSV does not contain a functional DMR codeplug. */
   static bool read(QTextStream &stream, Config *config, const ErrorStack &err=ErrorStack());
 
 protected:
@@ -135,7 +135,7 @@ protected:
   static bool writeChannel(QTextStream &stream, int i, FMChannel *channel, const ErrorStack &err=ErrorStack());
   /** Writes frequency related columns to the given stream. */
   static bool encodeFrequency(QTextStream &stream, FMChannel *channel, const ErrorStack &err = ErrorStack());
-  /** Wirtes sub tone related columns to the given stream. */
+  /** Writes sub tone related columns to the given stream. */
   static bool encodeSubTone(QTextStream &stream, FMChannel *channel, const ErrorStack &err = ErrorStack());
   /** Writes the bandwidth column to the given stream */
   static bool encodeBandwidth(QTextStream &stream, FMChannel *channel, const ErrorStack &err = ErrorStack());

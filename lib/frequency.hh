@@ -29,11 +29,11 @@ public:
   /** Assignment. */
   FrequencyBase &operator = (const FrequencyBase &other);
 
-  /** Retruns @c true of the frequency is negative. */
+  /** Returns @c true of the frequency is negative. */
   inline bool isNegative() const { return 0 > _frequency; }
-  /** Retruns @c true of the frequency is positive. */
+  /** Returns @c true of the frequency is positive. */
   inline bool isPositive() const { return 0 < _frequency; }
-  /** Retruns @c true of the frequency is zero. */
+  /** Returns @c true of the frequency is zero. */
   inline bool isZero() const { return 0 == _frequency; }
 
   /** Format the frequency. */
