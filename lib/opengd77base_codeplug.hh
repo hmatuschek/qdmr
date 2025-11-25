@@ -1162,6 +1162,7 @@ public:
     };
   };
 
+
   /** Encodes a satellite for the  OpenGD77 devices.
    * That is a set of orbital elements and transponder information. */
   class SatelliteElement: public Codeplug::Element
