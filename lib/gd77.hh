@@ -36,7 +36,7 @@ public:
   static RadioInfo defaultRadioInfo();
 
 public slots:
-  /** Encodes the given user-database and uploades it to the device. */
+  /** Encodes the given user-database and uploads it to the device. */
   bool startUploadCallsignDB(UserDatabase *db, bool blocking=false,
                              const CallsignDB::Flags &selection=CallsignDB::Flags(),
                              const ErrorStack &err=ErrorStack());
@@ -54,7 +54,7 @@ protected:
   GD77CallsignDB _callsigns;
 
 private:
-  /** Holds the signleton instance of the radio limits for this radio. */
+  /** Holds the singleton instance of the radio limits for this radio. */
   static RadioLimits *_limits;
 };
 

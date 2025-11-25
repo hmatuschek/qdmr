@@ -59,7 +59,7 @@ protected slots:
   void signalingChanged();
 
 protected:
-  /** Serializes the pinout singals. */
+  /** Serializes the pinout signals. */
   QString formatPinoutSignals();
 };
 

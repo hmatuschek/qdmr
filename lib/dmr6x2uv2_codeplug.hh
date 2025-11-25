@@ -178,12 +178,12 @@ public:
     /** Sets the FM mic gain [1-10]. */
     virtual void setFMMicGain(unsigned int gain);
 
-    /** Retruns @c true, if transmit timeout warning tone is enabled. */
+    /** Returns @c true, if transmit timeout warning tone is enabled. */
     virtual bool totWarningToneEnabled() const;
     /** Enables/disables transmit timeout warning tone. */
     virtual void enableTOTWarningTone(bool enable);
 
-    /** Retruns @c true, if ATPC is enabled. */
+    /** Returns @c true, if ATPC is enabled. */
     virtual bool atpcEnabled() const;
     /** Enables/disables ATPC. */
     virtual void enableATPC(bool enable);
@@ -217,7 +217,7 @@ public:
     /** Sets the power level for satellite mode. */
     virtual void setSatPower(Channel::Power power);
 
-    /** Retunrs the squelch level for satellite mode [0,1-10], 0=open.*/
+    /** Returns the squelch level for satellite mode [0,1-10], 0=open.*/
     virtual unsigned int satSquelchLevel() const;
     /** Sets the squelch level for satellite mode [0,1-10], 0=open. */
     virtual void setSatSquelchLevel(unsigned int level);
@@ -276,7 +276,7 @@ public:
     /** Sets the callsign. */
     virtual void setCall(const QString &call);
 
-    /** Retruns the SSID. */
+    /** Returns the SSID. */
     virtual unsigned int ssid() const;
     /** Sets the SSID. */
     virtual void setSSID(unsigned int ssid);

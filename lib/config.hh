@@ -14,11 +14,11 @@
  * used to implement the majority of the common functionality concerning the abstract codeplug.
  * These are
  *   - Copying & cloning of elements of the configuration.
- *   - Labeling of codeplug objects (eveything that has an ID for cross referencing).
- *   - Serialzation into YAML (all properties are serialized into YAML automatically if not
+ *   - Labeling of codeplug objects (everything that has an ID for cross referencing).
+ *   - Serialization into YAML (all properties are serialized into YAML automatically if not
  *     prevented by marking the property as not @c SCRIPTABLE).
  *   - Parsing of YAML codeplugs (automatic property parsing can be disabled on a per-property
- *     bassis by marking it as not @c SCRIPTABLE).
+ *     basis by marking it as not @c SCRIPTABLE).
  *   - Generic editing of the properties in the GUI.
  *   .
  * To this end, the creation of codeplug extensions is pretty easy, as only the properties for the

@@ -68,7 +68,7 @@ There are many commands already known see jhart99s
 
 ### 0000h Command -- Identify radio
 Not used by the manufacturer CPS but handled by the radio. This command is send without any 
-parameters and the radio returns a sting, identifying the radio. The response looks like
+parameters and the radio returns a string, identifying the radio. The response looks like
 ```
 aa 3a 80 00 01 20 2c 42   46 31 38 30 31 2c 41 36 	..... ,B  F1801,A6
 2d 30 30 30 30 2d 58 58   58 58 2c 70 6f 72 74 61 	-0000-XX  XX,porta

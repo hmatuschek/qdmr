@@ -84,7 +84,7 @@ autoDetect(QCommandLineParser &parser, QCoreApplication &app, const ErrorStack &
     msg << "is a DMR radio. Please specify the device explicitly to verify correctness.";
     return nullptr;
   } else {
-    // The first device is save to use
+    // The first device is safe to use
     device = interfaces.first();
   }
 

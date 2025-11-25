@@ -48,31 +48,31 @@ public:
   /** Sets the long-press duration, usually specified in ms. */
   void setLongPressDuration(Interval interval);
 
-  /** Returns the short-press function of the progammable function key 1 (SK1, P1). */
+  /** Returns the short-press function of the programmable function key 1 (SK1, P1). */
   Function funcKey1Short() const;
-  /** Sets the short-press function of the progammable function key 1 (SK1, P1). */
+  /** Sets the short-press function of the programmable function key 1 (SK1, P1). */
   void setFuncKey1Short(Function func);
-  /** Returns the long-press function of the progammable function key 1 (SK1, P1). */
+  /** Returns the long-press function of the programmable function key 1 (SK1, P1). */
   Function funcKey1Long() const;
-  /** Sets the long-press function of the progammable function key 1 (SK1, P1). */
+  /** Sets the long-press function of the programmable function key 1 (SK1, P1). */
   void setFuncKey1Long(Function func);
 
-  /** Returns the short-press function of the progammable function key 2 (SK2, P2). */
+  /** Returns the short-press function of the programmable function key 2 (SK2, P2). */
   Function funcKey2Short() const;
-  /** Sets the short-press function of the progammable function key 2 (SK2, P2). */
+  /** Sets the short-press function of the programmable function key 2 (SK2, P2). */
   void setFuncKey2Short(Function func);
-  /** Returns the long-press function of the progammable function key 2 (SK2, P2). */
+  /** Returns the long-press function of the programmable function key 2 (SK2, P2). */
   Function funcKey2Long() const;
-  /** Sets the long-press function of the progammable function key 2 (SK2, P2). */
+  /** Sets the long-press function of the programmable function key 2 (SK2, P2). */
   void setFuncKey2Long(Function func);
 
-  /** Returns the short-press function of the progammable function key 3 (TK). */
+  /** Returns the short-press function of the programmable function key 3 (TK). */
   Function funcKey3Short() const;
-  /** Sets the short-press function of the progammable function key 3 (TK). */
+  /** Sets the short-press function of the programmable function key 3 (TK). */
   void setFuncKey3Short(Function func);
-  /** Returns the long-press function of the progammable function key 3 (TK). */
+  /** Returns the long-press function of the programmable function key 3 (TK). */
   Function funcKey3Long() const;
-  /** Sets the long-press function of the progammable function key 3 (TK). */
+  /** Sets the long-press function of the programmable function key 3 (TK). */
   void setFuncKey3Long(Function func);
 
 protected:
@@ -159,11 +159,11 @@ public:
   /** Sets the volume of the low-battery warning tone [1,10]. */
   void setLowBatteryWarnVolume(unsigned int);
 
-  /** Retruns @c true, if the key tones are enabled. */
+  /** Returns @c true, if the key tones are enabled. */
   bool keyTone() const;
   /** Enables/disables key tones. */
   void enableKeyTone(bool enable);
-  /** Retruns the key-tone volume. */
+  /** Returns the key-tone volume. */
   unsigned int keyToneVolume() const;
   /** Sets the key-tone volume. */
   void setKeyToneVolume(unsigned int volume);
@@ -474,9 +474,9 @@ public:
   /** Sets the repeater STE in seconds. */
   void setRepeaterSTE(Interval ste);
 
-  /** Returns @c true if the TX iterrupt is enabled. */
+  /** Returns @c true if the TX interrupt is enabled. */
   bool txInterrupt() const;
-  /** Enables TX iterrupt. */
+  /** Enables TX interrupt. */
   void enableTXInterrupt(bool enable);
 
   /** Returns the UI language. */

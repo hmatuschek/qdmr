@@ -78,7 +78,7 @@ class AnytoneChannelExtension: public ConfigExtension
   Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
   /** Holds the frequency correction in some unknown units. */
   Q_PROPERTY(int frequencyCorrection READ frequencyCorrection WRITE setFrequencyCorrection)
-  /** If @c true, the hands-free featrue is enabled for this channel. */
+  /** If @c true, the hands-free feature is enabled for this channel. */
   Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
   /** A reference to the FM APRS frequency. If not set, the default will be used. */
   Q_PROPERTY(AnytoneAPRSFrequencyRef *fmAPRSFrequency READ fmAPRSFrequency())
@@ -127,7 +127,7 @@ protected:
   bool _talkaround;
   /** The frequency correction. */
   int _frequencyCorrection;
-  /** If @c true, the hands-free featrue is enabled for this channel. */
+  /** If @c true, the hands-free feature is enabled for this channel. */
   bool _handsFree;
   /** A reference to the FM APRS frequency. */
   AnytoneAPRSFrequencyRef *_fmAPRSFrequency;

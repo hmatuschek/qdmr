@@ -53,7 +53,7 @@ public:
   /** Defines the possible severity levels. */
   enum Severity {
     Silent,  ///< The user will not be notified.
-    Hint,    ///< Just a hint, a working codplug will be assembled.
+    Hint,    ///< Just a hint, a working codeplug will be assembled.
     Warning, ///< The codeplug gets changed but a working codeplug might be assembled.
     Critical ///< Assembly of the codeplug will fail or a non-functional codeplug might be created.
   };

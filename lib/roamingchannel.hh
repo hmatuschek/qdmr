@@ -41,11 +41,11 @@ public:
 
   /** Returns the RX frequency in Hz. */
   Frequency rxFrequency() const;
-  /** Sets the RX frquency in Hz. */
+  /** Sets the RX frequency in Hz. */
   void setRXFrequency(Frequency f);
   /** Returns the TX frequency in Hz. */
   Frequency txFrequency() const;
-  /** Sets the TX frquency in Hz. */
+  /** Sets the TX frequency in Hz. */
   void setTXFrequency(Frequency f);
 
   /** Returns @c true, if the color code of the channel gets overridden. */

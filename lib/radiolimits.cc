@@ -645,7 +645,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
   if (nullptr == ref) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
-    msg << "Cannot check type of property '" << prop.name() << "'. Exprected ConfigObjectReference.";
+    msg << "Cannot check type of property '" << prop.name() << "'. Expected ConfigObjectReference.";
     return false;
   }
 

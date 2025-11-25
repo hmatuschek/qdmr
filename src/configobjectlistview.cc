@@ -77,7 +77,7 @@ ConfigObjectListView::onMoveItemUp() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -99,7 +99,7 @@ ConfigObjectListView::onMoveItemTenUp() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -123,7 +123,7 @@ ConfigObjectListView::onMoveItemTop() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -146,7 +146,7 @@ ConfigObjectListView::onMoveItemDown() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -170,7 +170,7 @@ ConfigObjectListView::onMoveItemTenDown() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -193,7 +193,7 @@ ConfigObjectListView::onMoveItemBottom() {
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->listView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;

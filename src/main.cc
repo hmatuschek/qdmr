@@ -5,7 +5,6 @@
 #include <QMessageBox>
 #include "logger.hh"
 #include "settings.hh"
-#include <stdio.h>
 #include <QSplashScreen>
 
 

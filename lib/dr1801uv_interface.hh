@@ -115,7 +115,7 @@ protected:
   /** Response to a codeplug write. Just contains a status word. */
   struct Q_PACKED CodeplugWriteResponse {
     uint8_t  success;                ///< Response code.
-    uint16_t unknown;                ///< Some unkown data.
+    uint16_t unknown;                ///< Some unknown data.
 
     /** Returns @c true, if the operation was successful. */
     bool isSuccessful() const;

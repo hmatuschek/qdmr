@@ -447,7 +447,7 @@ public:
   };
 
 
-  /** Represents the base class for conacts in all AnyTone codeplugs.
+  /** Represents the base class for contacts in all AnyTone codeplugs.
    *
    * Memory layout of encoded contact (0x64 bytes):
    * @verbinclude anytone_contact.txt
@@ -941,7 +941,7 @@ public:
     /** Enables/disables the key-tone. */
     virtual void enableKeyTone(bool enable) = 0;
 
-    /** Returns @c true if the radio displays frequecies instead of channels is enabled. */
+    /** Returns @c true if the radio displays frequencies instead of channels is enabled. */
     virtual bool displayFrequency() const;
     /** Enables/disables the frequency display. */
     virtual void enableDisplayFrequency(bool enable);
@@ -1404,7 +1404,7 @@ public:
     };
   };
 
-  /** Represents the bitmap indcating which zones are valid. */
+  /** Represents the bitmap indicating which zones are valid. */
   class ZoneBitmapElement: public BitmapElement
   {
   protected:
@@ -3211,7 +3211,7 @@ public:
     static constexpr unsigned int size() { return 0x0020; }
   };
 
-  /** Represents the WFM (FM broadcast) VFO frquency. */
+  /** Represents the WFM (FM broadcast) VFO frequency. */
   class WFMVFOElement: public Element
   {
   protected:
