@@ -669,274 +669,274 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="207"/>
-        <location filename="../src/application.cc" line="225"/>
-        <location filename="../src/application.cc" line="542"/>
+        <location filename="../src/application.cc" line="203"/>
+        <location filename="../src/application.cc" line="221"/>
+        <location filename="../src/application.cc" line="538"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Nicht gespeicherte Änderungen am Codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="208"/>
-        <location filename="../src/application.cc" line="226"/>
-        <location filename="../src/application.cc" line="543"/>
+        <location filename="../src/application.cc" line="204"/>
+        <location filename="../src/application.cc" line="222"/>
+        <location filename="../src/application.cc" line="539"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Es gibt nicht gespeicherte Änderungen am Codeplug. Diese gehen verloren, wenn Sie fortfahren.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="234"/>
+        <location filename="../src/application.cc" line="230"/>
         <source>Open codeplug</source>
         <translation>Codeplug öffnen</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="236"/>
+        <location filename="../src/application.cc" line="232"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Codeplug Dateien (*.yaml);;Codeplug Dateien, altes Format (*.conf *.csv *.txt);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="242"/>
-        <location filename="../src/application.cc" line="305"/>
-        <location filename="../src/application.cc" line="342"/>
-        <location filename="../src/application.cc" line="381"/>
+        <location filename="../src/application.cc" line="238"/>
+        <location filename="../src/application.cc" line="301"/>
+        <location filename="../src/application.cc" line="338"/>
+        <location filename="../src/application.cc" line="377"/>
         <source>Cannot open file</source>
         <translation>Kann Datei nicht öffnen</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="243"/>
-        <location filename="../src/application.cc" line="257"/>
-        <location filename="../src/application.cc" line="268"/>
-        <location filename="../src/application.cc" line="382"/>
+        <location filename="../src/application.cc" line="239"/>
+        <location filename="../src/application.cc" line="253"/>
+        <location filename="../src/application.cc" line="264"/>
+        <location filename="../src/application.cc" line="378"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Kann Codeplug nicht aus Datei &apos;%1&apos; lesen: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="256"/>
-        <location filename="../src/application.cc" line="267"/>
+        <location filename="../src/application.cc" line="252"/>
+        <location filename="../src/application.cc" line="263"/>
         <source>Cannot read codeplug.</source>
         <translation>Kann Codeplug nicht lesen.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="286"/>
+        <location filename="../src/application.cc" line="282"/>
         <source>Save codeplug</source>
         <translation>Codeplug speichern</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="287"/>
+        <location filename="../src/application.cc" line="283"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Codeplug Dateien (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="293"/>
+        <location filename="../src/application.cc" line="289"/>
         <source>Please use new YAML format.</source>
         <translation>Nutze bitte das neue YAML-Format.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="294"/>
+        <location filename="../src/application.cc" line="290"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Das Speichern der Config im alten tabellenbasierten Format wurde mit Version 0.9.0 deaktiviert. Das Einlesen dieser Dateien funktioniert nach wie vor.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="306"/>
-        <location filename="../src/application.cc" line="343"/>
+        <location filename="../src/application.cc" line="302"/>
+        <location filename="../src/application.cc" line="339"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Kann Codeplug nicht in Datei &apos;%1&apos; speichern: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="315"/>
+        <location filename="../src/application.cc" line="311"/>
         <source>Cannot save codeplug</source>
         <translation>Kann Codeplug nicht speichern</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="316"/>
+        <location filename="../src/application.cc" line="312"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Kann Codeplug nicht in Datei &apos;%1&apos; speichern.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="329"/>
         <source>Export codeplug</source>
         <translation>Codeplug exportieren</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="334"/>
+        <location filename="../src/application.cc" line="330"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>CHIRP CSV Dateien (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="351"/>
+        <location filename="../src/application.cc" line="347"/>
         <source>Cannot export codeplug</source>
         <translation>Kann Codeplug nicht exportieren</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="352"/>
+        <location filename="../src/application.cc" line="348"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>Kann Codeplug nich in die Datei &apos;%1&apos; exportieren:
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="368"/>
+        <location filename="../src/application.cc" line="364"/>
         <source>Import codeplug</source>
         <translation>Codeplug importieren</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="369"/>
+        <location filename="../src/application.cc" line="365"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>CHIRP CSV Dateien (*.csv);;YAML Dateien (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="388"/>
-        <location filename="../src/application.cc" line="396"/>
-        <location filename="../src/application.cc" line="402"/>
-        <location filename="../src/application.cc" line="415"/>
+        <location filename="../src/application.cc" line="384"/>
+        <location filename="../src/application.cc" line="392"/>
+        <location filename="../src/application.cc" line="398"/>
+        <location filename="../src/application.cc" line="411"/>
         <source>Cannot import codeplug</source>
         <translation>Kann Codeplug nicht importieren</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="389"/>
-        <location filename="../src/application.cc" line="397"/>
-        <location filename="../src/application.cc" line="416"/>
+        <location filename="../src/application.cc" line="385"/>
+        <location filename="../src/application.cc" line="393"/>
+        <location filename="../src/application.cc" line="412"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>Kann Codeplug nicht aus Datei &apos;%1&apos; importieren: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="403"/>
+        <location filename="../src/application.cc" line="399"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>Kann Datei &apos;%1&apos; nicht verabreiten.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="440"/>
+        <location filename="../src/application.cc" line="436"/>
         <source>No matching devices found.</source>
         <translation>Kein passendes Gerät gefunden.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="466"/>
+        <location filename="../src/application.cc" line="462"/>
         <source>Cannot connect to radio</source>
         <translation>Verbindung zum Radio nicht möglich</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="467"/>
+        <location filename="../src/application.cc" line="463"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Kann keine Verbindung zum Gerät herstellen: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="477"/>
+        <location filename="../src/application.cc" line="473"/>
         <source>Radio found</source>
         <translation>Gerät gefunden</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="477"/>
+        <location filename="../src/application.cc" line="473"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Gerät &apos;%1&apos; gefunden.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="521"/>
+        <location filename="../src/application.cc" line="517"/>
         <source>Verification success</source>
         <translation>Verifizierung erfolgreich</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="522"/>
+        <location filename="../src/application.cc" line="518"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>Der aktuelle Codeplug passt zum Gerät &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="566"/>
+        <location filename="../src/application.cc" line="562"/>
         <source>Read ...</source>
         <translation>Lese …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="576"/>
+        <location filename="../src/application.cc" line="572"/>
         <source>Read error</source>
         <translation>Lesefehler</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="595"/>
+        <location filename="../src/application.cc" line="591"/>
         <source>Read complete</source>
         <translation>Gelesen</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="652"/>
+        <location filename="../src/application.cc" line="648"/>
         <source>Upload ...</source>
         <translation>Schreibe …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="672"/>
-        <location filename="../src/application.cc" line="682"/>
-        <location filename="../src/application.cc" line="694"/>
+        <location filename="../src/application.cc" line="668"/>
+        <location filename="../src/application.cc" line="678"/>
+        <location filename="../src/application.cc" line="690"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Kann Rufzeichendatenbank nicht schreiben.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="673"/>
+        <location filename="../src/application.cc" line="669"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>Das Gerät &apos;%1&apos; unterstützt keine Rufzeichendatenbank.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="683"/>
+        <location filename="../src/application.cc" line="679"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>Das Gerät &apos;%1&apos; unterstützt eine Rufzeichendatenbank. Diese Feature wurde jedoch noch nicht implementiert.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="695"/>
+        <location filename="../src/application.cc" line="691"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>qdmr kuratiert die Rufzeichendatenbank anhand Ihrer DMR ID. Es wurde keine Standard ID definiert.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="733"/>
+        <location filename="../src/application.cc" line="729"/>
         <source>Write call-sign DB ...</source>
         <translation>Schreibe Rufzeichendatenbank …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="754"/>
-        <location filename="../src/application.cc" line="764"/>
+        <location filename="../src/application.cc" line="750"/>
+        <location filename="../src/application.cc" line="760"/>
         <source>Cannot write satellite config.</source>
         <translation>Kann Satelliteneinstellungen nicht schreiben.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="755"/>
+        <location filename="../src/application.cc" line="751"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>Das erkannte Funkgerät &apos;%1&apos; unterstützt kein Statellitentracking.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="765"/>
+        <location filename="../src/application.cc" line="761"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>Das erkannte Funkgerät bietet zwar Satellitentracking, jedoch ist das Feature noch nicht implementiert.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="787"/>
+        <location filename="../src/application.cc" line="783"/>
         <source>Write satellite config ...</source>
         <translation>Satellitenkonfiguration schreiben …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="797"/>
+        <location filename="../src/application.cc" line="793"/>
         <source>Write error</source>
         <translation>Schreibfehler</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="809"/>
+        <location filename="../src/application.cc" line="805"/>
         <source>Write complete</source>
         <translation>Geschrieben</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="865"/>
+        <location filename="../src/application.cc" line="861"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (Alias für %2 %3)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="480"/>
-        <location filename="../src/application.cc" line="496"/>
-        <location filename="../src/application.cc" line="551"/>
-        <location filename="../src/application.cc" line="621"/>
-        <location filename="../src/application.cc" line="665"/>
-        <location filename="../src/application.cc" line="747"/>
+        <location filename="../src/application.cc" line="476"/>
+        <location filename="../src/application.cc" line="492"/>
+        <location filename="../src/application.cc" line="547"/>
+        <location filename="../src/application.cc" line="617"/>
+        <location filename="../src/application.cc" line="661"/>
+        <location filename="../src/application.cc" line="743"/>
         <source>No radio found</source>
         <translation>Kein Gerät erkannt</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="481"/>
-        <location filename="../src/application.cc" line="497"/>
-        <location filename="../src/application.cc" line="552"/>
-        <location filename="../src/application.cc" line="622"/>
-        <location filename="../src/application.cc" line="666"/>
-        <location filename="../src/application.cc" line="748"/>
+        <location filename="../src/application.cc" line="477"/>
+        <location filename="../src/application.cc" line="493"/>
+        <location filename="../src/application.cc" line="548"/>
+        <location filename="../src/application.cc" line="618"/>
+        <location filename="../src/application.cc" line="662"/>
+        <location filename="../src/application.cc" line="744"/>
         <source>No matching device was found.</source>
         <translation>Kein bekanntes Gerät erkannt.</translation>
     </message>
@@ -1403,54 +1403,60 @@
 <context>
     <name>ConfigObjectTableView</name>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="80"/>
-        <location filename="../src/configobjecttableview.cc" line="102"/>
-        <location filename="../src/configobjecttableview.cc" line="126"/>
-        <location filename="../src/configobjecttableview.cc" line="149"/>
-        <location filename="../src/configobjecttableview.cc" line="173"/>
-        <location filename="../src/configobjecttableview.cc" line="196"/>
+        <location filename="../src/configobjecttableview.cc" line="253"/>
+        <location filename="../src/configobjecttableview.cc" line="260"/>
         <source>Cannot move items.</source>
         <translation>Kann Elemente nicht verschieben</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="81"/>
-        <location filename="../src/configobjecttableview.cc" line="103"/>
-        <location filename="../src/configobjecttableview.cc" line="127"/>
-        <location filename="../src/configobjecttableview.cc" line="150"/>
-        <location filename="../src/configobjecttableview.cc" line="174"/>
-        <location filename="../src/configobjecttableview.cc" line="197"/>
+        <location filename="../src/configobjecttableview.cc" line="254"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Kann Elemente nicht verschieben: Wählen Sie zunächst mind. ein Element aus.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="25"/>
+        <location filename="../src/configobjecttableview.cc" line="261"/>
+        <source>Cannot move items as long as there is some filter or sorting applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="50"/>
         <source>Move selected item(s) to the top.</source>
         <translation>Verschiebe die ausgewählten Elemente an den Anfang.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="39"/>
+        <location filename="../src/configobjecttableview.ui" line="64"/>
         <source>Move selected item(s) ten positions up.</source>
         <translation>Verschiebe die ausgewählten Elemente zehn Positionen nach oben.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="53"/>
+        <location filename="../src/configobjecttableview.ui" line="78"/>
         <source>Move selected item(s) one position up.</source>
         <translation>Verschiebe die ausgewählten Elemente um eine Position nach oben.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="67"/>
+        <location filename="../src/configobjecttableview.ui" line="92"/>
         <source>Move selected item(s) one position down.</source>
         <translation>Verschiebe die ausgewählten Elemente um eine Position nach unten.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="81"/>
+        <location filename="../src/configobjecttableview.ui" line="106"/>
         <source>Move selected item(s) ten positions down.</source>
         <translation>Verschiebe die ausgewählten Elemente um zehn Position nach unten.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="95"/>
+        <location filename="../src/configobjecttableview.ui" line="120"/>
         <source>Move selected item(s) to the bottom.</source>
         <translation>Verschiebe die ausgewählten Elemente ans Ende.</translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="188"/>
+        <source>Toggle Filter and Sorting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="199"/>
+        <source>Close Sort and Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2457,7 +2463,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation>Exportiert alle FM Kanäle als CHIRP CSV.</translation>
+        <translation type="unfinished">Exportiert alle FM Kanäle als CHIRP CSV.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
@@ -3521,7 +3527,7 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="465"/>
+        <location filename="../src/settings.cc" line="482"/>
         <source>Warning!</source>
         <translation>Warnung!</translation>
     </message>
