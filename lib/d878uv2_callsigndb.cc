@@ -1,6 +1,6 @@
-#include "gpssystem.hh"
 #include "userdatabase.hh"
 #include "d878uv2_callsigndb.hh"
+#include "logger.hh"
 #include "utils.hh"
 #include <QtEndian>
 
@@ -22,6 +22,7 @@ D878UV2CallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorS
   // If DB size is limited by settings
   if (selection.hasCountLimit())
     n = std::min(n, (qint64)selection.countLimit());
+  logDebug() << "Encode " << n << " entries.";
 
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
