@@ -2009,12 +2009,12 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
         <source>Create DMR APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Create DMR APRS System</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
         <source>Edit DMR APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit DMR APRS System</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
@@ -2463,7 +2463,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Exports all FM channels to CHIRP CSV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exports all FM channels to CHIRP CSV.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
