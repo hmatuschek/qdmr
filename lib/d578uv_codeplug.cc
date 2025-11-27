@@ -404,6 +404,8 @@ D578UVCodeplug::KeyFunction::encode(AnytoneKeySettingsExtension::KeyFunction fun
   case AnytoneKeySettingsExtension::KeyFunction::APRSSet:           return (uint8_t)KeyFunction::APRSSet;
   case AnytoneKeySettingsExtension::KeyFunction::ZoneUp:            return (uint8_t)KeyFunction::ZoneUp;
   case AnytoneKeySettingsExtension::KeyFunction::ZoneDown:          return (uint8_t)KeyFunction::ZoneDown;
+  case AnytoneKeySettingsExtension::KeyFunction::Exit:              return (uint8_t)KeyFunction::Exit;
+  case AnytoneKeySettingsExtension::KeyFunction::Menu:              return (uint8_t)KeyFunction::Menu;
   case AnytoneKeySettingsExtension::KeyFunction::XBandRepeater:     return (uint8_t)KeyFunction::XBandRepeater;
   case AnytoneKeySettingsExtension::KeyFunction::Speaker:           return (uint8_t)KeyFunction::Speaker;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelName:       return (uint8_t)KeyFunction::ChannelName;
@@ -469,6 +471,8 @@ D578UVCodeplug::KeyFunction::decode(uint8_t code) {
   case KeyFunction::APRSSet:           return AnytoneKeySettingsExtension::KeyFunction::APRSSet;
   case KeyFunction::ZoneUp:            return AnytoneKeySettingsExtension::KeyFunction::ZoneUp;
   case KeyFunction::ZoneDown:          return AnytoneKeySettingsExtension::KeyFunction::ZoneDown;
+  case KeyFunction::Exit:              return AnytoneKeySettingsExtension::KeyFunction::Exit;
+  case KeyFunction::Menu:              return AnytoneKeySettingsExtension::KeyFunction::Menu;
   case KeyFunction::XBandRepeater:     return AnytoneKeySettingsExtension::KeyFunction::XBandRepeater;
   case KeyFunction::Speaker:           return AnytoneKeySettingsExtension::KeyFunction::Speaker;
   case KeyFunction::ChannelName:       return AnytoneKeySettingsExtension::KeyFunction::ChannelName;

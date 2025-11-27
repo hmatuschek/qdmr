@@ -269,9 +269,9 @@ public:
     Scan, WFM, Alarm, RecordSwitch, Record, SMS, Dial, GPSInformation, Monitor, ToggleMainChannel,
     HotKey1, HotKey2, HotKey3, HotKey4, HotKey5, HotKey6, WorkAlone, SkipChannel, DMRMonitor,
     SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
-    Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
-    APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
-    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
+    Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, Exit, Menu,
+    RoamingSet, APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName,
+    CDTScan, APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
     NoiseReductionTX, DIMShut, SatPredict
   };
   Q_ENUM(KeyFunction)
