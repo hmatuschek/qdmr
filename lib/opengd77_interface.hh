@@ -179,6 +179,11 @@ public:
   /** Returns an identifier of the radio. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack());
 
+  /** Returns @c true if the device allows for storing part of the call-sign DB inside the voice
+   * prompt memory. This property is valid after identifying the device, i.e., a call to
+   * @c identifier. */
+  bool extendedCallsignDB() const;
+
   bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool read_finish(const ErrorStack &err=ErrorStack());
@@ -242,6 +247,13 @@ protected:
     char build_date[16];      ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
     uint32_t flashChipSerial; ///< Serial number of the flash chip.
     uint16_t features;        ///< Some flags, signaling the presence of some features.
+
+    /** Returns @c true if the devices display is inverted. */
+    bool featureInvertedDisplay() const;
+    /** Returns @c true if the vocie prompt memory is used for storing callsign db. */
+    bool featureExtendedCallsignDB() const;
+    /** Returns @c true if the voice prompt data is loaded. */
+    bool featureVoicePromptLoaded() const;
   };
 
   /** Represents a read response message. */
@@ -414,6 +426,9 @@ protected:
 protected:
   /** The protocol variant determined by the device type obtained by the firmware info. */
   Variant _protocolVariant;
+  /** If @c true, the device allows for storing parts of the call-sign DB inside the voice prompt
+   *  memory. */
+  bool _extendedCallsignDB;
   /** The current Flash sector, set to -1 if none is currently selected. */
   int32_t _sector;
 };

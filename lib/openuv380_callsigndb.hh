@@ -21,8 +21,9 @@ class OpenUV380CallsignDB : public OpenGD77BaseCallsignDB
   Q_OBJECT
 
 public:
-  /** Constructor. */
-  explicit OpenUV380CallsignDB(QObject *parent=nullptr);
+  /** Constructor.
+   * @param extended If @c true, some extended callsign db memory is used. */
+  explicit OpenUV380CallsignDB(bool extended, QObject *parent=nullptr);
 
   static constexpr unsigned int size0() { return 0x40000; }
   static constexpr unsigned int size1() { return 0x48000; }
