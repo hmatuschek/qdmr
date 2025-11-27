@@ -669,274 +669,274 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="203"/>
-        <location filename="../src/application.cc" line="221"/>
-        <location filename="../src/application.cc" line="538"/>
+        <location filename="../src/application.cc" line="202"/>
+        <location filename="../src/application.cc" line="220"/>
+        <location filename="../src/application.cc" line="530"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifications au codeplug non enregistrées.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="204"/>
-        <location filename="../src/application.cc" line="222"/>
-        <location filename="../src/application.cc" line="539"/>
+        <location filename="../src/application.cc" line="203"/>
+        <location filename="../src/application.cc" line="221"/>
+        <location filename="../src/application.cc" line="531"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Il y a des modifications non enregsitrées dans le codeplug. Ces modifications seront perdues si vous continuez.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="230"/>
+        <location filename="../src/application.cc" line="229"/>
         <source>Open codeplug</source>
         <translation>Ouvrir un codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="232"/>
+        <location filename="../src/application.cc" line="231"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Fichiers Codeplug (*.yaml);;Fichiers Codeplug Files, ancien format (*.conf *.csv *.txt);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="238"/>
-        <location filename="../src/application.cc" line="301"/>
-        <location filename="../src/application.cc" line="338"/>
-        <location filename="../src/application.cc" line="377"/>
+        <location filename="../src/application.cc" line="237"/>
+        <location filename="../src/application.cc" line="296"/>
+        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="372"/>
         <source>Cannot open file</source>
         <translation>Impossible d&apos;ouvrir le fichier</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="239"/>
-        <location filename="../src/application.cc" line="253"/>
-        <location filename="../src/application.cc" line="264"/>
-        <location filename="../src/application.cc" line="378"/>
+        <location filename="../src/application.cc" line="238"/>
+        <location filename="../src/application.cc" line="250"/>
+        <location filename="../src/application.cc" line="259"/>
+        <location filename="../src/application.cc" line="373"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Impossible de lire le codeplug depuis le fichier &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="252"/>
-        <location filename="../src/application.cc" line="263"/>
+        <location filename="../src/application.cc" line="249"/>
+        <location filename="../src/application.cc" line="258"/>
         <source>Cannot read codeplug.</source>
         <translation>Impossible de lire le codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="282"/>
+        <location filename="../src/application.cc" line="277"/>
         <source>Save codeplug</source>
         <translation>Enregistrer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="283"/>
+        <location filename="../src/application.cc" line="278"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Fichiers Codeplug (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="289"/>
+        <location filename="../src/application.cc" line="284"/>
         <source>Please use new YAML format.</source>
         <translation>Merci d&apos;utiliser le nouveau format YAML.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="290"/>
+        <location filename="../src/application.cc" line="285"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Enregistrer dans l&apos;ancien format de paramétrage tabulaire est désactivé depuis la version 0.9.0. Lire ces fichiers reste possible.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="302"/>
-        <location filename="../src/application.cc" line="339"/>
+        <location filename="../src/application.cc" line="297"/>
+        <location filename="../src/application.cc" line="334"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Impossible d&apos;enregistrer le codeplug dans le fichier &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="311"/>
+        <location filename="../src/application.cc" line="306"/>
         <source>Cannot save codeplug</source>
         <translation>Impossible d&apos;enregistrer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="312"/>
+        <location filename="../src/application.cc" line="307"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Impossible d&apos;enregistrer le codeplug dans le fichier &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="329"/>
+        <location filename="../src/application.cc" line="324"/>
         <source>Export codeplug</source>
         <translation>Exporter le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="330"/>
+        <location filename="../src/application.cc" line="325"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>Fichiers CSV CHIRP (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="347"/>
+        <location filename="../src/application.cc" line="342"/>
         <source>Cannot export codeplug</source>
         <translation>Impossible d&apos;exporter le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="348"/>
+        <location filename="../src/application.cc" line="343"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>Impossible d&apos;exporter le codeplug vers le fichier &apos;%1&apos;:
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="364"/>
+        <location filename="../src/application.cc" line="359"/>
         <source>Import codeplug</source>
         <translation>Importer un codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="365"/>
+        <location filename="../src/application.cc" line="360"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>Fichiers CSV CHIRP (*.csv);;Fichiers YAML (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="384"/>
-        <location filename="../src/application.cc" line="392"/>
-        <location filename="../src/application.cc" line="398"/>
-        <location filename="../src/application.cc" line="411"/>
+        <location filename="../src/application.cc" line="379"/>
+        <location filename="../src/application.cc" line="387"/>
+        <location filename="../src/application.cc" line="393"/>
+        <location filename="../src/application.cc" line="406"/>
         <source>Cannot import codeplug</source>
         <translation>Impossible d&apos;importer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="385"/>
-        <location filename="../src/application.cc" line="393"/>
-        <location filename="../src/application.cc" line="412"/>
+        <location filename="../src/application.cc" line="380"/>
+        <location filename="../src/application.cc" line="388"/>
+        <location filename="../src/application.cc" line="407"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>Impossible d&apos;importer le codeplug depuis &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="399"/>
+        <location filename="../src/application.cc" line="394"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>Gestion du fichier &apos;%1&apos; inconnue.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="436"/>
+        <location filename="../src/application.cc" line="428"/>
         <source>No matching devices found.</source>
         <translation>Aucune radio correspondante trouvé.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="462"/>
+        <location filename="../src/application.cc" line="454"/>
         <source>Cannot connect to radio</source>
         <translation>Échec de connexion à la radio</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="463"/>
+        <location filename="../src/application.cc" line="455"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Échec de connexion à la radio: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="473"/>
+        <location filename="../src/application.cc" line="465"/>
         <source>Radio found</source>
         <translation>Radio accessible</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="473"/>
+        <location filename="../src/application.cc" line="465"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Radio trouvée &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="476"/>
-        <location filename="../src/application.cc" line="492"/>
-        <location filename="../src/application.cc" line="547"/>
-        <location filename="../src/application.cc" line="617"/>
-        <location filename="../src/application.cc" line="661"/>
-        <location filename="../src/application.cc" line="743"/>
+        <location filename="../src/application.cc" line="468"/>
+        <location filename="../src/application.cc" line="484"/>
+        <location filename="../src/application.cc" line="539"/>
+        <location filename="../src/application.cc" line="609"/>
+        <location filename="../src/application.cc" line="653"/>
+        <location filename="../src/application.cc" line="735"/>
         <source>No radio found</source>
         <translation>Aucune radio accessible</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="477"/>
-        <location filename="../src/application.cc" line="493"/>
-        <location filename="../src/application.cc" line="548"/>
-        <location filename="../src/application.cc" line="618"/>
-        <location filename="../src/application.cc" line="662"/>
-        <location filename="../src/application.cc" line="744"/>
+        <location filename="../src/application.cc" line="469"/>
+        <location filename="../src/application.cc" line="485"/>
+        <location filename="../src/application.cc" line="540"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="654"/>
+        <location filename="../src/application.cc" line="736"/>
         <source>No matching device was found.</source>
         <translation>Aucune radio correspondante trouvée.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="517"/>
+        <location filename="../src/application.cc" line="509"/>
         <source>Verification success</source>
         <translation>Succès de la validation</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="518"/>
+        <location filename="../src/application.cc" line="510"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>Le codeplug a été validé avec succès pour la radio &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="562"/>
+        <location filename="../src/application.cc" line="554"/>
         <source>Read ...</source>
         <translation>Lecture …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="572"/>
+        <location filename="../src/application.cc" line="564"/>
         <source>Read error</source>
         <translation>Erreur de lecture</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="591"/>
+        <location filename="../src/application.cc" line="583"/>
         <source>Read complete</source>
         <translation>Lecture terminée</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="648"/>
+        <location filename="../src/application.cc" line="640"/>
         <source>Upload ...</source>
         <translation>Téléversement …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="668"/>
-        <location filename="../src/application.cc" line="678"/>
-        <location filename="../src/application.cc" line="690"/>
+        <location filename="../src/application.cc" line="660"/>
+        <location filename="../src/application.cc" line="670"/>
+        <location filename="../src/application.cc" line="682"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Impossible d&apos;écrire la base d&apos;indicatifs.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="669"/>
+        <location filename="../src/application.cc" line="661"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>La radio &apos;%1&apos; détectée n&apos;accepte pas une base d&apos;indicatifs.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="679"/>
+        <location filename="../src/application.cc" line="671"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>La radio &apos;%1&apos; détectée ne gère pas de base d&apos;indicatifs. Cependant, cette fonctionnalité n&apos;est pas encore disponible.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="691"/>
+        <location filename="../src/application.cc" line="683"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR sélectionne les indicatifs à écrire sur la base du DMR ID par défaut de la radio. Aucun ID par défaut de configuré.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="729"/>
+        <location filename="../src/application.cc" line="721"/>
         <source>Write call-sign DB ...</source>
         <translation>Écriture de la base des indicatifs …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="750"/>
-        <location filename="../src/application.cc" line="760"/>
+        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="752"/>
         <source>Cannot write satellite config.</source>
         <translation>Échec de l’écriture du paramétrage des satellites.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="751"/>
+        <location filename="../src/application.cc" line="743"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>La radio &apos;%1&apos; détectée ne prend pas en charge le suivi des satellites.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="761"/>
+        <location filename="../src/application.cc" line="753"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>La radio &apos;%1&apos; détectée ne prend pas en charge le suivi des satellites. Cependant, cette fonctionnalité n&apos;est pas encore mise en œuvre.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="783"/>
+        <location filename="../src/application.cc" line="775"/>
         <source>Write satellite config ...</source>
         <translation>Écriture du paramétrage des satellites …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="793"/>
+        <location filename="../src/application.cc" line="785"/>
         <source>Write error</source>
         <translation>Erreur d&apos;écriture</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="805"/>
+        <location filename="../src/application.cc" line="797"/>
         <source>Write complete</source>
         <translation>Écriture terminée</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="861"/>
+        <location filename="../src/application.cc" line="853"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (raccourci pour %2 %3)</translation>
     </message>
@@ -2008,13 +2008,13 @@
     <name>GPSSystemDialog</name>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
-        <source>Create DMR APRS Sysmtem</source>
-        <translation>Créer un système DMR APRS</translation>
+        <source>Create DMR APRS System</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
-        <source>Edit DMR APRS Sysmtem</source>
-        <translation>Éditer un système DMR APRS</translation>
+        <source>Edit DMR APRS System</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
@@ -2462,8 +2462,8 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
-        <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation type="unfinished">Exporte tous les canaux FM vers le format CSV de CHIRP.</translation>
+        <source>Exports all FM channels to CHIRP CSV.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
@@ -2537,7 +2537,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="159"/>
+        <location filename="../src/mainwindow.cc" line="163"/>
         <source>Radio IDs</source>
         <translation>IDs de la radio</translation>
     </message>
@@ -2583,17 +2583,17 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="138"/>
-        <location filename="../src/mainwindow.cc" line="173"/>
+        <location filename="../src/mainwindow.cc" line="177"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="190"/>
+        <location filename="../src/mainwindow.cc" line="194"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifications au codeplug non sauvegardées.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="191"/>
+        <location filename="../src/mainwindow.cc" line="195"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Modifications au codeplug non sauvegardées. Ces modifications seront perdues si vous continuez.</translation>
     </message>
