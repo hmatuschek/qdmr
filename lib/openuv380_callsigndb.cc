@@ -8,10 +8,12 @@
 /* ******************************************************************************************** *
  * Implementation of OpenUV380CallsignDB
  * ******************************************************************************************** */
-OpenUV380CallsignDB::OpenUV380CallsignDB(QObject *parent)
+OpenUV380CallsignDB::OpenUV380CallsignDB(bool extended, QObject *parent)
   : OpenGD77BaseCallsignDB(parent)
 {
   addImage("OpenUV380 call-sign database");
+  if (extended)
+    logDebug() << "Used extended call-sign DB memory.";
 }
 
 
