@@ -3,8 +3,12 @@
 
 QString
 Interval::format(Format f) const {
-  if (0 == _duration)
+  if (isNull())
     return "0";
+
+  if (isInfinite())
+    return "infinite";
+
   switch (f) {
   case Format::Automatic:
     if (0 == _duration % 60000UL)
@@ -19,11 +23,17 @@ Interval::format(Format f) const {
   case Format::Milliseconds:
     return QString("%1 ms").arg(_duration);
   }
+
   return QString("%1 ms").arg(_duration);
 }
 
 bool
 Interval::parse(const QString &value) {
+  if (value.toLower().startsWith("inf")) {
+    _duration = std::numeric_limits<unsigned long long>::max();
+    return true;
+  }
+
   QRegularExpression ex(R"(\s*([0-9]+)\s*(min|s|ms|)\s*)");
   QRegularExpressionMatch match = ex.match(value);
   if (! match.hasMatch())
@@ -39,6 +49,7 @@ Interval::parse(const QString &value) {
     _duration = dur.toULongLong()*60000ULL;
   else
     _duration = dur.toULongLong();
+
   return true;
 }
 
