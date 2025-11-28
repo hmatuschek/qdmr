@@ -891,13 +891,26 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>backlightDurationRX</token>, 
+    <term><token>backlightDuration</token>, <token>backlightDurationRX</token>, 
       <token>backlightDurationTX</token></term>
     <listitem>
-      <para>Specifies the backlight duration. While setting the TX backlight duration to 0 disables
-      it during TX, setting the RX backlight duration to that value, enables it continuously.</para>
-      <para>Some radios only support the setting for the RX backlight duration. Especially the 
-        <productname>D868UVE</productname> and <productname>DMR-6X2</productname>.</para>
+      <para>Specifies the back-light duration for several occasions. Not all devices support all 
+        settings. None is supported by all devices. It is a mess.</para>
+      <para><token>backlightDuration</token> specifies how long the backlight stays on, after any 
+        event/user interaction. Usually, after a button has been pressed. This value can be set to
+        <token>infinity</token> to specify, that the backlight stays on indefinitely. The feature
+        is supported by all AnyTone like devices, except for the 
+        <productname>AT-D578UV</productname> and <productname>AT-D578UV III</productname>. </para>
+      <para><token>backlightDurationRX</token> specifies, how long the backlight stays on during
+        reception. This value can be set to <token>infinity</token> to specify, that the backlight 
+        stays on during the entire reception period. This feature is supported by 
+        <productname>AT-D878UV</productname>, <productname>AT-D878UV II</productname>, 
+        <productname>DMR-6X2</productname> and <productname>DMR-6X2 PRO</productname>.</para>
+      <para><token>backlightDurationTX</token> specifies, how long the backlight stays on during
+        transmission. This value can be set to <token>o</token> to disable the backlight during 
+        transmission. This feature is supported by <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>AT-D578UV</productname> and 
+        <productname>AT-D578UV III</productname>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
