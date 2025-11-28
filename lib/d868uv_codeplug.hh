@@ -4,7 +4,6 @@
 #include <QDateTime>
 
 #include "anytone_codeplug.hh"
-#include "signaling.hh"
 
 class Channel;
 class DMRContact;
@@ -341,6 +340,12 @@ public:
       } KeyFunctionCode;
     };
 
+    /** Possible backlight duration values. */
+    enum class BacklightDuration {
+      Infinite = 0, _5s = 1, _10s = 2, _15s = 3, _20s = 4, _25s = 5, _30s = 6, _1min=7, _2min=8,
+      _3min = 9, _4min = 10, _5min = 11
+    };
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -498,9 +503,9 @@ public:
     /** Returns @c true if the backlight is always on. */
     virtual bool backlightPermanent() const;
     /** Returns the backlight duration in seconds. */
-    virtual Interval rxBacklightDuration() const;
+    virtual Interval backlightDuration() const;
     /** Sets the backlight duration in seconds. */
-    virtual void setRXBacklightDuration(Interval sec);
+    virtual void setBacklightDuration(Interval sec);
     /** Sets the backlight to permanent (always on). */
     virtual void enableBacklightPermanent();
 

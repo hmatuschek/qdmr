@@ -591,10 +591,13 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
       else if (Qt::EditRole == role)
         return value;
     } else if (QString("Interval") == prop.typeName()) {
-      if (Qt::DisplayRole == role)
+      if (Qt::DisplayRole == role) {
+        if (value.value<Interval>().isInfinite())
+          return QChar(0x221e);
         return value.value<Interval>().format();
-      else if (Qt::EditRole == role)
+      } else if (Qt::EditRole == role) {
         return value;
+      }
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
       ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
       ConfigObject *obj = ref->as<ConfigObject>();

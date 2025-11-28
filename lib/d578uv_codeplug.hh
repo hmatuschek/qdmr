@@ -711,6 +711,11 @@ public:
     /** Sets the number of repeater check notifications. */
     virtual void setRepeaterCheckNumNotifications(unsigned num);
 
+    /** Returns the backlight duration during TX in seconds. */
+    virtual Interval txBacklightDuration() const;
+    /** Sets the backlight duration during TX in seconds. */
+    virtual void setTXBacklightDuration(Interval sec);
+
     /** Returns @c true, if the bluetooth hold time is enabled. */
     virtual bool btHoldTimeEnabled() const;
     /** Returns @c true, if the bluetooth hold time is infinite. */

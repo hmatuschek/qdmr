@@ -1619,14 +1619,16 @@ AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
  * ********************************************************************************************* */
 AnytoneDisplaySettingsExtension::AnytoneDisplaySettingsExtension(QObject *parent)
   : ConfigItem(parent), _displayFrequency(false), _brightness(5),
-    _volumeChangePrompt(true), _callEndPrompt(true),
-    _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
-    _callColor(Color::Orange), _language(Language::English), _dateFormat(DateFormat::DayFirst),
-    _showChannelNumber(true), _showGlobalChannelNumber(false), _showColorCode(true),
-    _showTimeSlot(true), _showChannelType(true), _showContact(true), _standbyTextColor(Color::White),
-    _standbyBackgroundColor(Color::Black), _showLastHeard(false), _backlightDurationTX(),
-    _backlightDurationRX(), _customChannelBackground(false), _channelNameColor(Color::Orange),
-    _channelBNameColor(Color::Orange), _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
+  _volumeChangePrompt(true), _callEndPrompt(true),
+  _lastCallerDisplay(LastCallerDisplayMode::Both), _showClock(true), _showCall(true),
+  _callColor(Color::Orange), _language(Language::English), _dateFormat(DateFormat::DayFirst),
+  _showChannelNumber(true), _showGlobalChannelNumber(false), _showColorCode(true),
+  _showTimeSlot(true), _showChannelType(true), _showContact(true), _standbyTextColor(Color::White),
+  _standbyBackgroundColor(Color::Black), _showLastHeard(false),
+  _backlightDuration(Interval::infinity()), _backlightDurationTX(),
+  _backlightDurationRX(Interval::infinity()),
+  _customChannelBackground(false), _channelNameColor(Color::Orange),
+  _channelBNameColor(Color::Orange), _zoneNameColor(Color::White), _zoneBNameColor(Color::White)
 {
   // pass...
 }
@@ -1869,10 +1871,26 @@ AnytoneDisplaySettingsExtension::setStandbyBackgroundColor(Color color) {
   emit modified(this);
 }
 
+
+Interval
+AnytoneDisplaySettingsExtension::backlightDuration() const {
+  return _backlightDuration;
+}
+
+void
+AnytoneDisplaySettingsExtension::setBacklightDuration(Interval sec) {
+  if (_backlightDuration == sec)
+    return;
+  _backlightDuration = sec;
+  emit modified(this);
+}
+
+
 Interval
 AnytoneDisplaySettingsExtension::backlightDurationTX() const {
   return _backlightDurationTX;
 }
+
 void
 AnytoneDisplaySettingsExtension::setBacklightDurationTX(Interval sec) {
   if (_backlightDurationTX == sec)
@@ -1880,6 +1898,7 @@ AnytoneDisplaySettingsExtension::setBacklightDurationTX(Interval sec) {
   _backlightDurationTX = sec;
   emit modified(this);
 }
+
 
 AnytoneDisplaySettingsExtension::Color
 AnytoneDisplaySettingsExtension::channelNameColor() const {
