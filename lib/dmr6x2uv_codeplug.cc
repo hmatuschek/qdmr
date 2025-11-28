@@ -965,15 +965,22 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
   setUInt8(Offset::keepLastCaller(), (enable ? 0x01 : 0x00));
 }
 
+
 Interval
 DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return Interval::fromSeconds(getUInt8(Offset::rxBacklightDuration()));
+  auto seconds = getUInt8(Offset::rxBacklightDuration());
+  if (0 == seconds)
+    return Interval::infinity();
+  return Interval::fromSeconds(seconds);
 }
+
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
-  unsigned int secs = std::max(30ULL, dur.seconds());
-  setUInt8(Offset::rxBacklightDuration(), secs);
+  if (dur.isFinite() || dur > Interval::fromSeconds(30))
+    setUInt8(Offset::rxBacklightDuration(), 0);
+  setUInt8(Offset::rxBacklightDuration(), dur.seconds());
 }
+
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::GeneralSettingsElement::standbyBackgroundColor() const {
