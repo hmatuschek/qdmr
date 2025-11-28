@@ -59,6 +59,12 @@ public:
   inline bool operator<=  (const Interval &other) const {///< Comparison.
     return _duration <= other._duration;
   }
+  inline bool operator>  (const Interval &other) const {///< Comparison.
+    return _duration > other._duration;
+  }
+  inline bool operator>=  (const Interval &other) const {///< Comparison.
+    return _duration >= other._duration;
+  }
 
   inline unsigned long long milliseconds() const { return _duration; }      ///< Unit conversion.
   inline unsigned long long seconds() const { return _duration/1000ULL; }   ///< Unit conversion.

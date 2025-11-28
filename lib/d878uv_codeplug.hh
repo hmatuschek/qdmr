@@ -385,6 +385,12 @@ public:
       Default=0, Custom1=1, Custom2=2
     };
 
+    /** Encoding of possible backlight durations. */
+    enum class BacklightDuration {
+      Infinite = 0, _5s = 1, _10s = 2, _15s = 3, _20s = 4, _25s = 5, _30s = 6, _1min=7, _2min=8,
+      _3min = 9, _4min = 10, _5min = 11, _15min = 12, _30min = 13, _45min = 14, _1h = 15
+    };
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -475,6 +481,9 @@ public:
     virtual bool wfmVFOEnabled() const;
     /** Enables/disables VFO mode for WFM RX. */
     virtual void enableWFMVFO(bool enable);
+
+    Interval backlightDuration() const override;
+    void setBacklightDuration(Interval intv) override;
 
     /** Returns the DTMF tone duration in ms. */
     virtual unsigned dtmfToneDuration() const;

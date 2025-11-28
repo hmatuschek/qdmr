@@ -1257,6 +1257,67 @@ D878UVCodeplug::GeneralSettingsElement::enableWFMVFO(bool enable) {
   setUInt8(Offset::wfmVFOEnabled(), (enable ? 0x01 : 0x00));
 }
 
+
+Interval
+D878UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+  switch ((BacklightDuration)getUInt8(Offset::backlightDuration())) {
+  case BacklightDuration::Infinite: return Interval::infinity();
+  case BacklightDuration::_5s:  return Interval::fromSeconds(5);
+  case BacklightDuration::_10s: return Interval::fromSeconds(10);
+  case BacklightDuration::_15s: return Interval::fromSeconds(15);
+  case BacklightDuration::_20s: return Interval::fromSeconds(20);
+  case BacklightDuration::_25s: return Interval::fromSeconds(25);
+  case BacklightDuration::_30s: return Interval::fromSeconds(30);
+  case BacklightDuration::_1min: return Interval::fromMinutes(1);
+  case BacklightDuration::_2min: return Interval::fromMinutes(2);
+  case BacklightDuration::_3min: return Interval::fromMinutes(3);
+  case BacklightDuration::_4min: return Interval::fromMinutes(4);
+  case BacklightDuration::_5min: return Interval::fromMinutes(5);
+  case BacklightDuration::_15min: return Interval::fromMinutes(15);
+  case BacklightDuration::_30min: return Interval::fromMinutes(30);
+  case BacklightDuration::_45min: return Interval::fromMinutes(45);
+  case BacklightDuration::_1h:    return Interval::fromMinutes(60);
+  }
+  return Interval::infinity();
+}
+
+void
+D878UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+  if (intv <= Interval::fromSeconds(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5s);
+  else if (intv <= Interval::fromSeconds(10))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_10s);
+  else if (intv <= Interval::fromSeconds(15))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_15s);
+  else if (intv <= Interval::fromSeconds(20))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_20s);
+  else if (intv <= Interval::fromSeconds(25))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_25s);
+  else if (intv <= Interval::fromSeconds(30))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_30s);
+  else if (intv <= Interval::fromMinutes(1))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_1min);
+  else if (intv <= Interval::fromMinutes(2))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_2min);
+  else if (intv <= Interval::fromMinutes(3))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_3min);
+  else if (intv <= Interval::fromMinutes(4))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_4min);
+  else if (intv <= Interval::fromMinutes(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5min);
+  else if (intv <= Interval::fromMinutes(15))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_15min);
+  else if (intv <= Interval::fromMinutes(30))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_30min);
+  else if (intv <= Interval::fromMinutes(45))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_45min);
+  else if (intv <= Interval::fromMinutes(60))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_1h);
+  else
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinite);
+}
+
+
 unsigned
 D878UVCodeplug::GeneralSettingsElement::dtmfToneDuration() const {
   switch (getUInt8(Offset::dtmfToneDuration())) {
@@ -1814,14 +1875,18 @@ D878UVCodeplug::GeneralSettingsElement::setRoamingStartCondition(AnytoneRoamingS
   setUInt8(Offset::roamStartCondition(), (unsigned)cond);
 }
 
+
 Interval
 D878UVCodeplug::GeneralSettingsElement::txBacklightDuration() const {
   return Interval::fromSeconds(getUInt8(Offset::txBacklightDuration()));
 }
+
 void
 D878UVCodeplug::GeneralSettingsElement::setTXBacklightDuration(Interval intv) {
-  setUInt8(Offset::txBacklightDuration(), intv.seconds());
+  auto seconds = std::min(30ULL, intv.seconds());
+  setUInt8(Offset::txBacklightDuration(), seconds);
 }
+
 
 bool
 D878UVCodeplug::GeneralSettingsElement::separateDisplay() const {
@@ -1862,12 +1927,19 @@ D878UVCodeplug::GeneralSettingsElement::enableRepeaterCheckNotification(bool ena
 
 Interval
 D878UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return Interval::fromSeconds(getUInt8(Offset::rxBacklightDuration()));
+  auto seconds = getUInt8(Offset::rxBacklightDuration());
+  if (0 == seconds)
+    return Interval::infinity();
+  return Interval::fromSeconds(seconds);
 }
+
 void
 D878UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
+  if (intv.isFinite() || intv > Interval::fromSeconds(30))
+    setUInt8(Offset::rxBacklightDuration(), 0);
   setUInt8(Offset::rxBacklightDuration(), intv.seconds());
 }
+
 
 bool
 D878UVCodeplug::GeneralSettingsElement::roaming() const {
@@ -2005,6 +2077,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   //setStandbyBackgroundImage(ext->displaySettings()->standbyBackgroundColor());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
   setChannelNameColor(ext->displaySettings()->channelNameColor());
+  setBacklightDuration(ext->displaySettings()->backlightDuration());
   setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
   setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
 
@@ -2100,6 +2173,8 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
   ext->displaySettings()->setChannelNameColor(this->channelNameColor());
+  ext->displaySettings()->setBacklightDuration(this->backlightDuration());
+  ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
   ext->displaySettings()->setBacklightDurationRX(this->rxBacklightDuration());
 
   // Decode menu settings
