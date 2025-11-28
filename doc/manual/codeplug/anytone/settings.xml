@@ -899,8 +899,9 @@
       <para><token>backlightDuration</token> specifies how long the backlight stays on, after any 
         event/user interaction. Usually, after a button has been pressed. This value can be set to
         <token>infinity</token> to specify, that the backlight stays on indefinitely. The feature
-        is supported by all AnyTone like devices, except for the 
-        <productname>AT-D578UV</productname> and <productname>AT-D578UV III</productname>. </para>
+        is supported by <productname>AT-D868UVE</productname>, <productname>AT-D878UV</productname>, 
+        <productname>AT-D878UV II</productname>, <productname>DMR-6X2</productname> and 
+        <productname>DMR-6X2 PRO</productname></para>
       <para><token>backlightDurationRX</token> specifies, how long the backlight stays on during
         reception. This value can be set to <token>infinity</token> to specify, that the backlight 
         stays on during the entire reception period. This feature is supported by 
