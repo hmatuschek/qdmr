@@ -1795,6 +1795,18 @@ D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigne
 }
 
 
+Interval
+D578UVCodeplug::GeneralSettingsElement::txBacklightDuration() const {
+  return Interval::fromSeconds(getUInt8(Offset::txBacklightDuration()));
+}
+
+void
+D578UVCodeplug::GeneralSettingsElement::setTXBacklightDuration(Interval intv) {
+  auto seconds = std::min(30ULL, intv.seconds());
+  setUInt8(Offset::txBacklightDuration(), seconds);
+}
+
+
 bool
 D578UVCodeplug::GeneralSettingsElement::btHoldTimeEnabled() const {
   return 0x00 != getUInt8(Offset::btHoldTime());
@@ -1900,6 +1912,7 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
   setChannelNameColor(ext->displaySettings()->callColor());
   enableShowCurrentContact(ext->displaySettings()->showContact());
+  setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
 
   // Encode menu settings
   enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
@@ -1986,6 +1999,7 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setChannelNameColor(this->channelNameColor());
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
+  ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
 
   // Decode menu settings
   ext->menuSettings()->enableSeparator(this->separateDisplay());
