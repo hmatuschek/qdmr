@@ -23,6 +23,7 @@ void
 OpenUV380CallsignDB::DatabaseEntryElement::setText(const QString &text) {
   QByteArray data = pack(text);
   auto n = std::min(3*Limit::textLength()/4, (unsigned int)data.size());
+  memset(_data+Offset::text(), 0, 3*Limit::textLength()/4);
   memcpy(_data+Offset::text(), data.constData(), n);
 }
 

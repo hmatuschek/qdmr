@@ -32,7 +32,7 @@ OpenGD77BaseCallsignDB::DatabaseEntryElement::DatabaseEntryElement(uint8_t *ptr)
 
 void
 OpenGD77BaseCallsignDB::DatabaseEntryElement::clear() {
-  memset(_data, 0xff, size());
+  memset(_data, 0x00, size());
 }
 
 void
@@ -54,19 +54,13 @@ OpenGD77BaseCallsignDB::DatabaseEntryElement::fromEntry(const UserDatabase::User
 
   QString txt;
   QTextStream stream(&txt);
-  stream << user.call << "." << user.name;
+  stream << user.call << " " << user.name;
   if (! user.city.isEmpty())
-    stream << ".in " << user.city;
-  else
-    stream << ".";
+    stream << "." << user.city;
   if (! user.state.isEmpty())
     stream << "." << user.state;
-  else
-    stream << ".";
   if (! user.country.isEmpty())
     stream << "." << user.country;
-  else
-    stream << ".";
   setText(txt);
 
   return true;
@@ -87,7 +81,7 @@ OpenGD77BaseCallsignDB::DatabaseEntryElement::pack(const QString &text) {
     codes.resize(codes.size() + (4-(codes.size() % 4)));
 
   // Pack
-  QByteArray data(3*codes.size()/4, '\xff');
+  QByteArray data(3*codes.size()/4, '\x00');
   for (int i=0, o=0; i<codes.size(); i += 4, o += 3) {
     uint32_t encoded
         = ((uint32_t)(codes[i+0] & 0x3f) << 18) |
@@ -125,7 +119,7 @@ OpenGD77BaseCallsignDB::DatabaseHeaderElement::clear() {
   memset(_data, 0, size());
   writeASCII(Offset::magic(), "Id", 2);
   setUInt8(Offset::format(), (unsigned int)Format::Compressed);
-  setUInt8(Offset::entrySize(), 0x59); // = 15 bytes -> 16 chars for text
+  setEntrySize(16); // Default text length = 16
   writeASCII(Offset::version(),"001", 3);
   setUInt32_le(Offset::entryCount(), 0);
 }
