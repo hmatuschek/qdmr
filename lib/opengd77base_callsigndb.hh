@@ -111,6 +111,7 @@ public:
 
     void clear();
 
+    void setEntrySize(unsigned int size);
     void setEntryCount(unsigned int count);
 
   public:

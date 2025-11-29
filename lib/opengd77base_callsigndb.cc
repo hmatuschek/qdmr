@@ -125,6 +125,11 @@ OpenGD77BaseCallsignDB::DatabaseHeaderElement::clear() {
 }
 
 void
+OpenGD77BaseCallsignDB::DatabaseHeaderElement::setEntrySize(unsigned int size) {
+  setUInt8(Offset::entrySize(), 0x4a+size);
+}
+
+void
 OpenGD77BaseCallsignDB::DatabaseHeaderElement::setEntryCount(unsigned int count) {
   setUInt32_le(Offset::entryCount(), count);
 }

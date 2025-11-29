@@ -51,7 +51,7 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const E
 
   // Encode user DB
   DatabaseHeaderElement header(this->data(Offset::header()));
-  header.clear(); header.setEntryCount(n);
+  header.clear(); header.setEntrySize(DatabaseEntryElement::size()); header.setEntryCount(n);
   for (unsigned i=0; i<n0; i++) {
     DatabaseEntryElement(this->data(Offset::entries0() + i*DatabaseEntryElement::size()))
         .fromEntry(users[i]);
