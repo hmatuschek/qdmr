@@ -84,8 +84,8 @@ AnalogChannelDialog::construct() {
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
   channelName->setText(_myChannel->name());
-  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
-  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
+  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Unit::MHz));
+  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Unit::MHz));
 
   offsetComboBox->addItem(QIcon::fromTheme("symbol-none"), "");
   offsetComboBox->setItemData(0, tr("No offset"), Qt::ToolTipRole);

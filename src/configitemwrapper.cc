@@ -281,9 +281,9 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return channel->name();
   case 2:
-    return channel->rxFrequency().format(Frequency::Format::MHz);
+    return channel->rxFrequency().format(Frequency::Unit::MHz);
   case 3:
-    return channel->txFrequency().format(Frequency::Format::MHz);
+    return channel->txFrequency().format(Frequency::Unit::MHz);
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
@@ -533,8 +533,8 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
   // Dispatch by column
   switch (index.column()) {
   case 0: return ch->name();
-  case 1: return ch->rxFrequency().format(Frequency::Format::MHz);
-  case 2: return ch->txFrequency().format(Frequency::Format::MHz);
+  case 1: return ch->rxFrequency().format(Frequency::Unit::MHz);
+  case 2: return ch->txFrequency().format(Frequency::Unit::MHz);
   case 3:
     if (ch->colorCodeOverridden())
       return ch->colorCode();
