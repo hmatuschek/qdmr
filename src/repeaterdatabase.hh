@@ -8,6 +8,7 @@
 #include <QCompleter>
 #include <QSortFilterProxyModel>
 #include <QNetworkAccessManager>
+#include <QFuture>
 
 #include "frequency.hh"
 #include "signaling.hh"
@@ -169,6 +170,7 @@ protected:
   QFile _cacheFile;
   QMap<RepeaterDatabaseEntry, unsigned int> _indices;
   QVector<RepeaterDatabaseEntry> _cache;
+  QFuture<void> _parsing;
 };
 
 

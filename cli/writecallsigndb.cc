@@ -12,14 +12,14 @@
 
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
-  UserDatabase userdb;
+  UserDatabase userdb(false);
 
   if (parser.isSet("database")) {
     if (! userdb.load(parser.value("database"))) {
       logError() << "Cannot load user-db from '" << parser.value("database") << "'.";
       return -1;
     }
-  } else if (0 == userdb.count()) {
+  } else if (! userdb.ready()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
     QEventLoop loop;
