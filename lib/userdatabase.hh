@@ -24,6 +24,9 @@ class UserDatabase : public QAbstractTableModel
 {
   Q_OBJECT
 
+  /** Get notification, once the database has been loaded. */
+  Q_PROPERTY(bool ready READ ready NOTIFY readyChanged FINAL)
+
 public:
   /** Represents the user information within the @c UserDatabase. */
   class User {
@@ -61,7 +64,7 @@ public:
   /** Constructs the user-database.
    * The constructor will download the current user database if it was not downloaded yet or
    * if the downloaded version is older than @c updatePeriodDays days. */
-  explicit UserDatabase(unsigned updatePeriodDays=30, QObject *parent=nullptr);
+  explicit UserDatabase(bool parallel, unsigned updatePeriodDays=30, QObject *parent=nullptr);
 
   /** Returns the number of users. */
   qint64 count() const;
@@ -73,6 +76,9 @@ public:
   bool load();
   /** Loads all entries from the downloaded user database at the specified location. */
   bool load(const QString &filename);
+
+  /** Returns @c true, if the database has been loaded. */
+  bool ready() const;
 
   /** Sorts users with respect to the distance to the given ID. */
   void sortUsers(unsigned id);
@@ -97,6 +103,8 @@ signals:
   void loaded();
   /** Gets emitted if the loading of the call-sign database fails. */
   void error(const QString &msg);
+  /** Gets emitted, once the database has been loaded or cleard. */
+  void readyChanged(bool ready);
 
 public slots:
   /** Starts the download of the user database. */

@@ -49,7 +49,7 @@ UserDatabase::User::distance(unsigned id) const {
 /* ********************************************************************************************* *
  * Implementation of UserDatabase
  * ********************************************************************************************* */
-UserDatabase::UserDatabase(unsigned updatePeriodDays, QObject *parent)
+UserDatabase::UserDatabase(bool parallel, unsigned updatePeriodDays, QObject *parent)
   : QAbstractTableModel(parent), _user(), _network()
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
@@ -57,8 +57,12 @@ UserDatabase::UserDatabase(unsigned updatePeriodDays, QObject *parent)
 
   if ((! exists()) || (updatePeriodDays < dbAge()))
     download();
-  else
-    _parsing = QtConcurrent::run([this]() { return this->load(); });
+  else {
+    if (parallel)
+      _parsing = QtConcurrent::run([this]() { return this->load(); });
+    else
+      load();
+  }
 }
 
 qint64
@@ -71,6 +75,11 @@ UserDatabase::exists() const {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
   QFileInfo info(path + "/user.json");
   return info.isFile() && info.isReadable();
+}
+
+bool
+UserDatabase::ready() const {
+  return ! _user.empty();
 }
 
 bool
@@ -125,7 +134,7 @@ UserDatabase::load(const QString &filename) {
   }
 
   beginResetModel();
-  _user.clear();
+  _user.clear(); emit readyChanged(false);
 
   QJsonArray array = doc.object()["users"].toArray();
   _user.reserve(array.size());
@@ -141,6 +150,8 @@ UserDatabase::load(const QString &filename) {
 
   logDebug() << "Loaded user database with " << _user.size() << " entries from " << filename << ".";
 
+  if (ready())
+    emit readyChanged(ready());
   emit loaded();
   return true;
 }

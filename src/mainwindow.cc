@@ -89,13 +89,16 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
     this->ui->statusbar->showMessage(tr("Orbital elements updated & loaded."), 10000);
   }, Qt::QueuedConnection);
 
-  connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
+  connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
+  connect(app->user(), &UserDatabase::readyChanged,
+          [this](bool ready){ this->ui->actionUploadCallsignDB->setEnabled(ready);});
+  ui->actionUploadCallsignDB->setEnabled(app->user()->ready());
 
+  connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
   connect(ui->actionDetectDevice, SIGNAL(triggered()), app, SLOT(detectRadio()));
   connect(ui->actionVerifyCodeplug, SIGNAL(triggered()), app, SLOT(verifyCodeplug()));
   connect(ui->actionDownload, SIGNAL(triggered()), app, SLOT(downloadCodeplug()));
   connect(ui->actionUpload, SIGNAL(triggered()), app, SLOT(uploadCodeplug()));
-  connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
   connect(ui->actionWriteSatellites, SIGNAL(triggered()), app, SLOT(uploadSatellites()));
 
   // Wire-up "General Settings" view
