@@ -54,13 +54,19 @@ OpenGD77BaseCallsignDB::DatabaseEntryElement::fromEntry(const UserDatabase::User
 
   QString txt;
   QTextStream stream(&txt);
-  stream << user.call << " " << user.name;
+  stream << user.call << "." << user.name;
   if (! user.city.isEmpty())
-    stream << " in " << user.city;
+    stream << ".in " << user.city;
+  else
+    stream << ".";
   if (! user.state.isEmpty())
-    stream << " " << user.state;
+    stream << "." << user.state;
+  else
+    stream << ".";
   if (! user.country.isEmpty())
-    stream << user.country;
+    stream << "." << user.country;
+  else
+    stream << ".";
   setText(txt);
 
   return true;
