@@ -13,6 +13,28 @@
 #define SECTOR_SIZE 4096
 #define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77Interface::FirmwareInfo
+ * ********************************************************************************************* */
+bool
+OpenGD77Interface::FirmwareInfo::featureInvertedDisplay() const {
+  return (qFromLittleEndian(features) & (1<<0));
+}
+
+bool
+OpenGD77Interface::FirmwareInfo::featureExtendedCallsignDB() const {
+  return (qFromLittleEndian(features) & (1<<1));
+}
+
+bool
+OpenGD77Interface::FirmwareInfo::featureVoicePromptLoaded() const {
+  return (qFromLittleEndian(features) & (1<<2));
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::ReadRequest
  * ********************************************************************************************* */
@@ -179,7 +201,8 @@ OpenGD77Interface::CommandRequest::initSetDateTime(const QDateTime &dt) {
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
 OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : USBSerial(descr, QSerialPort::Baud115200, err, parent), _sector(-1)
+  : USBSerial(descr, QSerialPort::Baud115200, err, parent), _extendedCallsignDB(false),
+  _sector(-1)
 {
   // pass...
 }
@@ -234,12 +257,21 @@ OpenGD77Interface::identifier(const ErrorStack &err) {
   case FirmwareInfo::RadioType::MD9600:
   case FirmwareInfo::RadioType::MD2017:
     _protocolVariant = Variant::UV380;
+    _extendedCallsignDB = info.featureExtendedCallsignDB() &&
+                          !info.featureVoicePromptLoaded();
   return RadioInfo::byID(RadioInfo::OpenUV380);
   }
 
   errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
   return RadioInfo();
 }
+
+
+bool
+OpenGD77Interface::extendedCallsignDB() const {
+  return _extendedCallsignDB;
+}
+
 
 bool
 OpenGD77Interface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err)

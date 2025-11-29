@@ -143,7 +143,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
   } else if (RadioInfo::OpenUV380 == radio) {
-    OpenUV380CallsignDB db;
+    OpenUV380CallsignDB db(false);
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;

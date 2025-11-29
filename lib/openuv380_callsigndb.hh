@@ -21,11 +21,35 @@ class OpenUV380CallsignDB : public OpenGD77BaseCallsignDB
   Q_OBJECT
 
 public:
-  /** Constructor. */
-  explicit OpenUV380CallsignDB(QObject *parent=nullptr);
+  class DatabaseEntryElement: public OpenGD77BaseCallsignDB::DatabaseEntryElement
+  {
+  public:
+    /** Constructor. */
+    DatabaseEntryElement(uint8_t *ptr);
 
-  static constexpr unsigned int size0() { return 0x40000; }
-  static constexpr unsigned int size1() { return 0x48000; }
+    /** The size of the entry. */
+    static constexpr unsigned int size() { return 0x001b; }
+
+    void clear() override;
+
+    /** Encodes the text. */
+    void setText(const QString &text) override;
+
+  public:
+    /** Some limits. */
+    struct Limit: public Element::Limit {
+      // The length of the text.
+      static constexpr unsigned int textLength() { return 32; }
+    };
+  };
+
+public:
+  /** Constructor.
+   * @param extended If @c true, some extended callsign db memory is used. */
+  explicit OpenUV380CallsignDB(bool extended, QObject *parent=nullptr);
+
+  static constexpr unsigned int size0() { return 0x040000; }
+  static constexpr unsigned int size1() { return 0xd28000; }
 
   /** Encodes as many entries as possible of the given user-database. */
   bool encode(UserDatabase *calldb, const Flags &selection=Flags(),
