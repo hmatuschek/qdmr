@@ -6,6 +6,28 @@
 
 
 /* ******************************************************************************************** *
+ * Implementation of OpenUV380CallsignDB::DatabaseEntryElement
+ * ******************************************************************************************** */
+OpenUV380CallsignDB::DatabaseEntryElement::DatabaseEntryElement(uint8_t *ptr)
+  : OpenGD77BaseCallsignDB::DatabaseEntryElement(ptr, size())
+{
+  // pass...
+}
+
+void
+OpenUV380CallsignDB::DatabaseEntryElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+void
+OpenUV380CallsignDB::DatabaseEntryElement::setText(const QString &text) {
+  QByteArray data = pack(text);
+  auto n = std::min(3*Limit::textLength()/4, (unsigned int)data.size());
+  memcpy(_data+Offset::text(), data.constData(), n);
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of OpenUV380CallsignDB
  * ******************************************************************************************** */
 OpenUV380CallsignDB::OpenUV380CallsignDB(bool extended, QObject *parent)

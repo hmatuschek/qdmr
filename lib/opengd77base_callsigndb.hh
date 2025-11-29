@@ -54,14 +54,19 @@ public:
     /** The size of the entry. */
     static constexpr unsigned int size() { return 0x000f; }
 
-    void clear();
+    void clear() override;
 
     /** Encodes the DMR ID. */
-    void setId(unsigned int id);
+    virtual void setId(unsigned int id);
     /** Encodes the text. */
-    void setText(const QString &text);
+    virtual void setText(const QString &text);
     /** Encodes the given user. */
-    void fromEntry(const UserDatabase::User &user);
+    virtual bool fromEntry(const UserDatabase::User &user);
+
+  protected:
+    /** Encodes and packs the given string. That is, chars are encoded into 6bit codes using _lut
+     *  and 4 encoded chars are then packed into 3bytes. */
+    QByteArray pack(const QString &text);
 
   public:
     /** Some limits. */
