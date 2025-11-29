@@ -66,28 +66,28 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionHelp, SIGNAL(triggered()), app, SLOT(showHelp()));
 
   connect(ui->actionRefreshCallsignDB, &QAction::triggered, app->user(), &UserDatabase::download);
-  QObject::connect(app->user(), &UserDatabase::error, [this](const QString &msg) {
+  QObject::connect(app->user(), &UserDatabase::error, this, [this](const QString &msg) {
     this->ui->statusbar->showMessage(tr("Cannot update callsign DB: %1").arg(msg), 10000);
-  });
-  QObject::connect(app->user(), &UserDatabase::loaded, [this]() {
+  }, Qt::QueuedConnection);
+  QObject::connect(app->user(), &UserDatabase::loaded, this, [this]() {
     this->ui->statusbar->showMessage(tr("Callsign database updated & loaded."), 10000);
-  });
+  }, Qt::QueuedConnection);
 
   connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, app->talkgroup(), &TalkGroupDatabase::download);
-  QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, [this](const QString &msg) {
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, this, [this](const QString &msg) {
     this->ui->statusbar->showMessage(tr("Cannot update talkgroup DB: %1").arg(msg), 10000);
-  });
-  QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, [this]() {
+  }, Qt::QueuedConnection);
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, this, [this]() {
     this->ui->statusbar->showMessage(tr("Talkgroup database updated & loaded."), 10000);
-  });
+  }, Qt::QueuedConnection);
 
   connect(ui->actionRefreshOrbitalElements, &QAction::triggered, app->satellite(), &SatelliteDatabase::update);
-  QObject::connect(app->satellite(), &SatelliteDatabase::error, [this](const QString &msg) {
+  QObject::connect(app->satellite(), &SatelliteDatabase::error, this, [this](const QString &msg) {
     this->ui->statusbar->showMessage(tr("Cannot update orbital elements: %1").arg(msg), 10000);
-  });
-  QObject::connect(app->satellite(), &SatelliteDatabase::loaded, [this]() {
+  }, Qt::QueuedConnection);
+  QObject::connect(app->satellite(), &SatelliteDatabase::loaded, this, [this]() {
     this->ui->statusbar->showMessage(tr("Orbital elements updated & loaded."), 10000);
-  });
+  }, Qt::QueuedConnection);
 
   connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
 

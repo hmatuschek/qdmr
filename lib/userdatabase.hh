@@ -9,6 +9,7 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QGeoPositionInfoSource>
+#include <QFuture>
 
 /** Auto-updating DMR user database.
  *
@@ -65,6 +66,9 @@ public:
   /** Returns the number of users. */
   qint64 count() const;
 
+  /** Retruns @c true, if the user database file exists. */
+  bool exists() const;
+
   /** Loads all entries from the downloaded user database. */
   bool load();
   /** Loads all entries from the downloaded user database at the specified location. */
@@ -107,6 +111,8 @@ private:
   QVector<User>         _user;
   /** The network access used for downloading. */
   QNetworkAccessManager _network;
+  /** The current parallel task of parsing the database. */
+  QFuture<bool> _parsing;
 };
 
 

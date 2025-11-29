@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkReply>
+#include <QtConcurrent>
 #include <algorithm>
 #include "logger.hh"
 #include <cmath>
@@ -54,13 +55,22 @@ UserDatabase::UserDatabase(unsigned updatePeriodDays, QObject *parent)
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(downloadFinished(QNetworkReply*)));
 
-  if ((! load()) || (updatePeriodDays < dbAge()))
+  if ((! exists()) || (updatePeriodDays < dbAge()))
     download();
+  else
+    _parsing = QtConcurrent::run([this]() { return this->load(); });
 }
 
 qint64
 UserDatabase::count() const {
   return _user.size();
+}
+
+bool
+UserDatabase::exists() const {
+  QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+  QFileInfo info(path + "/user.json");
+  return info.isFile() && info.isReadable();
 }
 
 bool
