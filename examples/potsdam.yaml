@@ -1,0 +1,245 @@
+---
+version: 0.13.1
+settings:
+  introLine1: qDMR
+  introLine2: DM3MAT
+  micLevel: 5
+  speech: false
+  power: High
+  squelch: 2
+  vox: 0
+  tot: 0
+  defaultID: id1
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+contacts:
+  - dmr: {id: cont1, name: DL, ring: false, type: GroupCall, number: 262}
+  - dmr: {id: cont2, name: Emcom EU, ring: false, type: GroupCall, number: 9112}
+  - dmr: {id: cont3, name: Berlin/Brandenburg, ring: false, type: GroupCall, number: 2621}
+  - dmr: {id: cont4, name: Local, ring: false, type: GroupCall, number: 9}
+  - dmr: {id: cont5, name: Regional, ring: false, type: GroupCall, number: 8}
+  - dmr: {id: cont6, name: BM SMS, ring: false, type: PrivateCall, number: 262993}
+  - dmr: {id: cont7, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
+groupLists:
+  - {id: grp1, name: DL, contacts: [cont1, cont2]}
+  - {id: grp2, name: BB, contacts: [cont3, cont4, cont5]}
+channels:
+  - analog:
+      id: ch1
+      name: DB0PDM
+      rxOnly: false
+      admit: Always
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 145.675 MHz
+      txFrequency: 145.075 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - digital:
+      id: ch2
+      name: DL DB0PDM TS1
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS1
+      radioId: id1
+      groupList: grp1
+      contact: cont1
+      aprs: aprs1
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch3
+      name: BB DB0PDM TS2
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS2
+      radioId: id1
+      groupList: grp2
+      contact: cont3
+      aprs: aprs1
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - digital:
+      id: ch4
+      name: L9 DB0PDM TS2
+      rxOnly: false
+      admit: Always
+      colorCode: 1
+      timeSlot: TS2
+      radioId: id1
+      groupList: grp2
+      contact: cont4
+      rxFrequency: 438.4 MHz
+      txFrequency: 430.8 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+  - analog:
+      id: ch5
+      name: DB0FES
+      rxOnly: false
+      admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 438.225 MHz
+      txFrequency: 430.625 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch6
+      name: DB0SP VHF
+      rxOnly: false
+      admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 145.6 MHz
+      txFrequency: 145 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch7
+      name: DB0SP UHF
+      rxOnly: false
+      admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 439.425 MHz
+      txFrequency: 431.825 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch8
+      name: DB0LUD
+      rxOnly: false
+      admit: Always
+      rxTone:
+        ctcss: 67.0 Hz
+      txTone:
+        ctcss: 67.0 Hz
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 438.575 MHz
+      txFrequency: 430.975 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch9
+      name: DB0BRB
+      rxOnly: false
+      admit: Always
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 439.4875 MHz
+      txFrequency: 431.8875 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch10
+      name: 2m Mobil
+      rxOnly: false
+      admit: Free
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 145.5 MHz
+      txFrequency: 145.5 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch11
+      name: 70cm Mobil
+      rxOnly: false
+      admit: Always
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      aprs: aprs2
+      rxFrequency: 433.5 MHz
+      txFrequency: 433.5 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+  - analog:
+      id: ch12
+      name: APRS
+      rxOnly: false
+      admit: Free
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      rxFrequency: 144.8 MHz
+      txFrequency: 144.8 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: !<!default> ""
+      squelch: !<!default> ""
+zones:
+  - id: zone1
+    name: Potsdam
+    A: [ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11]
+    B: []
+positioning:
+  - dmr:
+      id: aprs1
+      name: BM APRS
+      period: 300
+      contact: cont7
+      revert: !<!selected> ""
+  - aprs:
+      id: aprs2
+      name: FM APRS
+      period: 0
+      revert: ch12
+      icon: Jogger
+      message: Y07
+      destination: APAT81-0
+      source: DM3MAT-7
+      path: [WIDE1-1, WIDE2-1]
+commercial:
+  encryptionKeys:
+    []
+sms:
+  format: DMR
+  templates:
+    []
+...
