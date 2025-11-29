@@ -269,9 +269,9 @@ public:
     Scan, WFM, Alarm, RecordSwitch, Record, SMS, Dial, GPSInformation, Monitor, ToggleMainChannel,
     HotKey1, HotKey2, HotKey3, HotKey4, HotKey5, HotKey6, WorkAlone, SkipChannel, DMRMonitor,
     SubChannel, PriorityZone, VFOScan, MICSoundQuality, LastCallReply, ChannelType, Ranging,
-    Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, RoamingSet,
-    APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName, CDTScan,
-    APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
+    Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, Exit, Menu,
+    RoamingSet, APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName,
+    CDTScan, APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
     NoiseReductionTX, DIMShut, SatPredict
   };
   Q_ENUM(KeyFunction)
@@ -618,13 +618,16 @@ class AnytoneDisplaySettingsExtension: public ConfigItem
   /** The display brightness [1-10]. */
   Q_PROPERTY(unsigned int brightness READ brightness WRITE setBrightness)
 
+  Q_CLASSINFO("backlightDuration", "The duration in seconds, the backlight keeps lit after any action. ")
+  /** Backlight duration. */
+  Q_PROPERTY(Interval backlightDuration READ backlightDuration WRITE setBacklightDuration)
+
   Q_CLASSINFO("backlightDurationTX", "The duration in seconds, the backlight is lit during TX. "
                                      "A value of 0 means off.")
   /** TX backlight duration. */
   Q_PROPERTY(Interval backlightDurationTX READ backlightDurationTX WRITE setBacklightDurationTX)
 
-  Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX. "
-                                     "A value of 0 means always on.")
+  Q_CLASSINFO("backlightDurationRX", "The duration in seconds, the backlight is lit during RX.")
   /** RX backlight duration. */
   Q_PROPERTY(Interval backlightDurationRX READ backlightDurationRX WRITE setBacklightDurationRX)
 
@@ -806,6 +809,11 @@ public:
   /** Enables/disables display of last caller. */
   void enableShowLastHeard(bool enable);
 
+  /** Returns backlight duration. */
+  Interval backlightDuration() const;
+  /** Sets the backlight duration in seconds. */
+  void setBacklightDuration(Interval sec);
+
   /** Returns backlight duration during TX. */
   Interval backlightDurationTX() const;
   /** Sets the backlight duration during TX in seconds. */
@@ -858,8 +866,9 @@ protected:
   Color _standbyTextColor;                  ///< Standby text color.
   Color _standbyBackgroundColor;            ///< Standby background color.
   bool _showLastHeard;                      ///< Shows the last caller.
+  Interval _backlightDuration;              ///< Backlight duration.
   Interval _backlightDurationTX;            ///< Backlight duration during TX (0=off).
-  Interval _backlightDurationRX;            ///< Backlight duration during RX (0=permanent).
+  Interval _backlightDurationRX;            ///< Backlight duration during RX.
   bool _customChannelBackground;            ///< Custom channel background enabled.
   Color _channelNameColor;                  ///< Color of channel name.
   Color _channelBNameColor;                 ///< Color of channel name for VFO B.

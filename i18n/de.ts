@@ -1416,7 +1416,7 @@
     <message>
         <location filename="../src/configobjecttableview.cc" line="261"/>
         <source>Cannot move items as long as there is some filter or sorting applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Element nicht verschieben, solange Filter oder Sortierungen angewendet werden.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="50"/>
@@ -1451,12 +1451,12 @@
     <message>
         <location filename="../src/configobjecttableview.ui" line="188"/>
         <source>Toggle Filter and Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter und Sortierung ein- &amp; ausschalten</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="199"/>
         <source>Close Sort and Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter und Sortierungen verstecken</translation>
     </message>
 </context>
 <context>
@@ -2009,12 +2009,12 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
         <source>Create DMR APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR APRS System anlegen</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
         <source>Edit DMR APRS System</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR APRS System bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
@@ -2463,7 +2463,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Exports all FM channels to CHIRP CSV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportiert alle FM Kanäle als CHIRP CSV.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="339"/>
