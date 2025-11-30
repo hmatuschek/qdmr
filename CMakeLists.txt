@@ -31,7 +31,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(GNUInstallDirs)
 include(GenerateIcons)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning
+  Concurrent LinguistTools)
 qt6_standard_project_setup()
 
 find_package(LIBUSB_1 REQUIRED)

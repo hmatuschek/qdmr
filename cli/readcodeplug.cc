@@ -29,8 +29,10 @@ int readCodeplug(QCommandLineParser &parser, QCoreApplication &app)
 
   QString filename = parser.positionalArguments().at(1);
 
-  showProgress();
-  QObject::connect(radio, &Radio::downloadProgress, updateProgress);
+  if (! parser.isSet("verbose")) {
+    showProgress();
+    QObject::connect(radio, &Radio::downloadProgress, updateProgress);
+  }
 
   TransferFlags flags;
   flags.setBlocking(true);

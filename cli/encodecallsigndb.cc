@@ -15,7 +15,6 @@
 #include "gd77_callsigndb.hh"
 #include "d868uv_callsigndb.hh"
 #include "d878uv2_callsigndb.hh"
-#include "crc32.hh"
 
 
 int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
@@ -24,13 +23,13 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  UserDatabase userdb;
+  UserDatabase userdb(false);
   if (parser.isSet("database")) {
     if (! userdb.load(parser.value("database"))) {
       logError() << "Cannot load user-db from '" << parser.value("database") << "'.";
       return -1;
     }
-  } else if (0 == userdb.count()) {
+  } else if (! userdb.ready()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
     QEventLoop loop;
@@ -143,7 +142,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
   } else if (RadioInfo::OpenUV380 == radio) {
-    OpenUV380CallsignDB db;
+    OpenUV380CallsignDB db(false);
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();
       return -1;

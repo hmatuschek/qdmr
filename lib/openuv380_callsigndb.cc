@@ -1,16 +1,42 @@
 #include "openuv380_callsigndb.hh"
 #include "utils.hh"
 #include "userdatabase.hh"
+#include "logger.hh"
 #include <QtEndian>
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenUV380CallsignDB::DatabaseEntryElement
+ * ******************************************************************************************** */
+OpenUV380CallsignDB::DatabaseEntryElement::DatabaseEntryElement(uint8_t *ptr)
+  : OpenGD77BaseCallsignDB::DatabaseEntryElement(ptr, size())
+{
+  // pass...
+}
+
+void
+OpenUV380CallsignDB::DatabaseEntryElement::clear() {
+  memset(_data, 0x00, size());
+}
+
+void
+OpenUV380CallsignDB::DatabaseEntryElement::setText(const QString &text) {
+  QByteArray data = pack(text);
+  auto n = std::min(3*Limit::textLength()/4, (unsigned int)data.size());
+  memset(_data+Offset::text(), 0, 3*Limit::textLength()/4);
+  memcpy(_data+Offset::text(), data.constData(), n);
+}
 
 
 /* ******************************************************************************************** *
  * Implementation of OpenUV380CallsignDB
  * ******************************************************************************************** */
-OpenUV380CallsignDB::OpenUV380CallsignDB(QObject *parent)
+OpenUV380CallsignDB::OpenUV380CallsignDB(bool extended, QObject *parent)
   : OpenGD77BaseCallsignDB(parent)
 {
   addImage("OpenUV380 call-sign database");
+  if (extended)
+    logDebug() << "Used extended call-sign DB memory.";
 }
 
 
@@ -34,6 +60,10 @@ OpenUV380CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const 
     users.append(calldb->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
+  if (n)
+    logDebug() << "Store " << n << " entries for OpenUV380 starting from "
+               << users.front().id << ":" << users.front().call << ", " << users.front().name << " in " << users.front().city
+               << " to " << users.back().id << ":" << users.back().call << ", " << users.back().name << " in " << users.back().city;
 
   // Allocate segment0 for user db if requested
   unsigned size = align_size(DatabaseHeaderElement::size()+n0*DatabaseEntryElement::size(),
@@ -45,7 +75,7 @@ OpenUV380CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const 
 
   // Encode user DB
   DatabaseHeaderElement header(this->data(Offset::header()));
-  header.clear(); header.setEntryCount(n);
+  header.clear(); header.setEntrySize(DatabaseEntryElement::size()); header.setEntryCount(n);
   for (unsigned i=0; i<n0; i++) {
     DatabaseEntryElement(this->data(Offset::entries0() + i*DatabaseEntryElement::size()))
         .fromEntry(users[i]);
