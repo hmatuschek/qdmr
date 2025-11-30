@@ -140,8 +140,8 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x00e0; }
 
-    bool idleChannelTone() const;
-    void enableIdleChannelTone(bool enable);
+    bool idleChannelTone() const override;
+    void enableIdleChannelTone(bool enable) override;
 
     /** Returns the transmit timeout in seconds. */
     virtual unsigned transmitTimeout() const;
@@ -158,31 +158,31 @@ public:
     /** Sets the VFO frequency step in kHz. */
     virtual void setVFOFrequencyStep(Frequency kHz);
 
-    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
-    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
-    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
-    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
-    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
-    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
-    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
-    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
-    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
-    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
-    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const override;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const override;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const override;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const override;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const override;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const override;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const override;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const override;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const override;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const override;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) override;
 
-    bool vfoModeA() const;
-    void enableVFOModeA(bool enable);
-    bool vfoModeB() const;
-    void enableVFOModeB(bool enable);
+    bool vfoModeA() const override;
+    void enableVFOModeA(bool enable) override;
+    bool vfoModeB() const override;
+    void enableVFOModeB(bool enable) override;
 
     /** Returns the STE (squelch tail eliminate) type. */
     virtual AnytoneSettingsExtension::STEType steType() const;
@@ -247,8 +247,8 @@ public:
     /** Enables/disables the "pro mode". */
     virtual void enableProMode(bool enable);
 
-    bool keyToneEnabled() const;
-    void enableKeyTone(bool enable);
+    bool keyToneEnabled() const override;
+    void enableKeyTone(bool enable) override;
 
     /** Returns @c true if the own ID is filtered in call lists. */
     virtual bool filterOwnID() const;
@@ -325,8 +325,8 @@ public:
     /** Enables disables the simplex repeater feature. */
     virtual void enableSimplexRepeater(bool enable);
 
-    Interval gpsUpdatePeriod() const;
-    void setGPSUpdatePeriod(Interval sec);
+    Interval gpsUpdatePeriod() const override;
+    void setGPSUpdatePeriod(Interval sec) override;
 
     /** Returns @c true if the speaker is switched on during RX in simplex repeater mode,
      * see @c simplexRepeaterEnabled. */
@@ -334,76 +334,78 @@ public:
     /** Enables/disables the speaker during RX in simplex repeater mode. */
     virtual void enableMonitorSimplexRepeater(bool enable);
 
-    bool showCurrentContact() const;
-    void enableShowCurrentContact(bool enable);
+    bool showCurrentContact() const override;
+    void enableShowCurrentContact(bool enable) override;
 
-    bool keyToneLevelAdjustable() const;
-    unsigned keyToneLevel() const;
-    void setKeyToneLevel(unsigned level);
-    void setKeyToneLevelAdjustable();
+    bool keyToneLevelAdjustable() const override;
+    unsigned keyToneLevel() const override;
+    void setKeyToneLevel(unsigned level) override;
+    void setKeyToneLevelAdjustable() override;
 
-    bool knobLock() const;
-    void enableKnobLock(bool enable);
-    bool keypadLock() const;
-    void enableKeypadLock(bool enable);
-    bool sidekeysLock() const;
-    void enableSidekeysLock(bool enable);
-    bool keyLockForced() const;
-    void enableKeyLockForced(bool enable);
+    bool knobLock() const override;
+    void enableKnobLock(bool enable) override;
+    bool keypadLock() const override;
+    void enableKeypadLock(bool enable) override;
+    bool sidekeysLock() const override;
+    void enableSidekeysLock(bool enable) override;
+    bool keyLockForced() const override;
+    void enableKeyLockForced(bool enable) override;
 
     /** Returns the time-slot in simplex repeater mode. */
     virtual AnytoneRepeaterSettingsExtension::TimeSlot simplexRepeaterTimeslot() const;
     /** Sets the time-slot in simplex repeater mode. */
     virtual void setSimplexRepeaterTimeslot(AnytoneRepeaterSettingsExtension::TimeSlot slot);
 
-    bool showLastHeard() const;
-    void enableShowLastHeard(bool enable);
+    bool showLastHeard() const override;
+    void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
     virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
     virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
-    bool gpsUnitsImperial() const;
-    void enableGPSUnitsImperial(bool enable);
+    bool gpsUnitsImperial() const override;
+    void enableGPSUnitsImperial(bool enable) override;
 
-    Frequency autoRepeaterMinFrequencyVHF() const;
-    void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
-    Frequency autoRepeaterMaxFrequencyVHF() const;
-    void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
-    Frequency autoRepeaterMinFrequencyUHF() const;
-    void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
-    Frequency autoRepeaterMaxFrequencyUHF() const;
-    void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
+    Frequency autoRepeaterMinFrequencyVHF() const override;
+    void setAutoRepeaterMinFrequencyVHF(Frequency Hz) override;
+    Frequency autoRepeaterMaxFrequencyVHF() const override;
+    void setAutoRepeaterMaxFrequencyVHF(Frequency Hz) override;
+    Frequency autoRepeaterMinFrequencyUHF() const override;
+    void setAutoRepeaterMinFrequencyUHF(Frequency Hz) override;
+    Frequency autoRepeaterMaxFrequencyUHF() const override;
+    void setAutoRepeaterMaxFrequencyUHF(Frequency Hz) override;
 
-    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
-    void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const override;
+    void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) override;
 
     /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);
 
-    bool defaultChannel() const;
-    void enableDefaultChannel(bool enable);
-    unsigned defaultZoneIndexA() const;
-    void setDefaultZoneIndexA(unsigned idx);
-    unsigned defaultZoneIndexB() const;
-    void setDefaultZoneIndexB(unsigned idx);
-    bool defaultChannelAIsVFO() const;
-    unsigned defaultChannelAIndex() const;
-    void setDefaultChannelAIndex(unsigned idx);
-    void setDefaultChannelAToVFO();
-    bool defaultChannelBIsVFO() const;
-    unsigned defaultChannelBIndex() const;
-    void setDefaultChannelBIndex(unsigned idx);
-    void setDefaultChannelBToVFO();
+    bool defaultChannel() const override;
+    void enableDefaultChannel(bool enable) override;
+    unsigned defaultZoneIndexA() const override;
+    void setDefaultZoneIndexA(unsigned idx) override;
+    unsigned defaultZoneIndexB() const override;
+    void setDefaultZoneIndexB(unsigned idx) override;
+    bool defaultChannelAIsVFO() const override;
+    unsigned defaultChannelAIndex() const override;
+    void setDefaultChannelAIndex(unsigned idx) override;
+    void setDefaultChannelAToVFO() override;
+    bool defaultChannelBIsVFO() const override;
+    unsigned defaultChannelBIndex() const override;
+    void setDefaultChannelBIndex(unsigned idx) override;
+    void setDefaultChannelBToVFO() override;
 
-    bool keepLastCaller() const;
-    void enableKeepLastCaller(bool enable);
+    bool keepLastCaller() const override;
+    void enableKeepLastCaller(bool enable) override;
 
-    Interval rxBacklightDuration() const;
-    void setRXBacklightDuration(Interval sec);
+    /** Returns backlight duration during RX. */
+    virtual Interval rxBacklightDuration() const;
+    /** Sets the backlight duration during RX. */
+    virtual void setRXBacklightDuration(Interval sec);
 
     /** Returns the stand-by background color. */
     virtual AnytoneDisplaySettingsExtension::Color standbyBackgroundColor() const;
@@ -420,8 +422,8 @@ public:
     virtual void setManualDialedPrivateCallHangTime(unsigned int dur);
 
 
-    bool fromConfig(const Flags &flags, Context &ctx);
-    bool updateConfig(Context &ctx);
+    bool fromConfig(const Flags &flags, Context &ctx) override;
+    bool updateConfig(Context &ctx) override;
 
   protected:
     /** Some internal used offsets within the element. */

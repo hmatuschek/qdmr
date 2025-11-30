@@ -1340,11 +1340,11 @@ D578UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(Interval intv) {
 
 AnytoneDisplaySettingsExtension::Color
 D578UVCodeplug::GeneralSettingsElement::callDisplayColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::callColor());
+  return NameColor::decode(getUInt8(Offset::callColor()));
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::callColor(), (unsigned)color);
+  setUInt8(Offset::callColor(), NameColor::encode(color));
 }
 
 bool
@@ -1400,20 +1400,20 @@ D578UVCodeplug::GeneralSettingsElement::setAutoRoamDelay(Interval intv) {
 
 AnytoneDisplaySettingsExtension::Color
 D578UVCodeplug::GeneralSettingsElement::standbyTextColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::standbyTextColor());
+  return TextColor::decode(getUInt8(Offset::standbyTextColor()));
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setStandbyTextColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::standbyTextColor(), (unsigned)color);
+  setUInt8(Offset::standbyTextColor(), TextColor::encode(color));
 }
 
 AnytoneDisplaySettingsExtension::Color
 D578UVCodeplug::GeneralSettingsElement::standbyBackgroundColor() const {
-  return (AnytoneDisplaySettingsExtension::Color)getUInt8(Offset::standbyBackground());
+  return TextColor::decode(getUInt8(Offset::standbyBackground()));
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setStandbyBackgroundColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::standbyBackground(), (unsigned)color);
+  setUInt8(Offset::standbyBackground(), TextColor::encode(color));
 }
 
 bool
@@ -1578,11 +1578,11 @@ D578UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 
 AnytoneDisplaySettingsExtension::Color
 D578UVCodeplug::GeneralSettingsElement::channelNameColor() const {
-  return (AnytoneDisplaySettingsExtension::Color) getUInt8(Offset::channelNameColor());
+  return NameColor::decode(getUInt8(Offset::channelNameColor()));
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setChannelNameColor(AnytoneDisplaySettingsExtension::Color color) {
-  setUInt8(Offset::channelNameColor(), (unsigned)color);
+  setUInt8(Offset::channelNameColor(), NameColor::encode(color));
 }
 
 bool
@@ -1795,6 +1795,18 @@ D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigne
 }
 
 
+Interval
+D578UVCodeplug::GeneralSettingsElement::txBacklightDuration() const {
+  return Interval::fromSeconds(getUInt8(Offset::txBacklightDuration()));
+}
+
+void
+D578UVCodeplug::GeneralSettingsElement::setTXBacklightDuration(Interval intv) {
+  auto seconds = std::min(30ULL, intv.seconds());
+  setUInt8(Offset::txBacklightDuration(), seconds);
+}
+
+
 bool
 D578UVCodeplug::GeneralSettingsElement::btHoldTimeEnabled() const {
   return 0x00 != getUInt8(Offset::btHoldTime());
@@ -1898,8 +1910,9 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableShowCurrentContact(ext->displaySettings()->showContact());
   setStandbyTextColor(ext->displaySettings()->standbyTextColor());
   enableShowLastHeard(ext->displaySettings()->showLastHeardEnabled());
-  setChannelNameColor(ext->displaySettings()->callColor());
+  setChannelNameColor(ext->displaySettings()->channelNameColor());
   enableShowCurrentContact(ext->displaySettings()->showContact());
+  setTXBacklightDuration(ext->displaySettings()->backlightDurationTX());
 
   // Encode menu settings
   enableSeparateDisplay(ext->menuSettings()->separatorEnabled());
@@ -1986,6 +1999,7 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->displaySettings()->enableShowLastHeard(this->showLastHeard());
   ext->displaySettings()->setChannelNameColor(this->channelNameColor());
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
+  ext->displaySettings()->setBacklightDurationTX(this->txBacklightDuration());
 
   // Decode menu settings
   ext->menuSettings()->enableSeparator(this->separateDisplay());

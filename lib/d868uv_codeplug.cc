@@ -577,22 +577,64 @@ D868UVCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
   setUInt8(Offset::displayBrightness(), (level*4)/10);
 }
 
+
 bool
 D868UVCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return rxBacklightDuration().isNull();
+  return backlightDuration().isInfinite();
 }
+
 Interval
-D868UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return Interval::fromSeconds(5*((unsigned)getUInt8(Offset::backlightDuration())));
+D868UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+  switch ((BacklightDuration)getUInt8(Offset::backlightDuration())) {
+  case BacklightDuration::Infinite: return Interval::infinity();
+  case BacklightDuration::_5s:  return Interval::fromSeconds(5);
+  case BacklightDuration::_10s: return Interval::fromSeconds(10);
+  case BacklightDuration::_15s: return Interval::fromSeconds(15);
+  case BacklightDuration::_20s: return Interval::fromSeconds(20);
+  case BacklightDuration::_25s: return Interval::fromSeconds(25);
+  case BacklightDuration::_30s: return Interval::fromSeconds(30);
+  case BacklightDuration::_1min: return Interval::fromMinutes(1);
+  case BacklightDuration::_2min: return Interval::fromMinutes(2);
+  case BacklightDuration::_3min: return Interval::fromMinutes(3);
+  case BacklightDuration::_4min: return Interval::fromMinutes(4);
+  case BacklightDuration::_5min: return Interval::fromMinutes(5);
+  }
+  return Interval::infinity();
 }
+
 void
-D868UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
-  setUInt8(Offset::backlightDuration(), intv.seconds()/5);
+D868UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+  if (intv <= Interval::fromSeconds(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5s);
+  else if (intv <= Interval::fromSeconds(10))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_10s);
+  else if (intv <= Interval::fromSeconds(15))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_15s);
+  else if (intv <= Interval::fromSeconds(20))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_20s);
+  else if (intv <= Interval::fromSeconds(25))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_25s);
+  else if (intv <= Interval::fromSeconds(30))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_30s);
+  else if (intv <= Interval::fromMinutes(1))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_1min);
+  else if (intv <= Interval::fromMinutes(2))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_2min);
+  else if (intv <= Interval::fromMinutes(3))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_3min);
+  else if (intv <= Interval::fromMinutes(4))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_4min);
+  else if (intv <= Interval::fromMinutes(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5min);
+  else
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinite);
 }
+
 void
 D868UVCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setRXBacklightDuration(Interval());
+  setBacklightDuration(Interval::infinity());
 }
+
 
 bool
 D868UVCodeplug::GeneralSettingsElement::gps() const {
@@ -1183,7 +1225,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
   // Encode display settings
-  setRXBacklightDuration(ext->displaySettings()->backlightDurationRX());
+  setBacklightDuration(ext->displaySettings()->backlightDuration());
   enableShowCurrentContact(ext->displaySettings()->showContact());
 
   // Check encryption type
@@ -1229,7 +1271,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode display settings
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
-  ext->displaySettings()->setBacklightDurationRX(rxBacklightDuration());
+  ext->displaySettings()->setBacklightDuration(backlightDuration());
 
   // Set encryption type
   ext->dmrSettings()->setEncryption(AnytoneDMRSettingsExtension::EncryptionType::DMR);
