@@ -1266,7 +1266,7 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Strategie di risoluzione dei conflitti:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Se alcuni degli oggetti importati (canali, contatti, …) esistono già, seleziona come risolvere questi conflitti per singoli elementi e insiemi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Strategie di risoluzione dei conflitti:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;se alcuni degli oggetti importati (canali, contatti, …) esistono già, seleziona come risolvere questi conflitti per singoli elementi e insiemi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
