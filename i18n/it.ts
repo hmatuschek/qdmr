@@ -131,7 +131,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation>Incendio</translation>
+        <translation>Fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
