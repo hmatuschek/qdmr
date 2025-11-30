@@ -6,7 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QNetworkReply>
-
+#include <QtConcurrent>
 #include "logger.hh"
 #include "utils.hh"
 
@@ -341,7 +341,7 @@ CachedRepeaterDatabaseSource::CachedRepeaterDatabaseSource(const QString &filena
 
   _cacheFile.setFileName(path + "/" + filename);
 
-  loadCache();
+  _parsing = QtConcurrent::run([this](){ this->loadCache(); });
 }
 
 
