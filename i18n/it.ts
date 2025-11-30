@@ -643,12 +643,12 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="418"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation>Stretta (12.5 kHz)</translation>
+        <translation>stretta (12.5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="423"/>
         <source>Wide (25 kHz)</source>
-        <translation>Larga (25 kHz)</translation>
+        <translation>larga (25 kHz)</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="431"/>
@@ -1127,7 +1127,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="437"/>
         <source>Narrow</source>
-        <translation>Stretto</translation>
+        <translation>Stretta</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="458"/>
@@ -2127,7 +2127,7 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>MIC Amp.</source>
-        <translation>Amp. microfono</translation>
+        <translation>Amp. MIC.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="127"/>
@@ -2595,7 +2595,7 @@
     <message>
         <location filename="../src/mainwindow.cc" line="195"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo, queste modifiche andranno perse.</translation>
+        <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo queste modifiche andranno perse.</translation>
     </message>
 </context>
 <context>
@@ -3385,7 +3385,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="123"/>
         <source>Remove Channel</source>
-        <translation>Elimina canale</translation>
+        <translation>Rimuovi canale</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="126"/>
