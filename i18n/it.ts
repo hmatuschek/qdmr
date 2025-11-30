@@ -2292,7 +2292,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="128"/>
         <source>Toolbar</source>
-        <translation> </translation>
+        <translation>Barra degli strumenti</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="157"/>
