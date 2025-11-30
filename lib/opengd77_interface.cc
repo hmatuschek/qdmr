@@ -13,6 +13,28 @@
 #define SECTOR_SIZE 4096
 #define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77Interface::FirmwareInfo
+ * ********************************************************************************************* */
+bool
+OpenGD77Interface::FirmwareInfo::featureInvertedDisplay() const {
+  return (qFromLittleEndian(features) & (1<<0));
+}
+
+bool
+OpenGD77Interface::FirmwareInfo::featureExtendedCallsignDB() const {
+  return (qFromLittleEndian(features) & (1<<1));
+}
+
+bool
+OpenGD77Interface::FirmwareInfo::featureVoicePromptLoaded() const {
+  return (qFromLittleEndian(features) & (1<<2));
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of OpenGD77Interface::ReadRequest
  * ********************************************************************************************* */
@@ -62,6 +84,7 @@ bool
 OpenGD77Interface::WriteRequest::initSetFlashSector(Variant variant, uint32_t addr) {
   uint32_t sec = addr/SECTOR_SIZE;
   this->type = (Variant::GD77 == variant) ? 'W' : 'X';
+  logDebug() << "Send SET_FLASH_SECTOR (" << this->type << "): " << Qt::hex << sec << "h";
   this->command = SET_FLASH_SECTOR;
   this->sector[0] = ((sec>>16) & 0xff);
   this->sector[1] = ((sec>>8) & 0xff);
@@ -75,6 +98,7 @@ OpenGD77Interface::WriteRequest::initWriteFlash(Variant variant, uint32_t addr, 
     size = 32;
   this->type = (Variant::GD77 == variant) ? 'W' : 'X';
   this->command = WRITE_SECTOR_BUFFER;
+  logDebug() << "Send WRITE_FLASH_BUFFER (" << this->type << ") @ " << Qt::hex << addr << ".";
   this->payload.address = qToBigEndian(addr);
   this->payload.length = qToBigEndian(size);
   memcpy(this->payload.data, data, size);
@@ -179,7 +203,8 @@ OpenGD77Interface::CommandRequest::initSetDateTime(const QDateTime &dt) {
  * Implementation of OpenGD77Interface
  * ********************************************************************************************* */
 OpenGD77Interface::OpenGD77Interface(const USBDeviceDescriptor &descr, const ErrorStack &err, QObject *parent)
-  : USBSerial(descr, QSerialPort::Baud115200, err, parent), _sector(-1)
+  : USBSerial(descr, QSerialPort::Baud115200, err, parent), _extendedCallsignDB(false),
+  _sector(-1)
 {
   // pass...
 }
@@ -234,12 +259,21 @@ OpenGD77Interface::identifier(const ErrorStack &err) {
   case FirmwareInfo::RadioType::MD9600:
   case FirmwareInfo::RadioType::MD2017:
     _protocolVariant = Variant::UV380;
+    _extendedCallsignDB = info.featureExtendedCallsignDB() &&
+                          !info.featureVoicePromptLoaded();
   return RadioInfo::byID(RadioInfo::OpenUV380);
   }
 
   errMsg(err) << "Unknown OpenGD77 variant " << info.radioType << ".";
   return RadioInfo();
 }
+
+
+bool
+OpenGD77Interface::extendedCallsignDB() const {
+  return _extendedCallsignDB;
+}
+
 
 bool
 OpenGD77Interface::write_start(uint32_t bank, uint32_t addr, const ErrorStack &err)
@@ -327,7 +361,6 @@ start:
 
 bool
 OpenGD77Interface::write_finish(const ErrorStack &err) {
-  _sector = -1;
   if (0 > _sector)
     return true;
   _sector = -1;
@@ -401,8 +434,21 @@ OpenGD77Interface::setDateTime(const QDateTime &datetime, const ErrorStack &err)
 }
 
 bool
-OpenGD77Interface::reboot(const ErrorStack &err) {
+OpenGD77Interface::saveSettingsNotVFOs(const ErrorStack &err) {
+  logDebug() << "Send cmd SAVE_SETTINGS_NOT_VFOS.";
   return sendCommand(CommandRequest::SAVE_SETTINGS_NOT_VFOS, err);
+}
+
+bool
+OpenGD77Interface::saveSettingsAndVFOs(const ErrorStack &err) {
+  logDebug() << "Send cmd SAVE_SETTINGS_AND_VFOS.";
+  return sendCommand(CommandRequest::SAVE_SETTINGS_AND_VFOS, err);
+}
+
+bool
+OpenGD77Interface::reboot(const ErrorStack &err) {
+  logDebug() << "Send cmd REBOOT.";
+  return sendCommand(CommandRequest::REBOOT, err);
 }
 
 
@@ -616,6 +662,7 @@ OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
   //logDebug() << "Send finish write flash command ...";
   WriteRequest req;
   req.initFinishWriteFlash(_protocolVariant);
+  logDebug() << "Send cmd WRITE_FLASH_SECTOR.";
   WriteResponse resp;
 
   if ((2) != QSerialPort::write((const char *)&req, 2)) {

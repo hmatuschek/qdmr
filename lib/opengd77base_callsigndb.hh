@@ -12,10 +12,7 @@ class OpenGD77BaseCallsignDB : public CallsignDB
   Q_OBJECT
 
 public:
-  /** Represents a user-db entry within the binary codeplug.
-   *
-   * Memory representation of the call-sign DB entry (size 0x13 bytes):
-   * @verbinclude opengd77_callsign_db_entry.txt */
+  /** Represents a user-db entry within the binary codeplug. */
   struct __attribute__((packed)) userdb_entry_t {
     uint32_t number;                    ///< DMR ID stored in BCD little-endian.
     char name[15];                      ///< Call or name, up to 15 ASCII chars, 0x00 padded.
@@ -57,14 +54,19 @@ public:
     /** The size of the entry. */
     static constexpr unsigned int size() { return 0x000f; }
 
-    void clear();
+    void clear() override;
 
     /** Encodes the DMR ID. */
-    void setId(unsigned int id);
+    virtual void setId(unsigned int id);
     /** Encodes the text. */
-    void setText(const QString &text);
+    virtual void setText(const QString &text);
     /** Encodes the given user. */
-    void fromEntry(const UserDatabase::User &user);
+    virtual bool fromEntry(const UserDatabase::User &user);
+
+  protected:
+    /** Encodes and packs the given string. That is, chars are encoded into 6bit codes using _lut
+     *  and 4 encoded chars are then packed into 3bytes. */
+    QByteArray pack(const QString &text);
 
   public:
     /** Some limits. */
@@ -109,6 +111,7 @@ public:
 
     void clear();
 
+    void setEntrySize(unsigned int size);
     void setEntryCount(unsigned int count);
 
   public:
