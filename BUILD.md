@@ -115,7 +115,7 @@ brew install \
    ```sh
    cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/
    ```
-   The latter will install everything user-local.
+   The latter will prepare an user-local installation.
 
 4. **Build the project**
 
@@ -126,7 +126,7 @@ brew install \
 5. **(Optional) Run the application**
 
    ```sh
-   ./qdmr
+   ./src/qdmr
    ```
 
 6. **(Optional) Install**
