@@ -58,6 +58,7 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
+ * **[Version 0.13.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.2)** -- Bugfix release.
  * **[Version 0.13.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.1)** -- Bugfix release.
  * **[Version 0.13.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.0)** -- Added support BTech DMR6X2PRO and OpenUV390.
  * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
