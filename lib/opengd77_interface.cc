@@ -13,6 +13,7 @@
 #define SECTOR_SIZE 4096
 #define ALIGN_BLOCK_SIZE(n) ((0==((n)%BLOCK_SIZE)) ? (n) : (n)+(BLOCK_SIZE-((n)%BLOCK_SIZE)))
 
+#define TIMEOUT -1 // ms
 
 
 /* ********************************************************************************************* *
@@ -413,8 +414,10 @@ OpenGD77Interface::read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes,
       return false;
     }
 
-    if (! ok)
+    if (! ok) {
+      errMsg(err) << "Cannot read from bank " << bank << ", addr " << Qt::hex << addr+i << "h.";
       return false;
+    }
   }
 
   return true;
@@ -467,7 +470,7 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const 
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -509,7 +512,7 @@ OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len,
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -525,7 +528,7 @@ OpenGD77Interface::writeEEPROM(uint32_t addr, const uint8_t *data, uint16_t len,
   }
 
   if ((req.type != resp.type) || (req.command != resp.command)) {
-    errMsg(err) << "Cannot write EEPROM at " << QString::number(addr, 16)
+    errMsg(err) << "Cannot write EEPROM at " << Qt::hex << addr
              << ": Device returned error " << resp.type << ".";
     return false;
   }
@@ -551,7 +554,7 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len, const E
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << QSerialPort::errorString();
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
@@ -595,7 +598,7 @@ OpenGD77Interface::setFlashSector(uint32_t addr, const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << QSerialPort::errorString();
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
@@ -631,7 +634,7 @@ OpenGD77Interface::writeFlash(uint32_t addr, const uint8_t *data, uint16_t len, 
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << QSerialPort::errorString();
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
@@ -670,7 +673,7 @@ OpenGD77Interface::finishWriteFlash(const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -704,7 +707,7 @@ OpenGD77Interface::readFirmwareInfo(OpenGD77Interface::FirmwareInfo &radioInfo, 
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -741,7 +744,7 @@ OpenGD77Interface::sendShowCPSScreen(const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -773,7 +776,7 @@ OpenGD77Interface::sendClearScreen(const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -806,7 +809,7 @@ OpenGD77Interface::sendDisplay(uint8_t x, uint8_t y, const char *message, uint8_
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -837,7 +840,7 @@ OpenGD77Interface::sendRenderCPS(const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -869,7 +872,7 @@ OpenGD77Interface::sendCloseScreen(const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -901,7 +904,7 @@ OpenGD77Interface::sendSetDateTime(const QDateTime &dt, const ErrorStack &err) {
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
@@ -933,7 +936,7 @@ OpenGD77Interface::sendCommand(CommandRequest::Option option, const ErrorStack &
     return false;
   }
 
-  if (! waitForReadyRead(1000)) {
+  if (! waitForReadyRead(TIMEOUT)) {
     errMsg(err) << "Cannot read from serial port: Timeout!";
     return false;
   }
