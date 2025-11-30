@@ -58,7 +58,7 @@ FrequencyBase::parse(const QString &value, Qt::CaseSensitivity caseSensitivity) 
   QRegularExpression::PatternOption patternOption = caseSensitivity == Qt::CaseInsensitive
     ? QRegularExpression::PatternOption::CaseInsensitiveOption : QRegularExpression::PatternOption::NoPatternOption;
 
-  static QRegularExpression re(R"(\s*(\+|-)?\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]?)(Hz)?\s*)", patternOption);
+  static QRegularExpression re(R"(\s*(\+|-)?\s*([0-9]+)(?:\.([0-9]*)|)\s*([kMG]|[kMG]?Hz|)\s*)", patternOption);
   QRegularExpressionMatch match = re.match(value);
 
   if (!match.hasMatch())
