@@ -2416,7 +2416,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="103"/>
+        <location filename="../src/mainwindow.cc" line="106"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
@@ -2536,64 +2536,64 @@
         <translation>Elementi orbitali aggiornati e caricati.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="163"/>
+        <location filename="../src/mainwindow.cc" line="120"/>
+        <location filename="../src/mainwindow.cc" line="166"/>
         <source>Radio IDs</source>
         <translation>ID Radio</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="119"/>
+        <location filename="../src/mainwindow.cc" line="122"/>
         <source>Contacts</source>
         <translation>Contatti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="121"/>
+        <location filename="../src/mainwindow.cc" line="124"/>
         <source>Group Lists</source>
         <translation>Elenchi gruppi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <location filename="../src/mainwindow.cc" line="126"/>
         <source>Channels</source>
         <translation>Canali</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="125"/>
+        <location filename="../src/mainwindow.cc" line="128"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="127"/>
+        <location filename="../src/mainwindow.cc" line="130"/>
         <source>Scan Lists</source>
         <translation>Liste di scansione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="129"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="131"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Channels</source>
         <translation>Canali roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="137"/>
         <source>Roaming Zones</source>
         <translation>Zone roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="138"/>
-        <location filename="../src/mainwindow.cc" line="177"/>
+        <location filename="../src/mainwindow.cc" line="141"/>
+        <location filename="../src/mainwindow.cc" line="180"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="194"/>
+        <location filename="../src/mainwindow.cc" line="197"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifiche non salvate al codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="195"/>
+        <location filename="../src/mainwindow.cc" line="198"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo queste modifiche andranno perse.</translation>
     </message>
