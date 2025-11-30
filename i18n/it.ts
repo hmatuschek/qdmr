@@ -2423,7 +2423,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="295"/>
         <source>Shows settings dialog</source>
-        <translation>Mostra la finestra delle impostazioni.</translation>
+        <translation>Mostra la finestra delle impostazioni</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="304"/>
