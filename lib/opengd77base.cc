@@ -6,6 +6,8 @@
 
 
 #define BSIZE 32
+#define SLOWDOWN 100 // us
+
 
 RadioLimits *OpenGD77Base::_limits = nullptr;
 
@@ -177,7 +179,6 @@ OpenGD77Base::run() {
     }
 
     _dev->read_finish();
-    _dev->reboot();
     _dev->close();
     _task = StatusIdle;
     emit downloadFinished(this, &codeplug());
@@ -198,7 +199,7 @@ OpenGD77Base::run() {
     }
 
     _dev->write_finish();
-    _dev->reboot();
+    _dev->saveSettingsNotVFOs();
     _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);
@@ -217,7 +218,7 @@ OpenGD77Base::run() {
       return;
     }
 
-    _dev->write_finish();
+    _dev->saveSettingsAndVFOs();
     _dev->reboot();
     _dev->close();
     _task = StatusIdle;
@@ -238,7 +239,7 @@ OpenGD77Base::run() {
     }
 
     _dev->write_finish();
-    _dev->reboot();
+    _dev->saveSettingsNotVFOs();
     _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);
@@ -279,18 +280,22 @@ OpenGD77Base::download()
       unsigned addr = codeplug().image(image).element(n).address();
       unsigned size = codeplug().image(image).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
-
+      logDebug() << "Read " << size << "h bytes from bank " << bank
+                 << " @ addr " << Qt::hex << addr << "h.";
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
           errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
           return false;
         }
-        QThread::usleep(100);
+        QThread::usleep(SLOWDOWN);
         emit downloadProgress(float(bcount*100)/totb);
       }
     }
-    _dev->read_finish(_errorStack);
+    // The is needed to prevent a bug in the firmware that causes the FW to crash during read.
+    if (! _dev->read_finish(_errorStack))
+      return false;
   }
+
 
   return true;
 }
@@ -334,17 +339,21 @@ OpenGD77Base::upload()
       unsigned addr = codeplug().image(image).element(n).address();
       unsigned size = codeplug().image(image).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
+      logDebug() << "Read " << size << "h bytes from bank " << bank
+                 << " @ addr " << Qt::hex << addr << "h.";
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->read(bank, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
-          errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
+          errMsg(_errorStack) << "Cannot read block " << Qt::hex << (b0+b) << "h.";
           return false;
         }
-        QThread::usleep(100);
+        QThread::usleep(SLOWDOWN);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
+    // The is needed to prevent a bug in the firmware that causes the FW to crash during read.
+    if (! _dev->read_finish(_errorStack))
+      return false;
   }
-  _dev->read_finish();
 
   // Encode config into codeplug
   codeplug().encode(_config);
@@ -362,13 +371,14 @@ OpenGD77Base::upload()
       unsigned addr = codeplug().image(image).element(n).address();
       unsigned size = codeplug().image(image).element(n).data().size();
       unsigned b0 = addr/BSIZE, nb = size/BSIZE;
-
+      logDebug() << "Write " << size << "h bytes from bank " << bank
+                 << " @ addr " << Qt::hex << addr << "h.";
       for (unsigned b=0; b<nb; b++, bcount+=BSIZE) {
         if (! _dev->write(bank, (b0+b)*BSIZE, codeplug().data((b0+b)*BSIZE, image), BSIZE, _errorStack)) {
           errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
           return false;
         }
-        QThread::usleep(100);
+        QThread::usleep(SLOWDOWN);
         emit uploadProgress(float(bcount*50)/totb);
       }
     }
@@ -458,7 +468,7 @@ OpenGD77Base::uploadSatellites()
           errMsg(_errorStack) << "Cannot read block " << (b0+b) << ".";
           return false;
         }
-        QThread::usleep(100);
+        QThread::usleep(SLOWDOWN);
         emit uploadProgress(float(bcount*50)/totb);
       }
   }
@@ -493,7 +503,7 @@ OpenGD77Base::uploadSatellites()
         errMsg(_errorStack) << "Cannot write block " << (b0+b) << ".";
         return false;
       }
-      QThread::usleep(100);
+      QThread::usleep(SLOWDOWN);
       emit uploadProgress(float(bcount*50)/totb);
     }
   }

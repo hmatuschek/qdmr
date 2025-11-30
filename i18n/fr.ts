@@ -2808,18 +2808,18 @@
         <translation>faux</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="602"/>
-        <location filename="../src/extensionwrapper.cc" line="610"/>
+        <location filename="../src/extensionwrapper.cc" line="605"/>
+        <location filename="../src/extensionwrapper.cc" line="613"/>
         <source>[None]</source>
         <translation>[Aucun]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="612"/>
+        <location filename="../src/extensionwrapper.cc" line="615"/>
         <source>Instance of %1</source>
         <translation>Instance de &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="617"/>
+        <location filename="../src/extensionwrapper.cc" line="620"/>
         <source>List of %1 instances</source>
         <translation>Liste de %1 instances</translation>
     </message>

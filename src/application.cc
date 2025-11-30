@@ -94,7 +94,7 @@ Application::Application(int &argc, char *argv[])
     _repeater->addSource(new HearhamRepeaterSource());
   if (settings.radioIdRepeaterSourceEnabled())
     _repeater->addSource(new RadioidRepeaterSource());
-  _users      = new UserDatabase(30, this);
+  _users      = new UserDatabase(true, 30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _satellites = new SatelliteDatabase(7, this);
 

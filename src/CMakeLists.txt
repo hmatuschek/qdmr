@@ -125,7 +125,7 @@ if (UNIX AND APPLE AND INSTALL_BUNDLE)
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)
 
 target_link_libraries(qdmr PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Positioning Qt6::UiTools
-  ${LIBUSB_1_LIBS} libdmrconf)
+  Qt6::Concurrent ${LIBUSB_1_LIBS} libdmrconf)
 target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Install binary only if not a bundle under MacOS X
