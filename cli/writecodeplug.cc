@@ -73,8 +73,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  showProgress();
-  QObject::connect(radio, &Radio::uploadProgress, updateProgress);
+  if (! parser.isSet("verbose")) {
+    showProgress();
+    QObject::connect(radio, &Radio::downloadProgress, updateProgress);
+  }
 
   Codeplug::Flags flags;
   flags.setBlocking(true);
