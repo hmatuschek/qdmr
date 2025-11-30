@@ -3353,7 +3353,7 @@ public:
     struct Offset: public Element::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int id()    { return 0x0000; }
-      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int index() { return 0x0004; }
       /// @endcond
     };
   };

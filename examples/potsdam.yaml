@@ -20,8 +20,12 @@ contacts:
   - dmr: {id: cont5, name: Regional, ring: false, type: GroupCall, number: 8}
   - dmr: {id: cont6, name: BM SMS, ring: false, type: PrivateCall, number: 262993}
   - dmr: {id: cont7, name: BM APRS, ring: false, type: PrivateCall, number: 262999}
+  - dmr: {id: cont8, name: TAC1, ring: false, type: GroupCall, number: 26200}
+  - dmr: {id: cont9, name: TAC 2, ring: false, type: GroupCall, number: 26299}
+  - dmr: {id: cont10, name: TAC 3, ring: false, type: GroupCall, number: 26233}
+  - dmr: {id: cont11, name: TAC 4, ring: false, type: GroupCall, number: 26266}
 groupLists:
-  - {id: grp1, name: DL, contacts: [cont1, cont2]}
+  - {id: grp1, name: DL, contacts: [cont1, cont2, cont8, cont9, cont10, cont11]}
   - {id: grp2, name: BB, contacts: [cont3, cont4, cont5]}
 channels:
   - analog:

@@ -159,6 +159,10 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Flags &selection, const Er
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
+  logDebug() << "Encode call-signs from " << users.first().id << ": " << users.first().call << ", "
+             << users.first().name << " in " << users.first().city << " to " << users.last().id
+             << ": " << users.last().call << ", " << users.last().name << " in " << users.last().city << ".";
+
   // Compute total size of callsign db entries
   size_t dbSize = 0;
   size_t indexSize = n*IndexEntryElement::size();

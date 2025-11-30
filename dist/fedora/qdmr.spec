@@ -15,7 +15,7 @@
 
 %define ext_man .gz
 %define sover   0
-%define realver 0.13.1
+%define realver 0.13.2
 Name:           qdmr
 Version:        %{realver}
 Release:        0fedora
@@ -112,6 +112,8 @@ applications that want to make use of libdmrconf.
 %{_libdir}/libdmrconf.so
 
 %changelog
+* Sun Nov 30 2025 Hannes Matuschek <dm3mat@darc.de>
+  - Updated to 0.13.2
 * Tue Oct 21 2025 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.13.1
 * Sun Oct 19 2025 Hannes Matuschek <dm3mat@darc.de>
