@@ -194,6 +194,8 @@ public:
 
   bool setDateTime(const QDateTime &datetime, const ErrorStack &err);
 
+  bool saveSettingsNotVFOs(const ErrorStack &err=ErrorStack());
+  bool saveSettingsAndVFOs(const ErrorStack &err=ErrorStack());
   bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
@@ -280,7 +282,7 @@ protected:
       WRITE_WAV_BUFFER = 7
     };
 
-    /// 'R' read block, 'W' write block or 'C' command.
+    /// 'R' read block, 'W'/'X' write block or 'C' command.
     char type;
     /// Command, @see OpenGD77Internface::WriteReqest::Command.
     uint8_t command;

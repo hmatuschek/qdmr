@@ -177,7 +177,6 @@ OpenGD77Base::run() {
     }
 
     _dev->read_finish();
-    _dev->reboot();
     _dev->close();
     _task = StatusIdle;
     emit downloadFinished(this, &codeplug());
@@ -198,7 +197,7 @@ OpenGD77Base::run() {
     }
 
     _dev->write_finish();
-    _dev->reboot();
+    _dev->saveSettingsNotVFOs();
     _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);
@@ -217,7 +216,7 @@ OpenGD77Base::run() {
       return;
     }
 
-    _dev->write_finish();
+    _dev->saveSettingsAndVFOs();
     _dev->reboot();
     _dev->close();
     _task = StatusIdle;
@@ -238,7 +237,7 @@ OpenGD77Base::run() {
     }
 
     _dev->write_finish();
-    _dev->reboot();
+    _dev->saveSettingsNotVFOs();
     _dev->close();
     _task = StatusIdle;
     emit uploadComplete(this);

@@ -16,7 +16,7 @@ OpenUV380CallsignDB::DatabaseEntryElement::DatabaseEntryElement(uint8_t *ptr)
 
 void
 OpenUV380CallsignDB::DatabaseEntryElement::clear() {
-  memset(_data, 0xff, size());
+  memset(_data, 0x00, size());
 }
 
 void
@@ -61,7 +61,7 @@ OpenUV380CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const 
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
   if (n)
-    logDebug() << "Store " << n << " entries starting from "
+    logDebug() << "Store " << n << " entries for OpenUV380 starting from "
                << users.front().id << ":" << users.front().call << ", " << users.front().name << " in " << users.front().city
                << " to " << users.back().id << ":" << users.back().call << ", " << users.back().name << " in " << users.back().city;
 
