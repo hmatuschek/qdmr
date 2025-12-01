@@ -80,7 +80,7 @@ qdmr or dmrconf.
 
 
 ## Install
-There are several ways to install qdmr on your system ranging from simple app-package downloads to building qdmr from its sources. For a detailed list of instructions for your system, read the [install instructions](https://dm3mat.darc.de/qdmr/install.html). Some distributions (see badge above) already added qdmr, thus easing the install using the system package manager.
+There are several ways to install qdmr on your system ranging from simple app-package downloads to building qdmr from its sources. For a detailed list of instructions for your system, read the [install instructions](https://dm3mat.de/software/qdmr/install). Some distributions (see badge above) already added qdmr, thus easing the install using the system package manager.
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
