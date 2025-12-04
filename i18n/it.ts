@@ -598,7 +598,7 @@
     <message>
         <location filename="../src/analogchanneldialog.ui" line="277"/>
         <source>Scan List</source>
-        <translation>Lista scan</translation>
+        <translation>Lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="304"/>
@@ -1172,7 +1172,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="466"/>
         <source>Scanlist</source>
-        <translation>Lista scan</translation>
+        <translation>Lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="467"/>
@@ -1299,7 +1299,7 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="101"/>
         <source>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</source>
-        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come liste gruppo, zone, liste scan e zone roaming.</translation>
+        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come liste gruppo, zone, liste di scansione e zone roaming.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="104"/>
@@ -1826,7 +1826,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="285"/>
         <source>Scan List</source>
-        <translation>Lista scan</translation>
+        <translation>Lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="167"/>
@@ -2564,7 +2564,7 @@
     <message>
         <location filename="../src/mainwindow.cc" line="130"/>
         <source>Scan Lists</source>
-        <translation>Liste scan</translation>
+        <translation>Liste di scansione</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="132"/>
@@ -2915,12 +2915,12 @@
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete scan lists?</source>
-        <translation>Eliminare le liste scans?</translation>
+        <translation>Eliminare le liste di scansione?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete %1 scan lists?</source>
-        <translation>Eliminare %1 liste scan?</translation>
+        <translation>Eliminare %1 liste di scansione?</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
@@ -3345,7 +3345,7 @@
         <location filename="../src/scanlistdialog.ui" line="20"/>
         <location filename="../src/scanlistdialog.cc" line="13"/>
         <source>Edit Scan List</source>
-        <translation>Modifica lista scan</translation>
+        <translation>Modifica lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="30"/>
@@ -3400,7 +3400,7 @@
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
         <source>Create Scan List</source>
-        <translation>Crea lista scan</translation>
+        <translation>Crea lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="34"/>
@@ -3426,37 +3426,37 @@
     <message>
         <location filename="../src/scanlistsview.cc" line="42"/>
         <source>Cannot delete scanlist</source>
-        <translation>Impossibile eliminare la lista scan</translation>
+        <translation>Impossibile eliminare la lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="43"/>
         <source>Cannot delete scanlist: You have to select a scanlist first.</source>
-        <translation>Impossibile eliminare la lista scan: devi prima selezionarne una.</translation>
+        <translation>Impossibile eliminare la lista di scansione: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="53"/>
         <source>Delete scan list?</source>
-        <translation>Eliminare la lista scan?</translation>
+        <translation>Eliminare la lista di scansione?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="53"/>
         <source>Delete scan list %1?</source>
-        <translation>Eliminare la lista scan &apos;%1&apos;?</translation>
+        <translation>Eliminare la lista di scansione &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete scan lists?</source>
-        <translation>Eliminare le liste scan?</translation>
+        <translation>Eliminare le liste di scansione?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete %1 scan lists?</source>
-        <translation>Eliminare %1 liste scan?</translation>
+        <translation>Eliminare %1 liste di scansione?</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="35"/>
         <source>Add Scan List</source>
-        <translation>Aggiungi lista scan</translation>
+        <translation>Aggiungi lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="38"/>
@@ -3466,7 +3466,7 @@
     <message>
         <location filename="../src/scanlistsview.ui" line="45"/>
         <source>Delete Scan List</source>
-        <translation>Elimina lista scan</translation>
+        <translation>Elimina lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="48"/>
@@ -3479,7 +3479,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="850"/>
         <source>Scan-List</source>
-        <translation>Lista scan</translation>
+        <translation>Lista di scansione</translation>
     </message>
 </context>
 <context>
