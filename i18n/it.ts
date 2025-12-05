@@ -1192,7 +1192,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="470"/>
         <source>RX Group List</source>
-        <translation>Lista gruppo RX</translation>
+        <translation>Lista gruppi RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="471"/>
@@ -1299,7 +1299,7 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="101"/>
         <source>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</source>
-        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come liste gruppo, zone, liste di scansione e zone roaming.</translation>
+        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come liste gruppi, zone, liste di scansione e zone roaming.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="104"/>
@@ -1920,7 +1920,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="408"/>
         <source>Rx Group List</source>
-        <translation>Lista gruppo</translation>
+        <translation>Lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="425"/>
@@ -2214,33 +2214,33 @@
     <message>
         <location filename="../src/grouplistsview.cc" line="46"/>
         <source>Cannot delete RX group list</source>
-        <translation>Impossibile eliminare la lista gruppo</translation>
+        <translation>Impossibile eliminare la lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="47"/>
         <source>Cannot delete RX group lists: You have to select a group list first.</source>
-        <translation>Impossibile eliminare le liste gruppo: devi prima selezionarne una.</translation>
+        <translation>Impossibile eliminare le liste gruppi: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete RX group list?</source>
-        <translation>Eliminare la lista gruppo?</translation>
+        <translation>Eliminare la lista gruppi?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <source>Delete RX group list %1?</source>
-        <translation>Eliminare la lista gruppo &apos;%1&apos;?</translation>
+        <translation>Eliminare la lista gruppi &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete %1 RX group lists?</source>
-        <translation>Eliminare %1 liste gruppo?</translation>
+        <translation>Eliminare %1 liste gruppi?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="32"/>
         <source>Add RX Group</source>
-        <translation>Aggiungi lista gruppo</translation>
+        <translation>Aggiungi lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
@@ -2250,7 +2250,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
         <source>Delete RX Group</source>
-        <translation>Elimina lista gruppo</translation>
+        <translation>Elimina lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
@@ -2263,7 +2263,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="874"/>
         <source>RX Group Lists</source>
-        <translation>Liste gruppo</translation>
+        <translation>Liste gruppi</translation>
     </message>
 </context>
 <context>
@@ -2549,7 +2549,7 @@
     <message>
         <location filename="../src/mainwindow.cc" line="124"/>
         <source>Group Lists</source>
-        <translation>Liste gruppo</translation>
+        <translation>Liste gruppi</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="126"/>
@@ -2837,12 +2837,12 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="17"/>
         <source>Create Group List</source>
-        <translation>Crea lista gruppo</translation>
+        <translation>Crea lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="24"/>
         <source>Edit Group List</source>
-        <translation>Modifica lista gruppo</translation>
+        <translation>Modifica lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="84"/>
