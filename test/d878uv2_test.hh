@@ -16,6 +16,8 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
   void testKeyFunctions();
+
+  void testAESEncryption();
 };
 
 #endif // D878UV2TEST_HH
