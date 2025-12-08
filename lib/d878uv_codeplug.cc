@@ -3572,7 +3572,7 @@ D878UVCodeplug::AESEncryptionKeyElement::key() const {
   // Limit size to 32 byte (256 bit)
   size = std::min(Limit::keySize(), size);
   // Determine, where the key starts
-  unsigned int o = Limit::keySize() - size/2;
+  unsigned int o = Limit::keySize() - size;
   // Copy
   QByteArray ar(size, 0);
   memcpy(ar.data(), _data+Offset::key()+o, size);
