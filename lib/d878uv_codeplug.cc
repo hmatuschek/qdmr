@@ -3569,6 +3569,8 @@ D878UVCodeplug::AESEncryptionKeyElement::key() const {
   unsigned int size = getUInt8(Offset::size());
   // convert nibble to bytes
   size += (size%2); size /= 2;
+  // Limit size to 32 byte (256 bit)
+  size = std::min(Limit::keySize(), size);
   // Determine, where the key starts
   unsigned int o = Limit::keySize() - size;
   // Copy

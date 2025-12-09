@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -226,7 +226,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>Balloon</source>
-        <translation>Pallone aerostatico</translation>
+        <translation>Mongolfiera</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
@@ -484,7 +484,7 @@
         <location filename="../src/analogchanneldialog.cc" line="58"/>
         <location filename="../src/analogchanneldialog.cc" line="76"/>
         <source>[None]</source>
-        <translation>[Nessuna]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.cc" line="91"/>
@@ -572,7 +572,7 @@
         <location filename="../src/analogchanneldialog.ui" line="258"/>
         <location filename="../src/analogchanneldialog.ui" line="361"/>
         <source>Default</source>
-        <translation>Default</translation>
+        <translation>Predefinito/a</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="196"/>
@@ -583,7 +583,7 @@
         <location filename="../src/analogchanneldialog.ui" line="211"/>
         <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>Disattivato</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="233"/>
@@ -923,7 +923,7 @@
     <message>
         <location filename="../src/application.cc" line="775"/>
         <source>Write satellite config ...</source>
-        <translation>Salvataggio configurazione del satellite…</translation>
+        <translation>Salvataggio della configurazione del satellite…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="785"/>
@@ -961,7 +961,7 @@
     <message>
         <location filename="../src/channellistview.cc" line="113"/>
         <source>Cannot delete channel: You have to select a channel first.</source>
-        <translation>Impossibile eliminare il canale: devi prima selezionare un canale.</translation>
+        <translation>Impossibile eliminare il canale: devi prima selezionarne uno.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="123"/>
@@ -1039,7 +1039,7 @@
         <location filename="../src/configitemwrapper.cc" line="398"/>
         <location filename="../src/configitemwrapper.cc" line="409"/>
         <source>[Default]</source>
-        <translation>[Predefinito]</translation>
+        <translation>[Predefinito/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="291"/>
@@ -1192,7 +1192,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="470"/>
         <source>RX Group List</source>
-        <translation>Elenco gruppi RX</translation>
+        <translation>Lista gruppi RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="471"/>
@@ -1299,7 +1299,7 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="101"/>
         <source>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</source>
-        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come elenchi di gruppi, zone, liste di scansione e zone roaming.</translation>
+        <translation>Gli insiemi sono tutti oggetti che contengono altri elementi, come liste gruppi, zone, liste di scansione e zone roaming.</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="104"/>
@@ -1367,7 +1367,7 @@
         <location filename="../src/configobjectlistview.cc" line="166"/>
         <location filename="../src/configobjectlistview.cc" line="189"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Impossibile spostare gli elementi: devi prima selezionare almeno un elemento.</translation>
+        <translation>Impossibile spostare gli elementi: devi prima selezionarne almeno uno.</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="25"/>
@@ -1411,7 +1411,7 @@
     <message>
         <location filename="../src/configobjecttableview.cc" line="254"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Impossibile spostare gli elementi: devi prima selezionare almeno un elemento.</translation>
+        <translation>Impossibile spostare gli elementi: devi prima selezionarne almeno uno.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="261"/>
@@ -1492,7 +1492,7 @@
     <message>
         <location filename="../src/contactlistview.cc" line="64"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
-        <translation>Impossibile eliminare il contatto: devi prima selezionare un contatto.</translation>
+        <translation>Impossibile eliminare il contatto: devi prima selezionarne uno.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="74"/>
@@ -1587,7 +1587,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="672"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="690"/>
@@ -1755,13 +1755,13 @@
         <location filename="../src/digitalchanneldialog.cc" line="84"/>
         <location filename="../src/digitalchanneldialog.cc" line="91"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="92"/>
         <location filename="../src/digitalchanneldialog.cc" line="101"/>
         <source>[Default]</source>
-        <translation>[Predefinito]</translation>
+        <translation>[Predefinito/a]</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.cc" line="117"/>
@@ -1863,7 +1863,7 @@
         <location filename="../src/digitalchanneldialog.ui" line="235"/>
         <location filename="../src/digitalchanneldialog.ui" line="266"/>
         <source>Default</source>
-        <translation>Predefinita</translation>
+        <translation>Predefinito/a</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="219"/>
@@ -1920,7 +1920,7 @@
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="408"/>
         <source>Rx Group List</source>
-        <translation>Elenco gruppi</translation>
+        <translation>Lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="425"/>
@@ -2214,33 +2214,33 @@
     <message>
         <location filename="../src/grouplistsview.cc" line="46"/>
         <source>Cannot delete RX group list</source>
-        <translation>Impossibile eliminare l&apos;elenco gruppi</translation>
+        <translation>Impossibile eliminare la lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="47"/>
         <source>Cannot delete RX group lists: You have to select a group list first.</source>
-        <translation>Impossibile eliminare gli elenchi gruppi: devi prima selezionare un elenco gruppi.</translation>
+        <translation>Impossibile eliminare le liste gruppi: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete RX group list?</source>
-        <translation>Eliminare l’elenco gruppi?</translation>
+        <translation>Eliminare la lista gruppi?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <source>Delete RX group list %1?</source>
-        <translation>Eliminare l’elenco gruppi &apos;%1&apos;?</translation>
+        <translation>Eliminare la lista gruppi &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete %1 RX group lists?</source>
-        <translation>Eliminare %1 elenchi gruppi?</translation>
+        <translation>Eliminare %1 liste gruppi?</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="32"/>
         <source>Add RX Group</source>
-        <translation>Aggiungi elenco gruppi</translation>
+        <translation>Aggiungi lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
@@ -2250,7 +2250,7 @@
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
         <source>Delete RX Group</source>
-        <translation>Elimina elenco gruppi</translation>
+        <translation>Elimina lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
@@ -2263,7 +2263,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="874"/>
         <source>RX Group Lists</source>
-        <translation>Elenchi gruppi</translation>
+        <translation>Liste gruppi</translation>
     </message>
 </context>
 <context>
@@ -2416,7 +2416,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="103"/>
+        <location filename="../src/mainwindow.cc" line="106"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
@@ -2448,7 +2448,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="323"/>
         <source>Refresh Talkgroup DB</source>
-        <translation>Aggiorna DB dei talk-group</translation>
+        <translation>Aggiorna il DB dei talk-group</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
@@ -2488,7 +2488,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="358"/>
         <source>Edit Satellites ...</source>
-        <translation>Modifica satelliti...</translation>
+        <translation>Modifica i satelliti...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="361"/>
@@ -2498,7 +2498,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="369"/>
         <source>Write satellites</source>
-        <translation>Salva satelliti</translation>
+        <translation>Salva i satelliti</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="372"/>
@@ -2518,12 +2518,12 @@
     <message>
         <location filename="../src/mainwindow.cc" line="78"/>
         <source>Cannot update talkgroup DB: %1</source>
-        <translation>Impossibile aggiornare il database dei gruppi di conversazione: %1</translation>
+        <translation>Impossibile aggiornare il database dei talk-group: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="81"/>
         <source>Talkgroup database updated &amp; loaded.</source>
-        <translation>Database dei gruppi di conversazione aggiornato e caricato.</translation>
+        <translation>Database dei talk-group aggiornato e caricato.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="86"/>
@@ -2536,64 +2536,64 @@
         <translation>Elementi orbitali aggiornati e caricati.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
-        <location filename="../src/mainwindow.cc" line="163"/>
+        <location filename="../src/mainwindow.cc" line="120"/>
+        <location filename="../src/mainwindow.cc" line="166"/>
         <source>Radio IDs</source>
         <translation>ID Radio</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="119"/>
+        <location filename="../src/mainwindow.cc" line="122"/>
         <source>Contacts</source>
         <translation>Contatti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="121"/>
+        <location filename="../src/mainwindow.cc" line="124"/>
         <source>Group Lists</source>
-        <translation>Elenchi gruppi</translation>
+        <translation>Liste gruppi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <location filename="../src/mainwindow.cc" line="126"/>
         <source>Channels</source>
         <translation>Canali</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="125"/>
+        <location filename="../src/mainwindow.cc" line="128"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="127"/>
+        <location filename="../src/mainwindow.cc" line="130"/>
         <source>Scan Lists</source>
         <translation>Liste di scansione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="129"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="131"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Channels</source>
         <translation>Canali roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="137"/>
         <source>Roaming Zones</source>
         <translation>Zone roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="138"/>
-        <location filename="../src/mainwindow.cc" line="177"/>
+        <location filename="../src/mainwindow.cc" line="141"/>
+        <location filename="../src/mainwindow.cc" line="180"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="194"/>
+        <location filename="../src/mainwindow.cc" line="197"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifiche non salvate al codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="195"/>
+        <location filename="../src/mainwindow.cc" line="198"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo queste modifiche andranno perse.</translation>
     </message>
@@ -2642,7 +2642,7 @@
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="74"/>
         <source>Cannot delete GPS system: You have to select a GPS system first.</source>
-        <translation>Impossibile eliminare il sistema GPS: devi prima selezionare un sistema GPS.</translation>
+        <translation>Impossibile eliminare il sistema GPS: devi prima selezionarne uno.</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
@@ -2713,7 +2713,7 @@
         <location filename="../src/configitemwrapper.cc" line="792"/>
         <location filename="../src/configitemwrapper.cc" line="800"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="781"/>
@@ -2772,7 +2772,7 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="120"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
 </context>
 <context>
@@ -2811,7 +2811,7 @@
         <location filename="../src/extensionwrapper.cc" line="605"/>
         <location filename="../src/extensionwrapper.cc" line="613"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="615"/>
@@ -2829,7 +2829,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
 </context>
 <context>
@@ -2837,12 +2837,12 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="17"/>
         <source>Create Group List</source>
-        <translation>Crea elenco gruppi</translation>
+        <translation>Crea lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="24"/>
         <source>Edit Group List</source>
-        <translation>Modifica elenco gruppi</translation>
+        <translation>Modifica lista gruppi</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="84"/>
@@ -2852,7 +2852,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="85"/>
         <source>Cannot remove group call: You have to select at least one group call first.</source>
-        <translation>Impossibile rimuovere la chiamata di gruppo: devi prima selezionare almeno una chiamata di gruppo.</translation>
+        <translation>Impossibile rimuovere la chiamata di gruppo: devi prima selezionarne almeno una.</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="30"/>
@@ -2900,7 +2900,7 @@
     <message>
         <location filename="../src/radioidlistview.cc" line="62"/>
         <source>Cannot delete radio IDs: You have to select a radio ID first.</source>
-        <translation>Impossibile eliminare gli ID radio: devi prima selezionare un ID radio.</translation>
+        <translation>Impossibile eliminare gli ID radio: devi prima selezionarne uno.</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
@@ -2943,7 +2943,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="961"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="976"/>
@@ -3087,7 +3087,7 @@
     <message>
         <location filename="../src/roamingchannellistview.cc" line="64"/>
         <source>Cannot delete roaming channel: You have to select a channel first.</source>
-        <translation>Impossibile eliminare il canale roaming: devi prima selezionare un canale.</translation>
+        <translation>Impossibile eliminare il canale roaming: devi prima selezionarne uno.</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
@@ -3117,7 +3117,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="563"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="578"/>
@@ -3259,7 +3259,7 @@
     <message>
         <location filename="../src/roamingzonelistview.cc" line="88"/>
         <source>Cannot delete roaming zone: You have to select a zone first.</source>
-        <translation>Impossibile eliminare la zona roaming: devi prima selezionare una zona.</translation>
+        <translation>Impossibile eliminare la zona roaming: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="98"/>
@@ -3317,7 +3317,7 @@
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="20"/>
         <source>Edit satellite database</source>
-        <translation>Modifica database satelliti</translation>
+        <translation>Modifica il database dei satelliti</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="45"/>
@@ -3406,7 +3406,7 @@
         <location filename="../src/scanlistdialog.cc" line="34"/>
         <location filename="../src/scanlistdialog.cc" line="36"/>
         <source>[None]</source>
-        <translation>[Nessuno]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="35"/>
@@ -3431,7 +3431,7 @@
     <message>
         <location filename="../src/scanlistsview.cc" line="43"/>
         <source>Cannot delete scanlist: You have to select a scanlist first.</source>
-        <translation>Impossibile eliminare la lista di scansione: devi prima selezionare una lista di scansione.</translation>
+        <translation>Impossibile eliminare la lista di scansione: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="53"/>
@@ -3501,7 +3501,7 @@
     <message>
         <location filename="../src/selectivecallbox.cc" line="16"/>
         <source>None</source>
-        <translation>Nessuno</translation>
+        <translation>Nessuno/a</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="17"/>
@@ -3627,12 +3627,12 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="189"/>
         <source>disable auto-detect</source>
-        <translation>disabilita rilevamento automatico</translation>
+        <translation>disabilita il rilevamento automatico</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="272"/>
         <source>Ignore verification warnings</source>
-        <translation>Ignora avvisi di verifica</translation>
+        <translation>Ignora gli avvisi di verifica</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="279"/>
@@ -3811,7 +3811,7 @@
     <message>
         <location filename="../src/zonelistview.cc" line="42"/>
         <source>Cannot delete zone: You have to select a zone first.</source>
-        <translation>Impossibile eliminare la zona: devi prima selezionare una zona.</translation>
+        <translation>Impossibile eliminare la zona: devi prima selezionarne una.</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="52"/>
