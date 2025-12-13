@@ -51,12 +51,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Snowmobile</source>
-        <translation type="unfinished"></translation>
+        <translation>Sneeuwscooter</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Red cross</source>
-        <translation type="unfinished"></translation>
+        <translation>Rode kruis</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="18"/>
@@ -136,7 +136,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
         <source>Campground</source>
-        <translation type="unfinished"></translation>
+        <translation>Kampeerterrein</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="34"/>
@@ -176,7 +176,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="41"/>
         <source>Canoe</source>
-        <translation type="unfinished"></translation>
+        <translation>Kano</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="42"/>
@@ -186,7 +186,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="43"/>
         <source>Tractor</source>
-        <translation type="unfinished"></translation>
+        <translation>Trekker</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="44"/>
@@ -276,7 +276,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="61"/>
         <source>Yacht</source>
-        <translation type="unfinished"></translation>
+        <translation>Jacht</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="62"/>
@@ -331,7 +331,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="72"/>
         <source>Fire station</source>
-        <translation type="unfinished"></translation>
+        <translation>Brandweerkazerne</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="73"/>
@@ -341,7 +341,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="74"/>
         <source>Fire truck</source>
-        <translation type="unfinished"></translation>
+        <translation>Brandweerauto</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="75"/>
@@ -366,7 +366,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="79"/>
         <source>Truck small</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrachtwagen klein</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="80"/>
