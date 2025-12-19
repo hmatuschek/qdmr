@@ -46,12 +46,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Wheel Chair</source>
-        <translation type="unfinished">Rullstol</translation>
+        <translation>Rullstol</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Snowmobile</source>
-        <translation type="unfinished">Snöskoter</translation>
+        <translation>Snöskoter</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
@@ -221,12 +221,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="50"/>
         <source>NTS station</source>
-        <translation type="unfinished">NTS station</translation>
+        <translation>NTS station</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>Balloon</source>
-        <translation type="unfinished">Ballong</translation>
+        <translation>Ballong</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
@@ -286,7 +286,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="63"/>
         <source>Jogger</source>
-        <translation type="unfinished">Joggare</translation>
+        <translation>Joggare</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="64"/>
