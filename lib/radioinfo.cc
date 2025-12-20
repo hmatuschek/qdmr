@@ -45,7 +45,8 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"d878uv2",   RadioInfo::D878UVII},
   {"d578uv",    RadioInfo::D578UV},
   {"d578uv2",   RadioInfo::D578UVII},
-  {"dr1801uv",  RadioInfo::DR1801UV}
+  {"dr1801uv",  RadioInfo::DR1801UV},
+  {"dm32uv",    RadioInfo::DM32UV}
 };
 
 QHash<unsigned, RadioInfo>
@@ -66,7 +67,8 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::D578UV,    D578UV::defaultRadioInfo()},
   {RadioInfo::DMR6X2UV,  DMR6X2UV::defaultRadioInfo()},
   {RadioInfo::DMR6X2UV2, DMR6X2UV2::defaultRadioInfo()},
-  {RadioInfo::DR1801UV,  DR1801UV::defaultRadioInfo()}
+  {RadioInfo::DR1801UV,  DR1801UV::defaultRadioInfo()},
+  //{RadioInfo::DM32UV,    DM32UV::defaultRadioInfo()}
 };
 
 

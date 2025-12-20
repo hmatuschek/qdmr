@@ -44,7 +44,8 @@ qt_add_library(libdmrconf SHARED
   dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc
   dmr6x2uv2.cc dmr6x2uv2_codeplug.cc dmr6x2uv2_limits.cc
   auctus_a6_interface.cc
-  dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc)
+  dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
+  dm32uv.hh dm32uv.cc dm32uv_interface.hh dm32uv_interface.cc)
 
 target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
