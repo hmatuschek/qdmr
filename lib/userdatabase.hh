@@ -103,7 +103,8 @@ signals:
   void loaded();
   /** Gets emitted if the loading of the call-sign database fails. */
   void error(const QString &msg);
-  /** Gets emitted, once the database has been loaded or cleard. */
+  /** Gets emitted, once the database has been loaded or cleard.
+   * @warning This event might be emitted by another thread. */
   void readyChanged(bool ready);
 
 public slots:
