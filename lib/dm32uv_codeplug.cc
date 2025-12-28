@@ -574,6 +574,7 @@ DM32UVCodeplug::ContactElement::callType() const {
   case Type::Group: return DMRContact::Type::GroupCall;
   case Type::All: return DMRContact::Type::AllCall;
   }
+  return DMRContact::Type::PrivateCall;
 }
 
 void
@@ -642,6 +643,7 @@ DM32UVCodeplug::ContactIndexElement::EntryElement::callType() const {
   case Type::Group: return DMRContact::Type::GroupCall;
   case Type::All: return DMRContact::Type::AllCall;
   }
+  return DMRContact::Type::PrivateCall;
 }
 
 void
@@ -1414,6 +1416,300 @@ DM32UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) {
 }
 
 
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::RoamingChannelElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+QString
+DM32UVCodeplug::RoamingChannelElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::RoamingChannelElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+Frequency
+DM32UVCodeplug::RoamingChannelElement::rxFrequency() const {
+  return Frequency::fromHz((unsigned long long)getBCD8_le(Offset::rxFrequency()) * 10);
+}
+
+void
+DM32UVCodeplug::RoamingChannelElement::setRXFrequency(const Frequency &f) {
+  setBCD8_le(Offset::rxFrequency(), f.inHz()/10);
+}
+
+Frequency
+DM32UVCodeplug::RoamingChannelElement::txFrequency() const {
+  return Frequency::fromHz((unsigned long long)getBCD8_le(Offset::txFrequency()) * 10);
+}
+
+void
+DM32UVCodeplug::RoamingChannelElement::setTXFrequency(const Frequency &f) {
+  setBCD8_le(Offset::txFrequency(), f.inHz()/10);
+}
+
+unsigned int
+DM32UVCodeplug::RoamingChannelElement::colorCode() const {
+  return getUInt8(Offset::colorCode());
+}
+
+void
+DM32UVCodeplug::RoamingChannelElement::setColorCode(unsigned int cc) {
+  setUInt8(Offset::colorCode(), std::min(cc, 15u));
+}
+
+DMRChannel::TimeSlot
+DM32UVCodeplug::RoamingChannelElement::timeSlot() const {
+  switch ((TimeSlot) getUInt8(Offset::timeSlot())) {
+  case TimeSlot::TS1: return DMRChannel::TimeSlot::TS1;
+  case TimeSlot::TS2: return DMRChannel::TimeSlot::TS2;
+  }
+  return DMRChannel::TimeSlot::TS1;
+}
+
+void
+DM32UVCodeplug::RoamingChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
+  switch (ts) {
+  case DMRChannel::TimeSlot::TS1: setUInt8(Offset::timeSlot(), (unsigned int)TimeSlot::TS1); break;
+  case DMRChannel::TimeSlot::TS2: setUInt8(Offset::timeSlot(), (unsigned int)TimeSlot::TS2); break;
+  }
+}
+
+RoamingChannel *
+DM32UVCodeplug::RoamingChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  auto rc = new RoamingChannel();
+  rc->setName(name());
+  rc->setRXFrequency(rxFrequency());
+  rc->setTXFrequency(txFrequency());
+  rc->overrideColorCode(true);
+  rc->setColorCode(colorCode());
+  rc->overrideTimeSlot(true);
+  rc->setTimeSlot(timeSlot());
+  return rc;
+}
+
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::RoamingChannelBankElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::RoamingChannelBankElement::RoamingChannelBankElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+unsigned int
+DM32UVCodeplug::RoamingChannelBankElement::count() const {
+  return getUInt8(Offset::count());
+}
+
+void
+DM32UVCodeplug::RoamingChannelBankElement::setCount(unsigned int n) {
+  setUInt8(Offset::count(), std::min(n, Limit::channels()));
+}
+
+DM32UVCodeplug::RoamingChannelElement
+DM32UVCodeplug::RoamingChannelBankElement::channel(unsigned int n) {
+  return RoamingChannelElement(_data + Offset::channels() + n*Offset::betweenChannels());
+}
+
+bool
+DM32UVCodeplug::RoamingChannelBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<count(); i++) {
+    auto rc = channel(i).decode(ctx, err);
+    if (nullptr == rc) {
+      errMsg(err) << "Cannot decode roaming channel at index " << i << ".";
+      return false;
+    }
+    ctx.add(rc, i);
+    ctx.config()->roamingChannels()->add(rc);
+  }
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::RoamingZoneElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::RoamingZoneElement::RoamingZoneElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass..
+}
+
+
+QString
+DM32UVCodeplug::RoamingZoneElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::RoamingZoneElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+unsigned int
+DM32UVCodeplug::RoamingZoneElement::count() const {
+  return getUInt8(Offset::channelCount());
+}
+
+void
+DM32UVCodeplug::RoamingZoneElement::setCount(unsigned int n) {
+  setUInt8(Offset::channelCount(), std::min(n, Limit::channels()));
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneElement::channelIndexValid(unsigned int n) {
+  return 0 != getUInt8(Offset::channels() + n*Offset::betweenChannels());
+}
+
+unsigned int
+DM32UVCodeplug::RoamingZoneElement::channelIndex(unsigned int n) {
+  return getUInt8(Offset::channels() + n*Offset::betweenChannels())-1;
+}
+
+void
+DM32UVCodeplug::RoamingZoneElement::setChannelIndex(unsigned int n, unsigned int idx) {
+  setUInt8(Offset::channels() + n*Offset::betweenChannels(), idx+1);
+}
+
+void
+DM32UVCodeplug::RoamingZoneElement::clearChannelIndex(unsigned int n) {
+  setUInt8(Offset::channels() + n*Offset::betweenChannels(), 0);
+}
+
+RoamingZone *
+DM32UVCodeplug::RoamingZoneElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  return new RoamingZone(name());
+}
+
+bool
+DM32UVCodeplug::RoamingZoneElement::link(RoamingZone *zone, Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<count(); i++) {
+    if (! ctx.has<RoamingChannel>(channelIndex(i))) {
+      errMsg(err) << "Cannot resolve " << i << "-th channel index " << channelIndex(i)
+                  << ": Not defined.";
+      return false;
+    }
+    zone->addChannel(ctx.get<RoamingChannel>(channelIndex(i)));
+  }
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::RoamingZoneBankElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::RoamingZoneBankElement::RoamingZoneBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+unsigned int
+DM32UVCodeplug::RoamingZoneBankElement::count() const {
+  return getUInt8(Offset::count());
+}
+
+void
+DM32UVCodeplug::RoamingZoneBankElement::setCount(unsigned int n) {
+  setUInt8(Offset::count(), std::min(n, Limit::zones()));
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneBankElement::autoRoamEnabled() const {
+  return 0x01 == getUInt8(Offset::autoRoam());
+}
+
+void
+DM32UVCodeplug::RoamingZoneBankElement::enableAutoRoam(bool enable) {
+  setUInt8(Offset::autoRoam(), enable ? 0x01 : 0x00);
+}
+
+
+Interval
+DM32UVCodeplug::RoamingZoneBankElement::roamingDelay() const {
+  return Interval::fromMinutes(getUInt8(Offset::roamingDelay()));
+}
+
+void
+DM32UVCodeplug::RoamingZoneBankElement::setRoamingDelay(const Interval &delay) {
+  setUInt8(Offset::roamingDelay(), delay.minutes());
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneBankElement::defaultRoamingZoneIndexValid() const {
+  return 0 != getUInt8(Offset::defaultRoamingZone());
+}
+
+unsigned int
+DM32UVCodeplug::RoamingZoneBankElement::defaultRoamingZoneIndex() const {
+  return getUInt8(Offset::defaultRoamingZone())-1;
+}
+
+void
+DM32UVCodeplug::RoamingZoneBankElement::setDefaultRoamingZoneIndex(unsigned int idx) {
+  return setUInt8(Offset::defaultRoamingZone(), idx+1);
+}
+
+void
+DM32UVCodeplug::RoamingZoneBankElement::clearDefaultRoamingZoneIndex() {
+  setUInt8(Offset::defaultRoamingZone(), 0);
+}
+
+
+DM32UVCodeplug::RoamingZoneElement
+DM32UVCodeplug::RoamingZoneBankElement::zone(unsigned int n) {
+  return RoamingZoneElement(_data + Offset::zones() + n*Offset::betweenZones());
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<count(); i++) {
+    auto z = zone(i).decode(ctx, err);
+    if (nullptr == z) {
+      errMsg(err) << "Cannot decode zone at index " << i << ".";
+      return false;
+    }
+    ctx.add(z, i);
+    ctx.config()->roamingZones()->add(z);
+  }
+  return true;
+}
+
+bool
+DM32UVCodeplug::RoamingZoneBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<count(); i++) {
+    auto z = ctx.get<RoamingZone>(i);
+    if (nullptr == z) {
+      errMsg(err) << "Cannot link zone at index " << i << ": Cannot resolve index.";
+      return false;
+    }
+    if (! zone(i).link(z, ctx, err)) {
+      errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::SMSTemplateElement
@@ -1439,6 +1735,7 @@ DM32UVCodeplug::SMSTemplateElement::setMessage(const QString &msg) {
 
 SMSTemplate *
 DM32UVCodeplug::SMSTemplateElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   auto tmpl = new SMSTemplate(); tmpl->setMessage(message());
   return tmpl;
 }
@@ -1458,7 +1755,7 @@ DM32UVCodeplug::SMSTemplateBankElement::count() const {
   return getUInt8(Offset::count());
 }
 
-unsigned int
+void
 DM32UVCodeplug::SMSTemplateBankElement::setCount(unsigned int n) {
   n = std::min(n, Limit::messages());
   setUInt8(Offset::count(), n);
@@ -1482,6 +1779,223 @@ DM32UVCodeplug::SMSTemplateBankElement::decode(Context &ctx, const ErrorStack &e
   }
   return true;
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::GeneralSettingsElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::BootDisplay
+DM32UVCodeplug::GeneralSettingsElement::bootDisplay() const {
+  return (BootDisplay) getUInt8(Offset::bootDisplay());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay dis) {
+  setUInt8(Offset::bootDisplay(), (unsigned int)dis);
+}
+
+
+QString
+DM32UVCodeplug::GeneralSettingsElement::bootMessage1() const {
+  return readASCII(Offset::bootMessage1(), Limit::bootMessageLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setBootMessage1(const QString &msg) {
+  writeASCII(Offset::bootMessage1(), msg, Limit::bootMessageLength(), 0x00);
+}
+
+QString
+DM32UVCodeplug::GeneralSettingsElement::bootMessage2() const {
+  return readASCII(Offset::bootMessage2(), Limit::bootMessageLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setBootMessage2(const QString &msg) {
+  writeASCII(Offset::bootMessage2(), msg, Limit::bootMessageLength(), 0x00);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::mcuResetEnabled() const {
+  return 0x01 == getUInt8(Offset::mcuReset());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableMCUReset(bool enable) {
+  setUInt8(Offset::mcuReset(), enable ? 0x01 : 0x00);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::autoPowerOffDelay() const {
+  switch ((AutoPowerOffDelay)getUInt8(Offset::autoPowerOffDelay())) {
+  case AutoPowerOffDelay::Off: return Interval::infinity();
+  case AutoPowerOffDelay::T30Min: return Interval::fromMinutes(30);
+  case AutoPowerOffDelay::T60Min: return Interval::fromMinutes(60);
+  case AutoPowerOffDelay::T2h: return Interval::fromMinutes(120);
+  case AutoPowerOffDelay::T4h: return Interval::fromMinutes(240);
+  case AutoPowerOffDelay::T8h: return Interval::fromMinutes(480);
+  }
+  return Interval::infinity();
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setAutoPowerOffDelay(const Interval &delay) {
+  if (delay.isNull() || delay.isInfinite())
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::Off);
+  else if (delay.minutes() <= 30)
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::T30Min);
+  else if (delay.minutes() <= 60)
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::T60Min);
+  else if (delay.minutes() <= 120)
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::T2h);
+  else if (delay.minutes() <= 240)
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::T4h);
+  else if (delay.minutes() <= 480)
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::T8h);
+  else
+    setUInt8(Offset::autoPowerOffDelay(), (unsigned int)AutoPowerOffDelay::Off);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::radioSilentEnabled() const {
+  return getBit(Offset::radioSilent());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableRadioSilent(bool enable) {
+  setBit(Offset::radioSilent(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::keyToneEnabled() const {
+  return getBit(Offset::keyTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
+  setBit(Offset::keyTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::smsToneEnabled() const {
+  return getBit(Offset::smsTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableSMSTone(bool enable) {
+  setBit(Offset::smsTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::groupCallToneEnabled() const {
+  return getBit(Offset::groupCallTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableGroupCallTone(bool enable) {
+  setBit(Offset::groupCallTone(), enable);
+}
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::privateCallToneEnabled() const {
+  return getBit(Offset::privateCallTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enablePrivateCallTone(bool enable) {
+  setBit(Offset::privateCallTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::eotToneEnabled() const {
+  return getBit(Offset::eotTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableEOTTone(bool enable) {
+  setBit(Offset::eotTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::talkPermitToneEnabled() const {
+  return getBit(Offset::talkPermitTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableTalkPermitTone(bool enable) {
+  setBit(Offset::talkPermitTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::bootToneEnabled() const {
+  return getBit(Offset::bootTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableBootTone(bool enable) {
+  setBit(Offset::bootTone(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::voicePromptEnabled() const {
+  return getBit(Offset::voicePrompt());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableVoicePrompt(bool enable) {
+  setBit(Offset::voicePrompt(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::lowBatteryToneEnabled() const {
+  return getBit(Offset::lowBatteryTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableLowBatteryTone(bool enable) {
+  setBit(Offset::lowBatteryTone(), enable);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::FMRogerTone
+DM32UVCodeplug::GeneralSettingsElement::fmRogerTone() const {
+  return (FMRogerTone)getUInt2(Offset::fmRogerTone());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setFMRogerTone(FMRogerTone tone) {
+  setUInt2(Offset::fmRogerTone(), (unsigned int)tone);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  ctx.config()->settings()->setIntroLine1(bootMessage1());
+  ctx.config()->settings()->setIntroLine2(bootMessage2());
+  ctx.config()->settings()->enableSpeech(voicePromptEnabled());
+
+  return true;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -1632,6 +2146,21 @@ DM32UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! RoamingChannelBankElement(data(Offset::roamingChannelBank())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode roaming channels.";
+    return false;
+  }
+
+  if (! RoamingZoneBankElement(data(Offset::roamingZoneBank())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode roaming zones.";
+    return false;
+  }
+
+  if (! GeneralSettingsElement(data(Offset::generalSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode general settings.";
+    return false;
+  }
+
   return true;
 }
 
@@ -1655,6 +2184,11 @@ DM32UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! ScanListBankElement(data(Offset::scanListBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link scan lists.";
+    return false;
+  }
+
+  if (! RoamingZoneBankElement(data(Offset::roamingZoneBank())).link(ctx, err)) {
+    errMsg(err) << "Cannot link roaming zones.";
     return false;
   }
 

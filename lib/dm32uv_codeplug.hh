@@ -1,13 +1,15 @@
 #ifndef DM32UV_CODEPLUG_HH
 #define DM32UV_CODEPLUG_HH
 
+#include "channel.hh"
 #include "codeplug.hh"
+#include "contact.hh"
+#include "frequency.hh"
+#include "roamingchannel.hh"
 #include <QObject>
 #include <QString>
-#include "frequency.hh"
-#include "channel.hh"
-#include "contact.hh"
 
+#include "codeplug.hh"
 #include <codeplug.hh>
 #include <ranges.hh>
 
@@ -958,7 +960,7 @@ public:
   public:
     /** Some limits. */
     struct Limit: Element::Limit {
-      /** Maximum number of zones. */
+      /** Maximum number of scan lists. */
       static constexpr unsigned int scanLists()   { return 32; }
     };
 
@@ -972,6 +974,232 @@ public:
       static constexpr unsigned int vhfUpper()      { return 0x0e03; }
       static constexpr unsigned int uhfLower()      { return 0x0e05; }
       static constexpr unsigned int uhfUpper()      { return 0x0e07; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a roaming channel. */
+  class RoamingChannelElement: public Element
+  {
+  public:
+    /** Possible time-slot settings. */
+    enum class TimeSlot {
+      TS1 = 0, TS2 = 1
+    };
+
+  public:
+    /** Constructor from pointer to element. */
+    RoamingChannelElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x001a; }
+
+    /** Returns the name of the channel. */
+    virtual QString name() const;
+    /** Sets the name of the channel. */
+    virtual void setName(const QString &name);
+
+    /** Returns the RX frequency. */
+    virtual Frequency rxFrequency() const;
+    /** Sets the RX frequency. */
+    virtual void setRXFrequency(const Frequency &f);
+
+    /** Returns the TX frequency. */
+    virtual Frequency txFrequency() const;
+    /** Sets the TX frequency. */
+    virtual void setTXFrequency(const Frequency &f);
+
+    /** Return the color code. */
+    virtual unsigned int colorCode() const;
+    /** Sets the color code. */
+    virtual void setColorCode(unsigned int cc);
+
+    /** Returns the time slot. */
+    virtual DMRChannel::TimeSlot timeSlot() const;
+    /** Sets the time slots. */
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
+
+    /** Decodes the roaming channel.
+     * @returns nullptr on error. */
+    RoamingChannel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength()  { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()               { return 0x0000; }
+      static constexpr unsigned int rxFrequency()        { return 0x0010; }
+      static constexpr unsigned int txFrequency()        { return 0x0014; }
+      static constexpr unsigned int colorCode()          { return 0x0018; }
+      static constexpr unsigned int timeSlot()           { return 0x0019; }
+      /// @endcond
+    };
+  };
+
+
+  /** The bank of all roaming channels. */
+  class RoamingChannelBankElement: public Element
+  {
+  public:
+    /** Constructor from pointer to element. */
+    RoamingChannelBankElement(uint8_t *ptr);
+
+    /** Returns the size of the elment. */
+    static constexpr unsigned int size() { return 0x1000; }
+
+    /** Returns the number of channels. */
+    virtual unsigned int count() const;
+    /** Sets the number of channels. */
+    virtual void setCount(unsigned int n);
+
+    /** Returns the n-th channel. */
+    virtual RoamingChannelElement channel(unsigned int n);
+
+    /** Decides all romaming channels. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum number of channels. */
+      static constexpr unsigned int channels()        { return 150; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int channels()        { return 0x0000; }
+      static constexpr unsigned int count()           { return 0x0ff0; }
+      static constexpr unsigned int betweenChannels() { return RoamingChannelElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** En/Decodes a roaming zone. */
+  class RoamingZoneElement: public Element
+  {
+  public:
+    /** Constructor from pointer to element. */
+    RoamingZoneElement(uint8_t *ptr);
+
+    /** Returns the size of the elment. */
+    static constexpr unsigned int size() { return 0x0021; }
+
+    /** Returns the name of the zone. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    /** Returns the channel count. */
+    virtual unsigned int count() const;
+    /** Sets the number of channels. */
+    virtual void setCount(unsigned int n);
+
+    /** Returns @c true if the n-th channel index is set. */
+    virtual bool channelIndexValid(unsigned int n);
+    /** Returns the n-th channel index. */
+    virtual unsigned int channelIndex(unsigned int n);
+    /** Sets the n-th channel index. */
+    virtual void setChannelIndex(unsigned int n, unsigned int idx);
+    /** Clears the n-th channel index. */
+    virtual void clearChannelIndex(unsigned int n);
+
+    /** Decodes the roaming zone. */
+    virtual RoamingZone *decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the given roaming zone. */
+    virtual bool link(RoamingZone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength()  { return 16; }
+      /** Maximum number of channels per zone. */
+      static constexpr unsigned int channels()    { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()               { return 0x0000; }
+      static constexpr unsigned int channelCount()       { return 0x0010; }
+      static constexpr unsigned int channels()           { return 0x0011; }
+      static constexpr unsigned int betweenChannels()    { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+
+  /** En/decodes the roaming zone bank. */
+  class RoamingZoneBankElement : public Element
+  {
+  public:
+    /** Constructor from pointer to element. */
+    RoamingZoneBankElement(uint8_t *ptr);
+
+    /** Returns the size of the elment. */
+    static constexpr unsigned int size() { return 0x1000; }
+
+    /** Returns the zone count. */
+    virtual unsigned int count() const;
+    /** Sets the number of zones. */
+    virtual void setCount(unsigned int n);
+
+    /** Returns @c true if auto roaming is enabled. */
+    virtual bool autoRoamEnabled() const;
+    /** Enables auto roaming. */
+    virtual void enableAutoRoam(bool enable);
+
+    /** Returns the roaming delay. */
+    virtual Interval roamingDelay() const;
+    /** Sets the roaming delay. */
+    virtual void setRoamingDelay(const Interval &delay);
+
+    /** Returns @c true, if a default roaming zone is set. */
+    virtual bool defaultRoamingZoneIndexValid() const;
+    /** Returns the default roaming zone index. */
+    virtual unsigned int defaultRoamingZoneIndex() const;
+    /** Sets the default roaming zone index. */
+    virtual void setDefaultRoamingZoneIndex(unsigned int idx);
+    /** Clears the default roaming zone index. */
+    virtual void clearDefaultRoamingZoneIndex();
+
+    /** Returns the n-th roaming zone. */
+    virtual RoamingZoneElement zone(unsigned int n);
+
+    /** Decodes all roaming zones. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links all roaming zones. */
+    virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum number of zones. */
+      static constexpr unsigned int zones()        { return 64; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int count()              { return 0x0000; }
+      static constexpr unsigned int autoRoam()           { return 0x0001; }
+      static constexpr unsigned int roamingDelay()       { return 0x0002; }
+      static constexpr unsigned int defaultRoamingZone() { return 0x0003; }
+      static constexpr unsigned int zones()              { return 0x0010; }
+      static constexpr unsigned int betweenZones()       { return RoamingZoneElement::size(); }
       /// @endcond
     };
   };
@@ -998,7 +1226,7 @@ public:
   public:
     /** Some limits. */
     struct Limit: Element::Limit {
-      /** Maximum number of zones. */
+      /** Maximum message length. */
       static constexpr unsigned int messageLength()  { return 126; }
     };
 
@@ -1026,7 +1254,7 @@ public:
     /** Returns the number of messages. */
     virtual unsigned int count() const;
     /** Sets the number of messages. */
-    virtual unsigned int setCount(unsigned int n);
+    virtual void setCount(unsigned int n);
 
     /** Returns the n-th message. */
     virtual SMSTemplateElement message(unsigned int n) const;
@@ -1037,7 +1265,7 @@ public:
   public:
     /** Some limits. */
     struct Limit: Element::Limit {
-      /** Maximum number of zones. */
+      /** Maximum number of messages. */
       static constexpr unsigned int messages()        { return 20; }
     };
 
@@ -1048,6 +1276,144 @@ public:
       static constexpr unsigned int count()           { return 0x0000; }
       static constexpr unsigned int messages()        { return 0x0010; }
       static constexpr unsigned int betweenMessages() { return SMSTemplateElement::size(); }
+      /// @endcond
+    };
+  };
+
+
+  /** Common settings block. */
+  class GeneralSettingsElement: public Element
+  {
+  public:
+    /** Possible boot display settings. */
+    enum class BootDisplay {
+      Image=0, Message=1, Voltage=2
+    };
+
+    /** Possible auto-power-off delays. */
+    enum class AutoPowerOffDelay {
+      Off = 0, T30Min=1, T60Min=2, T2h=3, T4h=4, T8h=5
+    };
+
+    /** Possible FM roger tones. */
+    enum class FMRogerTone {
+      Off=0, Beep=1, BDC=2
+    };
+
+  public:
+    /** Constructor from pointer to element. */
+    GeneralSettingsElement(uint8_t *ptr);
+
+    /** Returns the size og the element. */
+    static constexpr unsigned int size() { return 0x1000; }
+
+    /** Returns the boot display setting. */
+    virtual BootDisplay bootDisplay() const;
+    /** Sets the boot display. */
+    virtual void setBootDisplay(BootDisplay dis);
+
+    /** Returns the first boot message line. */
+    virtual QString bootMessage1() const;
+    /** Sets the first boot message line. */
+    virtual void setBootMessage1(const QString &msg);
+    /** Returns the second boot message line. */
+    virtual QString bootMessage2() const;
+    /** Sets the second boot message line. */
+    virtual void setBootMessage2(const QString &msg);
+
+    /** Returns @c true if MCU reset is enabled. */
+    virtual bool mcuResetEnabled() const;
+    /** Enables MCU reset. */
+    virtual void enableMCUReset(bool enable);
+    /** Returns the auto-power-off delay. */
+    virtual Interval autoPowerOffDelay() const;
+    /** Sets the auto-power-off delay. */
+    virtual void setAutoPowerOffDelay(const Interval &delay);
+
+    /** Returns @c true if all tones are disabled. */
+    virtual bool radioSilentEnabled() const;
+    /** Disables all tones. */
+    virtual void enableRadioSilent(bool enable);
+
+    /** Returns @c true if key tones are enabled. */
+    virtual bool keyToneEnabled() const;
+    /** Enables key tones. */
+    virtual void enableKeyTone(bool enable);
+
+    /** Returns @c true if sms tones are enabled. */
+    virtual bool smsToneEnabled() const;
+    /** Enables sms tones. */
+    virtual void enableSMSTone(bool enable);
+
+    /** Returns @c true if group call tone is enabled. */
+    virtual bool groupCallToneEnabled() const;
+    /** Enables group call tones. */
+    virtual void enableGroupCallTone(bool enable);
+    /** Returns @c true if private call tone is enabled. */
+    virtual bool privateCallToneEnabled() const;
+    /** Enables group call tones. */
+    virtual void enablePrivateCallTone(bool enable);
+
+    /** Returns @c true if EOT tone is enabled. */
+    virtual bool eotToneEnabled() const;
+    /** Enables EOT tones. */
+    virtual void enableEOTTone(bool enable);
+
+    /** Returns @c true if talk permit tone is enabled. */
+    virtual bool talkPermitToneEnabled() const;
+    /** Enables talk permit tones. */
+    virtual void enableTalkPermitTone(bool enable);
+
+    /** Returns @c true if boot tone is enabled. */
+    virtual bool bootToneEnabled() const;
+    /** Enables boot tones. */
+    virtual void enableBootTone(bool enable);
+
+    /** Returns @c true if voice prompt is enabled. */
+    virtual bool voicePromptEnabled() const;
+    /** Enables voice prompt. */
+    virtual void enableVoicePrompt(bool enable);
+
+    /** Returns @c true if low-battery tone is enabled. */
+    virtual bool lowBatteryToneEnabled() const;
+    /** Enables low-battery tones. */
+    virtual void enableLowBatteryTone(bool enable);
+
+    /** Returns the FM roger tone setting. */
+    virtual FMRogerTone fmRogerTone() const;
+    /** Sets the FM roger tone. */
+    virtual void setFMRogerTone(FMRogerTone tone);
+
+    /** Decodes the general settings. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum boot message length */
+      static constexpr unsigned int bootMessageLength()  { return 14; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bootDisplay()        { return 0x0000; }
+      static constexpr unsigned int bootMessage1()       { return 0x0001; }
+      static constexpr unsigned int bootMessage2()       { return 0x000f; }
+      static constexpr unsigned int mcuReset()           { return 0x001d; }
+      static constexpr unsigned int autoPowerOffDelay()  { return 0x001e; }
+      static constexpr Bit radioSilent()                 { return {0x0020, 7}; }
+      static constexpr Bit keyTone()                     { return {0x0020, 6}; }
+      static constexpr Bit smsTone()                     { return {0x0020, 5}; }
+      static constexpr Bit groupCallTone()               { return {0x0020, 4}; }
+      static constexpr Bit privateCallTone()             { return {0x0020, 3}; }
+      static constexpr Bit eotTone()                     { return {0x0020, 2}; }
+      static constexpr Bit talkPermitTone()              { return {0x0020, 1}; }
+      static constexpr Bit bootTone()                    { return {0x0020, 0}; }
+      static constexpr Bit voicePrompt()                 { return {0x0021, 7}; }
+      static constexpr Bit lowBatteryTone()              { return {0x0021, 6}; }
+      static constexpr Bit fmRogerTone()                 { return {0x0021, 1}; }
       /// @endcond
     };
   };
@@ -1089,13 +1455,16 @@ protected:
   /** Some internal offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int contactIndex()   { return 0x0000b000; }
-    static constexpr unsigned int groupListBank()  { return 0x0000f000; }
-    static constexpr unsigned int scanListBank()   { return 0x00011000; }
-    static constexpr unsigned int channelBanks()   { return 0x00012000; }
-    static constexpr unsigned int contactBanks()   { return 0x00044000; }
-    static constexpr unsigned int zoneBanks()      { return 0x0005c000; }
-    static constexpr unsigned int radioIdBank()    { return 0x00067000; }
+    static constexpr unsigned int generalSettings()     { return 0x00004000; }
+    static constexpr unsigned int contactIndex()        { return 0x0000b000; }
+    static constexpr unsigned int groupListBank()       { return 0x0000f000; }
+    static constexpr unsigned int scanListBank()        { return 0x00011000; }
+    static constexpr unsigned int channelBanks()        { return 0x00012000; }
+    static constexpr unsigned int contactBanks()        { return 0x00044000; }
+    static constexpr unsigned int zoneBanks()           { return 0x0005c000; }
+    static constexpr unsigned int roamingZoneBank()     { return 0x00065000; }
+    static constexpr unsigned int roamingChannelBank()  { return 0x00066000; }
+    static constexpr unsigned int radioIdBank()         { return 0x00067000; }
     /// @endcond
   };
 };
