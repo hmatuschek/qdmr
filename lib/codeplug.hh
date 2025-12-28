@@ -276,6 +276,46 @@ public:
     size_t _size;
   };
 
+  /** Represents the base class for bitmaps in codeplugs. */
+  class BitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+
+  /** Represents the base class for inverted bitmaps in codeplugs. */
+  class InvertedBitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+
   /** Base class for all codeplug contexts.
    * Each device specific codeplug may extend this class to allow for device specific elements to
    * be indexed in a separate index. By default tables for @c DigitalContact, @c RXGroupList,

@@ -5,7 +5,7 @@
 #define USB_VID 0x067b
 #define USB_PID 0x23a3
 
-#define TIMEOUT 500
+#define TIMEOUT 1000
 
 
 /* ********************************************************************************************* *
@@ -61,7 +61,7 @@ DM32UVInterface::PasswordResponse::receive(DM32UVInterface *dev, const ErrorStac
     return false;
 
   n -= 1; data += 1;
-  if (0x50 != this->code) {
+  if (0x50 != this->result) {
     errMsg(err) << "Invalid response. Expected 50h, got " << Qt::hex << this->code << "h.";
     return false;
   }
@@ -86,7 +86,7 @@ DM32UVInterface::ACKResponse::receive(DM32UVInterface *dev, const ErrorStack &er
   if (! dev->receive((char *)this, 1, TIMEOUT, err))
     return false;
 
-  if (0x06 == result) {
+  if (0x06 != result) {
     errMsg(err) << "Unexpected response " << Qt::hex << result << "h, expected 6h.";
     return false;
   }
@@ -99,13 +99,13 @@ DM32UVInterface::ACKResponse::receive(DM32UVInterface *dev, const ErrorStack &er
  * Value Request
  * ********************************************************************************************* */
 DM32UVInterface::ValueRequest::ValueRequest(ValueId vId)
-  : request_type('V'), unused{0,0,0}, valueId((uint8_t)vId)
+  : valueId((uint8_t)vId)
 {
   // pass...
 }
 
 DM32UVInterface::ValueRequest::ValueRequest(uint8_t vId)
-  : request_type('V'), unused{0,0,0}, valueId(vId)
+  : valueId(vId)
 {
   // pass...
 }
@@ -131,9 +131,10 @@ DM32UVInterface::ValueResponse::receive(DM32UVInterface *dev, const ErrorStack &
   }
   data += 1;
 
-  if (! dev->receive(data, 4, TIMEOUT, err))
+  // Receive value ID and length
+  if (! dev->receive(data, 2, TIMEOUT, err))
     return false;
-  data += 4;
+  data += 2;
 
   return dev->receive(data, this->length, TIMEOUT, err);
 }
@@ -215,16 +216,17 @@ DM32UVInterface::ReadResponse::receive(DM32UVInterface *dev, const ErrorStack &e
   if (! dev->receive(data, 1, TIMEOUT, err))
     return false;
   if ('W' != this->response_type) {
-    errMsg(err) << "Unexpected response " << Qt::hex << this->response_type
-                << "h, expected " << Qt::hex << 'W' << "h.";
+    errMsg(err) << "Unexpected response " << Qt::hex << (uint8_t)this->response_type
+                << "h, expected " << Qt::hex << (uint8_t)'W' << "h.";
     return false;
   }
   data += 1;
 
-  if (! dev->receive(data, 4, TIMEOUT, err))
+  // Receive address (24bit) and length (16bit)
+  if (! dev->receive(data, 5, TIMEOUT, err))
     return false;
-  data += 4;
-
+  data += 5;
+  // Receive payload
   return dev->receive(data, this->length(), TIMEOUT, err);
 }
 
@@ -305,9 +307,11 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err) {
     return false;
   }
   _state = State::Program;
+  logDebug() << "Enter PROG mode.";
 
   // Map entire codeplug memory region
   for (uint32_t addr=_codeplugMemory.first; addr<_codeplugMemory.second; addr += 0x1000) {
+    QThread::msleep(100);
     ReadRequest mapReq(addr+0xfff, 1);
     ReadResponse mapRes;
     if (! sendReceive(mapReq, mapRes, err)) {
@@ -318,10 +322,13 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err) {
     // Unpack prefix
     uint8_t prefix = (uint8_t)mapRes.payload()[0];
     // If prefix is invalid -> do not map
-    if ((0x00 == prefix) || (0xff == prefix))
+    if ((0x00 == prefix) || (0xff == prefix)) {
+      logDebug() << "Address " << Qt::hex << addr << "h unallocated.";
       continue;
+    }
     // add to address map
     uint32_t vaddr = ((uint32_t)prefix) << 12;
+    logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
     map.map(addr, vaddr);
   }
 
@@ -329,16 +336,137 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err) {
 }
 
 
+
+bool
+DM32UVInterface::read_start(uint32_t bank, uint32_t address, const ErrorStack &err) {
+  Q_UNUSED(bank); Q_UNUSED(address);
+
+  // If not yet in program mode -> enter
+  if ((State::Program != _state) && (! enter_program_mode(err))) {
+    errMsg(err) << "Cannot enter program mode.";
+    _state = State::Error;
+    return false;
+  }
+
+  _state = State::Program;
+  return true;
+}
+
+
+bool
+DM32UVInterface::read(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err) {
+  Q_UNUSED(bank);
+
+  // align read with 1000h blocks
+  if (address & 0xfff) {
+    int n = std::min(nbytes, (int)(0x1000 - (address & 0xfff)));
+    ReadRequest req(address, n);
+    ReadResponse res;
+    if (! sendReceive(req, res, err)) {
+      errMsg(err) << "Cannot read from " << Qt::hex << address << "h " << n << " bytes.";
+      return false;
+    }
+    std::memcpy(data, res.payload().constData(), n);
+    data += n;
+    address += n;
+    nbytes -= n;
+  }
+
+  while (nbytes > 0) {
+    int n = std::min(nbytes, 0x1000);
+    ReadRequest req(address, n);
+    ReadResponse res;
+    if (! sendReceive(req, res, err)) {
+      errMsg(err) << "Cannot read from " << Qt::hex << address << "h " << n << " bytes.";
+      return false;
+    }
+    std::memcpy(data, res.payload().constData(), n);
+    data += n;
+    address += n;
+    nbytes -= n;
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVInterface::read_finish(const ErrorStack &err) {
+  Q_UNUSED(err)
+  // Nothing to do.
+  return true;
+}
+
+
+bool
+DM32UVInterface::write_start(uint32_t bank, uint32_t address, const ErrorStack &err) {
+  Q_UNUSED(bank); Q_UNUSED(address);
+
+  // If not yet in program mode -> enter
+  if ((State::Program != _state) && (! enter_program_mode(err))) {
+    errMsg(err) << "Cannot enter program mode.";
+    _state = State::Error;
+    return false;
+  }
+
+  _state = State::Program;
+  return true;
+}
+
+
+bool
+DM32UVInterface::write(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err) {
+  Q_UNUSED(bank);
+
+  // align read with 1000h blocks
+  if (address & 0xfff) {
+    int n = std::min(nbytes, (int)(0x1000 - (address & 0xfff)));
+    WriteRequest req(address, QByteArray((const char*)data, n));
+    ACKResponse res;
+    if (! sendReceive(req, res, err)) {
+      errMsg(err) << "Cannot write to " << Qt::hex << address << "h " << n << " bytes.";
+      return false;
+    }
+    data += n;
+    address += n;
+    nbytes -= n;
+  }
+
+  while (nbytes > 0) {
+    int n = std::min(nbytes, 0x1000);
+    WriteRequest req(address, QByteArray((const char*)data, n));
+    ACKResponse res;
+    if (! sendReceive(req, res, err)) {
+      errMsg(err) << "Cannot write to " << Qt::hex << address << "h " << n << " bytes.";
+      return false;
+    }
+    data += n;
+    address += n;
+    nbytes -= n;
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVInterface::write_finish(const ErrorStack &err) {
+  Q_UNUSED(err)
+  // Nothing to do.
+  return true;
+}
+
+
 USBDeviceInfo
 DM32UVInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID, false);
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, 0, 0, false);
 }
 
 QList<USBDeviceDescriptor>
 DM32UVInterface::detect(bool saveOnly) {
   if (saveOnly)
     return QList<USBDeviceDescriptor>();
-  return USBSerial::detect(USB_VID, USB_PID, false);
+  return USBSerial::detect();
 }
 
 
@@ -349,6 +477,7 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
     return false;
   }
 
+  QThread::msleep(100);
   DeviceDetectionRequest devDetReq;
   DeviceDetectionResponse devDetRes;
   if (! sendReceive(devDetReq, devDetRes, err)) {
@@ -362,6 +491,7 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
     return false;
   }
 
+  QThread::msleep(100);
   // Formally, request password
   PasswordRequest passReq;
   PasswordResponse passRes;
@@ -369,7 +499,9 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
     errMsg(err) << "Cannot request programming password.";
     return false;
   }
+  logDebug() << "Finished password request.";
 
+  QThread::msleep(100);
   // Enter System information mode
   SysinfoRequest sysInfoReq;
   ACKResponse sysInfoRes;
@@ -377,7 +509,9 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
     errMsg(err) << "Cannot enter system info mode.";
     return false;
   }
+  logDebug() << "Finished SysInfo request.";
 
+  QThread::msleep(100);
   // Request FW version
   ValueRequest fwVersionReq(ValueRequest::ValueId::FirmwareVersion);
   ValueResponse fwVersionRes;
@@ -388,6 +522,7 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
   _firmwareVersion = fwVersionRes.string();
   logDebug() << "Got firmware version " << _firmwareVersion << ".";
 
+  QThread::msleep(100);
   // Request codeplug memory region
   ValueRequest cpMemReq(ValueRequest::ValueId::MainConfigMemory);
   ValueResponse cpMemRes;
@@ -399,6 +534,7 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
   logDebug() << "Codeplug memory region: " << Qt::hex << _codeplugMemory.first
              << "h - " << Qt::hex << _codeplugMemory.second << "h.";
 
+  QThread::msleep(100);
   // Request callsign memory region
   ValueRequest callMemReq(ValueRequest::ValueId::CallSignDBMemory);
   ValueResponse callMemRes;
@@ -453,6 +589,7 @@ bool
 DM32UVInterface::send(const char *data, qint64 n, int timeout, const ErrorStack &err) {
   Q_UNUSED(timeout)
 
+  logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
   while (n) {
     auto k = QSerialPort::write(data, n);
     if (0 > k) {

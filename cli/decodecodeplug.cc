@@ -35,6 +35,7 @@
 #include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
 #include "dr1801uv_filereader.hh"
+#include "dm32uv_codeplug.hh"
 
 
 template <class Cpl, class Rdr>
@@ -92,87 +93,92 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   switch (radio) {
   case RadioInfo::MD390:
     if (! decode<MD390Codeplug, MD390FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::UV390:
     if (! decode<UV390Codeplug, UV390FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::MD2017:
     if (! decode<MD2017Codeplug, MD2017FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::DM1701:
     if (! decode<DM1701Codeplug, DM1701FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::RD5R:
     if (! decode<RD5RCodeplug, RD5RFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::GD73:
     if (! decode<GD73Codeplug, GD73FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::GD77:
     if (! decode<GD77Codeplug, GD77FileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::OpenGD77:
     if (! decode<OpenGD77Codeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::OpenUV380:
     if (! decode<OpenUV380Codeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::OpenRTX:
     if (! decode<OpenRTXCodeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::D868UVE:
     if (! decode<D868UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::D878UV:
     if (! decode<D878UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::D878UVII:
     if (! decode<D878UV2Codeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::D578UV:
     if (! decode<D578UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::DMR6X2UV:
     if (! decode<DMR6X2UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::DMR6X2UV2:
     if (! decode<DMR6X2UV2Codeplug, DummyFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   case RadioInfo::DR1801UV:
     if (! decode<DR1801UVCodeplug, DR1801UVFileReader>(config, filename, parser, err)) {
-      logError() << "Cannot decode codeplug '" << filename << "': " << err.format();
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
+      return -1;
+    } break;
+  case RadioInfo::DM32UV:
+    if (! decode<DM32UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
   default:

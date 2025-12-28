@@ -40,9 +40,9 @@ public:
   virtual ~USBSerial();
 
   /** If @c true, the device has been found and is open. */
-  bool isOpen() const;
+  bool isOpen() const override;
   /** Closes the interface to the device. */
-  void close();
+  void close() override;
 
 public:
   /** Searches for all USB serial ports with the specified VID/PID. */

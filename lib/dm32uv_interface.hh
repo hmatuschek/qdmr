@@ -90,7 +90,7 @@ protected:
     /** Static request type. */
     const char request_type = 'V';
     /** Some unknown fields. Likely some flags and length field. */
-    uint8_t unused[3];
+    const uint8_t unused[3] = {0x00, 0x00, 0x00};
     /** The value ID to read. */
     uint8_t valueId;
 
@@ -246,8 +246,17 @@ public:
 
   /** Returns the radio info, after identifying the radio. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack()) override;
+
   /** Reads the obfuscation address map from the device. */
   bool getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err=ErrorStack());
+
+  bool read_start(uint32_t bank, uint32_t address, const ErrorStack &err=ErrorStack()) override;
+  bool read(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack()) override;
+  bool read_finish(const ErrorStack &err=ErrorStack()) override;
+
+  bool write_start(uint32_t bank, uint32_t address, const ErrorStack &err=ErrorStack()) override;
+  bool write(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack()) override;
+  bool write_finish(const ErrorStack &err=ErrorStack()) override;
 
 public:
   /** Returns some information about this interface. */

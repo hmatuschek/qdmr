@@ -36,44 +36,6 @@ public:
     static SelectiveCall _codeTable[52];
   };
 
-  /** Represents the base class for bitmaps in all AnyTone codeplugs. */
-  class BitmapElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    BitmapElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Clears the bitmap, disables all channels. */
-    void clear();
-
-    /** Returns @c true if the given index is valid. */
-    virtual bool isEncoded(unsigned int idx) const ;
-    /** Enables/disables the specified index. */
-    virtual void setEncoded(unsigned int idx, bool enable);
-    /** Enables the first n elements. */
-    virtual void enableFirst(unsigned int n);
-  };
-
-  /** Represents the base class for inverted bitmaps in all AnyTone codeplugs. */
-  class InvertedBitmapElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    InvertedBitmapElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Clears the bitmap, disables all channels. */
-    void clear();
-
-    /** Returns @c true if the given index is valid. */
-    virtual bool isEncoded(unsigned int idx) const ;
-    /** Enables/disables the specified index. */
-    virtual void setEncoded(unsigned int idx, bool enable);
-    /** Enables the first n elements. */
-    virtual void enableFirst(unsigned int n);
-  };
-
   /** Represents the base class for inverted bytemaps in all AnyTone codeplugs.
    * This is obviously a result of a lazy firmware developer. There is already some code in the
    * firmware to handle bitmaps. The developer, however, copied some BS code from elsewhere. It is
