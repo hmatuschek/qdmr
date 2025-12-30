@@ -1783,6 +1783,34 @@ DM32UVCodeplug::SMSTemplateBankElement::decode(Context &ctx, const ErrorStack &e
 
 
 /* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::GeneralSettingsElement::Color
+ * ******************************************************************************************** */
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::Color::encode(Code name) {
+  return (unsigned int) name;
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::Color::decode(unsigned int code) {
+  return (Code)code;
+}
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::GeneralSettingsElement::Function
+ * ******************************************************************************************** */
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::encode(Function func) {
+  return (unsigned int) func;
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::decode(unsigned int code) {
+  return (Function)code;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 DM32UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
@@ -1987,11 +2015,829 @@ DM32UVCodeplug::GeneralSettingsElement::setFMRogerTone(FMRogerTone tone) {
 }
 
 
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::displayBrightness() const {
+  return (getUInt8(Offset::displayBrightness())*10)/Limit::maxBrightness();
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDisplayBrightness(unsigned int n) {
+  setUInt8(Offset::displayBrightness(), (n*Limit::maxBrightness())/10);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+  switch ((BacklightDuration)getUInt8(Offset::backlightDuration())) {
+  case BacklightDuration::Infinity: return Interval::infinity();
+  case BacklightDuration::T5s: return Interval::fromSeconds(5);
+  case BacklightDuration::T10s: return Interval::fromSeconds(10);
+  case BacklightDuration::T15s: return Interval::fromSeconds(15);
+  case BacklightDuration::T20s: return Interval::fromSeconds(20);
+  case BacklightDuration::T25s: return Interval::fromSeconds(25);
+  case BacklightDuration::T30s: return Interval::fromSeconds(30);
+  case BacklightDuration::T1min: return Interval::fromMinutes(1);
+  case BacklightDuration::T2min: return Interval::fromMinutes(2);
+  case BacklightDuration::T3min: return Interval::fromMinutes(3);
+  case BacklightDuration::T4min: return Interval::fromMinutes(4);
+  case BacklightDuration::T5min: return Interval::fromMinutes(5);
+  }
+  return Interval::infinity();
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval duration) {
+  if (duration.isNull() || duration.isInfinite()) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
+  } else if (duration.seconds() <= 5) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T5s);
+  } else if (duration.seconds() <= 10) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T10s);
+  } else if (duration.seconds() <= 15) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T15s);
+  } else if (duration.seconds() <= 20) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T20s);
+  } else if (duration.seconds() <= 25) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T25s);
+  } else if (duration.seconds() <= 30) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T30s);
+  } else if (duration.minutes() <= 1) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T1min);
+  } else if (duration.minutes() <= 2) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T2min);
+  } else if (duration.minutes() <= 3) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T3min);
+  } else if (duration.minutes() <= 4) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T4min);
+  } else if (duration.minutes() <= 5) {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T5min);
+  }
+  setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::menuDuration() const {
+  if (0 == getUInt8(Offset::menuDuration())) {
+    return Interval::infinity();
+  }
+  return Interval::fromSeconds(5 * getUInt8(Offset::menuDuration()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setMenuDuration(Interval duration) {
+  if (duration.isNull() || duration.isInfinite()) {
+    setUInt8(Offset::menuDuration(), 0);
+  } else {
+    setUInt8(Offset::menuDuration(), duration.seconds()/5);
+  }
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::showVolmueChange() const {
+  return getBit(Offset::showVolumeChange());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableShowVolumeChange(bool enable) {
+  setBit(Offset::showVolumeChange(), enable);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::DateFormat
+DM32UVCodeplug::GeneralSettingsElement::dateFormat() const {
+  return getBit(Offset::dateFormat()) ? DateFormat::DDMMYYYY : DateFormat::YYYYMMDD;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDateFormat(DateFormat format) {
+  setBit(Offset::dateFormat(), DateFormat::DDMMYYYY == format);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::showClock() const {
+  return getBit(Offset::showClock());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableShowClock(bool enable) {
+  setBit(Offset::showClock(), enable);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::callColor() const {
+  return Color::decode(getUInt8(Offset::callColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setCallColor(Color::Code c) {
+  setUInt8(Offset::callColor(), Color::encode(c));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::standbyColor() const {
+  return Color::decode(getUInt8(Offset::standbyColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setStandbyColor(Color::Code c) {
+  setUInt8(Offset::standbyColor(), Color::encode(c));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::channelNameAColor() const {
+  return Color::decode(getUInt8(Offset::channelNameAColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setChannelNameAColor(Color::Code c) {
+  setUInt8(Offset::channelNameAColor(), Color::encode(c));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::channelNameBColor() const {
+  return Color::decode(getUInt8(Offset::channelNameBColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setChannelNameBColor(Color::Code c) {
+  setUInt8(Offset::channelNameBColor(), Color::encode(c));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::zoneNameAColor() const {
+  return Color::decode(getUInt8(Offset::zoneNameAColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setZoneNameAColor(Color::Code c) {
+  setUInt8(Offset::zoneNameAColor(), Color::encode(c));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::Color::Code
+DM32UVCodeplug::GeneralSettingsElement::zoneNameBColor() const {
+  return Color::decode(getUInt8(Offset::zoneNameBColor()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setZoneNameBColor(Color::Code c) {
+  setUInt8(Offset::zoneNameBColor(), Color::encode(c));
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::PositionFormat
+DM32UVCodeplug::GeneralSettingsElement::positionFormat() const {
+  return getBit(Offset::positionFormat()) ? PositionFormat::DMS : PositionFormat::DD;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setPositionFormat(PositionFormat format) {
+  setBit(Offset::positionFormat(), PositionFormat::DMS == format);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::GNSSMode
+DM32UVCodeplug::GeneralSettingsElement::gnssMode() const {
+  return (GNSSMode)getUInt2(Offset::gnssMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setGNSSMode(GNSSMode mode) {
+  setUInt2(Offset::gnssMode(), (unsigned int )mode);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::gnssEnabled() const {
+  return getBit(Offset::enableGNSS());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableGNSS(bool enable) {
+  setBit(Offset::enableGNSS(), enable);
+}
+
+
+QTimeZone
+DM32UVCodeplug::GeneralSettingsElement::timeZone() const {
+  return QTimeZone( (((int)getUInt8(Offset::timeZone()))-11) * 3600);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTimeZone(const QTimeZone &timeZone) {
+  setUInt8(Offset::timeZone(), timeZone.offsetFromUtc(QDateTime::currentDateTime())/3600+11);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::posUpdatePeriod() const {
+  return Interval::fromMinutes(getUInt8(Offset::posUpdatePeriod()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setPosUpdatePeriod(const Interval &period) {
+  setUInt8(Offset::posUpdatePeriod(), period.minutes());
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::RecordMode
+DM32UVCodeplug::GeneralSettingsElement::recordMode() const {
+  return (RecordMode) getUInt2(Offset::recordMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setRecordMode(RecordMode mode) {
+  setUInt2(Offset::recordMode(), (unsigned int)mode);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::recordingEnabled() const {
+  return getBit(Offset::enableRecording());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableRecording(bool enable) {
+  setBit(Offset::enableRecording(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::groupCallMatchEnabled() const {
+  return getBit(Offset::groupCallMatch());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableGroupCallMatch(bool enable) {
+  setBit(Offset::groupCallMatch(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::privateCallMatchEnabled() const {
+  return getBit(Offset::privateCallMatch());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enablePrivateCallMatch(bool enable) {
+  setBit(Offset::privateCallMatch(), enable);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::dmrCallHangTime() const {
+  return Interval::fromMilliseconds( ((unsigned int)getUInt8(Offset::dmrCallHangTime())) * 500);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDMRCallHangTime(const Interval &time) {
+  setUInt8(Offset::dmrCallHangTime(), time.milliseconds()/500);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::activeWaitTime() const {
+  return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::activeWaitTime()))*30 + 300);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setActiveWaitTime(Interval waitTime) {
+  setUInt8(Offset::activeWaitTime(), (waitTime.milliseconds()-300)/30);
+}
+
+
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::activeRetries() const {
+  return getUInt8(Offset::activeReties());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setActiveRetries(unsigned int retries) {
+  setUInt8(Offset::activeReties(), retries);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::dmrPreambleDuration() const {
+  return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::dmrPreambleDur()))*120 + 120);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDmrPreambleDuration(Interval duration) {
+  setUInt8(Offset::dmrPreambleDur(), (duration.milliseconds()-120)/120);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::dmrRemoteMonitorEnabled() const {
+  return  getBit(Offset::dmrMonitor());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableDMRRemoteMonitor(bool enable) {
+  setBit(Offset::dmrMonitor(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::dmrRemoteKillEnabled() const {
+  return getBit(Offset::dmrKill());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableDMRRemoteKill(bool enable) {
+  setBit(Offset::dmrKill(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::dmrRemoteRadioCheckEnabled() const {
+  return getBit(Offset::dmrRadioCheck());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableDMRRemoteRadioCheck(bool enable) {
+  setBit(Offset::dmrRadioCheck(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::dmrRemoteReenableEnabled() const {
+  return getBit(Offset::dmrReenable());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableDMRRemoteReenable(bool enable) {
+  setBit(Offset::dmrReenable(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::dmrRXAlertEnabled() const {
+  return getBit(Offset::dmrRXAlert());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableDMRRXAlert(bool enable) {
+  setBit(Offset::dmrRXAlert(), enable);
+}
+
+
+SMSExtension::Format
+DM32UVCodeplug::GeneralSettingsElement::smsFormat() const {
+  switch ((SMSFormat)getUInt2(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
+  }
+  return SMSExtension::Format::DMR;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format format) {
+  switch (format) {
+  case SMSExtension::Format::Motorola: setUInt2(Offset::smsFormat(), (unsigned int)SMSFormat::Motorola); break;
+  case SMSExtension::Format::Hytera: setUInt2(Offset::smsFormat(), (unsigned int)SMSFormat::Hytera); break;
+  case SMSExtension::Format::DMR: setUInt2(Offset::smsFormat(), (unsigned int)SMSFormat::DMR); break;
+  }
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::missedCallNotificationEnabled() const {
+  return getBit(Offset::missedCallNotification());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableMissedCallNotification(bool enable) {
+  setBit(Offset::missedCallNotification(), enable);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::dmrRemoteMonitorDuration() const {
+  return Interval::fromSeconds(((unsigned int)getUInt8(Offset::dmrRemoteMonitorDuration()))*10 + 10);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDMRRemoteMonitorDuration(Interval duration) {
+  setUInt8(Offset::dmrRemoteMonitorDuration(), (duration.seconds()-10)/10);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::TalkerAliasFormat
+DM32UVCodeplug::GeneralSettingsElement::talkerAliasFormat() const {
+  return getBit(Offset::dmrTalkerAliasFormat()) ? TalkerAliasFormat::UnicodeU16 : TalkerAliasFormat::ISO8;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTalkerAliasFormat(TalkerAliasFormat format) {
+  setBit(Offset::dmrTalkerAliasFormat(), TalkerAliasFormat::UnicodeU16 == format);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::txTalkerAliasEnabled() const {
+  return getBit(Offset::txTalkerAlias());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableTXTalkerAlias(bool enable) {
+  setBit(Offset::txTalkerAlias(), enable);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::TalkerAliasSource
+DM32UVCodeplug::GeneralSettingsElement::talkerAliasSource() const {
+  return getBit(Offset::talkerSource()) ? TalkerAliasSource::OverTheAir : TalkerAliasSource::CallsignDB;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTalkerAliasSource(TalkerAliasSource source) {
+  setBit(Offset::talkerSource(), TalkerAliasSource::OverTheAir == source);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::DualStandbyMode
+DM32UVCodeplug::GeneralSettingsElement::dualStandbyMode() const {
+  return (DualStandbyMode) getUInt2(Offset::dualStandbyMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDualStandbyMode(DualStandbyMode mode) {
+  setUInt2(Offset::dualStandbyMode(), (unsigned int)mode);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::VFO
+DM32UVCodeplug::GeneralSettingsElement::mainVFO() const {
+  return getBit(Offset::mainVFO()) ? VFO::B : VFO::A;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setMainVFO(VFO mainVFO) {
+  setBit(Offset::mainVFO(), VFO::B == mainVFO);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::VFODisplayMode
+DM32UVCodeplug::GeneralSettingsElement::vfoDisplayModeA() const {
+  return getBit(Offset::displayModeA()) ? VFODisplayMode::ChannelName : VFODisplayMode::Frequency;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVFODisplayModeA(VFODisplayMode mode) {
+  setBit(Offset::displayModeA(), VFODisplayMode::ChannelName == mode);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::VFODisplayMode
+DM32UVCodeplug::GeneralSettingsElement::vfoDisplayModeB() const {
+  return getBit(Offset::displayModeB()) ? VFODisplayMode::ChannelName : VFODisplayMode::Frequency;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVFODisplayModeB(VFODisplayMode mode) {
+  setBit(Offset::displayModeB(), VFODisplayMode::ChannelName == mode);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::VFOMode
+DM32UVCodeplug::GeneralSettingsElement::vfoModeA() const {
+  return getBit(Offset::vfoModeA()) ? VFOMode::VFO : VFOMode::Channel;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVFOModeA(VFOMode mode) {
+  setBit(Offset::vfoModeA(), VFOMode::VFO == mode);
+}
+
+DM32UVCodeplug::GeneralSettingsElement::VFOMode
+DM32UVCodeplug::GeneralSettingsElement::vfoModeB() const {
+  return getBit(Offset::vfoModeB()) ? VFOMode::VFO : VFOMode::Channel;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVFOModeB(VFOMode mode) {
+  setBit(Offset::vfoModeB(), VFOMode::VFO == mode);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::vfoModeDisabled() const {
+  return getBit(Offset::disableVFOMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::disableVFOMode(bool enable) {
+  setBit(Offset::disableVFOMode(), enable);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::dualStandbyHangTime() const {
+  return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::dualStandbyHangTime()))*500);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDualStandbyHangTime(Interval hangTime) {
+  setUInt8(Offset::dualStandbyHangTime(), hangTime.milliseconds()/500);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::sideKeyLockEnabled() const {
+  return getBit(Offset::sideKeyLock());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableSideKeyLock(bool enable) {
+  setBit(Offset::sideKeyLock(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::knobLockEnabled() const {
+  return getBit(Offset::knobLock());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableKnobLock(bool enable) {
+  setBit(Offset::knobLock(), enable);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::autoKeyLockDelay() const {
+  if (! getBit(Offset::enableAutoKeyLock()))
+    return Interval::infinity();
+  return Interval::fromMinutes(5 + getUInt8(Offset::autoKeyLockDelay()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setAutoKeyLockDelay(Interval delay) {
+  if (delay.isInfinite()||delay.isNull()) {
+    setBit(Offset::enableAutoKeyLock(), false);
+  } else {
+    setBit(Offset::enableAutoKeyLock(), true);
+    setUInt8(Offset::autoKeyLockDelay(), delay.minutes()-5);
+  }
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::sk1Short() const {
+  return KeyFunction::decode(getUInt8(Offset::sk1Short()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSK1Short(KeyFunction::Function function) {
+  setUInt8(Offset::sk1Short(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::sk1Long() const {
+  return KeyFunction::decode(getUInt8(Offset::sk1Long()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSK1Long(KeyFunction::Function function) {
+  setUInt8(Offset::sk1Long(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::sk2Short() const {
+  return KeyFunction::decode(getUInt8(Offset::sk2Short()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSK2Short(KeyFunction::Function function) {
+  setUInt8(Offset::sk2Short(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::sk2Long() const {
+  return KeyFunction::decode(getUInt8(Offset::sk2Long()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSK2Long(KeyFunction::Function function) {
+  setUInt8(Offset::sk2Long(), KeyFunction::encode(function));
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::p1Short() const {
+  return KeyFunction::decode(getUInt8(Offset::p1Short()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setP1Short(KeyFunction::Function function) {
+  setUInt8(Offset::p1Short(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::p1Long() const {
+  return KeyFunction::decode(getUInt8(Offset::p1Long()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setP1Long(KeyFunction::Function function) {
+  setUInt8(Offset::p1Long(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::p2Short() const {
+  return KeyFunction::decode(getUInt8(Offset::p2Short()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setP2Short(KeyFunction::Function function) {
+  setUInt8(Offset::p2Short(), KeyFunction::encode(function));
+}
+
+DM32UVCodeplug::GeneralSettingsElement::KeyFunction::Function
+DM32UVCodeplug::GeneralSettingsElement::p2Long() const {
+  return KeyFunction::decode(getUInt8(Offset::p2Long()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setP2Long(KeyFunction::Function function) {
+  setUInt8(Offset::p2Long(), KeyFunction::encode(function));
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::longPressDuration() const {
+  return Interval::fromSeconds(getUInt8(Offset::longPressDuration()) + 1);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setLongPressDuration(Interval duration) {
+  duration = Limit::longPressDuration().limit(duration);
+  setUInt8(Offset::longPressDuration(), duration.seconds()-1);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
+  if (0 == getUInt8(Offset::transmitTimeout()))
+    return Interval::infinity();
+  return Interval::fromSeconds(((unsigned int)getUInt8(Offset::transmitTimeout()))*5 +  15);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTransmitTimeout(Interval timeout) {
+  if (timeout.isInfinite() || timeout.isNull()) {
+    setUInt8(Offset::transmitTimeout(), 0);
+  } else {
+    timeout = Limit::transmitTimeout().limit(timeout);
+    setUInt8(Offset::transmitTimeout(), (timeout.seconds()-15)/5);
+  }
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::transmitTimeoutReminder() const {
+  return Interval::fromSeconds(getUInt8(Offset::totReminder()));
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTransmitTimeoutReminder(Interval timeout) {
+  setUInt8(Offset::totReminder(), timeout.seconds());
+}
+
+
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::voxLevel() const {
+  if (0 == getUInt8(Offset::voxLevel()))
+    return 0;
+  return (getUInt8(Offset::voxLevel())-1)*9/4 + 1;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned int voxLevel) {
+  if (0 == voxLevel)
+    setUInt8(Offset::voxLevel(), 0);
+  else
+    setUInt8(Offset::voxLevel(), (voxLevel-1)*3/10 + 1);
+}
+
+
+Interval
+DM32UVCodeplug::GeneralSettingsElement::voxDelay() const {
+  return Interval::fromMilliseconds(((unsigned int)getUInt8(Offset::voxDelay()))*100);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setVoxDelay(Interval delay) {
+  delay = Limit::voxDelay().limit(delay);
+  setUInt8(Offset::voxDelay(), delay.milliseconds()/100);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::PowerSaveMode
+DM32UVCodeplug::GeneralSettingsElement::powerSaveMode() const {
+  return (PowerSaveMode) getUInt2(Offset::powerSaveMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setPowerSaveMode(PowerSaveMode mode) {
+  setUInt2(Offset::powerSaveMode(), (unsigned int)mode);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::weatherAlarmEnabled() const {
+  return getBit(Offset::weatherAlarm());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::enableWeatherAlarm(bool enable) {
+  setBit(Offset::weatherAlarm(), enable);
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::allLEDsDisabled() const {
+  return getBit(Offset::disableLEDs());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::disableAllLEDs(bool disable) {
+  setBit(Offset::disableLEDs(), disable);
+}
+
+
+Frequency
+DM32UVCodeplug::GeneralSettingsElement::tbstFrequency() const {
+  switch ((TBSTFrequency)getUInt2(Offset::tbstFrequency())) {
+  case TBSTFrequency::Hz1000: return Frequency::fromHz(1000);
+  case TBSTFrequency::Hz1450: return Frequency::fromHz(1450);
+  case TBSTFrequency::Hz1750: return Frequency::fromHz(1750);
+  case TBSTFrequency::Hz2100: return Frequency::fromHz(2100);
+  }
+  return Frequency::fromHz(1750);
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setTBSTFrequency(const Frequency &frequency) {
+  if (frequency.inHz() <= 1000)
+    setUInt2(Offset::tbstFrequency(), (unsigned int)TBSTFrequency::Hz1000);
+  else if (frequency.inHz() <= 1450)
+    setUInt2(Offset::tbstFrequency(), (unsigned int)TBSTFrequency::Hz1450);
+  else if (frequency.inHz() <= 1750)
+    setUInt2(Offset::tbstFrequency(), (unsigned int)TBSTFrequency::Hz1750);
+  else
+    setUInt2(Offset::tbstFrequency(), (unsigned int)TBSTFrequency::Hz2100);
+}
+
+
+DM32UVCodeplug::GeneralSettingsElement::STEMode
+DM32UVCodeplug::GeneralSettingsElement::steMode() const {
+  return (STEMode)getUInt2(Offset::steMode());
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
+  setUInt2(Offset::steMode(), (unsigned int)mode);
+}
+
+
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
+  return getUInt8(Offset::fmMicLevel())*10/5 + 1;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(unsigned int level) {
+  return setUInt8(Offset::fmMicLevel(), (level*4)/10);
+}
+
+unsigned int
+DM32UVCodeplug::GeneralSettingsElement::dmrMicLevel() const {
+  return getUInt8(Offset::dmrMicLevel())*10/5 + 1;
+}
+
+void
+DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(unsigned int level) {
+  return setUInt8(Offset::dmrMicLevel(), (level*4)/10);
+}
+
+
 bool
 DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   ctx.config()->settings()->setIntroLine1(bootMessage1());
   ctx.config()->settings()->setIntroLine2(bootMessage2());
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
+  ctx.config()->settings()->setVOX(voxLevel());
+  if (transmitTimeout().isInfinite()) ctx.config()->settings()->setTOT(0);
+  else ctx.config()->settings()->setTOT(transmitTimeout().seconds());
+  ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
+  ctx.config()->smsExtension()->setFormat(smsFormat());
 
   return true;
 }

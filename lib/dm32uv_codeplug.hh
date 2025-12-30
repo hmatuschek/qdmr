@@ -1,17 +1,18 @@
 #ifndef DM32UV_CODEPLUG_HH
 #define DM32UV_CODEPLUG_HH
 
+#include <QObject>
+#include <QString>
+
 #include "channel.hh"
 #include "codeplug.hh"
 #include "contact.hh"
 #include "frequency.hh"
 #include "roamingchannel.hh"
-#include <QObject>
-#include <QString>
-
 #include "codeplug.hh"
-#include <codeplug.hh>
-#include <ranges.hh>
+#include "ranges.hh"
+#include  "smsextension.hh"
+
 
 // forward declaration
 class Zone;
@@ -1300,6 +1301,113 @@ public:
       Off=0, Beep=1, BDC=2
     };
 
+    /** Possible settings for the backlight duration. */
+    enum class BacklightDuration {
+      Infinity = 0, T5s=1, T10s=2, T15s=3, T20s=4, T25s=5, T30s=6, T1min=7, T2min=8, T3min=9,
+      T4min=10, T5min=11
+    };
+
+    /** Possible date formats. */
+    enum class DateFormat {
+      YYYYMMDD = 0, DDMMYYYY = 1
+    };
+
+    /** Implements the translation between color names and code.
+     * For now, this struct is futile but becomes necessary, once there is a common color name
+     * scheme. */
+    struct Color {
+      enum class Code {
+        White = 0, Black = 1, Orange = 2, Red = 3, Yellow = 4, Green = 5, Cyan = 6, Blue = 7
+      };
+
+      static unsigned int encode(Code name);
+      static Code decode(unsigned int code);
+    };
+
+    /** Possible position formats. */
+    enum class PositionFormat {
+      DD = 0,   ///< Decimal degree
+      DMS = 1   ///< Degree, minute, second
+    };
+
+    /** GNSS modes. */
+    enum class GNSSMode {
+      GPS = 0, Baidou = 1, Both = 0
+    };
+
+    /** Possible recording modes. */
+    enum class RecordMode {
+      RX = 0, TX = 1, Both = 2
+    };
+
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Hytera = 0, Motorola = 1, DMR = 2
+    };
+
+    /** Talker alias formats. */
+    enum class TalkerAliasFormat {
+      ISO8 = 0, UnicodeU16 = 1
+    };
+
+    /** Talker alias sources. */
+    enum class TalkerAliasSource {
+      CallsignDB = 0, OverTheAir = 1
+    };
+
+    /** Possible dual-standby modes. */
+    enum class DualStandbyMode {
+      SingleVFO = 0, DoubleStandby = 1, SingleStandby = 2
+    };
+
+    /** VFO selection. */
+    enum class VFO {
+      A = 0, B = 1
+    };
+
+    /** VFO display modes. */
+    enum class VFODisplayMode {
+      Frequency = 0, ChannelName = 1
+    };
+
+    /** VFO Modes. */
+    enum class VFOMode {
+      Channel = 0, VFO = 1
+    };
+
+    /** Helper encoding/decoding key functions. */
+    struct KeyFunction
+    {
+      enum class Function {
+        None=0, PowerSelect=1, Volt=2, Talkaround=3, DMREncryption=4, VOX=6, ChannelMode=7, Alarm=8,
+        OneTouch1=9, OneTouch2=10, OneTouch3=11,OneTouch4=12, OneTouch5=13, SMS=14, Contacts=15,
+        ZoneUp=16, ZoneDown=17, Scan=18, ToggleRecord=19, PreviousRecord=20, NextRecord=21,
+        FMBCRadio=22, FMBCScan=23, GPSInformation=24, Monitor=25, ToggleMainChannel=26, LoneWorker=27,
+        KeypadLock=28, Mute=29, TBST=30, APRSTX=31, ChannelType=32, DisplayMode=33, CTCSSDSCScan=34,
+        CTCSSDSCSettings=25, SilentTone=36, Roaming=37, SubPTT=38, OneKeyScanFrequency=40,
+        Flashlight=41
+      };
+
+      static unsigned int encode(Function func);
+      static Function decode(unsigned int code);
+    };
+
+    /** Possible power-save mode. */
+    enum class PowerSaveMode {
+      Off=0, Percent50 = 1, Percent66 = 2, Percent75=3
+    };
+
+    /** Possible TBST frequencies. */
+    enum class TBSTFrequency {
+      Hz1000=0, Hz1450=1, Hz1750=2, Hz2100=3
+    };
+
+    /** Possible squelch tail-eliminations. */
+    enum class STEMode {
+      Off = 0, Deg120 = 1, Deg180 = 2, Hz55 = 3
+    };
+
+
   public:
     /** Constructor from pointer to element. */
     GeneralSettingsElement(uint8_t *ptr);
@@ -1384,6 +1492,324 @@ public:
     /** Sets the FM roger tone. */
     virtual void setFMRogerTone(FMRogerTone tone);
 
+    /** Returns the display brightness setting [0-10]. */
+    virtual unsigned int displayBrightness() const;
+    /** Sets the display brightness [0-10]. */
+    virtual void setDisplayBrightness(unsigned int n);
+
+    /** Returns the backlight duration. */
+    virtual Interval backlightDuration() const;
+    /** Sets the backlight duration. */
+    virtual void setBacklightDuration(Interval duration);
+
+    /** Returns the menu hold time. */
+    virtual Interval menuDuration() const;
+    /** Sets the menu hold time. */
+    virtual void setMenuDuration(Interval duration);
+
+    /** Returns @c true if the volume change prompt is shown. */
+    virtual bool showVolmueChange() const;
+    /** Enable volume change prompt. */
+    virtual void enableShowVolumeChange(bool enable);
+
+    /** Returns the date format. */
+    virtual DateFormat dateFormat() const;
+    /** Sets the date format. */
+    virtual void setDateFormat(DateFormat format);
+
+    /** Returns @c true if the clock is shown. */
+    virtual bool showClock() const;
+    /** Enable clock. */
+    virtual void enableShowClock(bool enable);
+
+    /** Returns the call color. */
+    virtual Color::Code callColor() const;
+    /** Sets the call color. */
+    virtual void setCallColor(Color::Code c);
+    /** Returns the standby text color. */
+    virtual Color::Code standbyColor() const;
+    /** Sets the standby text color. */
+    virtual void setStandbyColor(Color::Code c);
+    /** Returns the channel name A color. */
+    virtual Color::Code channelNameAColor() const;
+    /** Sets the channel name A color. */
+    virtual void setChannelNameAColor(Color::Code c);
+    /** Returns the channel name B color. */
+    virtual Color::Code channelNameBColor() const;
+    /** Sets the channel name B color. */
+    virtual void setChannelNameBColor(Color::Code c);
+    /** Returns the zone name A color. */
+    virtual Color::Code zoneNameAColor() const;
+    /** Sets the zone name A color. */
+    virtual void setZoneNameAColor(Color::Code c);
+    /** Returns the zone name B color. */
+    virtual Color::Code zoneNameBColor() const;
+    /** Sets the zone name B color. */
+    virtual void setZoneNameBColor(Color::Code c);
+
+    /** Returns the position display format. */
+    virtual PositionFormat positionFormat() const;
+    /** Sets the position display format. */
+    virtual void setPositionFormat(PositionFormat format);
+
+    /** Returns the GNSS mode. */
+    virtual GNSSMode gnssMode() const;
+    /** Sets the GNSS mode. */
+    virtual void setGNSSMode(GNSSMode mode);
+
+    /** Returns @c true if GNSS is enabled. */
+    virtual bool gnssEnabled() const;
+    /** Enables GNSS. */
+    virtual void enableGNSS(bool enable);
+
+    /** Returns the time zone. */
+    virtual QTimeZone timeZone() const;
+    /** Sets the timezone. */
+    virtual void setTimeZone(const QTimeZone &timeZone);
+
+    /** Returns the position update period. */
+    virtual Interval posUpdatePeriod() const;
+    /** Sets the position update period. */
+    virtual void setPosUpdatePeriod(const Interval &period);
+
+    /** Returns possible recording modes. */
+    virtual RecordMode recordMode() const;
+    /** Sets the record mode. */
+    virtual void setRecordMode(RecordMode mode);
+
+    /** Returns @c true if recording is enabled. */
+    virtual bool recordingEnabled() const;
+    /** Enables/disables recording. */
+    virtual void enableRecording(bool enable);
+
+    /** Returns @c true if group call must match. */
+    virtual bool groupCallMatchEnabled() const;
+    /** Enables group call match. */
+    virtual void enableGroupCallMatch(bool enable);
+
+    /** Returns @c true if private call must match. */
+    virtual bool privateCallMatchEnabled() const;
+    /** Enables private call match. */
+    virtual void enablePrivateCallMatch(bool enable);
+
+    /** Returns the DMR call hang time. */
+    virtual Interval dmrCallHangTime() const;
+    /** Sets the DMR call hang time. */
+    virtual void setDMRCallHangTime(const Interval &hangTime);
+
+    /** Returns the active wait time. */
+    virtual Interval activeWaitTime() const;
+    /** Sets the active wait time. */
+    virtual void setActiveWaitTime(Interval waitTime);
+
+    /** Returns the number of active retries. */
+    virtual unsigned int activeRetries() const;
+    /** Sets the number of active retires. */
+    virtual void setActiveRetries(unsigned int retries);
+
+    /** Retruns the DMR preamble duration. */
+    virtual Interval dmrPreambleDuration() const;
+    /** Sets the DMR preamble duration. */
+    virtual void setDmrPreambleDuration(Interval duration);
+
+    /** Returns @c true if the DMR remote monitor is enabled. */
+    virtual bool dmrRemoteMonitorEnabled() const;
+    /** Enables the remote monitor. */
+    virtual void enableDMRRemoteMonitor(bool enable);
+
+    /** Returns @c true if the remote kill switch is enabled. */
+    virtual bool dmrRemoteKillEnabled() const;
+    /** Enables the remote kill swtich. */
+    virtual void enableDMRRemoteKill(bool enable);
+
+    /** Returns @c true if the remote radio check is enabled. */
+    virtual bool dmrRemoteRadioCheckEnabled() const;
+    /** Enables remote radio check. */
+    virtual void enableDMRRemoteRadioCheck(bool enable);
+
+    /** Returns @c true if the remote reenable is enabled. */
+    virtual bool dmrRemoteReenableEnabled() const;
+    /** Enables DMR remote reenable. */
+    virtual void enableDMRRemoteReenable(bool enable);
+
+    /** Returns @c true reception of DMR alerts is enabled. */
+    virtual bool dmrRXAlertEnabled() const;
+    /** Enables enables reception of DMR alerts. */
+    virtual void enableDMRRXAlert(bool enable);
+
+    /** Returns the DMR SMS format. */
+    virtual SMSExtension::Format smsFormat() const;
+    /** Sets the DMR SMS format. */
+    virtual void setSMSFormat(SMSExtension::Format format);
+
+    /** Retruns @c true missed call notification is enabled. */
+    virtual bool missedCallNotificationEnabled() const;
+    /** Enables missed call notification. */
+    virtual void enableMissedCallNotification(bool enable);
+
+    /** Returns the remote monitor duration. */
+    virtual Interval dmrRemoteMonitorDuration() const;
+    /** Sets the remote monitor duration. */
+    virtual void setDMRRemoteMonitorDuration(Interval duration);
+
+    /** Returns the talker alias format. */
+    virtual TalkerAliasFormat talkerAliasFormat() const;
+    /** Sets the talker alias format. */
+    virtual void setTalkerAliasFormat(TalkerAliasFormat format);
+
+    /** Returns @c true, if transmission of talker alias is enabled. */
+    virtual bool txTalkerAliasEnabled() const;
+    /** Enables transmission of talker alias. */
+    virtual void enableTXTalkerAlias(bool enable);
+
+    /** Returns the talker alias source. */
+    virtual TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(TalkerAliasSource source);
+
+    /** Returns the dual-standby mode. */
+    virtual DualStandbyMode dualStandbyMode() const;
+    /** Sets the dual-standby mode. */
+    virtual void setDualStandbyMode(DualStandbyMode mode);
+
+    /** Returns the main VFO. */
+    virtual VFO mainVFO() const;
+    /** Sets the main VFO. */
+    virtual void setMainVFO(VFO mainVFO);
+
+    /** Returns the VFO A display mode. */
+    virtual VFODisplayMode vfoDisplayModeA() const;
+    /** Sets the VFO A display mode. */
+    virtual void setVFODisplayModeA(VFODisplayMode mode);
+    /** Returns the VFO B display mode. */
+    virtual VFODisplayMode vfoDisplayModeB() const;
+    /** Sets the VFO B display mode. */
+    virtual void setVFODisplayModeB(VFODisplayMode mode);
+    /** Returns the VFO A mode. */
+    virtual VFOMode vfoModeA() const;
+
+    /** Sets the VFO A mode. */
+    virtual void setVFOModeA(VFOMode mode);
+    /** Returns the VFO B mode. */
+    virtual VFOMode vfoModeB() const;
+    /** Sets the VFO B mode. */
+    virtual void setVFOModeB(VFOMode mode);
+
+    /** Returns @c true if VFO modes are disabled. */
+    virtual bool vfoModeDisabled() const;
+    /** Disables VFO modes. */
+    virtual void disableVFOMode(bool enable);
+
+    /** Returns the dual-standby hang-time. */
+    virtual Interval dualStandbyHangTime() const;
+    /** Sets the dual-standby hang-time. */
+    virtual void setDualStandbyHangTime(Interval hangTime);
+
+    /** Returns @c true if the side keys are locked. */
+    virtual bool sideKeyLockEnabled() const;
+    /** Enable side key lock. */
+    virtual void enableSideKeyLock(bool enable);
+    /** Returns @c true, if the knowb is locked. */
+    virtual bool knobLockEnabled() const;
+    /** Enables the knob lock. */
+    virtual void enableKnobLock(bool enable);
+    /** Returns the auto key-lock delay. If set to infinity, auto key-lock is disabled. */
+    virtual Interval autoKeyLockDelay() const;
+    /** Sets the auto key-lock delay. If set to infinity, the auto key-lock is disabled. */
+    virtual void setAutoKeyLockDelay(Interval delay);
+
+    /** Returns the side-key 1 short-press function. */
+    virtual KeyFunction::Function sk1Short() const;
+    /** Sets the side-key 1 short-press function. */
+    virtual void setSK1Short(KeyFunction::Function function);
+    /** Returns the side-key 1 long-press function. */
+    virtual KeyFunction::Function sk1Long() const;
+    /** Sets the side-key 1 long-press function. */
+    virtual void setSK1Long(KeyFunction::Function function);
+    /** Returns the side-key 2 short-press function. */
+    virtual KeyFunction::Function sk2Short() const;
+    /** Sets the side-key 2 short-press function. */
+    virtual void setSK2Short(KeyFunction::Function function);
+    /** Returns the side-key 2 long-press function. */
+    virtual KeyFunction::Function sk2Long() const;
+    /** Sets the side-key 2 long-press function. */
+    virtual void setSK2Long(KeyFunction::Function function);
+
+    /** Returns the programmable key 1 short-press function. */
+    virtual KeyFunction::Function p1Short() const;
+    /** Sets the programmable key 1 short-press function. */
+    virtual void setP1Short(KeyFunction::Function function);
+    /** Returns the programmable key 1 long-press function. */
+    virtual KeyFunction::Function p1Long() const;
+    /** Sets the programmable key 1 long-press function. */
+    virtual void setP1Long(KeyFunction::Function function);
+    /** Returns the programmable key 2 short-press function. */
+    virtual KeyFunction::Function p2Short() const;
+    /** Sets the programmable key 2 short-press function. */
+    virtual void setP2Short(KeyFunction::Function function);
+    /** Returns the programmable key 2 long-press function. */
+    virtual KeyFunction::Function p2Long() const;
+    /** Sets the programmable key 2 long-press function. */
+    virtual void setP2Long(KeyFunction::Function function);
+
+    /** Returns the long-press duration. */
+    virtual Interval longPressDuration() const;
+    /** Sets the long-press duration. */
+    virtual void setLongPressDuration(Interval duration);
+
+    /** Returns the transmit timeout. If infinite, the transmit timeout is disabled. */
+    virtual Interval transmitTimeout() const;
+    /** Sets transmit timeout. If set to infinity, the tot is disabled. */
+    virtual void setTransmitTimeout(Interval timeout);
+    /** Returns the transmit timeout reminder. If 0 disabled. */
+    virtual Interval transmitTimeoutReminder() const;
+    /** Sets transmit timeout reminder. If set to 0 disabled. */
+    virtual void setTransmitTimeoutReminder(Interval timeout);
+
+    /** Returns the VOX level. */
+    virtual unsigned int voxLevel() const;
+    /** Sets the VOX level. */
+    virtual void setVOXLevel(unsigned int voxLevel);
+    /** Retruns the VOX delay. */
+    virtual Interval voxDelay() const;
+    /** Sets the VOX delay. */
+    virtual void setVoxDelay(Interval delay);
+
+    /** Returns the power-save mode. */
+    virtual PowerSaveMode powerSaveMode() const;
+    /** Sets the power-save mode. */
+    virtual void setPowerSaveMode(PowerSaveMode mode);
+
+    /** Returns @c true, if the NOAA weather alarm is enabled. */
+    virtual bool weatherAlarmEnabled() const;
+    /** Enables the NOAA weather alarm. */
+    virtual void enableWeatherAlarm(bool enable);
+
+    /** Returns @c true if all LEDs are disabled. */
+    virtual bool allLEDsDisabled() const;
+    /** Disables all LEDs. */
+    virtual void disableAllLEDs(bool disable);
+
+    /** Returns the TBST frequency. */
+    virtual Frequency tbstFrequency() const;
+    /** Sets the TBST frequency. */
+    virtual void setTBSTFrequency(const Frequency &frequency);
+
+    /** Returns the squelch tail elimination mode. */
+    virtual STEMode steMode() const;
+    /** Sets the STE mode. */
+    virtual void setSTEMode(STEMode mode);
+
+    /** Returns the FM mic level. */
+    virtual unsigned int fmMicLevel() const;
+    /** Sets the FM mic level.*/
+    virtual void setFMMicLevel(unsigned int level);
+
+    /** Returns the DMR mic level. */
+    virtual unsigned int dmrMicLevel() const;
+    /** Sets the DMR mic level.*/
+    virtual void setDMRMicLevel(unsigned int level);
+
     /** Decodes the general settings. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
 
@@ -1392,6 +1818,22 @@ public:
     struct Limit: Element::Limit {
       /** Maximum boot message length */
       static constexpr unsigned int bootMessageLength()  { return 14; }
+      /** Maximum display brightness. */
+      static constexpr unsigned int maxBrightness()      { return 5; }
+      /** Range of valid active retires. */
+      static constexpr Range<unsigned int> activeRetires() { return {1, 8}; }
+      /** Range of valid long-press durations. */
+      static constexpr Range<Interval> longPressDuration() {
+        return {Interval::fromSeconds(1), Interval::fromSeconds(5)};
+      }
+      /** Range of valid transmit timeouts. */
+      static constexpr Range<Interval> transmitTimeout() {
+        return {Interval::fromSeconds(20), Interval::fromSeconds(500)};
+      }
+      /** Range of valid VOX delays. */
+      static constexpr Range<Interval> voxDelay() {
+        return {Interval::fromMilliseconds(300), Interval::fromSeconds(5)};
+      }
     };
 
   protected:
@@ -1414,6 +1856,74 @@ public:
       static constexpr Bit voicePrompt()                 { return {0x0021, 7}; }
       static constexpr Bit lowBatteryTone()              { return {0x0021, 6}; }
       static constexpr Bit fmRogerTone()                 { return {0x0021, 1}; }
+      static constexpr unsigned int displayBrightness()  { return 0x0030; }
+      static constexpr unsigned int backlightDuration()  { return 0x0031; }
+      static constexpr unsigned int menuDuration()       { return 0x0032; }
+      static constexpr Bit showVolumeChange()            { return {0x0033, 4}; }
+      static constexpr Bit dateFormat()                  { return {0x0033, 3}; }
+      static constexpr Bit showClock()                   { return {0x0033, 0}; }
+      static constexpr unsigned int callColor()          { return 0x0034; }
+      static constexpr unsigned int standbyColor()       { return 0x0035; }
+      static constexpr unsigned int channelNameAColor()  { return 0x0038; }
+      static constexpr unsigned int channelNameBColor()  { return 0x0039; }
+      static constexpr unsigned int zoneNameAColor()     { return 0x003a; }
+      static constexpr unsigned int zoneNameBColor()     { return 0x003b; }
+      static constexpr Bit positionFormat()              { return {0x0040, 6}; }
+      static constexpr Bit gnssMode()                    { return {0x0040, 3}; }
+      static constexpr Bit enableGNSS()                  { return {0x0040, 0}; }
+      static constexpr unsigned int timeZone()           { return 0x0041; }
+      static constexpr unsigned int posUpdatePeriod()    { return 0x0042; }
+      static constexpr Bit recordMode()                  { return {0x0043, 2}; }
+      static constexpr Bit enableRecording()             { return {0x0045, 0}; }
+      static constexpr Bit groupCallMatch()              { return {0x0060, 1}; }
+      static constexpr Bit privateCallMatch()            { return {0x0060, 0}; }
+      static constexpr unsigned int dmrCallHangTime()    { return 0x0061; }
+      static constexpr unsigned int activeWaitTime()     { return 0x0062; }
+      static constexpr unsigned int activeReties()       { return 0x0063; }
+      static constexpr unsigned int dmrPreambleDur()     { return 0x0064; }
+      static constexpr Bit dmrMonitor()                  { return {0x0065, 7}; }
+      static constexpr Bit dmrKill()                     { return {0x0065, 6}; }
+      static constexpr Bit dmrRadioCheck()               { return {0x0065, 5}; }
+      static constexpr Bit dmrReenable()                 { return {0x0065, 4}; }
+      static constexpr Bit dmrRXAlert()                  { return {0x0065, 3}; }
+      static constexpr Bit smsFormat()                   { return {0x0065, 1}; }
+      static constexpr Bit missedCallNotification()      { return {0x0065, 0}; }
+      static constexpr unsigned int dmrRemoteMonitorDuration() { return 0x0066; }
+      static constexpr Bit dmrTalkerAliasFormat()        { return {0x0067, 4}; }
+      static constexpr Bit txTalkerAlias()               { return {0x0067, 3}; }
+      static constexpr Bit talkerSource()                { return {0x0067, 2}; }
+      static constexpr Bit dualStandbyMode()             { return {0x0080, 6}; }
+      static constexpr Bit mainVFO()                     { return {0x0080, 5}; }
+      static constexpr Bit displayModeB()                { return {0x0080, 4}; }
+      static constexpr Bit displayModeA()                { return {0x0080, 3}; }
+      static constexpr Bit vfoModeB()                    { return {0x0080, 2}; }
+      static constexpr Bit vfoModeA()                    { return {0x0080, 1}; }
+      static constexpr Bit disableVFOMode()              { return {0x0080, 0}; }
+      static constexpr unsigned int dualStandbyHangTime() { return 0x0081;}
+      static constexpr Bit sideKeyLock()                 { return {0x0085, 2}; }
+      static constexpr Bit knobLock()                    { return {0x0085, 1}; }
+      static constexpr Bit enableAutoKeyLock()           { return {0x0085, 0}; }
+      static constexpr unsigned int autoKeyLockDelay()   { return 0x0086; }
+      static constexpr unsigned int sk1Short()           { return 0x0087; }
+      static constexpr unsigned int sk1Long()            { return 0x0088; }
+      static constexpr unsigned int sk2Short()           { return 0x0089; }
+      static constexpr unsigned int sk2Long()            { return 0x008a; }
+      static constexpr unsigned int p1Short()            { return 0x008d; }
+      static constexpr unsigned int p1Long()             { return 0x008e; }
+      static constexpr unsigned int p2Short()            { return 0x008f; }
+      static constexpr unsigned int p2Long()             { return 0x0090; }
+      static constexpr unsigned int longPressDuration()  { return 0x0094; }
+      static constexpr unsigned int transmitTimeout()    { return 0x00a0; }
+      static constexpr unsigned int totReminder()        { return 0x00a1; }
+      static constexpr unsigned int voxLevel()           { return 0x00a2; }
+      static constexpr unsigned int voxDelay()           { return 0x00a3; }
+      static constexpr Bit powerSaveMode()               { return {0x00a4, 4}; }
+      static constexpr Bit weatherAlarm()                { return {0x00a4, 2}; }
+      static constexpr Bit disableLEDs()                 { return {0x00a4, 0}; }
+      static constexpr Bit tbstFrequency()               { return {0x00a5, 4}; }
+      static constexpr Bit steMode()                     { return {0x00a5, 0}; }
+      static constexpr unsigned int fmMicLevel()         { return 0x00a6; }
+      static constexpr unsigned int dmrMicLevel()        { return 0x00a7; }
       /// @endcond
     };
   };
