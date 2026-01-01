@@ -2,6 +2,7 @@
 #include "intermediaterepresentation.hh"
 #include "config.hh"
 #include "logger.hh"
+#include <QRegularExpression>
 
 
 
@@ -2845,6 +2846,199 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 
 
 /* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::APRSSettingsElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::APRSSettingsElement::APRSSettingsElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+Interval
+DM32UVCodeplug::APRSSettingsElement::updatePeriod() {
+  if (0 == getUInt8(Offset::updatePeriod()))
+    return Interval::infinity();
+  return Interval::fromSeconds(((unsigned int)getUInt8(Offset::updatePeriod()))*30);
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setUpdatePeriod(Interval interval) {
+  if (interval.isInfinite() || interval.isNull()) {
+    setUInt8(Offset::updatePeriod(), 0);
+  } else {
+    interval = Limit::updatePeriod().limit(interval);
+    setUInt8(Offset::updatePeriod(), (unsigned int)interval.seconds()/30);
+  }
+}
+
+
+bool
+DM32UVCodeplug::APRSSettingsElement::fixedLocationValid() const {
+  return 0 != getUInt8(Offset::enableFixedLocation());
+}
+
+QGeoCoordinate
+DM32UVCodeplug::APRSSettingsElement::fixedLocation() const {
+  static QRegularExpression re(R"((\d+\.\d+)([NSEW]))");
+  QString lat = readASCII(Offset::fixedLocationLatitude(), 10, 0x00);
+  QString lon = readASCII(Offset::fixedLocationLongitude(), 10, 0x00);
+  auto latMatch = re.match(lat), lonMatch = re.match(lon);
+
+  if (latMatch.hasMatch() && lonMatch.hasMatch()) {
+    return QGeoCoordinate{
+      latMatch.captured(1).toDouble() * (latMatch.captured(2)=="S" ? -1 : 1),
+      lonMatch.captured(1).toDouble() * (lonMatch.captured(2)=="W" ? -1 : 1),
+    };
+  }
+
+  return {};
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &coordinate) {
+  if (! coordinate.isValid()) {
+    setUInt8(Offset::enableFixedLocation(), 0);
+    return;
+  }
+
+  QString latString, lonString;
+  latString.asprintf("%02.6f%c",std::abs(coordinate.latitude()), coordinate.latitude()<0 ? 'S' : 'N');
+  lonString.asprintf("%03.5f%c",std::abs(coordinate.longitude()), coordinate.longitude()<0 ? 'W' : 'E');
+  setUInt8(Offset::enableFixedLocation(), 1);
+  writeASCII(Offset::fixedLocationLatitude(), latString, 10);
+  writeASCII(Offset::fixedLocationLongitude(), lonString, 10);
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::clearFixedLocation() {
+  setUInt8(Offset::enableFixedLocation(), 0);
+}
+
+
+bool
+DM32UVCodeplug::APRSSettingsElement::revertChannelIsCurrent(unsigned int n) {
+  return 0 == getUInt16_le(Offset::revertChannelIndices()
+    + n * Offset::betweenRevertChannelIndices());
+}
+
+unsigned int
+DM32UVCodeplug::APRSSettingsElement::revertChannelIndex(unsigned int n) const {
+  return getUInt16_le(Offset::revertChannelIndices()
+    + n * Offset::betweenRevertChannelIndices()) -1 ;
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setRevertChannelIndex(unsigned int n, unsigned int idx) {
+  setUInt16_le(Offset::revertChannelIndices()
+    + n * Offset::betweenRevertChannelIndices(), idx+1);
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setRevertChannelToCurrent(unsigned int n) {
+  setUInt16_le(Offset::revertChannelIndices()
+    + n * Offset::betweenRevertChannelIndices(), 0);
+}
+
+
+Interval
+DM32UVCodeplug::APRSSettingsElement::preWaveDelay() const {
+  return Interval::fromMilliseconds((unsigned int)getUInt8(Offset::prewaveDelay()) * 100);
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setPreWaveDelay(const Interval &delay) {
+  setUInt8(Offset::prewaveDelay(), delay.milliseconds()/100);
+}
+
+
+DMRContact::Type
+DM32UVCodeplug::APRSSettingsElement::callType() const {
+  switch ((CallType)getUInt8(Offset::callType())) {
+  case CallType::Private: return DMRContact::Type::PrivateCall;
+  case CallType::Group: return DMRContact::Type::GroupCall;
+  }
+  return DMRContact::Type::PrivateCall;
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setCallType(DMRContact::Type type) {
+  switch (type) {
+  case DMRContact::Type::PrivateCall:
+    setUInt8(Offset::callType(), (unsigned int) CallType::Private);
+    break;
+  case DMRContact::Type::AllCall:
+  case DMRContact::Type::GroupCall:
+    setUInt8(Offset::callType(), (unsigned int) CallType::Group);
+    break;
+  }
+}
+
+
+unsigned int
+DM32UVCodeplug::APRSSettingsElement::destinationId() const {
+  return getUInt24_le(Offset::destinationId());
+}
+
+void
+DM32UVCodeplug::APRSSettingsElement::setDestinationId(unsigned int id) {
+  setUInt24_le(Offset::destinationId(), id);
+}
+
+
+bool
+DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  if (0 == destinationId())
+    return true;
+
+  auto aprs = new GPSSystem("DMR APRS System");
+  if (updatePeriod().isFinite())
+    aprs->setPeriod(updatePeriod().seconds());
+  else
+    aprs->setPeriod(0);
+
+  ctx.add(aprs, 0);
+  ctx.config()->posSystems()->add(aprs);
+
+  return true;
+}
+
+bool
+DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
+  if (0 == destinationId())
+    return true;
+
+  auto aprs = ctx.get<GPSSystem>(0);
+  if (nullptr == aprs) {
+    errMsg(err) << "Cannot resolve DMR APRS System at index 0!";
+    return false;
+  }
+
+  auto cont = ctx.config()->contacts()->findDigitalContact(destinationId());
+  if (nullptr == cont) {
+    cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
+    ctx.config()->contacts()->add(cont);
+  }
+
+  aprs->setContactObj(cont);
+  if (revertChannelIsCurrent(0)) {
+    aprs->resetRevertChannel();
+  } else {
+    if (! ctx.has<Channel>(revertChannelIndex(0))) {
+      errMsg(err) << "Cannot resolve revert channel index " << revertChannelIndex(0) << ".";
+      return false;
+    }
+    if (! ctx.get<Channel>(revertChannelIndex(0))->is<DMRChannel>()) {
+      errMsg(err) << "Revert channel with index " << revertChannelIndex(0) << " must be DMR channel.";
+      return false;
+    }
+    aprs->setRevertChannel(ctx.get<Channel>(revertChannelIndex(0))->as<DMRChannel>());
+  }
+
+  return true;
+}
+
+
+/* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug
  * ******************************************************************************************** */
 DM32UVCodeplug::DM32UVCodeplug(QObject *parent)
@@ -3007,6 +3201,11 @@ DM32UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! APRSSettingsElement(data(Offset::aprsSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode APRS settings.";
+    return false;
+  }
+
   return true;
 }
 
@@ -3035,6 +3234,11 @@ DM32UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! RoamingZoneBankElement(data(Offset::roamingZoneBank())).link(ctx, err)) {
     errMsg(err) << "Cannot link roaming zones.";
+    return false;
+  }
+
+  if (! APRSSettingsElement(data(Offset::aprsSettings())).link(ctx, err)) {
+    errMsg(err) << "Cannot link APRS settings.";
     return false;
   }
 

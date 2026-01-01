@@ -8,11 +8,9 @@
 #include "codeplug.hh"
 #include "contact.hh"
 #include "frequency.hh"
-#include "roamingchannel.hh"
-#include "codeplug.hh"
 #include "ranges.hh"
-#include  "smsextension.hh"
-
+#include "roamingchannel.hh"
+#include "smsextension.hh"
 
 // forward declaration
 class Zone;
@@ -1413,7 +1411,7 @@ public:
     GeneralSettingsElement(uint8_t *ptr);
 
     /** Returns the size og the element. */
-    static constexpr unsigned int size() { return 0x1000; }
+    static constexpr unsigned int size() { return 0x0100; }
 
     /** Returns the boot display setting. */
     virtual BootDisplay bootDisplay() const;
@@ -1928,6 +1926,95 @@ public:
     };
   };
 
+
+  /** Implements the APRS settings. */
+  class APRSSettingsElement: public Element
+  {
+  protected:
+    /** Encoding of call type. */
+    enum class CallType {
+      Private = 0, Group = 1
+    };
+
+  public:
+    /** Constructor from pointer. */
+    APRSSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    /** Returns the update interval. If set to infinity, update is disabled. */
+    virtual Interval updatePeriod();
+    /** Sets the update interval. */
+    virtual void setUpdatePeriod(Interval interval);
+
+    /** Returns @c true if the fixed location is set. */
+    virtual bool fixedLocationValid() const;
+    /** Returns the fixed location. */
+    virtual QGeoCoordinate fixedLocation() const;
+    /** Sets the fixed location. */
+    virtual void setFixedLocation(const QGeoCoordinate &coordinate);
+    /** Clears the fixed location. */
+    virtual void clearFixedLocation();
+
+    /** Returns @c true if the n-th revert channel is set. */
+    virtual bool revertChannelIsCurrent(unsigned int n);
+    /** Returns the n-th revert channel index. */
+    virtual unsigned int revertChannelIndex(unsigned int n) const;
+    /** Sets the n-th revert channel index. */
+    virtual void setRevertChannelIndex(unsigned int n, unsigned int idx);
+    /** Sets the n-th revert channel to be the current channel. */
+    virtual void setRevertChannelToCurrent(unsigned int n);
+
+    /** Returns the pre-wave delay. */
+    virtual Interval preWaveDelay() const;
+    /** Sets the pre-wave delay. */
+    virtual void setPreWaveDelay(const Interval &delay);
+
+    /** Returns the call type for all revert channels. */
+    virtual DMRContact::Type callType() const;
+    /** Sets the call type for all revert channels. */
+    virtual void setCallType(DMRContact::Type type);
+
+    /** Returns the destination ID */
+    virtual unsigned int destinationId() const;
+    /** Sets the destination ID for all revert channels. */
+    virtual void setDestinationId(unsigned int id);
+
+    /** Decodes the APRS settings. */
+    bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Links the APRS settings. */
+    bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      /** Valid range for update period. */
+      static constexpr Range<Interval> updatePeriod() {
+        return {Interval::fromSeconds(30), Interval::fromMinutes(120) };
+      }
+      /** Number of revert channels. */
+      static constexpr unsigned int revertChannels() { return 8; }
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int updatePeriod()                { return 0x0001; }
+      static constexpr unsigned int enableFixedLocation()         { return 0x0002; }
+      static constexpr unsigned int fixedLocationLatitude()       { return 0x0006; }
+      static constexpr unsigned int fixedLocationLongitude()      { return 0x0010; }
+      static constexpr unsigned int revertChannelIndices()        { return 0x0020; }
+      static constexpr unsigned int betweenRevertChannelIndices() { return 0x0002; }
+      static constexpr unsigned int prewaveDelay()                { return 0x0030; }
+      static constexpr unsigned int callType()                    { return 0x0031; }
+      static constexpr unsigned int destinationId()               { return 0x0032; }
+      /// @endcond
+    };
+  };
+
+
 public:
   /** Default/empty contructor.
    * Before encoding, @c encode will allocate all elements necessary to encode the codeplug.
@@ -1966,6 +2053,7 @@ protected:
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int generalSettings()     { return 0x00004000; }
+    static constexpr unsigned int aprsSettings()        { return 0x00004300; }
     static constexpr unsigned int contactIndex()        { return 0x0000b000; }
     static constexpr unsigned int groupListBank()       { return 0x0000f000; }
     static constexpr unsigned int scanListBank()        { return 0x00011000; }
