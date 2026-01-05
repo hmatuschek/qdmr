@@ -567,7 +567,7 @@ FMChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["analog"] = node;
+  type["fm"] = node;
   return type;
 }
 
@@ -906,7 +906,7 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["digital"] = node;
+  type["dmr"] = node;
   return type;
 }
 

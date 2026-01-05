@@ -476,13 +476,70 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
     else
       dmr->setRadioIdObj(ctx.get<DMRRadioID>(dmrIdIndex()));
 
-    /*if (dmrAPRSEnabled()) {
+    if (dmrAPRSEnabled()) {
       if (! ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
         errMsg(err) << "Unknown GPS system index " << dmrAPRSChannelIndex() << ".";
         return false;
       }
       dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
-    }*/
+    }
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, const ErrorStack &err) {
+  setName(channel->name());
+  setRXFrequency(channel->rxFrequency());
+  setTXFrequency(channel->txFrequency());
+  // AM channels are encoded as FM with rx frequency within the air band
+  setChannelType(channel->is<DMRChannel>() ? ChannelType::DMR : ChannelType::FM);
+  setPower(channel->power());
+  enableRXOnly(channel->rxOnly());
+  enableVOX(! channel->voxDisabled());
+
+  if (! channel->scanListRef()->isNull())
+    setScanListIndex(ctx.index(channel->scanList()));
+  else
+    clearEmergencySystemIndex();
+
+  if (channel->is<DMRChannel>()) {
+    auto dmr = channel->as<DMRChannel>();
+    setBandwidth(FMChannel::Bandwidth::Narrow);
+    switch (dmr->admit()) {
+      case DMRChannel::Admit::Always: setAdmitCriterion(Admit::Always); break;
+      case DMRChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
+      case DMRChannel::Admit::ColorCode: setAdmitCriterion(Admit::ToneOrCCMatch); break;
+    }
+    setSquelchLevel(ctx.config()->settings()->squelch());
+    setTimeslot(dmr->timeSlot());
+    setColorCode(dmr->colorCode());
+    enableEncryption(! dmr->commercialExtension()->encryptionKeyRef()->isNull());
+    if (! dmr->commercialExtension()->encryptionKeyRef()->isNull()) {
+      // reverse engineer encryption key index!
+    }
+    clearGroupListIndex();
+    if (! dmr->groupList()->isNull()) {
+      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    }
+    if (dmr->radioId()->is<DefaultRadioID>()) {
+      setDMRIdIndex(ctx.index(ctx.config()->settings()->defaultId()));
+    } else {
+      setDMRIdIndex(ctx.index(dmr->radioIdObj()));
+    }
+  } else if (channel->is<FMChannel>()) {
+    auto fm = channel->as<FMChannel>();
+    setBandwidth(fm->bandwidth());
+    switch (fm->admit()) {
+    case FMChannel::Admit::Always: setAdmitCriterion(Admit::Always); break;
+    case FMChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
+    case FMChannel::Admit::Tone: setAdmitCriterion(Admit::ToneOrCCMatch); break;
+    }
+    setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
+    setRXTone(fm->rxTone());
+    setTXTone(fm->txTone());
   }
 
   return true;
@@ -3038,6 +3095,223 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
 }
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::PasswordSettingsElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::PasswordSettingsElement::PasswordSettingsElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::bootPasswordEnabled() const {
+  return 165 == getUInt8(Offset::enableBootPassword());
+}
+
+QString
+DM32UVCodeplug::PasswordSettingsElement::bootPassword() const {
+  return readASCII(Offset::bootPassword(), Limit::passwordLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::setBootPassword(const QString &value) {
+  writeASCII(Offset::bootPassword(), value, Limit::passwordLength(), 0x00);
+  setUInt8(Offset::enableBootPassword(), 165);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::clearBootPassword() {
+  setUInt8(Offset::enableBootPassword(), 0);
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::writePasswordEnabled() const {
+  return 165 == getUInt8(Offset::enableWritePassword());
+}
+
+QString
+DM32UVCodeplug::PasswordSettingsElement::writePassword() const {
+  return readASCII(Offset::writePassword(), Limit::passwordLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::setWritePassword(const QString &value) {
+  writeASCII(Offset::writePassword(), value, Limit::passwordLength(), 0x00);
+  setUInt8(Offset::enableWritePassword(), 165);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::clearWritePassword() {
+  setUInt8(Offset::enableWritePassword(), 0);
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::readPasswordEnabled() const {
+  return 165 == getUInt8(Offset::enableReadPassword());
+}
+
+QString
+DM32UVCodeplug::PasswordSettingsElement::readPassword() const {
+  return readASCII(Offset::readPassword(), Limit::passwordLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::setReadPassword(const QString &value) {
+  writeASCII(Offset::readPassword(), value, Limit::passwordLength(), 0x00);
+  setUInt8(Offset::enableReadPassword(), 165);
+}
+
+void
+DM32UVCodeplug::PasswordSettingsElement::clearReadPassword() {
+  setUInt8(Offset::enableReadPassword(), 0);
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::EncrpytionKeyElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+
+void
+DM32UVCodeplug::EncryptionKeyElement::clear() {
+  setType(Type::Off);
+  setName("");
+  setKey(QByteArray(Limit::keyLength(), '\x00'));
+}
+
+
+unsigned int
+DM32UVCodeplug::EncryptionKeyElement::keyId() const {
+  return getUInt8(Offset::keyId());
+}
+
+void
+DM32UVCodeplug::EncryptionKeyElement::setKeyId(unsigned int id) {
+  setUInt8(Offset::keyId(), id);
+}
+
+
+QString
+DM32UVCodeplug::EncryptionKeyElement::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+
+void
+DM32UVCodeplug::EncryptionKeyElement::setName(const QString &value) {
+  writeASCII(Offset::name(), value, Limit::nameLength(), 0x00);
+}
+
+
+DM32UVCodeplug::EncryptionKeyElement::Type
+DM32UVCodeplug::EncryptionKeyElement::type() const {
+  return (Type)getUInt8(Offset::type());
+}
+
+void
+DM32UVCodeplug::EncryptionKeyElement::setType(Type type) {
+  setUInt8(Offset::type(), (unsigned int)type);
+}
+
+
+QByteArray
+DM32UVCodeplug::EncryptionKeyElement::key() const {
+  return QByteArray((const char *)_data + Offset::key(), (qsizetype) Limit::keyLength());
+}
+
+void
+DM32UVCodeplug::EncryptionKeyElement::setKey(const QByteArray &key) {
+  std::memset(_data + Offset::key(), 0, Limit::keyLength());
+  std::memcpy(_data + Offset::key(), key.constData(),
+    std::min(Limit::keyLength(), (unsigned int)key.length()));
+}
+
+
+EncryptionKey *
+DM32UVCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err) const {
+  switch (type()) {
+  case Type::Off:
+  case Type::Custom:
+    errMsg(err) << "Cannot decode disabled or custom key.";
+    return nullptr;
+  case Type::ARC4: {
+    auto key = new ARC4EncryptionKey();
+    key->setName(name());
+    if (! key->setKey(this->key().left(5), err))
+      return nullptr;
+    return  key;
+  }
+  case Type::AES128: {
+    auto key = new AESEncryptionKey();
+    key->setName(name());
+    if (! key->setKey(this->key().left(16), err))
+      return nullptr;
+    return  key;
+  }
+  case Type::AES256: {
+    auto key = new AESEncryptionKey();
+    key->setName(name());
+    if (! key->setKey(this->key(), err))
+      return nullptr;
+    return  key;
+  }
+  }
+
+  errMsg(err) << "Unhandled key type " << (unsigned int)type() << ".";
+  return nullptr;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::EncryptionKeyBankElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr)
+  : Element{ptr, size()}
+{
+  // pass...
+}
+
+bool
+DM32UVCodeplug::EncryptionKeyBankElement::keyValid(unsigned int idx) const {
+  return (EncryptionKeyElement::Type::ARC4 == key(idx).type()) ||
+    (EncryptionKeyElement::Type::AES128 == key(idx).type()) ||
+      (EncryptionKeyElement::Type::AES256 == key(idx).type());
+}
+
+DM32UVCodeplug::EncryptionKeyElement
+DM32UVCodeplug::EncryptionKeyBankElement::key(unsigned int idx) const {
+  return EncryptionKeyElement(_data + Offset::keys() + idx*Offset::betweenKeys());
+}
+
+bool
+DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    if (! keyValid(i))
+      continue;
+    auto key = this->key(i).decode(ctx, err);
+    if (nullptr == key) {
+      errMsg(err) << "Cannot decode encryption key at index " << i << ".";
+      return false;
+    }
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
+
+
+
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug
  * ******************************************************************************************** */
@@ -3131,8 +3405,20 @@ DM32UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const
 
 bool
 DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  errMsg(err) << "Not implemented yet.";
-  return false;
+  Q_UNUSED(flags);
+
+  Context ctx(config);
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug.";
+    return false;
+  }
+
+  if (! encodeElements(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -3206,6 +3492,11 @@ DM32UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode encryption keys.";
+    return false;
+  }
+
   return true;
 }
 
@@ -3239,6 +3530,17 @@ DM32UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! APRSSettingsElement(data(Offset::aprsSettings())).link(ctx, err)) {
     errMsg(err) << "Cannot link APRS settings.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
+  if (! encodeChannels(ctx, err)) {
+    errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
@@ -3286,6 +3588,38 @@ DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     // link channel
     if (! ChannelElement(data(addr)).link(ch, ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
+  // Allocate blocks
+  unsigned int numBlocks = ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock();
+    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0);
+  for (unsigned int b=0; b<numBlocks; b++) {
+    unsigned int addr = Offset::channelBanks()
+      + b*ChannelBankElement::Offset::betweenChannelBlocks();
+    image(0).addElement(addr, ChannelBankElement::Offset::betweenChannelBlocks());
+  }
+
+  // Encode channels
+  ChannelBankElement bank(data(Offset::channelBanks()));
+  bank.setChannelCount(ctx.count<Channel>());
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
+    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    uint32_t addr = Offset::channelBanks()
+                    + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
+                                        : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
+                    + indexInBlock * ChannelElement::size();
+    // Create channel
+    if (! ChannelElement(data(addr)).encode(ctx.get<Channel>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode channel at index " << i << ".";
       return false;
     }
   }

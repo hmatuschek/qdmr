@@ -202,7 +202,7 @@ public:
 
     /** Returns @c true, if the VOX is enabled. */
     virtual bool voxEnabled() const;
-    /** Enables the the VOX. */
+    /** Enables the VOX. */
     virtual void enableVOX(bool enable);
 
     /** Returns the DMR radio id index. */
@@ -214,6 +214,8 @@ public:
     virtual Channel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the channel object. */
     virtual bool link(Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes a channel. */
+    virtual bool encode(const Channel *channel, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -2015,8 +2017,238 @@ public:
   };
 
 
+  /** Implements the password settings. */
+  class PasswordSettingsElement: public Element
+  {
+  public:
+    /** Constructor. */
+    PasswordSettingsElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+    /** Returns @c true if the boot password is set. */
+    virtual bool bootPasswordEnabled() const;
+    /** Returns the boot password. */
+    virtual QString bootPassword() const;
+    /** Sets the boot password. */
+    virtual void setBootPassword(const QString &value);
+    /** Clears the boot password. */
+    virtual void clearBootPassword();
+
+    /** Returns @c true if the write password is set. */
+    virtual bool writePasswordEnabled() const;
+    /** Returns the write password. */
+    virtual QString writePassword() const;
+    /** Sets the write password. */
+    virtual void setWritePassword(const QString &value);
+    /** Clears the write password. */
+    virtual void clearWritePassword();
+
+    /** Returns @c true if the read password is set. */
+    virtual bool readPasswordEnabled() const;
+    /** Returns the read password. */
+    virtual QString readPassword() const;
+    /** Sets the read password. */
+    virtual void setReadPassword(const QString &value);
+    /** Clears the read password. */
+    virtual void clearReadPassword();
+
+  public:
+    /** Some limits for the element. */
+    struct Limit: Element::Limit
+    {
+      /** Maximum password length. */
+      static constexpr unsigned int passwordLength() { return 8;}
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset
+    {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int enableBootPassword()                { return 0x0030; }
+      static constexpr unsigned int bootPassword()                      { return 0x0031; }
+      static constexpr unsigned int enableWritePassword()               { return 0x0039; }
+      static constexpr unsigned int enableReadPassword()                { return 0x003a; }
+      static constexpr unsigned int writePassword()                     { return 0x003b; }
+      static constexpr unsigned int readPassword()                      { return 0x0043; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the menu settings. */
+  class MenuSettingElement: public Element
+  {
+  public:
+    /** Constructor. */
+    MenuSettingElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0100; }
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit newZone()                      { return {0x0000,1}; }
+      static constexpr Bit listZones()                    { return {0x0000,0}; }
+      static constexpr Bit measurePeriod()                { return {0x0001,5}; }
+      static constexpr Bit remoteKill()                   { return {0x0001,4}; }
+      static constexpr Bit reenableRadio()                { return {0x0001,3}; }
+      static constexpr Bit remoteMonitor()                { return {0x0001,2}; }
+      static constexpr Bit radioCheck()                   { return {0x0001,1}; }
+      static constexpr Bit callAlert()                    { return {0x0001,0}; }
+      static constexpr Bit matchGroupCall()               { return {0x0002,7}; }
+      static constexpr Bit displayMode()                  { return {0x0002,6}; }
+      static constexpr Bit matchPrivateCall()             { return {0x0002,5}; }
+      static constexpr Bit languageSelect()               { return {0x0002,4}; }
+      static constexpr Bit bootDisplay()                  { return {0x0002,3}; }
+      static constexpr Bit transmitPower()                { return {0x0002,2}; }
+      static constexpr Bit alertTone()                    { return {0x0002,1}; }
+      static constexpr Bit talkaround()                   { return {0x0002,0}; }
+      static constexpr Bit record()                       { return {0x0003,6}; }
+      static constexpr Bit aprs()                         { return {0x0003,5}; }
+      static constexpr Bit gnss()                         { return {0x0003,4}; }
+      static constexpr Bit powerSave()                    { return {0x0003,3}; }
+      static constexpr Bit subChannelMode()               { return {0x0003,2}; }
+      static constexpr Bit fmBCRadio()                    { return {0x0003,1}; }
+      static constexpr Bit smsFormat()                    { return {0x0003,0}; }
+      static constexpr Bit callsignDB()                   { return {0x0004,6}; }
+      static constexpr Bit manualDial()                   { return {0x0004,5}; }
+      static constexpr Bit sendMessage()                  { return {0x0004,4}; }
+      static constexpr Bit contactFunc()                  { return {0x0004,3}; }
+      static constexpr Bit editContact()                  { return {0x0004,2}; }
+      static constexpr Bit deleteContact()                { return {0x0004,1}; }
+      static constexpr Bit addContact()                   { return {0x0004,0}; }
+      static constexpr Bit clearCallLog()                 { return {0x0005,3}; }
+      static constexpr Bit outgoingCalls()                { return {0x0005,2}; }
+      static constexpr Bit incomingCalls()                { return {0x0005,1}; }
+      static constexpr Bit missedCalls()                  { return {0x0005,0}; }
+      static constexpr Bit radioName()                    { return {0x0006,7}; }
+      static constexpr Bit radioId()                      { return {0x0006,6}; }
+      static constexpr Bit timeslot()                     { return {0x0006,5}; }
+      static constexpr Bit colorCode()                    { return {0x0006,4}; }
+      static constexpr Bit txContact()                    { return {0x0006,3}; }
+      static constexpr Bit ctcssDcs()                     { return {0x0006,2}; }
+      static constexpr Bit txFrequency()                  { return {0x0006,1}; }
+      static constexpr Bit rxFrequency()                  { return {0x0006,0}; }
+      static constexpr Bit channelName()                  { return {0x0007,4}; }
+      static constexpr Bit addChannel()                   { return {0x0007,3}; }
+      static constexpr Bit groupList()                    { return {0x0007,2}; }
+      static constexpr Bit dcdm()                         { return {0x0007,1}; }
+      static constexpr Bit channelType()                  { return {0x0007,0}; }
+      /// @endcon
+    };
+  };
+
+
+
+  /** Implementation of a single encryption key. */
+  class EncryptionKeyElement: Element
+  {
+  public:
+    /** Possible key types. */
+    enum class Type {
+      Off = 0, Custom = 1, ARC4 = 2, AES128 = 3, AES256 = 4
+    };
+
+  public:
+    /** Constructor. */
+    EncryptionKeyElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x2c; }
+
+    virtual void clear() override;
+
+    /** Returns the key id. */
+    virtual unsigned int keyId() const;
+    /** Sets the key id. */
+    virtual void setKeyId(unsigned int id);
+
+    /** Returns the key name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    /** Returns the key type. */
+    virtual Type type() const;
+    /** Sets the key type. */
+    virtual void setType(Type type);
+
+    /** Returns the key data. */
+    virtual QByteArray key() const;
+    /** Sets the key data. */
+    virtual void setKey(const QByteArray &key);
+
+    /** Decodes the key. */
+    EncryptionKey *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  public:
+    /** Some limits of the element. */
+    struct Limit: Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 10; }
+      /** Maximum key length (bytes). */
+      static constexpr unsigned int keyLength() { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keyId() { return 0x0000; }
+      static constexpr unsigned int name()  { return 0x0001; }
+      static constexpr unsigned int type()  { return 0x000b; }
+      static constexpr unsigned int key()   { return 0x000c; }
+      /// @endcond
+    };
+  };
+
+
+
+  /** Implements encryption key bank. */
+  class EncryptionKeyBankElement: public Element
+  {
+  public:
+    /** Constructor from pointer to element. */
+    EncryptionKeyBankElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x600; }
+
+    /** Returns @c true, if the key is valid. */
+    virtual bool keyValid(unsigned int idx) const;
+    /** Returns the n-th key. */
+    virtual EncryptionKeyElement key(unsigned int idx) const;
+
+    /** Decodes all keys. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the element. */
+    struct Limit: Element::Limit {
+      /** Maximum number of keys. */
+      static constexpr unsigned int keys() { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keys() { return 0x0000; }
+      static constexpr unsigned int betweenKeys() {
+        return EncryptionKeyElement::size();
+      }
+      /// @endcond
+    };
+  };
+
+
 public:
-  /** Default/empty contructor.
+  /** Default/empty constructor.
    * Before encoding, @c encode will allocate all elements necessary to encode the codeplug.
    * Before decoding, all elements that are allocated on the device must be allocated within the
    * codeplug. */
@@ -2034,11 +2266,15 @@ protected:
   virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Link decoded elements. */
   virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encode all elements. */
+  virtual bool encodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decodes all channels defined. */
   virtual bool decodeChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all decoded channels. */
   virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encodes all channels. */
+  virtual bool encodeChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decode contacts. */
   virtual bool decodeContacts(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -2056,6 +2292,7 @@ protected:
     static constexpr unsigned int aprsSettings()        { return 0x00004300; }
     static constexpr unsigned int contactIndex()        { return 0x0000b000; }
     static constexpr unsigned int groupListBank()       { return 0x0000f000; }
+    static constexpr unsigned int encryptionKeys()      { return 0x00010300; }
     static constexpr unsigned int scanListBank()        { return 0x00011000; }
     static constexpr unsigned int channelBanks()        { return 0x00012000; }
     static constexpr unsigned int contactBanks()        { return 0x00044000; }
