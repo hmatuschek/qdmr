@@ -1,6 +1,6 @@
 app-id: de.darc.dm3mat.qdmr
 runtime: org.kde.Platform
-runtime-version: '6.8'
+runtime-version: '6.9'
 sdk: org.kde.Sdk
 command: qdmr
 rename-desktop-file: qdmr.desktop
@@ -39,8 +39,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/libusb/libusb.git
-        tag: v1.0.28
-        commit: a61afe5f75d969c4561a1d0ad753aa23cee6329a
+        tag: v1.0.29
+        commit: 15a7ebb4d426c5ce196684347d2b7cafad862626
 
   - name: qdmr
     buildsystem: cmake-ninja
