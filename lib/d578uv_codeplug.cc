@@ -610,7 +610,7 @@ D578UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::min(1U, std::min(10U, gain));
+  gain = Limit::Range<unsigned int>{1,10}.mapTo({0,4}, gain);
   setUInt8(Offset::dmrMicGain(), (gain*4)/10);
 }
 

@@ -100,9 +100,14 @@ public:
         inline T limit(const T &value) const {
           return std::min(max, std::max(min, value));
         }
-        /// Checks if value is in range
+        /** Checks if value is in range. */
         inline bool in(const T &value) const {
           return (value <= max) && (value >= min);
+        }
+        /** Maps a value from this range to the given range. */
+        inline T mapTo(const Range<T> &other, const T &value) const {
+          T myD = max-min, oD = other.max-other.min;
+          return ((limit(value)-min)*oD)/myD + other.min;
         }
       };
     };
