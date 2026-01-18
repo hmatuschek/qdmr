@@ -604,14 +604,18 @@ D578UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
   setUInt8(Offset::vfoScanType(), (unsigned int) type);
 }
 
+
 unsigned
 D578UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+  return Limit::Range<unsigned int>{0,4}
+    .mapTo({1,10},
+           getUInt8(Offset::dmrMicGain()));
 }
+
 void
 D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::min(1U, std::min(10U, gain));
-  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+  gain = Limit::Range<unsigned int>{1,10}.mapTo({0,4}, gain);
+  setUInt8(Offset::dmrMicGain(), gain);
 }
 
 
