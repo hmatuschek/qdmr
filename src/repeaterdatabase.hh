@@ -136,7 +136,8 @@ public:
   virtual RepeaterDatabaseEntry get(unsigned int idx) const;
 
 signals:
-  /** Gets emitted, once an entry gets updated or is added. */
+  /** Gets emitted, once an entry gets updated or is added.
+   * @warning This signal may originate in a separate thread.*/
   void updated(const RepeaterDatabaseEntry &entry);
 
 protected:

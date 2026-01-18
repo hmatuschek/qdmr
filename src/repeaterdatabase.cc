@@ -528,7 +528,9 @@ RepeaterDatabase::addSource(RepeaterDatabaseSource *source) {
 
   _sources.append(source);
   source->setParent(this);
-  connect(source, &RepeaterDatabaseSource::updated, this, &RepeaterDatabase::merge);
+  connect(source, &RepeaterDatabaseSource::updated,
+          this, &RepeaterDatabase::merge,
+          Qt::QueuedConnection);
 
   for (unsigned int i=0; i<source->count(); i++) {
     merge(source->get(i));
