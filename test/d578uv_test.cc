@@ -88,7 +88,8 @@ D578UVTest::testMicGain() {
 
   QCOMPARE(copy.settings()->micLevel(), 10);
   QVERIFY(copy.settings()->anytoneExtension());
-  QVERIFY(copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
+  // FM mic gain enabled only if it differs from DMR gain
+  QVERIFY(! copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
   QCOMPARE(copy.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 10);
 }
 
