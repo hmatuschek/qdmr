@@ -11,16 +11,16 @@
     
     <xi:include href="meta/authors.xml"/>    
 
-    <date>October 21th, 2025</date>
+    <date>January ??th, 2026</date>
     
     <copyright>
-      <year>2022-2025</year>
+      <year>2022-2026</year>
       <holder>Hannes Matuschek</holder>
     </copyright>
     
     <releaseinfo>
       <para>
-        This document covers <application>qdmr</application> version 0.13.2
+        This document covers <application>qdmr</application> version 0.13.3
       </para>
     </releaseinfo>
     
