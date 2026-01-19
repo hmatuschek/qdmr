@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QList>
+#include <QMutex>
 
 /** Constructs a debug message. */
 #define logDebug() LogMessage(LogMessage::DEBUG, __FILE__, __LINE__)
@@ -123,6 +124,8 @@ protected:
   static Logger *_instance;
   /** The list of registered log-handler. */
   QList<LogHandler *> _handler;
+  /** Some mutex to prevent issues with log messages from different threads. */
+  QMutex _lock;
 };
 
 
