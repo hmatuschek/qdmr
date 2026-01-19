@@ -869,7 +869,7 @@ Application::showAbout() {
 
 void
 Application::showHelp() {
-  QDesktopServices::openUrl(QUrl("https://dm3mat.darc.de/qdmr/manual"));
+  QDesktopServices::openUrl(QUrl("https://static.dm3mat.de/qdmr/manual"));
 }
 
 
