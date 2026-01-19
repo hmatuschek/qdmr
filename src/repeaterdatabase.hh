@@ -162,7 +162,9 @@ public:
   bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
 
 protected:
-  void loadCache();
+  bool loadCache();
+  bool parseCache(QList<RepeaterDatabaseEntry> &entries);
+  bool loadEntries(const QList<RepeaterDatabaseEntry> &entries);
   void cache(const RepeaterDatabaseEntry &entry);
   void saveCache();
 

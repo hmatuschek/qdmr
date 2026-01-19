@@ -329,7 +329,7 @@ RepeaterDatabaseSource::get(unsigned int idx) const {
  * Implementation of CachedRepeaterDatabaseSource
  * ********************************************************************************************* */
 CachedRepeaterDatabaseSource::CachedRepeaterDatabaseSource(const QString &filename, QObject *parent)
-  : RepeaterDatabaseSource{parent}
+  : RepeaterDatabaseSource{parent}, _parsing()
 {
   QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -340,17 +340,26 @@ CachedRepeaterDatabaseSource::CachedRepeaterDatabaseSource(const QString &filena
   }
 
   _cacheFile.setFileName(path + "/" + filename);
-
-  _parsing = QtConcurrent::run([this](){ this->loadCache(); });
+  if (_cacheFile.exists() && _cacheFile.isReadable())
+    _parsing = QtConcurrent::run([this](){ QList<RepeaterDatabaseEntry> entries; this->parseCache(entries); return entries; })
+                 .then([this](const QList<RepeaterDatabaseEntry> &entries) { return this->loadEntries(entries); });
 }
 
 
-void
+bool
 CachedRepeaterDatabaseSource::loadCache() {
+  QList<RepeaterDatabaseEntry> entries;
+  if (! parseCache(entries))
+    return false;
+  return loadEntries(entries);
+}
+
+bool
+CachedRepeaterDatabaseSource::parseCache(QList<RepeaterDatabaseEntry> &entries) {
   if (! _cacheFile.open(QIODevice::ReadOnly)) {
     logError() << "Cannot open cache '" << _cacheFile.fileName()
                << "': " << _cacheFile.errorString() << ".";
-    return;
+    return false;
   }
 
   QJsonParseError error;
@@ -360,26 +369,38 @@ CachedRepeaterDatabaseSource::loadCache() {
   if (doc.isNull()) {
     logError() << "Cannot parse cache '" << _cacheFile.fileName()
                << "': " << error.errorString() << ".";
-    return;
+    return false;
   }
 
   if (! doc.isArray()) {
     logError() << "Malformed cache file.";
-    return;
+    return false;
   }
 
-  _cache.clear();
+  entries.clear();
   for (QJsonValue obj: doc.array()) {
     if (! obj.isObject())
       continue;
     RepeaterDatabaseEntry entry = RepeaterDatabaseEntry::fromJson(obj.toObject());
     if (! entry.isValid())
       continue;
+    entries.append(entry);
+  }
+
+  logDebug() << "Loaded " << _cache.size() << " entries from '" << _cacheFile.fileName() << "'.";
+  return true;
+}
+
+bool CachedRepeaterDatabaseSource::loadEntries(const QList<RepeaterDatabaseEntry> &entries) {
+  _cache.clear();
+  for (auto entry: entries) {
+    if (! entry.isValid())
+      continue;
     _cache.append(entry);
     emit updated(entry);
   }
 
-  logDebug() << "Loaded " << _cache.size() << " entries from '" << _cacheFile.fileName() << "'.";
+  return true;
 }
 
 
@@ -526,15 +547,15 @@ RepeaterDatabase::addSource(RepeaterDatabaseSource *source) {
   if ((nullptr == source) || _sources.contains(source))
     return;
 
+  for (unsigned int i=0; i<source->count(); i++) {
+    merge(source->get(i));
+  }
+
   _sources.append(source);
   source->setParent(this);
   connect(source, &RepeaterDatabaseSource::updated,
           this, &RepeaterDatabase::merge,
           Qt::QueuedConnection);
-
-  for (unsigned int i=0; i<source->count(); i++) {
-    merge(source->get(i));
-  }
 }
 
 
