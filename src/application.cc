@@ -829,15 +829,21 @@ Application::showSettings() {
 
 void
 Application::showAbout() {
+
   QUiLoader loader;
   QFile uiFile("://ui/aboutdialog.ui");
   uiFile.open(QIODevice::ReadOnly);
-  QDialog *dialog = qobject_cast<QDialog *>(loader.load(&uiFile));
+  auto obj = loader.load(&uiFile);
+  if (nullptr == obj) return;
+  QDialog *dialog = qobject_cast<QDialog *>(obj);
+  if (nullptr == dialog) return;
+
   QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
   text->setHtml(text->toHtml().arg(VERSION_STRING));
 
   QTreeWidget *radioTab = dialog->findChild<QTreeWidget *>("radioTable");
   radioTab->setColumnCount(1);
+
   QHash<QString, QTreeWidgetItem*> items;
   foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
     if (! items.contains(radio.manufacturer()))
@@ -857,10 +863,8 @@ Application::showAbout() {
   radioTab->insertTopLevelItems(0, items.values());
   radioTab->sortByColumn(0,Qt::AscendingOrder);
 
-  if (dialog) {
-    dialog->exec();
-    dialog->deleteLater();
-  }
+  dialog->exec();
+  dialog->deleteLater();
 }
 
 void
