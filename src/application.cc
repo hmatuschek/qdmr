@@ -829,6 +829,7 @@ Application::showSettings() {
 
 void
 Application::showAbout() {
+
   QUiLoader loader;
   QFile uiFile("://ui/aboutdialog.ui");
   uiFile.open(QIODevice::ReadOnly);

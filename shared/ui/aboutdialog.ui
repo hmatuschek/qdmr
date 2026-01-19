@@ -13,6 +13,9 @@
     <height>371</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::FocusPolicy::StrongFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>About qdmr</string>
   </property>

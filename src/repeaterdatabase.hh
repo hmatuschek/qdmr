@@ -136,7 +136,8 @@ public:
   virtual RepeaterDatabaseEntry get(unsigned int idx) const;
 
 signals:
-  /** Gets emitted, once an entry gets updated or is added. */
+  /** Gets emitted, once an entry gets updated or is added.
+   * @warning This signal may originate in a separate thread.*/
   void updated(const RepeaterDatabaseEntry &entry);
 
 protected:
@@ -161,7 +162,9 @@ public:
   bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
 
 protected:
-  void loadCache();
+  bool loadCache();
+  bool parseCache(QList<RepeaterDatabaseEntry> &entries);
+  bool loadEntries(const QList<RepeaterDatabaseEntry> &entries);
   void cache(const RepeaterDatabaseEntry &entry);
   void saveCache();
 

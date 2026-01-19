@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
   //splash.show();
   //app.processEvents();
 
-
   auto mainWindow = app.mainWindow();
   mainWindow->show();
   //splash.finish(mainWindow);
