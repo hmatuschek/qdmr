@@ -79,7 +79,7 @@ D878UV2Test::testKeyFunctions() {
   AnytoneKeySettingsExtension *ext = config.settings()->anytoneExtension()->keySettings();
 
   QCOMPARE(ext->funcKey1Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel);
-  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::SubChannel);
+  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::GPS);
   QCOMPARE(ext->funcKey2Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleVFO);
   QCOMPARE(ext->funcKey2Long(), AnytoneKeySettingsExtension::KeyFunction::ChannelType);
   QCOMPARE(ext->funcKeyAShort(), AnytoneKeySettingsExtension::KeyFunction::Off);
@@ -109,7 +109,7 @@ D878UV2Test::testKeyFunctions() {
   ext = comp_config.settings()->anytoneExtension()->keySettings();
 
   QCOMPARE(ext->funcKey1Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel);
-  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::SubChannel);
+  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::GPS);
   QCOMPARE(ext->funcKey2Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleVFO);
   QCOMPARE(ext->funcKey2Long(), AnytoneKeySettingsExtension::KeyFunction::ChannelType);
   QCOMPARE(ext->funcKeyAShort(), AnytoneKeySettingsExtension::KeyFunction::Off);
@@ -118,6 +118,41 @@ D878UV2Test::testKeyFunctions() {
   QCOMPARE(ext->funcKeyBLong(), AnytoneKeySettingsExtension::KeyFunction::Call);
   QCOMPARE(ext->funcKeyBShort(), AnytoneKeySettingsExtension::KeyFunction::Voltage);
   QCOMPARE(ext->funcKeyBLong(), AnytoneKeySettingsExtension::KeyFunction::Call);
+}
+
+void
+D878UV2Test::testAESEncryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/aes_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+            .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existence of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
 }
 
 

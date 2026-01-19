@@ -911,6 +911,7 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsEx
   case AnytoneKeySettingsExtension::KeyFunction::CtcssDcsSet:       return (uint8_t)KeyFunction::CtcssDcsSet;
   case AnytoneKeySettingsExtension::KeyFunction::TBSTSend:          return (uint8_t)KeyFunction::TBSTSend;
   case AnytoneKeySettingsExtension::KeyFunction::Bluetooth:         return (uint8_t)KeyFunction::Bluetooth;
+  case AnytoneKeySettingsExtension::KeyFunction::GPS:               return (uint8_t)KeyFunction::GPS;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelName:       return (uint8_t)KeyFunction::ChannelName;
   case AnytoneKeySettingsExtension::KeyFunction::CDTScan:           return (uint8_t)KeyFunction::CDTScan;
   case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
@@ -3569,6 +3570,8 @@ D878UVCodeplug::AESEncryptionKeyElement::key() const {
   unsigned int size = getUInt8(Offset::size());
   // convert nibble to bytes
   size += (size%2); size /= 2;
+  // Limit size to 32 byte (256 bit)
+  size = std::min(Limit::keySize(), size);
   // Determine, where the key starts
   unsigned int o = Limit::keySize() - size;
   // Copy
