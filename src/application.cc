@@ -829,7 +829,6 @@ Application::showSettings() {
 
 void
 Application::showAbout() {
-
   QUiLoader loader;
   QFile uiFile("://ui/aboutdialog.ui");
   uiFile.open(QIODevice::ReadOnly);
@@ -861,10 +860,10 @@ Application::showAbout() {
     }
   }
   radioTab->insertTopLevelItems(0, items.values());
-  radioTab->sortByColumn(0,Qt::AscendingOrder);
+  radioTab->sortByColumn(0, Qt::AscendingOrder);
 
-  dialog->exec();
-  dialog->deleteLater();
+  connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+  dialog->open();
 }
 
 void
