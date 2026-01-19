@@ -271,7 +271,7 @@ GD77Codeplug::clearGeneralSettings() {
 bool
 GD77Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   GeneralSettingsElement el(data(Offset::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
   return el.fromConfig(ctx, err);
 }
@@ -549,17 +549,6 @@ GD77Codeplug::clearContacts() {
 }
 
 bool
-<<<<<<< HEAD
-GD77Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(err)
-
-  for (unsigned int i=0; i<NUM_CONTACTS; i++) {
-    ContactElement el(data(ADDR_CONTACTS + i*CONTACT_SIZE));
-    el.clear();
-    if (i >= ctx.count<DMRContact>())
-      continue;
-    el.fromContactObj(ctx.get<DMRContact>(i+1), ctx);
-=======
 GD77Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
@@ -572,7 +561,6 @@ GD77Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack 
       errMsg(err) << "Cannot encode contact at index " << i << ".";
       return false;
     }
->>>>>>> devel
   }
 
   return true;
@@ -604,17 +592,6 @@ GD77Codeplug::clearDTMFContacts() {
 }
 
 bool
-<<<<<<< HEAD
-GD77Codeplug::encodeDTMFContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err); Q_UNUSED(config)
-
-  for (unsigned int i=0; i<NUM_DTMF_CONTACTS; i++) {
-    DTMFContactElement el(data(ADDR_DTMF_CONTACTS + i*DTMF_CONTACT_SIZE));
-    el.clear();
-    if (i >= ctx.count<DTMFContact>())
-      continue;
-    el.fromContactObj(ctx.get<DTMFContact>(i+1), ctx);
-=======
 GD77Codeplug::encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
   for (unsigned int i=0; i<Limit::dtmfContactCount(); i++) {
@@ -623,7 +600,6 @@ GD77Codeplug::encodeDTMFContacts(const Flags &flags, Context &ctx, const ErrorSt
     if (i >= ctx.count<DTMFContact>())
       continue;
     el.fromContactObj(ctx.get<DTMFContact>(i), ctx, err);
->>>>>>> devel
   }
   return true;
 }

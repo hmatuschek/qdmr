@@ -103,6 +103,22 @@ Channel::setTXFrequency(Frequency freq) {
   return true;
 }
 
+FrequencyOffset
+Channel::offsetFrequency() const {
+
+    return _txFreq - _rxFreq;
+}
+
+Channel::OffsetShift
+Channel::offsetShift() const {
+    if (_rxFreq > _txFreq) {
+        return OffsetShift::Negative;
+    } else if (_txFreq > _rxFreq) {
+        return OffsetShift::Positive;
+    } else {
+        return OffsetShift::None;
+    }
+}
 
 bool
 Channel::defaultPower() const {

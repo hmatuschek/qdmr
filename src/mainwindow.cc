@@ -3,6 +3,7 @@
 #include <QProgressBar>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QStyleHints>
 
 #include "settings.hh"
 #include "logger.hh"
@@ -47,6 +48,13 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   ui->actionWriteSatellites->setIcon(QIcon::fromTheme("device-write-satellites"));
   ui->actionEditSatellites->setIcon(QIcon::fromTheme("edit-satellites"));
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+  connect(qApp->styleHints(), &QStyleHints::colorSchemeChanged, this, [=](Qt::ColorScheme scheme) {
+      bool isDarkTheme = scheme == Qt::ColorScheme::Dark ? true : false;
+      QIcon::setThemeName(isDarkTheme ? "dark" : "light");
+  });
+#endif
+
   connect(ui->actionNewCodeplug, SIGNAL(triggered()), app, SLOT(newCodeplug()));
   connect(ui->actionOpenCodeplug, SIGNAL(triggered()), app, SLOT(loadCodeplug()));
   connect(ui->actionSaveCodeplug, SIGNAL(triggered()), app, SLOT(saveCodeplug()));
@@ -57,16 +65,40 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionSettings, SIGNAL(triggered()), app, SLOT(showSettings()));
   connect(ui->actionHelp, SIGNAL(triggered()), app, SLOT(showHelp()));
 
-  connect(ui->actionRefreshCallsignDB, SIGNAL(triggered()), app->user(), SLOT(download()));
-  connect(ui->actionRefreshTalkgroupDB, SIGNAL(triggered()), app->talkgroup(), SLOT(download()));
-  connect(ui->actionRefreshOrbitalElements, SIGNAL(triggered()), app->satellite(), SLOT(update()));
-  connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
+  connect(ui->actionRefreshCallsignDB, &QAction::triggered, app->user(), &UserDatabase::download);
+  QObject::connect(app->user(), &UserDatabase::error, this, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update callsign DB: %1").arg(msg), 10000);
+  }, Qt::QueuedConnection);
+  QObject::connect(app->user(), &UserDatabase::loaded, this, [this]() {
+    this->ui->statusbar->showMessage(tr("Callsign database updated & loaded."), 10000);
+  }, Qt::QueuedConnection);
 
+  connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, app->talkgroup(), &TalkGroupDatabase::download);
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, this, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update talkgroup DB: %1").arg(msg), 10000);
+  }, Qt::QueuedConnection);
+  QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, this, [this]() {
+    this->ui->statusbar->showMessage(tr("Talkgroup database updated & loaded."), 10000);
+  }, Qt::QueuedConnection);
+
+  connect(ui->actionRefreshOrbitalElements, &QAction::triggered, app->satellite(), &SatelliteDatabase::update);
+  QObject::connect(app->satellite(), &SatelliteDatabase::error, this, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(tr("Cannot update orbital elements: %1").arg(msg), 10000);
+  }, Qt::QueuedConnection);
+  QObject::connect(app->satellite(), &SatelliteDatabase::loaded, this, [this]() {
+    this->ui->statusbar->showMessage(tr("Orbital elements updated & loaded."), 10000);
+  }, Qt::QueuedConnection);
+
+  connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
+  connect(app->user(), &UserDatabase::readyChanged,
+          [this](bool ready){ this->ui->actionUploadCallsignDB->setEnabled(ready);});
+  ui->actionUploadCallsignDB->setEnabled(app->user()->ready());
+
+  connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
   connect(ui->actionDetectDevice, SIGNAL(triggered()), app, SLOT(detectRadio()));
   connect(ui->actionVerifyCodeplug, SIGNAL(triggered()), app, SLOT(verifyCodeplug()));
   connect(ui->actionDownload, SIGNAL(triggered()), app, SLOT(downloadCodeplug()));
   connect(ui->actionUpload, SIGNAL(triggered()), app, SLOT(uploadCodeplug()));
-  connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
   connect(ui->actionWriteSatellites, SIGNAL(triggered()), app, SLOT(uploadSatellites()));
 
   // Wire-up "General Settings" view
@@ -118,6 +150,10 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   }
 
   restoreGeometry(settings.mainWindowState());
+
+  connect(config, &ConfigItem::modified, [this, config]() {
+    this->setWindowModified(config->isModified());
+  });
 }
 
 

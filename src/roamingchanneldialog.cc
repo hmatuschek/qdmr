@@ -40,9 +40,9 @@ RoamingChannelDialog::construct() {
 
   ui->name->setText(_myChannel->name());
   ui->rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  ui->rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
+  ui->rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Unit::MHz));
   ui->txFrequency->setValidator(new QDoubleValidator(0,500,5));
-  ui->txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
+  ui->txFrequency->setText(_myChannel->txFrequency().format(Frequency::Unit::MHz));
   ui->timeSlot->addItem(tr("TS 1"), QVariant::fromValue(DMRChannel::TimeSlot::TS1));
   ui->timeSlot->addItem(tr("TS 2"), QVariant::fromValue(DMRChannel::TimeSlot::TS2));
   ui->timeSlot->setCurrentIndex(

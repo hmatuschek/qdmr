@@ -491,7 +491,7 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
   } else {
-    errMsg(err) <<  "Unknonwn channel type " << (uint8_t)channelType() << ".";
+    errMsg(err) <<  "Unknown channel type " << (uint8_t)channelType() << ".";
     return nullptr;
   }
 
@@ -514,7 +514,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
     channel->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
-  // Handle DMR specifc references
+  // Handle DMR specific references
   if (DMRChannel *dmr = channel->as<DMRChannel>()) {
     if (hasTransmitContact()) {
       if (! ctx.has<DMRContact>(transmitContactIndex())) {
@@ -3250,7 +3250,7 @@ DR1801UVCodeplug::postprocess(Config *config, const ErrorStack &err) const {
     return false;
   }
 
-  // Merge splitted zones into one.
+  // Merge split zones into one.
   ZoneMergeVisitor merger;
   if (! merger.process(config, err)) {
     errMsg(err) << "Cannot post-process DR1801A6 codeplug.";
@@ -3269,7 +3269,7 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   // There must be a default DMR radio ID.
   if (nullptr == ctx.config()->settings()->defaultId()) {
     errMsg(err) << "No default DMR radio ID specified.";
-    errMsg(err) << "Cannot index codplug for encoding for the BTECH DR-1801UV.";
+    errMsg(err) << "Cannot index codeplug for encoding for the BTECH DR-1801UV.";
     return false;
   }
 
@@ -3308,7 +3308,6 @@ DR1801UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &e
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.addTable(&BasicEncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Cannot encode codeplug.";
     return false;

@@ -24,7 +24,7 @@ class Zone;
  *
  * <table>
  *  <tr><th>Start</th>   <th>End</th>      <th>Size</th>    <th>Content</th></tr>
- *  <tr><td>0x00000</td> <td>0x00300</td>  <td>0x00300</td>  <td>Some unkown settings, not
+ *  <tr><td>0x00000</td> <td>0x00300</td>  <td>0x00300</td>  <td>Some unknown settings, not
  *      configurable through the CPS. Likely some sort of calibration data. Must be conserved.</td></tr>
  *  <tr><td>0x00300</td> <td>0x003bc</td>  <td>0x000bc</td>  <td>Some information about the radio.
  *      Like serial number, firmware version, etc and timestamp. </td></tr>
@@ -119,7 +119,7 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x00034; }
 
-    /** Retunrs the 0-based index of the channel. */
+    /** Returns the 0-based index of the channel. */
     virtual unsigned int index() const;
     /** Sets the index. */
     virtual void setIndex(unsigned int idx);
@@ -134,18 +134,18 @@ public:
     /** Sets the power for the channel. */
     virtual void setPower(Channel::Power pwr);
 
-    /** Retunrs the RX frequency in MHz. */
+    /** Returns the RX frequency in MHz. */
     virtual Frequency rxFrequency() const;
     /** Sets the RX frequency in MHz. */
     virtual void setRXFrequency(Frequency MHz);
-    /** Retunrs the TX frequency in MHz. */
+    /** Returns the TX frequency in MHz. */
     virtual Frequency txFrequency() const;
     /** Sets the TX frequency in MHz. */
     virtual void setTXFrequency(Frequency MHz);
 
     /** Returns @c true if a contact index is set. */
     virtual bool hasTransmitContact() const;
-    /** Retunrs the contact index. */
+    /** Returns the contact index. */
     virtual unsigned int transmitContactIndex() const;
     /** Sets the transmit contact index. */
     virtual void setTransmitContactIndex(unsigned int index);
@@ -198,16 +198,16 @@ public:
     /** Clears the alarm system index. */
     virtual void clearAlarmSystemIndex();
 
-    /** Retunrs the band width for FM channels. */
+    /** Returns the band width for FM channels. */
     virtual FMChannel::Bandwidth bandwidth() const;
     /** Sets the band width for FM channels. */
     virtual void setBandwidth(FMChannel::Bandwidth bw);
 
-    /** Retunrs @c true, if the auto-scan is enabled. */
+    /** Returns @c true, if the auto-scan is enabled. */
     virtual bool autoScanEnabled() const;
     /** Enables/disables auto-scan. */
     virtual void enableAutoScan(bool enable);
-    /** Retunrs @c true if a scan list is assigned. */
+    /** Returns @c true if a scan list is assigned. */
     virtual bool hasScanList() const;
     /** Returns the scan list index. */
     virtual unsigned int scanListIndex() const;
@@ -216,11 +216,11 @@ public:
     /** Clears the scan list index. */
     virtual void clearScanListIndex();
 
-    /** Retunrs the RX CTCSS/DCS signaling. */
+    /** Returns the RX CTCSS/DCS signaling. */
     virtual SelectiveCall rxTone() const;
     /** Sets the RX CTCSS/DCS signaling. */
     virtual void setRXTone(const SelectiveCall &code);
-    /** Retunrs the TX CTCSS/DCS signaling. */
+    /** Returns the TX CTCSS/DCS signaling. */
     virtual SelectiveCall txTone() const;
     /** Sets the TX CTCSS/DCS signaling. */
     virtual void setTXTone(const SelectiveCall &code);
@@ -239,9 +239,9 @@ public:
     /** Clears the PTT ID. */
     virtual void clearPTTID();
 
-    /** Retruns @c true if a group list is assigned. */
+    /** Returns @c true if a group list is assigned. */
     virtual bool hasGroupList() const;
-    /** Retunrs the group-list index. */
+    /** Returns the group-list index. */
     virtual unsigned int groupListIndex() const;
     /** Sets the group-list index. */
     virtual void setGroupListIndex(unsigned int index);
@@ -333,7 +333,7 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links channels. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack()) const;
-    /** Encodes all channles. */
+    /** Encodes all channels. */
     virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
@@ -527,7 +527,7 @@ public:
 
     /** Returns @c true if the n-th member index is set. */
     virtual bool hasMemberIndex(unsigned int n) const;
-    /** Retuns the n-th member index. */
+    /** Returns the n-th member index. */
     virtual unsigned int memberIndex(unsigned int n) const;
     /** Sets the n-th member index. */
     virtual void setMemberIndex(unsigned int n, unsigned int index);
@@ -621,7 +621,7 @@ public:
     ZoneElement(uint8_t *ptr, size_t size);
 
   public:
-    /** Construtor. */
+    /** Constructor. */
     ZoneElement(uint8_t *ptr);
 
     bool isValid() const;
@@ -635,7 +635,7 @@ public:
     /** Sets the name of the zone. */
     virtual void setName(const QString &name);
 
-    /** Retunrs the number of entries. */
+    /** Returns the number of entries. */
     virtual unsigned int numEntries() const;
     /** Returns the channel index of the n-th entry. */
     virtual unsigned int entryIndex(unsigned int n);
@@ -816,7 +816,7 @@ public:
     /** Sets the radios DMR ID. */
     virtual void setDMRID(unsigned int id);
 
-    /** Retunrs the the power-save mode. */
+    /** Returns the the power-save mode. */
     virtual PowerSaveMode powerSaveMode() const;
     /** Sets the power-save mode.  */
     virtual void setPowerSaveMode(PowerSaveMode mode);
@@ -845,15 +845,15 @@ public:
     virtual unsigned int keyLockDelay() const;
     /** Sets the key-lock delay in seconds. */
     virtual void setKeyLockDelay(unsigned int sec);
-    /** Retunrs @c true if the side-key 1 gets locked too. */
+    /** Returns @c true if the side-key 1 gets locked too. */
     virtual bool lockSideKey1() const;
     /** Enables/disables locking the side-key 1. */
     virtual void enableLockSideKey1(bool enable);
-    /** Retunrs @c true if the side-key 2 gets locked too. */
+    /** Returns @c true if the side-key 2 gets locked too. */
     virtual bool lockSideKey2() const;
     /** Enables/disables locking the side-key 2. */
     virtual void enableLockSideKey2(bool enable);
-    /** Retunrs @c true if the PTT gets locked too. */
+    /** Returns @c true if the PTT gets locked too. */
     virtual bool lockPTT() const;
     /** Enables/disables locking the PTT. */
     virtual void enableLockPTT(bool enable);
@@ -897,12 +897,12 @@ public:
     /** Enables/disables message tone. */
     virtual void enableMessageTone(bool enable);
 
-    /** Retuns the ring tone. */
+    /** Returns the ring tone. */
     virtual RingTone ringTone() const;
     /** Sets the ring tone. */
     virtual void setRingTone(RingTone tone);
 
-    /** Retuns the radio name. */
+    /** Returns the radio name. */
     virtual QString radioName() const;
     /** Sets the radio name. */
     virtual void setRadioName(const QString &name);
@@ -922,11 +922,11 @@ public:
     /** Enables/disables campanding. */
     virtual void enableCampanding(bool enable);
 
-    /** Retunrs the tuning mode up-direction. */
+    /** Returns the tuning mode up-direction. */
     virtual TuningMode tunigModeUp() const;
     /** Sets the tuning mode up-direction. */
     virtual void setTuningModeUp(TuningMode mode);
-    /** Retunrs the tuning mode down-direction. */
+    /** Returns the tuning mode down-direction. */
     virtual TuningMode tunigModeDown() const;
     /** Sets the tuning mode down-direction. */
     virtual void setTuningModeDown(TuningMode mode);
@@ -1093,7 +1093,7 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x00050; }
 
-    /** Retunrs the index of the scan list. */
+    /** Returns the index of the scan list. */
     virtual unsigned int index() const;
     /** Sets the index of the scan list. */
     virtual void setIndex(unsigned int idx);
@@ -1103,7 +1103,7 @@ public:
     /** Sets the number of entries. */
     virtual void setEntryCount(unsigned int num);
 
-    /** Retunrs the priority channel 1 setting. */
+    /** Returns the priority channel 1 setting. */
     virtual PriorityChannel priorityChannel1() const;
     /** Sets the priority channel 1 setting. */
     virtual void setPriorityChannel1(PriorityChannel mode);
@@ -1112,7 +1112,7 @@ public:
     /** Sets the priority channel 1 index. */
     virtual void setPriorityChannel1Index(unsigned int index);
 
-    /** Retunrs the priority channel 2 setting. */
+    /** Returns the priority channel 2 setting. */
     virtual PriorityChannel priorityChannel2() const;
     /** Sets the priority channel 2 setting. */
     virtual void setPriorityChannel2(PriorityChannel mode);
@@ -1121,7 +1121,7 @@ public:
     /** Sets the priority channel 2 index. */
     virtual void setPriorityChannel2Index(unsigned int index);
 
-    /** Retunrs the revert channel setting. */
+    /** Returns the revert channel setting. */
     virtual RevertChannel revertChannel() const;
     /** Sets the revert channel setting. */
     virtual void setRevertChannel(RevertChannel mode);
@@ -1298,7 +1298,7 @@ public:
     /** Size of the element. */
     static constexpr unsigned int size() { return 0x00164; }
 
-    /** Retunrs the number of elements in the bank. */
+    /** Returns the number of elements in the bank. */
     virtual unsigned int messageCount() const;
     /** Sets the number of messages. */
     virtual void setMessageCount(unsigned int count);
@@ -1420,11 +1420,11 @@ public:
     /** Returns a reference to the VFO A settings. */
     virtual ChannelElement vfoB() const;
 
-    /** Retunrs the name of the first VFO. */
+    /** Returns the name of the first VFO. */
     virtual QString nameA() const;
     /** Sets the name for the first VFO. */
     virtual void setNameA(const QString &name);
-    /** Retunrs the name of the second VFO. */
+    /** Returns the name of the second VFO. */
     virtual QString nameB() const;
     /** Sets the name for the second VFO. */
     virtual void setNameB(const QString &name);
@@ -1474,7 +1474,7 @@ public:
     /** Sets the index of the key. */
     virtual void setIndex(unsigned int index);
 
-    /** Retunrs the length of the key. */
+    /** Returns the length of the key. */
     virtual unsigned int keyLength() const;
 
     /** Returns the key as a string. */
@@ -1579,9 +1579,9 @@ public:
     /** Sets the code duration in milliseconds. */
     virtual void setCodeDuration(unsigned int ms);
 
-    /** Returns the code intervall in milliseconds. */
+    /** Returns the code interval in milliseconds. */
     virtual unsigned int codeItervall() const;
-    /** Sets the code intervall in milliseconds. */
+    /** Sets the code interval in milliseconds. */
     virtual void setCodeItervall(unsigned int ms);
 
     /** Returns the reset time in milliseconds. */
@@ -1844,7 +1844,7 @@ public:
 
     /** Returns the number of PTT IDs defined. */
     virtual unsigned int idCount() const;
-    /** Set the numbe of PTT IDs. */
+    /** Set the number of PTT IDs. */
     virtual void setPTTIDCount(unsigned int n);
 
     /** Returns a reference to the n-th PTT ID. */
@@ -1901,15 +1901,15 @@ public:
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x029c; }
 
-    /** Retunrs the DTMF radio ID as a string. */
+    /** Returns the DTMF radio ID as a string. */
     virtual QString radioID() const;
     /** Sets the DTMF radio ID as a string. */
     virtual void setRadioID(const QString &id);
-    /** Retunrs the DTMF kill code as a string. */
+    /** Returns the DTMF kill code as a string. */
     virtual QString killCode() const;
     /** Sets the DTMF kill code as a string. */
     virtual void setKillCode(const QString &code);
-    /** Retunrs the DTMF wake code as a string. */
+    /** Returns the DTMF wake code as a string. */
     virtual QString wakeCode() const;
     /** Sets the DTMF wake code as a string. */
     virtual void setWakeCode(const QString &code);
@@ -1947,7 +1947,7 @@ public:
     virtual DTMFSystemBankElement dtmfSystems() const;
     /** Returns a reference to the DTMF IDs. */
     virtual DTMFIDBankElement dtmfIDs() const;
-    /** Retunrs a reference to the PTT ID bank. */
+    /** Returns a reference to the PTT ID bank. */
     virtual PTTIDBankElement pttIDs() const;
 
   public:
@@ -2025,7 +2025,7 @@ public:
     virtual unsigned int alarmChannelIndex() const;
     /** Sets the alarm channel index. */
     virtual void setAlarmChannelIndex(unsigned int index);
-    /** Sets the alarm channel to the selected chanel. */
+    /** Sets the alarm channel to the selected channel. */
     virtual void setAlarmChannelSelected();
     /** Clears the alarm channel. */
     virtual void clearAlarmChannel();
@@ -2143,7 +2143,7 @@ public:
 
     /** Returns the active resend count. */
     virtual unsigned int activeResend() const;
-    /** Sets the active resend cound. */
+    /** Sets the active resend count. */
     virtual void setActiveResend(unsigned int count);
 
     /** Returns the pre-send count. */
@@ -2310,7 +2310,7 @@ public:
     /** Clears the message. */
     virtual void clearMessage();
 
-    /** Retuns the type of the one-touch setting. */
+    /** Returns the type of the one-touch setting. */
     virtual Type type() const;
     /** Sets the type of the one-touch setting. */
     virtual void setType(Type type);

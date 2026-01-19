@@ -1,4 +1,6 @@
 #include "packetstream.hh"
+#include <QIODevice>
+
 
 /* ******************************************************************************************** *
  * Implementation of PacketStream interface

@@ -35,7 +35,6 @@
 #include "roamingchannellistview.hh"
 #include "roamingzonelistview.hh"
 #include "errormessageview.hh"
-#include "extensionview.hh"
 #include "deviceselectiondialog.hh"
 #include "radioselectiondialog.hh"
 #include "chirpformat.hh"
@@ -52,10 +51,6 @@ inline QStringList getLanguages() {
     languages.append(languages.last().split("_").first());
   }
   return languages;
-}
-
-inline QString getLocalePath(const QString &language) {
-  return QDir(LOCALE_DIRECTORY "/" + language + "/LC_MESSAGES/").absolutePath();
 }
 
 Application::Application(int &argc, char *argv[])
@@ -79,8 +74,8 @@ Application::Application(int &argc, char *argv[])
   // handle translations
   _translator = new QTranslator(this);
   foreach (QString language, getLanguages()) {
-    logDebug() << "Search for translation in '" << getLocalePath(language) << "'.";
-    if (_translator->load("qdmr", ":/i18n", "", "_qt.qm")) {
+    logDebug() << "Search for translation in ':/i18n/" << language << ".qm'.";
+    if (_translator->load(language, ":/i18n/", "", ".qm")) {
       this->installTranslator(_translator);
       logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
       break;
@@ -99,7 +94,7 @@ Application::Application(int &argc, char *argv[])
     _repeater->addSource(new HearhamRepeaterSource());
   if (settings.radioIdRepeaterSourceEnabled())
     _repeater->addSource(new RadioidRepeaterSource());
-  _users      = new UserDatabase(30, this);
+  _users      = new UserDatabase(true, 30, this);
   _talkgroups = new TalkGroupDatabase(30, this);
   _satellites = new SatelliteDatabase(7, this);
 
@@ -107,7 +102,7 @@ Application::Application(int &argc, char *argv[])
   _config     = new Config(this);
 
   // Handle args (if there are some)
-  if (argc>1) {
+  if (argc > 1) {
     QFileInfo info(argv[1]);
     QFile file(argv[1]);
     if (! file.open(QIODevice::ReadOnly)) {
@@ -250,9 +245,7 @@ Application::loadCodeplug() {
 
   if ("yaml" == info.suffix()){
     ErrorStack err;
-    if (_config->readYAML(filename, err)) {
-      _mainWindow->setWindowModified(false);
-    } else {
+    if (! _config->readYAML(filename, err)) {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(err.format()));
@@ -261,9 +254,7 @@ Application::loadCodeplug() {
   } else {
     QString errorMessage;
     QTextStream stream(&file);
-    if (_config->readCSV(stream, errorMessage)) {
-      _mainWindow->setWindowModified(false);
-    } else {
+    if (!_config->readCSV(stream, errorMessage)) {
       QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
                             tr("Cannot read codeplug from file '%1': %2")
                             .arg(filename).arg(errorMessage));
@@ -310,7 +301,7 @@ Application::saveCodeplug() {
   QTextStream stream(&file);
   QFileInfo info(filename);
   if (_config->toYAML(stream)) {
-    _mainWindow->setWindowModified(false);
+    _config->setModified(false);
   } else {
     QMessageBox::critical(nullptr, tr("Cannot save codeplug"),
                           tr("Cannot save codeplug to file '%1'.").arg(filename));
@@ -415,11 +406,8 @@ Application::importCodeplug() {
     QMessageBox::critical(nullptr, tr("Cannot import codeplug"),
                           tr("Cannot import codeplug from '%1': %2")
                           .arg(filename).arg(err.format()));
-    _config->setModified(true);
     return;
   }
-
-  _config->setModified(true);
 }
 
 
@@ -559,8 +547,10 @@ Application::downloadCodeplug() {
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
 
+  TransferFlags flags; flags.setBlocking(false);
+
   ErrorStack err;
-  if (radio->startDownload(false, err)) {
+  if (radio->startDownload(flags, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
   } else {
@@ -643,7 +633,10 @@ Application::uploadCodeplug() {
     return;
   }
 
-  if (radio->startUpload(intermediate, false, settings.codePlugFlags(), err)) {
+  Codeplug::Flags flags = settings.codePlugFlags();
+  flags.setBlocking(false);
+
+  if (radio->startUpload(intermediate, flags, err)) {
      _mainWindow->statusBar()->showMessage(tr("Upload ..."));
      _mainWindow->setEnabled(false);
   } else {
@@ -706,7 +699,8 @@ Application::uploadCallsignDB() {
   }
 
   // Assemble flags for callsign DB encoding
-  CallsignDB::Selection css;
+  CallsignDB::Flags css;
+  css.setUpdateDeviceClock(settings.updateDeviceClock());
   if (settings.limitCallSignDBEntries()) {
     logDebug() << "Limit callsign DB entries to " << settings.maxCallSignDBEntries() << ".";
     css.setCountLimit(settings.maxCallSignDBEntries());
@@ -721,7 +715,8 @@ Application::uploadCallsignDB() {
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
   ErrorStack err;
-  if (radio->startUploadCallsignDB(_users, false, css, err)) {
+  css.setBlocking(false);
+  if (radio->startUploadCallsignDB(_users, css, err)) {
     logDebug() << "Start call-sign DB write...";
     _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
@@ -761,6 +756,10 @@ Application::uploadSatellites() {
     return;
   }
 
+  Settings settings;
+  TransferFlags flags;
+  flags.setUpdateDeviceClock(settings.updateDeviceClock());
+
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
   progress->setRange(0, 100); progress->setValue(0);
   progress->setVisible(true);
@@ -769,8 +768,9 @@ Application::uploadSatellites() {
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
-  ErrorStack err;
-  if (radio->startUploadSatelliteConfig(_satellites, false, err)) {
+  ErrorStack err;  
+  flags.setBlocking(false);
+  if (radio->startUploadSatelliteConfig(_satellites, flags, err)) {
     logDebug() << "Start satellite config write...";
     _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
     _mainWindow->setEnabled(false);

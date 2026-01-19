@@ -151,9 +151,9 @@ class APRSSystem: public PositioningSystem
   Q_PROPERTY(Icon icon READ icon WRITE setIcon)
   /** An optional text message. */
   Q_PROPERTY(QString message READ message WRITE setMessage)
-  /** Anytone sepecific settings. */
+  /** Anytone specific settings. */
   Q_PROPERTY(AnytoneFMAPRSSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
-  /** OpenGD77 sepecific settings. */
+  /** OpenGD77 specific settings. */
   Q_PROPERTY(OpenGD77APRSSystemExtension *opengd77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:

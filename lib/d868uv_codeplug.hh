@@ -4,7 +4,6 @@
 #include <QDateTime>
 
 #include "anytone_codeplug.hh"
-#include "signaling.hh"
 
 class Channel;
 class DMRContact;
@@ -215,6 +214,18 @@ public:
    *  @verbinclude d868uv_channel.txt */
   class ChannelElement: public AnytoneCodeplug::ChannelElement
   {
+  public:
+    /** Possible encryption types. */
+    enum class DMREncryptionType {
+      Basic = 0,
+      Enhanced = 1
+    };
+
+    /** Possible APRS modes. */
+    enum class APRSType {
+      Off = 0, DMR = 1
+    };
+
   protected:
     /** Hidden constructor. */
     ChannelElement(uint8_t *ptr, unsigned size);
@@ -236,19 +247,28 @@ public:
     /** Enables/disables data ACK. */
     virtual void enableDataACK(bool enable);
 
-    /** Returns @c true if TX APRS is enabled. */
-    virtual bool txDigitalAPRS() const;
-    /** Enables/disables TX APRS. */
-    virtual void enableTXDigitalAPRS(bool enable);
+    /** Returns APRS type for reporting the position. */
+    APRSType txAPRSType() const;
+    /** Sets APRS type for reporting the position. */
+    void setTXAPRSType(APRSType aprsType);
     /** Returns the DMR APRS system index. */
     virtual unsigned digitalAPRSSystemIndex() const;
     /** Sets the DMR APRS system index. */
     virtual void setDigitalAPRSSystemIndex(unsigned idx);
 
+    /** Returns the encryption type. */
+    virtual DMREncryptionType dmrEncryptionType() const;
+    /** Sets the encryption type. */
+    virtual void setDMREncryptionType(DMREncryptionType type);
+    /** Returns @c true if a DMR encryption key is set. */
+    virtual bool hasDMREncryptionKeyIndex() const;
     /** Returns the DMR encryption key index (+1), 0=Off. */
     virtual unsigned dmrEncryptionKeyIndex() const;
     /** Sets the DMR encryption key index (+1), 0=Off. */
     virtual void setDMREncryptionKeyIndex(unsigned idx);
+    /** Clears the DMR encryption key index. */
+    virtual void clearDMREncryptionKeyIndex();
+
     /** Returns @c true if multiple key encryption is enabled. */
     virtual bool multipleKeyEncryption() const;
     /** Enables/disables multiple key encryption. */
@@ -272,7 +292,18 @@ public:
   protected:
     /** Internal used offsets within the channel element. */
     struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
-      /// @todo Implement
+      /// @cond DO_NOT_DOCUMENT
+      static Bit dmrEncryptionType()               { return {0x0021, 6}; }
+      static unsigned int dmrEncryptionKey()       { return 0x0022; }
+      static Bit ranging()                         { return {0x0034, 0}; }
+      static Bit throughMode()                     { return {0x0034, 1}; }
+      static Bit dataACK()                         { return {0x0034, 2}; }
+      static unsigned int txAPRSType()             { return 0x0035; }
+      static unsigned int digitalAPRSSystemIndex() { return 0x0036; }
+      static Bit multipleKeyEncryption()           { return {0x003b, 0}; }
+      static Bit randomKey()                       { return {0x003b, 1}; }
+      static Bit sms()                             { return {0x003b, 2}; }
+      /// @endcond
     };
   };
 
@@ -307,6 +338,12 @@ public:
         PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
         ChannelType = 0x22, Ranging = 0x23, ChannelRanging = 0x24, MaxVolume = 0x25, Slot = 0x26
       } KeyFunctionCode;
+    };
+
+    /** Possible backlight duration values. */
+    enum class BacklightDuration {
+      Infinite = 0, _5s = 1, _10s = 2, _15s = 3, _20s = 4, _25s = 5, _30s = 6, _1min=7, _2min=8,
+      _3min = 9, _4min = 10, _5min = 11
     };
 
   protected:
@@ -466,9 +503,9 @@ public:
     /** Returns @c true if the backlight is always on. */
     virtual bool backlightPermanent() const;
     /** Returns the backlight duration in seconds. */
-    virtual Interval rxBacklightDuration() const;
+    virtual Interval backlightDuration() const;
     /** Sets the backlight duration in seconds. */
-    virtual void setRXBacklightDuration(Interval sec);
+    virtual void setBacklightDuration(Interval sec);
     /** Sets the backlight to permanent (always on). */
     virtual void enableBacklightPermanent();
 
@@ -632,6 +669,8 @@ public:
   /** Empty constructor. */
   explicit D868UVCodeplug(QObject *parent = nullptr);
 
+  Config* preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   virtual void setBitmaps(Context &ctx);
@@ -640,7 +679,8 @@ protected:
   virtual void allocateForEncoding();
 
   virtual bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  virtual bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Allocate channels from bitmap. */
   virtual void allocateChannels();
@@ -758,6 +798,16 @@ protected:
   virtual bool encodeRepeaterOffsetFrequencies(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   /** Decodes auto-repeater offset frequencies. */
   virtual bool decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates DMR encryption keys. */
+  virtual void allocatDMREncryptionKeys();
+  /** Encodes DMR encryption keys. */
+  virtual bool encodeDMREncryptionKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decodes DMR encryption keys */
+  virtual bool decodeDMREncryptionKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates 'enhanced' encryption keys. */
+  virtual void allocatEnhancedEncryptionKeys();
 
   /** Allocates alarm settings memory section. */
   virtual void allocateAlarmSettings();
@@ -881,8 +931,8 @@ protected:
     static constexpr unsigned int wfmChannels()          { return 0x02480000; }
     static constexpr unsigned int wfmVFO()               { return 0x02480200; }
 
-    static constexpr unsigned int dmrEncryptionIDs()     { return 0x024C1700; }
-    static constexpr unsigned int dmrEncryptionKeys()    { return 0x024C1800; }
+    static constexpr unsigned int dmrEncryptionKeys()      { return 0x024C1700; }
+    static constexpr unsigned int enhancedEncryptionKeys() { return 0x024C1800; }
     /// @endcond
   };
 

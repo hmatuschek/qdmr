@@ -31,11 +31,13 @@ public:
     MD2017, RT82 = MD2017,
     // Anytone devices
     D868UVE,
-    D868UV = D868UVE, // Actually a different device. Implement!
+    D868UV = D868UVE,
     DMR6X2UV,
+    DMR6X2UV2,
     D878UV,
     D878UVII,
     D578UV,
+    D578UVII = D578UV,
     // Baofeng/BTECH
     DM1701, RT84 = DM1701,
     DR1801UV
@@ -44,11 +46,11 @@ public:
 public:
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &name, const QString manufacturer,
-            const USBDeviceInfo &interface,
+            const QSet<USBDeviceInfo> &interfaces,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
   /** Use static methods the access radio info or call @c Radio::defaultRadioInfo. */
   RadioInfo(Radio radio, const QString &key, const QString &name, const QString manufacturer,
-            const USBDeviceInfo &interface,
+            const QSet<USBDeviceInfo> &interfaces,
             const QList<RadioInfo> &alias=QList<RadioInfo>());
 
   /** Empty constructor. */
@@ -64,7 +66,7 @@ public:
   /** Returns the manufacturer name. */
   const QString &manufacturer() const;
   /** Returns some information about the interface to the radio. */
-  const USBDeviceInfo &interface() const;
+  bool interfaceMatches(const USBDeviceInfo &other) const;
 
   /** Returns @c true if the radio has aliases.
    * That is other radios that are identical. */
@@ -100,7 +102,7 @@ protected:
   /** Holds possible identical radios from other manufacturers. */
   QList<RadioInfo> _alias;
   /** Holds some information about the interface to the radio. */
-  USBDeviceInfo _interface;
+  QSet<USBDeviceInfo> _interfaces;
 
 protected:
   /** Key->ID map. */

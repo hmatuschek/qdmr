@@ -127,6 +127,15 @@ Settings::setUpdateCodeplug(bool update) {
 }
 
 bool
+Settings::updateDeviceClock() const {
+  return value("updateDeviceClock", false).toBool();
+}
+void
+Settings::setUpdateDeviceClock(bool update) {
+  setValue("updateDeviceClock", update);
+}
+
+bool
 Settings::autoEnableGPS() const {
   return value("autoEnableGPS", false).toBool();
 }
@@ -156,9 +165,10 @@ Settings::setLastDirectoryDir(const QDir &dir) {
 Codeplug::Flags
 Settings::codePlugFlags() const {
   Codeplug::Flags flags;
-  flags.updateCodePlug = updateCodeplug();
-  flags.autoEnableGPS  = autoEnableGPS();
-  flags.autoEnableRoaming = autoEnableRoaming();
+  flags.setUpdateDeviceClock(updateDeviceClock());
+  flags.setUpdateCodeplug(updateCodeplug());
+  flags.setAutoEnableGPS(autoEnableGPS());
+  flags.setAutoEnableRoaming(autoEnableRoaming());
   return flags;
 }
 
@@ -353,6 +363,23 @@ Settings::setHeaderState(const QString &objName, const QByteArray &state) {
   setValue(key, state);
 }
 
+
+bool
+Settings::sortFilterEnabled(const QString &objName) const {
+  if (objName.isEmpty())
+    return false;
+  QString key = QString("sortFilter/%1").arg(objName);
+  return value(key, false).toBool();
+}
+
+void
+Settings::enableSortFilter(const QString &objName, bool enable) {
+  if (objName.isEmpty())
+    return;
+  QString key = QString("sortFilter/%1").arg(objName);
+  setValue(key, enable);
+}
+
 bool
 Settings::isUpdated() const {
   if (! contains("version"))
@@ -403,6 +430,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
   Ui::SettingsDialog::disableAutoDetect->setChecked(settings.disableAutoDetect());
   Ui::SettingsDialog::updateCodeplug->setChecked(settings.updateCodeplug());
+  Ui::SettingsDialog::updateDeviceClock->setChecked(settings.updateDeviceClock());
   Ui::SettingsDialog::autoEnableGPS->setChecked(settings.autoEnableGPS());
   Ui::SettingsDialog::autoEnableRoaming->setChecked(settings.autoEnableRoaming());
   Ui::SettingsDialog::ignoreVerificationWarnings->setChecked(settings.ignoreVerificationWarning());
@@ -492,6 +520,7 @@ SettingsDialog::accept() {
   settings.enableRadioIdRepeaterSource(Ui::SettingsDialog::radioIdEnable->isChecked());
 
   settings.setUpdateCodeplug(updateCodeplug->isChecked());
+  settings.setUpdateDeviceClock(updateDeviceClock->isChecked());
   settings.setAutoEnableGPS(autoEnableGPS->isChecked());
   settings.setAutoEnableRoaming(autoEnableRoaming->isChecked());
   settings.setIgnoreVerificationWarning(ignoreVerificationWarnings->isChecked());

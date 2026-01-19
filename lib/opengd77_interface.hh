@@ -4,7 +4,7 @@
 #include "usbserial.hh"
 #include "errorstack.hh"
 
-/** Implements the interfact to a radio running the Open GD77 firmware.
+/** Implements the interface to a radio running the Open GD77 firmware.
  *
  * This interface uses a USB serial-port to communicate with the device. To find the corresponding
  * port, the device-specific VID @c 0x1fc9 and PID @c 0x0094 are used. Hence no udev rules are
@@ -13,7 +13,7 @@
  *
  *
  * @section ogd77cmd Command requests
- * The overall command requets structure is
+ * The overall command requests structure is
  *
  * @verbinclude opengd77_protocol_command_request.txt
  *
@@ -124,14 +124,14 @@
  *  <tr><td>0ah</td>  <td>FLASH security registers</td></tr>
  * </table>
  *
- * Whenever the read request returns some data, it is tranmitted with the read response
+ * Whenever the read request returns some data, it is transmitted with the read response
  * @verbinclude opengd77_protocol_read_response.txt
  *
  * If not, a simple ACK response is send
  * @verbinclude opengd77_protocol_command_okay_response.txt
  *
  * @subsection ogd77info Radio info struct
- * When reading the radio inforamtion, the information is returned in a binary struct:
+ * When reading the radio information, the information is returned in a binary struct:
  * @verbinclude opengd77_radio_info.txt
  * <table>
  *  <tr><th>Code</th> <th>Radio Variant</th></tr>
@@ -179,6 +179,11 @@ public:
   /** Returns an identifier of the radio. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack());
 
+  /** Returns @c true if the device allows for storing part of the call-sign DB inside the voice
+   * prompt memory. This property is valid after identifying the device, i.e., a call to
+   * @c identifier. */
+  bool extendedCallsignDB() const;
+
   bool read_start(uint32_t bank, uint32_t addr, const ErrorStack &err=ErrorStack());
   bool read(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool read_finish(const ErrorStack &err=ErrorStack());
@@ -187,6 +192,10 @@ public:
   bool write(uint32_t bank, uint32_t addr, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack());
   bool write_finish(const ErrorStack &err=ErrorStack());
 
+  bool setDateTime(const QDateTime &datetime, const ErrorStack &err);
+
+  bool saveSettingsNotVFOs(const ErrorStack &err=ErrorStack());
+  bool saveSettingsAndVFOs(const ErrorStack &err=ErrorStack());
   bool reboot(const ErrorStack &err=ErrorStack());
 
 public:
@@ -226,7 +235,7 @@ protected:
     bool initReadFirmwareInfo();
   };
 
-  /** Radio inforation struct. */
+  /** Radio information struct. */
   struct __attribute__((packed)) FirmwareInfo {
     /** Possible radio types, returned by the radio_info struct.*/
     enum class RadioType {
@@ -240,6 +249,13 @@ protected:
     char build_date[16];      ///< Firmware build time, YYYYMMDDhhmmss, 0-padded.
     uint32_t flashChipSerial; ///< Serial number of the flash chip.
     uint16_t features;        ///< Some flags, signaling the presence of some features.
+
+    /** Returns @c true if the devices display is inverted. */
+    bool featureInvertedDisplay() const;
+    /** Returns @c true if the vocie prompt memory is used for storing callsign db. */
+    bool featureExtendedCallsignDB() const;
+    /** Returns @c true if the voice prompt data is loaded. */
+    bool featureVoicePromptLoaded() const;
   };
 
   /** Represents a read response message. */
@@ -266,7 +282,7 @@ protected:
       WRITE_WAV_BUFFER = 7
     };
 
-    /// 'R' read block, 'W' write block or 'C' command.
+    /// 'R' read block, 'W'/'X' write block or 'C' command.
     char type;
     /// Command, @see OpenGD77Internface::WriteReqest::Command.
     uint8_t command;
@@ -321,7 +337,11 @@ protected:
       REBOOT = 1,
       SAVE_SETTINGS_AND_VFOS = 2,
       FLASH_GREEN_LED = 3,
-      FLASH_RED_LED = 4
+      FLASH_RED_LED = 4,
+      INIT_CODEC = 5,
+      INIT_SOUND = 6,
+      SET_DATETIME = 7,
+      DELAY_10ms = 10
     };
 
     /** Message type, here 'C' for command. */
@@ -335,14 +355,21 @@ protected:
       /** The command option. */
       uint8_t option;
     };
-    /** The y-position on the screen. */
-    uint8_t y;
-    /** The font size. */
-    uint8_t font;
-    /** The text alignment. */
-    uint8_t alignment;
-    /** Is text inverted? */
-    uint8_t inverted;
+    // Either some text options or a timestamp.
+    union {
+      struct __attribute__((packed)) {
+        /** The y-position on the screen. */
+        uint8_t y;
+        /** The font size. */
+        uint8_t font;
+        /** The text alignment. */
+        uint8_t alignment;
+        /** Is text inverted? */
+        uint8_t inverted;
+      };
+      uint32_t timestamp;
+    };
+
     /** Some text message. */
     char message[16];
 
@@ -359,6 +386,8 @@ protected:
     void initCloseScreen();
     /** Construct a command message with the given option. */
     void initCommand(Option option);
+    /** Construct a SET_DATETIME message with the given date time. */
+    void initSetDateTime(const QDateTime &dt);
   };
 
 protected:
@@ -391,12 +420,17 @@ protected:
   bool sendRenderCPS(const ErrorStack &err=ErrorStack());
   /** Send a "close screen" message. */
   bool sendCloseScreen(const ErrorStack &err=ErrorStack());
+  /** Send a "set date time" message. */
+  bool sendSetDateTime(const QDateTime &dt, const ErrorStack &err=ErrorStack());
   /** Sends some command message with the given options. */
   bool sendCommand(CommandRequest::Option option, const ErrorStack &err=ErrorStack());
 
 protected:
   /** The protocol variant determined by the device type obtained by the firmware info. */
   Variant _protocolVariant;
+  /** If @c true, the device allows for storing parts of the call-sign DB inside the voice prompt
+   *  memory. */
+  bool _extendedCallsignDB;
   /** The current Flash sector, set to -1 if none is currently selected. */
   int32_t _sector;
 };

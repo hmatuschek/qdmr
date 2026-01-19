@@ -481,10 +481,25 @@
 <context>
     <name>AnalogChannelDialog</name>
     <message>
-        <location filename="../src/analogchanneldialog.cc" line="57"/>
-        <location filename="../src/analogchanneldialog.cc" line="75"/>
+        <location filename="../src/analogchanneldialog.cc" line="58"/>
+        <location filename="../src/analogchanneldialog.cc" line="76"/>
         <source>[None]</source>
         <translation>[None]</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.cc" line="91"/>
+        <source>No offset</source>
+        <translation>No offset</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.cc" line="93"/>
+        <source>Positive offset</source>
+        <translation>Positive offset</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.cc" line="95"/>
+        <source>Negative offset</source>
+        <translation>Negative offset</translation>
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="20"/>
@@ -518,130 +533,135 @@
     </message>
     <message>
         <location filename="../src/analogchanneldialog.ui" line="91"/>
+        <source>Tx Offset</source>
+        <translation>Tx Offset</translation>
+    </message>
+    <message>
+        <location filename="../src/analogchanneldialog.ui" line="143"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="107"/>
+        <location filename="../src/analogchanneldialog.ui" line="159"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="112"/>
+        <location filename="../src/analogchanneldialog.ui" line="164"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="117"/>
+        <location filename="../src/analogchanneldialog.ui" line="169"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="122"/>
+        <location filename="../src/analogchanneldialog.ui" line="174"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="127"/>
+        <location filename="../src/analogchanneldialog.ui" line="179"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="135"/>
-        <location filename="../src/analogchanneldialog.ui" line="172"/>
-        <location filename="../src/analogchanneldialog.ui" line="206"/>
-        <location filename="../src/analogchanneldialog.ui" line="367"/>
+        <location filename="../src/analogchanneldialog.ui" line="187"/>
+        <location filename="../src/analogchanneldialog.ui" line="224"/>
+        <location filename="../src/analogchanneldialog.ui" line="258"/>
+        <location filename="../src/analogchanneldialog.ui" line="361"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="144"/>
+        <location filename="../src/analogchanneldialog.ui" line="196"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="159"/>
-        <location filename="../src/analogchanneldialog.ui" line="196"/>
+        <location filename="../src/analogchanneldialog.ui" line="211"/>
+        <location filename="../src/analogchanneldialog.ui" line="248"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="181"/>
+        <location filename="../src/analogchanneldialog.ui" line="233"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="215"/>
+        <location filename="../src/analogchanneldialog.ui" line="267"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="225"/>
+        <location filename="../src/analogchanneldialog.ui" line="277"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="252"/>
+        <location filename="../src/analogchanneldialog.ui" line="304"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="266"/>
+        <location filename="../src/analogchanneldialog.ui" line="318"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="271"/>
+        <location filename="../src/analogchanneldialog.ui" line="323"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="276"/>
+        <location filename="../src/analogchanneldialog.ui" line="328"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="284"/>
+        <location filename="../src/analogchanneldialog.ui" line="336"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="291"/>
+        <location filename="../src/analogchanneldialog.ui" line="370"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="298"/>
+        <location filename="../src/analogchanneldialog.ui" line="387"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="305"/>
+        <location filename="../src/analogchanneldialog.ui" line="404"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="319"/>
+        <location filename="../src/analogchanneldialog.ui" line="418"/>
         <source>Narrow (12.5 kHz)</source>
         <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="324"/>
+        <location filename="../src/analogchanneldialog.ui" line="423"/>
         <source>Wide (25 kHz)</source>
         <translation>Wide (25 kHz)</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="332"/>
+        <location filename="../src/analogchanneldialog.ui" line="431"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="357"/>
+        <location filename="../src/analogchanneldialog.ui" line="351"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/analogchanneldialog.ui" line="399"/>
+        <location filename="../src/analogchanneldialog.ui" line="451"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
@@ -649,254 +669,254 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="207"/>
-        <location filename="../src/application.cc" line="225"/>
-        <location filename="../src/application.cc" line="542"/>
+        <location filename="../src/application.cc" line="202"/>
+        <location filename="../src/application.cc" line="220"/>
+        <location filename="../src/application.cc" line="530"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="208"/>
-        <location filename="../src/application.cc" line="226"/>
-        <location filename="../src/application.cc" line="543"/>
+        <location filename="../src/application.cc" line="203"/>
+        <location filename="../src/application.cc" line="221"/>
+        <location filename="../src/application.cc" line="531"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="234"/>
+        <location filename="../src/application.cc" line="229"/>
         <source>Open codeplug</source>
         <translation>Open codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="236"/>
+        <location filename="../src/application.cc" line="231"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="242"/>
-        <location filename="../src/application.cc" line="305"/>
-        <location filename="../src/application.cc" line="342"/>
-        <location filename="../src/application.cc" line="381"/>
+        <location filename="../src/application.cc" line="237"/>
+        <location filename="../src/application.cc" line="296"/>
+        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="372"/>
         <source>Cannot open file</source>
         <translation>Cannot open file</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="243"/>
-        <location filename="../src/application.cc" line="257"/>
-        <location filename="../src/application.cc" line="268"/>
-        <location filename="../src/application.cc" line="382"/>
+        <location filename="../src/application.cc" line="238"/>
+        <location filename="../src/application.cc" line="250"/>
+        <location filename="../src/application.cc" line="259"/>
+        <location filename="../src/application.cc" line="373"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Cannot read codeplug from file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="256"/>
-        <location filename="../src/application.cc" line="267"/>
+        <location filename="../src/application.cc" line="249"/>
+        <location filename="../src/application.cc" line="258"/>
         <source>Cannot read codeplug.</source>
         <translation>Cannot read codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="286"/>
+        <location filename="../src/application.cc" line="277"/>
         <source>Save codeplug</source>
         <translation>Save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="287"/>
+        <location filename="../src/application.cc" line="278"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Codeplug Files (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="293"/>
+        <location filename="../src/application.cc" line="284"/>
         <source>Please use new YAML format.</source>
         <translation>Please use new YAML format.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="294"/>
+        <location filename="../src/application.cc" line="285"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="306"/>
-        <location filename="../src/application.cc" line="343"/>
+        <location filename="../src/application.cc" line="297"/>
+        <location filename="../src/application.cc" line="334"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="315"/>
+        <location filename="../src/application.cc" line="306"/>
         <source>Cannot save codeplug</source>
         <translation>Cannot save codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="316"/>
+        <location filename="../src/application.cc" line="307"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Cannot save codeplug to file &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="324"/>
         <source>Export codeplug</source>
         <translation>Export codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="334"/>
+        <location filename="../src/application.cc" line="325"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>CHIRP CSV Files (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="351"/>
+        <location filename="../src/application.cc" line="342"/>
         <source>Cannot export codeplug</source>
         <translation>Cannot export codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="352"/>
+        <location filename="../src/application.cc" line="343"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>Cannot export codeplug to file &apos;%1&apos;:
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="368"/>
+        <location filename="../src/application.cc" line="359"/>
         <source>Import codeplug</source>
         <translation>Import codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="369"/>
+        <location filename="../src/application.cc" line="360"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="388"/>
-        <location filename="../src/application.cc" line="396"/>
-        <location filename="../src/application.cc" line="402"/>
-        <location filename="../src/application.cc" line="415"/>
+        <location filename="../src/application.cc" line="379"/>
+        <location filename="../src/application.cc" line="387"/>
+        <location filename="../src/application.cc" line="393"/>
+        <location filename="../src/application.cc" line="406"/>
         <source>Cannot import codeplug</source>
         <translation>Cannot import codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="389"/>
-        <location filename="../src/application.cc" line="397"/>
-        <location filename="../src/application.cc" line="416"/>
+        <location filename="../src/application.cc" line="380"/>
+        <location filename="../src/application.cc" line="388"/>
+        <location filename="../src/application.cc" line="407"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>Cannot import codeplug from &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="403"/>
+        <location filename="../src/application.cc" line="394"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>Do not know, how to handle file &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="440"/>
+        <location filename="../src/application.cc" line="428"/>
         <source>No matching devices found.</source>
         <translation>No matching devices found.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="466"/>
+        <location filename="../src/application.cc" line="454"/>
         <source>Cannot connect to radio</source>
         <translation>Cannot connect to radio</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="467"/>
+        <location filename="../src/application.cc" line="455"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Cannot connect to radio: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="477"/>
+        <location filename="../src/application.cc" line="465"/>
         <source>Radio found</source>
         <translation>Radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="477"/>
+        <location filename="../src/application.cc" line="465"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Found device &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="480"/>
-        <location filename="../src/application.cc" line="496"/>
-        <location filename="../src/application.cc" line="551"/>
-        <location filename="../src/application.cc" line="619"/>
-        <location filename="../src/application.cc" line="660"/>
-        <location filename="../src/application.cc" line="740"/>
+        <location filename="../src/application.cc" line="468"/>
+        <location filename="../src/application.cc" line="484"/>
+        <location filename="../src/application.cc" line="539"/>
+        <location filename="../src/application.cc" line="609"/>
+        <location filename="../src/application.cc" line="653"/>
+        <location filename="../src/application.cc" line="735"/>
         <source>No radio found</source>
         <translation>No radio found</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="521"/>
+        <location filename="../src/application.cc" line="509"/>
         <source>Verification success</source>
         <translation>Verification success</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="522"/>
+        <location filename="../src/application.cc" line="510"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>The codeplug was successfully verified with the radio &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="564"/>
+        <location filename="../src/application.cc" line="554"/>
         <source>Read ...</source>
         <translation>Read …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="574"/>
+        <location filename="../src/application.cc" line="564"/>
         <source>Read error</source>
         <translation>Read error</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="593"/>
+        <location filename="../src/application.cc" line="583"/>
         <source>Read complete</source>
         <translation>Read complete</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="647"/>
+        <location filename="../src/application.cc" line="640"/>
         <source>Upload ...</source>
         <translation>Upload …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="667"/>
-        <location filename="../src/application.cc" line="677"/>
-        <location filename="../src/application.cc" line="689"/>
+        <location filename="../src/application.cc" line="660"/>
+        <location filename="../src/application.cc" line="670"/>
+        <location filename="../src/application.cc" line="682"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Cannot write call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="668"/>
+        <location filename="../src/application.cc" line="661"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="481"/>
-        <location filename="../src/application.cc" line="497"/>
-        <location filename="../src/application.cc" line="552"/>
-        <location filename="../src/application.cc" line="620"/>
-        <location filename="../src/application.cc" line="661"/>
-        <location filename="../src/application.cc" line="741"/>
+        <location filename="../src/application.cc" line="469"/>
+        <location filename="../src/application.cc" line="485"/>
+        <location filename="../src/application.cc" line="540"/>
+        <location filename="../src/application.cc" line="610"/>
+        <location filename="../src/application.cc" line="654"/>
+        <location filename="../src/application.cc" line="736"/>
         <source>No matching device was found.</source>
         <translation>No matching device was found.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="678"/>
+        <location filename="../src/application.cc" line="671"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="690"/>
+        <location filename="../src/application.cc" line="683"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="726"/>
+        <location filename="../src/application.cc" line="721"/>
         <source>Write call-sign DB ...</source>
         <translation>Write call-sign DB …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="747"/>
-        <location filename="../src/application.cc" line="757"/>
+        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="752"/>
         <source>Cannot write satellite config.</source>
         <translation>Cannot write satellite config.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="748"/>
+        <location filename="../src/application.cc" line="743"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>The detected radio &apos;%1&apos; does not support satellite tracking.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="758"/>
+        <location filename="../src/application.cc" line="753"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</translation>
     </message>
@@ -1003,213 +1023,219 @@
 <context>
     <name>ChannelListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="252"/>
+        <location filename="../src/configitemwrapper.cc" line="278"/>
         <source>FM</source>
         <translation>FM</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="254"/>
+        <location filename="../src/configitemwrapper.cc" line="280"/>
         <source>DMR</source>
         <translation>DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="263"/>
-        <location filename="../src/configitemwrapper.cc" line="274"/>
-        <location filename="../src/configitemwrapper.cc" line="348"/>
-        <location filename="../src/configitemwrapper.cc" line="372"/>
-        <location filename="../src/configitemwrapper.cc" line="383"/>
+        <location filename="../src/configitemwrapper.cc" line="289"/>
+        <location filename="../src/configitemwrapper.cc" line="300"/>
+        <location filename="../src/configitemwrapper.cc" line="374"/>
+        <location filename="../src/configitemwrapper.cc" line="398"/>
+        <location filename="../src/configitemwrapper.cc" line="409"/>
         <source>[Default]</source>
         <translation>[Default]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="265"/>
+        <location filename="../src/configitemwrapper.cc" line="291"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="266"/>
+        <location filename="../src/configitemwrapper.cc" line="292"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="267"/>
+        <location filename="../src/configitemwrapper.cc" line="293"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="268"/>
+        <location filename="../src/configitemwrapper.cc" line="294"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="269"/>
+        <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="276"/>
-        <location filename="../src/configitemwrapper.cc" line="279"/>
+        <location filename="../src/configitemwrapper.cc" line="302"/>
+        <location filename="../src/configitemwrapper.cc" line="305"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="279"/>
+        <location filename="../src/configitemwrapper.cc" line="305"/>
         <source>On</source>
         <translation>On</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="283"/>
-        <location filename="../src/configitemwrapper.cc" line="289"/>
+        <location filename="../src/configitemwrapper.cc" line="309"/>
+        <location filename="../src/configitemwrapper.cc" line="315"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="284"/>
-        <location filename="../src/configitemwrapper.cc" line="290"/>
+        <location filename="../src/configitemwrapper.cc" line="310"/>
+        <location filename="../src/configitemwrapper.cc" line="316"/>
         <source>Free</source>
         <translation>Free</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="285"/>
+        <location filename="../src/configitemwrapper.cc" line="311"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="291"/>
+        <location filename="../src/configitemwrapper.cc" line="317"/>
         <source>Tone</source>
         <translation>Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="314"/>
-        <location filename="../src/configitemwrapper.cc" line="321"/>
-        <location filename="../src/configitemwrapper.cc" line="332"/>
-        <location filename="../src/configitemwrapper.cc" line="342"/>
-        <location filename="../src/configitemwrapper.cc" line="351"/>
-        <location filename="../src/configitemwrapper.cc" line="375"/>
-        <location filename="../src/configitemwrapper.cc" line="380"/>
-        <location filename="../src/configitemwrapper.cc" line="392"/>
-        <location filename="../src/configitemwrapper.cc" line="399"/>
+        <location filename="../src/configitemwrapper.cc" line="340"/>
+        <location filename="../src/configitemwrapper.cc" line="347"/>
+        <location filename="../src/configitemwrapper.cc" line="358"/>
+        <location filename="../src/configitemwrapper.cc" line="368"/>
+        <location filename="../src/configitemwrapper.cc" line="377"/>
+        <location filename="../src/configitemwrapper.cc" line="401"/>
         <location filename="../src/configitemwrapper.cc" line="406"/>
+        <location filename="../src/configitemwrapper.cc" line="418"/>
+        <location filename="../src/configitemwrapper.cc" line="425"/>
+        <location filename="../src/configitemwrapper.cc" line="432"/>
+        <location filename="../src/configitemwrapper.cc" line="443"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="385"/>
+        <location filename="../src/configitemwrapper.cc" line="411"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="409"/>
+        <location filename="../src/configitemwrapper.cc" line="435"/>
         <source>Wide</source>
         <translation>Wide</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="411"/>
+        <location filename="../src/configitemwrapper.cc" line="437"/>
         <source>Narrow</source>
         <translation>Narrow</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="427"/>
+        <location filename="../src/configitemwrapper.cc" line="458"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="428"/>
+        <location filename="../src/configitemwrapper.cc" line="459"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="429"/>
+        <location filename="../src/configitemwrapper.cc" line="460"/>
         <source>Rx Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="430"/>
+        <location filename="../src/configitemwrapper.cc" line="461"/>
         <source>Tx Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="431"/>
+        <location filename="../src/configitemwrapper.cc" line="462"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="432"/>
+        <location filename="../src/configitemwrapper.cc" line="463"/>
         <source>Timeout</source>
         <translation>Timeout</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="433"/>
+        <location filename="../src/configitemwrapper.cc" line="464"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="434"/>
+        <location filename="../src/configitemwrapper.cc" line="465"/>
         <source>Admit</source>
         <translation>Admit</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="435"/>
+        <location filename="../src/configitemwrapper.cc" line="466"/>
         <source>Scanlist</source>
         <translation>Scanlist</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="437"/>
+        <location filename="../src/configitemwrapper.cc" line="468"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="438"/>
+        <location filename="../src/configitemwrapper.cc" line="469"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="439"/>
+        <location filename="../src/configitemwrapper.cc" line="470"/>
         <source>RX Group List</source>
         <translation>RX Group List</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="440"/>
+        <location filename="../src/configitemwrapper.cc" line="471"/>
         <source>TX Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="441"/>
+        <location filename="../src/configitemwrapper.cc" line="472"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="442"/>
+        <location filename="../src/configitemwrapper.cc" line="473"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="443"/>
+        <location filename="../src/configitemwrapper.cc" line="474"/>
         <source>Roaming</source>
         <translation>Roaming</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="444"/>
+        <location filename="../src/configitemwrapper.cc" line="475"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="445"/>
+        <location filename="../src/configitemwrapper.cc" line="476"/>
         <source>Rx Tone</source>
         <translation>RX Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="446"/>
+        <location filename="../src/configitemwrapper.cc" line="477"/>
         <source>Tx Tone</source>
         <translation>TX Tone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="436"/>
+        <location filename="../src/configitemwrapper.cc" line="479"/>
+        <source>Extensions</source>
+        <translation>Extensions</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="467"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="447"/>
+        <location filename="../src/configitemwrapper.cc" line="478"/>
         <source>Bandwidth</source>
         <translation>Bandwidth</translation>
     </message>
@@ -1217,7 +1243,7 @@
 <context>
     <name>ChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="475"/>
+        <location filename="../src/configitemwrapper.cc" line="507"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
@@ -1377,54 +1403,60 @@
 <context>
     <name>ConfigObjectTableView</name>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="80"/>
-        <location filename="../src/configobjecttableview.cc" line="102"/>
-        <location filename="../src/configobjecttableview.cc" line="126"/>
-        <location filename="../src/configobjecttableview.cc" line="149"/>
-        <location filename="../src/configobjecttableview.cc" line="173"/>
-        <location filename="../src/configobjecttableview.cc" line="196"/>
+        <location filename="../src/configobjecttableview.cc" line="253"/>
+        <location filename="../src/configobjecttableview.cc" line="260"/>
         <source>Cannot move items.</source>
         <translation>Cannot move items.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="81"/>
-        <location filename="../src/configobjecttableview.cc" line="103"/>
-        <location filename="../src/configobjecttableview.cc" line="127"/>
-        <location filename="../src/configobjecttableview.cc" line="150"/>
-        <location filename="../src/configobjecttableview.cc" line="174"/>
-        <location filename="../src/configobjecttableview.cc" line="197"/>
+        <location filename="../src/configobjecttableview.cc" line="254"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation>Cannot move items: You have to select at least one item first.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="25"/>
+        <location filename="../src/configobjecttableview.cc" line="261"/>
+        <source>Cannot move items as long as there is some filter or sorting applied.</source>
+        <translation>Cannot move items as long as there is some filter or sorting applied.</translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="50"/>
         <source>Move selected item(s) to the top.</source>
         <translation>Move selected item(s) to the top.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="39"/>
+        <location filename="../src/configobjecttableview.ui" line="64"/>
         <source>Move selected item(s) ten positions up.</source>
         <translation>Move selected item(s) ten positions up.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="53"/>
+        <location filename="../src/configobjecttableview.ui" line="78"/>
         <source>Move selected item(s) one position up.</source>
         <translation>Move selected item(s) one position up.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="67"/>
+        <location filename="../src/configobjecttableview.ui" line="92"/>
         <source>Move selected item(s) one position down.</source>
         <translation>Move selected item(s) one position down.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="81"/>
+        <location filename="../src/configobjecttableview.ui" line="106"/>
         <source>Move selected item(s) ten positions down.</source>
         <translation>Move selected item(s) ten positions down.</translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.ui" line="95"/>
+        <location filename="../src/configobjecttableview.ui" line="120"/>
         <source>Move selected item(s) to the bottom.</source>
         <translation>Move selected item(s) to the bottom.</translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="188"/>
+        <source>Toggle Filter and Sorting</source>
+        <translation>Toggle Filter and Sorting</translation>
+    </message>
+    <message>
+        <location filename="../src/configobjecttableview.ui" line="199"/>
+        <source>Close Sort and Filter</source>
+        <translation>Close Sort and Filter</translation>
     </message>
 </context>
 <context>
@@ -1521,56 +1553,66 @@
 <context>
     <name>ContactListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="601"/>
+        <location filename="../src/configitemwrapper.cc" line="641"/>
         <source>DTMF</source>
         <translation>DTMF</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="607"/>
-        <location filename="../src/configitemwrapper.cc" line="626"/>
+        <location filename="../src/configitemwrapper.cc" line="647"/>
+        <location filename="../src/configitemwrapper.cc" line="668"/>
         <source>On</source>
         <translation>On</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="607"/>
-        <location filename="../src/configitemwrapper.cc" line="626"/>
+        <location filename="../src/configitemwrapper.cc" line="647"/>
+        <location filename="../src/configitemwrapper.cc" line="668"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="616"/>
+        <location filename="../src/configitemwrapper.cc" line="658"/>
         <source>Private Call</source>
         <translation>Private Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="617"/>
+        <location filename="../src/configitemwrapper.cc" line="659"/>
         <source>Group Call</source>
         <translation>Group Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="618"/>
+        <location filename="../src/configitemwrapper.cc" line="660"/>
         <source>All Call</source>
         <translation>All Call</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="642"/>
+        <location filename="../src/configitemwrapper.cc" line="672"/>
+        <source>[None]</source>
+        <translation>[None]</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="690"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="644"/>
+        <location filename="../src/configitemwrapper.cc" line="692"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="646"/>
+        <location filename="../src/configitemwrapper.cc" line="694"/>
         <source>Number</source>
         <translation>Number</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="648"/>
+        <location filename="../src/configitemwrapper.cc" line="696"/>
         <source>RX Tone</source>
         <translation>RX Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="698"/>
+        <source>Extensions</source>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -1708,18 +1750,33 @@
 <context>
     <name>DigitalChannelDialog</name>
     <message>
-        <location filename="../src/digitalchanneldialog.cc" line="59"/>
-        <location filename="../src/digitalchanneldialog.cc" line="74"/>
-        <location filename="../src/digitalchanneldialog.cc" line="83"/>
-        <location filename="../src/digitalchanneldialog.cc" line="90"/>
+        <location filename="../src/digitalchanneldialog.cc" line="60"/>
+        <location filename="../src/digitalchanneldialog.cc" line="75"/>
+        <location filename="../src/digitalchanneldialog.cc" line="84"/>
+        <location filename="../src/digitalchanneldialog.cc" line="91"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.cc" line="91"/>
-        <location filename="../src/digitalchanneldialog.cc" line="100"/>
+        <location filename="../src/digitalchanneldialog.cc" line="92"/>
+        <location filename="../src/digitalchanneldialog.cc" line="101"/>
         <source>[Default]</source>
         <translation>[Default]</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.cc" line="117"/>
+        <source>No offset</source>
+        <translation>No offset</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.cc" line="119"/>
+        <source>Positive offset</source>
+        <translation>Positive offset</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.cc" line="121"/>
+        <source>Negative offset</source>
+        <translation>Negative offset</translation>
     </message>
     <message>
         <location filename="../src/digitalchanneldialog.ui" line="20"/>
@@ -1752,141 +1809,146 @@
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="111"/>
+        <location filename="../src/digitalchanneldialog.ui" line="151"/>
         <source>Power</source>
         <translation>Power</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="118"/>
+        <location filename="../src/digitalchanneldialog.ui" line="204"/>
         <source>Tx Timeout</source>
         <translation>TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="125"/>
+        <location filename="../src/digitalchanneldialog.ui" line="275"/>
         <source>Rx Only</source>
         <translation>RX Only</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="135"/>
+        <location filename="../src/digitalchanneldialog.ui" line="285"/>
         <source>Scan List</source>
         <translation>Scan List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="161"/>
+        <location filename="../src/digitalchanneldialog.ui" line="167"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="166"/>
+        <location filename="../src/digitalchanneldialog.ui" line="111"/>
+        <source>Tx Offset</source>
+        <translation>Tx Offset</translation>
+    </message>
+    <message>
+        <location filename="../src/digitalchanneldialog.ui" line="172"/>
         <source>High</source>
         <translation>High</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="171"/>
+        <location filename="../src/digitalchanneldialog.ui" line="177"/>
         <source>Mid</source>
         <translation>Mid</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="176"/>
+        <location filename="../src/digitalchanneldialog.ui" line="182"/>
         <source>Low</source>
         <translation>Low</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="181"/>
+        <location filename="../src/digitalchanneldialog.ui" line="187"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="189"/>
-        <location filename="../src/digitalchanneldialog.ui" line="222"/>
-        <location filename="../src/digitalchanneldialog.ui" line="253"/>
+        <location filename="../src/digitalchanneldialog.ui" line="195"/>
+        <location filename="../src/digitalchanneldialog.ui" line="235"/>
+        <location filename="../src/digitalchanneldialog.ui" line="266"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="206"/>
+        <location filename="../src/digitalchanneldialog.ui" line="219"/>
         <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
         <translation>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="209"/>
-        <location filename="../src/digitalchanneldialog.ui" line="246"/>
+        <location filename="../src/digitalchanneldialog.ui" line="222"/>
+        <location filename="../src/digitalchanneldialog.ui" line="259"/>
         <source>Off</source>
         <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="231"/>
+        <location filename="../src/digitalchanneldialog.ui" line="244"/>
         <source>VOX Level</source>
         <translation>VOX Level</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="266"/>
+        <location filename="../src/digitalchanneldialog.ui" line="323"/>
         <source>Tx Admit</source>
         <translation>TX Admit</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="280"/>
+        <location filename="../src/digitalchanneldialog.ui" line="337"/>
         <source>Always</source>
         <translation>Always</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="285"/>
+        <location filename="../src/digitalchanneldialog.ui" line="342"/>
         <source>Channel Free</source>
         <translation>Channel Free</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="290"/>
-        <location filename="../src/digitalchanneldialog.ui" line="298"/>
+        <location filename="../src/digitalchanneldialog.ui" line="347"/>
+        <location filename="../src/digitalchanneldialog.ui" line="355"/>
         <source>Color Code</source>
         <translation>Color Code</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="321"/>
+        <location filename="../src/digitalchanneldialog.ui" line="378"/>
         <source>Time Slot</source>
         <translation>Time Slot</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="338"/>
+        <location filename="../src/digitalchanneldialog.ui" line="395"/>
         <source>TS 1</source>
         <translation>TS 1</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="343"/>
+        <location filename="../src/digitalchanneldialog.ui" line="400"/>
         <source>TS 2</source>
         <translation>TS 2</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="351"/>
+        <location filename="../src/digitalchanneldialog.ui" line="408"/>
         <source>Rx Group List</source>
         <translation>Group List</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="368"/>
+        <location filename="../src/digitalchanneldialog.ui" line="425"/>
         <source>Tx Contact</source>
         <translation>TX Contact</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="385"/>
+        <location filename="../src/digitalchanneldialog.ui" line="442"/>
         <source>Positioning System</source>
         <translation>Positioning System</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="402"/>
+        <location filename="../src/digitalchanneldialog.ui" line="459"/>
         <source>Roaming Zone</source>
         <translation>Roaming Zone</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="419"/>
+        <location filename="../src/digitalchanneldialog.ui" line="306"/>
         <source>DMR ID</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="439"/>
+        <location filename="../src/digitalchanneldialog.ui" line="479"/>
         <source>Extended</source>
         <translation>Extended</translation>
     </message>
     <message>
-        <location filename="../src/digitalchanneldialog.ui" line="442"/>
+        <location filename="../src/digitalchanneldialog.ui" line="482"/>
         <source>Device specific settings</source>
         <translation>Device specific settings</translation>
     </message>
@@ -1946,13 +2008,13 @@
     <name>GPSSystemDialog</name>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
-        <source>Create DMR APRS Sysmtem</source>
-        <translation>Create DMR APRS Sysmtem</translation>
+        <source>Create DMR APRS System</source>
+        <translation>Create DMR APRS System</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
-        <source>Edit DMR APRS Sysmtem</source>
-        <translation>Edit DMR APRS Sysmtem</translation>
+        <source>Edit DMR APRS System</source>
+        <translation>Edit DMR APRS System</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="41"/>
@@ -2142,7 +2204,7 @@
 <context>
     <name>GroupListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="834"/>
+        <location filename="../src/configitemwrapper.cc" line="898"/>
         <source>Contact</source>
         <translation>Contact</translation>
     </message>
@@ -2199,7 +2261,7 @@
 <context>
     <name>GroupListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="810"/>
+        <location filename="../src/configitemwrapper.cc" line="874"/>
         <source>RX Group Lists</source>
         <translation>Group Lists</translation>
     </message>
@@ -2354,7 +2416,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="67"/>
+        <location filename="../src/mainwindow.cc" line="106"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
@@ -2374,134 +2436,164 @@
         <translation>Writes call-sign DB to radio.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="316"/>
+        <location filename="../src/mainwindow.ui" line="312"/>
         <source>Refresh Callsign DB</source>
         <translation>Refresh call-sign DB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="319"/>
+        <location filename="../src/mainwindow.ui" line="315"/>
         <source>Refreshes the downloaded callsign DB</source>
         <translation>Refreshes the downloaded call-sign DB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="328"/>
+        <location filename="../src/mainwindow.ui" line="323"/>
         <source>Refresh Talkgroup DB</source>
         <translation>Refresh talk-group DB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="331"/>
+        <location filename="../src/mainwindow.ui" line="326"/>
         <source>Refreshes the downloaded talkgroup DB</source>
         <translation>Refreshes the downloaded talk-group DB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="336"/>
+        <location filename="../src/mainwindow.ui" line="331"/>
         <source>Export to CHIRP ...</source>
         <translation>Export to CHIRP ...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="339"/>
-        <source>Exports all FM channels to CHRIP CSV.</source>
-        <translation>Exports all FM channels to CHRIP CSV.</translation>
+        <location filename="../src/mainwindow.ui" line="334"/>
+        <source>Exports all FM channels to CHIRP CSV.</source>
+        <translation>Exports all FM channels to CHIRP CSV.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="344"/>
+        <location filename="../src/mainwindow.ui" line="339"/>
         <source>Import ...</source>
         <translation>Import ...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="347"/>
+        <location filename="../src/mainwindow.ui" line="342"/>
         <source>Imports and merges a codeplug into the current one.</source>
         <translation>Imports and merges a codeplug into the current one.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="352"/>
+        <location filename="../src/mainwindow.ui" line="347"/>
         <source>Refresh Orbital Elements</source>
         <translation>Refresh Orbital Elements</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="355"/>
+        <location filename="../src/mainwindow.ui" line="350"/>
         <source>Refreshes the orbital elements.</source>
         <translation>Refreshes the orbital elements.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="363"/>
+        <location filename="../src/mainwindow.ui" line="358"/>
         <source>Edit Satellites ...</source>
         <translation>Edit Satellites ...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="366"/>
+        <location filename="../src/mainwindow.ui" line="361"/>
         <source>Opens an editor to edit your satellite database.</source>
         <translation>Opens an editor to edit your satellite database.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="374"/>
+        <location filename="../src/mainwindow.ui" line="369"/>
         <source>Write satellites</source>
         <translation>Write satellites</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="377"/>
+        <location filename="../src/mainwindow.ui" line="372"/>
         <source>Writes the orbital elements and transponder information onto the connected device.</source>
         <translation>Writes the orbital elements and transponder information onto the connected device.</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cc" line="70"/>
+        <source>Cannot update callsign DB: %1</source>
+        <translation>Cannot update call-sign DB: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="73"/>
+        <source>Callsign database updated &amp; loaded.</source>
+        <translation>Call-sign database updated &amp; loaded.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="78"/>
+        <source>Cannot update talkgroup DB: %1</source>
+        <translation>Cannot update talk-group DB: %1</translation>
+    </message>
+    <message>
         <location filename="../src/mainwindow.cc" line="81"/>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <source>Talkgroup database updated &amp; loaded.</source>
+        <translation>Talk-group database updated &amp; loaded.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="86"/>
+        <source>Cannot update orbital elements: %1</source>
+        <translation>Cannot update orbital elements: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="89"/>
+        <source>Orbital elements updated &amp; loaded.</source>
+        <translation>Orbital elements updated &amp; loaded.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="120"/>
+        <location filename="../src/mainwindow.cc" line="166"/>
         <source>Radio IDs</source>
         <translation>Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="83"/>
+        <location filename="../src/mainwindow.cc" line="122"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="85"/>
+        <location filename="../src/mainwindow.cc" line="124"/>
         <source>Group Lists</source>
         <translation>Group Lists</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="87"/>
+        <location filename="../src/mainwindow.cc" line="126"/>
         <source>Channels</source>
         <translation>Channels</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="89"/>
+        <location filename="../src/mainwindow.cc" line="128"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="91"/>
+        <location filename="../src/mainwindow.cc" line="130"/>
         <source>Scan Lists</source>
         <translation>Scan Lists</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="93"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="95"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Roaming Channels</source>
         <translation>Roaming Channels</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="98"/>
+        <location filename="../src/mainwindow.cc" line="137"/>
         <source>Roaming Zones</source>
         <translation>Roaming Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
-        <location filename="../src/mainwindow.cc" line="137"/>
+        <location filename="../src/mainwindow.cc" line="141"/>
+        <location filename="../src/mainwindow.cc" line="180"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="154"/>
+        <location filename="../src/mainwindow.cc" line="197"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Unsaved changes to codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="155"/>
+        <location filename="../src/mainwindow.cc" line="198"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
     </message>
@@ -2607,72 +2699,78 @@
 <context>
     <name>PositioningSystemListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="706"/>
+        <location filename="../src/configitemwrapper.cc" line="756"/>
         <source>DMR</source>
         <translation>DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="708"/>
+        <location filename="../src/configitemwrapper.cc" line="758"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="716"/>
-        <location filename="../src/configitemwrapper.cc" line="737"/>
+        <location filename="../src/configitemwrapper.cc" line="768"/>
+        <location filename="../src/configitemwrapper.cc" line="792"/>
+        <location filename="../src/configitemwrapper.cc" line="800"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="727"/>
-        <location filename="../src/configitemwrapper.cc" line="731"/>
+        <location filename="../src/configitemwrapper.cc" line="781"/>
+        <location filename="../src/configitemwrapper.cc" line="785"/>
         <source>[Selected]</source>
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="753"/>
+        <location filename="../src/configitemwrapper.cc" line="816"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="754"/>
+        <location filename="../src/configitemwrapper.cc" line="817"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="755"/>
+        <location filename="../src/configitemwrapper.cc" line="818"/>
         <source>Destination</source>
         <translation>Destination</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="756"/>
+        <location filename="../src/configitemwrapper.cc" line="819"/>
         <source>Period [s]</source>
         <translation>Period [s]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="757"/>
+        <location filename="../src/configitemwrapper.cc" line="820"/>
         <source>Channel</source>
         <translation>Channel</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="758"/>
+        <location filename="../src/configitemwrapper.cc" line="821"/>
         <source>Message</source>
         <translation>Message</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="822"/>
+        <source>Extensions</source>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
     <name>PropertyDelegate</name>
     <message>
-        <location filename="../src/propertydelegate.cc" line="97"/>
+        <location filename="../src/propertydelegate.cc" line="96"/>
         <source>False</source>
         <translation>False</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="98"/>
+        <location filename="../src/propertydelegate.cc" line="97"/>
         <source>True</source>
         <translation>True</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="121"/>
+        <location filename="../src/propertydelegate.cc" line="120"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
@@ -2680,48 +2778,48 @@
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="349"/>
+        <location filename="../src/extensionwrapper.cc" line="348"/>
         <source>new element</source>
         <translation>new element</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="525"/>
+        <location filename="../src/extensionwrapper.cc" line="524"/>
         <source>Property</source>
         <translation>Property</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="526"/>
+        <location filename="../src/extensionwrapper.cc" line="525"/>
         <source>Value</source>
         <translation>Value</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="527"/>
+        <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="583"/>
+        <location filename="../src/extensionwrapper.cc" line="582"/>
         <source>true</source>
         <translation>true</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="584"/>
+        <location filename="../src/extensionwrapper.cc" line="583"/>
         <source>false</source>
         <translation>false</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="603"/>
-        <location filename="../src/extensionwrapper.cc" line="611"/>
+        <location filename="../src/extensionwrapper.cc" line="605"/>
+        <location filename="../src/extensionwrapper.cc" line="613"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="613"/>
+        <location filename="../src/extensionwrapper.cc" line="615"/>
         <source>Instance of %1</source>
         <translation>Instance of &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="618"/>
+        <location filename="../src/extensionwrapper.cc" line="620"/>
         <source>List of %1 instances</source>
         <translation>List of %1 instances</translation>
     </message>
@@ -2843,19 +2941,29 @@
 <context>
     <name>RadioIdListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="906"/>
+        <location filename="../src/configitemwrapper.cc" line="961"/>
+        <source>[None]</source>
+        <translation>[None]</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="976"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="907"/>
+        <location filename="../src/configitemwrapper.cc" line="977"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="908"/>
+        <location filename="../src/configitemwrapper.cc" line="978"/>
         <source>Number</source>
         <translation>Number</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="979"/>
+        <source>Extensions</source>
+        <translation>Extensions</translation>
     </message>
 </context>
 <context>
@@ -3001,38 +3109,48 @@
 <context>
     <name>RoamingChannelListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="509"/>
-        <location filename="../src/configitemwrapper.cc" line="517"/>
+        <location filename="../src/configitemwrapper.cc" line="541"/>
+        <location filename="../src/configitemwrapper.cc" line="549"/>
         <source>[Selected]</source>
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="539"/>
+        <location filename="../src/configitemwrapper.cc" line="563"/>
+        <source>[None]</source>
+        <translation>[None]</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="578"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="540"/>
+        <location filename="../src/configitemwrapper.cc" line="579"/>
         <source>RX Frequency</source>
         <translation>RX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="541"/>
+        <location filename="../src/configitemwrapper.cc" line="580"/>
         <source>TX Frequency</source>
         <translation>TX Frequency</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="543"/>
+        <location filename="../src/configitemwrapper.cc" line="582"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="544"/>
+        <location filename="../src/configitemwrapper.cc" line="583"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="542"/>
+        <location filename="../src/configitemwrapper.cc" line="584"/>
+        <source>Extensions</source>
+        <translation>Extensions</translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="581"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
@@ -3040,7 +3158,7 @@
 <context>
     <name>RoamingChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="571"/>
+        <location filename="../src/configitemwrapper.cc" line="611"/>
         <source>Roaming Channel</source>
         <translation>Roaming Channel</translation>
     </message>
@@ -3048,12 +3166,12 @@
 <context>
     <name>RoamingListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="852"/>
+        <location filename="../src/configitemwrapper.cc" line="916"/>
         <source>%1 (containing %2 channels)</source>
         <translation>%1 (containing %2 channels)</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="859"/>
+        <location filename="../src/configitemwrapper.cc" line="923"/>
         <source>Roaming zone</source>
         <translation>Roaming zone</translation>
     </message>
@@ -3359,7 +3477,7 @@
 <context>
     <name>ScanListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="786"/>
+        <location filename="../src/configitemwrapper.cc" line="850"/>
         <source>Scan-List</source>
         <translation>Scanlist</translation>
     </message>
@@ -3409,7 +3527,7 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="454"/>
+        <location filename="../src/settings.cc" line="482"/>
         <source>Warning!</source>
         <translation>Warning!</translation>
     </message>
@@ -3532,67 +3650,72 @@
         <translation>Do not set this option unless you know what you are doing.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="315"/>
+        <location filename="../src/settingsdialog.ui" line="306"/>
+        <source>Update Device Clock</source>
+        <translation>Update Device Clock</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="329"/>
         <source>Call-Sign DB</source>
         <translation>Call-Sign DB</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="321"/>
+        <location filename="../src/settingsdialog.ui" line="335"/>
         <source>Limit number of DB entries</source>
         <translation>Limit number of DB entries</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="328"/>
+        <location filename="../src/settingsdialog.ui" line="342"/>
         <source>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</source>
         <translation>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="338"/>
+        <location filename="../src/settingsdialog.ui" line="352"/>
         <source>Number of DB entries</source>
         <translation>Number of DB entries</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="351"/>
+        <location filename="../src/settingsdialog.ui" line="365"/>
         <source>Specifies the number of DB entries (if enabled above).</source>
         <translation>Specifies the number of DB entries (if enabled above).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="364"/>
+        <location filename="../src/settingsdialog.ui" line="378"/>
         <source>Select using my DMR ID</source>
         <translation>Select using my DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="371"/>
+        <location filename="../src/settingsdialog.ui" line="385"/>
         <source>If enabled, the entries are selected using the users DMR ID.</source>
         <translation>If enabled, the entries are selected using the users DMR ID.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="381"/>
+        <location filename="../src/settingsdialog.ui" line="395"/>
         <source>Select using prefixes</source>
         <translation>Select using prefixes</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="388"/>
+        <location filename="../src/settingsdialog.ui" line="402"/>
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
         <translation>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="399"/>
+        <location filename="../src/settingsdialog.ui" line="413"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="411"/>
+        <location filename="../src/settingsdialog.ui" line="425"/>
         <source>Extended Features</source>
         <translation>Extended Features</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="417"/>
+        <location filename="../src/settingsdialog.ui" line="431"/>
         <source>Show commercial features</source>
         <translation>Show commercial features</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="431"/>
+        <location filename="../src/settingsdialog.ui" line="445"/>
         <source>Show device extensions</source>
         <translation>Show device extensions</translation>
     </message>
@@ -3603,6 +3726,11 @@
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
         <translation>Verify Codeplug</translation>
+    </message>
+    <message>
+        <location filename="../src/verifydialog.ui" line="20"/>
+        <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
+        <translation>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</translation>
     </message>
 </context>
 <context>
@@ -3729,7 +3857,7 @@
 <context>
     <name>ZoneListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="675"/>
+        <location filename="../src/configitemwrapper.cc" line="725"/>
         <source>Zone</source>
         <translation>Zone</translation>
     </message>

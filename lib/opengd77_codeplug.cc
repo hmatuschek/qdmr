@@ -29,7 +29,7 @@ OpenGD77Codeplug::clearGeneralSettings() {
 bool
 OpenGD77Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   GeneralSettingsElement el(data(Offset::settings(), ImageIndex::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
 
   return el.encode(ctx, err);
@@ -67,7 +67,7 @@ OpenGD77Codeplug::clearAPRSSettings() {
 bool
 OpenGD77Codeplug::encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   APRSSettingsBankElement el(data(Offset::aprsSettings(), ImageIndex::aprsSettings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
 
   return el.encode(ctx, err);
@@ -149,21 +149,6 @@ OpenGD77Codeplug::clearChannels() {
 }
 
 bool
-<<<<<<< HEAD
-OpenGD77Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(flags)
-
-  for (unsigned int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
-    uint8_t *ptr = nullptr;
-    if (0 == b) ptr = data(ADDR_CHANNEL_BANK_0, IMAGE_CHANNEL_BANK_0);
-    else ptr = data(ADDR_CHANNEL_BANK_1 + (b-1)*CHANNEL_BANK_SIZE, IMAGE_CHANNEL_BANK_1);
-    ChannelBankElement bank(ptr); bank.clear();
-    for (int i=0; (i<NUM_CHANNELS_PER_BANK)&&(c<NUM_CHANNELS); i++, c++) {
-      ChannelElement el(bank.get(i));
-      if (c < ctx.count<Channel>()) {
-        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx)) {
-          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
-=======
 OpenGD77Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
 
@@ -179,7 +164,6 @@ OpenGD77Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
         if (! bank.channel(i).encode(ctx.get<Channel>(c), ctx, err)) {
           errMsg(err) << "Cannot encode channel '" << ctx.get<Channel>(c)->name()
                       << "' at index " << i << " of bank " << b << ".";
->>>>>>> devel
           return false;
         }
         bank.enable(i, true);

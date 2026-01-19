@@ -2,7 +2,7 @@
 #include "ui_m17contactdialog.h"
 #include "contact.hh"
 #include "settings.hh"
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 
 
@@ -34,7 +34,7 @@ M17ContactDialog::construct() {
   ui->setupUi(this);
   Settings settings;
 
-  ui->call->setValidator(new QRegExpValidator(QRegExp("[A-Z0-9\\./\\-]{0,9}")));
+  ui->call->setValidator(new QRegularExpressionValidator(QRegularExpression(R"([A-Z0-9\./\-]{0,9})")));
 
   if (_contact) {
     setWindowTitle(tr("Edit M17 Contact"));

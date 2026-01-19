@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>488</height>
+    <height>512</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -232,14 +232,14 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Auto-enable GPS</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QCheckBox" name="autoEnableGPS">
             <property name="toolTip">
              <string>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</string>
@@ -249,14 +249,14 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Auto-enable roaming</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QCheckBox" name="autoEnableRoaming">
             <property name="toolTip">
              <string>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</string>
@@ -266,14 +266,14 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>Ignore verification warnings</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QCheckBox" name="ignoreVerificationWarnings">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -283,18 +283,32 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>Ignore frequency limits</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="QCheckBox" name="ignoreFrequencyLimits">
             <property name="toolTip">
              <string>Do not set this option unless you know what you are doing.</string>
             </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>Update Device Clock</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="updateDeviceClock">
             <property name="text">
              <string/>
             </property>

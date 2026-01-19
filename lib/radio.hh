@@ -86,23 +86,22 @@ public slots:
   /** Starts the download of the codeplug.
    * Once the download finished, the codeplug can be accessed and decoded using
    * the @c codeplug() method. */
-  virtual bool startDownload(bool blocking=false, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool startDownload(const TransferFlags &flags, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Derives the device-specific codeplug from the generic configuration and uploads that
    * codeplug to the radio. */
   virtual bool startUpload(
-      Config *config, bool blocking=false,
-      const Codeplug::Flags &flags = Codeplug::Flags(), const ErrorStack &err=ErrorStack()) = 0;
+      Config *config, const Codeplug::Flags &flags = Codeplug::Flags(),
+      const ErrorStack &err=ErrorStack()) = 0;
 
   /** Assembles the callsign DB from the given one and uploads it to the device. */
   virtual bool startUploadCallsignDB(
-      UserDatabase *db, bool blocking=false,
-      const CallsignDB::Selection &selection=CallsignDB::Selection(),
+      UserDatabase *db, const CallsignDB::Flags &selection=CallsignDB::Flags(),
       const ErrorStack &err=ErrorStack()) = 0;
 
   /** Assembles the satellite config and writes it to the device. */
   virtual bool startUploadSatelliteConfig(
-      SatelliteDatabase *db, bool blocking=false, const ErrorStack &err=ErrorStack()) = 0;
+      SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err=ErrorStack()) = 0;
 
 signals:
   /** Gets emitted once the codeplug download has been started. */

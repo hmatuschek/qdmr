@@ -285,9 +285,9 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 1:
     return channel->name();
   case 2:
-    return channel->rxFrequency().format(Frequency::Format::MHz);
+    return channel->rxFrequency().format(Frequency::Unit::MHz);
   case 3:
-    return channel->txFrequency().format(Frequency::Format::MHz);
+    return channel->txFrequency().format(Frequency::Unit::MHz);
   case 4:
     if (channel->defaultPower())
       return tr("[Default]");
@@ -550,8 +550,8 @@ RoamingChannelListWrapper::data(const QModelIndex &index, int role) const {
   // Dispatch by column
   switch (index.column()) {
   case 0: return ch->name();
-  case 1: return ch->rxFrequency().format(Frequency::Format::MHz);
-  case 2: return ch->txFrequency().format(Frequency::Format::MHz);
+  case 1: return ch->rxFrequency().format(Frequency::Unit::MHz);
+  case 2: return ch->txFrequency().format(Frequency::Unit::MHz);
   case 3:
     if (ch->colorCodeOverridden())
       return ch->colorCode();
@@ -671,18 +671,18 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
       DMRContact *dmr = contact->as<DMRContact>();
       switch (index.column()) {
       case 0:
-        switch (digi->type()) {
+        switch (dmr->type()) {
         case DMRContact::PrivateCall: return tr("Private Call");
         case DMRContact::GroupCall: return tr("Group Call");
         case DMRContact::AllCall: return tr("All Call");
         }
       break;
       case 1:
-      return digi->name();
+      return dmr->name();
       case 2:
-      return digi->number();
+      return dmr->number();
       case 3:
-      return (digi->ring() ? tr("On") : tr("Off"));
+      return (dmr->ring() ? tr("On") : tr("Off"));
       case 4: {
         auto exts = formatExtensions(index.row());
         if (exts.isEmpty())

@@ -43,18 +43,18 @@ GD73::codeplug() {
 RadioInfo
 GD73::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::GD73, "gd73", "GD-73", "Radioddity", GD73Interface::interfaceInfo());
+        RadioInfo::GD73, "gd73", "GD-73", "Radioddity", {GD73Interface::interfaceInfo()});
 }
 
 bool
-GD73::startDownload(bool blocking, const ErrorStack &err) {
+GD73::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -64,7 +64,7 @@ GD73::startDownload(bool blocking, const ErrorStack &err) {
 }
 
 bool
-GD73::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+GD73::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -73,7 +73,7 @@ GD73::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, c
 
   _task = StatusUpload;
   _codeplugFlags = flags;
-  if (blocking) {
+  if (flags.blocking()) {
     this->run();
     return (StatusIdle == _task);
   }
@@ -84,8 +84,8 @@ GD73::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, c
 }
 
 bool
-GD73::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking); Q_UNUSED(selection);
+GD73::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(selection);
 
   errMsg(err) << "Radio does not support a callsign DB.";
 
@@ -94,8 +94,8 @@ GD73::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::S
 
 
 bool
-GD73::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(blocking);
+GD73::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
+  Q_UNUSED(db); Q_UNUSED(flags);
 
   errMsg(err) << "Satellite config upload is not implemented yet.";
 
@@ -205,7 +205,7 @@ GD73::upload() {
   }
 
   unsigned bcount = 0;
-  if (_codeplugFlags.updateCodePlug) {
+  if (_codeplugFlags.updateCodeplug()) {
     if (! _dev->read_start(0,0,_errorStack))
       return false;
 

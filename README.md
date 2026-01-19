@@ -15,7 +15,8 @@ and **platform-independent** CPS for several types of (mainly Chinese) DMR radio
 ## Supported Radios 
 Currently, there are only few radios that are supported
 
-  * Open GD77 firmware (since version 0.4.0)
+  * OpenGD77, OpenRD5R, etc. firmware (since version 0.4.0)
+  * OpenUV390, OpenDM1701, etc. firmware (since version 0.13.0)
   * Radioddity GD77 (since version 0.8.1)
   * Radioddity GD73 (since version 0.12.0)
   * Baofeng/Radioddity RD-5R & RD-5R+ (since version 0.2.0)
@@ -27,23 +28,31 @@ Currently, there are only few radios that are supported
   * Anytone AT-D868UVE (since version 0.7.0)
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
+  * Anytone AT-D578UV II (since version 0.13.0)
   * BTECH DM-1701 / Retevis RT84 (since version 0.10.0)
   * BTECH BF-1801A6 (since version 0.12.0)
   * BTECH DMR-6x2 (since version 0.11.0)
+  * BTECH DMR-6x2 PRO (since version 0.13.0)
 
 A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
 
+
 ## Questions?
 
-  * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions).
-  * If you want to help translating qdmr in your language, checkout [qdmr's weblate project](https://translate.codeberg.org/projects/qdmr/graphical-user-interface/).
-  * There is also a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
+  * Have a look at the [discussions](https://github.com/hmatuschek/qdmr/discussions), maybe your questions has already been answered.
+  * There is a *Matrix* chat at [#qdmr:darc.de](https://matrix.to/#/#qdmr:darc.de).
   * You can also follow me at [mastodon](https://mastodon.radio/@dm3mat), where I usually announce new releases.
+
+
+## Want to help?
+
+  * If you find any bugs or have suggestions to improve qdmr, consider [opening an issue](https://github.com/hmatuschek/qdmr/issues/new) or participate in one of the [discussions](https://github.com/hmatuschek/qdmr/discussions). 
+  * If you want to help translating qdmr in your language, checkout [qdmr's weblate project](https://translate.codeberg.org/projects/qdmr/graphical-user-interface/).
 
 
 ## Ecosystem
 As *qdmr* gets more and more popular with Linux HAMs, the ecosystem around it grows too. These are 
-tools, that make your day-to-day useage of *qdmr* easier, by providing features, not covered in 
+tools, that make your day-to-day usage of *qdmr* easier, by providing features, not covered in 
 qdmr or dmrconf.
 
   * **[dmrfill](https://github.com/jancona/dmrfill)** -- Automatically extemds a qdmr YAML file with repeaters from a selected region. Get them all with one single command.
@@ -55,8 +64,10 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
- * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Bugfix release
- * **[Version 0.12.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.0)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
+ * **[Version 0.13.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.2)** -- Bugfix release.
+ * **[Version 0.13.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.1)** -- Bugfix release.
+ * **[Version 0.13.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.0)** -- Added support BTech DMR6X2PRO and OpenUV390.
+ * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
  * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
  * **[Version 0.10.4](https://github.com/hmatuschek/qdmr/releases/tag/v0.10.4)** -- Added support for BTech DM1701, some bugfixes.
  * **[Version 0.9.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.9.3)** -- Reworked core library, added support for TyT MD-2017/Retevis RT82, TyT MD-390/Retevis RT8 & TyT MD-UV380.
@@ -69,7 +80,7 @@ qdmr or dmrconf.
 
 
 ## Install
-There are several ways to install qdmr on your system ranging from simple app-package downloads to building qdmr from its sources. For a detailed list of instructions for your system, read the [install instructions](https://dm3mat.darc.de/qdmr/install.html). Some distributions (see badge above) already added qdmr, thus easing the install using the system package manager.
+There are several ways to install qdmr on your system ranging from simple app-package downloads to building qdmr from its sources. For a detailed list of instructions for your system, read the [install instructions](https://dm3mat.de/software/qdmr/install). Some distributions (see badge above) already added qdmr, thus easing the install using the system package manager.
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.

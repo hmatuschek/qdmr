@@ -5,7 +5,7 @@
 #include "channel.hh"
 
 #include "radioddity_extensions.hh"
-#include "anytone_extension.hh"
+#include "anytone_settingsextension.hh"
 #include "tyt_extensions.hh"
 
 
@@ -16,7 +16,7 @@ class RadioSettings : public ConfigItem
   Q_OBJECT
   /** The first intro line. */
   Q_PROPERTY(QString introLine1 READ introLine1 WRITE setIntroLine1)
-  /** The scond intro line. */
+  /** The second intro line. */
   Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
   /** The mic amplification level. */
   Q_PROPERTY(unsigned micLevel READ micLevel WRITE setMicLevel)
@@ -97,7 +97,7 @@ public:
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
-  /** Retruns a reference to the default DMR radio Id. */
+  /** Returns a reference to the default DMR radio Id. */
   DMRRadioIDReference *defaultIdRef() const;
   /** Returns the default DMR ID or nullptr, if non is set. */
   DMRRadioID *defaultId() const;

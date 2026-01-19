@@ -35,8 +35,11 @@ DMRChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
-  if (settings.hideChannelNote())
+  if (settings.hideChannelNote()) {
     hintLabel->setVisible(false);
+    layout()->invalidate();
+    adjustSize();
+  }
 
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
@@ -47,8 +50,6 @@ DMRChannelDialog::construct() {
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
 
-  rxFrequency->setValidator(new QDoubleValidator(0,500,5));
-  txFrequency->setValidator(new QDoubleValidator(0,500,5));
   powerValue->setItemData(0, unsigned(Channel::Power::Max));
   powerValue->setItemData(1, unsigned(Channel::Power::High));
   powerValue->setItemData(2, unsigned(Channel::Power::Mid));
@@ -112,8 +113,19 @@ DMRChannelDialog::construct() {
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
 
   channelName->setText(_myChannel->name());
-  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Format::MHz));
-  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Format::MHz));
+  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Unit::MHz));
+  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Unit::MHz));
+
+  offsetComboBox->addItem(QIcon::fromTheme("symbol-none"), "");
+  offsetComboBox->setItemData(0, tr("No offset"), Qt::ToolTipRole);
+  offsetComboBox->addItem(QIcon::fromTheme("symbol-plus"), "");
+  offsetComboBox->setItemData(1, tr("Positive offset"), Qt::ToolTipRole);
+  offsetComboBox->addItem(QIcon::fromTheme("symbol-minus"), "");
+  offsetComboBox->setItemData(2, tr("Negative offset"), Qt::ToolTipRole);
+
+  updateOffsetFrequency();
+
+
   if (! _myChannel->defaultPower()) {
     powerDefault->setChecked(false); powerValue->setEnabled(true);
     switch (_myChannel->power()) {
@@ -154,6 +166,11 @@ DMRChannelDialog::construct() {
   connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
   connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
+
+  connect(txFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DMRChannelDialog::onOffsetFrequencyEdited);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DMRChannelDialog::onOffsetCurrentIndexChanged);
 }
 
 DMRChannel *
@@ -208,8 +225,12 @@ DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Frequency rx = app->repeater()->get(src.row()).rxFrequency();
   Frequency tx = app->repeater()->get(src.row()).txFrequency();
   colorCode->setValue(app->repeater()->get(src.row()).colorCode());
-  txFrequency->setText(tx.format());
   rxFrequency->setText(rx.format());
+  txFrequency->setText(tx.format());
+
+  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
+  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
+  updateOffsetFrequency();
 }
 
 void
@@ -232,5 +253,95 @@ DMRChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
+  layout()->invalidate();
+  adjustSize();
 }
 
+void
+DMRChannelDialog::onTxFrequencyEdited() {
+  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
+  txFrequency->setText(_myChannel->txFrequency().format());
+  updateOffsetFrequency();
+}
+
+void
+DMRChannelDialog::onRxFrequencyEdited() {
+  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
+  rxFrequency->setText(_myChannel->rxFrequency().format());
+
+  if (_myChannel->txFrequency().isZero()) {
+    // If no previous txFrequency set, match rx frequency.
+    _myChannel->setTXFrequency(Frequency::fromString(rxFrequency->text()));
+    txFrequency->setText(_myChannel->txFrequency().format());
+  }
+
+  updateOffsetFrequency();
+}
+
+void
+DMRChannelDialog::onOffsetFrequencyEdited() {
+  Frequency txFreq = _myChannel->rxFrequency();
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
+
+  switch (offsetComboBox->currentIndex()) {
+  case 0: txFreq = _myChannel->rxFrequency(); break;
+  case 1: txFreq = _myChannel->rxFrequency() + offsetFrequency; break;
+  case 2: txFreq = _myChannel->rxFrequency() + offsetFrequency.invert(); break;
+  }
+
+  _myChannel->setTXFrequency(txFreq);
+  txFrequency->setText(txFreq.format());
+  offsetLineEdit->setText(offsetFrequency.format());
+}
+
+void
+DMRChannelDialog::onOffsetCurrentIndexChanged(int index) {
+  Frequency txFreq = _myChannel->rxFrequency();
+  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
+
+  switch (index) {
+  case 0:
+    offsetLineEdit->setEnabled(false);
+    txFreq = _myChannel->rxFrequency();
+  break;
+  case 1:
+    offsetLineEdit->setEnabled(true);
+    txFreq = _myChannel->rxFrequency() + offsetFrequency;
+  break;
+  case 2:
+    offsetLineEdit->setEnabled(true);
+    txFreq = _myChannel->rxFrequency() + offsetFrequency.invert();
+  break;
+  }
+
+  _myChannel->setTXFrequency(txFreq);
+  txFrequency->setText(txFreq.format());
+}
+
+
+void
+DMRChannelDialog::updateOffsetFrequency() {
+  FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
+  // Show absolute value
+  offsetLineEdit->setText(offsetFrequency.abs().format());
+  // Use combo box to indicate direction
+  updateComboBox();
+}
+
+void
+DMRChannelDialog::updateComboBox() {
+  switch (_myChannel->offsetShift()) {
+  case Channel::OffsetShift::None:
+    offsetComboBox->setCurrentIndex(0);
+    offsetLineEdit->setEnabled(false);
+  break;
+  case Channel::OffsetShift::Positive:
+    offsetComboBox->setCurrentIndex(1);
+    offsetLineEdit->setEnabled(true);
+  break;
+  case Channel::OffsetShift::Negative:
+    offsetComboBox->setCurrentIndex(2);
+    offsetLineEdit->setEnabled(true);
+  break;
+  }
+}

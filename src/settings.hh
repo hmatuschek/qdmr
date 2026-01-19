@@ -50,6 +50,9 @@ public:
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
 
+  bool updateDeviceClock() const;
+  void setUpdateDeviceClock(bool update);
+
   bool autoEnableGPS() const;
   void setAutoEnableGPS(bool enable);
 
@@ -111,6 +114,9 @@ public:
 
   QByteArray headerState(const QString &objName) const;
   void setHeaderState(const QString &objName, const QByteArray &state);
+
+  bool sortFilterEnabled(const QString &objName) const;
+  void enableSortFilter(const QString &objName, bool enable);
 
   bool isUpdated() const;
   void markUpdated();

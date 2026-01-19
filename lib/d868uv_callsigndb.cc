@@ -1,6 +1,7 @@
 #include "userdatabase.hh"
 #include "d868uv_callsigndb.hh"
 #include "utils.hh"
+#include "logger.hh"
 #include <QtEndian>
 
 
@@ -14,7 +15,7 @@ D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr, unsigned size)
 }
 
 D868UVCallsignDB::EntryElement::EntryElement(uint8_t *ptr)
-  : Element(ptr, 0x0064)
+  : Element(ptr, Limit::totalLength())
 {
   // pass...
 }
@@ -28,25 +29,25 @@ D868UVCallsignDB::EntryElement::clear() {
 void
 D868UVCallsignDB::EntryElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DMRContact::PrivateCall: setUInt8(0x0000, 0); break;
-  case DMRContact::GroupCall: setUInt8(0x0000, 1); break;
-  case DMRContact::AllCall: setUInt8(0x0000, 2); break;
+  case DMRContact::PrivateCall: setUInt8(Offset::callType(), (unsigned int)CallType::Private); break;
+  case DMRContact::GroupCall: setUInt8(Offset::callType(), (unsigned int)CallType::Group); break;
+  case DMRContact::AllCall: setUInt8(Offset::callType(), (unsigned int)CallType::All); break;
   }
 }
 
 void
 D868UVCallsignDB::EntryElement::setNumber(unsigned num) {
-  setBCD8_be(0x0001, num);
+  setBCD8_be(Offset::number(), num);
 }
 
 void
 D868UVCallsignDB::EntryElement::setFriendFlag(bool set) {
-  setBit(0x0005, 4, set);
+  setBit(Offset::friendFlag(), set);
 }
 
 void
 D868UVCallsignDB::EntryElement::setRingTone(RingTone tone) {
-  setUInt2(0x0005, 0, (unsigned)tone);
+  setUInt2(Offset::ringTone(), (unsigned)tone);
 }
 
 void
@@ -54,13 +55,13 @@ D868UVCallsignDB::EntryElement::setContent(
     const QString &name, const QString &city, const QString &call, const QString &state,
     const QString &country, const QString &comment)
 {
-  unsigned addr = 0x0006;
-  writeASCII(addr, name, 16, 0x00); addr += std::min(qsizetype(16), name.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, city, 15, 0x00); addr += std::min(qsizetype(15), city.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, call, 8, 0x00); addr += std::min(qsizetype(8), call.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, state, 16, 0x00); addr += std::min(qsizetype(16), state.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, country, 16, 0x00); addr += std::min(qsizetype(16), country.size()); setUInt8(addr, 0); addr++;
-  writeASCII(addr, comment, 16, 0x00); addr += std::min(qsizetype(16), comment.size()); setUInt8(addr, 0); addr++;
+  unsigned addr = Offset::name(), flen;
+  flen = std::min(qsizetype(Limit::nameLength()), name.size()); writeASCII(addr, name, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(Limit::cityLength()), city.size()); writeASCII(addr, city, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(Limit::callLength()), call.size()); writeASCII(addr, call, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(Limit::stateLength()), state.size()); writeASCII(addr, state, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(Limit::countryLength()), country.size()); writeASCII(addr, country, flen+1); addr += flen+1;
+  flen = std::min(qsizetype(Limit::commentLength()), comment.size()); writeASCII(addr, comment, flen+1);
 }
 
 unsigned
@@ -75,13 +76,13 @@ D868UVCallsignDB::EntryElement::fromUser(const UserDatabase::User &user) {
 
 unsigned
 D868UVCallsignDB::EntryElement::size(const UserDatabase::User &user) {
-  return 6 // header
-      + std::min(qsizetype(16), user.name.size())+1 // name
-      + std::min(qsizetype(15), user.city.size())+1 // city
-      + std::min(qsizetype( 8), user.call.size())+1 // call
-      + std::min(qsizetype(16), user.state.size())+1 // state
-      + std::min(qsizetype(16), user.country.size())+1 // country
-      + 1; // no comment but 0x00 terminator
+  return Limit::headerLength() // header
+         + std::min(qsizetype(Limit::nameLength()), user.name.size())+1       // name
+         + std::min(qsizetype(Limit::cityLength()), user.city.size())+1       // city
+         + std::min(qsizetype(Limit::callLength()), user.call.size())+1       // call
+         + std::min(qsizetype(Limit::stateLength()), user.state.size())+1     // state
+         + std::min(qsizetype(Limit::countryLength()), user.country.size())+1 // country
+         + 1; // no comment but 0x00 terminator
 }
 
 
@@ -96,7 +97,7 @@ D868UVCallsignDB::LimitsElement::LimitsElement(uint8_t *ptr, unsigned size)
 }
 
 D868UVCallsignDB::LimitsElement::LimitsElement(uint8_t *ptr)
-  : Element(ptr, 0x0010)
+  : Element(ptr, size())
 {
   // pass...
 }
@@ -109,29 +110,24 @@ D868UVCallsignDB::LimitsElement::clear() {
 
 unsigned
 D868UVCallsignDB::LimitsElement::count() const {
-  return getUInt32_le(0x0000);
+  return getUInt32_le(Offset::count());
 }
 void
 D868UVCallsignDB::LimitsElement::setCount(unsigned count) {
-  setUInt32_le(0x0000, count);
+  setUInt32_le(Offset::count(), count);
 }
 
 unsigned
 D868UVCallsignDB::LimitsElement::endOfDB() const {
-  return getUInt32_le(0x0004);
+  return getUInt32_le(Offset::endOfDB());
 }
 void
 D868UVCallsignDB::LimitsElement::setEndOfDB(unsigned addr) {
-  setUInt32_le(0x0004, addr);
+  setUInt32_le(Offset::endOfDB(), addr);
 }
 void
 D868UVCallsignDB::LimitsElement::setTotalSize(unsigned size) {
   setEndOfDB(D868UVCallsignDB::Offset::callsigns() + size);
-}
-
-unsigned
-D868UVCallsignDB::LimitsElement::size() {
-  return 0x0010;
 }
 
 
@@ -145,7 +141,7 @@ D868UVCallsignDB::D868UVCallsignDB(QObject *parent)
   addImage("AnyTone AT-D878UV Callsign database.");
 }
 
-bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+bool D868UVCallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Determine size of call-sign DB in memory
@@ -153,6 +149,7 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, cons
   // If DB size is limited by settings
   if (selection.hasCountLimit())
     n = std::min(n, (qint64)selection.countLimit());
+  logDebug() << "Encode " << n << " entries.";
 
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
@@ -161,6 +158,10 @@ bool D868UVCallsignDB::encode(UserDatabase *db, const Selection &selection, cons
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
+
+  logDebug() << "Encode call-signs from " << users.first().id << ": " << users.first().call << ", "
+             << users.first().name << " in " << users.first().city << " to " << users.last().id
+             << ": " << users.last().call << ", " << users.last().name << " in " << users.last().city << ".";
 
   // Compute total size of callsign db entries
   size_t dbSize = 0;

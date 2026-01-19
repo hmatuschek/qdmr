@@ -73,6 +73,7 @@ UV390Codeplug::ChannelElement::clear() {
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
   enableDCDMLeader(true);
+  enablePrivacySwitch(false);
 }
 
 bool
@@ -84,35 +85,51 @@ UV390Codeplug::ChannelElement::enableTalkaround(bool enable) {
   setBit(Offset::talkaround(), enable);
 }
 
+bool
+UV390Codeplug::ChannelElement::privacySwitch() const {
+  return getBit(Offset::privacySwitch());
+}
+void
+UV390Codeplug::ChannelElement::enablePrivacySwitch(bool enable) {
+  setBit(Offset::privacySwitch(), enable);
+}
+
+void
+UV390Codeplug::ChannelElement::setPrivacyType(PrivacyType type) {
+  enablePrivacySwitch(PrivacyType::PRIV_NONE != type);
+  TyTCodeplug::ChannelElement::setPrivacyType(type);
+}
+
+
 TyTChannelExtension::InCallCriterion UV390Codeplug::ChannelElement::inCallCriteria() const {
-  return TyTChannelExtension::InCallCriterion(getUInt2(5,4));
+  return TyTChannelExtension::InCallCriterion(getUInt2(Offset::inCallCriteria()));
 }
 void
 UV390Codeplug::ChannelElement::setInCallCriteria(TyTChannelExtension::InCallCriterion crit) {
-  setUInt2(5,4, uint8_t(crit));
+  setUInt2(Offset::inCallCriteria(), uint8_t(crit));
 }
 
 TyTChannelExtension::KillTone UV390Codeplug::ChannelElement::turnOffFreq() const {
-  return TyTChannelExtension::KillTone(getUInt2(5,6));
+  return TyTChannelExtension::KillTone(getUInt2(Offset::turnOffFreq()));
 }
 void
 UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq) {
-  setUInt2(5,6, uint8_t(freq));
+  setUInt2(Offset::turnOffFreq(), uint8_t(freq));
 }
 
 unsigned
 UV390Codeplug::ChannelElement::squelch() const {
-  return getUInt8(15);
+  return getUInt8(Offset::squelch());
 }
 void
 UV390Codeplug::ChannelElement::setSquelch(unsigned value) {
   value = std::min(unsigned(10), value);
-  return setUInt8(15, value);
+  return setUInt8(Offset::squelch(), value);
 }
 
 Channel::Power
 UV390Codeplug::ChannelElement::power() const {
-  switch (getUInt2(30, 0)) {
+  switch (getUInt2(Offset::power())) {
   case 0: return Channel::Power::Low;
   case 2: return Channel::Power::Mid;
   case 3: return Channel::Power::High;
@@ -125,42 +142,42 @@ UV390Codeplug::ChannelElement::setPower(Channel::Power pwr) {
   switch (pwr) {
   case Channel::Power::Min:
   case Channel::Power::Low:
-    setUInt2(30,0, 0);
+    setUInt2(Offset::power(), 0);
     break;
   case Channel::Power::Mid:
-    setUInt2(30,0, 2);
+    setUInt2(Offset::power(), 2);
     break;
   case Channel::Power::High:
   case Channel::Power::Max:
-    setUInt2(30,0, 3);
+    setUInt2(Offset::power(), 3);
   }
 }
 
 bool
 UV390Codeplug::ChannelElement::allowInterrupt() const {
-  return !getBit(31, 2);
+  return !getBit(Offset::allowInterrupt());
 }
 void
 UV390Codeplug::ChannelElement::enableAllowInterrupt(bool enable) {
-  setBit(31,2, !enable);
+  setBit(Offset::allowInterrupt(), !enable);
 }
 
 bool
 UV390Codeplug::ChannelElement::dualCapacityDirectMode() const {
-  return !getBit(31, 3);
+  return !getBit(Offset::dualCapacityDirectMode());
 }
 void
 UV390Codeplug::ChannelElement::enableDualCapacityDirectMode(bool enable) {
-  setBit(31,3, !enable);
+  setBit(Offset::dualCapacityDirectMode(), !enable);
 }
 
 bool
 UV390Codeplug::ChannelElement::dcdmLeader() const {
-  return !getBit(31, 4);
+  return !getBit(Offset::dcdmLeader());
 }
 void
 UV390Codeplug::ChannelElement::enableDCDMLeader(bool enable) {
-  setBit(31,4, !enable);
+  setBit(Offset::dcdmLeader(), !enable);
 }
 
 

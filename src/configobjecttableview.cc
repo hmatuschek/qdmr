@@ -2,6 +2,8 @@
 #include "ui_configobjecttableview.h"
 #include "searchpopup.hh"
 #include <QMessageBox>
+#include <QSortFilterProxyModel>
+#include "settings.hh"
 
 
 inline QPair<int, int>
@@ -18,9 +20,12 @@ getSelectionRowRange(const QModelIndexList &indices) {
 
 
 ConfigObjectTableView::ConfigObjectTableView(QWidget *parent)
-  : QWidget(parent), ui(new Ui::ConfigObjectTableView)
+  : QWidget(parent), _model(nullptr), ui(new Ui::ConfigObjectTableView)
 {
   ui->setupUi(this);
+
+  ui->filterToggleButton->setDefaultAction(ui->actionToggleFilterSort);
+
   connect(ui->itemTop, SIGNAL(clicked(bool)), this, SLOT(onMoveItemTop()));
   connect(ui->itemTenUp, SIGNAL(clicked(bool)), this, SLOT(onMoveItemTenUp()));
   connect(ui->itemUp, SIGNAL(clicked(bool)), this, SLOT(onMoveItemUp()));
@@ -33,12 +38,26 @@ ConfigObjectTableView::ConfigObjectTableView(QWidget *parent)
   ui->tableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
   ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  ui->tableView->setDragEnabled(true);
-  ui->tableView->viewport()->setAcceptDrops(true);
+  toggleSortFilter(ui->actionToggleFilterSort->isChecked());
+  connect(this, &QObject::objectNameChanged, [this](const QString &objName) {
+    this->ui->actionToggleFilterSort->setChecked(Settings().sortFilterEnabled(objName));
+  });
+
   ui->tableView->setDropIndicatorShown(true);
   ui->tableView->setDefaultDropAction(Qt::MoveAction);
   ui->tableView->setDragDropMode(QAbstractItemView::InternalMove);
   ui->tableView->setDragDropOverwriteMode(false);
+
+  ui->tableView->addAction(ui->actionToggleFilterSort);
+  connect(ui->actionToggleFilterSort, &QAction::toggled,
+          this, &ConfigObjectTableView::toggleSortFilter);
+
+  connect(ui->clearButton, &QPushButton::clicked, ui->filterEdit, &QLineEdit::clear);
+
+  ui->filterEdit->addAction(ui->actionCloseSortFilter);
+  connect(ui->actionCloseSortFilter, &QAction::triggered, [this]() {
+    this->ui->actionToggleFilterSort->setChecked(false);
+  });
 
   SearchPopup::attach(ui->tableView);
 }
@@ -49,12 +68,38 @@ ConfigObjectTableView::~ConfigObjectTableView() {
 
 GenericTableWrapper *
 ConfigObjectTableView::model() const {
-  return qobject_cast<GenericTableWrapper *>(ui->tableView->model());
+  return _model;
 }
 
 void
 ConfigObjectTableView::setModel(GenericTableWrapper *model) {
-  ui->tableView->setModel(model);
+  _model = model;
+  _model->setParent(this);
+  // If sorting is enabled -> set source model of proxy
+  if (ui->actionToggleFilterSort->isChecked()) {
+    proxy()->setSourceModel(_model);
+  } else {
+    // if not, set model directly
+    auto selectionModel = ui->tableView->selectionModel();
+    ui->tableView->setModel(_model);
+    if (selectionModel)
+      selectionModel->deleteLater();
+  }
+}
+
+
+QSortFilterProxyModel *
+ConfigObjectTableView::proxy() const {
+  if (nullptr == ui->tableView->model())
+    return nullptr;
+  return qobject_cast<QSortFilterProxyModel*>(ui->tableView->model());
+}
+
+bool
+ConfigObjectTableView::isFilteredOrSorted() const {
+  if (nullptr == ui->tableView->model())
+    return false;
+  return nullptr != qobject_cast<QSortFilterProxyModel*>(ui->tableView->model());
 }
 
 bool
@@ -64,6 +109,10 @@ ConfigObjectTableView::hasSelection() const {
 
 QPair<int,int>
 ConfigObjectTableView::selection() const {
+  if (isFilteredOrSorted())
+    return getSelectionRowRange(
+          proxy()->mapSelectionToSource(
+            ui->tableView->selectionModel()->selection()).indexes());
   return getSelectionRowRange(ui->tableView->selectionModel()->selection().indexes());
 }
 
@@ -74,18 +123,13 @@ ConfigObjectTableView::header() const {
 
 void
 ConfigObjectTableView::onMoveItemUp() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -96,18 +140,13 @@ ConfigObjectTableView::onMoveItemUp() {
 
 void
 ConfigObjectTableView::onMoveItemTenUp() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -120,18 +159,13 @@ ConfigObjectTableView::onMoveItemTenUp() {
 
 void
 ConfigObjectTableView::onMoveItemTop() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>=rows.first) || (0>rows.second))
     return;
 
@@ -143,18 +177,14 @@ ConfigObjectTableView::onMoveItemTop() {
 
 void
 ConfigObjectTableView::onMoveItemDown() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -167,18 +197,14 @@ ConfigObjectTableView::onMoveItemDown() {
 
 void
 ConfigObjectTableView::onMoveItemTenDown() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -190,18 +216,14 @@ ConfigObjectTableView::onMoveItemTenDown() {
 
 void
 ConfigObjectTableView::onMoveItemBottom() {
-  // Check if there is a selection
-  if (! ui->tableView->selectionModel()->hasSelection()) {
-    QMessageBox::information(
-          nullptr, tr("Cannot move items."),
-          tr("Cannot move items: You have to select at least one item first."));
-    return;
-  }
+  // check if we can move items around safely
+  if (! canMove()) return;
 
   // Get selection range assuming only continuous selection mode
   QPair<int, int> rows = getSelectionRowRange(
         ui->tableView->selectionModel()->selection().indexes());
-  // If selection range is invalud or I cannot move at all: done.
+
+  // If selection range is invalid or I cannot move at all: done.
   if ((0>rows.first) || (0>rows.second) ||
       ((rows.second+1)>=model()->rowCount(QModelIndex())))
     return;
@@ -213,7 +235,65 @@ ConfigObjectTableView::onMoveItemBottom() {
 
 void
 ConfigObjectTableView::onDoubleClicked(QModelIndex idx) {
+  // Map index if sort/filter is enabled
+  if (isFilteredOrSorted())
+    idx = proxy()->mapToSource(idx);
+
   if ((0 > idx.row()) || (idx.row() >= model()->rowCount(QModelIndex())))
     return;
+
   emit doubleClicked(idx.row());
+}
+
+bool
+ConfigObjectTableView::canMove() const {
+  // Check if there is a selection
+  if (! ui->tableView->selectionModel()->hasSelection()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items: You have to select at least one item first."));
+    return false;
+  }
+
+  if (isFilteredOrSorted()) {
+    QMessageBox::information(
+          nullptr, tr("Cannot move items."),
+          tr("Cannot move items as long as there is some filter or sorting applied."));
+    return false;
+  }
+
+  return true;
+}
+
+void
+ConfigObjectTableView::toggleSortFilter(bool enableSortFilter) {
+  Settings().enableSortFilter(objectName(), enableSortFilter);
+
+  ui->filterWidget->setVisible(enableSortFilter);
+  ui->tableView->setSortingEnabled(enableSortFilter);
+  ui->moveWidget->setVisible(! enableSortFilter);
+
+  auto selectionModel = ui->tableView->selectionModel();
+
+  if (enableSortFilter) {
+    // Setup proxy model
+    ui->tableView->setModel(new QSortFilterProxyModel());
+    proxy()->setFilterKeyColumn(-1);
+    proxy()->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    if (_model) proxy()->setSourceModel(_model);
+    // Connect filter edit
+    connect(ui->filterEdit, &QLineEdit::textChanged,
+            proxy(), &QSortFilterProxyModel::setFilterFixedString);
+    ui->filterEdit->setFocus();
+  } else {
+    if (_model)
+      ui->tableView->setModel(_model);
+    ui->filterEdit->clear();
+  }
+
+  if (selectionModel)
+    selectionModel->deleteLater();
+
+  ui->tableView->setDragEnabled(! enableSortFilter);
+  ui->tableView->viewport()->setAcceptDrops(! enableSortFilter);
 }

@@ -218,7 +218,7 @@ bool
 RD5RCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   GeneralSettingsElement el(data(Offset::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
   return el.fromConfig(ctx, err);
 }
@@ -356,15 +356,9 @@ RD5RCodeplug::clearChannels() {
 }
 
 bool
-<<<<<<< HEAD
-RD5RCodeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(config)
-  for (unsigned int b=0,c=0; b<NUM_CHANNEL_BANKS; b++) {
-=======
 RD5RCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (unsigned int b=0,c=0; b<Limit::channelBankCount(); b++) {
->>>>>>> devel
     uint8_t *ptr = nullptr;
     if (0 == b) ptr = data(Offset::channelBank0());
     else ptr = data(Offset::channelBank1() + (b-1)*ChannelBankElement::size());
@@ -372,13 +366,8 @@ RD5RCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack 
     for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
       if (c < ctx.count<Channel>()) {
-<<<<<<< HEAD
         if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx)) {
           errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
-=======
-        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx, err)) {
-          errMsg(err) << "Cannot encode channel " << c+1 << " (" << i << " of bank " << b <<").";
->>>>>>> devel
           return false;
         }
         bank.enable(i,true);

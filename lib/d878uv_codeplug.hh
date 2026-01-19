@@ -39,193 +39,7 @@ class RoamingChannel;
  * using wireshark to monitor the USB communication between the windows CPS (running in a virtual
  * box) and the device. The latter makes the reverse-engineering particularly cumbersome.
  *
- * @section d878uvcpl Codeplug structure within radio
- * <table>
- *  <tr><th colspan="3">Channels</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C1500</td> <td>000200</td>      <td>Bitmap of 4000 channels, default 0x00,
- *    0x00 padded.</td></tr>
- *  <tr><td>00800000</td> <td>max. 002000</td> <td>Channel bank 0 of up to 128 channels,
- *    see @c D878UVCodeplug::ChannelElement 64 b each. </td></tr>
- *  <tr><td>00802000</td> <td>max, 002000</td> <td>Unknown data, Maybe extended channel information
- *    for channel bank 0? It is of exactly the same size as the channel bank 0. Mostly 0x00, a
- *    few 0xff.</td></tr>
- *  <tr><td>00840000</td> <td>max. 002000</td> <td>Channel bank 1 of up to 128 channels.</td></tr>
- *  <tr><td>00842000</td> <td>max. 002000</td> <td>Unknown data, related to CH bank 1?</td></tr>
- *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
- *  <tr><td>00FC0000</td> <td>max. 000800</td> <td>Channel bank 32, up to 32 channels.</td></tr>
- *  <tr><td>00FC2000</td> <td>max. 000800</td> <td>Unknown data, related to CH bank 32.</td></tr>
- *  <tr><td>00FC0800</td> <td>000040</td>      <td>VFO A settings,
- *    see @c D878UVCodeplug::ChannelElement.</td></tr>
- *  <tr><td>00FC0840</td> <td>000040</td>      <td>VFO B settings,
- *    see @c D878UVCodeplug::ChannelElement.</td></tr>
- *  <tr><td>00FC2800</td> <td>000080</td>      <td>Unknown data, related to VFO A+B?
- *    It is of exactly the same size as the two VFO channels. Mostly 0x00, a few 0xff. Same pattern
- *    as the unknown data associated with channel banks.</td></tr>
- *
- *  <tr><th colspan="3">Zones</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C1300</td> <td>000020</td>      <td>Bitmap of 250 zones.</td></tr>
- *  <tr><td>024C1360</td> <td>000020</td>      <td>Hidden zone bitmap of 250 zones.</td></tr>
- *  <tr><td>01000000</td> <td>max. 01f400</td> <td>250 zones channel lists of 250 16bit indices each.
- *    0-based, little endian, default/padded=0xffff. Offset between channel lists 0x200,
- *    size of each list 0x1f4.</td></tr>
- *  <tr><td>02540000</td> <td>max. 001f40</td> <td>250 Zone names.
- *    Each zone name is up to 16 ASCII chars long and gets 0-padded to 32b.</td></tr>
- *
- *  <tr><th colspan="3">Roaming</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>01042000</td> <td>000020</td>      <td>Roaming channel bitmask, up to 250 bits,
- *    0-padded, default 0.</td></tr>
- *  <tr><td>01040000</td> <td>max. 0x1f40</td> <td>Optional up to 250 roaming channels, of 32b each.
- *    See @c D878UVCodeplug::RoamingChannelElement for details.</td></tr>
- *  <tr><td>01042080</td> <td>000010</td>      <td>Roaming zone bitmask, up to 64 bits, 0-padded,
- *    default 0.</td></tr>
- *  <tr><td>01043000</td> <td>max. 0x2000</td> <td>Optional up to 64 roaming zones, of 128b each.
- *    See @c D878UVCodeplug::RoamingZoneElement for details.</td></tr>
- *
- *  <tr><th colspan="3">Contacts</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02600000</td> <td>max. 009C40</td> <td>Index list of valid contacts.
- *    10000 32bit indices, little endian, default 0xffffffff</td></tr>
- *  <tr><td>02640000</td> <td>000500</td>      <td>Contact bitmap, 10000 bit, inverted,
- *    default 0xff, 0x00 padded.</td></tr>
- *  <tr><td>02680000</td> <td>max. 0f4240</td> <td>10000 contacts,
- *    see @c AnytoneCodeplug::ContactElement. As each contact is 100b, they do not align with the
- *    16b blocks being transferred to the device. Hence contacts are organized internally in groups
- *    of 4 contacts forming a "bank". </td></tr>
- *  <tr><td>04340000</td> <td>max. 013880</td> <td>DMR ID to contact index map,
- *    see @c AnytoneCodeplug::ContactMapElement. Sorted by ID, empty entries set to
- *    @c 0xffffffffffffffff.</td>
- *
- *  <tr><th colspan="3">Analog Contacts</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02900000</td> <td>000080</td>      <td>Index list of valid analog contacts.</td></tr>
- *  <tr><td>02900100</td> <td>000080</td>      <td>Bytemap for 128 analog contacts.</td></tr>
- *  <tr><td>02940000</td> <td>max. 000180</td> <td>128 analog contacts.
- *    See @c AnytoneCodeplug::DTMFContactElement. As each analog contact is 24b, they do not align with
- *    the 16b transfer block-size. Hence analog contacts are internally organized in groups of 2. </td></tr>
- *
- *  <tr><th colspan="3">RX Group Lists</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>025C0B10</td> <td>000020</td>      <td>Bitmap of 250 RX group lists,
- *    default/padding 0x00.</td></tr>
- *  <tr><td>02980000</td> <td>max. 000120</td> <td>Grouplist 0,
- *    see @c AnytoneCodeplug::GroupListElement.</td></tr>
- *  <tr><td>02980200</td> <td>max. 000120</td> <td>Grouplist 1</td></tr>
- *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
- *  <tr><td>0299f200</td> <td>max. 000120</td> <td>Grouplist 250</td></tr>
- *
- *  <tr><th colspan="3">Scan lists</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1340</td> <td>000020</td> <td>Bitmap of 250 scan lists.</td></tr>
- *  <tr><td>01080000</td> <td>000090</td> <td>Bank 0, Scanlist 1,
- *    see @c AnytoneCodeplug::ScanListElement. </td></tr>
- *  <tr><td>01080200</td> <td>000090</td> <td>Bank 0, Scanlist 2</td></tr>
- *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
- *  <tr><td>01081E00</td> <td>000090</td> <td>Bank 0, Scanlist 16</td></tr>
- *  <tr><td>010C0000</td> <td>000090</td> <td>Bank 1, Scanlist 17</td></tr>
- *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
- *  <tr><td>01440000</td> <td>000090</td> <td>Bank 15, Scanlist 241</td></tr>
- *  <tr><td>...</td>      <td>...</td>    <td>...</td></tr>
- *  <tr><td>01441400</td> <td>000090</td> <td>Bank 15, Scanlist 250</td></tr>
- *
- *  <tr><th colspan="3">Radio IDs</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C1320</td> <td>000020</td>      <td>Bitmap of 250 radio IDs.</td></tr>
- *  <tr><td>02580000</td> <td>max. 001f40</td> <td>250 Radio IDs.
- *    See @c AnytoneCodeplug::RadioIDElement.</td></tr>
- *
- *  <tr><th colspan="3">GPS/APRS</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02501000</td> <td>000100</td> <td>APRS settings,
- *    see @c D878UVCodeplug::APRSSettingsElement.</td>
- *  <tr><td>02501200</td> <td>000040</td> <td>APRS Text, up to 60 chars ASCII, 0-padded.</td>
- *  <tr><td>02501280</td> <td>000030</td> <td>APRS template text (optional settings).</td></tr>
- *  <tr><td>02501800</td> <td>000100</td> <td>APRS-RX settings list up to 32 entries, 8b each.
- *    See @c D878UVCodeplug::AnalogAPRSRXEntryElement.</td></tr>
- *  <tr><td>02502000</td> <td>000080</td> <td>FM APRS frequency names,
- *    see @c FMAPRSFrequencyNamesElement. This element is not part of the manufacturer codeplug.
- *    QDMR uses this memory section to store additional information.</td></tr>
- *
- *  <tr><th colspan="3">General Settings</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>02500000</td> <td>0000f0</td> <td>General settings,
- *    see @c D878UVCodeplug::GeneralSettingsElement.</td></tr>
- *  <tr><td>02500100</td> <td>000400</td> <td>Zone A & B channel list.</td></tr>
- *  <tr><td>02500500</td> <td>000100</td> <td>DTMF list</td></tr>
- *  <tr><td>02500600</td> <td>000030</td> <td>Power on settings,
- *    see @c AnytoneCodeplug::BootSettingsElement.</td></tr>
- *  <tr><td>02501400</td> <td>000200</td> <td>General settings extension,
- *    see @c D878UVCodeplug::GeneralSettingsExtensionElement.</td></tr>
- *  <tr><td>024C2000</td> <td>0003F0</td> <td>List of 250 auto-repeater offset frequencies.
- *    32bit little endian frequency in 10Hz. I.e., 600kHz = 60000.
- *    Default 0x00000000, 0x00 padded.</td></tr>
- *
- *  <tr><th colspan="3">Messages</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>01640000</td> <td>max. 000100</td> <td>Some kind of linked list of messages.
- *    See @c AnytoneCodeplug::MessageListElement. Each entry has a size of 0x10.</td></tr>
- *  <tr><td>01640800</td> <td>000090</td>      <td>Bytemap of up to 100 valid messages.
- *    0x00=valid, 0xff=invalid, remaining 46b set to 0x00.</td></tr>
- *  <tr><td>02140000</td> <td>max. 000800</td> <td>Bank 0, Messages 1-8.
- *    Each message consumes 0x100b. See @c AnytoneCodeplug::MessageElement. </td></tr>
- *  <tr><td>02180000</td> <td>max. 000800</td> <td>Bank 1, Messages 9-16</td></tr>
- *  <tr><td>...</td>      <td>...</td>         <td>...</td></tr>
- *  <tr><td>02440000</td> <td>max. 000800</td> <td>Bank 12, Messages 97-100</td></tr>
- *
- *  <tr><th colspan="3">Hot Keys</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>025C0000</td> <td>000100</td> <td>4 analog quick-call settings.
- *    See @c AnytoneCodeplug::AnalogQuickCallElement.</td>
- *  <tr><td>025C0B00</td> <td>000010</td> <td>Status message bitmap.</td>
- *  <tr><td>025C0100</td> <td>000400</td> <td>Up to 32 status messages.
- *    Length unknown, offset 0x20. ASCII 0x00 terminated and padded.</td>
- *  <tr><td>025C0500</td> <td>000360</td> <td>18 hot-key settings, see
- *    @c AnytoneCodeplug::HotKeyElement</td></tr>
- *
- *  <tr><th colspan="3">Encryption</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1700</td> <td>000040</td> <td>32 Encryption IDs, 0-based, 16bit big-endian.</td></tr>
- *  <tr><td>024C1800</td> <td>000500</td> <td>32 DMR-Encryption keys,
- *    see @c D868UVCodeplug::dmr_encryption_key_t,
- *    40b each.</td></tr>
- *  <tr><td>024C4000</td> <td>004000</td> <td>Up to 256 AES encryption keys.
- *    See @c D878UVCodeplug::AESEncryptionKeyElement.</td></tr>
- *
- *  <tr><th colspan="3">Misc</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>   <th>Content</th></tr>
- *  <tr><td>024C1400</td> <td>000020</td> <td>Alarm setting,
- *    see @c AnytoneCodeplug::AlarmSettingElement.</td></tr>
- *  <tr><td>024C1440</td> <td>000030</td> <td>Digital alarm settings extension,
- *    see @c AnytoneCodeplug::DigitalAlarmExtensionElement. </td></tr>
- *
- *  <tr><th colspan="3">FM Broadcast</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>02480210</td> <td>000020</td>      <td>Bitmap of 100 FM broadcast channels.</td></tr>
- *  <tr><td>02480000</td> <td>max. 000200</td> <td>100 FM broadcast channels. Encoded
- *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
- *  <tr><td>02480200</td> <td>000010</td>      <td>FM broadcast VFO frequency. Encoded
- *    as 8-digit BCD little-endian in 100Hz. Filled with 0x00.</td></tr>
- *
- *  <tr><th colspan="3">DTMF, 2-tone & 5-tone signaling.</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C0C80</td> <td>000010</td> <td>5-tone encoding bitmap.</td></tr>
- *  <tr><td>024C0000</td> <td>000020</td> <td>5-tone encoding.</td></tr>
- *  <tr><td>024C0D00</td> <td>000200</td> <td>5-tone ID list.</td></tr>
- *  <tr><td>024C1000</td> <td>000080</td> <td>5-tone settings.</td></tr>
- *  <tr><td>024C1080</td> <td>000050</td> <td>DTMF settings.</td></tr>
- *  <tr><td>024C1280</td> <td>000010</td> <td>2-tone encoding bitmap.</td></tr>
- *  <tr><td>024C1100</td> <td>000010</td> <td>2-tone encoding.</td></tr>
- *  <tr><td>024C1290</td> <td>000010</td> <td>2-tone settings.</td></tr>
- *  <tr><td>024C2600</td> <td>000010</td> <td>2-tone decoding bitmap.</td></tr>
- *  <tr><td>024C2400</td> <td>000030</td> <td>2-tone decoding.</td></tr>
- *
- *  <tr><th colspan="3">Unknown settings.</th></tr>
- *  <tr><th>Start</th>    <th>Size</th>        <th>Content</th></tr>
- *  <tr><td>024C1090</td> <td>000040</td> <td>Unknown, filled with 0xff.</td></tr>
- *  <tr><td>02504000</td> <td>000400</td> <td>Unknown, filled with 0xff.</td></tr>
- * </table>
+ * For more details, see https://dmr-tools.github.io/codeplugs.
  *
  * @ingroup d878uv */
 class D878UVCodeplug : public D868UVCodeplug
@@ -283,11 +97,21 @@ public:
       Both = 3                    ///< Send PTT-ID at start and end.
     };
 
+    /** Possible APRS modes. */
+    enum class APRSType {
+      Off = 0, FM = 1, DMR = 2
+    };
+
     /** Defines all possible APRS PTT settings. */
     enum class APRSPTT {
       Off   = 0,                  ///< Do not send APRS on PTT.
       Start = 1,                  ///< Send APRS at start of transmission.
       End   = 2                   ///< Send APRS at end of transmission.
+    };
+
+    /** Possible encryption types. */
+    enum class AdvancedEncryptionType {
+      AES, ARC4
     };
 
   protected:
@@ -299,7 +123,7 @@ public:
     explicit ChannelElement(uint8_t *ptr);
 
     /** Resets the channel. */
-    void clear();
+    void clear()  override;
 
     /** Returns the PTT ID settings. */
     virtual PTTId pttIDSetting() const;
@@ -312,32 +136,32 @@ public:
     virtual void enableRoaming(bool enable);
     // Moved
     /** Returns @c true if the data ACK is enabled. */
-    bool dataACK() const;
+    bool dataACK() const override;
     /** Enables/disables data ACK. */
-    void enableDataACK(bool enable);
+    void enableDataACK(bool enable) override;
+    /** Returns @c true, if auto scan is enabled. */
+    virtual bool autoScan() const ;
+    /** Enable/disable auto scan. */
+    virtual void enableAutoScan(bool enable);
 
-    /** Returns @c true if digital APRS transmission is enabled. */
-    bool txDigitalAPRS() const;
-    /** Enables/disables digital APRS transmission. */
-    void enableTXDigitalAPRS(bool enable);
-    /** Returns @c true if the analog APRS reporting (TX) is enabled. */
-    virtual bool txAnalogAPRS() const;
-    /** Enables/disables analog APRS reporting. */
-    virtual void enableTXAnalogAPRS(bool enable);
+    /** Returns APRS type for reporting the position. */
+    APRSType txAPRSType() const;
+    /** Sets APRS type for reporting the position. */
+    void setTXAPRSType(APRSType aprsType);
 
     /** Returns the analog APRS PTT setting. */
-    virtual APRSPTT analogAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT analogAPRSPTTSetting() const;
     /** Sets the analog APRS PTT setting. */
-    virtual void setAnalogAPRSPTTSetting(APRSPTT ptt);
+    virtual void setAnalogAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
     /** Returns the digital APRS PTT setting. */
-    virtual APRSPTT digitalAPRSPTTSetting() const;
+    virtual AnytoneChannelExtension::APRSPTT digitalAPRSPTTSetting() const;
     /** Sets the digital APRS PTT setting. */
-    virtual void setDigitalAPRSPTTSetting(APRSPTT ptt);
+    virtual void setDigitalAPRSPTTSetting(AnytoneChannelExtension::APRSPTT ptt);
 
     /** Returns the DMR APRS system index. */
-    virtual unsigned digitalAPRSSystemIndex() const;
+    unsigned digitalAPRSSystemIndex() const override;
     /** Sets the DMR APRS system index. */
-    virtual void setDigitalAPRSSystemIndex(unsigned idx);
+    void setDigitalAPRSSystemIndex(unsigned idx) override;
 
     /** Returns the frequency correction in ???. */
     virtual int frequenyCorrection() const;
@@ -349,26 +173,75 @@ public:
     /** Sets the FM APRS frequency index [0,7]. */
     virtual void setFMAPRSFrequencyIndex(unsigned int idx);
 
+    /** If set, transmission of talker alias for this channel is enabled. */
+    virtual bool sendTalkerAlias() const;
+    /** Enable transmission of talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
+
+    /** Returns the encryption type. */
+    virtual AdvancedEncryptionType advancedEncryptionType() const;
+    /** Sets the encryptionType. */
+    virtual void setEncryptionType(AdvancedEncryptionType type);
+
+    /** Returns @c true, if an AES encryption key index is set. */
+    virtual bool hasAESEncryptionKeyIndex() const;
+    /** Returns the AES encryption key index.
+     * The index is 0-based. */
+    virtual unsigned int aesEncryptionKeyIndex() const;
+    /** Sets the AES encryption key index. */
+    virtual void setAESEncryptionKeyIndex(unsigned int index);
+    /** Clears the AES encryption key index. */
+    virtual void clearAESEncryptionKeyIndex();
+
+    /** Returns @c true, if an ARC4 encryption key index is set. */
+    virtual bool hasARC4EncryptionKeyIndex() const;
+    /** Returns the ARC4 encryption key index.
+     * The index is 0-based. */
+    virtual unsigned int arc4EncryptionKeyIndex() const;
+    /** Sets the ARC4 encryption key index. */
+    virtual void setARC4EncryptionKeyIndex(unsigned int index);
+    /** Clears the ARC4 encryption key index. */
+    virtual void clearARC4EncryptionKeyIndex();
+
+    /** Returns the encryption type. */
+    DMREncryptionType dmrEncryptionType() const override;
+    /** Sets the encryption type. */
+    void setDMREncryptionType(DMREncryptionType type) override;
+    /** Returns @c true if a DMR encryption key is set. */
+    bool hasDMREncryptionKeyIndex() const override;
+    /** Returns the DMR encryption key index (+1), 0=Off. */
+    unsigned dmrEncryptionKeyIndex() const override;
+    /** Sets the DMR encryption key index (+1), 0=Off. */
+    void setDMREncryptionKeyIndex(unsigned idx) override;
+    /** Clears the DMR encryption key index. */
+    void clearDMREncryptionKeyIndex() override;
+
     /** Constructs a Channel object from this element. */
-    Channel *toChannelObj(Context &ctx) const;
+    Channel *toChannelObj(Context &ctx) const override;
     /** Links a previously created channel object. */
-    bool linkChannelObj(Channel *c, Context &ctx) const;
+    bool linkChannelObj(Channel *c, Context &ctx) const override;
     /** Encodes the given channel object. */
-    bool fromChannelObj(const Channel *c, Context &ctx);
+    bool fromChannelObj(const Channel *c, Context &ctx) override;
 
   protected:
     /** Internal used offsets within the channel element. */
     struct Offset : public D868UVCodeplug::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
-      static constexpr unsigned int roamingEnabled()       { return 0x0034; }
-      static constexpr unsigned int dataACK()              { return 0x0034; }
-      static constexpr unsigned int txDMRAPRS()            { return 0x0035; }
+      static constexpr unsigned int aesKeyIndex()          { return 0x0022; }
+      static constexpr Bit roaming()                       { return {0x034,  2}; }
+      static constexpr Bit dataACK()                       { return {0x0034, 3}; }
+      static constexpr Bit autoScan()                      { return {0x0034, 4}; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
       static constexpr unsigned int dmrAPRSPTTSetting()    { return 0x0037; }
       static constexpr unsigned int dmrAPRSSystemIndex()   { return 0x0038; }
       static constexpr unsigned int frequenyCorrection()   { return 0x0039; }
+      static constexpr unsigned int dmrEncryptionKey()     { return 0x003a; }
+      static constexpr Bit muteFMAPRS()                    { return {0x003b, 3}; }
+      static constexpr Bit talkerAlias()                   { return {0x003b, 4}; }
+      static constexpr Bit advancedEncryptionType()        { return {0x003b, 5}; }
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
+      static constexpr unsigned int arc4KeyIndex()         { return 0x003d; }
       /// @endcond
     };
   };
@@ -484,11 +357,12 @@ public:
       FREQ_STEP_2_5kHz = 0,             ///< 2.5kHz
       FREQ_STEP_5kHz = 1,               ///< 5kHz
       FREQ_STEP_6_25kHz = 2,            ///< 6.25kHz
-      FREQ_STEP_10kHz = 3,              ///< 10kHz
-      FREQ_STEP_12_5kHz = 4,            ///< 12.5kHz
-      FREQ_STEP_20kHz = 5,              ///< 20kHz
-      FREQ_STEP_25kHz = 6,              ///< 25kHz
-      FREQ_STEP_50kHz = 7               ///< 50kHz
+      FREQ_STEP_8_33kHz = 3,            ///< 8.33kHz
+      FREQ_STEP_10kHz = 4,              ///< 10kHz
+      FREQ_STEP_12_5kHz = 5,            ///< 12.5kHz
+      FREQ_STEP_20kHz = 6,              ///< 20kHz
+      FREQ_STEP_25kHz = 7,              ///< 25kHz
+      FREQ_STEP_50kHz = 8               ///< 50kHz
     };
 
     /** DTMF signalling durations. */
@@ -511,6 +385,12 @@ public:
       Default=0, Custom1=1, Custom2=2
     };
 
+    /** Encoding of possible backlight durations. */
+    enum class BacklightDuration {
+      Infinite = 0, _5s = 1, _10s = 2, _15s = 3, _20s = 4, _25s = 5, _30s = 6, _1min=7, _2min=8,
+      _3min = 9, _4min = 10, _5min = 11, _15min = 12, _30min = 13, _45min = 14, _1h = 15
+    };
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -523,7 +403,7 @@ public:
     static constexpr unsigned int size() { return 0x00f0; }
 
     /** Resets the general settings. */
-    void clear();
+    void clear() override;
 
     /** Returns the transmit timeout in seconds. */
     virtual unsigned transmitTimeout() const;
@@ -535,34 +415,34 @@ public:
     /** Sets the UI language. */
     virtual void setLanguage(AnytoneDisplaySettingsExtension::Language lang);
 
-    QTimeZone gpsTimeZone() const;
-    void setGPSTimeZone(const QTimeZone &zone);
+    QTimeZone gpsTimeZone() const override;
+    void setGPSTimeZone(const QTimeZone &zone) override;
 
     /** Returns the VFO frequency step in kHz. */
     virtual Frequency vfoFrequencyStep() const;
     /** Sets the VFO frequency step in kHz. */
     virtual void setVFOFrequencyStep(Frequency kHz);
 
-    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const;
-    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const;
-    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const;
-    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const;
-    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const;
-    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const;
-    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const;
-    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const;
-    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const;
-    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func);
-    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
-    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const override;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const override;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const override;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const override;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const override;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const override;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const override;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const override;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const override;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const override;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) override;
 
     /** Returns the STE (squelch tail eliminate) type. */
     virtual AnytoneSettingsExtension::STEType steType() const;
@@ -601,6 +481,9 @@ public:
     virtual bool wfmVFOEnabled() const;
     /** Enables/disables VFO mode for WFM RX. */
     virtual void enableWFMVFO(bool enable);
+
+    Interval backlightDuration() const override;
+    void setBacklightDuration(Interval intv) override;
 
     /** Returns the DTMF tone duration in ms. */
     virtual unsigned dtmfToneDuration() const;
@@ -706,9 +589,9 @@ public:
     virtual void enablePluginRecTone(bool enable);
 
     /** Returns the GPS ranging interval in seconds. */
-    virtual Interval gpsUpdatePeriod() const;
+    virtual Interval gpsUpdatePeriod() const override;
     /** Sets the GPS ranging interval in seconds. */
-    virtual void setGPSUpdatePeriod(Interval sec);
+    virtual void setGPSUpdatePeriod(Interval sec) override;
 
     /** Returns the bluetooth microphone gain [1,10]. */
     virtual unsigned int btMicGain() const;
@@ -724,33 +607,33 @@ public:
     /** Enables/disables display of channel number. */
     virtual void enableDisplayChannelNumber(bool enable);
 
-    bool showCurrentContact() const;
-    void enableShowCurrentContact(bool enable);
+    bool showCurrentContact() const override;
+    void enableShowCurrentContact(bool enable) override;
 
     /** Returns the auto roaming period in minutes. */
     virtual Interval autoRoamPeriod() const;
     /** Sets the auto roaming period in minutes. */
     virtual void setAutoRoamPeriod(Interval min);
 
-    bool keyToneLevelAdjustable() const;
-    unsigned keyToneLevel() const;
-    void setKeyToneLevel(unsigned level);
-    void setKeyToneLevelAdjustable();
+    bool keyToneLevelAdjustable() const override;
+    unsigned keyToneLevel() const override;
+    void setKeyToneLevel(unsigned level) override;
+    void setKeyToneLevelAdjustable() override;
 
-    AnytoneDisplaySettingsExtension::Color callDisplayColor() const;
-    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color);
+    AnytoneDisplaySettingsExtension::Color callDisplayColor() const override;
+    void setCallDisplayColor(AnytoneDisplaySettingsExtension::Color color) override;
 
-    bool gpsUnitsImperial() const;
-    void enableGPSUnitsImperial(bool enable);
+    bool gpsUnitsImperial() const override;
+    void enableGPSUnitsImperial(bool enable) override;
 
-    bool knobLock() const;
-    void enableKnobLock(bool enable);
-    bool keypadLock() const;
-    void enableKeypadLock(bool enable);
-    bool sidekeysLock() const;
-    void enableSidekeysLock(bool enable);
-    bool keyLockForced() const;
-    void enableKeyLockForced(bool enable);
+    bool knobLock() const override;
+    void enableKnobLock(bool enable) override;
+    bool keypadLock() const override;
+    void enableKeypadLock(bool enable) override;
+    bool sidekeysLock() const override;
+    void enableSidekeysLock(bool enable) override;
+    bool keyLockForced() const override;
+    void enableKeyLockForced(bool enable) override;
 
     /** Returns the auto-roam delay in seconds. */
     virtual Interval autoRoamDelay() const;
@@ -766,8 +649,8 @@ public:
     /** Sets the standby background image. */
     virtual void setStandbyBackgroundImage(D878UVCodeplug::GeneralSettingsElement::BackgroundImage img);
 
-    bool showLastHeard() const;
-    void enableShowLastHeard(bool enable);
+    bool showLastHeard() const override;
+    void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
     virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
@@ -775,47 +658,47 @@ public:
     virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual Frequency autoRepeaterMinFrequencyVHF() const;
+    virtual Frequency autoRepeaterMinFrequencyVHF() const override;
     /** Sets the minimum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz);
+    virtual void setAutoRepeaterMinFrequencyVHF(Frequency Hz) override;
     /** Returns the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual Frequency autoRepeaterMaxFrequencyVHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyVHF() const override;
     /** Sets the maximum frequency in Hz for the auto-repeater range in VHF band. */
-    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz);
+    virtual void setAutoRepeaterMaxFrequencyVHF(Frequency Hz) override;
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual Frequency autoRepeaterMinFrequencyUHF() const;
+    virtual Frequency autoRepeaterMinFrequencyUHF() const override;
     /** Sets the minimum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz);
+    virtual void setAutoRepeaterMinFrequencyUHF(Frequency Hz) override;
     /** Returns the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual Frequency autoRepeaterMaxFrequencyUHF() const;
+    virtual Frequency autoRepeaterMaxFrequencyUHF() const override;
     /** Sets the maximum frequency in Hz for the auto-repeater range in UHF band. */
-    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz);
+    virtual void setAutoRepeaterMaxFrequencyUHF(Frequency Hz) override;
 
     /** Returns the auto-repeater direction for VFO B. */
-    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const;
+    virtual AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const override;
     /** Sets the auto-repeater direction for VFO B. */
-    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir);
+    virtual void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) override;
 
     /** If enabled, the FM ID is sent together with selected contact. */
     virtual bool fmSendIDAndContact() const;
     /** Enables/disables sending contact with FM ID. */
     virtual void enableFMSendIDAndContact(bool enable);
 
-    bool defaultChannel() const;
-    void enableDefaultChannel(bool enable);
-    unsigned defaultZoneIndexA() const;
-    void setDefaultZoneIndexA(unsigned idx);
-    unsigned defaultZoneIndexB() const;
-    void setDefaultZoneIndexB(unsigned idx);
-    bool defaultChannelAIsVFO() const;
-    unsigned defaultChannelAIndex() const;
-    void setDefaultChannelAIndex(unsigned idx);
-    void setDefaultChannelAToVFO();
-    bool defaultChannelBIsVFO() const;
-    unsigned defaultChannelBIndex() const;
-    void setDefaultChannelBIndex(unsigned idx);
-    void setDefaultChannelBToVFO();
+    bool defaultChannel() const override;
+    void enableDefaultChannel(bool enable) override;
+    unsigned defaultZoneIndexA() const override;
+    void setDefaultZoneIndexA(unsigned idx) override;
+    unsigned defaultZoneIndexB() const override;
+    void setDefaultZoneIndexB(unsigned idx) override;
+    bool defaultChannelAIsVFO() const override;
+    unsigned defaultChannelAIndex() const override;
+    void setDefaultChannelAIndex(unsigned idx) override;
+    void setDefaultChannelAToVFO() override;
+    bool defaultChannelBIsVFO() const override;
+    unsigned defaultChannelBIndex() const override;
+    void setDefaultChannelBIndex(unsigned idx) override;
+    void setDefaultChannelBToVFO() override;
 
     /** Returns the default roaming zone index. */
     virtual unsigned defaultRoamingZoneIndex() const;
@@ -850,8 +733,8 @@ public:
     /** Enables/disables "separate display. */
     virtual void enableSeparateDisplay(bool enable);
 
-    bool keepLastCaller() const;
-    void enableKeepLastCaller(bool enable);
+    bool keepLastCaller() const override;
+    void enableKeepLastCaller(bool enable) override;
 
     /** Returns the channel name color. */
     virtual AnytoneDisplaySettingsExtension::Color channelNameColor() const;
@@ -898,11 +781,11 @@ public:
     virtual bool btHoldTimeInfinite() const;
     /** Returns the bluetooth hold time. */
     virtual Interval btHoldTime() const;
-    /** Sets the bluethooth hold time (1-120s). */
+    /** Sets the Bluetooth hold time (1-120s). */
     virtual void setBTHoldTime(Interval interval);
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void setBTHoldTimeInfinite();
-    /** Sets the bluethooth hold time to infinite. */
+    /** Sets the Bluetooth hold time to infinite. */
     virtual void disableBTHoldTime();
 
     /** Returns the bluetooth RX delay in ms. */
@@ -910,9 +793,9 @@ public:
     /** Sets the bluetooth RX delay in ms. */
     virtual void setBTRXDelay(Interval delay);
 
-    bool fromConfig(const Flags &flags, Context &ctx);
-    bool updateConfig(Context &ctx);
-    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
+    bool fromConfig(const Flags &flags, Context &ctx) override;
+    bool updateConfig(Context &ctx) override;
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Some internal used offsets within the element. */
@@ -1022,14 +905,20 @@ public:
     /** Resets the settings. */
     void clear();
 
-    bool sendTalkerAlias() const;
-    void enableSendTalkerAlias(bool enable);
+    /** Returns @c true if the talker alias is sent. */
+    virtual bool sendTalkerAlias() const;
+    /** Enables/disables sending the talker alias. */
+    virtual void enableSendTalkerAlias(bool enable);
 
-    AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
-    void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
+    /** Returns the talker alias source. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasSource talkerAliasSource() const;
+    /** Sets the talker alias source. */
+    virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
-    AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
-    void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    /** Returns the talker alias encoding. */
+    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    /** Sets the talker alias encoding. */
+    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;
@@ -1193,7 +1082,7 @@ public:
 
   protected:
     /** Internal used offset within the element. */
-    struct Offset {
+    struct Offset: public AnytoneCodeplug::ExtendedSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
@@ -1217,9 +1106,9 @@ public:
       static constexpr unsigned int zoneANameColor()               { return 0x003d; }
       static constexpr unsigned int zoneBNameColor()               { return 0x003e; }
       static constexpr unsigned int autoShutdownMode()             { return 0x003f; }
-      static constexpr unsigned int displayColorCode()             { return 0x0040; }  // bit 2
-      static constexpr unsigned int displayTimeSlot()              { return 0x0040; }  // bit 1
-      static constexpr unsigned int displayChannelType()           { return 0x0040; }  // bit 0
+      static constexpr Bit displayColorCode()                      { return {0x0040, 2}; }
+      static constexpr Bit displayTimeSlot()                       { return {0x0040, 1}; }
+      static constexpr Bit displayChannelType()                    { return {0x0040, 0}; }
       static constexpr unsigned int fmIdleTone()                   { return 0x0041; }
       static constexpr unsigned int dateFormat()                   { return 0x0042; }
       static constexpr unsigned int analogMicGain()                { return 0x0043; }
@@ -1415,12 +1304,12 @@ public:
     /** Sets the FM APRS channel width. */
     virtual void setFMChannelWidth(AnytoneFMAPRSSettingsExtension::Bandwidth width);
 
-    /** Retruns @c true if the CRC check on received FM APRS messages is disabled. */
+    /** Returns @c true if the CRC check on received FM APRS messages is disabled. */
     virtual bool fmPassAll() const;
     /** Enables/disables "pass all", that is the CRC check on FM APRS messages is disabled. */
     virtual void enableFMPassAll(bool enable);
 
-    /** Retruns @c true if the n-th of 8 FM APRS frequencies is set. */
+    /** Returns @c true if the n-th of 8 FM APRS frequencies is set. */
     virtual bool fmFrequencySet(unsigned int n) const;
     /** Returns the n-th of 8 FM APRS frequencies. */
     virtual Frequency fmFrequency(unsigned int n) const;
@@ -1790,10 +1679,10 @@ public:
     static constexpr unsigned int size() { return 0x0010; }
   };
 
+
   /** Represents an AES encryption key.
    *
-   * Binary representation of the key (size 0x0040 bytes):
-   * @verbinclude d878uv_aeskey.txt */
+   * Binary representation of a variable size AES key. The key size is between 4 and 256 bits. */
   class AESEncryptionKeyElement: public Element
   {
   protected:
@@ -1822,7 +1711,106 @@ public:
     virtual QByteArray key() const;
     /** Sets the key. */
     virtual void setKey(const QByteArray &key);
+
+  public:
+    /** Some limits of the key element. */
+    struct Limit: public Element::Limit {
+      /// The maximum index.
+      static constexpr unsigned int maxIndex() { return 254; }
+      /// The maximum key length in bytes.
+      static constexpr unsigned int keySize() { return 32; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int key()   { return 0x0001; }
+      static constexpr unsigned int size()  { return 0x0022; }
+      /// @endcond
+    };
   };
+
+  /** Represents the bitmap, indicating which AES key is valid. */
+  class AESEncryptionKeyBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    AESEncryptionKeyBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    AESEncryptionKeyBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+
+  /** Represents an ARC4 encryption key.
+   *
+   * Encodes a 8bit ID and 40bit key. A smaller key might be encoded right-aligned. */
+  class ARC4EncryptionKeyElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    ARC4EncryptionKeyElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ARC4EncryptionKeyElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    void clear();
+    bool isValid() const;
+
+    /** Returns the key index. */
+    virtual unsigned index() const;
+    /** Sets the key index. */
+    virtual void setIndex(unsigned idx);
+
+    /** Returns the actual key. */
+    virtual QByteArray key() const;
+    /** Sets the key. */
+    virtual void setKey(const QByteArray &key);
+
+  public:
+    /** Some limits of the key element. */
+    struct Limit: public Element::Limit {
+      /// The maximum index.
+      static constexpr unsigned int maxIndex() { return 254; }
+      /// The maximum key length in bytes.
+      static constexpr unsigned int keySize() { return 5; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: public Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int key()   { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+  /** Represents the bitmap, indicating which ARC4 key is valid. */
+  class ARC4EncryptionKeyBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ARC4EncryptionKeyBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    ARC4EncryptionKeyBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
 
   /** Encodes the bitmap, indicating which zone is hidden. */
   class HiddenZoneBitmapElement: public BitmapElement
@@ -1941,6 +1929,8 @@ public:
   /** Empty constructor. */
   explicit D878UVCodeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const;
+
 protected:
   bool allocateBitmaps();
   void setBitmaps(Context &ctx);
@@ -1948,8 +1938,9 @@ protected:
   void allocateUpdated();
   void allocateForEncoding();
 
-  bool decodeElements(Context &ctx, const ErrorStack &err=ErrorStack());
   bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool linkElements(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void allocateChannels();
   bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1979,13 +1970,29 @@ protected:
   /** Links roaming channels and zones. */
   virtual bool linkRoaming(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  /** Allocates memory to encode/decode AES keys. */
+  virtual void allocateAESKeys();
+  /** Encode all AES keys. */
+  virtual bool encodeAESKeys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode AES keys from the codeplug. */
+  virtual bool createAESKeys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  /** Allocates memory to encode/decode ARC4 keys. */
+  virtual void allocateARC4Keys();
+  /** Encode all ARC4 keys. */
+  virtual bool encodeARC4Keys(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode ARC4 keys from the codeplug. */
+  virtual bool createARC4Keys(Context &ctx, const ErrorStack &err=ErrorStack());
+
+
 public:
   /** Some limits. */
   struct Limit: public D868UVCodeplug::Limit {
     static constexpr unsigned int analogAPRSRXEntries() { return 32; }   ///< Maximum number of analog APRS RX entries.
     static constexpr unsigned int roamingChannels()     { return 250; }  ///< Maximum number of roaming channels.
     static constexpr unsigned int roamingZones()        { return 64; }   ///< Maximum number of roaming zones.
-    static constexpr unsigned int aesKeys()             { return 256; }  ///< Maximum number of AES keys.
+    static constexpr unsigned int aesKeys()             { return 255; }  ///< Maximum number of AES keys.
+    static constexpr unsigned int arc4Keys()            { return 255; }  ///< Maximum number of ARC4 keys.
   };
 
 protected:
@@ -2004,6 +2011,9 @@ protected:
     static constexpr unsigned int roamingZoneBitmap()           { return 0x01042080; }
     static constexpr unsigned int roamingZones()                { return 0x01043000; }
     static constexpr unsigned int aesKeys()                     { return 0x024C4000; }
+    static constexpr unsigned int aesKeyBitmap()                { return 0x024C8000; }
+    static constexpr unsigned int arc4Keys()                    { return 0x025C0C00; }
+    static constexpr unsigned int arc4KeyBitmap()               { return 0x025C1C00; }
     /// @endcond
   };
 };

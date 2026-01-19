@@ -12,14 +12,14 @@
 
 
 int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
-  UserDatabase userdb;
+  UserDatabase userdb(false);
 
   if (parser.isSet("database")) {
     if (! userdb.load(parser.value("database"))) {
       logError() << "Cannot load user-db from '" << parser.value("database") << "'.";
       return -1;
     }
-  } else if (0 == userdb.count()) {
+  } else if (! userdb.ready()) {
     logInfo() << "Downloading call-sign DB...";
     // Wait for download to finish
     QEventLoop loop;
@@ -59,7 +59,8 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
               << "select those entries 'closest' to you. I.e., DMR IDs with the same prefix.";
   }
 
-  CallsignDB::Selection selection;
+  CallsignDB::Flags selection;
+  selection.setUpdateDeviceClock(parser.isSet("update-device-clock"));
   if (parser.isSet("limit")) {
     bool ok=true;
     selection.setCountLimit(parser.value("limit").toUInt(&ok));
@@ -76,10 +77,13 @@ int writeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  showProgress();
-  QObject::connect(radio, &Radio::uploadProgress, updateProgress);
+  if (! parser.isSet("verbose")) {
+    showProgress();
+    QObject::connect(radio, &Radio::downloadProgress, updateProgress);
+  }
 
-  if (! radio->startUploadCallsignDB(&userdb, true, selection, err)) {
+  selection.setBlocking(true);
+  if (! radio->startUploadCallsignDB(&userdb, selection, err)) {
     logError() << "Could not upload call-sign DB to radio: " << err.format();
     return -1;
   }

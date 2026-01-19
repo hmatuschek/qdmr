@@ -30,7 +30,7 @@ OpenUV380Codeplug::clearGeneralSettings() {
 bool
 OpenUV380Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   GeneralSettingsElement el(data(Offset::settings(), ImageIndex::settings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
 
   return el.encode(ctx, err);
@@ -68,7 +68,7 @@ OpenUV380Codeplug::clearAPRSSettings() {
 bool
 OpenUV380Codeplug::encodeAPRSSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   APRSSettingsBankElement el(data(Offset::aprsSettings(), ImageIndex::aprsSettings()));
-  if (! flags.updateCodePlug)
+  if (! flags.updateCodeplug())
     el.clear();
 
   return el.encode(ctx, err);

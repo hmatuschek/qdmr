@@ -1,6 +1,7 @@
 #include "opengd77_callsigndb.hh"
 #include "utils.hh"
 #include "userdatabase.hh"
+#include "logger.hh"
 #include <QtEndian>
 
 
@@ -15,7 +16,7 @@ OpenGD77CallsignDB::OpenGD77CallsignDB(QObject *parent)
 
 
 bool
-OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, const ErrorStack &err) {
+OpenGD77CallsignDB::encode(UserDatabase *calldb, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Limit entry count
@@ -35,6 +36,11 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, con
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
 
+  if (n)
+    logDebug() << "Store " << n << " entries starting from "
+               << users.front().id << ":" << users.front().call << ", " << users.front().name << " in " << users.front().city
+               << " to " << users.back().id << ":" << users.back().call << ", " << users.back().name << " in " << users.back().city;
+
   // Allocate segment0 for user db if requested
   unsigned size = align_size(DatabaseHeaderElement::size()+n0*DatabaseEntryElement::size(),
                              Limit::blockSize());
@@ -45,7 +51,7 @@ OpenGD77CallsignDB::encode(UserDatabase *calldb, const Selection &selection, con
 
   // Encode user DB
   DatabaseHeaderElement header(this->data(Offset::header()));
-  header.clear(); header.setEntryCount(n);
+  header.clear(); header.setEntrySize(DatabaseEntryElement::size()); header.setEntryCount(n);
   for (unsigned i=0; i<n0; i++) {
     DatabaseEntryElement(this->data(Offset::entries0() + i*DatabaseEntryElement::size()))
         .fromEntry(users[i]);

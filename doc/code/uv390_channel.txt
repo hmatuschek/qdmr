@@ -2,7 +2,7 @@
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 00 |LWK| 1   1 |ASC| BandW | ChMod |   ColorCode   |TimeSlt|RXO|ALT|DCC|PCC| PRIV  |   PrivIdx     |DPD| 0 |EAA| 1   1   0 |RXFreqR|
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-04 |AdimtCr| 1 |VOX| 0   1 |TXFreqR|TOffFre|InCallC| 0   0   0   0 | TX Contact name index + 1, little endian                      |
+04 |AdimtCr| 1 |VOX| 0   1 |TXFreqR|TOffFre|InCallC| 0 |PrK| 0   0 | TX Contact name index + 1, little endian                      |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 08 | 0   0 |      Tx Timeout       |    Tx Timeout Rekey Delay     | Emergency System index + 1    | Scan List index + 1           |
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -42,6 +42,7 @@ Field description:
  TXFreqR = TX reference frequency: 0=Low, 1=Medium, 2=High, default=0.
  TOffFre = Non-QT/DQT Turn-off Freq., 3=none, 0=259.2Hz, 1=55.2Hz, default=3.
  InCallC = In Call Criteria, 0=Always, 1=Follow Admit Criteria, 2=TX Interrupt, default=0.
+ PrK = Privacy key. Also Enables encryption.
  Tx Timeout = Tx Timeout x 15sec, 0-Infinite, 1=15s, etc, 37=555s, default=0.
  Power = Power, 0=low, 1=middle, 2=high, default=high.
  LMS = Leader/MS: Leader or MS, default=1.

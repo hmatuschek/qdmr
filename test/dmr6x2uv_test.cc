@@ -16,7 +16,7 @@ DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
 void
 DMR6X2UVTest::testBasicConfigEncoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   DMR6X2UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
@@ -27,7 +27,7 @@ DMR6X2UVTest::testBasicConfigEncoding() {
 void
 DMR6X2UVTest::testBasicConfigDecoding() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   DMR6X2UVCodeplug codeplug;
   if (! codeplug.encode(&_basicConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
@@ -44,7 +44,7 @@ DMR6X2UVTest::testBasicConfigDecoding() {
 void
 DMR6X2UVTest::testChannelFrequency() {
   ErrorStack err;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D868UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
@@ -97,7 +97,7 @@ DMR6X2UVTest::testFMAPRSSettings() {
 
   // Encode
   DMR6X2UVCodeplug codeplug;
-  Codeplug::Flags flags; flags.updateCodePlug=false;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     QFAIL(QString("Cannot prepare codeplug for BTECH DMR-6X2UV: %1")
@@ -148,6 +148,80 @@ DMR6X2UVTest::testFMAPRSSettings() {
   auto comp_ch_ext = comp_config.channelList()->channel(1)->as<FMChannel>()->anytoneChannelExtension();
   QCOMPARE(comp_ch_ext->aprsPTT(), ch_ext->aprsPTT());
 }
+
+
+void
+DMR6X2UVTest::testAESEncryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/aes_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  DMR6X2UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existence of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
+void
+DMR6X2UVTest::testARC4Encryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/arc4_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  DMR6X2UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existence of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("1122334455"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
 

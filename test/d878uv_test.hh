@@ -25,8 +25,14 @@ private slots:
 
   void testFMAPRSSettings();
 
+  void testAESEncryption();
+  void testARC4Encryption();
+
   void testRegressionDefaultChannel();
   void testRegressionAutoRepeater();
+  void testRegressionVFOStep();
+
+  void testEmptyAESKey();  /// < Regression test for #711
 
 protected:
   Config _micGainConfig;

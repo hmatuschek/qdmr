@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="guiSatellite"
+         xmlns="http://docbook.org/ns/docbook" 
+         xmlns:xlink="http://www.w3.org/1999/xlink" >
+
+
+<info>
+  <title>Orbital Elements and Transponder</title>
+</info>
+
+<para>
+  Some radios support the prediction of satellite passes and also ease satellite operations by 
+  correcting doppler shifts of up- and downlink frequencies. To this end, this feature turns a
+  cheap handheld radio in a fully fledged satellite station. 
+</para>
+
+<para>
+  The satellite editor dialog allows to select which satellites will be tracked by the device. The 
+  dialog also allows to specify the up- and downlink frequencies for the chosen satellites. 
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-satellite-editor.png" width="15cm" align="center"/></imageobject>
+    <textobject>Screen shot of the satellite editor dialog.</textobject>
+  </mediaobject>
+  <title>The satellite editor dialog.</title>
+</screenshot>
+
+<para>
+  To add a new satellite, click the <guilabel>Add</guilabel> button at the bottom of the dialog. 
+  You will be presented with a selection dialog of all known satellites.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-satellite-select.png" width="6cm" align="center"/></imageobject>
+    <textobject>Screen shot of the satellite selection dialog.</textobject>
+  </mediaobject>
+  <title>The satellite selection dialog.</title>
+</screenshot>
+
+<para> 
+  The list of all known (amateur radio) satellites is huge. You may search for a name using the 
+  <shortcut><keycombo><keycap>Ctrl</keycap>-<keycap>F</keycap></keycombo></shortcut> shortcut. 
+</para>
+
+<para>
+  Once all satellites are added you are interested in, you can edit the transponder frequencies. 
+  In qdmr, a satellite may have an FM transponder, an APRS transponder and a beacon. At least one 
+  of these features should be configured. 
+</para>
+
+<para>
+  The uplink (from earth to satellite) or transmit frequency as well as the downlink (from 
+  satellite to search) or receive frequency can be entered directly or selected from a known set of
+  frequencies. To change a frequency, simply double-clock the field in the table.
+</para>
+
+<screenshot>
+  <mediaobject>
+    <imageobject><imagedata fileref="fig/qdmr-satellite-edit-downlink.png" width="4cm" align="center"/></imageobject>
+    <textobject>Detail screen shot of the satellite editor dialog, selecting a downlink frequency.</textobject>
+  </mediaobject>
+  <title>The satellite editor dialog: Selecting a downlink frequency.</title>
+</screenshot>
+
+<para>
+  Some satellites also require a sub-tone (CTCSS). These tones can be selected from the dropdown 
+  menu for up- and downlink separately.
+</para>
+
+<para>
+  Once all satellites and their transponders are set up, you can write the configuration to the 
+  radio using <guimenuitem>Write satellites</guimenuitem> from the <guimenu>Device</guimenu> menu.
+</para>
+</section>
+  

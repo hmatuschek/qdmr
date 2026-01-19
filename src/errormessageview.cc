@@ -10,7 +10,7 @@ ErrorMessageView::ErrorMessageView(const ErrorStack &stack, QWidget *parent) :
 
   if (stack.isEmpty()) {
     setWindowTitle(tr("Error: Unknown."));
-    ui->errorMessage->setText("An unknown error has orccured.");
+    ui->errorMessage->setText("An unknown error has occurred.");
     ui->errorStack->setVisible(false);
     return;
   }

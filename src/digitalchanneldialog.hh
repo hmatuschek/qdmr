@@ -23,16 +23,23 @@ protected slots:
   void onVOXDefaultToggled(bool checked);
   void onHideChannelHint();
 
+private slots:
+  void onRxFrequencyEdited();
+  void onTxFrequencyEdited();
+  void onOffsetFrequencyEdited();
+  void onOffsetCurrentIndexChanged(int index);
+  void updateOffsetFrequency();
+
 protected:
   void construct();
+
+private:
+  void updateComboBox();
 
 protected:
   Config *_config;
   DMRChannel *_myChannel;
   DMRChannel *_channel;
 };
-
-
-
 
 #endif // DIGITALCHANNELDIALOG_HH

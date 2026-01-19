@@ -25,7 +25,7 @@ public:
   explicit DR1801UV(DR1801UVInterface *device=nullptr, QObject *parent=nullptr);
 
 public:
-  /** Retunrs the default radio info. */
+  /** Returns the default radio info. */
   static RadioInfo defaultRadioInfo();
 
   const QString &name() const;
@@ -35,10 +35,10 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
-  bool startDownload(bool blocking, const ErrorStack &err);
-  bool startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err);
-  bool startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err);
-  bool startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err);
+  bool startDownload(const TransferFlags &flags, const ErrorStack &err);
+  bool startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err);
+  bool startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err);
+  bool startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err);
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */

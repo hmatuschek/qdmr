@@ -8,6 +8,7 @@
 #include "config.h"
 #include "logger.hh"
 #include "utils.hh"
+#include "intermediaterepresentation.hh"
 #include <cmath>
 
 #include <QTimeZone>
@@ -60,83 +61,106 @@ D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+
 bool
 D868UVCodeplug::ChannelElement::ranging() const {
-  return getBit(0x0034, 0);
+  return getBit(Offset::ranging());
 }
 void
 D868UVCodeplug::ChannelElement::enableRanging(bool enable) {
-  setBit(0x0034, 0, enable);
+  setBit(Offset::ranging(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::throughMode() const {
-  return getBit(0x0034, 1);
+  return getBit(Offset::throughMode());
 }
 void
 D868UVCodeplug::ChannelElement::enableThroughMode(bool enable) {
-  setBit(0x0034, 1, enable);
+  setBit(Offset::throughMode(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::dataACK() const {
-  return !getBit(0x0034, 2);
+  return !getBit(Offset::dataACK());
 }
 void
 D868UVCodeplug::ChannelElement::enableDataACK(bool enable) {
-  setBit(0x0034, 2, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
-bool
-D868UVCodeplug::ChannelElement::txDigitalAPRS() const {
-  return getBit(0x0035, 0);
+D868UVCodeplug::ChannelElement::APRSType
+D868UVCodeplug::ChannelElement::txAPRSType() const {
+  return (APRSType)getUInt8(Offset::txAPRSType());
 }
 void
-D868UVCodeplug::ChannelElement::enableTXDigitalAPRS(bool enable) {
-  setBit(0x0035, 0, enable);
+D868UVCodeplug::ChannelElement::setTXAPRSType(APRSType aprsType) {
+  setUInt8(Offset::txAPRSType(), (uint8_t)aprsType);
 }
+
 unsigned
 D868UVCodeplug::ChannelElement::digitalAPRSSystemIndex() const {
-  return getUInt8(0x0036);
+  return getUInt8(Offset::digitalAPRSSystemIndex());
 }
 void
 D868UVCodeplug::ChannelElement::setDigitalAPRSSystemIndex(unsigned idx) {
-  setUInt8(0x0036, idx);
+  setUInt8(Offset::digitalAPRSSystemIndex(), idx);
 }
 
+
+D868UVCodeplug::ChannelElement::DMREncryptionType
+D868UVCodeplug::ChannelElement::dmrEncryptionType() const {
+  return getBit(Offset::dmrEncryptionType()) ?
+        DMREncryptionType::Enhanced : DMREncryptionType::Basic;
+}
+
+void
+D868UVCodeplug::ChannelElement::setDMREncryptionType(DMREncryptionType type) {
+  setBit(Offset::dmrEncryptionType(), DMREncryptionType::Enhanced == type);
+}
+
+
+bool
+D868UVCodeplug::ChannelElement::hasDMREncryptionKeyIndex() const {
+  return 0 != getUInt8(Offset::dmrEncryptionKey());
+}
 unsigned
 D868UVCodeplug::ChannelElement::dmrEncryptionKeyIndex() const {
-  return getUInt8(0x003a);
+  return getUInt8(Offset::dmrEncryptionKey()) - 1;
 }
 void
 D868UVCodeplug::ChannelElement::setDMREncryptionKeyIndex(unsigned idx) {
-  setUInt8(0x003a, idx);
+  setUInt8(Offset::dmrEncryptionKey(), idx+1);
+}
+void
+D868UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
+  setUInt8(Offset::dmrEncryptionKey(), 0);
 }
 
 bool
 D868UVCodeplug::ChannelElement::multipleKeyEncryption() const {
-  return getBit(0x003b, 0);
+  return getBit(Offset::multipleKeyEncryption());
 }
 void
 D868UVCodeplug::ChannelElement::enableMultipleKeyEncryption(bool enable) {
-  setBit(0x003b, 0, enable);
+  setBit(Offset::multipleKeyEncryption(), enable);
 }
 
 bool
 D868UVCodeplug::ChannelElement::randomKey() const {
-  return getBit(0x003b, 1);
+  return getBit(Offset::randomKey());
 }
 void
 D868UVCodeplug::ChannelElement::enableRandomKey(bool enable) {
-  setBit(0x003b, 1, enable);
+  setBit(Offset::randomKey(), enable);
 }
 bool
 D868UVCodeplug::ChannelElement::sms() const {
-  return !getBit(0x003b, 2);
+  return !getBit(Offset::sms());
 }
 void
 D868UVCodeplug::ChannelElement::enableSMS(bool enable) {
-  setBit(0x003b, 0, !enable);
+  setBit(Offset::sms(), !enable);
 }
 
 Channel *
@@ -165,10 +189,22 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if (txDigitalAPRS() && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+    if ((APRSType::Off != txAPRSType())  && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
     else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
       dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    // Link to encryption key (only basic implemented)
+    if (hasDMREncryptionKeyIndex() && (DMREncryptionType::Basic == dmrEncryptionType())) {
+      if (ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
+        auto cex = dc->commercialExtension();
+        if (nullptr == cex)
+          dc->setCommercialExtension(cex = new CommercialChannelExtension());
+        cex->setEncryptionKey(ctx.get<BasicEncryptionKey>(dmrEncryptionKeyIndex()));
+      } else {
+        logWarn() << "Cannot link DMR encryption: no key with index "
+                  << dmrEncryptionKeyIndex() << " found.";
+      }
+    }
   }
 
   return true;
@@ -184,11 +220,25 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Set GPS system index
     if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
       setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-      enableTXDigitalAPRS(true);
+      setTXAPRSType(APRSType::DMR);
       enableRXAPRS(false);
     } else {
-      enableTXDigitalAPRS(false);
+      setTXAPRSType(APRSType::Off);
       enableRXAPRS(false);
+    }
+
+    clearDMREncryptionKeyIndex();
+    bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
+        (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+         ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption());
+
+    // Handle commercial extension
+    if (auto cex = dc->commercialExtension()) {
+      if (cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>() && (! hasStrongEncryption)) {
+        auto key = cex->encryptionKey()->as<BasicEncryptionKey>();
+        setDMREncryptionType(DMREncryptionType::Basic);
+        setDMREncryptionKeyIndex(ctx.index(key));
+      }
     }
 
     // Handle extension
@@ -527,22 +577,64 @@ D868UVCodeplug::GeneralSettingsElement::setBrightness(unsigned level) {
   setUInt8(Offset::displayBrightness(), (level*4)/10);
 }
 
+
 bool
 D868UVCodeplug::GeneralSettingsElement::backlightPermanent() const {
-  return rxBacklightDuration().isNull();
+  return backlightDuration().isInfinite();
 }
+
 Interval
-D868UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
-  return Interval::fromSeconds(5*((unsigned)getUInt8(Offset::backlightDuration())));
+D868UVCodeplug::GeneralSettingsElement::backlightDuration() const {
+  switch ((BacklightDuration)getUInt8(Offset::backlightDuration())) {
+  case BacklightDuration::Infinite: return Interval::infinity();
+  case BacklightDuration::_5s:  return Interval::fromSeconds(5);
+  case BacklightDuration::_10s: return Interval::fromSeconds(10);
+  case BacklightDuration::_15s: return Interval::fromSeconds(15);
+  case BacklightDuration::_20s: return Interval::fromSeconds(20);
+  case BacklightDuration::_25s: return Interval::fromSeconds(25);
+  case BacklightDuration::_30s: return Interval::fromSeconds(30);
+  case BacklightDuration::_1min: return Interval::fromMinutes(1);
+  case BacklightDuration::_2min: return Interval::fromMinutes(2);
+  case BacklightDuration::_3min: return Interval::fromMinutes(3);
+  case BacklightDuration::_4min: return Interval::fromMinutes(4);
+  case BacklightDuration::_5min: return Interval::fromMinutes(5);
+  }
+  return Interval::infinity();
 }
+
 void
-D868UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
-  setUInt8(Offset::backlightDuration(), intv.seconds()/5);
+D868UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval intv) {
+  if (intv <= Interval::fromSeconds(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5s);
+  else if (intv <= Interval::fromSeconds(10))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_10s);
+  else if (intv <= Interval::fromSeconds(15))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_15s);
+  else if (intv <= Interval::fromSeconds(20))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_20s);
+  else if (intv <= Interval::fromSeconds(25))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_25s);
+  else if (intv <= Interval::fromSeconds(30))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_30s);
+  else if (intv <= Interval::fromMinutes(1))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_1min);
+  else if (intv <= Interval::fromMinutes(2))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_2min);
+  else if (intv <= Interval::fromMinutes(3))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_3min);
+  else if (intv <= Interval::fromMinutes(4))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_4min);
+  else if (intv <= Interval::fromMinutes(5))
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::_5min);
+  else
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinite);
 }
+
 void
 D868UVCodeplug::GeneralSettingsElement::enableBacklightPermanent() {
-  setRXBacklightDuration(Interval());
+  setBacklightDuration(Interval::infinity());
 }
+
 
 bool
 D868UVCodeplug::GeneralSettingsElement::gps() const {
@@ -695,7 +787,7 @@ D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x00));
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -1133,8 +1225,13 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
   // Encode display settings
-  setRXBacklightDuration(ext->displaySettings()->backlightDuration());
+  setBacklightDuration(ext->displaySettings()->backlightDuration());
   enableShowCurrentContact(ext->displaySettings()->showContact());
+
+  // Check encryption type
+  if (AnytoneDMRSettingsExtension::EncryptionType::AES == ext->dmrSettings()->encryption()) {
+    logInfo() << "D868UVE does not support AES/ARC4 encryption.";
+  }
 
   return true;
 }
@@ -1174,7 +1271,10 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode display settings
   ext->displaySettings()->enableShowContact(this->showCurrentContact());
-  ext->displaySettings()->setBacklightDuration(rxBacklightDuration());
+  ext->displaySettings()->setBacklightDuration(backlightDuration());
+
+  // Set encryption type
+  ext->dmrSettings()->setEncryption(AnytoneDMRSettingsExtension::EncryptionType::DMR);
 
   return true;
 }
@@ -1227,6 +1327,8 @@ D868UVCodeplug::allocateUpdated() {
 
   this->allocateGPSSystems();
 
+  this->allocatEnhancedEncryptionKeys();
+
   this->allocateHotKeySettings();
   this->allocateAlarmSettings();
   this->allocateFMBroadcastSettings();
@@ -1240,9 +1342,6 @@ D868UVCodeplug::allocateUpdated() {
   this->allocate2ToneSettings();
 
   this->allocateDTMFSettings();
-
-  image(0).addElement(Offset::dmrEncryptionIDs(), DMREncryptionKeyIDListElement::size());
-  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
 }
 
 void
@@ -1255,6 +1354,9 @@ D868UVCodeplug::allocateForEncoding() {
   this->allocateScanLists();
   this->allocateRadioIDs();
   this->allocateSMSMessages();
+
+  // Encryption
+  this->allocatDMREncryptionKeys();
 }
 
 void
@@ -1273,6 +1375,9 @@ D868UVCodeplug::allocateForDecoding() {
   this->allocateBootSettings();
   this->allocateRepeaterOffsetFrequencies();
   this->allocateSMSMessages();
+
+  // Encryption
+  this->allocatDMREncryptionKeys();
 
   // GPS settings
   this->allocateGPSSystems();
@@ -1356,6 +1461,29 @@ D868UVCodeplug::setBitmaps(Context& ctx)
 }
 
 
+Config *
+D868UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for D868UVE.";
+    return nullptr;
+  }
+
+  // Remove all but 16bit DMR encryption keys.
+  EncryptionKeyFilterVisitor filter(
+        { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16) });
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  // Remove DMR encryption keys, that are not 16bit wide.
+  return intermediate;
+}
+
+
 bool
 D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
@@ -1395,11 +1523,14 @@ D868UVCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStac
   if (! this->encodeGPSSystems(flags, ctx, err))
     return false;
 
+  if (! this->encodeDMREncryptionKeys(flags, ctx, err))
+    return false;
+
   return true;
 }
 
 bool
-D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
+D868UVCodeplug::createElements(Context &ctx, const ErrorStack &err)
 {
   if (! this->setRadioID(ctx, err))
     return false;
@@ -1416,6 +1547,9 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
   if (! this->decodeBootSettings(ctx, err))
     return false;
 
+  if (! this->decodeDMREncryptionKeys(ctx, err))
+    return false;
+
   if (! this->createChannels(ctx, err))
     return false;
 
@@ -1428,22 +1562,28 @@ D868UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err)
   if (! this->createRXGroupLists(ctx, err))
     return false;
 
-  if (! this->linkRXGroupLists(ctx, err))
-    return false;
-
   if (! this->createZones(ctx, err))
-    return false;
-
-  if (! this->linkZones(ctx, err))
     return false;
 
   if (! this->createScanLists(ctx, err))
     return false;
 
-  if (! this->linkScanLists(ctx, err))
+  if (! this->createGPSSystems(ctx, err))
     return false;
 
-  if (! this->createGPSSystems(ctx, err))
+  return true;
+}
+
+
+bool
+D868UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
+  if (! this->linkRXGroupLists(ctx, err))
+    return false;
+
+  if (! this->linkZones(ctx, err))
+    return false;
+
+  if (! this->linkScanLists(ctx, err))
     return false;
 
   if (! this->linkChannels(ctx, err))
@@ -2061,7 +2201,7 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       continue;
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
-    if (ch.txDigitalAPRS())
+    if (ChannelElement::APRSType::Off != ch.txAPRSType())
       systems.insert(ch.digitalAPRSSystemIndex());
   }
   // Then create all referenced GPS systems
@@ -2207,6 +2347,54 @@ D868UVCodeplug::decodeRepeaterOffsetFrequencies(Context &ctx, const ErrorStack &
   }
 
   return true;
+}
+
+
+void
+D868UVCodeplug::allocatDMREncryptionKeys() {
+  image(0).addElement(Offset::dmrEncryptionKeys(), DMREncryptionKeyListElement::size());
+}
+
+bool
+D868UVCodeplug::encodeDMREncryptionKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err);
+
+  DMREncryptionKeyListElement keys(data(Offset::dmrEncryptionKeys()));
+  keys.clear();
+
+  for (unsigned int i=0; i<DMREncryptionKeyListElement::Limit::numEntries(); i++) {
+    keys.clearKey(i);
+    if (! ctx.has<BasicEncryptionKey>(i))
+      continue;
+    keys.setKey(i, *ctx.get<BasicEncryptionKey>(i));
+  }
+
+  return true;
+}
+
+
+bool
+D868UVCodeplug::decodeDMREncryptionKeys(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  DMREncryptionKeyListElement keys(data(Offset::dmrEncryptionKeys()));
+  for (unsigned int i=0; i<DMREncryptionKeyListElement::Limit::numEntries(); i++) {
+    if (! keys.hasKey(i))
+      continue;
+    auto key = new BasicEncryptionKey();
+    key->setName(QString("Basic Key %1").arg(i));
+    key->setKey(keys.key(i));
+    ctx.add(key, i);
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+  }
+
+  return true;
+}
+
+
+void
+D868UVCodeplug::allocatEnhancedEncryptionKeys() {
+  image(0).addElement(Offset::enhancedEncryptionKeys(), EnhancedEncryptionKeyListElement::size());
 }
 
 

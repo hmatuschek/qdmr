@@ -2,7 +2,8 @@
 #define OPENRTXLINK_HH
 
 #include <QObject>
-
+#include <QHash>
+#include <QIODevice>
 #include "packetstream.hh"
 
 // Forward declaration

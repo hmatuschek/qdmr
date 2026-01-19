@@ -1,6 +1,6 @@
-#include "gpssystem.hh"
 #include "userdatabase.hh"
 #include "d878uv2_callsigndb.hh"
+#include "logger.hh"
 #include "utils.hh"
 #include <QtEndian>
 
@@ -14,7 +14,7 @@ D878UV2CallsignDB::D878UV2CallsignDB(QObject *parent)
 }
 
 bool
-D878UV2CallsignDB::encode(UserDatabase *db, const Selection &selection, const ErrorStack &err) {
+D878UV2CallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorStack &err) {
   Q_UNUSED(err)
 
   // Determine size of call-sign DB in memory
@@ -22,6 +22,7 @@ D878UV2CallsignDB::encode(UserDatabase *db, const Selection &selection, const Er
   // If DB size is limited by settings
   if (selection.hasCountLimit())
     n = std::min(n, (qint64)selection.countLimit());
+  logDebug() << "Encode " << n << " entries.";
 
   // Select n users and sort them in ascending order of their IDs
   QVector<UserDatabase::User> users;
@@ -30,6 +31,10 @@ D878UV2CallsignDB::encode(UserDatabase *db, const Selection &selection, const Er
     users.append(db->user(i));
   std::sort(users.begin(), users.end(),
             [](const UserDatabase::User &a, const UserDatabase::User &b) { return a.id < b.id; });
+
+  logDebug() << "Encode call-signs from " << users.first().id << ": " << users.first().call << ", "
+             << users.first().name << " in " << users.first().city << " to " << users.last().id
+             << ": " << users.last().call << ", " << users.last().name << " in " << users.last().city << ".";
 
   // Compute total size of callsign db entries
   size_t dbSize = 0;

@@ -8,6 +8,7 @@
 #include <QCompleter>
 #include <QSortFilterProxyModel>
 #include <QNetworkAccessManager>
+#include <QFuture>
 
 #include "frequency.hh"
 #include "signaling.hh"
@@ -93,7 +94,7 @@ public:
                                   const QDateTime &loaded = QDateTime::currentDateTime());
 
   static RepeaterDatabaseEntry dmr(const QString &call,
-                                   const Frequency &rxFrequeny, const Frequency &txFrequency,
+                                   const Frequency &rxFrequency, const Frequency &txFrequency,
                                    const QGeoCoordinate &location,
                                    const QString &qth="",
                                    unsigned int colorCode = 0,
@@ -169,6 +170,7 @@ protected:
   QFile _cacheFile;
   QMap<RepeaterDatabaseEntry, unsigned int> _indices;
   QVector<RepeaterDatabaseEntry> _cache;
+  QFuture<void> _parsing;
 };
 
 

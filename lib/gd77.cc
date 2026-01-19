@@ -41,12 +41,12 @@ GD77::codeplug() {
 RadioInfo
 GD77::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::GD77, "gd77", "GD-77", "Radioddity", RadioddityInterface::interfaceInfo());
+        RadioInfo::GD77, "gd77", "GD-77", "Radioddity", {RadioddityInterface::interfaceInfo()});
 }
 
 
 bool
-GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+GD77::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Flags &selection, const ErrorStack &err) {
   logDebug() << "Start call-sign DB upload to " << name() << "...";
   _errorStack = err;
 

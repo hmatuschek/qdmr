@@ -14,12 +14,12 @@ ContactListView::ContactListView(Config *config, QWidget *parent)
 {
   ui->setupUi(this);
 
-  connect(ui->listView->header(), SIGNAL(sectionCountChanged(int,int)),
+  connect(ui->contactTableView->header(), SIGNAL(sectionCountChanged(int,int)),
           this, SLOT(loadHeaderState()));
-  connect(ui->listView->header(), SIGNAL(sectionResized(int,int,int)),
+  connect(ui->contactTableView->header(), SIGNAL(sectionResized(int,int,int)),
           this, SLOT(storeHeaderState()));
 
-  ui->listView->setModel(new ContactListWrapper(_config->contacts(), ui->listView));
+  ui->contactTableView->setModel(new ContactListWrapper(_config->contacts(), ui->contactTableView));
 
   QMenu *menu = new QMenu();
   menu->addAction(ui->actionAdd_DMR_Contact);
@@ -31,7 +31,7 @@ ContactListView::ContactListView(Config *config, QWidget *parent)
   connect(ui->actionAdd_M17_Contact, SIGNAL(triggered(bool)), this, SLOT(onAddM17Contact()));
   connect(ui->actionAdd_DTMF_Contact, SIGNAL(triggered(bool)), this, SLOT(onAddDTMFContact()));
   connect(ui->remContact, SIGNAL(clicked()), this, SLOT(onRemContact()));
-  connect(ui->listView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditContact(unsigned)));
+  connect(ui->contactTableView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditContact(unsigned)));
 }
 
 ContactListView::~ContactListView() {
@@ -46,8 +46,8 @@ ContactListView::onAddDMRContact() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->contactTableView->hasSelection())
+    row = ui->contactTableView->selection().second+1;
   _config->contacts()->add(dialog.contact(), row);
 }
 
@@ -58,8 +58,8 @@ ContactListView::onAddM17Contact() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->contactTableView->hasSelection())
+    row = ui->contactTableView->selection().second+1;
   _config->contacts()->add(dialog.contact(), row);
 }
 
@@ -70,15 +70,15 @@ ContactListView::onAddDTMFContact() {
     return;
 
   int row=-1;
-  if (ui->listView->hasSelection())
-    row = ui->listView->selection().second+1;
+  if (ui->contactTableView->hasSelection())
+    row = ui->contactTableView->selection().second+1;
   _config->contacts()->add(dialog.contact(), row);
 }
 
 void
 ContactListView::onRemContact() {
   // Check if there is any contacts selected
-  if (! ui->listView->hasSelection()) {
+  if (! ui->contactTableView->hasSelection()) {
     QMessageBox::information(
           nullptr, tr("Cannot delete contact"),
           tr("Cannot delete contact: You have to select a contact first."));
@@ -86,7 +86,7 @@ ContactListView::onRemContact() {
   }
 
   // Get selection and ask for deletion
-  QPair<int,int> rows = ui->listView->selection();
+  QPair<int,int> rows = ui->contactTableView->selection();
   int numrows = rows.second-rows.first+1;
   if (rows.first == rows.second) {
     QString name = _config->contacts()->contact(rows.first)->name();
@@ -135,10 +135,10 @@ ContactListView::onEditContact(unsigned row) {
 void
 ContactListView::loadHeaderState() {
   Settings settings;
-  ui->listView->header()->restoreState(settings.headerState("contactList"));
+  ui->contactTableView->header()->restoreState(settings.headerState("contactList"));
 }
 void
 ContactListView::storeHeaderState() {
   Settings settings;
-  settings.setHeaderState("contactList", ui->listView->header()->saveState());
+  settings.setHeaderState("contactList", ui->contactTableView->header()->saveState());
 }

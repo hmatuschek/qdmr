@@ -1162,7 +1162,7 @@ public:
   public:
     /** Some limits for the element. */
     struct Limit {
-      /** Specifies the maxumum number of basic (DMR) encryption keys (16bit). */
+      /** Specifies the maximum number of basic (DMR) encryption keys (16bit). */
       static constexpr unsigned int basicKeys() { return 16; }
       /** Specifies the maximum number of advanced (AES) encryption keys (128bit). */
       static constexpr unsigned int advancedKeys() { return 8; }
@@ -1199,7 +1199,7 @@ public:
 
     bool isValid() const;
 
-    /** Retunrs the text of the message. */
+    /** Returns the text of the message. */
     virtual QString text() const;
     /** Sets the text of the message. */
     virtual void setText(const QString &text);

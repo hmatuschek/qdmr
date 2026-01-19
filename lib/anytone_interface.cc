@@ -2,8 +2,10 @@
 #include "logger.hh"
 #include <QtEndian>
 
-#define USB_VID 0x28e9
-#define USB_PID 0x018a
+#define USB_VID_GD32  0x28e9
+#define USB_PID_GD32  0x018a
+#define USB_VID_STM32 0x2e3c
+#define USB_PID_STM32 0x5740
 
 /* ********************************************************************************************* *
  * Implementation of AnytoneInterface::ReadRequest
@@ -110,17 +112,6 @@ AnytoneInterface::~AnytoneInterface() {
     AnytoneInterface::close();
 }
 
-USBDeviceInfo
-AnytoneInterface::interfaceInfo() {
-  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID, USB_PID);
-}
-
-QList<USBDeviceDescriptor>
-AnytoneInterface::detect(bool saveOnly) {
-  Q_UNUSED(saveOnly);
-  return USBSerial::detect(USB_VID, USB_PID, true);
-}
-
 
 void
 AnytoneInterface::close() {
@@ -136,27 +127,6 @@ AnytoneInterface::close() {
   case STATE_ERROR:
     break;
   }
-}
-
-RadioInfo
-AnytoneInterface::identifier(const ErrorStack &err) {
-  if (! _info.isValid())
-    return RadioInfo();
-  if ("D868UVE" == _info.name) {
-    return RadioInfo::byID(RadioInfo::D868UVE);
-  } else if ("D6X2UV" == _info.name) {
-    return RadioInfo::byID(RadioInfo::DMR6X2UV);
-  } else if ("D878UV" == _info.name) {
-    return RadioInfo::byID(RadioInfo::D878UV);
-  } else if ("D878UV2" == _info.name) {
-    return RadioInfo::byID(RadioInfo::D878UVII);
-  } else if ("D578UV" == _info.name) {
-    return RadioInfo::byID(RadioInfo::D578UV);
-  }
-
-  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
-                 .arg(_info.name).arg(_info.version);
-  return RadioInfo();
 }
 
 bool
@@ -393,4 +363,91 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen, 
 
   // done
   return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneGD32Interface
+ * ********************************************************************************************* */
+AnytoneGD32Interface::AnytoneGD32Interface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : AnytoneInterface(descriptor, err, parent)
+{
+  // pass...
+}
+
+
+RadioInfo
+AnytoneGD32Interface::identifier(const ErrorStack &err) {
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D868UVE" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D868UVE);
+  } else if ("D6X2UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::DMR6X2UV);
+  } else if ("D6X2UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::DMR6X2UV2);
+  } else if ("D878UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UV);
+  } else if ("D878UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D878UVII);
+  } else if ("D578UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UV);
+  }  else if ("D578UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UVII);
+  }
+
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
+  return RadioInfo();
+}
+
+
+USBDeviceInfo
+AnytoneGD32Interface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID_GD32, USB_PID_GD32);
+}
+
+QList<USBDeviceDescriptor>
+AnytoneGD32Interface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly);
+  return USBSerial::detect(USB_VID_GD32, USB_PID_GD32, true);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneSTM32Interface
+ * ********************************************************************************************* */
+AnytoneSTM32Interface::AnytoneSTM32Interface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : AnytoneInterface(descriptor, err, parent)
+{
+  // pass...
+}
+
+RadioInfo
+AnytoneSTM32Interface::identifier(const ErrorStack &err) {
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D578UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UV);
+  }  else if ("D578UV2" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D578UVII);
+  }
+
+
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
+  return RadioInfo();
+}
+
+USBDeviceInfo
+AnytoneSTM32Interface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, USB_VID_STM32, USB_PID_STM32);
+}
+
+QList<USBDeviceDescriptor>
+AnytoneSTM32Interface::detect(bool saveOnly) {
+  Q_UNUSED(saveOnly);
+  return USBSerial::detect(USB_VID_STM32, USB_PID_STM32, true);
 }

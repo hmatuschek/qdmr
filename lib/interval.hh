@@ -43,11 +43,27 @@ public:
   }
 
   inline bool isNull() const { return 0 == _duration; }  ///< Test for 0.
+  /** Test for infinite durations. */
+  inline bool isInfinite() const {
+    return std::numeric_limits<unsigned long long>::max() == _duration;
+  }
+  /** Test for finite values. */
+  inline bool isFinite() const { return (!isNull()) && (!isInfinite()); }
+
   inline bool operator ==(const Interval &other) const { ///< Comparison.
     return _duration == other._duration;
   }
   inline bool operator<  (const Interval &other) const {///< Comparison.
     return _duration < other._duration;
+  }
+  inline bool operator<=  (const Interval &other) const {///< Comparison.
+    return _duration <= other._duration;
+  }
+  inline bool operator>  (const Interval &other) const {///< Comparison.
+    return _duration > other._duration;
+  }
+  inline bool operator>=  (const Interval &other) const {///< Comparison.
+    return _duration >= other._duration;
   }
 
   inline unsigned long long milliseconds() const { return _duration; }      ///< Unit conversion.
@@ -69,12 +85,21 @@ public:
   /** Parses a frequency. */
   bool parse(const QString &value);
 
+public:
+  /** Constructs a null interval. */
+  static inline Interval null() { return Interval(0); }
+  /** Constructs an infinite interval. */
+  static inline Interval infinity() {
+    return Interval(std::numeric_limits<unsigned long long>::max());
+  }
+
 private:
   /** An interval duration in ms. */
   unsigned long long _duration;
 };
 
 Q_DECLARE_METATYPE(Interval)
+
 
 namespace YAML
 {

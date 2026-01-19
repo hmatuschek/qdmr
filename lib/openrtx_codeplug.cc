@@ -1,5 +1,4 @@
 #include "openrtx_codeplug.hh"
-#include "utils.hh"
 #include "logger.hh"
 #include "scanlist.hh"
 #include "radioid.hh"
@@ -80,7 +79,7 @@ OpenRTXCodeplug::HeaderElement::setDescription(const QString description) {
 
 QDateTime
 OpenRTXCodeplug::HeaderElement::timestamp() const {
-  return QDateTime::fromSecsSinceEpoch(getUInt64_le(OffsetTimestamp), Qt::UTC);
+  return QDateTime::fromSecsSinceEpoch(getUInt64_le(OffsetTimestamp), QTimeZone::utc());
 }
 
 void

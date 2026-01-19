@@ -47,14 +47,14 @@ AnytoneRadio::codeplug() {
 }
 
 bool
-AnytoneRadio::startDownload(bool blocking, const ErrorStack &err) {
+AnytoneRadio::startDownload(const TransferFlags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
   _task = StatusDownload;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -68,7 +68,7 @@ AnytoneRadio::startDownload(bool blocking, const ErrorStack &err) {
 }
 
 bool
-AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &flags, const ErrorStack &err) {
+AnytoneRadio::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorStack &err) {
   if (StatusIdle != _task)
     return false;
 
@@ -83,7 +83,7 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
   _codeplugFlags = flags;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -102,13 +102,13 @@ AnytoneRadio::startUpload(Config *config, bool blocking, const Codeplug::Flags &
 
 
 bool
-AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const CallsignDB::Selection &selection, const ErrorStack &err) {
+AnytoneRadio::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
   _callsigns->encode(db, selection);
 
   _task = StatusUploadCallsigns;
   _errorStack = err;
 
-  if (blocking) {
+  if (selection.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -123,7 +123,7 @@ AnytoneRadio::startUploadCallsignDB(UserDatabase *db, bool blocking, const Calls
 
 
 bool
-AnytoneRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, const ErrorStack &err) {
+AnytoneRadio::startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) {
   if (! _satellites->encode(db, err)) {
     errMsg(err) << "Cannot encode satellite config for AnyTone device.";
     return false;
@@ -132,7 +132,7 @@ AnytoneRadio::startUploadSatelliteConfig(SatelliteDatabase *db, bool blocking, c
   _task = StatusUploadSatellites;
   _errorStack = err;
 
-  if (blocking) {
+  if (flags.blocking()) {
     run();
     return (StatusIdle == _task);
   }
@@ -259,6 +259,8 @@ AnytoneRadio::download() {
   unsigned nstart = _codeplug->image(0).numElements();
   _codeplug->allocateForDecoding();
 
+  logDebug() << "Download of " << _codeplug->image(0).numElements()-nstart << " discovered elements.";
+
   // Check every segment in the remaining codeplug
   for (int n=nstart; n<_codeplug->image(0).numElements(); n++) {
     if (! _codeplug->image(0).element(n).isAligned(RBSIZE)) {
@@ -278,6 +280,8 @@ AnytoneRadio::download() {
       errMsg(_errorStack) << "Cannot download codeplug.";
       return false;
     }
+    logDebug() << "Read " << Qt::hex << size <<
+                  "h bytes from address " << Qt::hex << addr << ".";
     emit downloadProgress(float(n*100)/_codeplug->image(0).numElements());
   }
 

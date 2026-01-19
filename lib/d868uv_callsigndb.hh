@@ -33,9 +33,6 @@ public:
    *
    * Max length for name is 16, city is 15, callsign is 8, state is 16, country is 16 and
    * comment is 16, excluding terminating 0x00.
-   *
-   * Memory layout of encoded Callsign/User database entry (variable size, min 0x000c-0x0064):
-   * @verbinclude d868uv_callsigndbentry.txt
    */
   class EntryElement: public Codeplug::Element
   {
@@ -45,6 +42,10 @@ public:
       Off = 0,
       Tone = 1,
       Online = 2
+    };
+    /** Possible call types. */
+    enum class CallType {
+      Private = 0, Group = 1, All = 2
     };
 
   protected:
@@ -75,7 +76,37 @@ public:
 
     /** Computes the size of the database entry for the given user. */
     static unsigned size(const UserDatabase::User &user);
+
+  public:
+    /** Some limits for the entry. */
+    struct Limit: Element::Limit {
+      static constexpr unsigned int headerLength()  { return  6; } ///< Header length (fixed).
+      static constexpr unsigned int nameLength()    { return 16; } ///< Maximum name length.
+      static constexpr unsigned int cityLength()    { return 15; } ///< Maximum city length.
+      static constexpr unsigned int callLength()    { return  8; } ///< Maximum call length.
+      static constexpr unsigned int stateLength()   { return 16; } ///< Maximum state length.
+      static constexpr unsigned int countryLength() { return 16; } ///< Maximum country length.
+      static constexpr unsigned int commentLength() { return  0; } ///< Maximum comment length.
+      /** Maximum entry size. */
+      static constexpr unsigned int totalLength()   {
+        return headerLength() + nameLength()+1 + cityLength()+1 + callLength()+1 + stateLength()+1
+            + countryLength()+1 + commentLength()+1; }
+    };
+
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int callType()   { return 0x0000; }
+      static constexpr unsigned int number()     { return 0x0001; }
+      static constexpr Bit          friendFlag() { return {0x0005, 4}; }
+      static constexpr Bit          ringTone()   { return { 0x0005, 0}; }
+      static constexpr unsigned int name()       { return Limit::headerLength(); }
+      /// @endcond
+    };
   };
+
 
   /** Represents a bank of call-sign DB entries. */
   class EntryBankElement: public Codeplug::Element
@@ -96,6 +127,7 @@ public:
     /** Returns the i-th element of the bank. */
     uint8_t *entry(unsigned int i) const;
   };
+
 
   /** Same index entry used by the codeplug to map normal digital contacts to an contact index. Here
    * it maps to the byte offset within the database entries. */
@@ -121,10 +153,8 @@ public:
     uint8_t *entry(unsigned int i) const;
   };
 
-  /** Stores some basic limits of the callsign db.
-   *
-   * Memory layout of encoded Callsign/User database entry (size 0x0010 bytes):
-   * @verbinclude d868uv_callsigndblimit.txt */
+
+  /** Stores some basic limits of the callsign db. */
   class LimitsElement: public Codeplug::Element
   {
   protected:
@@ -134,6 +164,9 @@ public:
   public:
     /** Constructor. */
     LimitsElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
 
     /** Resets the limits. */
     void clear();
@@ -150,9 +183,14 @@ public:
     /** Sets the total size of the DB (updated end-of-db address). */
     virtual void setTotalSize(unsigned size);
 
-  public:
-    /** Returns the size of the encoded element. */
-    static unsigned size();
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int count()   { return 0x0000; }
+      static constexpr unsigned int endOfDB() { return 0x0004; }
+      /// @endcond
+    };
   };
 
 
@@ -161,7 +199,7 @@ public:
   explicit D868UVCallsignDB(QObject *parent=nullptr);
 
   /** Tries to encode as many entries of the given user-database. */
-  bool encode(UserDatabase *db, const Selection &selection=Selection(),
+  bool encode(UserDatabase *db, const Flags &selection=Flags(),
               const ErrorStack &err=ErrorStack());
 
 public:

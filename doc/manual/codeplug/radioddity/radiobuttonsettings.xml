@@ -203,7 +203,7 @@
     <listitem>
       <para>
         If configured, the radio will transmit tones, that cause other radios --- if configured 
-        to do so --- to either response, disable or reenable themselves. This allows to control 
+        to do so --- to either response, disable or re-enable themselves. This allows to control 
         other radios remotely.
       </para>
     </listitem>

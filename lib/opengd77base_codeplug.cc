@@ -206,6 +206,25 @@ OpenGD77BaseCodeplug::ChannelElement::clearPower() {
 }
 
 
+Interval
+OpenGD77BaseCodeplug::ChannelElement::transmitTimeout() const {
+  if (0 == getUInt8(Offset::txTimeout()))
+    return Interval::infinity();
+  return Interval::fromSeconds((unsigned)getUInt8(Offset::txTimeout())*15);
+}
+
+void
+OpenGD77BaseCodeplug::ChannelElement::setTransmitTimeout(const Interval &interval) {
+  if (interval.isInfinite())
+    setUInt8(Offset::txTimeout(), 0);
+  else {
+    unsigned s = interval.seconds()/15;
+    s = std::max(1u, std::min(33u, s));
+    setUInt8(Offset::txTimeout(), s);
+  }
+}
+
+
 bool
 OpenGD77BaseCodeplug::ChannelElement::hasFixedPosition() const {
   return getBit(Offset::useFixedLocation());
@@ -548,19 +567,28 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   // Apply common settings
   ch->setName(name());
   ch->setRXFrequency(rxFrequency());
+
   if (isSimplex())
     ch->setTXFrequency(rxFrequency());
   else
     ch->setTXFrequency(txFrequency());
+
   if (globalPower())
     ch->setDefaultPower();
   else
     ch->setPower(power());
+
   ch->setRXOnly(rxOnly());
+
   if (vox())
     ch->setVOXDefault();
   else
     ch->disableVOX();
+
+  if (transmitTimeout().isInfinite())
+    ch->disableTimeout();
+  else
+    ch->setTimeout(transmitTimeout().seconds());
 
   ch->setOpenGD77ChannelExtension(new OpenGD77ChannelExtension());
   ch->openGD77ChannelExtension()->enableScanZoneSkip(skipZoneScan());
@@ -609,7 +637,7 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     auto fm = c->as<FMChannel>();
     if (hasAPRSIndex()) {
       if (! ctx.has<APRSSystem>(aprsIndex())) {
-        logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unkown index. (ignored)";
+        logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unknown index. (ignored)";
       } else {
         fm->setAPRSSystem(ctx.get<APRSSystem>(aprsIndex()));
       }
@@ -635,6 +663,10 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());
+  if (c->timeoutDisabled())
+    setTransmitTimeout(Interval::infinity());
+  else
+    setTransmitTimeout(Interval::fromSeconds(c->timeout()));
 
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
@@ -1358,7 +1390,7 @@ OpenGD77BaseCodeplug::DTMFContactElement::number() const {
   QString number;
   uint8_t *ptr = _data + Offset::number();
   const QVector<char> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
-  for (unsigned int i=0; (i<Limit::numberLength()) && (lut.size() < *ptr); i++, ptr++)
+  for (unsigned int i=0; (i<Limit::numberLength()) && (lut.size() > *ptr); i++, ptr++)
     number.append(lut[*ptr]);
   return number;
 }
@@ -1366,9 +1398,10 @@ OpenGD77BaseCodeplug::DTMFContactElement::number() const {
 void
 OpenGD77BaseCodeplug::DTMFContactElement::setNumber(const QString &number) {
   uint8_t *ptr = _data + Offset::number();
+  memset(ptr, 0xff, Limit::numberLength());
   unsigned int n = std::min(Limit::numberLength(), (unsigned int)number.length());
   const QVector<QChar> lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'};
-  for (unsigned int i=0; (i<n) && (lut.contains(number.at(i))); i++, ptr++)
+  for (unsigned int i=0; (i<n) && lut.contains(number.at(i)); i++, ptr++)
     *ptr = lut.indexOf(number.at(i));
 }
 

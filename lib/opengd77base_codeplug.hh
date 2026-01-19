@@ -96,6 +96,13 @@ public:
     /** Clears the power setting. The global power setting is used. */
     virtual void clearPower();
 
+    /** Returns the transmit timeout.
+     * An invalid interval indicates an infinite timeout. */
+    virtual Interval transmitTimeout() const;
+    /** Sets a transmit timeout.
+     * To disable the timeout, set an invalid interval. */
+    virtual void setTransmitTimeout(const Interval &interval);
+
     /** Returns @c true, if a fixed position is set for the channel. */
     virtual bool hasFixedPosition() const;
     /** Returns the fixed position. */
@@ -131,7 +138,7 @@ public:
 
     /** Returns @c true if the global DMR ID is overridden. */
     virtual bool hasDMRId() const;
-    /** Retruns the DMR ID for this channel. */
+    /** Returns the DMR ID for this channel. */
     virtual unsigned int dmrId() const;
     /** Sets the DMR ID for this channel. */
     virtual void setDMRId(unsigned int id);
@@ -210,7 +217,7 @@ public:
 
     /** Returns the squelch mode*/
     virtual SquelchMode squelchMode() const;
-    /** Retunrs the squelch level. */
+    /** Returns the squelch level. */
     virtual unsigned int squelchLevel() const;
     /** Set the squelch level and mode. Level is ignored, if mode is not normal.*/
     virtual void setSquelch(SquelchMode mode, unsigned int level);
@@ -239,6 +246,7 @@ public:
       static constexpr unsigned int mode() { return 0x0018; }
       static constexpr unsigned int power() { return 0x0019; }
       static constexpr unsigned int latitude0() { return 0x001a; }
+      static constexpr unsigned int txTimeout() { return 0x001b; }
       static constexpr unsigned int latitude1() { return 0x001c; }
       static constexpr unsigned int latitude2() { return 0x001d; }
       static constexpr unsigned int longitude0() { return 0x001e; }
@@ -298,7 +306,7 @@ public:
     virtual void enable(unsigned idx, bool enabled);
     /** Returns a pointer to the channel at the given index. */
     virtual uint8_t *get(unsigned idx) const;
-    /** Retunrs the n-th channel. */
+    /** Returns the n-th channel. */
     ChannelElement channel(unsigned int n);
 
   public:
@@ -514,7 +522,7 @@ public:
     /** Resets the fixed position. */
     virtual void clearFixedPosition();
 
-    /** Retunrs the posiiton reporting precision. */
+    /** Returns the posiiton reporting precision. */
     virtual PositionPrecision positionPrecision() const;
     /** Sets the position reporting precision in degrees. */
     virtual void setPositionPrecision(PositionPrecision prec);
@@ -541,17 +549,17 @@ public:
     /** Clears the second via node. */
     virtual void clearVia2();
 
-    /** Retunrs the icon. */
+    /** Returns the icon. */
     virtual APRSSystem::Icon icon() const;
     /** Sets the icon. */
     virtual void setIcon(APRSSystem::Icon icon);
 
-    /** Retunrs the comment text. */
+    /** Returns the comment text. */
     virtual QString comment() const;
     /** Sets the comment text. */
     virtual void setComment(const QString &text);
 
-    /** Retunrs the baud-rate. */
+    /** Returns the baud-rate. */
     virtual BaudRate baudRate() const;
     /** Sets the baud rate. */
     virtual void setBaudRate(BaudRate rate);
@@ -619,7 +627,7 @@ public:
     /** Clears the bank. */
     void clear();
 
-    /** Retunrs the n-th APRS system. */
+    /** Returns the n-th APRS system. */
     APRSSettingsElement system(unsigned int idx) const;
 
     /** Encodes all FM APRS systems. */
@@ -892,7 +900,7 @@ public:
     /** Enable/disable a zone in the bank. */
     virtual void enable(unsigned idx, bool enabled);
 
-    /** Retunrs the n-th zone. */
+    /** Returns the n-th zone. */
     ZoneElement zone(unsigned int n);
 
     /** Encodes all zones. */
@@ -1153,6 +1161,7 @@ public:
       // @endcond
     };
   };
+
 
   /** Encodes a satellite for the  OpenGD77 devices.
    * That is a set of orbital elements and transponder information. */

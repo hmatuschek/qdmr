@@ -306,7 +306,7 @@ FixReferencesVisistor::processProperty(ConfigItem *item, const QMetaProperty &pr
       return true;
     ConfigObject *obj = ref->as<ConfigObject>();
     if ((! _keepUnknown) && (! _map.contains(obj))) {
-      errMsg(err) << "Cannot fix refrence to object '" << obj->name()
+      errMsg(err) << "Cannot fix reference to object '" << obj->name()
                   << "' of type " << obj->metaObject()->className()
                   << ": Not mapped/cloned yet.";
       return false;
@@ -329,7 +329,7 @@ FixReferencesVisistor::processList(AbstractConfigObjectList *list, const ErrorSt
     // Resolve all references.
     for (int i=0; i<rlist->count(); i++) {
       if ((! _keepUnknown) && (! _map.contains(rlist->get(i)))) {
-        errMsg(err) << "Cannot fix refrence to object '" << rlist->get(i)->name()
+        errMsg(err) << "Cannot fix reference to object '" << rlist->get(i)->name()
                     << "' of type " << rlist->get(i)->metaObject()->className()
                     << ": Not mapped/cloned yet.";
         return false;
