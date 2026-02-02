@@ -303,7 +303,9 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int channelCount() { return 0x0000; }
       static constexpr unsigned int channelBlock0() { return 0x0010; }
-      static constexpr unsigned int betweenChannelBlocks() { return 0x1000; }
+      static constexpr unsigned int betweenChannelBlocks() {
+        return DM32UVCodeplug::Limit::blockSize();
+      }
       /// @endcond
     };
   };
@@ -346,6 +348,8 @@ public:
 
     /** Constructs a contact object. */
     virtual DMRContact *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the contact. */
+    virtual bool encode(const DMRContact *contact, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -462,6 +466,9 @@ public:
     /** Returns the n-th sorted index entry. */
     virtual EntryElement sortedIndexEntry(unsigned n);
 
+    /** Encodes the contact index. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+
   protected:
     /** Some internal offsets. */
     struct Offset: Element::Offset {
@@ -509,6 +516,8 @@ public:
     virtual RXGroupList *decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links this group list. */
     virtual bool link(RXGroupList *gl, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes this group list. */
+    virtual bool encode(const RXGroupList *gl, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -564,6 +573,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links all group lists. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes all group lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -605,6 +616,8 @@ public:
 
     /** Decodes the radio ID. */
     virtual DMRRadioID *decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the given ID. */
+    virtual bool encode(const DMRRadioID *id, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -644,6 +657,8 @@ public:
 
     /** Decodes all radio IDs. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes add radio IDs. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -697,6 +712,8 @@ public:
     virtual Zone *decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Link zone. */
     virtual bool link(Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes a zone. */
+    virtual bool encode(const Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -885,6 +902,8 @@ public:
     virtual ScanList *decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given scan list. */
     virtual bool link(ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encode the scan list. */
+    virtual bool encode(const ScanList *lst, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -957,6 +976,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Link all scan lists. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes all scan lists. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1023,7 +1044,9 @@ public:
 
     /** Decodes the roaming channel.
      * @returns nullptr on error. */
-    RoamingChannel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual RoamingChannel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the roaming channel. */
+    virtual bool encode(const RoamingChannel *ch, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1066,6 +1089,8 @@ public:
 
     /** Decides all romaming channels. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes all roaming channels. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1119,6 +1144,8 @@ public:
     virtual RoamingZone *decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the given roaming zone. */
     virtual bool link(RoamingZone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the given roaming zone. */
+    virtual bool encode(const RoamingZone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1183,6 +1210,8 @@ public:
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links all roaming zones. */
     virtual bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encode all roaming zones. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1812,6 +1841,8 @@ public:
 
     /** Decodes the general settings. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encode general settings. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */
@@ -1987,6 +2018,8 @@ public:
     bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the APRS settings. */
     bool link(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes the APRS settings. */
+    bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the settings. */
@@ -2278,11 +2311,24 @@ protected:
 
   /** Decode contacts. */
   virtual bool decodeContacts(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Allocate and encode contacts. */
+  virtual bool encodeContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   /** Decodes all zones defined. */
   virtual bool decodeZones(Context &ctx, const ErrorStack &err=ErrorStack());
   /** Links all decoded zones. */
   virtual bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Encodes all zones. */
+  virtual bool encodeZones(Context &ctx, const ErrorStack &err=ErrorStack());
+
+public:
+  /** Some internal limits. */
+  struct Limit: Element::Limit {
+    static constexpr unsigned int blockSize() { return 0x1000; }
+    static constexpr Range<unsigned int> channelBanks() { return {1, 49}; }
+    static constexpr Range<unsigned int> contactBanks() { return {1, 5}; }
+    static constexpr Range<unsigned int> zoneBanks()    { return {1, 8}; }
+  };
 
 protected:
   /** Some internal offsets. */

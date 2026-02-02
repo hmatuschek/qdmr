@@ -655,6 +655,8 @@ DFUFile::Image::dump(QTextStream &stream) const {
 
 bool
 DFUFile::Image::isAllocated(uint32_t offset) const {
+  if (_elements.isEmpty())
+    return false;
   return 0 <= _addressmap.find(offset);
 }
 
