@@ -5,6 +5,7 @@
 
 #include "radio.hh"
 #include "dm32uv_codeplug.hh"
+#include "dm32uv_callsigndb.hh"
 #include <QObject>
 #include <QHash>
 
@@ -102,6 +103,7 @@ public:
 private:
   virtual bool download(const ErrorStack &err=ErrorStack());
   virtual bool upload(const ErrorStack &err=ErrorStack());
+  virtual bool uploadCallsigns(const ErrorStack &err=ErrorStack());
 
 protected:
   /** Thread main routine, performs all blocking IO operations for codeplug up- and download. */
@@ -116,6 +118,8 @@ protected:
   Codeplug::Flags _codeplugFlags;
   /** Encoded / read codeplug. */
   DM32UVCodeplug _codeplug;
+  /** Encoded call-sign db. */
+  DM32UVCallsignDB _callsigns;
   /** The generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

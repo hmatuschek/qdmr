@@ -137,11 +137,22 @@ DM32UV::startUpload(Config *config, const Codeplug::Flags &flags, const ErrorSta
 
 bool
 DM32UV::startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) {
-  Q_UNUSED(db); Q_UNUSED(selection);
+  _callsigns.encode(db, selection);
 
-  errMsg(err) << "This device does not support a call-sign DB.";
+  _task = StatusUploadCallsigns;
+  _errorStack = err;
 
-  return false;
+  if (selection.blocking()) {
+    run();
+    return (StatusIdle == _task);
+  }
+
+  // If non-blocking -> move device to this thread
+  if (_dev && _dev->isOpen())
+    _dev->moveToThread(this);
+  start();
+
+  return true;
 }
 
 
@@ -203,9 +214,28 @@ DM32UV::run() {
 
     emit uploadComplete(this);
   } else if (StatusUploadCallsigns == _task) {
-    // Not implemented.
-    emit uploadError(this);
-    return;
+    if ((nullptr==_dev) || (! _dev->isOpen())) {
+      emit uploadError(this);
+      return;
+    }
+
+    emit uploadStarted();
+
+    if (! uploadCallsigns()) {
+      _dev->write_finish();
+      _dev->reboot();
+      _dev->close();
+      _task = StatusError;
+      emit uploadError(this);
+      return;
+    }
+
+    _dev->write_finish();
+    _dev->reboot();
+    _dev->close();
+    _task = StatusIdle;
+
+    emit uploadComplete(this);
   }
 }
 
@@ -326,4 +356,31 @@ DM32UV::upload(const ErrorStack &err) {
 }
 
 
+bool
+DM32UV::uploadCallsigns(const ErrorStack &err) {
+  if (! _dev->write_start(0,0,err)) {
+    errMsg(err) << "Cannot start codeplug write´.";
+    return false;
+  }
+
+  // Now mark all blocks with their virtual address
+  // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
+  for (unsigned int blk=0; blk<(unsigned int)_callsigns.image(0).numElements(); blk++) {
+    emit downloadProgress(50 + 50*blk/_callsigns.image(0).numElements());
+    auto element = _callsigns.image(0).element(blk);
+    auto blockAddress = element.address();
+    if (! _dev->write(0, blockAddress, _codeplug.data(blockAddress), Offset::blockSize())) {
+      errMsg(err) << "Cannot write codeplug block to "
+                  << Qt::hex << blockAddress << "h.";
+      return false;
+    }
+  }
+
+  if (! _dev->write_finish(err)) {
+    errMsg(err) << "Cannot finish codeplug write.";
+    return false;
+  }
+
+  return true;
+}
 
