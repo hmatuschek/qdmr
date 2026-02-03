@@ -3232,6 +3232,14 @@ DR1801UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(copy, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete copy;
+    return nullptr;
+  }
+
   // Split dual-zones into two.
   ZoneSplitVisitor splitter;
   if (! splitter.process(copy, err)) {

@@ -2235,6 +2235,14 @@ GD73Codeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(copy, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete copy;
+    return nullptr;
+  }
+
   ZoneSplitVisitor splitter;
   if (! splitter.process(copy, err)) {
     errMsg(err) << "Cannot pre-process codeplug for GD73A/E.";

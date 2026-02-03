@@ -3663,9 +3663,23 @@ DM32UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Keep only ARC4, AES (128 and 256)
+  EncryptionKeyFilterVisitor encFilter{
+    EncryptionKeyFilterVisitor::Filter(ARC4EncryptionKey::staticMetaObject, 40),
+    EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128),
+    EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256)
+  };
+  if (! encFilter.process(copy, err)) {
+    errMsg(err) << "Clear encryption keys.";
+    errMsg(err) << "Cannot pre-process DM32UV codeplug.";
+    delete copy;
+    return nullptr;
+  }
+
   // Split dual-zones into two.
   ZoneSplitVisitor splitter;
   if (! splitter.process(copy, err)) {
+    errMsg(err) << "Cannot split dual VFO zones.";
     errMsg(err) << "Cannot pre-process DM32UV codeplug.";
     delete copy;
     return nullptr;
@@ -3677,14 +3691,14 @@ DM32UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
 bool
 DM32UVCodeplug::postprocess(Config *config, const ErrorStack &err) const {
   if (! Codeplug::postprocess(config, err)) {
-    errMsg(err) << "Cannot post-process DR1801A6 codeplug.";
+    errMsg(err) << "Cannot post-process DM32UV codeplug.";
     return false;
   }
 
   // Merge split zones into one.
   ZoneMergeVisitor merger;
   if (! merger.process(config, err)) {
-    errMsg(err) << "Cannot post-process DR1801A6 codeplug.";
+    errMsg(err) << "Cannot post-process DM32UV codeplug.";
     return false;
   }
 
@@ -3701,7 +3715,7 @@ DM32UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const
   // There must be a default DMR radio ID.
   if (nullptr == ctx.config()->settings()->defaultId()) {
     errMsg(err) << "No default DMR radio ID specified.";
-    errMsg(err) << "Cannot index codeplug for encoding for the BTECH DR-1801UV.";
+    errMsg(err) << "Cannot index codeplug for encoding for the BTECH DM32UV.";
     return false;
   }
 

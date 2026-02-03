@@ -4521,9 +4521,17 @@ AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
   ZoneSplitVisitor splitter;
   if (! splitter.process(intermediate, err)) {
-    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    errMsg(err) << "Split multi-VFO zones.";
     delete intermediate;
     return nullptr;
   }

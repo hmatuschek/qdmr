@@ -8,6 +8,7 @@
 #include "tyt_extensions.hh"
 #include "encryptionextension.hh"
 #include "commercial_extension.hh"
+#include "intermediaterepresentation.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -2965,6 +2966,27 @@ TyTCodeplug::clear()
   // Clear contacts
   this->clearContacts();
 }
+
+
+Config *
+TyTCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process codeplug for TyT device.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
 
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
