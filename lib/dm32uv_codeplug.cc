@@ -402,6 +402,7 @@ DM32UVCodeplug::ChannelElement::setDMRIdIndex(unsigned int id) {
 
 Channel *
 DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   Channel *ch = nullptr;
 
   if ((ChannelType::FM == channelType()) || (ChannelType::FMFixed == channelType())) {
@@ -491,6 +492,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
 
 bool
 DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   setName(channel->name());
   setRXFrequency(channel->rxFrequency());
   setTXFrequency(channel->txFrequency());
@@ -901,6 +903,7 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
 
 bool
 DM32UVCodeplug::GroupListElement::encode(const RXGroupList *gl, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   setName(gl->name());
   for (unsigned int i=0; i<std::min((unsigned int)gl->count(), Limit::contacts()); i++) {
     setId(i, gl->contacts()->get(i)->as<DMRContact>()->number());
@@ -1179,10 +1182,13 @@ DM32UVCodeplug::ZoneElement::link(Zone *zone, Context &ctx, const ErrorStack &er
 
 bool
 DM32UVCodeplug::ZoneElement::encode(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(zone->name());
   setChannelCount(std::min(Limit::channels(), (unsigned int)zone->A()->count()));
   for (unsigned int i=0; i<channelCount(); i++) {
     setChannelIndex(i, ctx.index(zone->A()->get(i)->as<Channel>()));
   }
+
   return true;
 }
 
@@ -1463,12 +1469,40 @@ DM32UVCodeplug::ScanListElement::decode(Context &ctx, const ErrorStack &err) {
 
 bool
 DM32UVCodeplug::ScanListElement::link(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  // Link primary, secondary and revert channels if set
+  if (primaryChannelIndexValid()) {
+    if (! ctx.has<Channel>(primaryChannelIndex())) {
+      errMsg(err) << "Cannot link primary priority channel for scan list '" << lst->name()
+                  << "': Channel with index " << primaryChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+  }
+
+  if (secondaryChannelIndexValid()) {
+    if (! ctx.has<Channel>(secondaryChannelIndex())) {
+      errMsg(err) << "Cannot link secondary priority channel for scan list '" << lst->name()
+      << "': Channel with index " << secondaryChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+  }
+
+  if (revertChannelIndexValid()) {
+    if (! ctx.has<Channel>(revertChannelIndex())) {
+      errMsg(err) << "Cannot link revert channel for scan list '" << lst->name()
+      << "': Channel with index " << revertChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+  }
+
   for (unsigned int i=0; i<channelCount(); i++) {
     if (isCurrentChannel(i)) {
       lst->addChannel(SelectedChannel::get());
     } else if (! ctx.has<Channel>(channelIndex(i))) {
-      errMsg(err) << "Cannot link scan list, channel with index " << channelIndex(i)
-                  << "not defined";
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Channel with index " << channelIndex(i) << "not defined";
       return false;
     }
     lst->addChannel(ctx.get<Channel>(channelIndex(i)));
@@ -1480,6 +1514,14 @@ DM32UVCodeplug::ScanListElement::link(ScanList *lst, Context &ctx, const ErrorSt
 bool
 DM32UVCodeplug::ScanListElement::encode(const ScanList *lst, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+  setName(lst->name());
+
+  if (! lst->primary()->isNull())
+    setPrimaryChannelIndex(ctx.index(lst->primaryChannel()));
+  if (! lst->secondary()->isNull())
+    setSecondaryChannelIndex(ctx.index(lst->secondaryChannel()));
+  if (! lst->revert()->isNull())
+    setRevertChannelIndex(ctx.index(lst->revertChannel()));
   setChannelCount(std::min(Limit::channels(), (unsigned int)lst->count()));
   for (unsigned int i=0; i<channelCount(); i++) {
     if (SelectedChannel::get() == lst->channel(i))
@@ -1487,6 +1529,7 @@ DM32UVCodeplug::ScanListElement::encode(const ScanList *lst, Context &ctx, const
     else
       setChannelIndex(i, ctx.index(lst->channel(i)));
   }
+
   return true;
 }
 
@@ -3236,6 +3279,8 @@ DM32UVCodeplug::APRSSettingsElement::setDestinationId(unsigned int id) {
 
 bool
 DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   if (0 == destinationId())
     return true;
 
@@ -3457,6 +3502,8 @@ DM32UVCodeplug::EncryptionKeyElement::setKey(const QByteArray &key) {
 
 EncryptionKey *
 DM32UVCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx);
+
   switch (type()) {
   case Type::Off:
   case Type::Custom:
@@ -3490,6 +3537,27 @@ DM32UVCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err
 }
 
 
+bool
+DM32UVCodeplug::EncryptionKeyElement::encode(const EncryptionKey *key, Context &ctx, const ErrorStack &err) {
+  setKeyId(ctx.index((EncryptionKey*)key)+1);
+  setName(key->name());
+  setKey(key->key());
+
+  if (key->is<ARC4EncryptionKey>()) {
+    setType(Type::ARC4);
+  } else if (key->is<AESEncryptionKey>() && (16 == key->key().size())) {
+    setType(Type::AES128);
+  } else if (key->is<AESEncryptionKey>() && (32 == key->key().size())) {
+    setType(Type::AES256);
+  } else {
+    errMsg(err) << "Cannot encode encryption key: Format not supported.";
+    return false;
+  }
+
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::EncryptionKeyBankElement
@@ -3512,6 +3580,7 @@ DM32UVCodeplug::EncryptionKeyBankElement::key(unsigned int idx) const {
   return EncryptionKeyElement(_data + Offset::keys() + idx*Offset::betweenKeys());
 }
 
+
 bool
 DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::keys(); i++) {
@@ -3526,6 +3595,21 @@ DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack 
     ctx.config()->commercialExtension()->encryptionKeys()->add(key);
   }
 
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    key(i).clear();
+    if (i >= ctx.count<EncryptionKey>())
+      continue;
+    if (! key(i).encode(ctx.get<EncryptionKey>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode encryption key.";
+      return false;
+    }
+  }
   return true;
 }
 
@@ -3618,6 +3702,17 @@ DM32UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const
   for (int i=0; i<config->scanlists()->count(); i++)
     ctx.add(config->scanlists()->scanlist(i), i);
 
+  // Map roaming channels and zones
+  for (int i=0; i<config->roamingChannels()->count(); i++)
+    ctx.add(config->roamingChannels()->channel(i), i);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i);
+
+  // Map encryption keys
+  if (config->commercialExtension()) {
+    for (int i=0; i<config->commercialExtension()->encryptionKeys()->count(); i++)
+      ctx.add(config->commercialExtension()->encryptionKeys()->key(i), i);
+  }
   return true;
 }
 
@@ -3627,6 +3722,10 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
   Q_UNUSED(flags);
 
   Context ctx(config);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject);
+  ctx.addTable(&EncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Index elements.";
     return false;
@@ -3803,7 +3902,7 @@ DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
   }
   if (! image(0).isAllocated(Offset::roamingZoneBank()))
     image(0).addElement(Offset::roamingZoneBank(), RoamingZoneBankElement::size());
-  if (! RoamingZoneBankElement(data(Offset::roamingChannelBank())).encode(ctx, err)) {
+  if (! RoamingZoneBankElement(data(Offset::roamingZoneBank())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode roaming zones.";
     return false;
   }
@@ -3816,6 +3915,13 @@ DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
   }
   if (! APRSSettingsElement(data(Offset::aprsSettings())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode APRS settings.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::extendedSettings()))
+    image(0).addElement(Offset::extendedSettings(), Limit::blockSize());
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
     return false;
   }
 

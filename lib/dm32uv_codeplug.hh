@@ -2218,6 +2218,8 @@ public:
 
     /** Decodes the key. */
     EncryptionKey *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes the key. */
+    bool encode(const EncryptionKey *key, Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits of the element. */
@@ -2259,6 +2261,8 @@ public:
 
     /** Decodes all keys. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Encodes all keys. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits for the element. */
@@ -2338,6 +2342,7 @@ protected:
     static constexpr unsigned int aprsSettings()        { return 0x00004300; }
     static constexpr unsigned int contactIndex()        { return 0x0000b000; }
     static constexpr unsigned int groupListBank()       { return 0x0000f000; }
+    static constexpr unsigned int extendedSettings()    { return 0x00010000; }
     static constexpr unsigned int encryptionKeys()      { return 0x00010300; }
     static constexpr unsigned int scanListBank()        { return 0x00011000; }
     static constexpr unsigned int channelBanks()        { return 0x00012000; }

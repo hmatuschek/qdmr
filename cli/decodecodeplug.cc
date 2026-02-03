@@ -26,7 +26,6 @@
 #include "opengd77_codeplug.hh"
 #include "openuv380_codeplug.hh"
 #include "openrtx_codeplug.hh"
-#include "anytone_filereader.hh"
 #include "d868uv_codeplug.hh"
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"

@@ -800,6 +800,7 @@ Codeplug::Context::satellites() const {
   return _satellites;
 }
 
+
 bool
 Codeplug::Context::hasTable(const QMetaObject *obj) const {
   // Find a matching table
@@ -824,6 +825,16 @@ Codeplug::Context::addTable(const QMetaObject *obj) {
   _tables.insert(obj->className(), Table());
   return true;
 }
+
+bool
+Codeplug::Context::remTable(const QMetaObject *obj) {
+  if (! hasTable(obj))
+    return false;
+  if (_tables.contains(obj->className()))
+    return _tables.remove(obj->className());
+  return remTable(obj->superClass());
+}
+
 
 ConfigItem *
 Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {

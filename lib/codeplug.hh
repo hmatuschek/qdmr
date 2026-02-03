@@ -347,6 +347,8 @@ public:
     bool addTable(const QMetaObject *obj);
     /** Returns @c true if a table is defined for the given type. */
     bool hasTable(const QMetaObject *obj) const;
+    /** Deletes a table. */
+    bool remTable(const QMetaObject *obj);
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -363,6 +365,8 @@ public:
     /** Returns the number of elements for the specified type. */
     template <class T>
     unsigned int count() {
+      if (! hasTable(&T::staticMetaObject))
+        return 0;
       return getTable(&T::staticMetaObject).indices.size();
     }
 
