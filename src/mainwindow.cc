@@ -90,8 +90,9 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   }, Qt::QueuedConnection);
 
   connect(ui->actionUploadCallsignDB, SIGNAL(triggered()), app, SLOT(uploadCallsignDB()));
-  connect(app->user(), &UserDatabase::readyChanged,
-          [this](bool ready){ this->ui->actionUploadCallsignDB->setEnabled(ready);});
+  connect(app->user(), &UserDatabase::readyChanged, this, [this](bool ready){
+    this->ui->actionUploadCallsignDB->setEnabled(ready);
+  }, Qt::QueuedConnection);
   ui->actionUploadCallsignDB->setEnabled(app->user()->ready());
 
   connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));

@@ -9,7 +9,7 @@
 *qdmr* is a graphical user interface (GUI) application that allows to program several types of DMR radios.
 To this end, it aims at being a more universal codeplug programming software (CPS) compared to the
 device and even revision specific CPSs provided by the manufacturers. The goal of this project is to
-provide a **single**, **comfortable**, [**well-documented**](https://dm3mat.darc.de/qdmr/manual/) 
+provide a **single**, **comfortable**, [**well-documented**](https://static.dm3mat.de/qdmr/manual/) 
 and **platform-independent** CPS for several types of (mainly Chinese) DMR radios.
 
 ## Supported Radios 
@@ -34,7 +34,7 @@ Currently, there are only few radios that are supported
   * BTECH DMR-6x2 (since version 0.11.0)
   * BTECH DMR-6x2 PRO (since version 0.13.0)
 
-A more [detailed list](https://dm3mat.darc.de/qdmr/#dev) is also available. 
+A more [detailed list](https://dm3mat.de/software/qdmr) is also available. 
 
 
 ## Questions?
@@ -64,6 +64,7 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
  
+ * **[Version 0.13.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.3)** -- Bugfix release.
  * **[Version 0.13.2](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.2)** -- Bugfix release.
  * **[Version 0.13.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.1)** -- Bugfix release.
  * **[Version 0.13.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.0)** -- Added support BTech DMR6X2PRO and OpenUV390.
@@ -84,7 +85,7 @@ There are several ways to install qdmr on your system ranging from simple app-pa
 
 ## License
 qdmr - A GUI application and command-line-tool to program DMR radios.
-Copyright (C) 2019-2025 Hannes Matuschek, DM3MAT
+Copyright (C) 2019-2026 Hannes Matuschek, DM3MAT
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
