@@ -402,6 +402,7 @@ DM32UVCodeplug::ChannelElement::setDMRIdIndex(unsigned int id) {
 
 Channel *
 DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   Channel *ch = nullptr;
 
   if ((ChannelType::FM == channelType()) || (ChannelType::FMFixed == channelType())) {
@@ -491,6 +492,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
 
 bool
 DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   setName(channel->name());
   setRXFrequency(channel->rxFrequency());
   setTXFrequency(channel->txFrequency());
@@ -516,9 +518,11 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setSquelchLevel(ctx.config()->settings()->squelch());
     setTimeslot(dmr->timeSlot());
     setColorCode(dmr->colorCode());
-    enableEncryption(! dmr->commercialExtension()->encryptionKeyRef()->isNull());
-    if (! dmr->commercialExtension()->encryptionKeyRef()->isNull()) {
-      // reverse engineer encryption key index!
+    if (dmr->commercialExtension()) {
+      enableEncryption(! dmr->commercialExtension()->encryptionKeyRef()->isNull());
+      if (! dmr->commercialExtension()->encryptionKeyRef()->isNull()) {
+        // reverse engineer encryption key index!
+      }
     }
     clearGroupListIndex();
     if (! dmr->groupList()->isNull()) {
@@ -668,6 +672,18 @@ DM32UVCodeplug::ContactElement::decode(Context &ctx, const ErrorStack &err) cons
 }
 
 
+bool
+DM32UVCodeplug::ContactElement::encode(const DMRContact *contact, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  setCallType(contact->type());
+  setName(contact->name());
+  setDMRId(contact->number());
+
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::ContactIndexElement::ContactBitmapElement
@@ -784,6 +800,29 @@ DM32UVCodeplug::ContactIndexElement::sortedIndexEntry(unsigned int n) {
 }
 
 
+bool
+DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  unsigned int privatCallCount = 0, groupCallCount = 0;
+  for (unsigned int i=0; i<contactCount(); i++) {
+    if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(i)->type())
+      privatCallCount++;
+    else if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(i)->type())
+      groupCallCount++;
+  }
+
+  setContactCount(ctx.count<DMRContact>());
+  setPrivateCallCount(privatCallCount);
+  setGroupCallCount(groupCallCount);
+  bitmap().enableFirst(ctx.count<DMRContact>());
+
+  ///@bug Implement index!
+
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::GroupListElement
@@ -862,6 +901,16 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
 }
 
 
+bool
+DM32UVCodeplug::GroupListElement::encode(const RXGroupList *gl, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  setName(gl->name());
+  for (unsigned int i=0; i<std::min((unsigned int)gl->count(), Limit::contacts()); i++) {
+    setId(i, gl->contacts()->get(i)->as<DMRContact>()->number());
+  }
+  return true;
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::GroupListBankElement::GroupListBitmapElement
@@ -934,6 +983,20 @@ DM32UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) 
 }
 
 
+bool
+DM32UVCodeplug::GroupListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  bitmap().enableFirst(ctx.count<RXGroupList>());
+  for (unsigned int i=0; i<ctx.count<RXGroupList>(); i++) {
+    auto gl = ctx.get<RXGroupList>(i);
+    if (! groupList(i).encode(gl, ctx, err)) {
+      errMsg(err) << "Cannot encode " << i << "-th group list.";
+      return false;
+    }
+  }
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::RadioIdElement
@@ -971,6 +1034,15 @@ DMRRadioID *
 DM32UVCodeplug::RadioIdElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
   return new DMRRadioID(name(), id());
+}
+
+
+bool
+DM32UVCodeplug::RadioIdElement::encode(const DMRRadioID *id, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(id->name());
+  setId(id->number());
+  return true;
 }
 
 
@@ -1017,6 +1089,21 @@ DM32UVCodeplug::RadioIdBankElement::decode(Context &ctx, const ErrorStack &err) 
   return true;
 }
 
+
+bool
+DM32UVCodeplug::RadioIdBankElement::encode(Context &ctx, const ErrorStack &err) {
+  setIdCount(ctx.count<DMRRadioID>());
+
+  for (unsigned int i=0; i<std::min(ctx.count<DMRRadioID>(), Limit::ids()); i++) {
+    if (! id(i).encode(ctx.get<DMRRadioID>(i), err)) {
+      errMsg(err) << "Cannot encode DMR radio ID '" << ctx.get<DMRRadioID>(i)->name()
+                  << "' at idx " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
 
 
 /* ******************************************************************************************** *
@@ -1088,6 +1175,18 @@ DM32UVCodeplug::ZoneElement::link(Zone *zone, Context &ctx, const ErrorStack &er
       return false;
     }
     zone->A()->add(ctx.get<Channel>(channelIndex(i)));
+  }
+
+  return true;
+}
+
+bool
+DM32UVCodeplug::ZoneElement::encode(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(zone->name());
+  setChannelCount(std::min(Limit::channels(), (unsigned int)zone->A()->count()));
+  for (unsigned int i=0; i<channelCount(); i++) {
+    setChannelIndex(i, ctx.index(zone->A()->get(i)->as<Channel>()));
   }
 
   return true;
@@ -1370,18 +1469,70 @@ DM32UVCodeplug::ScanListElement::decode(Context &ctx, const ErrorStack &err) {
 
 bool
 DM32UVCodeplug::ScanListElement::link(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  // Link primary, secondary and revert channels if set
+  if (primaryChannelIndexValid()) {
+    if (! ctx.has<Channel>(primaryChannelIndex())) {
+      errMsg(err) << "Cannot link primary priority channel for scan list '" << lst->name()
+                  << "': Channel with index " << primaryChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
+  }
+
+  if (secondaryChannelIndexValid()) {
+    if (! ctx.has<Channel>(secondaryChannelIndex())) {
+      errMsg(err) << "Cannot link secondary priority channel for scan list '" << lst->name()
+      << "': Channel with index " << secondaryChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
+  }
+
+  if (revertChannelIndexValid()) {
+    if (! ctx.has<Channel>(revertChannelIndex())) {
+      errMsg(err) << "Cannot link revert channel for scan list '" << lst->name()
+      << "': Channel with index " << revertChannelIndex() << " not defined.";
+      return false;
+    }
+    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
+  }
+
   for (unsigned int i=0; i<channelCount(); i++) {
     if (isCurrentChannel(i)) {
       lst->addChannel(SelectedChannel::get());
     } else if (! ctx.has<Channel>(channelIndex(i))) {
-      errMsg(err) << "Cannot link scan list, channel with index " << channelIndex(i)
-                  << "not defined";
+      errMsg(err) << "Cannot link scan list '" << lst->name()
+                  << "': Channel with index " << channelIndex(i) << "not defined";
       return false;
     }
     lst->addChannel(ctx.get<Channel>(channelIndex(i)));
   }
   return true;
 }
+
+
+bool
+DM32UVCodeplug::ScanListElement::encode(const ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(lst->name());
+
+  if (! lst->primary()->isNull())
+    setPrimaryChannelIndex(ctx.index(lst->primaryChannel()));
+  if (! lst->secondary()->isNull())
+    setSecondaryChannelIndex(ctx.index(lst->secondaryChannel()));
+  if (! lst->revert()->isNull())
+    setRevertChannelIndex(ctx.index(lst->revertChannel()));
+  setChannelCount(std::min(Limit::channels(), (unsigned int)lst->count()));
+  for (unsigned int i=0; i<channelCount(); i++) {
+    if (SelectedChannel::get() == lst->channel(i))
+      setCurrentChannel(i);
+    else
+      setChannelIndex(i, ctx.index(lst->channel(i)));
+  }
+
+  return true;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -1474,6 +1625,20 @@ DM32UVCodeplug::ScanListBankElement::link(Context &ctx, const ErrorStack &err) {
 }
 
 
+bool
+DM32UVCodeplug::ScanListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  setCount(std::min(Limit::scanLists(), ctx.count<ScanList>()));
+  for (unsigned int i=0; i<count(); i++) {
+    if (! scanList(i).encode(ctx.get<ScanList>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode scan list at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::RoamingChannelElement
  * ******************************************************************************************** */
@@ -1540,8 +1705,10 @@ DM32UVCodeplug::RoamingChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
   }
 }
 
+
 RoamingChannel *
 DM32UVCodeplug::RoamingChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
   auto rc = new RoamingChannel();
   rc->setName(name());
   rc->setRXFrequency(rxFrequency());
@@ -1553,6 +1720,17 @@ DM32UVCodeplug::RoamingChannelElement::decode(Context &ctx, const ErrorStack &er
   return rc;
 }
 
+
+bool
+DM32UVCodeplug::RoamingChannelElement::encode(const RoamingChannel *ch, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(ch->name());
+  setRXFrequency(ch->rxFrequency());
+  setTXFrequency(ch->txFrequency());
+  setColorCode(ch->colorCode());
+  setTimeSlot(ch->timeSlot());
+  return true;
+}
 
 
 
@@ -1590,6 +1768,19 @@ DM32UVCodeplug::RoamingChannelBankElement::decode(Context &ctx, const ErrorStack
     }
     ctx.add(rc, i);
     ctx.config()->roamingChannels()->add(rc);
+  }
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::RoamingChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  setCount(std::min(Limit::channels(), ctx.count<RoamingChannel>()));
+  for (unsigned int i=0; i<count(); i++) {
+    if (! channel(i).encode(ctx.get<RoamingChannel>(i), err)) {
+      errMsg(err) << "Cannot encode roaming channel at index " << i << ".";
+      return false;
+    }
   }
   return true;
 }
@@ -1662,6 +1853,18 @@ DM32UVCodeplug::RoamingZoneElement::link(RoamingZone *zone, Context &ctx, const 
       return false;
     }
     zone->addChannel(ctx.get<RoamingChannel>(channelIndex(i)));
+  }
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneElement::encode(const RoamingZone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setName(zone->name());
+  setCount(std::min(Limit::channels(), (unsigned int)zone->count()));
+  for (unsigned int i=0; i<count(); i++) {
+    setChannelIndex(i, ctx.index(zone->channel(i)));
   }
   return true;
 }
@@ -1761,6 +1964,19 @@ DM32UVCodeplug::RoamingZoneBankElement::link(Context &ctx, const ErrorStack &err
     }
     if (! zone(i).link(z, ctx, err)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::RoamingZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  setCount(std::min(Limit::zones(), ctx.count<RoamingZone>()));
+  for (unsigned int i=0; i<count(); i++) {
+    if (! zone(i).encode(ctx.get<RoamingZone>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode roaming zone at index " << i << ".";
       return false;
     }
   }
@@ -2888,6 +3104,7 @@ DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(unsigned int level) {
 
 bool
 DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   ctx.config()->settings()->setIntroLine1(bootMessage1());
   ctx.config()->settings()->setIntroLine2(bootMessage2());
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
@@ -2896,6 +3113,24 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   else ctx.config()->settings()->setTOT(transmitTimeout().seconds());
   ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
   ctx.config()->smsExtension()->setFormat(smsFormat());
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setBootMessage1(ctx.config()->settings()->introLine1());
+  setBootMessage2(ctx.config()->settings()->introLine2());
+  enableVoicePrompt(ctx.config()->settings()->speech());
+  setVOXLevel(ctx.config()->settings()->vox());
+  if (ctx.config()->settings()->totDisabled()) setTransmitTimeout(Interval::infinity());
+  else setTransmitTimeout(Interval::fromSeconds(ctx.config()->settings()->tot()));
+  setFMMicLevel(ctx.config()->settings()->micLevel());
+  setDMRMicLevel(ctx.config()->settings()->micLevel());
+  if (ctx.config()->smsExtension())
+    setSMSFormat(ctx.config()->smsExtension()->format());
 
   return true;
 }
@@ -3044,6 +3279,8 @@ DM32UVCodeplug::APRSSettingsElement::setDestinationId(unsigned int id) {
 
 bool
 DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   if (0 == destinationId())
     return true;
 
@@ -3090,6 +3327,33 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
     }
     aprs->setRevertChannel(ctx.get<Channel>(revertChannelIndex(0))->as<DMRChannel>());
   }
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (0 == ctx.count<GPSSystem>()) {
+    setDestinationId(0);
+    return true;
+  }
+
+  // We can only encode a single system -> use the first
+  auto sys = ctx.get<GPSSystem>(0);
+  if (0 == sys->period())
+    setUpdatePeriod(Interval::infinity());
+  else
+    setUpdatePeriod(Interval::fromSeconds(sys->period()));
+  setDestinationId(sys->contactObj()->number());
+  setCallType(sys->contactObj()->type());
+
+  for (unsigned int i=0; i<Limit::revertChannels(); i++)
+    setRevertChannelToCurrent(i);
+  if (sys->hasRevertChannel())
+    setRevertChannelIndex(0, ctx.index((Channel*)sys->revertChannel()));
 
   return true;
 }
@@ -3238,6 +3502,8 @@ DM32UVCodeplug::EncryptionKeyElement::setKey(const QByteArray &key) {
 
 EncryptionKey *
 DM32UVCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx);
+
   switch (type()) {
   case Type::Off:
   case Type::Custom:
@@ -3271,6 +3537,27 @@ DM32UVCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err
 }
 
 
+bool
+DM32UVCodeplug::EncryptionKeyElement::encode(const EncryptionKey *key, Context &ctx, const ErrorStack &err) {
+  setKeyId(ctx.index((EncryptionKey*)key)+1);
+  setName(key->name());
+  setKey(key->key());
+
+  if (key->is<ARC4EncryptionKey>()) {
+    setType(Type::ARC4);
+  } else if (key->is<AESEncryptionKey>() && (16 == key->key().size())) {
+    setType(Type::AES128);
+  } else if (key->is<AESEncryptionKey>() && (32 == key->key().size())) {
+    setType(Type::AES256);
+  } else {
+    errMsg(err) << "Cannot encode encryption key: Format not supported.";
+    return false;
+  }
+
+  return true;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::EncryptionKeyBankElement
@@ -3293,6 +3580,7 @@ DM32UVCodeplug::EncryptionKeyBankElement::key(unsigned int idx) const {
   return EncryptionKeyElement(_data + Offset::keys() + idx*Offset::betweenKeys());
 }
 
+
 bool
 DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::keys(); i++) {
@@ -3307,6 +3595,21 @@ DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack 
     ctx.config()->commercialExtension()->encryptionKeys()->add(key);
   }
 
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int i=0; i<Limit::keys(); i++) {
+    key(i).clear();
+    if (i >= ctx.count<EncryptionKey>())
+      continue;
+    if (! key(i).encode(ctx.get<EncryptionKey>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode encryption key.";
+      return false;
+    }
+  }
   return true;
 }
 
@@ -3399,6 +3702,17 @@ DM32UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const
   for (int i=0; i<config->scanlists()->count(); i++)
     ctx.add(config->scanlists()->scanlist(i), i);
 
+  // Map roaming channels and zones
+  for (int i=0; i<config->roamingChannels()->count(); i++)
+    ctx.add(config->roamingChannels()->channel(i), i);
+  for (int i=0; i<config->roamingZones()->count(); i++)
+    ctx.add(config->roamingZones()->zone(i), i);
+
+  // Map encryption keys
+  if (config->commercialExtension()) {
+    for (int i=0; i<config->commercialExtension()->encryptionKeys()->count(); i++)
+      ctx.add(config->commercialExtension()->encryptionKeys()->key(i), i);
+  }
   return true;
 }
 
@@ -3408,8 +3722,12 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
   Q_UNUSED(flags);
 
   Context ctx(config);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject);
+  ctx.addTable(&EncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
-    errMsg(err) << "Cannot encode codeplug.";
+    errMsg(err) << "Index elements.";
     return false;
   }
 
@@ -3544,6 +3862,69 @@ DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! encodeContacts(ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::groupListBank()))
+    image(0).addElement(Offset::groupListBank(), GroupListBankElement::size());
+  if (! GroupListBankElement(data(Offset::groupListBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::radioIdBank()))
+    image(0).addElement(Offset::radioIdBank(), RadioIdBankElement::size());
+  if (! RadioIdBankElement(data(Offset::radioIdBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode radio IDs.";
+    return false;
+  }
+
+  if (! encodeZones(ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::scanListBank()))
+    image(0).addElement(Offset::scanListBank(), ScanListBankElement::size());
+  if (! ScanListBankElement(data(Offset::scanListBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode scan lists.";
+    return false;
+  }
+
+
+  if (! image(0).isAllocated(Offset::roamingChannelBank()))
+    image(0).addElement(Offset::roamingChannelBank(), RoamingChannelBankElement::size());
+  if (! RoamingChannelBankElement(data(Offset::roamingChannelBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode roaming channels.";
+    return false;
+  }
+  if (! image(0).isAllocated(Offset::roamingZoneBank()))
+    image(0).addElement(Offset::roamingZoneBank(), RoamingZoneBankElement::size());
+  if (! RoamingZoneBankElement(data(Offset::roamingZoneBank())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode roaming zones.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::generalSettings()))
+    image(0).addElement(Offset::generalSettings(), Limit::blockSize());
+  if (! GeneralSettingsElement(data(Offset::generalSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode settings.";
+    return false;
+  }
+  if (! APRSSettingsElement(data(Offset::aprsSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode APRS settings.";
+    return false;
+  }
+
+  if (! image(0).isAllocated(Offset::extendedSettings()))
+    image(0).addElement(Offset::extendedSettings(), Limit::blockSize());
+  if (! EncryptionKeyBankElement(data(Offset::encryptionKeys())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode encryption keys.";
+    return false;
+  }
+
   return true;
 }
 
@@ -3599,12 +3980,14 @@ DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 bool
 DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
   // Allocate blocks
-  unsigned int numBlocks = ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock();
-    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0);
+  auto numBlocks = Limit::channelBanks().limit(
+    ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock()
+    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0));
+
   for (unsigned int b=0; b<numBlocks; b++) {
-    unsigned int addr = Offset::channelBanks()
-      + b*ChannelBankElement::Offset::betweenChannelBlocks();
-    image(0).addElement(addr, ChannelBankElement::Offset::betweenChannelBlocks());
+    unsigned int addr = Offset::channelBanks() + b*Limit::blockSize();
+    if (! isAllocated(addr))
+      image(0).addElement(addr, Limit::blockSize());
   }
 
   // Encode channels
@@ -3651,6 +4034,43 @@ DM32UVCodeplug::decodeContacts(Context &ctx, const ErrorStack &err) {
 
 
 bool
+DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
+  // Allocate index
+  if (! isAllocated(Offset::contactIndex()))
+    image(0).addElement(Offset::contactIndex(), ContactIndexElement::size());
+  // Allocate blocks
+  auto numBlocks = Limit::contactBanks().limit(
+    ctx.count<DMRContact>()/ContactBankElement::Limit::contactsPerBlock()
+    + ((0 != ctx.count<DMRContact>() % ContactBankElement::Limit::contactsPerBlock()) ? 1 : 0));
+  for (unsigned int b=0; b<numBlocks; b++) {
+    unsigned int addr = Offset::contactBanks() + b*Limit::blockSize();
+    if (! isAllocated(addr))
+      image(0).addElement(addr, Limit::blockSize());
+  }
+
+  if (! ContactIndexElement(data(Offset::contactIndex())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode contact index.";
+    return false;
+  }
+
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+    unsigned int blockIndex    = i / ContactBankElement::Limit::contactsPerBlock(),
+      indexInBlock = i % ContactBankElement::Limit::contactsPerBlock();
+    uint32_t addr = Offset::contactBanks()
+                    + blockIndex * ContactBankElement::Offset::betweenBlocks()
+                    + indexInBlock * ContactElement::size();
+    if (! ContactElement(data(addr)).encode(ctx.get<DMRContact>(i), err)) {
+      errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
 DM32UVCodeplug::decodeZones(Context &ctx, const ErrorStack &err) {
   ZoneBankElement bank(data(Offset::zoneBanks()));
   for (unsigned int i=0; i<bank.count(); i++) {
@@ -3690,6 +4110,39 @@ DM32UVCodeplug::linkZones(Context &ctx, const ErrorStack &err) {
     // link zone
     if (! ZoneElement(data(addr)).link(zone, ctx, err)) {
       errMsg(err) << "Cannot link zone at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::encodeZones(Context &ctx, const ErrorStack &err) {
+  // Allocate blocks
+  auto numBlocks = Limit::zoneBanks().limit(
+    ctx.count<Zone>()/ZoneBankElement::Limit::zonesPerBlock()
+    + ((0 != ctx.count<Zone>() % ZoneBankElement::Limit::zonesPerBlock()) ? 1 : 0));
+  for (unsigned int b=0; b<numBlocks; b++) {
+    unsigned int addr = Offset::zoneBanks() + b*Limit::blockSize();
+    if (! isAllocated(addr))
+      image(0).addElement(addr, Limit::blockSize());
+  }
+  // Encode all zones
+  ZoneBankElement bank(data(Offset::zoneBanks()));
+  bank.setCount(std::min(ZoneBankElement::Limit::zones(), ctx.count<Zone>()));
+  for (unsigned int i=0; i<bank.count(); i++) {
+    unsigned int blockNumber  = i / ZoneBankElement::Limit::zonesPerBlock();
+    unsigned int indexInBlock = i % ZoneBankElement::Limit::zonesPerBlock();
+    uint32_t addr = Offset::zoneBanks()
+                    + (0 == blockNumber ? ZoneBankElement::Offset::zones0()
+                                        : blockNumber * ZoneBankElement::Offset::betweenBlocks())
+                    + indexInBlock * ZoneElement::size();
+    // encode zone
+    if (! ZoneElement(data(addr)).encode(ctx.get<Zone>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode zone '" << ctx.get<Zone>(i)->name()
+                  << "' at index " << i << ".";
       return false;
     }
   }
