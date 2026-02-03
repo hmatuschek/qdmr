@@ -710,9 +710,19 @@ DM32UVCodeplug::ContactIndexElement::EntryElement::EntryElement(uint8_t *ptr)
   // pass...
 }
 
+void
+DM32UVCodeplug::ContactIndexElement::EntryElement::clear() {
+  setUInt16_le(0x0000, 0xffff);
+}
+
+bool
+DM32UVCodeplug::ContactIndexElement::EntryElement::isValid() const {
+  return 0xffff != getUInt16_le(0x0000);
+}
+
 DMRContact::Type
 DM32UVCodeplug::ContactIndexElement::EntryElement::callType() const {
-  switch ((Type)getUInt4(Offset::callType())) {
+  switch ((Type)(getUInt16_le(0x0000) >> 12)) {
   case Type::Private: return DMRContact::Type::PrivateCall;
   case Type::Group: return DMRContact::Type::GroupCall;
   case Type::All: return DMRContact::Type::AllCall;
@@ -722,18 +732,26 @@ DM32UVCodeplug::ContactIndexElement::EntryElement::callType() const {
 
 void
 DM32UVCodeplug::ContactIndexElement::EntryElement::setCallType(DMRContact::Type type) {
+  uint16_t value = (getUInt16_le(0x0000) & 0x0fff);
   switch (type) {
-  case DMRContact::Type::PrivateCall:
-    setUInt4(Offset::callType(), (unsigned int)Type::Private);
-    break;
-  case DMRContact::Type::GroupCall:
-    setUInt4(Offset::callType(), (unsigned int)Type::Group);
-    break;
-  case DMRContact::Type::AllCall:
-    setUInt4(Offset::callType(), (unsigned int)Type::All);
-    break;
+  case DMRContact::Type::PrivateCall: value |= ((unsigned int)Type::Private)<<12; break;
+  case DMRContact::Type::GroupCall: value |= ((unsigned int)Type::Group)<<12; break;
+  case DMRContact::Type::AllCall: value |= ((unsigned int)Type::All)<<12; break;
   }
+  setUInt16_le(0x0000, value);
 }
+
+
+unsigned int
+DM32UVCodeplug::ContactIndexElement::EntryElement::index() const {
+  return (getUInt16_le(0x0000) & 0x0fff)-1;
+}
+
+void
+DM32UVCodeplug::ContactIndexElement::EntryElement::setIndex(unsigned int idx) {
+  setUInt16_le(0x0000, (getUInt16_le(0x0000) & 0xf000) | ((idx+1) & 0x0fff));
+}
+
 
 
 
@@ -804,20 +822,32 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  setContactCount(ctx.count<DMRContact>());
   unsigned int privatCallCount = 0, groupCallCount = 0;
-  for (unsigned int i=0; i<contactCount(); i++) {
-    if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(i)->type())
+
+  QVector<unsigned int> indices; indices.reserve(contactCount());
+  for (unsigned int idx=0; idx<contactCount(); idx++) {
+    if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(idx)->type())
       privatCallCount++;
-    else if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(i)->type())
+    else if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(idx)->type())
       groupCallCount++;
+    indexEntry(idx).setCallType(ctx.get<DMRContact>(idx)->type());
+    indexEntry(idx).setIndex(idx);
+    indices.append(idx);
   }
 
-  setContactCount(ctx.count<DMRContact>());
   setPrivateCallCount(privatCallCount);
   setGroupCallCount(groupCallCount);
   bitmap().enableFirst(ctx.count<DMRContact>());
 
-  ///@bug Implement index!
+  // Sort indices w.r.t. associated DMR id:
+  std::sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
+    return ctx.get<DMRContact>(ia)->number() < ctx.get<DMRContact>(ib)->number();
+  });
+  for (unsigned int sidx=0; sidx<contactCount(); sidx++) {
+    sortedIndexEntry(sidx).setCallType(ctx.get<DMRContact>(indices[sidx])->type());
+    sortedIndexEntry(sidx).setIndex(indices[sidx]);
+  }
 
   return true;
 }

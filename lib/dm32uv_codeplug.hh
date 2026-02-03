@@ -421,21 +421,23 @@ public:
       /** Constructor. */
       EntryElement(uint8_t *ptr);
 
+      void clear() override;
+
       /** Returns the size of the element. */
       static constexpr unsigned int size() { return 0x0002; }
+
+      /** Returns @c true if the entry is valid. */
+      bool isValid() const override;
 
       /** Returns the call type. */
       virtual DMRContact::Type callType() const;
       /** Sets the call type. */
       virtual void setCallType(DMRContact::Type type);
 
-    protected:
-      /** Some internal offsets. */
-      struct Offset: Element::Offset {
-        /// @cond DO_NOT_DOCUMENT
-        static constexpr Bit callType() { return {0x0001, 4}; }
-        /// @endcond DO_NOT_DOCUMENT
-      };
+      /** Returns the contact index. */
+      virtual unsigned int index() const;
+      /** Sets the index. */
+      virtual void setIndex(unsigned int idx);
     };
 
   public:
