@@ -253,8 +253,76 @@ DM32UV::download(const ErrorStack &err) {
 
 bool
 DM32UV::upload(const ErrorStack &err) {
-  errMsg(err) << "Not implemented yet.";
-  return false;
+  // First, we need to get the codeplug address map
+  DM32UV::AddressMap addressMap;
+  if (! _dev->getAddressMap(addressMap, err)) {
+    errMsg(err) << "Cannot read codeplug from device: Cannot get address map.";
+    return false;
+  }
+
+  // Allocate all mapped memory regions:
+  foreach (uint32_t virtualBlockAddress, addressMap.mappedVirtual()) {
+    _codeplug.image(0).addElement(virtualBlockAddress, Offset::blockSize());
+  }
+
+  if (! _dev->read_start(0, 0, err)) {
+    errMsg(err) << "Cannot start reading codeplug.";
+    return false;
+  }
+
+  // Read all allocated memory regions (sorted by physical address).
+  uint32_t blockCount = 0;
+  foreach (uint32_t physicalBlockAddress, addressMap.mappedPhysical()) {
+    emit downloadProgress(50*blockCount/addressMap.mappedPhysical().count());
+    uint32_t virtualBlockAddress = addressMap.toVirtual(physicalBlockAddress);
+    if (! _dev->read(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
+      errMsg(err) << "Cannot read codeplug block from "
+                  << Qt::hex << physicalBlockAddress << "h (virt. "
+                  << Qt::hex << virtualBlockAddress << "h).";
+      return false;
+    }
+  }
+
+  if (! _dev->read_finish(err)) {
+    errMsg(err) << "Cannot finish codeplug read.";
+    return false;
+  }
+
+  // Now, encode codeplug in physical address space, may override large portions and may also add
+  // new portions to the codeplug.
+  if (! _codeplug.encode(_config, _codeplugFlags, err)) {
+    errMsg(err) << "Cannot encode codeplug from config.";
+    return false;
+  }
+
+  if (! _dev->write_start(0,0,err)) {
+    errMsg(err) << "Cannot start codeplug write´.";
+    return false;
+  }
+
+  // Now mark all blocks with their virtual address
+  // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
+  for (unsigned int blk=0; blk<(unsigned int)_codeplug.image(0).numElements(); blk++) {
+    emit downloadProgress(50 + 50*blk/_codeplug.image(0).numElements());
+    auto element = _codeplug.image(0).element(blk);
+    auto virtualBlockAddress = element.address();
+    element.data()[Offset::blockSize()-1] = (virtualBlockAddress>>12);
+    auto physicalBlockAddress = addressMap.virtualIsMapped(virtualBlockAddress)
+        ? addressMap.toPhysical(virtualBlockAddress) : 0xff<<12;
+    if (! _dev->write(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
+      errMsg(err) << "Cannot write codeplug block to "
+                  << Qt::hex << physicalBlockAddress << "h (virt. "
+                  << Qt::hex << virtualBlockAddress << "h).";
+      return false;
+    }
+  }
+
+  if (! _dev->write_finish(err)) {
+    errMsg(err) << "Cannot finish codeplug write.";
+    return false;
+  }
+
+  return true;
 }
 
 
