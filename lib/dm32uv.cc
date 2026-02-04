@@ -1,6 +1,7 @@
 #include "dm32uv.hh"
 #include "dm32uv_limits.hh"
 #include "dm32uv_interface.hh"
+#include "logger.hh"
 
 
 /* ********************************************************************************************* *
@@ -262,7 +263,8 @@ DM32UV::download(const ErrorStack &err) {
   // Read all allocated memory regions (sorted by physical address).
   uint32_t blockCount = 0;
   foreach (uint32_t physicalBlockAddress, addressMap.mappedPhysical()) {
-    emit downloadProgress(100*blockCount/addressMap.mappedPhysical().count());
+    auto progress = (100*++blockCount)/addressMap.mappedPhysical().count();
+    emit downloadProgress(progress);
     uint32_t virtualBlockAddress = addressMap.toVirtual(physicalBlockAddress);
     if (! _dev->read(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot read codeplug block from "
@@ -303,7 +305,7 @@ DM32UV::upload(const ErrorStack &err) {
   // Read all allocated memory regions (sorted by physical address).
   uint32_t blockCount = 0;
   foreach (uint32_t physicalBlockAddress, addressMap.mappedPhysical()) {
-    emit downloadProgress(50*blockCount/addressMap.mappedPhysical().count());
+    emit uploadProgress((50*++blockCount)/addressMap.mappedPhysical().count());
     uint32_t virtualBlockAddress = addressMap.toVirtual(physicalBlockAddress);
     if (! _dev->read(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot read codeplug block from "
@@ -333,7 +335,7 @@ DM32UV::upload(const ErrorStack &err) {
   // Now mark all blocks with their virtual address
   // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
   for (unsigned int blk=0; blk<(unsigned int)_codeplug.image(0).numElements(); blk++) {
-    emit downloadProgress(50 + 50*blk/_codeplug.image(0).numElements());
+    emit uploadProgress(50 + (50*blk)/_codeplug.image(0).numElements());
     auto element = _codeplug.image(0).element(blk);
     auto virtualBlockAddress = element.address();
     element.data()[Offset::blockSize()-1] = (virtualBlockAddress>>12);
@@ -366,7 +368,7 @@ DM32UV::uploadCallsigns(const ErrorStack &err) {
   // Now mark all blocks with their virtual address
   // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
   for (unsigned int blk=0; blk<(unsigned int)_callsigns.image(0).numElements(); blk++) {
-    emit downloadProgress(50 + 50*blk/_callsigns.image(0).numElements());
+    emit uploadProgress(50 + 50*blk/_callsigns.image(0).numElements());
     auto element = _callsigns.image(0).element(blk);
     auto blockAddress = element.address();
     if (! _dev->write(0, blockAddress, _codeplug.data(blockAddress), Offset::blockSize())) {

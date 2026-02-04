@@ -248,7 +248,8 @@ public:
   RadioInfo identifier(const ErrorStack &err=ErrorStack()) override;
 
   /** Reads the obfuscation address map from the device. */
-  bool getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err=ErrorStack());
+  bool getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err=ErrorStack(),
+                     void (*progress)(unsigned int percent)=nullptr);
 
   bool read_start(uint32_t bank, uint32_t address, const ErrorStack &err=ErrorStack()) override;
   bool read(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err=ErrorStack()) override;

@@ -365,6 +365,7 @@ public:
       static constexpr unsigned int name()        { return 0x0002; }
       static constexpr unsigned int dmrId()       { return 0x0013; }
       static constexpr unsigned int callType()    { return 0x0016; }
+      // @endcond
     };
   };
 
@@ -2174,7 +2175,7 @@ public:
       static constexpr Bit groupList()                    { return {0x0007,2}; }
       static constexpr Bit dcdm()                         { return {0x0007,1}; }
       static constexpr Bit channelType()                  { return {0x0007,0}; }
-      /// @endcon
+      /// @endcond
     };
   };
 

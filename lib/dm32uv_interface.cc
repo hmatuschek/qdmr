@@ -262,7 +262,7 @@ DM32UVInterface::WriteRequest::WriteRequest(uint32_t address, const QByteArray &
 
 bool
 DM32UVInterface::WriteRequest::send(DM32UVInterface *dev, const ErrorStack &err) const {
-  return dev->send((const char *)this, sizeof(EnterProgramModeRequest), TIMEOUT, err);
+  return dev->send((const char *)this, sizeof(WriteRequest), TIMEOUT, err);
 }
 
 
@@ -299,7 +299,7 @@ DM32UVInterface::identifier(const ErrorStack &err) {
 
 
 bool
-DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err) {
+DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err, void (*progress)(unsigned int)) {
   // If not yet in program mode -> enter
   if ((State::Program != _state) && (! enter_program_mode(err))) {
     errMsg(err) << "Cannot enter program mode.";
@@ -330,6 +330,8 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err) {
     uint32_t vaddr = ((uint32_t)prefix) << 12;
     logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
     map.map(addr, vaddr);
+    // Signal progress
+    if (progress) progress((100*addr)/_codeplugMemory.second);
   }
 
   return true;
@@ -418,7 +420,7 @@ bool
 DM32UVInterface::write(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, const ErrorStack &err) {
   Q_UNUSED(bank);
 
-  // align read with 1000h blocks
+  // align with 1000h blocks
   if (address & 0xfff) {
     int n = std::min(nbytes, (int)(0x1000 - (address & 0xfff)));
     WriteRequest req(address, QByteArray((const char*)data, n));
