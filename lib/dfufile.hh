@@ -75,82 +75,86 @@ class DFUFile: public QObject
 
 public:
   /** Represents a single element within a @c Image. */
-	class Element {
-	public:
+  class Element {
+  public:
     /** Empty constructor. */
-		Element();
+    Element();
     /** Constructs an element for the given address and of the given size. */
-		Element(uint32_t addr, uint32_t size);
+    Element(uint32_t addr, uint32_t size);
     /** Copy constructor. */
-		Element(const Element &other);
+    Element(const Element &other);
     /** Copying assignment. */
-		Element &operator= (const Element &other);
+    Element &operator= (const Element &other);
 
     /** Returns the address of the element. */
-		uint32_t address() const;
+    uint32_t address() const;
     /** Sets the address of the element. */
-		void setAddress(uint32_t addr);
+    void setAddress(uint32_t addr);
     /** Returns the size of the element (including headers). */
-		uint32_t size() const;
+    uint32_t size() const;
     /** Returns the memory size of the element. */
     uint32_t memSize() const;
     /** Checks if the element address and size is aligned with the given block size. */
     bool isAligned(unsigned blocksize) const;
     /** Returns a reference to the data. */
-		const QByteArray &data() const;
+    const QByteArray &data() const;
     /** Returns a reference to the data. */
-		QByteArray &data();
+    QByteArray &data();
 
     /** Reads an element from the given file and updates the CRC. */
-		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
+    bool read(QFile &file, CRC32 &crc, QString &errorMessage);
     /** Writes an element to the given file and updates the CRC. */
-		bool write(QFile &file, CRC32 &crc, QString &errorMessage) const;
+    bool write(QFile &file, CRC32 &crc, QString &errorMessage) const;
 
     /** Dumps a textual representation of the element. */
-		void dump(QTextStream &stream) const;
+    void dump(QTextStream &stream) const;
 
-	protected:
+  protected:
     /** The address of the element. */
-		uint32_t _address;
+    uint32_t _address;
     /** The data of the element. */
-		QByteArray _data;
-	};
+    QByteArray _data;
+  };
 
   /** Represents a single image within a @c DFUFile. */
-	class Image
-	{
-	public:
+  class Image
+  {
+  public:
+    /** Iterator type over elements. */
+    typedef QVector<Element>::iterator iterator;
+
+  public:
     /** Default constructor.
      * Constructs an empty image. */
-		Image();
+    Image();
     /** Constructs an image with the given name and optional "alternative settings". */
     Image(const QString &name, uint8_t altSettings=0);
     /** Copy constructor. */
-		Image(const Image &other);
+    Image(const Image &other);
     /** Destructor. */
     virtual ~Image();
     /** Copying assignment. */
-		Image &operator=(const Image &other);
+    Image &operator=(const Image &other);
 
     /** Returns the alternate settings byte. */
-		uint8_t alternateSettings() const;
+    uint8_t alternateSettings() const;
     /** Sets the alternate settings byte. */
-		void setAlternateSettings(uint8_t s);
+    void setAlternateSettings(uint8_t s);
 
     /** Returns @c true if the image is named. */
-		bool isNamed() const;
+    bool isNamed() const;
     /** Returns the name of the image. */
-		const QString &name() const;
+    const QString &name() const;
     /** Sets the name of the image. */
-		void setName(const QString &name);
+    void setName(const QString &name);
     /** Returns the total size of the image (including headers). */
-		uint32_t size() const;
+    uint32_t size() const;
     /** Returns the memory size stored in the image. */
     uint32_t memSize() const;
     /** Returns the number of elements of this image. */
-		int numElements() const;
+    int numElements() const;
     /** Returns a reference to the i-th element of the image. */
-		const Element &element(int i) const;
+    const Element &element(int i) const;
     /** Returns a reference to the i-th element of the image. */
     Element &element(int i);
     /** Adds an element to the image with the given address and size at the specified index.
@@ -159,17 +163,22 @@ public:
     /** Adds an element to the image. */
     void addElement(const Element &element);
     /** Removes the i-th element from this image. */
-		void remElement(int i);
+    void remElement(int i);
     /** Checks if all element addresses and sizes is aligned with the given block size. */
     bool isAligned(unsigned blocksize) const;
 
+    /** Retruns a pointer to the first element. */
+    iterator begin();
+    /** Returns a pointer after the last element. */
+    iterator end();
+
     /** Reads an image from the given file and updates the CRC. */
-		bool read(QFile &file, CRC32 &crc, QString &errorMessage);
+    bool read(QFile &file, CRC32 &crc, QString &errorMessage);
     /** Writes this image to the given file and updates the CRC. */
-		bool write(QFile &file, CRC32 &crc, QString &errorMessage) const;
+    bool write(QFile &file, CRC32 &crc, QString &errorMessage) const;
 
     /** Prints a textual representation of the image into the given stream. */
-		void dump(QTextStream &stream) const;
+    void dump(QTextStream &stream) const;
 
     /** Returns @c true if the specified address is allocated. */
     virtual bool isAllocated(uint32_t offset) const;
@@ -182,16 +191,16 @@ public:
     /** Sorts all elements with respect to their addresses. */
     void sort();
 
-	protected:
+  protected:
     /** Alternate settings byte. */
-		uint8_t  _alternate_settings;
+    uint8_t  _alternate_settings;
     /** Optional image name. */
-		QString _name;
+    QString _name;
     /** The elements of the image. */
-		QVector<Element> _elements;
+    QVector<Element> _elements;
     /** Maps an address range to element index. */
     AddressMap _addressmap;
-	};
+  };
 
 public:
   /** Constructs an empty DFU file object. */

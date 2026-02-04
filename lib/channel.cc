@@ -5,8 +5,6 @@
 #include "scanlist.hh"
 #include "logger.hh"
 #include <cmath>
-#include "utils.hh"
-//#include "application.hh"
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
 #include <QRegularExpression>
@@ -567,7 +565,7 @@ FMChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["analog"] = node;
+  type["fm"] = node;
   return type;
 }
 
@@ -607,6 +605,124 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
   return AnalogChannel::parse(node, ctx, err);
 }
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AMChannel
+ * ********************************************************************************************* */
+AMChannel::AMChannel(QObject *parent)
+  : AnalogChannel(parent), _squelch(std::numeric_limits<unsigned>::max())
+{
+  // pass...
+}
+
+
+bool
+AMChannel::copy(const ConfigItem &other) {
+  auto c = other.as<AMChannel>();
+  if ((nullptr==c) || (! AnalogChannel::copy(other)))
+    return false;
+  return true;
+}
+
+ConfigItem *
+AMChannel::clone() const {
+  auto c = new AMChannel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+AMChannel::clear() {
+  AnalogChannel::clear();
+  setSquelchDefault();
+}
+
+
+bool
+AMChannel::defaultSquelch() const {
+  return std::numeric_limits<unsigned>::max()==squelch();
+}
+
+bool
+AMChannel::squelchDisabled() const {
+  return 0==squelch();
+}
+
+unsigned
+AMChannel::squelch() const {
+  return _squelch;
+}
+
+bool
+AMChannel::setSquelch(unsigned val) {
+  _squelch = val;
+  emit modified(this);
+  return true;
+}
+
+void
+AMChannel::disableSquelch() {
+  setSquelch(0);
+}
+
+void
+AMChannel::setSquelchDefault() {
+  setSquelch(std::numeric_limits<unsigned>::max());
+}
+
+YAML::Node
+AMChannel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = AnalogChannel::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["am"] = node;
+  return type;
+}
+
+bool
+AMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! AnalogChannel::populate(node, context, err))
+    return false;
+
+  if (defaultSquelch()) {
+    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
+    node["squelch"] = def;
+  } else {
+    node["squelch"] = squelch();
+  }
+
+  return true;
+}
+
+bool
+AMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if ((! node.IsMap()) || (1 != node.size())) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse analog channel: Expected object with one child.";
+    return false;
+  }
+
+  YAML::Node ch = node.begin()->second;
+
+  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
+    setSquelchDefault();
+  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
+    setSquelch(ch["squelch"].as<unsigned>());
+  }
+
+  return AnalogChannel::parse(node, ctx, err);
+}
+
 
 
 /* ********************************************************************************************* *
@@ -656,7 +772,7 @@ DMRChannel::clear() {
   DigitalChannel::clear();
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
-  setGroupListObj(nullptr);
+  setGroupList(nullptr);
   setTXContactObj(nullptr);
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
@@ -712,17 +828,17 @@ DMRChannel::setTimeSlot(TimeSlot slot) {
 }
 
 const GroupListReference *
-DMRChannel::groupList() const {
+DMRChannel::groupListRef() const {
   return &_rxGroup;
 }
 
 GroupListReference *
-DMRChannel::groupList() {
+DMRChannel::groupListRef() {
   return &_rxGroup;
 }
 
 void
-DMRChannel::setGroupList(GroupListReference *ref) {
+DMRChannel::setGroupListRef(GroupListReference *ref) {
   if (nullptr == ref)
     _rxGroup.clear();
   else
@@ -730,12 +846,12 @@ DMRChannel::setGroupList(GroupListReference *ref) {
 }
 
 RXGroupList *
-DMRChannel::groupListObj() const {
+DMRChannel::groupList() const {
   return _rxGroup.as<RXGroupList>();
 }
 
 bool
-DMRChannel::setGroupListObj(RXGroupList *g) {
+DMRChannel::setGroupList(RXGroupList *g) {
   if(! _rxGroup.set(g))
     return false;
   emit modified(this);
@@ -906,7 +1022,7 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
     return node;
 
   YAML::Node type;
-  type["digital"] = node;
+  type["dmr"] = node;
   return type;
 }
 

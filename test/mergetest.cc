@@ -242,7 +242,7 @@ MergeTest::testMergeChannels() {
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
     dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setGroupList(lst);
     base->channelList()->add(dch);
   }
 
@@ -265,7 +265,7 @@ MergeTest::testMergeChannels() {
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
     dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setGroupList(lst);
     merging->channelList()->add(dch);
   }
 
@@ -287,7 +287,7 @@ MergeTest::testMergeChannels() {
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 144.0);
   QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 
 
   merged = ConfigMerge::merge(base, merging,
@@ -306,7 +306,7 @@ MergeTest::testMergeChannels() {
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 145.0);
   QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 }
 
 
@@ -332,7 +332,7 @@ MergeTest::testMergeZones() {
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
     dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setGroupList(lst);
     base->channelList()->add(dch);
 
     Zone *zone = new Zone("Zone 0");
@@ -360,7 +360,7 @@ MergeTest::testMergeZones() {
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
     dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setGroupList(lst);
     merging->channelList()->add(dch);
 
     Zone *zone = new Zone("Zone 0");

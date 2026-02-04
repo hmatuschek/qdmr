@@ -5,6 +5,7 @@
 #include "tyt_interface.hh"
 #include "dr1801uv_interface.hh"
 #include "gd73_interface.hh"
+#include "dm32uv_interface.hh"
 
 #include "rd5r.hh"
 #include "gd73.hh"
@@ -13,6 +14,7 @@
 #include "uv390.hh"
 #include "md2017.hh"
 #include "dm1701.hh"
+#include "dm32uv.hh"
 #include "dr1801uv.hh"
 #include "opengd77.hh"
 #include "openuv380.hh"
@@ -164,12 +166,11 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     hid->deleteLater();
-  } else if (DR1801UVInterface::interfaceInfo() == descr) {
+  } else if ((DR1801UVInterface::interfaceInfo() == descr) && force.isValid() && (RadioInfo::DR1801UV==force.id())){
     DR1801UVInterface *dif = new DR1801UVInterface(descr, err);
     if (dif->isOpen()) {
       RadioInfo id = dif->identifier(err);
-      if (((id.isValid()) && (RadioInfo::DR1801UV == id.id())) ||
-          (force.isValid() && (RadioInfo::DR1801UV==force.id()))) {
+      if (id.isValid() && (RadioInfo::DR1801UV == id.id())) {
         return new DR1801UV(dif);
       } else if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
@@ -198,6 +199,24 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     gdif->deleteLater();
+  } else if ((DM32UVInterface::interfaceInfo() == descr) && force.isValid() && (RadioInfo::DM32UV==force.id())) {
+    DM32UVInterface *dm32if = new DM32UVInterface(descr, err);
+    if (dm32if->isOpen()) {
+      RadioInfo id = dm32if->identifier(err);
+      if (! id.isValid()) {
+        errMsg(err) << "Cannot identify device.";
+      } else if (RadioInfo::DM32UV == id.id()) {
+        return new DM32UV(dm32if);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+        << ". Device known but not implemented yet.";
+      }
+      dm32if->close();
+      dm32if->deleteLater();
+      return nullptr;
+    }
+    dm32if->deleteLater();
+    return nullptr;
   }
   return nullptr;
 }

@@ -399,7 +399,7 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, con
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasContact() && ctx.has<DMRContact>(contactIndex()))
       dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
   }
@@ -455,8 +455,8 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     setTimeSlot(dc->timeSlot());
     setRXColorCode(dc->colorCode());
     setTXColorCode(dc->colorCode());
-    if (dc->groupListObj())
-      setGroupListIndex(ctx.index(dc->groupListObj()));
+    if (dc->groupList())
+      setGroupListIndex(ctx.index(dc->groupList()));
     if (dc->txContactObj())
       setContactIndex(ctx.index(dc->txContactObj()));
   } else {
@@ -2885,6 +2885,14 @@ RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *intermediate = Codeplug::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot pre-process Radioddity codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
     return nullptr;
   }
 

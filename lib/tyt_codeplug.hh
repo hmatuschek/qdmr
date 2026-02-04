@@ -1260,6 +1260,8 @@ public:
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
+  Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
   /** Encodes the given generic configuration as a binary codeplug. */

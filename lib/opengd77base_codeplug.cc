@@ -617,7 +617,7 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     // Link DMR channel
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
       dc->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
     // Testing dmrId() == 0 fixes a bug in the OpenGD77 firmware. May change in future.
@@ -688,8 +688,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setTimeSlot(dc->timeSlot());
     setColorCode(dc->colorCode());
     // OpenGD77 does not allow for both TX contact and group list, select one, prefer group list
-    if (dc->groupListObj())
-      setGroupListIndex(ctx.index(dc->groupListObj()));
+    if (dc->groupList())
+      setGroupListIndex(ctx.index(dc->groupList()));
     else if (dc->txContactObj())
       setTXContactIndex(ctx.index(dc->txContactObj()));
     if (dc->radioIdObj() != ctx.config()->settings()->defaultId())
@@ -2650,6 +2650,14 @@ OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *intermediate = Codeplug::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot pre-process OpenGD77 codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
     return nullptr;
   }
 

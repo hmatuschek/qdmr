@@ -94,6 +94,9 @@ target_link_libraries(dm1701_test PRIVATE Qt6::Core Qt6::Network Qt6::Positionin
 qt_add_executable(dr1801_test dr1801_test.cc dr1801_test.hh ${TESTDATA})
 target_link_libraries(dr1801_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
+qt_add_executable(dm32uv_test dm32uv_test.cc dm32uv_test.hh ${TESTDATA})
+target_link_libraries(dm32uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
+
 
 add_test(NAME Config    COMMAND configtest)
 add_test(NAME TableFormat COMMAND tableformattest)
@@ -126,4 +129,5 @@ add_test(NAME DMR6X2UV  COMMAND dmr6x2uv_test)
 add_test(NAME DMR6X2UV2 COMMAND dmr6x2uv2_test)
 add_test(NAME DM1701    COMMAND dm1701_test)
 add_test(NAME DR1801    COMMAND dr1801_test)
+add_test(NAME DM32UV    COMMAND dm32uv_test)
 

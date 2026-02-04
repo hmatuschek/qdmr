@@ -8,6 +8,7 @@
 #include "tyt_extensions.hh"
 #include "encryptionextension.hh"
 #include "commercial_extension.hh"
+#include "intermediaterepresentation.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -530,7 +531,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
       dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
     }
     if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
     if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
       dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
@@ -601,8 +602,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     }
     setColorCode(dchan->colorCode());
     setTimeSlot(dchan->timeSlot());
-    if (dchan->groupListObj())
-      setGroupListIndex(ctx.index(dchan->groupListObj()));
+    if (dchan->groupList())
+      setGroupListIndex(ctx.index(dchan->groupList()));
     else
       setGroupListIndex(0);
     if (dchan->txContactObj())
@@ -2965,6 +2966,27 @@ TyTCodeplug::clear()
   // Clear contacts
   this->clearContacts();
 }
+
+
+Config *
+TyTCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process codeplug for TyT device.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
 
 bool
 TyTCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {

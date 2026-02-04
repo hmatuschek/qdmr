@@ -71,7 +71,7 @@ DigitalChannelDialog::construct() {
   timeSlot->setItemData(0, unsigned(DMRChannel::TimeSlot::TS1));
   timeSlot->setItemData(1, unsigned(DMRChannel::TimeSlot::TS2));
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
-                         (nullptr != _myChannel ? _myChannel->groupListObj() : nullptr));
+                         (nullptr != _myChannel ? _myChannel->groupList() : nullptr));
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
   if (_myChannel && (nullptr == _myChannel->txContactObj()))
     txContact->setCurrentIndex(0);
@@ -190,7 +190,7 @@ DigitalChannelDialog::channel()
   _myChannel->setAdmit(DMRChannel::Admit(txAdmit->currentData().toUInt()));
   _myChannel->setColorCode(colorCode->value());
   _myChannel->setTimeSlot(DMRChannel::TimeSlot(timeSlot->currentData().toUInt()));
-  _myChannel->setGroupListObj(rxGroupList->currentData().value<RXGroupList *>());
+  _myChannel->setGroupList(rxGroupList->currentData().value<RXGroupList *>());
   _myChannel->setTXContactObj(txContact->currentData().value<DMRContact *>());
   _myChannel->setAPRSObj(gpsSystem->currentData().value<PositioningSystem *>());
   _myChannel->setRoamingZone(roaming->currentData().value<RoamingZone *>());

@@ -1912,7 +1912,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gl);
         return false;
       }
-      _channels[idx]->as<DMRChannel>()->setGroupListObj(_rxgroups[gl]);
+      _channels[idx]->as<DMRChannel>()->setGroupList(_rxgroups[gl]);
     }
 
     // Check TX Contact
