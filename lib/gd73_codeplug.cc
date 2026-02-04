@@ -1684,7 +1684,7 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
     }
     if ((! groupListAllMatch()) && (! groupListMatchesContact())) {
       if (ctx.has<RXGroupList>(groupListIndex()))
-        dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+        dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
       else
         logWarn() << "Cannot link channel '" << name() << "', cannot resolve group list index "
                   << groupListIndex() << ".";
@@ -1735,10 +1735,10 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     setType(ChannelElement::Type::DMR);
     if (! dmr->contact()->isNull())
       setTXContactIndex(ctx.index(dmr->txContactObj()));
-    if (dmr->groupList()->isNull())
+    if (dmr->groupListRef()->isNull())
       setGroupListAllMatch();
     else
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+      setGroupListIndex(ctx.index(dmr->groupList()));
     switch (dmr->admit()) {
     case DMRChannel::Admit::Always: setAdmit(Admit::Always); break;
     case DMRChannel::Admit::ColorCode: setAdmit(Admit::CC_CTCSS); break;

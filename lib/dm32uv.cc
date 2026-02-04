@@ -251,8 +251,10 @@ DM32UV::download(const ErrorStack &err) {
   }
 
   // Allocate all mapped memory regions:
+  static Range<unsigned int> codeplugMemoryRange = {0x3000, 0x68000};
   foreach (uint32_t virtualBlockAddress, addressMap.mappedVirtual()) {
-    _codeplug.image(0).addElement(virtualBlockAddress, Offset::blockSize());
+    if (codeplugMemoryRange.contains(virtualBlockAddress))
+      _codeplug.image(0).addElement(virtualBlockAddress, Offset::blockSize());
   }
 
   if (! _dev->read_start(0, 0, err)) {
@@ -293,8 +295,10 @@ DM32UV::upload(const ErrorStack &err) {
   }
 
   // Allocate all mapped memory regions:
+  static Range<unsigned int> codeplugMemoryRange = {0x3000, 0x68000};
   foreach (uint32_t virtualBlockAddress, addressMap.mappedVirtual()) {
-    _codeplug.image(0).addElement(virtualBlockAddress, Offset::blockSize());
+    if (codeplugMemoryRange.contains(virtualBlockAddress))
+      _codeplug.image(0).addElement(virtualBlockAddress, Offset::blockSize());
   }
 
   if (! _dev->read_start(0, 0, err)) {

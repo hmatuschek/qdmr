@@ -248,7 +248,7 @@ GD73Test::testEncryptionLimits() {
   DMRChannel *ch = new DMRChannel();
   ch->setName("Ch");
   ch->setTXContactObj(cnt);
-  ch->setGroupListObj(grpLst);
+  ch->setGroupList(grpLst);
   ch->setTXFrequency(Frequency::fromMHz(440));
   ch->setRXFrequency(Frequency::fromMHz(440));
   ch->setCommercialExtension(ext);

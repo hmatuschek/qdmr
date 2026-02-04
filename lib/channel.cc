@@ -772,7 +772,7 @@ DMRChannel::clear() {
   DigitalChannel::clear();
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
-  setGroupListObj(nullptr);
+  setGroupList(nullptr);
   setTXContactObj(nullptr);
   setAPRSObj(nullptr);
   setRoamingZone(nullptr);
@@ -828,17 +828,17 @@ DMRChannel::setTimeSlot(TimeSlot slot) {
 }
 
 const GroupListReference *
-DMRChannel::groupList() const {
+DMRChannel::groupListRef() const {
   return &_rxGroup;
 }
 
 GroupListReference *
-DMRChannel::groupList() {
+DMRChannel::groupListRef() {
   return &_rxGroup;
 }
 
 void
-DMRChannel::setGroupList(GroupListReference *ref) {
+DMRChannel::setGroupListRef(GroupListReference *ref) {
   if (nullptr == ref)
     _rxGroup.clear();
   else
@@ -846,12 +846,12 @@ DMRChannel::setGroupList(GroupListReference *ref) {
 }
 
 RXGroupList *
-DMRChannel::groupListObj() const {
+DMRChannel::groupList() const {
   return _rxGroup.as<RXGroupList>();
 }
 
 bool
-DMRChannel::setGroupListObj(RXGroupList *g) {
+DMRChannel::setGroupList(RXGroupList *g) {
   if(! _rxGroup.set(g))
     return false;
   emit modified(this);

@@ -528,7 +528,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "Group list with index " << groupListIndex() << " not known.";
         return false;
       }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
   }
 
@@ -579,8 +579,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       setEncryptionKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
     else
       clearEncryptionKeyIndex();
-    if (dmr->groupListObj())
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (dmr->groupList())
+      setGroupListIndex(ctx.index(dmr->groupList()));
     else
       clearGroupListIndex();
   }

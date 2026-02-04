@@ -424,7 +424,7 @@ class DMRChannel: public DigitalChannel
   /** The radio ID. */
   Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
+  Q_PROPERTY(GroupListReference* groupList READ groupListRef WRITE setGroupListRef)
   /** The tx contact. */
   Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
@@ -476,15 +476,15 @@ public:
 	bool setTimeSlot(TimeSlot ts);
 
   /** Returns a reference to the group list. */
-  const GroupListReference *groupList() const;
+  const GroupListReference *groupListRef() const;
   /** Returns a reference to the group list. */
-  GroupListReference *groupList();
+  GroupListReference *groupListRef();
   /** Sets the reference to the group list. */
-  void setGroupList(GroupListReference *ref);
+  void setGroupListRef(GroupListReference *ref);
   /** Returns the RX group list for the channel. */
-  RXGroupList *groupListObj() const;
+  RXGroupList *groupList() const;
   /** (Re-)Sets the RX group list for the channel. */
-  bool setGroupListObj(RXGroupList *rxg);
+  bool setGroupList(RXGroupList *rxg);
 
   /** Returns a reference to the transmit contact. */
   const DMRContactReference *contact() const;

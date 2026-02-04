@@ -531,7 +531,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
       dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
     }
     if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
     if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
       dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
@@ -602,8 +602,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     }
     setColorCode(dchan->colorCode());
     setTimeSlot(dchan->timeSlot());
-    if (dchan->groupListObj())
-      setGroupListIndex(ctx.index(dchan->groupListObj()));
+    if (dchan->groupList())
+      setGroupListIndex(ctx.index(dchan->groupList()));
     else
       setGroupListIndex(0);
     if (dchan->txContactObj())

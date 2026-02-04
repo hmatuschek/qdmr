@@ -349,8 +349,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 12:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->groupListObj()) {
-        return digi->groupListObj()->name();
+      if (digi->groupList()) {
+        return digi->groupList()->name();
       } else {
         return QString("-");
       }

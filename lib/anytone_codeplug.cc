@@ -681,7 +681,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
@@ -779,10 +779,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     else
       setContactIndex(ctx.index(dc->txContactObj()));
     // link RX group list
-    if (nullptr == dc->groupListObj())
+    if (nullptr == dc->groupList())
       clearGroupListIndex();
     else
-      setGroupListIndex(ctx.index(dc->groupListObj()));
+      setGroupListIndex(ctx.index(dc->groupList()));
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
       if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {

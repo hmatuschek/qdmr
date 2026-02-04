@@ -406,17 +406,23 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
   Channel *ch = nullptr;
 
   if ((ChannelType::FM == channelType()) || (ChannelType::FMFixed == channelType())) {
-    FMChannel *fm = new FMChannel(); ch = fm;
-    fm->setBandwidth(bandwidth());
-    switch (admitCriterion()) {
-    case Admit::Always: fm->setAdmit(FMChannel::Admit::Always); break;
-    case Admit::ChannelFree:
-    case Admit::ToneOrCCMatch: fm->setAdmit(FMChannel::Admit::Free); break;
-    case Admit::ToneMismatch: fm->setAdmit(FMChannel::Admit::Tone); break;
+    if ((rxFrequency().inMHz() >= 118) && (rxFrequency().inMHz() <= 137)) {
+      AMChannel *am = new AMChannel(); ch = am;
+      am->setTXFrequency(Frequency());
+      am->setSquelch(squelchLevel());
+    } else {
+      FMChannel *fm = new FMChannel(); ch = fm;
+      fm->setBandwidth(bandwidth());
+      switch (admitCriterion()) {
+      case Admit::Always: fm->setAdmit(FMChannel::Admit::Always); break;
+      case Admit::ChannelFree:
+      case Admit::ToneOrCCMatch: fm->setAdmit(FMChannel::Admit::Free); break;
+      case Admit::ToneMismatch: fm->setAdmit(FMChannel::Admit::Tone); break;
+      }
+      fm->setSquelch(squelchLevel());
+      fm->setRXTone(rxTone());
+      fm->setTXTone(txTone());
     }
-    fm->setSquelch(squelchLevel());
-    fm->setRXTone(rxTone());
-    fm->setTXTone(txTone());
   } else if ((ChannelType::DMR == channelType()) || (ChannelType::DMRFixed == channelType())) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admitCriterion()) {
@@ -427,12 +433,14 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
     }
     dmr->setTimeSlot(timeslot());
     dmr->setColorCode(colorCode());
+  } else {
+    errMsg(err) << "Unknown channel type " << (unsigned int)channelType() << ".";
+    return nullptr;
   }
 
   ch->setName(name());
   ch->setRXFrequency(rxFrequency());
-  if (validTXFrequency())
-    ch->setTXFrequency(txFrequency());
+  ch->setTXFrequency(validTXFrequency() ? txFrequency() : Frequency());
   ch->setPower(power());
   ch->setRXOnly(rxOnlyEnabled());
 
@@ -464,7 +472,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
         errMsg(err) << "Cannot resolve group list index " << groupListIndex() << ".";
         return false;
       }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
 
     // Link DMR ID
@@ -495,7 +503,10 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
   Q_UNUSED(err);
   setName(channel->name());
   setRXFrequency(channel->rxFrequency());
-  setTXFrequency(channel->txFrequency());
+  if (channel->txFrequency().isZero())
+    clearTXFrequency();
+  else
+    setTXFrequency(channel->txFrequency());
   // AM channels are encoded as FM with rx frequency within the air band
   setChannelType(channel->is<DMRChannel>() ? ChannelType::DMR : ChannelType::FM);
   setPower(channel->power());
@@ -505,7 +516,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
   if (! channel->scanListRef()->isNull())
     setScanListIndex(ctx.index(channel->scanList()));
   else
-    clearEmergencySystemIndex();
+    clearScanListIndex();
 
   if (channel->is<DMRChannel>()) {
     auto dmr = channel->as<DMRChannel>();
@@ -525,8 +536,8 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
       }
     }
     clearGroupListIndex();
-    if (! dmr->groupList()->isNull()) {
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (! dmr->groupListRef()->isNull()) {
+      setGroupListIndex(ctx.index(dmr->groupList()));
     }
     if (dmr->radioId()->is<DefaultRadioID>()) {
       setDMRIdIndex(ctx.index(ctx.config()->settings()->defaultId()));
@@ -544,6 +555,11 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
+  } else if (channel->is<AMChannel>()) {
+    auto am = channel->as<AMChannel>();
+    clearTXFrequency();
+    setSquelchLevel(am->defaultSquelch() ? ctx.config()->settings()->squelch() : am->squelch());
+    enableRXOnly(true);
   }
 
   return true;
