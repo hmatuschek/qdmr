@@ -55,14 +55,14 @@ TrafoTest::testListElementRemoval() {
   if (nullptr == copy)
     QFAIL(err.format().toLocal8Bit().constData());
 
-  ObjectFilterVisitor filter({GPSSystem::staticMetaObject});
+  ObjectFilterVisitor filter({DMRAPRSSystem::staticMetaObject});
   if (! filter.process(copy, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   // Check filter
   QCOMPARE(copy->posSystems()->count(), 0);
   // Check references to deleted objects
-  QCOMPARE(copy->channelList()->channel(1)->as<DMRChannel>()->aprsObj(), nullptr);
+  QCOMPARE(copy->channelList()->channel(1)->as<DMRChannel>()->aprs(), nullptr);
 }
 
 void

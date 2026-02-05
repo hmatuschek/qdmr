@@ -360,8 +360,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->txContactObj())
-        return digi->txContactObj()->name();
+      if (digi->txContact())
+        return digi->txContact()->name();
       else
         return QString("-");
     } else if (channel->is<FMChannel>()) {
@@ -370,33 +370,33 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 14:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
+      if ((nullptr == digi->radioId()) || (DefaultRadioID::get() == digi->radioId()))
         return tr("[Default]");
-      return digi->radioIdObj()->name();
+      return digi->radioId()->name();
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
     break;
   case 15:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->aprsObj())
-        return digi->aprsObj()->name();
+      if (digi->aprs())
+        return digi->aprs()->name();
       else
         return QString("-");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (analog->aprsSystem())
-        return analog->aprsSystem()->name();
+      if (analog->aprs())
+        return analog->aprs()->name();
       else
         return QString("-");
     }
     break;
   case 16:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (nullptr == digi->roamingZone())
+      if (nullptr == digi->roaming())
         return QString("-");
-      else if (DefaultRoamingZone::get() == digi->roamingZone())
+      else if (DefaultRoamingZone::get() == digi->roaming())
         return tr("[Default]");
-      return digi->roamingZone()->name();
+      return digi->roaming()->name();
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
@@ -729,7 +729,7 @@ ZoneListWrapper::headerData(int section, Qt::Orientation orientation, int role) 
 /* ********************************************************************************************* *
  * Implementation of PositioningSystemListWrapper
  * ********************************************************************************************* */
-PositioningSystemListWrapper::PositioningSystemListWrapper(PositioningSystems *list, QObject *parent)
+PositioningSystemListWrapper::PositioningSystemListWrapper(PositionReportingSystems *list, QObject *parent)
   : GenericTableWrapper(list, parent)
 {
   // pass...
@@ -748,13 +748,13 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  PositioningSystem *sys = _list->get(index.row())->as<PositioningSystem>();
+  PositionReportingSystem *sys = _list->get(index.row())->as<PositionReportingSystem>();
 
   switch (index.column()) {
   case 0:
-    if (sys->is<GPSSystem>())
+    if (sys->is<DMRAPRSSystem>())
       return tr("DMR");
-    else if (sys->is<APRSSystem>())
+    else if (sys->is<FMAPRSSystem>())
       return tr("APRS");
     else
       return QString("Oops!");
@@ -763,35 +763,35 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     return sys->name();
 
   case 2:
-    if (sys->is<GPSSystem>()) {
-      if (! sys->as<GPSSystem>()->hasContact())
+    if (sys->is<DMRAPRSSystem>()) {
+      if (! sys->as<DMRAPRSSystem>()->hasContact())
         return tr("[None]");
-      return sys->as<GPSSystem>()->contactObj()->name();
-    } else if (sys->is<APRSSystem>())
-      return QString("%1-%2").arg(sys->as<APRSSystem>()->destination())
-          .arg(sys->as<APRSSystem>()->destSSID());
+      return sys->as<DMRAPRSSystem>()->contact()->name();
+    } else if (sys->is<FMAPRSSystem>())
+      return QString("%1-%2").arg(sys->as<FMAPRSSystem>()->destination())
+          .arg(sys->as<FMAPRSSystem>()->destSSID());
     break;
 
   case 3:
     return sys->period();
 
   case 4:
-    if (sys->is<GPSSystem>()) {
-      if (! sys->as<GPSSystem>()->hasRevertChannel())
+    if (sys->is<DMRAPRSSystem>()) {
+      if (! sys->as<DMRAPRSSystem>()->hasRevertChannel())
         return tr("[Selected]");
-      return sys->as<GPSSystem>()->revertChannel()->name();
-    } else if (sys->is<APRSSystem>()) {
-      if (! sys->as<APRSSystem>()->hasRevertChannel())
+      return sys->as<DMRAPRSSystem>()->revertChannel()->name();
+    } else if (sys->is<FMAPRSSystem>()) {
+      if (! sys->as<FMAPRSSystem>()->hasRevertChannel())
         return tr("[Selected]");
-      return sys->as<APRSSystem>()->revertChannel()->name();
+      return sys->as<FMAPRSSystem>()->revertChannel()->name();
     }
   break;
 
   case 5:
-    if (sys->is<GPSSystem>())
+    if (sys->is<DMRAPRSSystem>())
       return tr("[None]");
-    else if (sys->is<APRSSystem>())
-      return sys->as<APRSSystem>()->message();
+    else if (sys->is<FMAPRSSystem>())
+      return sys->as<FMAPRSSystem>()->message();
   break;
 
   case 6: {

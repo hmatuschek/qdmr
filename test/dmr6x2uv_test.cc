@@ -1,9 +1,7 @@
 #include "dmr6x2uv_test.hh"
 #include "config.hh"
-#include "dmr6x2uv.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
 
 DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
@@ -81,9 +79,9 @@ DMR6X2UVTest::testFMAPRSSettings() {
 
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
-  QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
+  QVERIFY(config.posSystems()->get(0)->is<FMAPRSSystem>());
 
-  APRSSystem *aprs = config.posSystems()->get(0)->as<APRSSystem>();
+  FMAPRSSystem *aprs = config.posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
@@ -120,9 +118,9 @@ DMR6X2UVTest::testFMAPRSSettings() {
 
   // Check config
   QCOMPARE(comp_config.posSystems()->count(), 1);
-  QVERIFY(comp_config.posSystems()->get(0)->is<APRSSystem>());
+  QVERIFY(comp_config.posSystems()->get(0)->is<FMAPRSSystem>());
 
-  APRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<APRSSystem>();
+  FMAPRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(comp_aprs->source(), aprs->source()); QCOMPARE(comp_aprs->srcSSID(), aprs->srcSSID());
   QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
   QCOMPARE(comp_aprs->path(), aprs->path());

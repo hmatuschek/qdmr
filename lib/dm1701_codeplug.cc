@@ -629,10 +629,10 @@ bool
 DM1701Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
-  for (int i=0; i<NUM_CONTACTS; i++) {
+  for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < config->contacts()->digitalCount())
-      cont.fromContactObj(config->contacts()->digitalContact(i));
+    if (i < ctx.count<DMRContact>())
+      cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();
   }

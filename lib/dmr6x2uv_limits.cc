@@ -96,7 +96,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRef(APRSSystem::staticMetaObject)},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } },
@@ -121,7 +121,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false)},
-              {"aprs", new RadioLimitObjRef(PositioningSystem::staticMetaObject, true)},
+              {"aprs", new RadioLimitObjRef(PositionReportingSystem::staticMetaObject, true)},
               {"roaming", new RadioLimitObjRef(RoamingZone::staticMetaObject, true) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
@@ -151,12 +151,12 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
 
   /* Handle positioning systems. */
   add("positioning", new RadioLimitList{
-        { GPSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
+        { DMRAPRSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
             { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
-        { APRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
+        { FMAPRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },

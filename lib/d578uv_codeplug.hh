@@ -10,7 +10,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 
 
 /** Represents the device specific binary codeplug for Anytone AT-D578UV radios.

@@ -2,10 +2,8 @@
 #include "config.hh"
 #include "opengd77_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
 #include <QtEndian>
-#include <iostream>
 #include "logger.hh"
 
 
@@ -93,24 +91,24 @@ OpenGD77Test::testChannelGroupList() {
           .arg(err.format()).toLocal8Bit().constData());
 
   config.channelList()->channel(0)->as<DMRChannel>()->setGroupList(nullptr);
-  config.channelList()->channel(0)->as<DMRChannel>()->setTXContactObj(nullptr);
-  config.channelList()->channel(1)->as<DMRChannel>()->setTXContactObj(nullptr);
+  config.channelList()->channel(0)->as<DMRChannel>()->setTXContact(nullptr);
+  config.channelList()->channel(1)->as<DMRChannel>()->setTXContact(nullptr);
   config.channelList()->channel(2)->as<DMRChannel>()->setGroupList(nullptr);
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->groupListRef()->isNull());
-  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contact()->isNull());
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contactRef()->isNull());
 
   QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->groupListRef()->isNull());
-  QVERIFY(decoded.channelList()->channel(1)->as<DMRChannel>()->contact()->isNull());
+  QVERIFY(decoded.channelList()->channel(1)->as<DMRChannel>()->contactRef()->isNull());
 
   QVERIFY(decoded.channelList()->channel(2)->as<DMRChannel>()->groupListRef()->isNull());
-  QVERIFY(! decoded.channelList()->channel(2)->as<DMRChannel>()->contact()->isNull());
+  QVERIFY(! decoded.channelList()->channel(2)->as<DMRChannel>()->contactRef()->isNull());
 
   QVERIFY(! decoded.channelList()->channel(3)->as<DMRChannel>()->groupListRef()->isNull());
-  QVERIFY(decoded.channelList()->channel(3)->as<DMRChannel>()->contact()->isNull());
+  QVERIFY(decoded.channelList()->channel(3)->as<DMRChannel>()->contactRef()->isNull());
 }
 
 
@@ -156,17 +154,17 @@ OpenGD77Test::testOverrideChannelRadioId() {
   // add another DMR ID and assign it to two channels
   auto id2 = new DMRRadioID("Test", 1234567);
   config.radioIDs()->add(id2);
-  config.channelList()->channel(0)->as<DMRChannel>()->setRadioIdObj(id2);
-  config.channelList()->channel(1)->as<DMRChannel>()->setRadioIdObj(id2);
+  config.channelList()->channel(0)->as<DMRChannel>()->setRadioId(id2);
+  config.channelList()->channel(1)->as<DMRChannel>()->setRadioId(id2);
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(decoded.radioIDs()->count(), 2);
-  QVERIFY(! decoded.channelList()->channel(0)->as<DMRChannel>()->radioId()->isNull());
-  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
-  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->radioId()->isNull());
-  QCOMPARE(decoded.channelList()->channel(1)->as<DMRChannel>()->radioIdObj()->number(), 1234567);
+  QVERIFY(! decoded.channelList()->channel(0)->as<DMRChannel>()->radioIdRef()->isNull());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->radioId()->number(), 1234567);
+  QVERIFY(! decoded.channelList()->channel(1)->as<DMRChannel>()->radioIdRef()->isNull());
+  QCOMPARE(decoded.channelList()->channel(1)->as<DMRChannel>()->radioId()->number(), 1234567);
 }
 
 
@@ -248,10 +246,11 @@ OpenGD77Test::testAPRSSourceCall() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(decoded.posSystems()->count(), 1);
-  auto sys = decoded.posSystems()->aprsSystem(0);
+  auto sys = decoded.posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(sys->source(), "DM3MAT");
 
-  FMChannel *channel = decoded.posSystems()->aprsSystem(0)->revert()->as<FMChannel>();
+  FMChannel *channel = decoded.posSystems()->get(0)->as<FMAPRSSystem>()
+                         ->revertChannelRef()->as<FMChannel>();
   QVERIFY(channel->name() == "2m APRS");
 }
 

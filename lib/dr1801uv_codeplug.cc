@@ -521,7 +521,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "DMR contact with index " << transmitContactIndex() << " not known.";
         return false;
       }
-      dmr->setTXContactObj(ctx.get<DMRContact>(transmitContactIndex()));
+      dmr->setTXContact(ctx.get<DMRContact>(transmitContactIndex()));
     }
     if (hasGroupList()) {
       if (! ctx.has<RXGroupList>(groupListIndex())) {
@@ -564,8 +564,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
     DMRChannel *dmr = channel->as<DMRChannel>();
     setChannelType(Type::DMR);
     setBandwidth(FMChannel::Bandwidth::Narrow);
-    if (dmr->txContactObj())
-      setTransmitContactIndex(ctx.index(dmr->txContactObj()));
+    if (dmr->txContact())
+      setTransmitContactIndex(ctx.index(dmr->txContact()));
     else
       clearTransmitContactIndex();
     switch (dmr->admit()) {
@@ -1602,8 +1602,8 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   Q_UNUSED(err);
 
   // Store radio ID
-  config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
-  config->settings()->setDefaultId(config->radioIDs()->getId(0));
+  auto idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
+  config->settings()->setDefaultId(config->radioIDs()->get(idx)->as<DMRRadioID>());
 
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
@@ -3282,8 +3282,10 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   }
 
   // Map radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
-    ctx.add(ctx.config()->radioIDs()->getId(i), i);
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    if (ctx.config()->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(ctx.config()->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {

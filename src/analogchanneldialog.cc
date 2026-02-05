@@ -73,12 +73,14 @@ AnalogChannelDialog::construct() {
   }
   bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
-  aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
+  aprsList->addItem(tr("[None]"), QVariant::fromValue((FMAPRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
-  for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
-    APRSSystem *sys = _config->posSystems()->aprsSystem(i);
-    aprsList->addItem(sys->name(),QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprsSystem() == sys))
+  for (int i=0; i<_config->posSystems()->count(); i++) {
+    if (! _config->posSystems()->get(i)->is<FMAPRSSystem>())
+      continue;
+    FMAPRSSystem *sys = _config->posSystems()->get(i)->as<FMAPRSSystem>();
+    aprsList->addItem(sys->name(), QVariant::fromValue(sys));
+    if (_myChannel && (_myChannel->aprs() == sys))
       aprsList->setCurrentIndex(i+1);
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
@@ -174,7 +176,7 @@ AnalogChannelDialog::channel()
   _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
-  _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
+  _myChannel->setAPRS(aprsList->currentData().value<FMAPRSSystem *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else

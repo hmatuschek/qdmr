@@ -18,8 +18,8 @@ class Config;
 class RXGroupList;
 class DMRContact;
 class ScanList;
-class APRSSystem;
-class PositioningSystem;
+class FMAPRSSystem;
+class PositionReportingSystem;
 class RoamingZone;
 class DMRRadioID;
 
@@ -234,7 +234,7 @@ class FMChannel: public AnalogChannel
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
-  Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
+  Q_PROPERTY(FMAPRSSystemReference* aprsRef READ aprsRef WRITE setAPRSRef)
 
   /** The AnyTone FM channel extension. */
   Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
@@ -297,15 +297,15 @@ public:
   bool setBandwidth(Bandwidth bw);
 
   /** Returns the reference to the APRS system. */
-  const APRSSystemReference *aprs() const;
+  const FMAPRSSystemReference *aprsRef() const;
   /** Returns the reference to the APRS system. */
-  APRSSystemReference *aprs();
+  FMAPRSSystemReference *aprsRef();
   /** Sets the APRS system reference. */
-  void setAPRS(APRSSystemReference *ref);
+  void setAPRSRef(FMAPRSSystemReference *ref);
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
-  APRSSystem *aprsSystem() const;
+  FMAPRSSystem *aprs() const;
   /** Sets the APRS system. */
-  void setAPRSSystem(APRSSystem *sys);
+  void setAPRS(FMAPRSSystem *sys);
 
   /** Returns the FM channel extension for AnyTone devices.
    * If this extension is not set, returns @c nullptr. */
@@ -332,7 +332,7 @@ protected:
   /** The channel bandwidth. */
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
-  APRSSystemReference _aprsSystem;
+  FMAPRSSystemReference _aprsSystem;
 
   /** Owns the AnyTone FM channel extension. */
   AnytoneFMChannelExtension *_anytoneExtension;
@@ -357,29 +357,29 @@ public:
   /** Constructs a new empty AM channel. */
   Q_INVOKABLE explicit AMChannel(QObject *parent=nullptr);
 
-  bool copy(const ConfigItem &other);
-  ConfigItem *clone() const;
-  void clear();
+  bool copy(const ConfigItem &other) override;
+  ConfigItem *clone() const override;
+  void clear() override;
 
   /** Returns @c true if the global default squelch level is used. */
   bool defaultSquelch() const;
   /** Returns @c true if the squelch is disabled. */
   bool squelchDisabled() const;
   /** Returns the squelch level [0,10]. */
-        unsigned squelch() const;
+  unsigned squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-        bool setSquelch(unsigned squelch);
+  bool setSquelch(unsigned squelch);
   /** Disables the quelch. */
   void disableSquelch();
   /** Sets the squelch to the global default value. */
   void setSquelchDefault();
 
 public:
-  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
-  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack()) override;
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
 protected:
-  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack()) override;
 
 protected:
   /** Holds the squelch level [0,10]. */
@@ -422,15 +422,15 @@ class DMRChannel: public DigitalChannel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
+  Q_PROPERTY(DMRRadioIDReference* radioId READ radioIdRef WRITE setRadioIdRef)
   /** The rx group list. */
   Q_PROPERTY(GroupListReference* groupList READ groupListRef WRITE setGroupListRef)
   /** The tx contact. */
-  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
+  Q_PROPERTY(DMRContactReference* contact READ contactRef WRITE setContactRef)
   /** The positioning system. */
-  Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprsRef WRITE setAPRSRef)
   /** The roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
+  Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef WRITE setRoamingRef)
 
   /** The commercial channel extension. */
   Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
@@ -486,49 +486,49 @@ public:
   /** (Re-)Sets the RX group list for the channel. */
   bool setGroupList(RXGroupList *rxg);
 
-  /** Returns a reference to the transmit contact. */
-  const DMRContactReference *contact() const;
-  /** Returns a reference to the transmit contact. */
-  DMRContactReference *contact();
+  /** Returns a reference to the transmit contactRef. */
+  const DMRContactReference *contactRef() const;
+  /** Returns a reference to the transmit contactRef. */
+  DMRContactReference *contactRef();
   /** Sets the reference to the transmit contact. */
-  void setContact(DMRContactReference *ref);
+  void setContactRef(DMRContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
-  DMRContact *txContactObj() const;
+  DMRContact *txContact() const;
   /** (Re-) Sets the default TX contact for this channel. */
-  bool setTXContactObj(DMRContact *c);
+  bool setTXContact(DMRContact *c);
 
   /** Returns a reference to the positioning system. */
-  const PositioningSystemReference *aprs() const;
+  const PositioningSystemReference *aprsRef() const;
   /** Returns a reference to the positioning system. */
-  PositioningSystemReference *aprs();
+  PositioningSystemReference *aprsRef();
   /** Sets the reference to the positioning system. */
-  void setAPRS(PositioningSystemReference *ref);
+  void setAPRSRef(PositioningSystemReference *ref);
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
-  PositioningSystem *aprsObj() const;
+  PositionReportingSystem *aprs() const;
   /** Associates the GPS System with this channel. */
-  bool setAPRSObj(PositioningSystem *sys);
+  bool setAPRS(PositionReportingSystem *sys);
 
-  /** Returns a reference to the roaming zone. */
-  const RoamingZoneReference *roaming() const;
-  /** Returns a reference to the roaming zone. */
-  RoamingZoneReference *roaming();
+  /** Returns a reference to the roamingRef zone. */
+  const RoamingZoneReference *roamingRef() const;
+  /** Returns a reference to the roamingRef zone. */
+  RoamingZoneReference *roamingRef();
   /** Sets the reference to the roaming zone. */
-  void setRoaming(RoamingZoneReference *ref);
+  void setRoamingRef(RoamingZoneReference *ref);
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
-  RoamingZone *roamingZone() const;
+  RoamingZone *roaming() const;
   /** Associates the given roaming zone with this channel. */
-  bool setRoamingZone(RoamingZone *zone);
+  bool setRoaming(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const DMRRadioIDReference *radioId() const;
+  const DMRRadioIDReference *radioIdRef() const;
   /** Returns the reference to the radio ID. */
-  DMRRadioIDReference *radioId();
+  DMRRadioIDReference *radioIdRef();
   /** Sets the reference to the radio ID. */
-  void setRadioId(DMRRadioIDReference *ref);
+  void setRadioIdRef(DMRRadioIDReference *ref);
   /** Returns the radio ID associated with this channel. */
-  DMRRadioID *radioIdObj() const;
+  DMRRadioID *radioId() const;
   /** Associates the given radio ID with this channel. */
-  bool setRadioIdObj(DMRRadioID *id);
+  bool setRadioId(DMRRadioID *id);
 
   /** Returns the extension for commercial features. */
   CommercialChannelExtension *commercialExtension() const;

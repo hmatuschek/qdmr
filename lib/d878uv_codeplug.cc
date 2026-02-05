@@ -1,5 +1,4 @@
 #include "gpssystem.hh"
-#include "userdatabase.hh"
 #include "roamingchannel.hh"
 #include "d878uv_codeplug.hh"
 #include "config.hh"
@@ -336,16 +335,16 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if ((APRSType::DMR == txAPRSType()) && ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    if ((APRSType::DMR == txAPRSType()) && ctx.has<DMRAPRSSystem>(digitalAPRSSystemIndex()))
+      dc->setAPRS(ctx.get<DMRAPRSSystem>(digitalAPRSSystemIndex()));
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
-      dc->setAPRSObj(ctx.get<APRSSystem>(0));
+    if ((APRSType::FM == txAPRSType()) && ctx.has<FMAPRSSystem>(0))
+      dc->setAPRS(ctx.get<FMAPRSSystem>(0));
 
     // If roaming is not disabled -> link to default roaming zone
     if (roamingEnabled())
-      dc->setRoamingZone(DefaultRoamingZone::get());
+      dc->setRoaming(DefaultRoamingZone::get());
 
     if (auto *ext = dc->anytoneChannelExtension()) {
       // If not default FM APRS frequency
@@ -404,8 +403,8 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
     FMChannel *ac = c->as<FMChannel>();
     // Link APRS system if one is defined
     //  There can only be one active APRS system, hence the index is fixed to one.
-    if ((APRSType::FM == txAPRSType()) && ctx.has<APRSSystem>(0))
-      ac->setAPRSSystem(ctx.get<APRSSystem>(0));
+    if ((APRSType::FM == txAPRSType()) && ctx.has<FMAPRSSystem>(0))
+      ac->setAPRS(ctx.get<FMAPRSSystem>(0));
 
     if (auto *ext = ac->anytoneChannelExtension()) {
       // If not default FM APRS frequency
@@ -430,16 +429,16 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Set GPS system index
     setTXAPRSType(APRSType::Off);
     enableRXAPRS(false);
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
+    if (dc->aprs() && dc->aprs()->is<DMRAPRSSystem>()) {
       enableRXAPRS(true);
       setTXAPRSType(APRSType::DMR);
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
-    } else if (dc->aprsObj() && dc->aprsObj()->is<APRSSystem>()) {
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprs()->as<DMRAPRSSystem>()));
+    } else if (dc->aprs() && dc->aprs()->is<FMAPRSSystem>()) {
       setTXAPRSType(APRSType::FM);
     }
 
     // Enable roaming
-    if (dc->roaming())
+    if (dc->roamingRef())
       enableRoaming(true);
 
     // Apply extension settings, if present
@@ -478,9 +477,9 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Set APRS system
     enableRXAPRS(false);
     setTXAPRSType(APRSType::Off);
-    if (nullptr != ac->aprsSystem()) {
+    if (nullptr != ac->aprs()) {
       setTXAPRSType(APRSType::FM);
-      if (ac == ac->aprsSystem()->revertChannel()) {
+      if (ac == ac->aprs()->revertChannel()) {
         enableRXAPRS(true);
       }
     }
@@ -3017,12 +3016,12 @@ D878UVCodeplug::APRSSettingsElement::setPath(const QString &path) {
   writeASCII(Offset::path(), path, 20, 0x00);
 }
 
-APRSSystem::Icon
+FMAPRSSystem::Icon
 D878UVCodeplug::APRSSettingsElement::icon() const {
   return code2aprsicon(getUInt8(Offset::symbolTable()), getUInt8(Offset::symbol()));
 }
 void
-D878UVCodeplug::APRSSettingsElement::setIcon(APRSSystem::Icon icon) {
+D878UVCodeplug::APRSSettingsElement::setIcon(FMAPRSSystem::Icon icon) {
   setUInt8(Offset::symbolTable(), aprsicon2tablecode(icon));
   setUInt8(Offset::symbol(), aprsicon2iconcode(icon));
 }
@@ -3284,7 +3283,7 @@ D878UVCodeplug::APRSSettingsElement::clearFMFrequency(unsigned int n) {
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
-    const APRSSystem *sys, Context &ctx, FMAPRSFrequencyNamesElement &names, const ErrorStack &err)
+    const FMAPRSSystem *sys, Context &ctx, FMAPRSFrequencyNamesElement &names, const ErrorStack &err)
 {
   Q_UNUSED(ctx)
   clear();
@@ -3337,13 +3336,13 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
   return true;
 }
 
-APRSSystem *
+FMAPRSSystem *
 D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
   Q_UNUSED(err)
   QString name = QString("APRS %1").arg(destination());
   if (names.isValid() && (! names.name(0).isEmpty()))
     name = names.name(0);
-  APRSSystem *sys = new APRSSystem(
+  FMAPRSSystem *sys = new FMAPRSSystem(
         name, nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
         path(), icon(), "", autoTXInterval().seconds());
@@ -3383,7 +3382,7 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
+D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
   FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(fmFrequency(0));
   if (! ch) {
@@ -3406,17 +3405,17 @@ D878UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystems(Context &ctx) {
-  unsigned int n = std::min(ctx.count<GPSSystem>(), Limit::dmrSystems());
+  unsigned int n = std::min(ctx.count<DMRAPRSSystem>(), Limit::dmrSystems());
   for (unsigned int idx=0; idx<n; idx++)
-    fromDMRAPRSSystemObj(idx, ctx.get<GPSSystem>(idx), ctx);
+    fromDMRAPRSSystemObj(idx, ctx.get<DMRAPRSSystem>(idx), ctx);
   return true;
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx) {
+D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, DMRAPRSSystem *sys, Context &ctx) {
   if (sys->hasContact()) {
-    setDMRDestination(idx, sys->contactObj()->number());
-    setDMRCallType(idx, sys->contactObj()->type());
+    setDMRDestination(idx, sys->contact()->number());
+    setDMRCallType(idx, sys->contact()->type());
   }
   if (sys->hasRevertChannel()) {
     setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
@@ -3427,15 +3426,15 @@ D878UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSS
   return true;
 }
 
-GPSSystem *
+DMRAPRSSystem *
 D878UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
   if (0 == dmrDestination(idx))
     return nullptr;
-  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
+  return new DMRAPRSSystem(tr("GPS Sys #%1").arg(idx+1));
 }
 
 bool
-D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
+D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem *sys, Context &ctx) const {
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
     sys->resetRevertChannel();
@@ -3451,7 +3450,7 @@ D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, 
     ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
-  sys->setContactObj(cont);
+  sys->setContact(cont);
 
   return true;
 }
@@ -4173,21 +4172,21 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
 
   // Encode APRS system (there can only be one)
-  if (0 < ctx.config()->posSystems()->aprsCount()) {
-    aprs.fromFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx, aprsNames, err);
+  if (0 < ctx.count<FMAPRSSystem>()) {
+    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, aprsNames, err);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
-        .setMessage(ctx.config()->posSystems()->aprsSystem(0)->message());
+        .setMessage(ctx.get<FMAPRSSystem>(0)->message());
   }
 
   // Encode GPS systems
   if (! aprs.fromDMRAPRSSystems(ctx))
     return false;
-  if (0 < ctx.config()->posSystems()->gpsCount()) {
+  if (0 < ctx.count<DMRAPRSSystem>()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
     APRSSettingsElement aprs(data(Offset::aprsSettings()));
-    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
-    aprs.setManualTXInterval(Interval::fromSeconds(ctx.config()->posSystems()->gpsSystem(0)->period()));
+    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
+    aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
   }
   return true;
 }
@@ -4208,7 +4207,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
+    FMAPRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
     if (nullptr == sys) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;
@@ -4222,7 +4221,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == aprs.dmrDestination(i))
       continue;
-    if (GPSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
+    if (DMRAPRSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
       sys->setPeriod(pos_intervall);
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
@@ -4241,14 +4240,14 @@ D878UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // Link APRS system
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
   if (aprs.isValid()) {
-    aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.linkFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx);
   }
 
   // Link GPS systems
   for (unsigned int i=0; i<Limit::dmrAPRSSystems(); i++) {
     if (0 == aprs.dmrDestination(i))
       continue;
-    aprs.linkDMRAPRSSystem(i, ctx.get<GPSSystem>(i), ctx);
+    aprs.linkDMRAPRSSystem(i, ctx.get<DMRAPRSSystem>(i), ctx);
   }
 
   return true;

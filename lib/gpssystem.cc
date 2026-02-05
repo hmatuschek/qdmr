@@ -7,44 +7,44 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of PositioningSystem
+ * Implementation of PositionReportingSystem
  * ********************************************************************************************* */
-PositioningSystem::PositioningSystem(QObject *parent)
+PositionReportingSystem::PositionReportingSystem(QObject *parent)
   : ConfigObject(parent), _period(0)
 {
   // pass...
 }
 
-PositioningSystem::PositioningSystem(const QString &name, unsigned period, QObject *parent)
+PositionReportingSystem::PositionReportingSystem(const QString &name, unsigned period, QObject *parent)
   : ConfigObject(name, parent), _period(period)
 {
   // pass...
 }
 
-PositioningSystem::~PositioningSystem() {
+PositionReportingSystem::~PositionReportingSystem() {
   // pass...
 }
 
 unsigned
-PositioningSystem::period() const {
+PositionReportingSystem::period() const {
   return _period;
 }
 
 void
-PositioningSystem::setPeriod(unsigned period) {
+PositionReportingSystem::setPeriod(unsigned period) {
   _period = period;
   emit modified(this);
 }
 
 bool
-PositioningSystem::populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err) {
+PositionReportingSystem::populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err) {
   if (! ConfigObject::populate(node, context, err))
     return false;
   return true;
 }
 
 bool
-PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+PositionReportingSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
@@ -64,21 +64,21 @@ PositioningSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack 
 }
 
 bool
-PositioningSystem::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
+PositionReportingSystem::link(const YAML::Node &node, const Context &ctx, const ErrorStack &err) {
   return ConfigObject::link(node.begin()->second, ctx, err);
 }
 
 void
-PositioningSystem::onReferenceModified() {
+PositionReportingSystem::onReferenceModified() {
   emit modified(this);
 }
 
 
 /* ********************************************************************************************* *
- * Implementation of GPSSystem
+ * Implementation of DMRAPRSSystem
  * ********************************************************************************************* */
-GPSSystem::GPSSystem(QObject *parent)
-  : PositioningSystem(parent), _contact(), _revertChannel()
+DMRAPRSSystem::DMRAPRSSystem(QObject *parent)
+  : PositionReportingSystem(parent), _contact(), _revertChannel()
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
@@ -92,10 +92,10 @@ GPSSystem::GPSSystem(QObject *parent)
   connect(&_revertChannel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-GPSSystem::GPSSystem(const QString &name, DMRContact *contact,
+DMRAPRSSystem::DMRAPRSSystem(const QString &name, DMRContact *contact,
                      DMRChannel *revertChannel, unsigned period,
                      QObject *parent)
-  : PositioningSystem(name, period, parent), _contact(), _revertChannel()
+  : PositionReportingSystem(name, period, parent), _contact(), _revertChannel()
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
@@ -112,8 +112,8 @@ GPSSystem::GPSSystem(const QString &name, DMRContact *contact,
 }
 
 ConfigItem *
-GPSSystem::clone() const {
-  GPSSystem *sys = new GPSSystem();
+DMRAPRSSystem::clone() const {
+  DMRAPRSSystem *sys = new DMRAPRSSystem();
   if (! sys->copy(*this)) {
     sys->deleteLater();
     return nullptr;
@@ -122,48 +122,44 @@ GPSSystem::clone() const {
 }
 
 bool
-GPSSystem::hasContact() const {
+DMRAPRSSystem::hasContact() const {
   return ! _contact.isNull();
 }
 
 DMRContact *
-GPSSystem::contactObj() const {
+DMRAPRSSystem::contact() const {
   return _contact.as<DMRContact>();
 }
 
 void
-GPSSystem::setContactObj(DMRContact *contact) {
+DMRAPRSSystem::setContact(DMRContact *contact) {
   _contact.set(contact);
 }
 
-void
-GPSSystem::setContact(DMRContactReference *contact) {
-  _contact.copy(contact);
-}
 
 const DMRContactReference *
-GPSSystem::contact() const {
+DMRAPRSSystem::contactRef() const {
   return &_contact;
 }
 
 DMRContactReference *
-GPSSystem::contact() {
+DMRAPRSSystem::contactRef() {
   return &_contact;
 }
 
 
 bool
-GPSSystem::hasRevertChannel() const {
+DMRAPRSSystem::hasRevertChannel() const {
   return _revertChannel.is<DMRChannel>();
 }
 
 DMRChannel *
-GPSSystem::revertChannel() const {
+DMRAPRSSystem::revertChannel() const {
   return _revertChannel.as<DMRChannel>();
 }
 
 void
-GPSSystem::setRevertChannel(DMRChannel *channel) {
+DMRAPRSSystem::setRevertChannel(DMRChannel *channel) {
   if (nullptr == channel)
     resetRevertChannel();
   else
@@ -171,24 +167,24 @@ GPSSystem::setRevertChannel(DMRChannel *channel) {
 }
 
 void
-GPSSystem::resetRevertChannel() {
+DMRAPRSSystem::resetRevertChannel() {
   _revertChannel.set(SelectedChannel::get());
 }
 
 
 const DMRChannelReference*
-GPSSystem::revert() const {
+DMRAPRSSystem::revertChannelRef() const {
   return &_revertChannel;
 }
 
 DMRChannelReference*
-GPSSystem::revert() {
+DMRAPRSSystem::revertChannelRef() {
   return &_revertChannel;
 }
 
 YAML::Node
-GPSSystem::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = PositioningSystem::serialize(context, err);
+DMRAPRSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositionReportingSystem::serialize(context, err);
   if (node.IsNull())
     return node;
   YAML::Node type; type["dmr"] = node;
@@ -198,10 +194,10 @@ GPSSystem::serialize(const Context &context, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
- * Implementation of APRSSystem
+ * Implementation of FMAPRSSystem
  * ********************************************************************************************* */
-APRSSystem::APRSSystem(QObject *parent)
-  : PositioningSystem(parent), _channel(), _destination(), _destSSID(0),
+FMAPRSSystem::FMAPRSSystem(QObject *parent)
+  : PositionReportingSystem(parent), _channel(), _destination(), _destSSID(0),
     _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
     _anytone(nullptr), _openGD77(nullptr)
 {
@@ -216,10 +212,10 @@ APRSSystem::APRSSystem(QObject *parent)
   connect(&_channel, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
 
-APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
+FMAPRSSystem::FMAPRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
                        unsigned period, QObject *parent)
-  : PositioningSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
+  : PositionReportingSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
     _anytone(nullptr), _openGD77(nullptr)
 {
@@ -236,9 +232,9 @@ APRSSystem::APRSSystem(const QString &name, FMChannel *channel, const QString &d
 }
 
 bool
-APRSSystem::copy(const ConfigItem &other) {
-  const APRSSystem *sys = other.as<APRSSystem>();
-  if ((nullptr == sys) || (! PositioningSystem::copy(other)))
+FMAPRSSystem::copy(const ConfigItem &other) {
+  const FMAPRSSystem *sys = other.as<FMAPRSSystem>();
+  if ((nullptr == sys) || (! PositionReportingSystem::copy(other)))
     return false;
   _destination = sys->destination();
   _destSSID = sys->_destSSID;
@@ -249,8 +245,8 @@ APRSSystem::copy(const ConfigItem &other) {
 }
 
 ConfigItem *
-APRSSystem::clone() const {
-  APRSSystem *sys = new APRSSystem();
+FMAPRSSystem::clone() const {
+  FMAPRSSystem *sys = new FMAPRSSystem();
   if (! sys->copy(*this)) {
     sys->deleteLater();
     return nullptr;
@@ -260,17 +256,17 @@ APRSSystem::clone() const {
 
 
 bool
-APRSSystem::hasRevertChannel() const {
+FMAPRSSystem::hasRevertChannel() const {
   return _channel.is<FMChannel>();
 }
 
 FMChannel *
-APRSSystem::revertChannel() const {
+FMAPRSSystem::revertChannel() const {
   return _channel.as<FMChannel>();
 }
 
 void
-APRSSystem::setRevertChannel(FMChannel *channel) {
+FMAPRSSystem::setRevertChannel(FMChannel *channel) {
   if (nullptr == channel)
     resetRevertChannel();
   else
@@ -278,111 +274,111 @@ APRSSystem::setRevertChannel(FMChannel *channel) {
 }
 
 void
-APRSSystem::resetRevertChannel() {
+FMAPRSSystem::resetRevertChannel() {
   _channel.set(SelectedChannel::get());
 }
 
 
 const FMChannelReference *
-APRSSystem::revert() const {
+FMAPRSSystem::revertChannelRef() const {
   return &_channel;
 }
 
 FMChannelReference *
-APRSSystem::revert() {
+FMAPRSSystem::revertChannelRef() {
   return &_channel;
 }
 
 
 const QString &
-APRSSystem::destination() const {
+FMAPRSSystem::destination() const {
   return _destination;
 }
 
 unsigned
-APRSSystem::destSSID() const {
+FMAPRSSystem::destSSID() const {
   return _destSSID;
 }
 
 void
-APRSSystem::setDestination(const QString &call, unsigned ssid) {
+FMAPRSSystem::setDestination(const QString &call, unsigned ssid) {
   _destination = call;
   _destSSID = ssid;
 }
 
 void
-APRSSystem::setDestination(const QString &call) {
+FMAPRSSystem::setDestination(const QString &call) {
   _destination = call;
 }
 
 void
-APRSSystem::setDestSSID(unsigned int ssid) {
+FMAPRSSystem::setDestSSID(unsigned int ssid) {
   _destSSID = ssid;
 }
 
 
 const QString &
-APRSSystem::source() const {
+FMAPRSSystem::source() const {
   return _source;
 }
 
 unsigned
-APRSSystem::srcSSID() const {
+FMAPRSSystem::srcSSID() const {
   return _srcSSID;
 }
 
 void
-APRSSystem::setSource(const QString &call, unsigned ssid) {
+FMAPRSSystem::setSource(const QString &call, unsigned ssid) {
   _source = call;
   _srcSSID = ssid;
 }
 
 void
-APRSSystem::setSource(const QString &call) {
+FMAPRSSystem::setSource(const QString &call) {
   _source = call;
 }
 
 void
-APRSSystem::setSrcSSID(unsigned ssid) {
+FMAPRSSystem::setSrcSSID(unsigned ssid) {
   _srcSSID = ssid;
 }
 
 
 const QString &
-APRSSystem::path() const {
+FMAPRSSystem::path() const {
   return _path;
 }
 void
-APRSSystem::setPath(const QString &path) {
+FMAPRSSystem::setPath(const QString &path) {
   _path = path.toUpper();
   _path.replace(" ","");
 }
 
-APRSSystem::Icon
-APRSSystem::icon() const {
+FMAPRSSystem::Icon
+FMAPRSSystem::icon() const {
   return _icon;
 }
 void
-APRSSystem::setIcon(Icon icon) {
+FMAPRSSystem::setIcon(Icon icon) {
   _icon = icon;
 }
 
 const QString &
-APRSSystem::message() const {
+FMAPRSSystem::message() const {
   return _message;
 }
 void
-APRSSystem::setMessage(const QString &msg) {
+FMAPRSSystem::setMessage(const QString &msg) {
   _message = msg;
   emit modified(this);
 }
 
 AnytoneFMAPRSSettingsExtension *
-APRSSystem::anytoneExtension() const {
+FMAPRSSystem::anytoneExtension() const {
   return _anytone;
 }
 void
-APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
+FMAPRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
   if (_anytone) {
     _anytone->deleteLater();
     _anytone = nullptr;
@@ -395,11 +391,11 @@ APRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
 }
 
 OpenGD77APRSSystemExtension *
-APRSSystem::openGD77Extension() const {
+FMAPRSSystem::openGD77Extension() const {
   return _openGD77;
 }
 void
-APRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
+FMAPRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
   if (_openGD77) {
     _openGD77->deleteLater();
     _openGD77 = nullptr;
@@ -412,8 +408,8 @@ APRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
 }
 
 YAML::Node
-APRSSystem::serialize(const Context &context, const ErrorStack &err) {
-  YAML::Node node = PositioningSystem::serialize(context, err);
+FMAPRSSystem::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = PositionReportingSystem::serialize(context, err);
   if (node.IsNull())
     return node;
   YAML::Node type; type["aprs"] = node;
@@ -421,8 +417,8 @@ APRSSystem::serialize(const Context &context, const ErrorStack &err) {
 }
 
 bool
-APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! PositioningSystem::populate(node, context, err))
+FMAPRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! PositionReportingSystem::populate(node, context, err))
     return false;
 
   node["destination"] = QString("%1-%2").arg(_destination).arg(_destSSID).toStdString();
@@ -452,7 +448,7 @@ APRSSystem::populate(YAML::Node &node, const Context &context, const ErrorStack 
 
 
 bool
-APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
+FMAPRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
 
@@ -504,66 +500,66 @@ APRSSystem::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
     setPath(path.join(","));
   }
 
-  return PositioningSystem::parse(node, ctx, err);
+  return PositionReportingSystem::parse(node, ctx, err);
 }
 
 
 /* ********************************************************************************************* *
  * Implementation of GPSSystems table
  * ********************************************************************************************* */
-PositioningSystems::PositioningSystems(QObject *parent)
-  : ConfigObjectList(PositioningSystem::staticMetaObject, parent)
+PositionReportingSystems::PositionReportingSystems(QObject *parent)
+  : ConfigObjectList(PositionReportingSystem::staticMetaObject, parent)
 {
   // pass...
 }
 
-PositioningSystem *
-PositioningSystems::system(int idx) const {
+PositionReportingSystem *
+PositionReportingSystems::system(int idx) const {
   if (ConfigItem *obj = get(idx))
-    return obj->as<PositioningSystem>();
+    return obj->as<PositionReportingSystem>();
   return nullptr;
 }
 
 int
-PositioningSystems::add(ConfigObject *obj, int row, bool unique) {
-  if (obj && obj->is<PositioningSystem>())
+PositionReportingSystems::add(ConfigObject *obj, int row, bool unique) {
+  if (obj && obj->is<PositionReportingSystem>())
     return ConfigObjectList::add(obj, row, unique);
   return -1;
 }
 
 int
-PositioningSystems::gpsCount() const {
+PositionReportingSystems::gpsCount() const {
   int c=0;
   for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<GPSSystem>())
+    if (_items.at(i)->is<DMRAPRSSystem>())
       c++;
   return c;
 }
 
 int
-PositioningSystems::indexOfGPSSys(const GPSSystem *gps) const {
-  if (! _items.contains((GPSSystem *)gps))
+PositionReportingSystems::indexOfGPSSys(const DMRAPRSSystem *gps) const {
+  if (! _items.contains((DMRAPRSSystem *)gps))
     return -1;
 
   int idx=0;
   for (int i=0; i<count(); i++) {
     if (gps == _items.at(i))
       return idx;
-    if (_items.at(i)->is<GPSSystem>())
+    if (_items.at(i)->is<DMRAPRSSystem>())
       idx++;
   }
 
   return -1;
 }
 
-GPSSystem *
-PositioningSystems::gpsSystem(int idx) const {
+DMRAPRSSystem *
+PositionReportingSystems::gpsSystem(int idx) const {
   if ((0>idx) || (idx >= _items.size()))
     return nullptr;
   for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<GPSSystem>()) {
+    if (_items.at(i)->is<DMRAPRSSystem>()) {
       if (0==idx)
-        return _items.at(i)->as<GPSSystem>();
+        return _items.at(i)->as<DMRAPRSSystem>();
       else
         idx--;
     }
@@ -573,17 +569,17 @@ PositioningSystems::gpsSystem(int idx) const {
 
 
 int
-PositioningSystems::aprsCount() const {
+PositionReportingSystems::aprsCount() const {
   int c=0;
   for (int i=0; i<count(); i++) {
-    if (_items.at(i)->is<APRSSystem>())
+    if (_items.at(i)->is<FMAPRSSystem>())
       c++;
   }
   return c;
 }
 
 int
-PositioningSystems::indexOfAPRSSys(APRSSystem *aprs) const {
+PositionReportingSystems::indexOfAPRSSys(FMAPRSSystem *aprs) const {
   if (! _items.contains(aprs))
     return -1;
 
@@ -591,21 +587,21 @@ PositioningSystems::indexOfAPRSSys(APRSSystem *aprs) const {
   for (int i=0; i<count(); i++) {
     if (aprs == _items.at(i))
       return idx;
-    if (_items.at(i)->is<APRSSystem>())
+    if (_items.at(i)->is<FMAPRSSystem>())
       idx++;
   }
 
   return -1;
 }
 
-APRSSystem *
-PositioningSystems::aprsSystem(int idx) const {
+FMAPRSSystem *
+PositionReportingSystems::aprsSystem(int idx) const {
   if ((0>idx) || (idx >= _items.size()))
     return nullptr;
   for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<APRSSystem>()) {
+    if (_items.at(i)->is<FMAPRSSystem>()) {
       if (0==idx)
-        return _items.at(i)->as<APRSSystem>();
+        return _items.at(i)->as<FMAPRSSystem>();
       else
         idx--;
     }
@@ -614,7 +610,7 @@ PositioningSystems::aprsSystem(int idx) const {
 }
 
 ConfigItem *
-PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+PositionReportingSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
@@ -627,9 +623,9 @@ PositioningSystems::allocateChild(const YAML::Node &node, ConfigItem::Context &c
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if ("dmr" == type) {
-    return new GPSSystem();
+    return new DMRAPRSSystem();
   } else if ("aprs"==type) {
-    return new APRSSystem();
+    return new FMAPRSSystem();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

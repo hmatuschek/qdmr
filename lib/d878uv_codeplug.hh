@@ -12,7 +12,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 class RoamingChannel;
 
 
@@ -1238,9 +1238,9 @@ public:
     virtual void setPath(const QString &path);
 
     /** Returns the APRS icon. */
-    virtual APRSSystem::Icon icon() const;
+    virtual FMAPRSSystem::Icon icon() const;
     /** Sets the APRS icon. */
-    virtual void setIcon(APRSSystem::Icon icon);
+    virtual void setIcon(FMAPRSSystem::Icon icon);
 
     /** Returns the transmit power. */
     virtual Channel::Power power() const;
@@ -1356,24 +1356,24 @@ public:
     virtual void enableReportOther(bool enable);
 
     /** Configures this APRS system from the given generic config. */
-    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+    virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,
                                   FMAPRSFrequencyNamesElement &names,
                                   const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toFMAPRSSystem(
+    virtual FMAPRSSystem *toFMAPRSSystem(
         Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err=ErrorStack());
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
-    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+    virtual bool linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx);
 
     /** Constructs all GPS system from the generic configuration. */
     virtual bool fromDMRAPRSSystems(Context &ctx);
     /** Encodes the given GPS system. */
-    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, DMRAPRSSystem *sys, Context &ctx);
     /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    virtual DMRAPRSSystem *toDMRAPRSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
-    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+    virtual bool linkDMRAPRSSystem(int idx, DMRAPRSSystem *sys, Context &ctx) const;
 
   public:
     /** Some static limits for this element. */

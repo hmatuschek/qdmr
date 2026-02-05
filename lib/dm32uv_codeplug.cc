@@ -481,16 +481,16 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
       return false;
     }
     if (0 == dmrIdIndex())
-      dmr->setRadioIdObj(DefaultRadioID::get());
+      dmr->setRadioId(DefaultRadioID::get());
     else
-      dmr->setRadioIdObj(ctx.get<DMRRadioID>(dmrIdIndex()));
+      dmr->setRadioId(ctx.get<DMRRadioID>(dmrIdIndex()));
 
     if (dmrAPRSEnabled()) {
-      if (! ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+      if (! ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
         errMsg(err) << "Unknown GPS system index " << dmrAPRSChannelIndex() << ".";
         return false;
       }
-      dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
+      dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
   }
 
@@ -539,10 +539,10 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     if (! dmr->groupListRef()->isNull()) {
       setGroupListIndex(ctx.index(dmr->groupList()));
     }
-    if (dmr->radioId()->is<DefaultRadioID>()) {
+    if (dmr->radioIdRef()->is<DefaultRadioID>()) {
       setDMRIdIndex(ctx.index(ctx.config()->settings()->defaultId()));
     } else {
-      setDMRIdIndex(ctx.index(dmr->radioIdObj()));
+      setDMRIdIndex(ctx.index(dmr->radioId()));
     }
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();
@@ -1562,11 +1562,11 @@ DM32UVCodeplug::ScanListElement::encode(const ScanList *lst, Context &ctx, const
   Q_UNUSED(err);
   setName(lst->name());
 
-  if (! lst->primary()->isNull())
+  if (! lst->primaryChannelRef()->isNull())
     setPrimaryChannelIndex(ctx.index(lst->primaryChannel()));
-  if (! lst->secondary()->isNull())
+  if (! lst->secondaryChannelRef()->isNull())
     setSecondaryChannelIndex(ctx.index(lst->secondaryChannel()));
-  if (! lst->revert()->isNull())
+  if (! lst->revertChannelRef()->isNull())
     setRevertChannelIndex(ctx.index(lst->revertChannel()));
   setChannelCount(std::min(Limit::channels(), (unsigned int)lst->count()));
   for (unsigned int i=0; i<channelCount(); i++) {
@@ -3330,7 +3330,7 @@ DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err)
   if (0 == destinationId())
     return true;
 
-  auto aprs = new GPSSystem("DMR APRS System");
+  auto aprs = new DMRAPRSSystem("DMR APRS System");
   if (updatePeriod().isFinite())
     aprs->setPeriod(updatePeriod().seconds());
   else
@@ -3347,7 +3347,7 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
   if (0 == destinationId())
     return true;
 
-  auto aprs = ctx.get<GPSSystem>(0);
+  auto aprs = ctx.get<DMRAPRSSystem>(0);
   if (nullptr == aprs) {
     errMsg(err) << "Cannot resolve DMR APRS System at index 0!";
     return false;
@@ -3359,7 +3359,7 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
     ctx.config()->contacts()->add(cont);
   }
 
-  aprs->setContactObj(cont);
+  aprs->setContact(cont);
   if (revertChannelIsCurrent(0)) {
     aprs->resetRevertChannel();
   } else {
@@ -3382,19 +3382,19 @@ bool
 DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (0 == ctx.count<GPSSystem>()) {
+  if (0 == ctx.count<DMRAPRSSystem>()) {
     setDestinationId(0);
     return true;
   }
 
   // We can only encode a single system -> use the first
-  auto sys = ctx.get<GPSSystem>(0);
+  auto sys = ctx.get<DMRAPRSSystem>(0);
   if (0 == sys->period())
     setUpdatePeriod(Interval::infinity());
   else
     setUpdatePeriod(Interval::fromSeconds(sys->period()));
-  setDestinationId(sys->contactObj()->number());
-  setCallType(sys->contactObj()->type());
+  setDestinationId(sys->contact()->number());
+  setCallType(sys->contact()->type());
 
   for (unsigned int i=0; i<Limit::revertChannels(); i++)
     setRevertChannelToCurrent(i);
@@ -3736,8 +3736,10 @@ DM32UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const
   }
 
   // Map radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
-    ctx.add(ctx.config()->radioIDs()->getId(i), i);
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    if (ctx.config()->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(ctx.config()->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map DMR contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {

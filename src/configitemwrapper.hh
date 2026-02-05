@@ -201,7 +201,7 @@ class PositioningSystemListWrapper: public GenericTableWrapper
   Q_OBJECT
 
 public:
-  PositioningSystemListWrapper(PositioningSystems *list, QObject *parent=nullptr);
+  PositioningSystemListWrapper(PositionReportingSystems *list, QObject *parent=nullptr);
 
 public:
   // Implementation of QAbstractTableModel

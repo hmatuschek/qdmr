@@ -12,9 +12,9 @@ class DMRChannel;
 class FMChannel;
 
 
-/** Base class of the positioning systems, that is APRS and DMR position reporting system.
+/** Base class of the position reporting systems, that is APRS and DMR position reporting system.
  * @ingroup conf */
-class PositioningSystem: public ConfigObject
+class PositionReportingSystem: public ConfigObject
 {
   Q_OBJECT
   Q_CLASSINFO("IdPrefix", "aprs")
@@ -24,18 +24,18 @@ class PositioningSystem: public ConfigObject
 
 protected:
   /** Default constructor. */
-  explicit PositioningSystem(QObject *parent=nullptr);
+  explicit PositionReportingSystem(QObject *parent=nullptr);
   /** Hidden constructor.
-   * The PositioningSystem class is not instantiated directly, use either @c GPSSystem or
+   * The PositionReportingSystem class is not instantiated directly, use either @c GPSSystem or
    * @c APRSSystem instead.
    * @param name Specifies the name of the system.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specified the QObject parent object. */
-  PositioningSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
+  PositionReportingSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
 
 public:
   /** Destructor. */
-  virtual ~PositioningSystem();
+  virtual ~PositionReportingSystem();
 
   /** Returns the update period in seconds. */
   unsigned period() const;
@@ -59,20 +59,20 @@ protected:
 };
 
 
-/** This class represents a GPS signalling system within the codeplug.
+/** This class represents a DMR position reporting system within the codeplug.
  * @ingroup conf */
-class GPSSystem : public PositioningSystem
+class DMRAPRSSystem : public PositionReportingSystem
 {
   Q_OBJECT
 
   /** References the destination contact. */
-  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
-  /** References the revert channel. */
-  Q_PROPERTY(DMRChannelReference* revert READ revert)
+  Q_PROPERTY(DMRContactReference* contact READ contactRef)
+  /** References the revertRef channel. */
+  Q_PROPERTY(DMRChannelReference* revert READ revertChannelRef)
 
 public:
   /** Default constructor. */
-  Q_INVOKABLE explicit GPSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit DMRAPRSSystem(QObject *parent=nullptr);
   /** Constructor.
    *
    * Please note, that a contact needs to be set in order for the GPS system to work properly.
@@ -83,7 +83,7 @@ public:
    * data is sent on the current channel.
    * @param period Specifies the update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  GPSSystem(const QString &name, DMRContact *contact=nullptr,
+  DMRAPRSSystem(const QString &name, DMRContact *contact=nullptr,
             DMRChannel *revertChannel = nullptr, unsigned period=300,
             QObject *parent = nullptr);
 
@@ -92,15 +92,13 @@ public:
   /** Returns @c true if a contact is set for the GPS system. */
   bool hasContact() const;
   /** Returns the destination contact for the GPS information or @c nullptr if not set. */
-  DMRContact *contactObj() const;
+  DMRContact *contact() const;
   /** Sets the destination contact for the GPS information. */
-  void setContactObj(DMRContact *contactObj);
-  /** Returns the reference to the destination contact. */
-  const DMRContactReference *contact() const;
-  /** Returns the reference to the destination contact. */
-  DMRContactReference *contact();
-  /** Sets the reference to the destination contact for the GPS information. */
-  void setContact(DMRContactReference *contactObj);
+  void setContact(DMRContact *contactObj);
+  /** Returns the reference to the destination contactRef. */
+  const DMRContactReference *contactRef() const;
+  /** Returns the reference to the destination contactRef. */
+  DMRContactReference *contactRef();
 
   /** Returns @c true if the GPS system has a revert channel set. If not, the GPS information will
    * be sent on the current channel. */
@@ -112,10 +110,10 @@ public:
   /** Resets the revert channel to the current channel. */
   void resetRevertChannel();
 
-  /** Returns a reference to the revert channel. */
-  const DMRChannelReference *revert() const;
-  /** Returns a reference to the revert channel. */
-  DMRChannelReference *revert();
+  /** Returns a reference to the revertChannelRef channel. */
+  const DMRChannelReference *revertChannelRef() const;
+  /** Returns a reference to the revertChannelRef channel. */
+  DMRChannelReference *revertChannelRef();
 
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
@@ -130,12 +128,12 @@ protected:
 
 /** Represents an APRS system within the generic config.
  * @ingroup conf */
-class APRSSystem: public PositioningSystem
+class FMAPRSSystem: public PositionReportingSystem
 {
   Q_OBJECT
 
   /** The transmit channel. */
-  Q_PROPERTY(FMChannelReference* revert READ revert)
+  Q_PROPERTY(FMChannelReference* revert READ revertChannelRef)
   /** The destination call. */
   Q_PROPERTY(QString destination READ destination WRITE setDestination SCRIPTABLE false)
   /** The destination SSID. */
@@ -179,7 +177,7 @@ public:
 
 public:
   /** Default constructor. */
-  Q_INVOKABLE explicit APRSSystem(QObject *parent=nullptr);
+  Q_INVOKABLE explicit FMAPRSSystem(QObject *parent=nullptr);
   /** Constructor for a APRS system.
    * @param name Specifies the name of the APRS system. This property is just a name, it does not
    *        affect the radio configuration.
@@ -195,7 +193,7 @@ public:
    * @param message An optional message to send.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
-  APRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
+  FMAPRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
              const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
              const QString &message="", unsigned period=300, QObject *parent=nullptr);
 
@@ -212,10 +210,10 @@ public:
   /** Resets the revert channel to the current one */
   void resetRevertChannel();
 
-  /** Returns a reference to the revert channel. */
-  const FMChannelReference *revert() const;
-  /** Returns a reference to the revert channel. */
-  FMChannelReference *revert();
+  /** Returns a reference to the revertChannelRef channel. */
+  const FMChannelReference *revertChannelRef() const;
+  /** Returns a reference to the revertChannelRef channel. */
+  FMChannelReference *revertChannelRef();
 
   /** Returns the destination call. */
   const QString &destination() const;
@@ -297,36 +295,36 @@ protected:
 
 /** The list of positioning systems.
  * @ingroup conf */
-class PositioningSystems: public ConfigObjectList
+class PositionReportingSystems: public ConfigObjectList
 {
 Q_OBJECT
 
 public:
   /** Constructs an empty list of GPS systems. */
-  explicit PositioningSystems(QObject *parent=nullptr);
+  explicit PositionReportingSystems(QObject *parent=nullptr);
 
   /** Returns the positioning system at the specified index. */
-  PositioningSystem *system(int idx) const;
+  PositionReportingSystem *system(int idx) const;
 
   int add(ConfigObject *obj, int row=-1, bool unique=true);
 
   /** Returns the number of defined GPS systems. */
-  int gpsCount() const;
+  [[deprecated("Use indexing instead.")]] int gpsCount() const;
   /** Returns the index of the GPS System.
    * This index in only within all defined GPS systems. */
-  int indexOfGPSSys(const GPSSystem *gps) const;
+  [[deprecated("Use indexing instead.")]] int indexOfGPSSys(const DMRAPRSSystem *gps) const;
   /** Gets the GPS system at the specified index.
    * This index is only within all defined GPS systems. */
-  GPSSystem *gpsSystem(int idx) const;
+  [[deprecated("Use indexing instead.")]] DMRAPRSSystem *gpsSystem(int idx) const;
 
   /** Returns the number of defined APRS system. */
-  int aprsCount() const;
+  [[deprecated("Use indexing instead.")]]int aprsCount() const;
   /** Returns the index of the specified APRS system. That index is only within all
    * defined APRS systems. */
-  int indexOfAPRSSys(APRSSystem *gps) const;
+  [[deprecated("Use indexing instead.")]] int indexOfAPRSSys(FMAPRSSystem *gps) const;
   /** Returns the APRS system at index @c idx.
    * That index is only within all defined APRS systems. */
-  APRSSystem *aprsSystem(int idx) const;
+  [[deprecated("Use indexing instead.")]] FMAPRSSystem *aprsSystem(int idx) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

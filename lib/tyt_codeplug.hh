@@ -13,7 +13,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 class SMSExtension;
 class SMSTemplate;
 
@@ -740,11 +740,11 @@ public:
     virtual void disableDestinationContact();
 
     /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
+    virtual bool fromGPSSystemObj(DMRAPRSSystem *sys, Context &ctx);
     /** Constructs a GPS system. */
-    virtual GPSSystem *toGPSSystemObj();
+    virtual DMRAPRSSystem *toGPSSystemObj();
     /** Links the given GPS system. */
-    virtual bool linkGPSSystemObj(GPSSystem *sys, Context &ctx);
+    virtual bool linkGPSSystemObj(DMRAPRSSystem *sys, Context &ctx);
   };
 
   /** Represents all menu settings within the codeplug on the radio.

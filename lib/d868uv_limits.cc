@@ -123,7 +123,7 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<Frequency, Freq
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false)},
-              {"aprs", new RadioLimitObjRef(GPSSystem::staticMetaObject, true)},
+              {"aprs", new RadioLimitObjRef(DMRAPRSSystem::staticMetaObject, true)},
               {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get()) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
@@ -153,12 +153,12 @@ D868UVLimits::D868UVLimits(const std::initializer_list<std::pair<Frequency, Freq
 
   /* Ignore positioning systems. */
   add("positioning", new RadioLimitList({
-        { GPSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
+        { DMRAPRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
-        { APRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );
+        { FMAPRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );
 
 
   /* Ignore roaming zones. */

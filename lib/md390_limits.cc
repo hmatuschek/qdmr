@@ -150,12 +150,12 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
 
   /* Define limits for positioning systems. */
   add("positioning", new RadioLimitList({
-        { GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
+        { DMRAPRSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
           { "period", new RadioLimitUInt(0, 7650) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
-        { APRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );
+        { FMAPRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );
 
   /* Check encryption keys. */
   add("commercial", new RadioLimitItem {

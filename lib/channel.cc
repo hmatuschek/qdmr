@@ -441,7 +441,7 @@ FMChannel::clear() {
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
   setBandwidth(Bandwidth::Narrow);
-  setAPRSSystem(nullptr);
+  setAPRS(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
 
@@ -515,29 +515,29 @@ FMChannel::setBandwidth(Bandwidth bw) {
   return true;
 }
 
-const APRSSystemReference *
-FMChannel::aprs() const {
+const FMAPRSSystemReference *
+FMChannel::aprsRef() const {
   return &_aprsSystem;
 }
 
-APRSSystemReference *
-FMChannel::aprs() {
+FMAPRSSystemReference *
+FMChannel::aprsRef() {
   return &_aprsSystem;
 }
 
 void
-FMChannel::setAPRS(APRSSystemReference *ref) {
+FMChannel::setAPRSRef(FMAPRSSystemReference *ref) {
   if (nullptr == ref)
     return _aprsSystem.clear();
   _aprsSystem.copy(ref);
 }
 
-APRSSystem *
-FMChannel::aprsSystem() const {
-  return _aprsSystem.as<APRSSystem>();
+FMAPRSSystem *
+FMChannel::aprs() const {
+  return _aprsSystem.as<FMAPRSSystem>();
 }
 void
-FMChannel::setAPRSSystem(APRSSystem *sys) {
+FMChannel::setAPRS(FMAPRSSystem *sys) {
   _aprsSystem.set(sys);
 }
 
@@ -773,10 +773,10 @@ DMRChannel::clear() {
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupList(nullptr);
-  setTXContactObj(nullptr);
-  setAPRSObj(nullptr);
-  setRoamingZone(nullptr);
-  setRadioIdObj(DefaultRadioID::get());
+  setTXContact(nullptr);
+  setAPRS(nullptr);
+  setRoaming(nullptr);
+  setRadioId(DefaultRadioID::get());
   setCommercialExtension(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
@@ -859,17 +859,17 @@ DMRChannel::setGroupList(RXGroupList *g) {
 }
 
 const DMRContactReference *
-DMRChannel::contact() const {
+DMRChannel::contactRef() const {
   return &_txContact;
 }
 
 DMRContactReference *
-DMRChannel::contact() {
+DMRChannel::contactRef() {
   return &_txContact;
 }
 
 void
-DMRChannel::setContact(DMRContactReference *ref) {
+DMRChannel::setContactRef(DMRContactReference *ref) {
   if (nullptr == ref)
     _txContact.clear();
   else
@@ -877,12 +877,12 @@ DMRChannel::setContact(DMRContactReference *ref) {
 }
 
 DMRContact *
-DMRChannel::txContactObj() const {
+DMRChannel::txContact() const {
   return _txContact.as<DMRContact>();
 }
 
 bool
-DMRChannel::setTXContactObj(DMRContact *c) {
+DMRChannel::setTXContact(DMRContact *c) {
   if(! _txContact.set(c))
     return false;
   emit modified(this);
@@ -890,30 +890,30 @@ DMRChannel::setTXContactObj(DMRContact *c) {
 }
 
 const PositioningSystemReference *
-DMRChannel::aprs() const {
+DMRChannel::aprsRef() const {
   return &_posSystem;
 }
 
 PositioningSystemReference *
-DMRChannel::aprs() {
+DMRChannel::aprsRef() {
   return &_posSystem;
 }
 
 void
-DMRChannel::setAPRS(PositioningSystemReference *ref) {
+DMRChannel::setAPRSRef(PositioningSystemReference *ref) {
   if (nullptr == ref)
     _posSystem.clear();
   else
     _posSystem.copy(ref);
 }
 
-PositioningSystem *
-DMRChannel::aprsObj() const {
-  return _posSystem.as<PositioningSystem>();
+PositionReportingSystem *
+DMRChannel::aprs() const {
+  return _posSystem.as<PositionReportingSystem>();
 }
 
 bool
-DMRChannel::setAPRSObj(PositioningSystem *sys) {
+DMRChannel::setAPRS(PositionReportingSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);
@@ -921,17 +921,17 @@ DMRChannel::setAPRSObj(PositioningSystem *sys) {
 }
 
 const RoamingZoneReference *
-DMRChannel::roaming() const {
+DMRChannel::roamingRef() const {
   return &_roaming;
 }
 
 RoamingZoneReference *
-DMRChannel::roaming() {
+DMRChannel::roamingRef() {
   return &_roaming;
 }
 
 void
-DMRChannel::setRoaming(RoamingZoneReference *ref) {
+DMRChannel::setRoamingRef(RoamingZoneReference *ref) {
   if (nullptr == ref)
     _roaming.clear();
   else
@@ -939,29 +939,29 @@ DMRChannel::setRoaming(RoamingZoneReference *ref) {
 }
 
 RoamingZone *
-DMRChannel::roamingZone() const {
+DMRChannel::roaming() const {
   return _roaming.as<RoamingZone>();
 }
 
 bool
-DMRChannel::setRoamingZone(RoamingZone *zone) {
+DMRChannel::setRoaming(RoamingZone *zone) {
   _roaming.set(zone);
   emit modified(this);
   return true;
 }
 
 const DMRRadioIDReference *
-DMRChannel::radioId() const {
+DMRChannel::radioIdRef() const {
   return &_radioId;
 }
 
 DMRRadioIDReference *
-DMRChannel::radioId() {
+DMRChannel::radioIdRef() {
   return &_radioId;
 }
 
 void
-DMRChannel::setRadioId(DMRRadioIDReference *ref) {
+DMRChannel::setRadioIdRef(DMRRadioIDReference *ref) {
   if (nullptr == ref)
     _radioId.clear();
   else
@@ -969,12 +969,12 @@ DMRChannel::setRadioId(DMRRadioIDReference *ref) {
 }
 
 DMRRadioID *
-DMRChannel::radioIdObj() const {
+DMRChannel::radioId() const {
   return _radioId.as<DMRRadioID>();
 }
 
 bool
-DMRChannel::setRadioIdObj(DMRRadioID *id) {
+DMRChannel::setRadioId(DMRRadioID *id) {
   if (! _radioId.set(id))
     return false;
   emit modified(this);

@@ -677,7 +677,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
                  << c->name() << "'.";
       return false;
     }
-    dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
+    dc->setTXContact(ctx.get<DMRContact>(contactIndex()));
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
@@ -686,9 +686,9 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
     if (rid == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>())
-      dc->setRadioIdObj(DefaultRadioID::get());
+      dc->setRadioId(DefaultRadioID::get());
     else
-      dc->setRadioIdObj(rid);
+      dc->setRadioId(rid);
   } else if (Mode::Analog == mode()) {
     // If channel is analog
     FMChannel *ac = c->as<FMChannel>();
@@ -774,17 +774,17 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // set time-slot
     setTimeSlot(dc->timeSlot());
     // link transmit contact
-    if (nullptr == dc->txContactObj())
+    if (nullptr == dc->txContact())
       setContactIndex(0);
     else
-      setContactIndex(ctx.index(dc->txContactObj()));
+      setContactIndex(ctx.index(dc->txContact()));
     // link RX group list
     if (nullptr == dc->groupList())
       clearGroupListIndex();
     else
       setGroupListIndex(ctx.index(dc->groupList()));
     // Set radio ID
-    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+    if ((nullptr == dc->radioId()) || (DefaultRadioID::get() == dc->radioId())) {
       if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {
         logWarn() << "No default radio ID set: using index 0.";
         setRadioIDIndex(0);
@@ -792,7 +792,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
         setRadioIDIndex(ctx.index(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()));
       }
     } else {
-      setRadioIDIndex(ctx.index(dc->radioIdObj()));
+      setRadioIDIndex(ctx.index(dc->radioId()));
     }
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
@@ -2361,21 +2361,21 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
 
-  if (1 < ctx.config()->posSystems()->gpsCount()) {
+  if (1 < ctx.count<DMRAPRSSystem>()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
-  } else if (0 == ctx.config()->posSystems()->gpsCount()) {
+  } else if (0 == ctx.count<DMRAPRSSystem>()) {
     return true;
   }
 
-  GPSSystem *sys = ctx.config()->posSystems()->gpsSystem(0);
-  setDestination(sys->contactObj()->number());
-  setCallType(sys->contactObj()->type());
+  DMRAPRSSystem *sys = ctx.get<DMRAPRSSystem>(0);
+  setDestination(sys->contact()->number());
+  setCallType(sys->contact()->type());
   setManualInterval(Interval::fromSeconds(sys->period()));
   setAutomaticInterval(Interval::fromSeconds(sys->period()));
   disableTimeSlotOverride();
   if (! sys->hasRevertChannel()) {
     setChannelSelected(0);
-  } else if (sys->revert()->is<DMRChannel>()) {
+  } else if (sys->revertChannelRef()->is<DMRChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
   } else {
     clearChannel(0);
@@ -2385,7 +2385,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx) {
-  GPSSystem *sys = new GPSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval().seconds());
+  DMRAPRSSystem *sys = new DMRAPRSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval().seconds());
   ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
   return true;
 }
@@ -2398,14 +2398,14 @@ AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) 
     cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
-  ctx.get<GPSSystem>(i)->setContactObj(cont);
+  ctx.get<DMRAPRSSystem>(i)->setContact(cont);
 
   // Check if there is a revert channel set
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DMRChannel>()) {
     DMRChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DMRChannel>();
-    ctx.get<GPSSystem>(i)->setRevertChannel(ch);
+    ctx.get<DMRAPRSSystem>(i)->setRevertChannel(ch);
   } else {
-    ctx.get<GPSSystem>(i)->resetRevertChannel();
+    ctx.get<DMRAPRSSystem>(i)->resetRevertChannel();
   }
   return true;
 }
@@ -4418,8 +4418,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // All indices as 0-based. That is, the first channel gets index 0 etc.
 
   // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i);
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    if (config->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(config->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
@@ -4448,10 +4450,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map DMR APRS systems
   for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<GPSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d); d++;
-    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      auto *aprs = config->posSystems()->system(i)->as<APRSSystem>();
+    if (config->posSystems()->system(i)->is<DMRAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<DMRAPRSSystem>(), d); d++;
+    } else if (config->posSystems()->system(i)->is<FMAPRSSystem>()) {
+      auto *aprs = config->posSystems()->system(i)->as<FMAPRSSystem>();
       ctx.add(aprs, a); a++;
       // Index FM APRS frequencies (referenced in channel extensions).
       if (auto *ext = aprs->anytoneExtension()) {

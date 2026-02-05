@@ -38,13 +38,13 @@ ConfigTest::testImmediateRefInvalidation() {
   QCOMPARE(_basicConfig.posSystems()->count(), 1);
   QVERIFY(_basicConfig.channelList()->get(1));
   QVERIFY(_basicConfig.channelList()->get(1)->is<DMRChannel>());
-  QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprsObj(),
-           _basicConfig.posSystems()->get(0)->as<GPSSystem>());
+  QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprs(),
+           _basicConfig.posSystems()->get(0)->as<DMRAPRSSystem>());
 
   // Delete DMR APRS system and check if reference to it (channel 2) is removed as well.
   QVERIFY(copy->posSystems()->del(copy->posSystems()->get(0)));
   QCOMPARE(copy->posSystems()->count(), 0);
-  QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprsObj(), nullptr);
+  QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprs(), nullptr);
 
   QVERIFY(_basicConfig.channelList()->get(2));
   QCOMPARE(_basicConfig.zones()->get(0)->as<Zone>()->B()->count(), 1);
@@ -187,7 +187,7 @@ ConfigTest::testDMRIdVerification() {
   QVERIFY(limits.verifyConfig(&cfg, ctx));
   QVERIFY(ctx.maxSeverity() < RadioLimitIssue::Severity::Critical);
 
-  cfg.radioIDs()->getId(0)->setNumber(0x12345678);
+  cfg.radioIDs()->get(0)->as<DMRRadioID>()->setNumber(0x12345678);
 
   QVERIFY(!limits.verifyConfig(&cfg, ctx));
   QVERIFY(ctx.maxSeverity() == RadioLimitIssue::Severity::Critical);
