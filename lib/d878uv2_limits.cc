@@ -86,7 +86,7 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
@@ -110,7 +110,7 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

@@ -155,7 +155,7 @@ DigitalChannelDialog::construct() {
     timeSlot->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_channel->vox());
+    voxValue->setValue(_channel->vox().value());
   }
 
   extensionView->setObjectName("digitalChannelExtension");
@@ -204,7 +204,7 @@ DigitalChannelDialog::channel()
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   DMRChannel *channel = _myChannel;
   if (nullptr == _channel) {

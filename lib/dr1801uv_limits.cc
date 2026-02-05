@@ -88,7 +88,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -119,7 +119,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
                }},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

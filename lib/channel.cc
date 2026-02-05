@@ -18,7 +18,7 @@
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
     _defaultPower(true), _power(Power::Low), _txTimeOut(Interval::null()),
-    _rxOnly(false), _vox(std::numeric_limits<unsigned>::max()), _scanlist(),
+    _rxOnly(false), _vox(), _scanlist(),
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
@@ -201,28 +201,30 @@ Channel::setRXOnly(bool enable) {
 
 bool
 Channel::voxDisabled() const {
-  return 0==vox();
+  return _vox.isNull();
 }
 bool
 Channel::defaultVOX() const {
-  return std::numeric_limits<unsigned>::max() == vox();
+  return _vox.isInvalid();
 }
-unsigned
+Level
 Channel::vox() const {
   return _vox;
 }
 void
-Channel::setVOX(unsigned level) {
+Channel::setVOX(Level level) {
+  if (_vox == level)
+    return;
   _vox = level;
   emit modified(this);
 }
 void
 Channel::setVOXDefault() {
-  setVOX(std::numeric_limits<unsigned>::max());
+  setVOX(Level::invalid());
 }
 void
 Channel::disableVOX() {
-  setVOX(0);
+  setVOX(Level::null());
 }
 
 const ScanListReference *
@@ -342,12 +344,6 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
       setTimeout(to);
     else
       disableTimeout();
-  }
-
-  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
-    setVOXDefault();
-  } else if (ch["vox"] && ch["vox"].IsScalar()) {
-    setVOX(ch["vox"].as<unsigned>());
   }
 
   return ConfigObject::parse(ch, ctx, err);

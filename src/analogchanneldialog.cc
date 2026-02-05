@@ -132,7 +132,7 @@ AnalogChannelDialog::construct() {
     bandwidth->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_myChannel->vox());
+    voxValue->setValue(_myChannel->vox().value());
   }
 
   if (! settings.showExtensions())
@@ -186,7 +186,7 @@ AnalogChannelDialog::channel()
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   FMChannel *channel = _myChannel;
   if (nullptr == _channel) {

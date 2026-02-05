@@ -542,6 +542,29 @@ RadioLimitInterval::verify(const ConfigItem *item, const QMetaProperty &prop, Ra
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitLevel
+ * ********************************************************************************************* */
+RadioLimitLevel::RadioLimitLevel(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent)
+{
+  // pass...
+}
+
+bool
+RadioLimitLevel::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  Q_UNUSED(item);
+
+  if (qMetaTypeId<Level>() != prop.userType()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected interval.";
+    return false;
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitItem
  * ********************************************************************************************* */
 RadioLimitItem::RadioLimitItem(QObject *parent)

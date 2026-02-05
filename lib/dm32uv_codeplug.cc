@@ -447,7 +447,7 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
   if (voxEnabled())
     ch->setVOXDefault();
   else
-    ch->setVOX(0);
+    ch->disableVOX();
 
   return ch;
 }

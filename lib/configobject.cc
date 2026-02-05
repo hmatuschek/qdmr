@@ -3,6 +3,7 @@
 #include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "level.hh"
 #include "signaling.hh"
 
 #include <QMetaProperty>
@@ -166,7 +167,9 @@ ConfigItem::copy(const ConfigItem &other) {
                          (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
                          (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
                          (QString("Frequency")==prop.typeName()) ||
-                         (QString("Interval")==prop.typeName()) );
+                         (QString("Interval")==prop.typeName()) ||
+                        (QString("Level")==prop.typeName()) ||
+                        (QString("SelectiveCall")==prop.typeName()));
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
@@ -289,6 +292,15 @@ ConfigItem::compare(const ConfigItem &other) const {
 
     if (QString("Interval") == prop.typeName()) {
       Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
+      continue;
+    }
+
+    if (QString("Level") == prop.typeName()) {
+      Level a = prop.read(this).value<Level>(), b = oprop.read(&other).value<Level>();
       if (a<b)
         return -1;
       if (b<a)
@@ -429,6 +441,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).value<Frequency>();
     } else if (QString("Interval") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<Interval>();
+    } else if (QString("Level") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Level>();
     } else if (QString("SelectiveCall") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
@@ -645,6 +659,18 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
+    } else if (QString("Level") == prop.typeName()) {
+      // If property is not set -> skip
+      if (! node[prop.name()])
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected level.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<Level>()));
     } else if (QString("SelectiveCall") == prop.typeName()) {
       // If property is not set -> skip
       if ((! node[prop.name()]) || (node[prop.name()].IsNull())) {

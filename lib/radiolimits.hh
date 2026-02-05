@@ -424,6 +424,21 @@ protected:
 };
 
 
+/** Represents a limit on levels.
+ * @ingroup limits */
+class RadioLimitLevel: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RadioLimitLevel(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                           QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+};
+
+
 /** Represents the limits for a @c ConfigItem instance.
  *
  * That is, it holds the limits for every property of the @c ConfigItem instance. This class

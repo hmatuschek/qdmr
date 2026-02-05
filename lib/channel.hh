@@ -8,6 +8,7 @@
 #include "configreference.hh"
 #include "signaling.hh"
 #include "interval.hh"
+#include "level.hh"
 
 #include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
@@ -48,7 +49,7 @@ class Channel: public ConfigObject
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
   /** The VOX setting. */
-  Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
@@ -131,9 +132,9 @@ public:
   /** Returns @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
-  unsigned vox() const;
+  Level vox() const;
   /** Sets the VOX level [0-10]. */
-  void setVOX(unsigned level);
+  void setVOX(Level level);
   /** Sets the VOX level to the default value. */
   void setVOXDefault();
   /** Disables the VOX. */
@@ -186,7 +187,7 @@ protected:
   /** RX only flag. */
   bool _rxOnly;
   /** Holds the VOX level. */
-  unsigned _vox;
+  Level _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
   /** Owns the OpenGD77 channel extension object. */

@@ -81,7 +81,7 @@ GD73Limits::GD73Limits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
@@ -105,7 +105,7 @@ GD73Limits::GD73Limits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
