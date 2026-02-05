@@ -1799,9 +1799,9 @@ public:
     virtual void setTransmitTimeoutReminder(Interval timeout);
 
     /** Returns the VOX level. */
-    virtual unsigned int voxLevel() const;
+    virtual Level voxLevel() const;
     /** Sets the VOX level. */
-    virtual void setVOXLevel(unsigned int voxLevel);
+    virtual void setVOXLevel(Level voxLevel);
     /** Retruns the VOX delay. */
     virtual Interval voxDelay() const;
     /** Sets the VOX delay. */
@@ -1868,6 +1868,8 @@ public:
       static constexpr Range<Interval> voxDelay() {
         return {Interval::fromMilliseconds(300), Interval::fromSeconds(5)};
       }
+      /** Valid VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1,5}; }
     };
 
   protected:

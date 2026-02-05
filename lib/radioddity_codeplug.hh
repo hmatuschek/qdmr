@@ -1000,9 +1000,9 @@ public:
     virtual void setMonitorType(MonitorType type);
 
     /** Returns the VOX sensitivity [1-10], 0=disabled. */
-    virtual unsigned voxSensitivity() const;
+    virtual Level voxSensitivity() const;
     /** Sets the VOX sensitivity. */
-    virtual void setVOXSensitivity(unsigned value);
+    virtual void setVOXSensitivity(Level value);
 
     /** Returns the low-battery warn interval in seconds. */
     virtual unsigned lowBatteryWarnInterval() const;
@@ -1130,6 +1130,13 @@ public:
     virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Updates the given config from this settings. */
     virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // VOX sensitivity settings.
+      static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
   };
 
   /** Implements the base class of button settings for all Radioddity codeplugs.

@@ -36,7 +36,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
     ui->totValue->setValue(0);
   else
     ui->totValue->setValue(_config->settings()->tot().seconds());
-  ui->voxValue->setValue(_config->settings()->vox());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 
   ui->extensionView->setObjectName("radioSettingsExtension");
   ui->extensionView->setObject(_config->settings(), _config);
@@ -93,7 +93,7 @@ GeneralSettingsView::onConfigModified() {
     ui->totValue->setValue(0);
   else
     ui->totValue->setValue(_config->settings()->tot().seconds());
-  ui->voxValue->setValue(_config->settings()->vox());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 }
 
 void
@@ -159,5 +159,5 @@ GeneralSettingsView::onTOTChanged() {
 }
 void
 GeneralSettingsView::onVOXChanged() {
-  _config->settings()->setVOX(ui->voxValue->value());
+  _config->settings()->setVOX(Level::fromValue(ui->voxValue->value()));
 }

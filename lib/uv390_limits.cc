@@ -33,7 +33,7 @@ UV390Limits::UV390Limits(QObject *parent)
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
+        { "vox", new RadioLimitLevel() },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );

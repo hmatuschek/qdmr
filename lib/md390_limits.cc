@@ -34,7 +34,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
+        { "vox", new RadioLimitLevel() },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );

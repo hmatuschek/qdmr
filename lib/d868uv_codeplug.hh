@@ -366,9 +366,9 @@ public:
     virtual void setPowerSave(AnytonePowerSaveSettingsExtension::PowerSave mode);
 
     /** Returns the VOX level. */
-    virtual unsigned voxLevel() const;
+    virtual Level voxLevel() const;
     /** Sets the VOX level. */
-    virtual void setVOXLevel(unsigned level);
+    virtual void setVOXLevel(Level level);
     /** Returns the VOX delay in ms. */
     virtual Interval voxDelay() const;
     /** Sets the VOX delay in ms. */
@@ -572,6 +572,13 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx);
     bool updateConfig(Context &ctx);
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      /** Valid VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1,3}; }
+    };
 
   protected:
     /** Some internal used offsets within the element. */

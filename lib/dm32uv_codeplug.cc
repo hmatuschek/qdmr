@@ -3031,19 +3031,19 @@ DM32UVCodeplug::GeneralSettingsElement::setTransmitTimeoutReminder(Interval time
 }
 
 
-unsigned int
+Level
 DM32UVCodeplug::GeneralSettingsElement::voxLevel() const {
   if (0 == getUInt8(Offset::voxLevel()))
-    return 0;
-  return (getUInt8(Offset::voxLevel())-1)*9/4 + 1;
+    return Level::null();
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned int voxLevel) {
-  if (0 == voxLevel)
+DM32UVCodeplug::GeneralSettingsElement::setVOXLevel(Level voxLevel) {
+  if (voxLevel.isNull())
     setUInt8(Offset::voxLevel(), 0);
   else
-    setUInt8(Offset::voxLevel(), (voxLevel-1)*3/10 + 1);
+    setUInt8(Offset::voxLevel(), voxLevel.mapTo(Limit::vox()));
 }
 
 

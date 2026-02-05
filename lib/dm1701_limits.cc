@@ -33,7 +33,7 @@ DM1701Limits::DM1701Limits(QObject *parent)
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
+        { "vox", new RadioLimitLevel() },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );

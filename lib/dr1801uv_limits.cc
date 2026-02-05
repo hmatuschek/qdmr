@@ -33,7 +33,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
+        { "vox", new RadioLimitLevel() },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );

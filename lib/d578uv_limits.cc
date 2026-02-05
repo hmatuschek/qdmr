@@ -33,7 +33,7 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<Frequency, Freq
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
+        { "vox", new RadioLimitLevel() },
         { "tot", new RadioLimitInterval() }
       });
 

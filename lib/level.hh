@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include <yaml-cpp/yaml.h>
+#include "codeplug.hh"
 
 
 
@@ -55,6 +56,11 @@ public:
 
   /** Returns the value of the level. */
   inline unsigned int value() const { return _level; }
+  inline unsigned int mapTo(const Codeplug::Element::Limit::Range<unsigned int> &range) const {
+    if (isNull() || isInvalid())
+      return 0;
+    return Codeplug::Element::Limit::Range<unsigned int>{1,10}.mapTo(range, value());
+  }
 
   /** Format the frequency. */
   QString format() const;
@@ -67,8 +73,10 @@ public:
   /** Constructs an invalid level. */
   inline static constexpr Level invalid() { return Level(std::numeric_limits<unsigned int>::max()); }
   /** Constructs a proper level. */
-  inline static constexpr Level fromValue(unsigned int value) {
-    return Level(std::min(10U, value));
+  inline static constexpr Level fromValue(unsigned int value, const Codeplug::Element::Limit::Range<unsigned int> range={1,10}) {
+    if (0 == value)
+      return Level::null();
+    return Level(range.mapTo({1,10},value));
   }
 
 protected:

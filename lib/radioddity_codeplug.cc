@@ -1459,7 +1459,7 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
 
   setPreambleDuration(360);
   setMonitorType(MonitorType::Silent);
-  setVOXSensitivity(3);
+  setVOXSensitivity(Level::fromValue(3));
   setLowBatteryWarnInterval(30);
   setCallAlertDuration(120);
   setLoneWorkerResponsePeriod(1);
@@ -1536,14 +1536,13 @@ RadioddityCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
   setUInt8(0x0012, (unsigned)type);
 }
 
-unsigned
+Level
 RadioddityCodeplug::GeneralSettingsElement::voxSensitivity() const {
-  return getUInt8(0x0013);
+  return Level::fromValue(getUInt8(0x0013));
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(unsigned value) {
-  value = std::min(10u, std::max(1u, value));
-  setUInt8(0x0013, value);
+RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(Level value) {
+  setUInt8(0x0013, value.mapTo(Limit::vox()));
 }
 
 unsigned

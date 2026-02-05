@@ -386,13 +386,13 @@ D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytonePowerSaveSettingsExt
   setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
-  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
-  setUInt8(Offset::voxLevel(), level/3);
+D868UVCodeplug::GeneralSettingsElement::setVOXLevel(Level level) {
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
 Interval

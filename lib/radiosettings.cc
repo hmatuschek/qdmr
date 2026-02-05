@@ -3,7 +3,7 @@
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-  _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(Interval::infinity()),
+  _squelch(1), _power(Channel::Power::High), _vox(Level::null()), _transmitTimeOut(Interval::infinity()),
   _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
   _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
@@ -115,20 +115,22 @@ RadioSettings::setPower(Channel::Power power) {
 
 bool
 RadioSettings::voxDisabled() const {
-  return 0 == vox();
+  return _vox.isNull();
 }
-unsigned
+Level
 RadioSettings::vox() const {
   return _vox;
 }
 void
-RadioSettings::setVOX(unsigned level) {
+RadioSettings::setVOX(Level level) {
+  if (_vox == level)
+    return;
   _vox = level;
   emit modified(this);
 }
 void
 RadioSettings::disableVOX() {
-  setVOX(0);
+  setVOX(Level::null());
 }
 
 

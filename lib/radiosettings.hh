@@ -27,7 +27,7 @@ class RadioSettings : public ConfigItem
   /** The squelch level. */
   Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
   /** The default vox sensitivity */
-  Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
+  Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The default transmit timeout */
   Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
@@ -82,9 +82,9 @@ public:
   /** Returns @c true if VOX is disabled by default. */
   bool voxDisabled() const;
   /** Returns the default VOX level [0-10], 0=disabled. */
-  unsigned vox() const;
+  Level vox() const;
   /** Sets the default VOX level [0-10], 0=disabled. */
-  void setVOX(unsigned level);
+  void setVOX(Level level);
   /** Disables VOX by default. */
   void disableVOX();
 
@@ -142,7 +142,7 @@ protected:
   /** Holds the global power setting. */
   Channel::Power _power;
   /** Holds the global VOX level. */
-  unsigned _vox;
+  Level _vox;
   /** Holds the global transmit timeout. */
   Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */

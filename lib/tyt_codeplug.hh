@@ -580,9 +580,9 @@ public:
     /** Sets the private call hang time. */
     virtual void setPrivateCallHangTime(unsigned ms);
     /** Returns the VOX sensitivity. */
-    virtual unsigned voxSesitivity() const;
+    virtual Level voxSesitivity() const;
     /** Sets the group call hang time. */
-    virtual void setVOXSesitivity(unsigned ms);
+    virtual void setVOXSesitivity(Level level);
     /** Returns the low-battery warning interval. */
     virtual unsigned lowBatteryInterval() const;
     /** Sets the low-battery warning interval. */
@@ -664,6 +664,13 @@ public:
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // Valid VOX sensitivity range.
+      static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
   };
 
   /** Codeplug representation of programming time-stamp and CPS version.

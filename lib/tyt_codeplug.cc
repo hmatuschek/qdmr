@@ -1231,7 +1231,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setTXPreambleDuration(600);
   setGroupCallHangTime(3000);
   setPrivateCallHangTime(4000);
-  setVOXSesitivity(3);
+  setVOXSesitivity(Level::fromValue(3));
   setUInt8(0x4c, 0x00); setUInt8(0x4d, 0x00);
   setLowBatteryInterval(120);
   setCallAlertToneDuration(0);
@@ -1402,14 +1402,13 @@ TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned dur) {
   setUInt8(0x4a, dur/100);
 }
 
-unsigned
+Level
 TyTCodeplug::GeneralSettingsElement::voxSesitivity() const {
-  return getUInt8(0x4b);
+  return Level::fromValue(getUInt8(0x4b));
 }
 void
-TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(unsigned level) {
-  level = std::min(10U, std::max(1U, level));
-  setUInt8(0x4b, level);
+TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(Level level) {
+  setUInt8(0x4b, level.mapTo(Limit::vox()));
 }
 
 unsigned

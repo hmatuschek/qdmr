@@ -214,13 +214,13 @@ GD73Codeplug::SettingsElement::setLanguage(Language lang) {
   setUInt8(Offset::language(), (unsigned int)lang);
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::vox() const {
-  return getUInt8(Offset::voxLevel())*10/4;
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 void
-GD73Codeplug::SettingsElement::setVOX(unsigned int level) {
-  setUInt8(Offset::voxLevel(), level*4/10);
+GD73Codeplug::SettingsElement::setVOX(Level level) {
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
 unsigned int
