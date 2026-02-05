@@ -32,7 +32,7 @@ CopyTest::testChannelClone() {
 
   {
     ch->setPower(Channel::Power::Min);
-    ch->setTimeout(60);
+    ch->setTimeout(Interval::fromSeconds(60));
     ch->setVOX(3);
 
     if (! cloner.processItem(ch, err))
@@ -42,7 +42,7 @@ CopyTest::testChannelClone() {
     QVERIFY(item);
     QVERIFY(item->is<Channel>());
     QCOMPARE(item->as<Channel>()->power(), Channel::Power::Min);
-    QCOMPARE(item->as<Channel>()->timeout(), 60);
+    QCOMPARE(item->as<Channel>()->timeout(), Interval::fromSeconds(60));
     QCOMPARE(item->as<Channel>()->vox(), 3);
     delete item;
   }

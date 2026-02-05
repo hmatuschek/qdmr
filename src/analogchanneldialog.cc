@@ -108,10 +108,14 @@ AnalogChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_myChannel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_myChannel->timeout().seconds());
   }
+
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
   case FMChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
@@ -164,8 +168,10 @@ AnalogChannelDialog::channel()
   }
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setAdmit(FMChannel::Admit(txAdmit->currentData().toUInt()));
   if (squelchDefault->isChecked())

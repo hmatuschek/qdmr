@@ -588,7 +588,7 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   if (transmitTimeout().isInfinite())
     ch->disableTimeout();
   else
-    ch->setTimeout(transmitTimeout().seconds());
+    ch->setTimeout(transmitTimeout());
 
   ch->setOpenGD77ChannelExtension(new OpenGD77ChannelExtension());
   ch->openGD77ChannelExtension()->enableScanZoneSkip(skipZoneScan());
@@ -666,7 +666,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   if (c->timeoutDisabled())
     setTransmitTimeout(Interval::infinity());
   else
-    setTransmitTimeout(Interval::fromSeconds(c->timeout()));
+    setTransmitTimeout(c->timeout());
 
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));

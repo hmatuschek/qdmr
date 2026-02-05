@@ -285,14 +285,14 @@ OpenGD77Test::testChannelTransmitTimeout() {
           .arg(err.format()).toLocal8Bit().constData());
   }
 
-  config.channelList()->channel(0)->setTimeout(60);
+  config.channelList()->channel(0)->setTimeout(Interval::fromSeconds(60));
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(decoded.channelList()->count(), 2);
   QVERIFY(! decoded.channelList()->channel(0)->timeoutDisabled());
-  QCOMPARE(decoded.channelList()->channel(0)->timeout(), 60);
+  QCOMPARE(decoded.channelList()->channel(0)->timeout(), Interval::fromSeconds(60));
   QVERIFY(decoded.channelList()->channel(1)->timeoutDisabled());
 }
 

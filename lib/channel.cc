@@ -17,7 +17,7 @@
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
-    _defaultPower(true), _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()),
+    _defaultPower(true), _power(Power::Low), _txTimeOut(Interval::null()),
     _rxOnly(false), _vox(std::numeric_limits<unsigned>::max()), _scanlist(),
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
@@ -149,21 +149,21 @@ Channel::setDefaultPower() {
 
 bool
 Channel::defaultTimeout() const {
-  return std::numeric_limits<unsigned>::max() == timeout();
+  return timeout().isNull();
 }
 
 bool
 Channel::timeoutDisabled() const {
-  return 0 == timeout();
+  return timeout().isInfinite();
 }
 
-unsigned
+Interval
 Channel::timeout() const {
   return _txTimeOut;
 }
 
 bool
-Channel::setTimeout(unsigned dur) {
+Channel::setTimeout(const Interval& dur) {
   if (dur == _txTimeOut)
     return true;
 
@@ -178,13 +178,13 @@ Channel::setDefaultTimeout() {
   if (defaultTimeout())
     return;
 
-  setTimeout(std::numeric_limits<unsigned>::max());
+  setTimeout(Interval::null());
   emit modified(this);
 }
 
 void
 Channel::disableTimeout() {
-  setTimeout(0);
+  setTimeout(Interval::infinity());
 }
 
 
@@ -354,7 +354,7 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
     setDefaultTimeout();
   } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<unsigned>());
+    setTimeout(ch["timeout"].as<Interval>());
   }
 
   if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {

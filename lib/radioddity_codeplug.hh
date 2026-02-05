@@ -87,9 +87,9 @@ public:
     virtual void setMode(Mode mode);
 
     /** Returns the TX timeout in seconds. A value of 0 means disabled. */
-    virtual unsigned txTimeOut() const;
+    virtual Interval txTimeOut() const;
     /** Sets the TX timeout in seconds. Setting it to 0 disables the timeout. */
-    virtual void setTXTimeOut(unsigned tot);
+    virtual void setTXTimeOut(const Interval &tot);
     /** Returns the transmit time-out re-key delay in seconds. */
     virtual unsigned txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */

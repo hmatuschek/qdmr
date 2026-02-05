@@ -37,7 +37,7 @@ RadioddityCodeplug::ChannelElement::clear() {
   setTXFrequency(0);
   setMode(MODE_ANALOG);
   setUInt8(0x0019, 0x00); setUInt8(0x001a, 0x00);
-  setTXTimeOut(0);
+  setTXTimeOut(Interval::infinity());
   setTXTimeOutRekeyDelay(0);
   setAdmitCriterion(ADMIT_ALWAYS);
   setUInt8(0x001e, 0x50);
@@ -94,13 +94,17 @@ RadioddityCodeplug::ChannelElement::setMode(Mode mode) {
   setUInt8(Offset::mode(), (unsigned)mode);
 }
 
-unsigned
-RadioddityCodeplug::ChannelElement::txTimeOut() const {
-  return getUInt8(Offset::txTimeout())*15;
+Interval RadioddityCodeplug::ChannelElement::txTimeOut() const {
+  if (0 == getUInt8(Offset::txTimeout()))
+    return Interval::infinity();
+  return Interval::fromSeconds(getUInt8(Offset::txTimeout())*15);
 }
 void
-RadioddityCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
-  setUInt8(Offset::txTimeout(), tot/15);
+RadioddityCodeplug::ChannelElement::setTXTimeOut(const Interval& tot) {
+  if (tot.isInfinite())
+    setUInt8(Offset::txTimeout(), 0);
+  else
+    setUInt8(Offset::txTimeout(), tot.seconds()/15);
 }
 unsigned
 RadioddityCodeplug::ChannelElement::txTimeOutRekeyDelay() const {
@@ -419,7 +423,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   else
     setPower(c->power());
   if (c->defaultTimeout())
-    setTXTimeOut(ctx.config()->settings()->tot());
+    setTXTimeOut(Interval::fromSeconds(ctx.config()->settings()->tot()));
   else
     setTXTimeOut(c->timeout());
   enableRXOnly(c->rxOnly());

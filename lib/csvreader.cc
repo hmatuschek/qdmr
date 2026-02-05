@@ -1985,7 +1985,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   chan->setRXFrequency(Frequency::fromMHz(rx));
   chan->setTXFrequency(Frequency::fromMHz(tx));
   chan->setPower(power);
-  chan->setTimeout(tot);
+  chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
   chan->setColorCode(color);
@@ -2043,7 +2043,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
   chan->setRXFrequency(Frequency::fromMHz(rx));
   chan->setTXFrequency(Frequency::fromMHz(tx));
   chan->setPower(power);
-  chan->setTimeout(tot);
+  chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
   chan->setSquelch(squelch);

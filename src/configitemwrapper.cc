@@ -300,7 +300,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       return tr("[Default]");
     if (channel->timeoutDisabled())
       return tr("Off");
-    return QString::number(channel->timeout());
+    return channel->timeout().format();
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:

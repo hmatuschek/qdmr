@@ -135,9 +135,12 @@ DigitalChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_channel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_channel->timeout().seconds());
   }
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
@@ -185,8 +188,10 @@ DigitalChannelDialog::channel()
     _myChannel->setPower(Channel::Power(powerValue->currentData().toUInt()));
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAdmit(DMRChannel::Admit(txAdmit->currentData().toUInt()));

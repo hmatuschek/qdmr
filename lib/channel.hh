@@ -7,6 +7,7 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+#include "interval.hh"
 
 #include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
@@ -41,7 +42,7 @@ class Channel: public ConfigObject
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
-  Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout SCRIPTABLE false)
+  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout SCRIPTABLE false)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
@@ -112,9 +113,9 @@ public:
   /** Returns @c true if the transmit timeout is disabled. */
   bool timeoutDisabled() const;
   /** Returns the TX timeout (TOT) in seconds. */
-  unsigned timeout() const;
+  Interval timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
-  bool setTimeout(unsigned dur);
+  bool setTimeout(const Interval &dur);
   /** Disables the transmit timeout. */
   void disableTimeout();
   /** Sets the timeout to the global default timeout. */
@@ -179,8 +180,9 @@ protected:
   bool _defaultPower;
   /** The transmit power setting. */
   Power _power;
-  /** Transmit timeout in seconds. */
-  unsigned _txTimeOut;
+  /** Transmit timeout. If set to null, the global/default ToT interval is used. If set to
+   * infinity, ToT is disabled. */
+  Interval _txTimeOut;
   /** RX only flag. */
   bool _rxOnly;
   /** Holds the VOX level. */
