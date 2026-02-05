@@ -234,7 +234,7 @@ class FMChannel: public AnalogChannel
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
-  Q_PROPERTY(FMAPRSSystemReference* aprsRef READ aprsRef WRITE setAPRSRef)
+  Q_PROPERTY(FMAPRSSystemReference* aprs READ aprsRef)
 
   /** The AnyTone FM channel extension. */
   Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
@@ -300,8 +300,6 @@ public:
   const FMAPRSSystemReference *aprsRef() const;
   /** Returns the reference to the APRS system. */
   FMAPRSSystemReference *aprsRef();
-  /** Sets the APRS system reference. */
-  void setAPRSRef(FMAPRSSystemReference *ref);
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
   FMAPRSSystem *aprs() const;
   /** Sets the APRS system. */

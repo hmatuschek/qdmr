@@ -73,10 +73,6 @@ DMR6X2UVTest::testFMAPRSSettings() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  auto ch_ext = new AnytoneFMChannelExtension();
-  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
-  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
-
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
   QVERIFY(config.posSystems()->get(0)->is<FMAPRSSystem>());
@@ -86,6 +82,16 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
   QCOMPARE(aprs->period(), 300);
+
+  QCOMPARE(config.channelList()->count(), 2);
+  QVERIFY(config.channelList()->channel(0)->is<FMChannel>());
+  QVERIFY(config.channelList()->channel(1)->is<FMChannel>());
+  QVERIFY(! config.channelList()->channel(1)->as<FMChannel>()->aprsRef()->isNull());
+
+  // Add extensions
+  auto ch_ext = new AnytoneFMChannelExtension();
+  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
+  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
 
   // test extension settings
   auto ext = new AnytoneFMAPRSSettingsExtension();
@@ -159,16 +165,24 @@ DMR6X2UVTest::testAESEncryption() {
           .arg(err.format(" ")).toStdString().c_str());
   }
 
+  // Check parser
+  QVERIFY(nullptr != config.commercialExtension());
+  QCOMPARE(config.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(config.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
+  QVERIFY(nullptr != config.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           config.commercialExtension()->encryptionKeys()->key(0));
+
   DMR6X2UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot encode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config decoded;
   if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot decode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -198,13 +212,13 @@ DMR6X2UVTest::testARC4Encryption() {
   DMR6X2UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot encode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config decoded;
   if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot decode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 

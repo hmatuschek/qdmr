@@ -1712,25 +1712,25 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
             enableDMRAPRSPTT(AnytoneChannelExtension::APRSPTT::Off != ext->aprsPTT());
         }
       }
+    }
 
-      // Handle encryption
-      clearAESEncryptionKeyIndex();
-      clearDMREncryptionKeyIndex();
+    // Handle encryption
+    clearAESEncryptionKeyIndex();
+    clearDMREncryptionKeyIndex();
 
-      if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
-        // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
-        bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
-            ( ctx.config()->settings()->anytoneExtension() &&
-              (AnytoneDMRSettingsExtension::EncryptionType::AES ==
-               ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
-        if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
-          setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
-        } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
-          setDMREncryptionType(DMREncryptionType::Basic);
-          setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
-        }
+    if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
+      // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
+      bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
+          ( ctx.config()->settings()->anytoneExtension() &&
+            (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+             ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
+      if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
+        setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+      } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+        setDMREncryptionType(DMREncryptionType::Basic);
+        setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       }
-    }    
+    }
   }
 
   return true;

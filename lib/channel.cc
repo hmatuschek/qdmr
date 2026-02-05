@@ -525,13 +525,6 @@ FMChannel::aprsRef() {
   return &_aprsSystem;
 }
 
-void
-FMChannel::setAPRSRef(FMAPRSSystemReference *ref) {
-  if (nullptr == ref)
-    return _aprsSystem.clear();
-  _aprsSystem.copy(ref);
-}
-
 FMAPRSSystem *
 FMChannel::aprs() const {
   return _aprsSystem.as<FMAPRSSystem>();
