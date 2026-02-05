@@ -35,7 +35,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squlech", new RadioLimitUInt(0, 10) },
         { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "tot", new RadioLimitInterval() }
       });
 
   /* Define limits for radio IDs. */
@@ -82,7 +82,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
               {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
@@ -106,7 +106,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
               {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},

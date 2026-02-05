@@ -288,10 +288,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
-  // Serialize freuqencies in MHz
-  node["rxFrequency"] = _rxFreq;
-  node["txFrequency"] = _txFreq;
-
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -329,21 +325,6 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
-  // Parse frequencies
-  if (ch["rxFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No rxFreuqency specified.";
-    return false;
-  }
-  setRXFrequency(ch["rxFrequency"].as<Frequency>());
-
-  if (ch["txFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No txFrequency specified.";
-    return false;
-  }
-  setTXFrequency(ch["txFrequency"].as<Frequency>());
-
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {
@@ -357,8 +338,10 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     Interval to;
     if (! to.parse(QString::fromStdString(ch["timeout"].as<std::string>()), Interval::Format::Seconds))
       setDefaultTimeout();
-    else
+    else if (to.isFinite())
       setTimeout(to);
+    else
+      disableTimeout();
   }
 
   if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {

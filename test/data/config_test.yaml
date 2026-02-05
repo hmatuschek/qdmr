@@ -100,8 +100,8 @@ zones:
 roamingChannels:
   - id: rc1
     name: R DB0LDS
-    rxFrequency: 439.5625
-    txFrequency: 431.96249999999998
+    rxFrequency: 439.5625 MHz
+    txFrequency: 431.9625 MHz
     colorCode: 1
 
 roamingZones:

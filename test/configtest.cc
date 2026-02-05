@@ -184,6 +184,10 @@ ConfigTest::testDMRIdVerification() {
           .arg(err.format()).toStdString().c_str());
   }
 
+  /*limits.verifyConfig(&cfg, ctx);
+  for (unsigned int i=0; i<ctx.count(); i++)
+    qDebug() << ctx.message(i).format();*/
+
   QVERIFY(limits.verifyConfig(&cfg, ctx));
   QVERIFY(ctx.maxSeverity() < RadioLimitIssue::Severity::Critical);
 

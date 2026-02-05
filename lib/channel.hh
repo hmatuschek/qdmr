@@ -36,9 +36,9 @@ class Channel: public ConfigObject
   Q_OBJECT
 
   /** The receive frequency of the channel in Hz. */
-  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel in Hz. */
-  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */

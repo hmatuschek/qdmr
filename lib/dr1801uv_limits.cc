@@ -34,7 +34,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
         { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
 
@@ -86,7 +86,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
@@ -117,7 +117,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::High),
                }},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
               {"rxOnly", new RadioLimitBool()},
