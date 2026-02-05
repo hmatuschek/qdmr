@@ -619,7 +619,7 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
-      dc->setTXContact(ctx.get<DMRContact>(txContactIndex()));
+      dc->setContact(ctx.get<DMRContact>(txContactIndex()));
     // Testing dmrId() == 0 fixes a bug in the OpenGD77 firmware. May change in future.
     if (hasDMRId() && (0 != dmrId())) {
       logDebug() << "Channel '" << c->name() << "' overrides default DMR id with "
@@ -690,8 +690,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     // OpenGD77 does not allow for both TX contact and group list, select one, prefer group list
     if (dc->groupList())
       setGroupListIndex(ctx.index(dc->groupList()));
-    else if (dc->txContact())
-      setTXContactIndex(ctx.index(dc->txContact()));
+    else if (dc->contact())
+      setTXContactIndex(ctx.index(dc->contact()));
     if (dc->radioId() != ctx.config()->settings()->defaultId())
       setDMRId(dc->radioId()->number());
   } else {

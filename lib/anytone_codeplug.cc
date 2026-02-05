@@ -677,7 +677,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
                  << c->name() << "'.";
       return false;
     }
-    dc->setTXContact(ctx.get<DMRContact>(contactIndex()));
+    dc->setContact(ctx.get<DMRContact>(contactIndex()));
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
@@ -774,10 +774,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // set time-slot
     setTimeSlot(dc->timeSlot());
     // link transmit contact
-    if (nullptr == dc->txContact())
+    if (nullptr == dc->contact())
       setContactIndex(0);
     else
-      setContactIndex(ctx.index(dc->txContact()));
+      setContactIndex(ctx.index(dc->contact()));
     // link RX group list
     if (nullptr == dc->groupList())
       clearGroupListIndex();

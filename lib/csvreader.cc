@@ -1922,7 +1922,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(contact);
         return false;
       }
-      _channels[idx]->as<DMRChannel>()->setTXContact(_digital_contacts[contact]);
+      _channels[idx]->as<DMRChannel>()->setContact(_digital_contacts[contact]);
     }
 
     // Check scanlist

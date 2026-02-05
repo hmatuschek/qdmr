@@ -401,7 +401,7 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, con
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasContact() && ctx.has<DMRContact>(contactIndex()))
-      dc->setTXContact(ctx.get<DMRContact>(contactIndex()));
+      dc->setContact(ctx.get<DMRContact>(contactIndex()));
   }
 
   return true;
@@ -457,8 +457,8 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     setTXColorCode(dc->colorCode());
     if (dc->groupList())
       setGroupListIndex(ctx.index(dc->groupList()));
-    if (dc->txContact())
-      setContactIndex(ctx.index(dc->txContact()));
+    if (dc->contact())
+      setContactIndex(ctx.index(dc->contact()));
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
                 << "': Not supported by the radio.";

@@ -1677,7 +1677,7 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
     DMRChannel *dmr = ch->as<DMRChannel>();
     if (hasTXContact()) {
       if (ctx.has<DMRContact>(txContactIndex()))
-        dmr->setTXContact(ctx.get<DMRContact>(txContactIndex()));
+        dmr->setContact(ctx.get<DMRContact>(txContactIndex()));
       else
         logWarn() << "Cannot link channel '" << name() << "', cannot resolve contact index "
                   << txContactIndex() << ".";
@@ -1734,7 +1734,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     DMRChannel *dmr = ch->as<DMRChannel>();
     setType(ChannelElement::Type::DMR);
     if (! dmr->contactRef()->isNull())
-      setTXContactIndex(ctx.index(dmr->txContact()));
+      setTXContactIndex(ctx.index(dmr->contact()));
     if (dmr->groupListRef()->isNull())
       setGroupListAllMatch();
     else

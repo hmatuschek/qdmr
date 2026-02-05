@@ -308,24 +308,6 @@ public:
 
   int add(ConfigObject *obj, int row=-1, bool unique=true);
 
-  /** Returns the number of defined GPS systems. */
-  [[deprecated("Use indexing instead.")]] int gpsCount() const;
-  /** Returns the index of the GPS System.
-   * This index in only within all defined GPS systems. */
-  [[deprecated("Use indexing instead.")]] int indexOfGPSSys(const DMRAPRSSystem *gps) const;
-  /** Gets the GPS system at the specified index.
-   * This index is only within all defined GPS systems. */
-  [[deprecated("Use indexing instead.")]] DMRAPRSSystem *gpsSystem(int idx) const;
-
-  /** Returns the number of defined APRS system. */
-  [[deprecated("Use indexing instead.")]]int aprsCount() const;
-  /** Returns the index of the specified APRS system. That index is only within all
-   * defined APRS systems. */
-  [[deprecated("Use indexing instead.")]] int indexOfAPRSSys(FMAPRSSystem *gps) const;
-  /** Returns the APRS system at index @c idx.
-   * That index is only within all defined APRS systems. */
-  [[deprecated("Use indexing instead.")]] FMAPRSSystem *aprsSystem(int idx) const;
-
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };

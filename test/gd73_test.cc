@@ -197,7 +197,7 @@ GD73Test::testEncryption() {
 
   DMRChannel *ch = new DMRChannel();
   ch->setName("Ch");
-  ch->setTXContact(cnt);
+  ch->setContact(cnt);
   ch->setTXFrequency(Frequency::fromMHz(440));
   ch->setRXFrequency(Frequency::fromMHz(440));
   ch->setCommercialExtension(ext);
@@ -247,7 +247,7 @@ GD73Test::testEncryptionLimits() {
 
   DMRChannel *ch = new DMRChannel();
   ch->setName("Ch");
-  ch->setTXContact(cnt);
+  ch->setContact(cnt);
   ch->setGroupList(grpLst);
   ch->setTXFrequency(Frequency::fromMHz(440));
   ch->setRXFrequency(Frequency::fromMHz(440));

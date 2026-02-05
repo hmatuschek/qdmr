@@ -420,15 +420,15 @@ class DMRChannel: public DigitalChannel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(DMRRadioIDReference* radioId READ radioIdRef WRITE setRadioIdRef)
+  Q_PROPERTY(DMRRadioIDReference* radioId READ radioIdRef)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupListRef WRITE setGroupListRef)
+  Q_PROPERTY(GroupListReference* groupList READ groupListRef)
   /** The tx contact. */
-  Q_PROPERTY(DMRContactReference* contact READ contactRef WRITE setContactRef)
+  Q_PROPERTY(DMRContactReference* contact READ contactRef)
   /** The positioning system. */
-  Q_PROPERTY(PositioningSystemReference* aprs READ aprsRef WRITE setAPRSRef)
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprsRef)
   /** The roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef WRITE setRoamingRef)
+  Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef)
 
   /** The commercial channel extension. */
   Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
@@ -477,8 +477,6 @@ public:
   const GroupListReference *groupListRef() const;
   /** Returns a reference to the group list. */
   GroupListReference *groupListRef();
-  /** Sets the reference to the group list. */
-  void setGroupListRef(GroupListReference *ref);
   /** Returns the RX group list for the channel. */
   RXGroupList *groupList() const;
   /** (Re-)Sets the RX group list for the channel. */
@@ -488,19 +486,15 @@ public:
   const DMRContactReference *contactRef() const;
   /** Returns a reference to the transmit contactRef. */
   DMRContactReference *contactRef();
-  /** Sets the reference to the transmit contact. */
-  void setContactRef(DMRContactReference *ref);
   /** Returns the default TX contact to call on this channel. */
-  DMRContact *txContact() const;
+  DMRContact *contact() const;
   /** (Re-) Sets the default TX contact for this channel. */
-  bool setTXContact(DMRContact *c);
+  bool setContact(DMRContact *c);
 
   /** Returns a reference to the positioning system. */
   const PositioningSystemReference *aprsRef() const;
   /** Returns a reference to the positioning system. */
   PositioningSystemReference *aprsRef();
-  /** Sets the reference to the positioning system. */
-  void setAPRSRef(PositioningSystemReference *ref);
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
   PositionReportingSystem *aprs() const;
   /** Associates the GPS System with this channel. */
@@ -510,8 +504,6 @@ public:
   const RoamingZoneReference *roamingRef() const;
   /** Returns a reference to the roamingRef zone. */
   RoamingZoneReference *roamingRef();
-  /** Sets the reference to the roaming zone. */
-  void setRoamingRef(RoamingZoneReference *ref);
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
   RoamingZone *roaming() const;
   /** Associates the given roaming zone with this channel. */
@@ -521,8 +513,6 @@ public:
   const DMRRadioIDReference *radioIdRef() const;
   /** Returns the reference to the radio ID. */
   DMRRadioIDReference *radioIdRef();
-  /** Sets the reference to the radio ID. */
-  void setRadioIdRef(DMRRadioIDReference *ref);
   /** Returns the radio ID associated with this channel. */
   DMRRadioID *radioId() const;
   /** Associates the given radio ID with this channel. */

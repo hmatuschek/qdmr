@@ -241,7 +241,7 @@ MergeTest::testMergeChannels() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
-    dch->setTXContact(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setContact(base->contacts()->contact(0)->as<DMRContact>());
     dch->setGroupList(lst);
     base->channelList()->add(dch);
   }
@@ -264,7 +264,7 @@ MergeTest::testMergeChannels() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
-    dch->setTXContact(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setContact(merging->contacts()->contact(0)->as<DMRContact>());
     dch->setGroupList(lst);
     merging->channelList()->add(dch);
   }
@@ -286,7 +286,7 @@ MergeTest::testMergeChannels() {
 
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 144.0);
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContact(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->contact(), merged->contacts()->contact(0)->as<DMRContact>());
   QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 
 
@@ -305,7 +305,7 @@ MergeTest::testMergeChannels() {
 
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 145.0);
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContact(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->contact(), merged->contacts()->contact(0)->as<DMRContact>());
   QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 }
 
@@ -331,7 +331,7 @@ MergeTest::testMergeZones() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
-    dch->setTXContact(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setContact(base->contacts()->contact(0)->as<DMRContact>());
     dch->setGroupList(lst);
     base->channelList()->add(dch);
 
@@ -359,7 +359,7 @@ MergeTest::testMergeZones() {
     dch->setName("DMR 1");
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
-    dch->setTXContact(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setContact(merging->contacts()->contact(0)->as<DMRContact>());
     dch->setGroupList(lst);
     merging->channelList()->add(dch);
 

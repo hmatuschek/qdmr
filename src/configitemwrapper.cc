@@ -360,8 +360,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 13:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->txContact())
-        return digi->txContact()->name();
+      if (digi->contact())
+        return digi->contact()->name();
       else
         return QString("-");
     } else if (channel->is<FMChannel>()) {

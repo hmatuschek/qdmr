@@ -521,7 +521,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "DMR contact with index " << transmitContactIndex() << " not known.";
         return false;
       }
-      dmr->setTXContact(ctx.get<DMRContact>(transmitContactIndex()));
+      dmr->setContact(ctx.get<DMRContact>(transmitContactIndex()));
     }
     if (hasGroupList()) {
       if (! ctx.has<RXGroupList>(groupListIndex())) {
@@ -564,8 +564,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
     DMRChannel *dmr = channel->as<DMRChannel>();
     setChannelType(Type::DMR);
     setBandwidth(FMChannel::Bandwidth::Narrow);
-    if (dmr->txContact())
-      setTransmitContactIndex(ctx.index(dmr->txContact()));
+    if (dmr->contact())
+      setTransmitContactIndex(ctx.index(dmr->contact()));
     else
       clearTransmitContactIndex();
     switch (dmr->admit()) {

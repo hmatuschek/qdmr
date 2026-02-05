@@ -766,7 +766,7 @@ DMRChannel::clear() {
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupList(nullptr);
-  setTXContact(nullptr);
+  setContact(nullptr);
   setAPRS(nullptr);
   setRoaming(nullptr);
   setRadioId(DefaultRadioID::get());
@@ -830,14 +830,6 @@ DMRChannel::groupListRef() {
   return &_rxGroup;
 }
 
-void
-DMRChannel::setGroupListRef(GroupListReference *ref) {
-  if (nullptr == ref)
-    _rxGroup.clear();
-  else
-    _rxGroup.copy(ref);
-}
-
 RXGroupList *
 DMRChannel::groupList() const {
   return _rxGroup.as<RXGroupList>();
@@ -861,21 +853,13 @@ DMRChannel::contactRef() {
   return &_txContact;
 }
 
-void
-DMRChannel::setContactRef(DMRContactReference *ref) {
-  if (nullptr == ref)
-    _txContact.clear();
-  else
-    _txContact.copy(ref);
-}
-
 DMRContact *
-DMRChannel::txContact() const {
+DMRChannel::contact() const {
   return _txContact.as<DMRContact>();
 }
 
 bool
-DMRChannel::setTXContact(DMRContact *c) {
+DMRChannel::setContact(DMRContact *c) {
   if(! _txContact.set(c))
     return false;
   emit modified(this);
@@ -890,14 +874,6 @@ DMRChannel::aprsRef() const {
 PositioningSystemReference *
 DMRChannel::aprsRef() {
   return &_posSystem;
-}
-
-void
-DMRChannel::setAPRSRef(PositioningSystemReference *ref) {
-  if (nullptr == ref)
-    _posSystem.clear();
-  else
-    _posSystem.copy(ref);
 }
 
 PositionReportingSystem *
@@ -923,14 +899,6 @@ DMRChannel::roamingRef() {
   return &_roaming;
 }
 
-void
-DMRChannel::setRoamingRef(RoamingZoneReference *ref) {
-  if (nullptr == ref)
-    _roaming.clear();
-  else
-    _roaming.copy(ref);
-}
-
 RoamingZone *
 DMRChannel::roaming() const {
   return _roaming.as<RoamingZone>();
@@ -951,14 +919,6 @@ DMRChannel::radioIdRef() const {
 DMRRadioIDReference *
 DMRChannel::radioIdRef() {
   return &_radioId;
-}
-
-void
-DMRChannel::setRadioIdRef(DMRRadioIDReference *ref) {
-  if (nullptr == ref)
-    _radioId.clear();
-  else
-    _radioId.copy(ref);
 }
 
 DMRRadioID *

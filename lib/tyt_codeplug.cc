@@ -528,7 +528,7 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
   } else if ((MODE_DIGITAL == mode()) && (c->is<DMRChannel>())){
     DMRChannel *dc = c->as<DMRChannel>();
     if (contactIndex() && ctx.has<DMRContact>(contactIndex())) {
-      dc->setTXContact(ctx.get<DMRContact>(contactIndex()));
+      dc->setContact(ctx.get<DMRContact>(contactIndex()));
     }
     if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
@@ -606,8 +606,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setGroupListIndex(ctx.index(dchan->groupList()));
     else
       setGroupListIndex(0);
-    if (dchan->txContact())
-      setContactIndex(ctx.index(dchan->txContact()));
+    if (dchan->contact())
+      setContactIndex(ctx.index(dchan->contact()));
     setBandwidth(FMChannel::Bandwidth::Narrow);
     setRXSignaling(SelectiveCall());
     setTXSignaling(SelectiveCall());

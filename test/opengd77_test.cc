@@ -91,8 +91,8 @@ OpenGD77Test::testChannelGroupList() {
           .arg(err.format()).toLocal8Bit().constData());
 
   config.channelList()->channel(0)->as<DMRChannel>()->setGroupList(nullptr);
-  config.channelList()->channel(0)->as<DMRChannel>()->setTXContact(nullptr);
-  config.channelList()->channel(1)->as<DMRChannel>()->setTXContact(nullptr);
+  config.channelList()->channel(0)->as<DMRChannel>()->setContact(nullptr);
+  config.channelList()->channel(1)->as<DMRChannel>()->setContact(nullptr);
   config.channelList()->channel(2)->as<DMRChannel>()->setGroupList(nullptr);
 
   if (! encodeDecode(config, decoded, err))
