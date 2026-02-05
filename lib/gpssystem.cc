@@ -2,7 +2,6 @@
 #include "contact.hh"
 #include "channel.hh"
 #include "logger.hh"
-#include "utils.hh"
 #include <QRegularExpressionMatch>
 
 
@@ -10,12 +9,12 @@
  * Implementation of PositionReportingSystem
  * ********************************************************************************************* */
 PositionReportingSystem::PositionReportingSystem(QObject *parent)
-  : ConfigObject(parent), _period(0)
+  : ConfigObject(parent), _period(Interval::infinity())
 {
   // pass...
 }
 
-PositionReportingSystem::PositionReportingSystem(const QString &name, unsigned period, QObject *parent)
+PositionReportingSystem::PositionReportingSystem(const QString &name, const Interval &period, QObject *parent)
   : ConfigObject(name, parent), _period(period)
 {
   // pass...
@@ -25,21 +24,38 @@ PositionReportingSystem::~PositionReportingSystem() {
   // pass...
 }
 
-unsigned
+
+bool
+PositionReportingSystem::periodDisabled() const {
+  return !_period.isFinite();
+}
+
+Interval
 PositionReportingSystem::period() const {
   return _period;
 }
 
 void
-PositionReportingSystem::setPeriod(unsigned period) {
+PositionReportingSystem::setPeriod(const Interval &period) {
+  if (_period == period)
+    return;
   _period = period;
   emit modified(this);
+}
+
+void
+PositionReportingSystem::disablePeriod() {
+  _period = Interval::infinity();
 }
 
 bool
 PositionReportingSystem::populate(YAML::Node &node, const ConfigItem::Context &context, const ErrorStack &err) {
   if (! ConfigObject::populate(node, context, err))
     return false;
+
+  if (! periodDisabled())
+    node["period"] = _period.format().toStdString();
+
   return true;
 }
 
@@ -55,9 +71,15 @@ PositionReportingSystem::parse(const YAML::Node &node, Context &ctx, const Error
   }
 
   YAML::Node pos = node.begin()->second;
-  if (pos && (!pos["period"])) {
+  if (pos && (! pos["period"])) {
     logWarn() << pos.Mark().line << ":" << pos.Mark().column
               << ": Positioning system has no period.";
+  } else if (pos && pos["period"].IsScalar()) {
+    Interval period;
+    if (! period.parse(QString::fromStdString(pos["period"].as<std::string>()), Interval::Format::Seconds))
+      disablePeriod();
+    else
+      setPeriod(period);
   }
 
   return ConfigObject::parse(pos, ctx, err);
@@ -93,7 +115,7 @@ DMRAPRSSystem::DMRAPRSSystem(QObject *parent)
 }
 
 DMRAPRSSystem::DMRAPRSSystem(const QString &name, DMRContact *contact,
-                     DMRChannel *revertChannel, unsigned period,
+                     DMRChannel *revertChannel, const Interval &period,
                      QObject *parent)
   : PositionReportingSystem(name, period, parent), _contact(), _revertChannel()
 {
@@ -214,7 +236,7 @@ FMAPRSSystem::FMAPRSSystem(QObject *parent)
 
 FMAPRSSystem::FMAPRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
                        const QString &src, unsigned srcSSID, const QString &path, Icon icon, const QString &message,
-                       unsigned period, QObject *parent)
+                       const Interval &period, QObject *parent)
   : PositionReportingSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
     _anytone(nullptr), _openGD77(nullptr)

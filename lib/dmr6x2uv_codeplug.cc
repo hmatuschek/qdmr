@@ -2210,8 +2210,8 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const FMAPRSSystem *sys,
   setFMFrequency(sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
-  setManualTXInterval(Interval::fromSeconds(sys->period()));
-  setAutoTXInterval(Interval::fromSeconds(sys->period()));
+  setManualTXInterval(sys->period());
+  setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
@@ -2232,7 +2232,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
   FMAPRSSystem *sys = new FMAPRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
-        path(), icon(), "", autoTXInterval().seconds());
+        path(), icon(), "", autoTXInterval());
 
   AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
   ext->setPreWaveDelay(fmPreWaveDelay());
@@ -2615,8 +2615,8 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   if (0 < ctx.count<DMRAPRSSystem>()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
-    aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
+    aprs.setAutoTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
+    aprs.setManualTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
   }
 
   return true;
@@ -2630,7 +2630,6 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  unsigned pos_interval = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
@@ -2640,7 +2639,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;
     }
-    sys->setPeriod(pos_interval);
+    sys->setPeriod(aprs.autoTXInterval());
     sys->setMessage(decode_ascii(aprsmsg, Limit::fmAPRSMessage(), 0x00));
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
@@ -2650,7 +2649,7 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
     if (0 == aprs.dmrDestination(i))
       continue;
     if (DMRAPRSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
-      sys->setPeriod(pos_interval);
+      sys->setPeriod(aprs.autoTXInterval());
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
     } else {
       return false;

@@ -579,7 +579,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setTXFrequency(chan->txFrequency());
   enableRXOnly(chan->rxOnly());
   if (chan->defaultTimeout())
-    setTXTimeOut(Interval::fromSeconds(ctx.config()->settings()->tot()));
+    setTXTimeOut(ctx.config()->settings()->tot());
   else
     setTXTimeOut(chan->timeout());
   if (chan->scanList())
@@ -1783,22 +1783,29 @@ TyTCodeplug::GPSSystemElement::setRevertChannelSelected() {
   setUInt16_le(0x00, 0);
 }
 
+
 bool
 TyTCodeplug::GPSSystemElement::repeatIntervalDisabled() const {
   return 0 == getUInt8(0x02);
 }
-unsigned
-TyTCodeplug::GPSSystemElement::repeatInterval() const {
-  return unsigned(getUInt8(0x02))*30;
+
+Interval TyTCodeplug::GPSSystemElement::repeatInterval() const {
+  return Interval::fromSeconds(unsigned(getUInt8(0x02))*30);
 }
+
 void
-TyTCodeplug::GPSSystemElement::setRepeatInterval(unsigned dur) {
-  setUInt8(0x02, dur/30);
+TyTCodeplug::GPSSystemElement::setRepeatInterval(const Interval &dur) {
+  if (! dur.isFinite())
+    disableRepeatInterval();
+  else
+    setUInt8(0x02, dur.seconds()/30);
 }
+
 void
 TyTCodeplug::GPSSystemElement::disableRepeatInterval() {
   setUInt8(0x02, 0);
 }
+
 
 bool
 TyTCodeplug::GPSSystemElement::destinationContactDisabled() const {

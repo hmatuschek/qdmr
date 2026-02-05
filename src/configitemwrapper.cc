@@ -773,7 +773,11 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     break;
 
   case 3:
-    return sys->period();
+    if (Qt::DisplayRole == role)
+      return sys->period().format();
+    else if (Qt::EditRole == role)
+      return QVariant::fromValue(sys->period());
+    break;
 
   case 4:
     if (sys->is<DMRAPRSSystem>()) {
@@ -816,7 +820,7 @@ PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientatio
   case 0: return tr("Type");
   case 1: return tr("Name");
   case 2: return tr("Destination");
-  case 3: return tr("Period [s]");
+  case 3: return tr("Period");
   case 4: return tr("Channel");
   case 5: return tr("Message");
   case 6: return tr("Extensions");

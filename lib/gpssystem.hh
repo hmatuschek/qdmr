@@ -20,7 +20,7 @@ class PositionReportingSystem: public ConfigObject
   Q_CLASSINFO("IdPrefix", "aprs")
 
   /** The update period in seconds. */
-  Q_PROPERTY(unsigned period READ period WRITE setPeriod)
+  Q_PROPERTY(Interval period READ period WRITE setPeriod SCRIPTABLE false)
 
 protected:
   /** Default constructor. */
@@ -31,16 +31,21 @@ protected:
    * @param name Specifies the name of the system.
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specified the QObject parent object. */
-  PositionReportingSystem(const QString &name, unsigned period=300, QObject *parent=nullptr);
+  PositionReportingSystem(const QString &name, const Interval &period=Interval::fromMinutes(5),
+                          QObject *parent=nullptr);
 
 public:
   /** Destructor. */
   virtual ~PositionReportingSystem();
 
+  /** Returns @c true, if the period is disabled. */
+  bool periodDisabled() const;
   /** Returns the update period in seconds. */
-  unsigned period() const;
+  Interval period() const;
   /** Sets the update period in seconds. */
-  void setPeriod(unsigned period);
+  void setPeriod(const Interval &period);
+  /** Disable update period. */
+  void disablePeriod();
 
 public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
@@ -55,7 +60,7 @@ protected slots:
 
 protected:
   /** Holds the update period in seconds. */
-  unsigned _period;
+  Interval _period;
 };
 
 
@@ -84,8 +89,8 @@ public:
    * @param period Specifies the update period in seconds.
    * @param parent Specifies the QObject parent object. */
   DMRAPRSSystem(const QString &name, DMRContact *contact=nullptr,
-            DMRChannel *revertChannel = nullptr, unsigned period=300,
-            QObject *parent = nullptr);
+                DMRChannel *revertChannel = nullptr, const Interval &period=Interval::fromMinutes(5),
+                QObject *parent = nullptr);
 
   ConfigItem *clone() const;
 
@@ -194,8 +199,9 @@ public:
    * @param period Specifies the auto-update period in seconds.
    * @param parent Specifies the QObject parent object. */
   FMAPRSSystem(const QString &name, FMChannel *channel, const QString &dest, unsigned destSSID,
-             const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
-             const QString &message="", unsigned period=300, QObject *parent=nullptr);
+               const QString &src, unsigned srcSSID, const QString &path="", Icon icon=Icon::Jogger,
+               const QString &message="", const Interval &period=Interval::fromMinutes(5),
+               QObject *parent=nullptr);
 
   bool copy(const ConfigItem &other);
   ConfigItem *clone() const;

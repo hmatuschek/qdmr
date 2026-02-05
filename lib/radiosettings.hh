@@ -29,7 +29,7 @@ class RadioSettings : public ConfigItem
   /** The default vox sensitivity */
   Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
   /** The default transmit timeout */
-  Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
+  Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
   /** The settings extension for TyT devices. */
@@ -91,9 +91,9 @@ public:
   /** Returns @c true if the transmit timeout (TOT) is disabled. */
   bool totDisabled() const;
   /** Returns the default transmit timeout (TOT) in seconds, 0=disabled. */
-  unsigned tot() const;
+  Interval tot() const;
   /** Sets the default transmit timeout (TOT) in seconds, 0=disabled. */
-  void setTOT(unsigned sec);
+  void setTOT(const Interval &sec);
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
@@ -119,6 +119,11 @@ public:
   /** Sets the AnyTone device specific radio settings. */
   void setAnytoneExtension(AnytoneSettingsExtension *ext);
 
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
+
 protected slots:
   /** Internal used callback whenever an extension is modified. */
   void onExtensionModified();
@@ -139,7 +144,7 @@ protected:
   /** Holds the global VOX level. */
   unsigned _vox;
   /** Holds the global transmit timeout. */
-  unsigned _transmitTimeOut;
+  Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */
   DMRRadioIDReference *_defaultId;
   /** Device specific settings extension for TyT devices. */

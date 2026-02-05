@@ -157,7 +157,10 @@ APRSSystemDialog::construct() {
       ui->icon->setCurrentIndex(i);
   }
 
-  ui->updatePeriod->setValue(_myAPRS->period());
+  if (_myAPRS->periodDisabled())
+    ui->updatePeriod->setValue(0);
+  else
+    ui->updatePeriod->setValue(_myAPRS->period().seconds());
   ui->message->setText(_myAPRS->message());
 
   ui->extensionView->setObjectName("aprsSystemExtension");
@@ -177,7 +180,10 @@ APRSSystemDialog::aprsSystem() {
   _myAPRS->setDestination(ui->destination->text().simplified(), ui->destSSID->value());
   _myAPRS->setPath(ui->path->text().simplified());
   _myAPRS->setIcon(FMAPRSSystem::Icon(ui->icon->currentData().toUInt()));
-  _myAPRS->setPeriod(ui->updatePeriod->value());
+  if (0 == ui->updatePeriod->value())
+    _myAPRS->disablePeriod();
+  else
+    _myAPRS->setPeriod(Interval::fromSeconds(ui->updatePeriod->value()));
   _myAPRS->setMessage(ui->message->text().simplified());
 
   FMAPRSSystem *system = _myAPRS;

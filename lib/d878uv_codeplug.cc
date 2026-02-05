@@ -1036,13 +1036,13 @@ D878UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
   setUInt8(Offset::gpsTimeZone(), TimeZone::encode(zone)); // <- Set to UTC
 }
 
-unsigned
+Interval
 D878UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
-  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+  return Interval::fromSeconds((unsigned)getUInt8(Offset::transmitTimeout())*30);
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
-  setUInt8(Offset::transmitTimeout(), tot/30);
+D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(const Interval &tot) {
+  setUInt8(Offset::transmitTimeout(), tot.seconds()/30);
 }
 
 AnytoneDisplaySettingsExtension::Language
@@ -3299,8 +3299,8 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
   setFMChannelWidth(FMChannel::Bandwidth::Wide == sys->revertChannel()->bandwidth() ?
                       AnytoneFMAPRSSettingsExtension::Bandwidth::Wide :
                       AnytoneFMAPRSSettingsExtension::Bandwidth::Narrow);
-  setManualTXInterval(Interval::fromSeconds(sys->period()));
-  setAutoTXInterval(Interval::fromSeconds(sys->period()));
+  setManualTXInterval(sys->period());
+  setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
@@ -3345,7 +3345,7 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
   FMAPRSSystem *sys = new FMAPRSSystem(
         name, nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
-        path(), icon(), "", autoTXInterval().seconds());
+        path(), icon(), "", autoTXInterval());
 
   // Decode extension
   AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
@@ -4185,8 +4185,8 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
     APRSSettingsElement aprs(data(Offset::aprsSettings()));
-    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
-    aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<DMRAPRSSystem>(0)->period()));
+    aprs.setAutoTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
+    aprs.setManualTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
   }
   return true;
 }
@@ -4203,7 +4203,6 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
                                           data(Offset::fmAPRSFrequencyNames()):
                                           nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
-  unsigned pos_intervall = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
@@ -4212,7 +4211,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;
     }
-    sys->setPeriod(pos_intervall);
+    sys->setPeriod(aprs.autoTXInterval());
     sys->setMessage(aprsMessage.message());
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
@@ -4223,7 +4222,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
       continue;
     if (DMRAPRSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
       logDebug() << "Create GPS sys '" << sys->name() << "' at idx " << i << ".";
-      sys->setPeriod(pos_intervall);
+      sys->setPeriod(aprs.autoTXInterval());
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
     } else {
       return false;

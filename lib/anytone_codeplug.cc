@@ -2370,8 +2370,8 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   DMRAPRSSystem *sys = ctx.get<DMRAPRSSystem>(0);
   setDestination(sys->contact()->number());
   setCallType(sys->contact()->type());
-  setManualInterval(Interval::fromSeconds(sys->period()));
-  setAutomaticInterval(Interval::fromSeconds(sys->period()));
+  setManualInterval(sys->period());
+  setAutomaticInterval(sys->period());
   disableTimeSlotOverride();
   if (! sys->hasRevertChannel()) {
     setChannelSelected(0);
@@ -2385,7 +2385,7 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx) {
-  DMRAPRSSystem *sys = new DMRAPRSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval().seconds());
+  DMRAPRSSystem *sys = new DMRAPRSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval());
   ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
   return true;
 }

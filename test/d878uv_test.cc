@@ -1,9 +1,7 @@
 #include "d878uv_test.hh"
 #include "config.hh"
-#include "d878uv.hh"
 #include "d878uv_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
 #include "logger.hh"
 
@@ -255,7 +253,7 @@ D878UVTest::testFMAPRSSettings() {
   QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
-  QCOMPARE(aprs->period(), 300);
+  QCOMPARE(aprs->period(), Interval::fromMinutes(5));
 
   // Encode
   D878UVCodeplug codeplug;

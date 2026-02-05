@@ -81,7 +81,7 @@ DMR6X2UVTest::testFMAPRSSettings() {
   QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
-  QCOMPARE(aprs->period(), 300);
+  QCOMPARE(aprs->period(), Interval::fromMinutes(5));
 
   QCOMPARE(config.channelList()->count(), 2);
   QVERIFY(config.channelList()->channel(0)->is<FMChannel>());

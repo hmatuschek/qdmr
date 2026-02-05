@@ -724,9 +724,9 @@ public:
     /** Returns @c true if the repeat interval is disabled. */
     virtual bool repeatIntervalDisabled() const;
     /** Returns the repeat interval. */
-    virtual unsigned repeatInterval() const;
+    virtual Interval repeatInterval() const;
     /** Sets the repeat interval in seconds. */
-    virtual void setRepeatInterval(unsigned sec);
+    virtual void setRepeatInterval(const Interval &sec);
     /** Disables the GPS repeat interval. */
     virtual void disableRepeatInterval();
 

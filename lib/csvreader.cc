@@ -2128,7 +2128,7 @@ CSVReader::handleGPSSystem(
     return false;
   }
 
-  DMRAPRSSystem *gps = new DMRAPRSSystem(name, nullptr, nullptr, period);
+  DMRAPRSSystem *gps = new DMRAPRSSystem(name, nullptr, nullptr, Interval::fromSeconds(period));
   _posSystems[idx] = gps;
   _config->posSystems()->add(gps);
 
@@ -2168,7 +2168,7 @@ CSVReader::handleAPRSSystem(
 
   FMAPRSSystem::Icon icon = name2aprsicon(iconname);
   FMAPRSSystem *aprs = new FMAPRSSystem(name, nullptr, dest, destSSID, src, srcSSID, path,
-                                    icon, message, period);
+                                        icon, message, Interval::fromSeconds(period));
   _posSystems[idx] = aprs;
   _config->posSystems()->add(aprs);
 

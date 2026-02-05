@@ -423,7 +423,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   else
     setPower(c->power());
   if (c->defaultTimeout())
-    setTXTimeOut(Interval::fromSeconds(ctx.config()->settings()->tot()));
+    setTXTimeOut(ctx.config()->settings()->tot());
   else
     setTXTimeOut(c->timeout());
   enableRXOnly(c->rxOnly());

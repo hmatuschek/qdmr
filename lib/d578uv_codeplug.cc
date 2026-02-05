@@ -541,13 +541,13 @@ D578UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
 }
 
-unsigned
+Interval
 D578UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
-  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+  return Interval::fromSeconds((unsigned)getUInt8(Offset::transmitTimeout())*30);
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
-  setUInt8(Offset::transmitTimeout(), tot/30);
+D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(const Interval &tot) {
+  setUInt8(Offset::transmitTimeout(), tot.seconds()/30);
 }
 
 AnytoneDisplaySettingsExtension::Language

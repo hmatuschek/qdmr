@@ -37,7 +37,10 @@ GPSSystemDialog::construct() {
   }
 
   // setup period
-  period->setValue(_myGPSSystem->period());
+  if (_myGPSSystem->periodDisabled())
+    period->setValue(0);
+  else
+    period->setValue(_myGPSSystem->period().seconds());
 
   // setup revert channel
   revChannel->addItem(tr("[Selected]"), QVariant::fromValue<DMRChannel *>(nullptr));
@@ -64,7 +67,10 @@ DMRAPRSSystem *
 GPSSystemDialog::gpsSystem() {
   _myGPSSystem->setName(name->text().simplified());
   _myGPSSystem->setContact(destination->currentData().value<DMRContact*>());
-  _myGPSSystem->setPeriod(period->value());
+  if (0 == period->value())
+    _myGPSSystem->disablePeriod();
+  else
+    _myGPSSystem->setPeriod(Interval::fromSeconds(period->value()));
   if (revChannel->currentData().isNull())
     _myGPSSystem->resetRevertChannel();
   else

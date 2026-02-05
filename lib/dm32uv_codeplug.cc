@@ -3155,8 +3155,10 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->setIntroLine2(bootMessage2());
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
   ctx.config()->settings()->setVOX(voxLevel());
-  if (transmitTimeout().isInfinite()) ctx.config()->settings()->setTOT(0);
-  else ctx.config()->settings()->setTOT(transmitTimeout().seconds());
+  if (transmitTimeout().isInfinite())
+    ctx.config()->settings()->disableTOT();
+  else
+    ctx.config()->settings()->setTOT(transmitTimeout());
   ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
   ctx.config()->smsExtension()->setFormat(smsFormat());
 
@@ -3171,8 +3173,10 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   setBootMessage2(ctx.config()->settings()->introLine2());
   enableVoicePrompt(ctx.config()->settings()->speech());
   setVOXLevel(ctx.config()->settings()->vox());
-  if (ctx.config()->settings()->totDisabled()) setTransmitTimeout(Interval::infinity());
-  else setTransmitTimeout(Interval::fromSeconds(ctx.config()->settings()->tot()));
+  if (ctx.config()->settings()->totDisabled())
+    setTransmitTimeout(Interval::infinity());
+  else
+    setTransmitTimeout(ctx.config()->settings()->tot());
   setFMMicLevel(ctx.config()->settings()->micLevel());
   setDMRMicLevel(ctx.config()->settings()->micLevel());
   if (ctx.config()->smsExtension())
@@ -3332,9 +3336,9 @@ DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err)
 
   auto aprs = new DMRAPRSSystem("DMR APRS System");
   if (updatePeriod().isFinite())
-    aprs->setPeriod(updatePeriod().seconds());
+    aprs->setPeriod(updatePeriod());
   else
-    aprs->setPeriod(0);
+    aprs->disablePeriod();
 
   ctx.add(aprs, 0);
   ctx.config()->posSystems()->add(aprs);
@@ -3389,10 +3393,10 @@ DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err)
 
   // We can only encode a single system -> use the first
   auto sys = ctx.get<DMRAPRSSystem>(0);
-  if (0 == sys->period())
+  if (sys->periodDisabled())
     setUpdatePeriod(Interval::infinity());
   else
-    setUpdatePeriod(Interval::fromSeconds(sys->period()));
+    setUpdatePeriod(sys->period());
   setDestinationId(sys->contact()->number());
   setCallType(sys->contact()->type());
 

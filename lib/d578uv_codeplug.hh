@@ -260,9 +260,9 @@ public:
     void enableKeyTone(bool enable) override;
 
     /** Returns the transmit timeout in seconds. */
-    virtual unsigned transmitTimeout() const;
+    virtual Interval transmitTimeout() const;
     /** Sets the transmit timeout in seconds. */
-    virtual void setTransmitTimeout(unsigned tot);
+    virtual void setTransmitTimeout(const Interval &tot);
 
     /** Returns the UI language. */
     virtual AnytoneDisplaySettingsExtension::Language language() const;

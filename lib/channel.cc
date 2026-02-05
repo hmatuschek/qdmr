@@ -351,10 +351,14 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
   }
 
-  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
+  if ((! ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
     setDefaultTimeout();
   } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<Interval>());
+    Interval to;
+    if (! to.parse(QString::fromStdString(ch["timeout"].as<std::string>()), Interval::Format::Seconds))
+      setDefaultTimeout();
+    else
+      setTimeout(to);
   }
 
   if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {

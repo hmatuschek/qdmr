@@ -485,9 +485,9 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ctx.config()->settings()->setSquelch(squelch());
   ctx.config()->settings()->setVOX(vox());
   if (! totIsSet())
-    ctx.config()->settings()->setTOT(0);
+    ctx.config()->settings()->disableTOT();
   else
-    ctx.config()->settings()->setTOT(tot().seconds());
+    ctx.config()->settings()->setTOT(tot());
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -566,7 +566,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   if (ctx.config()->settings()->totDisabled())
     clearTOT();
   else
-    setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
+    setTOT(ctx.config()->settings()->tot());
 
   setLanguage(Language::English);
   setUInt8(0x003c, 0x01);
