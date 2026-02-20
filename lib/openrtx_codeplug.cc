@@ -1276,38 +1276,20 @@ bool
 OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  // Count zones (A + B)
-  unsigned int zoneCount=0;
-  for (int i=0; i<config->zones()->count(); i++) {
-    zoneCount++;
-    // Check if B contains channels
-    if (config->zones()->zone(i)->B()->count())
-      zoneCount++;
-  }
-
   // Allocate zone offsets
-  HeaderElement(data(0x0000)).setZoneCount(zoneCount);
-  image(0).addElement(offsetZoneOffsets(), zoneCount*sizeof(uint32_t));
+  HeaderElement(data(0x0000)).setZoneCount(config->zones()->count());
+  image(0).addElement(offsetZoneOffsets(), (config->zones()->count())*sizeof(uint32_t));
   uint32_t *offsets = (uint32_t *)data(offsetZoneOffsets());
 
   // Allocate and encode zones
-  uint32_t currentOffset = offsetZoneOffsets() + zoneCount*sizeof(uint32_t);
-  for (unsigned int z=0, i=0; i<zoneCount; i++,z++) {
+  uint32_t currentOffset = offsetZoneOffsets() + (config->zones()->count())*sizeof(uint32_t);
+  for (int z=0, i=0; i<config->zones()->count(); i++,z++) {
     // Allocate & encode zone A
     unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->A()->count()*sizeof(uint32_t);
     image(0).addElement(currentOffset, zoneSize);
     offsets[i] = qToLittleEndian(currentOffset);
     ZoneElement(data(currentOffset)).fromZoneObjA(config->zones()->zone(z), ctx);
     currentOffset += zoneSize;
-    // Allocate & encode zone B, if not empty
-    if (ZoneHeaderSize+config->zones()->zone(z)->B()->count()) {
-      i++;
-      unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->B()->count()*sizeof(uint32_t);
-      image(0).addElement(currentOffset, zoneSize);
-      offsets[i] = qToLittleEndian(currentOffset);
-      ZoneElement(data(currentOffset)).fromZoneObjB(config->zones()->zone(z), ctx);
-      currentOffset += zoneSize;
-    }
   }
 
   return true;
@@ -1319,20 +1301,12 @@ OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err
   unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
-  Zone *last_zone = nullptr;
   for (unsigned int i=0; i<zoneCount; i++) {
     ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
     if (! zone.isValid())
       continue;
-    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
-        (zone.name().startsWith(last_zone->name()));
-    Zone *obj = last_zone;
-    if (! is_ext) {
-      last_zone = obj = new Zone(zone.name());
-      if (zone.name().endsWith(" A"))
-        obj->setName(zone.name().chopped(2));
-      config->zones()->add(obj); ctx.add(obj, i+1);
-    }
+    Zone *obj = new Zone(zone.name());
+    config->zones()->add(obj); ctx.add(obj, i+1);
   }
 
   return true;
@@ -1342,34 +1316,22 @@ bool
 OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err)
 
-  unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
-  Zone *last_zone = nullptr;
-  for (unsigned int i=0, z=0; i<zoneCount; i++, z++) {
+  for (unsigned int i=0, z=0; i<numZones(); i++, z++) {
     ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
     if (! zone.isValid())
       continue;
-    if (ctx.has<Zone>(i+1)) {
-      Zone *obj = last_zone = ctx.get<Zone>(i+1);
-      for (unsigned int i=0; i<zone.channelCount(); i++) {
-        if (! ctx.has<Channel>(zone.channelIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->A()->add(ctx.get<Channel>(zone.channelIndex(i)));
+    if (! ctx.has<Zone>(i+1))
+      continue;
+    Zone *obj = ctx.get<Zone>(i+1);
+    for (unsigned int i=0; i<zone.channelCount(); i++) {
+      if (! ctx.has<Channel>(zone.channelIndex(i))) {
+        logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
+                  << " channel not defined.";
+        continue;
       }
-    } else {
-      Zone *obj = last_zone; last_zone = nullptr;
-      for (unsigned int i=0; i<zone.channelCount(); i++) {
-        if (! ctx.has<Channel>(zone.channelIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->B()->add(ctx.get<Channel>(zone.channelIndex(i)));
-      }
+      obj->A()->add(ctx.get<Channel>(zone.channelIndex(i)));
     }
   }
 
