@@ -2645,6 +2645,7 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
   return true;
 }
 
+
 Config *
 OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *intermediate = Codeplug::preprocess(config, err);

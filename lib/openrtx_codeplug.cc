@@ -7,7 +7,9 @@
 #include "zone.hh"
 #include "config.hh"
 #include "config.h"
+#include "intermediaterepresentation.hh"
 #include <QtEndian>
+
 
 QVector<unsigned int> _openrtx_ctcss_tone_table{
     670, 693, 719, 744, 770, 797, 825, 854, 885, 915, 948, 974, 1000, 1034,
@@ -999,6 +1001,34 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   return true;
 }
 
+
+Config *
+OpenRTXCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process OpenRTX codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zone for OpenRTX codeplug.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
 bool
 OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
@@ -1014,6 +1044,7 @@ OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
 
   return this->encodeElements(flags, ctx, err);
 }
+
 
 bool
 OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
@@ -1041,6 +1072,7 @@ OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorSta
   return true;
 }
 
+
 bool
 OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
@@ -1051,6 +1083,24 @@ OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
 
   return this->decodeElements(ctx, err);
 }
+
+
+bool
+OpenRTXCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process Radioddy codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merg zones in decoded Radioddity codeplug.";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool
 OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
