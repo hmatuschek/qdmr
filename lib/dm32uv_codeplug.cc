@@ -3679,6 +3679,14 @@ DM32UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all M17 channels
+  ObjectFilterVisitor amFilter{M17Channel::staticMetaObject};
+  if (! amFilter.process(copy, err)) {
+    errMsg(err) << "Remove M17 channels.";
+    delete copy;
+    return nullptr;
+  }
+
   // Keep only ARC4, AES (128 and 256)
   EncryptionKeyFilterVisitor encFilter{
     EncryptionKeyFilterVisitor::Filter(ARC4EncryptionKey::staticMetaObject, 40),
