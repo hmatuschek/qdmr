@@ -15,6 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+  void testMicGain(); // Retression test for #773
 };
 
 #endif // D578UVTEST_HH

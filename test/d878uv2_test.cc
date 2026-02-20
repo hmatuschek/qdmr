@@ -79,7 +79,7 @@ D878UV2Test::testKeyFunctions() {
   AnytoneKeySettingsExtension *ext = config.settings()->anytoneExtension()->keySettings();
 
   QCOMPARE(ext->funcKey1Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel);
-  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::SubChannel);
+  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::GPS);
   QCOMPARE(ext->funcKey2Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleVFO);
   QCOMPARE(ext->funcKey2Long(), AnytoneKeySettingsExtension::KeyFunction::ChannelType);
   QCOMPARE(ext->funcKeyAShort(), AnytoneKeySettingsExtension::KeyFunction::Off);
@@ -109,7 +109,7 @@ D878UV2Test::testKeyFunctions() {
   ext = comp_config.settings()->anytoneExtension()->keySettings();
 
   QCOMPARE(ext->funcKey1Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel);
-  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::SubChannel);
+  QCOMPARE(ext->funcKey1Long(), AnytoneKeySettingsExtension::KeyFunction::GPS);
   QCOMPARE(ext->funcKey2Short(), AnytoneKeySettingsExtension::KeyFunction::ToggleVFO);
   QCOMPARE(ext->funcKey2Long(), AnytoneKeySettingsExtension::KeyFunction::ChannelType);
   QCOMPARE(ext->funcKeyAShort(), AnytoneKeySettingsExtension::KeyFunction::Off);

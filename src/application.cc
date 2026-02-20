@@ -542,8 +542,8 @@ Application::downloadCodeplug() {
   }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setValue(0); progress->setMaximum(100); progress->setVisible(true);
-  connect(radio, SIGNAL(downloadProgress(int)), progress, SLOT(setValue(int)));
+  progress->setMaximum(0); progress->setVisible(true);
+  connect(radio, &Radio::downloadProgress, this, &Application::onProgress);
   connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
   connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
 
@@ -599,6 +599,7 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
     radio->deleteLater();
 }
 
+
 void
 Application::uploadCodeplug() {
   // Start upload
@@ -617,11 +618,9 @@ Application::uploadCodeplug() {
   }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setValue(0);
-  progress->setMaximum(100);
-  progress->setVisible(true);
+  progress->setValue(0); progress->setMaximum(0); progress->setVisible(true);
+  connect(radio, &Radio::uploadProgress, this, &Application::onProgress);
 
-  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
@@ -644,6 +643,7 @@ Application::uploadCodeplug() {
     progress->setVisible(false);
   }
 }
+
 
 void
 Application::uploadCallsignDB() {
@@ -707,10 +707,9 @@ Application::uploadCallsignDB() {
   }
 
   QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setRange(0, 100); progress->setValue(0);
-  progress->setVisible(true);
+  progress->setRange(0, 0); progress->setValue(0); progress->setVisible(true);
 
-  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
+  connect(radio, &Radio::uploadProgress, this, &Application::onProgress);
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
@@ -780,6 +779,15 @@ Application::uploadSatellites() {
   }
 }
 
+
+void
+Application::onProgress(int value) {
+  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
+  if (value >= 0)
+    progress->setMaximum(100);
+  progress->setValue(value);
+}
+
 void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
@@ -829,15 +837,21 @@ Application::showSettings() {
 
 void
 Application::showAbout() {
+
   QUiLoader loader;
   QFile uiFile("://ui/aboutdialog.ui");
   uiFile.open(QIODevice::ReadOnly);
-  QDialog *dialog = qobject_cast<QDialog *>(loader.load(&uiFile));
+  auto obj = loader.load(&uiFile);
+  if (nullptr == obj) return;
+  QDialog *dialog = qobject_cast<QDialog *>(obj);
+  if (nullptr == dialog) return;
+
   QTextEdit *text = dialog->findChild<QTextEdit *>("textEdit");
   text->setHtml(text->toHtml().arg(VERSION_STRING));
 
   QTreeWidget *radioTab = dialog->findChild<QTreeWidget *>("radioTable");
   radioTab->setColumnCount(1);
+
   QHash<QString, QTreeWidgetItem*> items;
   foreach (RadioInfo radio, RadioInfo::allRadios(false)) {
     if (! items.contains(radio.manufacturer()))
@@ -855,17 +869,15 @@ Application::showAbout() {
     }
   }
   radioTab->insertTopLevelItems(0, items.values());
-  radioTab->sortByColumn(0,Qt::AscendingOrder);
+  radioTab->sortByColumn(0, Qt::AscendingOrder);
 
-  if (dialog) {
-    dialog->exec();
-    dialog->deleteLater();
-  }
+  connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+  dialog->open();
 }
 
 void
 Application::showHelp() {
-  QDesktopServices::openUrl(QUrl("https://dm3mat.darc.de/qdmr/manual"));
+  QDesktopServices::openUrl(QUrl("https://static.dm3mat.de/qdmr/manual"));
 }
 
 

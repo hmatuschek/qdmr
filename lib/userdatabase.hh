@@ -76,7 +76,6 @@ public:
   bool load();
   /** Loads all entries from the downloaded user database at the specified location. */
   bool load(const QString &filename);
-
   /** Returns @c true, if the database has been loaded. */
   bool ready() const;
 
@@ -103,7 +102,8 @@ signals:
   void loaded();
   /** Gets emitted if the loading of the call-sign database fails. */
   void error(const QString &msg);
-  /** Gets emitted, once the database has been loaded or cleard. */
+  /** Gets emitted, once the database has been loaded or cleard.
+   * @warning This event might be emitted by another thread. */
   void readyChanged(bool ready);
 
 public slots:
@@ -113,6 +113,12 @@ public slots:
 private slots:
   /** Gets called whenever the download is complete. */
   void downloadFinished(QNetworkReply *reply);
+  /** Parses cache and stores all users in given result list. */
+  bool parse(QList<User> &users);
+  /** Parses the given file and stores all users in given result list. */
+  bool parse(const QString &filename, QList<User> &users);
+  /** Loads all entries from the parsed file. */
+  bool load(const QList<User> &users);
 
 private:
   /** Holds all users sorted by their ID. */

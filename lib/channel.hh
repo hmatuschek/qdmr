@@ -195,6 +195,7 @@ protected:
 };
 
 
+
 /** Base class for all analog channels.
  *
  * @ingroup conf */
@@ -210,6 +211,7 @@ public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 };
+
 
 
 /** Extension to the @c AnalogChannel class to implement an analog FM channel.
@@ -338,6 +340,55 @@ protected:
 };
 
 
+
+/** Extension to the @c AnalogChannel class to implement an analog AM channel.
+ *
+ * This class implements all the properties specific to an AM channel. These channels are usually
+ * used to represent air-band channels. So there are not that many settings.
+ *
+ * @ingroup conf */
+class AMChannel: public AnalogChannel
+{
+  Q_OBJECT
+
+  /** The squelch level of the channel [1-10]. */
+  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
+
+public:
+  /** Constructs a new empty AM channel. */
+  Q_INVOKABLE explicit AMChannel(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other);
+  ConfigItem *clone() const;
+  void clear();
+
+  /** Returns @c true if the global default squelch level is used. */
+  bool defaultSquelch() const;
+  /** Returns @c true if the squelch is disabled. */
+  bool squelchDisabled() const;
+  /** Returns the squelch level [0,10]. */
+        unsigned squelch() const;
+  /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
+        bool setSquelch(unsigned squelch);
+  /** Disables the quelch. */
+  void disableSquelch();
+  /** Sets the squelch to the global default value. */
+  void setSquelchDefault();
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Holds the squelch level [0,10]. */
+  unsigned _squelch;
+};
+
+
+
 /** Base class of all digital channels.
  *
  * @ingroup conf */
@@ -353,6 +404,7 @@ public:
   /** Copy constructor. */
   DigitalChannel(const DigitalChannel &other, QObject *parent=nullptr);
 };
+
 
 
 /** Extension to the @c DigitalChannel class to implement an DMR channel.
@@ -373,7 +425,7 @@ class DMRChannel: public DigitalChannel
   /** The radio ID. */
   Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
+  Q_PROPERTY(GroupListReference* groupList READ groupListRef WRITE setGroupListRef)
   /** The tx contact. */
   Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
   /** The positioning system. */
@@ -425,15 +477,15 @@ public:
 	bool setTimeSlot(TimeSlot ts);
 
   /** Returns a reference to the group list. */
-  const GroupListReference *groupList() const;
+  const GroupListReference *groupListRef() const;
   /** Returns a reference to the group list. */
-  GroupListReference *groupList();
+  GroupListReference *groupListRef();
   /** Sets the reference to the group list. */
-  void setGroupList(GroupListReference *ref);
+  void setGroupListRef(GroupListReference *ref);
   /** Returns the RX group list for the channel. */
-  RXGroupList *groupListObj() const;
+  RXGroupList *groupList() const;
   /** (Re-)Sets the RX group list for the channel. */
-  bool setGroupListObj(RXGroupList *rxg);
+  bool setGroupList(RXGroupList *rxg);
 
   /** Returns a reference to the transmit contact. */
   const DMRContactReference *contact() const;
@@ -495,11 +547,11 @@ public:
 
 protected:
   /** The admit criterion. */
-	Admit _admit;
+  Admit _admit;
   /** The channel color code. */
-	unsigned _colorCode;
+  unsigned _colorCode;
   /** The time slot for the channel. */
-	TimeSlot _timeSlot;
+  TimeSlot _timeSlot;
   /** The RX group list for this channel. */
   GroupListReference _rxGroup;
   /** The default TX contact. */
@@ -630,6 +682,7 @@ protected:
   /** Holds the channel singleton instance. */
   static SelectedChannel *_instance;
 };
+
 
 
 /** Container class holding all channels (analog and digital) for a specific configuration

@@ -31,7 +31,7 @@ AnytoneInterface::ReadResponse::check(uint32_t addr, QString &msg) const {
     return false;
   }
   if (16 != size) {
-    msg = QObject::tr("Invalid read response: Expected size 64 got %1").arg((int)size);
+    msg = QObject::tr("Invalid read response: Expected size 16 got %1").arg((int)size);
     return false;
   }
   // Compute checksum

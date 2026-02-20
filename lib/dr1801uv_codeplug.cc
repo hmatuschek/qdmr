@@ -528,7 +528,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "Group list with index " << groupListIndex() << " not known.";
         return false;
       }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
   }
 
@@ -579,8 +579,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       setEncryptionKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
     else
       clearEncryptionKeyIndex();
-    if (dmr->groupListObj())
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (dmr->groupList())
+      setGroupListIndex(ctx.index(dmr->groupList()));
     else
       clearGroupListIndex();
   }
@@ -3229,6 +3229,14 @@ DR1801UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *copy = Codeplug::preprocess(config, err);
   if (nullptr == copy) {
     errMsg(err) << "Cannot pre-process DR1801A6 codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(copy, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete copy;
     return nullptr;
   }
 

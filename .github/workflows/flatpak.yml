@@ -1,8 +1,7 @@
 on:
-  push:
-    tags: 
-      -"*"
-
+  release:
+    types: [published]
+    
 name: Flatpak
 
 jobs:
@@ -10,7 +9,7 @@ jobs:
     name: "Flatpak"
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-5.15-24.08
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.9
       options: --privileged
     steps:
     - uses: actions/checkout@v4

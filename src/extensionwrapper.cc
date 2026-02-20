@@ -312,7 +312,7 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
   if (! propIsInstance<ConfigItem>(prop))
     return false;
   // If property is set -> delete
-  if (ConfigItem *ext = prop.read(obj).value<ConfigItem*>()) {
+  if (nullptr != prop.read(obj).value<ConfigItem*>()) {
     if (! prop.isWritable())
       return false;
     beginRemoveRows(item, 0, rowCount(item));

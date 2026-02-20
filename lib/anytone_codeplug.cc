@@ -53,82 +53,6 @@ AnytoneCodeplug::CTCSS::decode(uint8_t num) {
 
 
 
-/* ********************************************************************************************* *
- * Implementation of AnytoneCodeplug::BitmapElement
- * ********************************************************************************************* */
-AnytoneCodeplug::BitmapElement::BitmapElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-void
-AnytoneCodeplug::BitmapElement::clear() {
-  memset(_data, 0, _size);
-}
-
-bool
-AnytoneCodeplug::BitmapElement::isEncoded(unsigned int idx) const {
-  unsigned int byte = idx/8, bit = idx%8;
-  return (_data[byte] & (1 << bit));
-}
-
-void
-AnytoneCodeplug::BitmapElement::setEncoded(unsigned int idx, bool enable) {
-  unsigned int byte = idx/8, bit = idx%8;
-  if (enable)
-    _data[byte] |= (1 << bit);
-  else
-    _data[byte] &= ~(1 << bit);
-}
-
-void
-AnytoneCodeplug::BitmapElement::enableFirst(unsigned int n) {
-  unsigned int byte = n/8, bit=n%8;
-  memset(_data, 0xff, byte);
-  for (unsigned int i=0; i<bit; i++) {
-    _data[byte] |= (1<<i);
-  }
-}
-
-
-/* ********************************************************************************************* *
- * Implementation of AnytoneCodeplug::InvertedBitmapElement
- * ********************************************************************************************* */
-AnytoneCodeplug::InvertedBitmapElement::InvertedBitmapElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-void
-AnytoneCodeplug::InvertedBitmapElement::clear() {
-  memset(_data, 0xff, _size);
-}
-
-bool
-AnytoneCodeplug::InvertedBitmapElement::isEncoded(unsigned int idx) const {
-  unsigned int byte = idx/8, bit = idx%8;
-  return 0 == (_data[byte] & (1 << bit));
-}
-
-void
-AnytoneCodeplug::InvertedBitmapElement::setEncoded(unsigned int idx, bool enable) {
-  unsigned int byte = idx/8, bit = idx%8;
-  if (enable)
-    _data[byte] &= ~(1 << bit);
-  else
-    _data[byte] |= (1 << bit);
-}
-
-void
-AnytoneCodeplug::InvertedBitmapElement::enableFirst(unsigned int n) {
-  unsigned int byte = n/8, bit=n%8;
-  memset(_data, 0x00, byte);
-  for (unsigned int i=0; i<bit; i++) {
-    _data[byte] &= ~(1<<i);
-  }
-}
 
 
 /* ********************************************************************************************* *
@@ -757,7 +681,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
@@ -855,10 +779,10 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     else
       setContactIndex(ctx.index(dc->txContactObj()));
     // link RX group list
-    if (nullptr == dc->groupListObj())
+    if (nullptr == dc->groupList())
       clearGroupListIndex();
     else
-      setGroupListIndex(ctx.index(dc->groupListObj()));
+      setGroupListIndex(ctx.index(dc->groupList()));
     // Set radio ID
     if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
       if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {
@@ -4609,9 +4533,17 @@ AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
   ZoneSplitVisitor splitter;
   if (! splitter.process(intermediate, err)) {
-    errMsg(err) << "Cannot pre-process codeplug for anytone device.";
+    errMsg(err) << "Split multi-VFO zones.";
     delete intermediate;
     return nullptr;
   }

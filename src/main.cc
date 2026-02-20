@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   //splash.show();
   //app.processEvents();
 
-  QMainWindow *mainWindow = app.mainWindow();
+  auto mainWindow = app.mainWindow();
   mainWindow->show();
   //splash.finish(mainWindow);
 

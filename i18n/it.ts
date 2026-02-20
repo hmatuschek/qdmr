@@ -466,14 +466,14 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../src/aboutdialog.ui" line="14"/>
-        <location filename="../shared/ui/aboutdialog.ui" line="14"/>
-        <location filename="../shared/ui/aboutdialog.ui" line="28"/>
-        <location filename="../shared/ui/aboutdialog.ui" line="46"/>
+        <location filename="../shared/ui/aboutdialog.ui" line="20"/>
+        <location filename="../shared/ui/aboutdialog.ui" line="37"/>
+        <location filename="../shared/ui/aboutdialog.ui" line="55"/>
         <source>About qdmr</source>
         <translation>Informazioni su qdmr</translation>
     </message>
     <message>
-        <location filename="../shared/ui/aboutdialog.ui" line="79"/>
+        <location filename="../shared/ui/aboutdialog.ui" line="88"/>
         <source>Supported Radios</source>
         <translation>Radio supportate</translation>
     </message>
@@ -936,7 +936,7 @@
         <translation>Scrittura completata</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="853"/>
+        <location filename="../src/application.cc" line="859"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias di %2 %3)</translation>
     </message>
@@ -2269,239 +2269,239 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.ui" line="75"/>
+        <location filename="../src/mainwindow.ui" line="74"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="87"/>
+        <location filename="../src/mainwindow.ui" line="86"/>
         <source>Device</source>
         <translation>Dispositivo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="99"/>
-        <location filename="../src/mainwindow.ui" line="277"/>
+        <location filename="../src/mainwindow.ui" line="98"/>
+        <location filename="../src/mainwindow.ui" line="266"/>
         <source>Help</source>
         <translation>Aiuto</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="106"/>
+        <location filename="../src/mainwindow.ui" line="105"/>
         <source>Databases</source>
         <translation>Database</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="128"/>
+        <location filename="../src/mainwindow.ui" line="127"/>
         <source>Toolbar</source>
         <translation>Barra degli strumenti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="157"/>
+        <location filename="../src/mainwindow.ui" line="155"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="160"/>
+        <location filename="../src/mainwindow.ui" line="158"/>
         <source>Creates a new Codeplug.</source>
         <translation>Crea un nuovo codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="163"/>
+        <location filename="../src/mainwindow.ui" line="161"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="172"/>
+        <location filename="../src/mainwindow.ui" line="169"/>
         <source>Open ...</source>
         <translation>Apri…</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="175"/>
+        <location filename="../src/mainwindow.ui" line="172"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Importa un codeplug dai file &amp;quot;conf&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="178"/>
+        <location filename="../src/mainwindow.ui" line="175"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="187"/>
+        <location filename="../src/mainwindow.ui" line="183"/>
         <source>Save ...</source>
         <translation>Salva…</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="190"/>
+        <location filename="../src/mainwindow.ui" line="186"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Salva il codeplug in un file &amp;quot;conf&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="193"/>
+        <location filename="../src/mainwindow.ui" line="189"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="202"/>
+        <location filename="../src/mainwindow.ui" line="197"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="205"/>
+        <location filename="../src/mainwindow.ui" line="200"/>
         <source>Quits the application.</source>
         <translation>Esci dall&apos;applicazione.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="208"/>
+        <location filename="../src/mainwindow.ui" line="203"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="217"/>
+        <location filename="../src/mainwindow.ui" line="211"/>
         <source>Detect</source>
         <translation>Rileva</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="220"/>
+        <location filename="../src/mainwindow.ui" line="214"/>
         <source>Detect connected radios.</source>
         <translation>Rileva le radio collegate.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="229"/>
+        <location filename="../src/mainwindow.ui" line="222"/>
         <source>Verify</source>
         <translation>Verifica</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="232"/>
+        <location filename="../src/mainwindow.ui" line="225"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifica il codeplug corrente con le radio collegate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="235"/>
+        <location filename="../src/mainwindow.ui" line="228"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="244"/>
+        <location filename="../src/mainwindow.ui" line="236"/>
         <source>Read</source>
         <translation>Leggi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="247"/>
+        <location filename="../src/mainwindow.ui" line="239"/>
         <source>Reads a codeplug from connected radios.</source>
         <translation>Legge il codeplug dalle radio collegate.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="256"/>
+        <location filename="../src/mainwindow.ui" line="247"/>
         <source>Write</source>
         <translation>Scrivi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="259"/>
+        <location filename="../src/mainwindow.ui" line="250"/>
         <source>Writes the codeplug to the connected radio.</source>
         <translation>Scrive il codeplug sulla radio collegata.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="268"/>
+        <location filename="../src/mainwindow.ui" line="258"/>
         <source>About qdmr</source>
         <translation>Informazioni su qdmr</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="280"/>
+        <location filename="../src/mainwindow.ui" line="269"/>
         <source>Read the handbook.</source>
         <translation>Leggi il manuale.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="283"/>
+        <location filename="../src/mainwindow.ui" line="272"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="292"/>
-        <location filename="../src/mainwindow.cc" line="106"/>
+        <location filename="../src/mainwindow.ui" line="280"/>
+        <location filename="../src/mainwindow.cc" line="107"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="295"/>
+        <location filename="../src/mainwindow.ui" line="283"/>
         <source>Shows settings dialog</source>
         <translation>Mostra la finestra delle impostazioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="304"/>
+        <location filename="../src/mainwindow.ui" line="291"/>
         <source>Write Callsign DB</source>
         <translation>Scrivi il DB dei nominativi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="307"/>
+        <location filename="../src/mainwindow.ui" line="294"/>
         <source>Writes call-sign DB to radio.</source>
         <translation>Scrive il DB dei nominativi sulla radio.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="312"/>
+        <location filename="../src/mainwindow.ui" line="299"/>
         <source>Refresh Callsign DB</source>
         <translation>Aggiorna il DB dei nominativi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="315"/>
+        <location filename="../src/mainwindow.ui" line="302"/>
         <source>Refreshes the downloaded callsign DB</source>
         <translation>Aggiorna il DB dei nominativi scaricati</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="323"/>
+        <location filename="../src/mainwindow.ui" line="310"/>
         <source>Refresh Talkgroup DB</source>
         <translation>Aggiorna il DB dei talk-group</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="326"/>
+        <location filename="../src/mainwindow.ui" line="313"/>
         <source>Refreshes the downloaded talkgroup DB</source>
         <translation>Aggiorna il DB dei talk-group scaricati</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="331"/>
+        <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
         <translation>Esporta in CHIRP...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="334"/>
+        <location filename="../src/mainwindow.ui" line="321"/>
         <source>Exports all FM channels to CHIRP CSV.</source>
         <translation>Esporta tutti i canali FM in un file CSV per CHIRP.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="339"/>
+        <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
         <translation>Importa...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="342"/>
+        <location filename="../src/mainwindow.ui" line="329"/>
         <source>Imports and merges a codeplug into the current one.</source>
         <translation>Importa e unisce un codeplug in quello corrente.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="347"/>
+        <location filename="../src/mainwindow.ui" line="334"/>
         <source>Refresh Orbital Elements</source>
         <translation>Aggiorna gli elementi orbitali</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="350"/>
+        <location filename="../src/mainwindow.ui" line="337"/>
         <source>Refreshes the orbital elements.</source>
         <translation>Aggiorna gli elementi orbitali.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="358"/>
+        <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
         <translation>Modifica i satelliti...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="361"/>
+        <location filename="../src/mainwindow.ui" line="348"/>
         <source>Opens an editor to edit your satellite database.</source>
         <translation>Apre un editor per modificare il database dei satelliti.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="369"/>
+        <location filename="../src/mainwindow.ui" line="356"/>
         <source>Write satellites</source>
         <translation>Salva i satelliti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="372"/>
+        <location filename="../src/mainwindow.ui" line="359"/>
         <source>Writes the orbital elements and transponder information onto the connected device.</source>
         <translation>Scrive gli elementi orbitali e le informazioni del transponder sul dispositivo connesso.</translation>
     </message>
@@ -2536,64 +2536,64 @@
         <translation>Elementi orbitali aggiornati e caricati.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="120"/>
-        <location filename="../src/mainwindow.cc" line="166"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
+        <location filename="../src/mainwindow.cc" line="167"/>
         <source>Radio IDs</source>
         <translation>ID Radio</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="122"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Contacts</source>
         <translation>Contatti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="124"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Group Lists</source>
         <translation>Liste gruppi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="126"/>
+        <location filename="../src/mainwindow.cc" line="127"/>
         <source>Channels</source>
         <translation>Canali</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="128"/>
+        <location filename="../src/mainwindow.cc" line="129"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="130"/>
+        <location filename="../src/mainwindow.cc" line="131"/>
         <source>Scan Lists</source>
         <translation>Liste di scansione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="132"/>
+        <location filename="../src/mainwindow.cc" line="133"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="135"/>
         <source>Roaming Channels</source>
         <translation>Canali roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="137"/>
+        <location filename="../src/mainwindow.cc" line="138"/>
         <source>Roaming Zones</source>
         <translation>Zone roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="141"/>
-        <location filename="../src/mainwindow.cc" line="180"/>
+        <location filename="../src/mainwindow.cc" line="142"/>
+        <location filename="../src/mainwindow.cc" line="181"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="197"/>
+        <location filename="../src/mainwindow.cc" line="198"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifiche non salvate al codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="198"/>
+        <location filename="../src/mainwindow.cc" line="199"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo queste modifiche andranno perse.</translation>
     </message>
@@ -3749,7 +3749,7 @@
     <message>
         <location filename="../src/zonedialog.ui" line="39"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nota:&lt;/span&gt; le zone sono raccolte di canali generalmente valide per una specifica regione. Cioè, una raccolta di canali per ripetitori all’interno di una certa area.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR gestisce le zone permettendo due elenchi di canali indipendenti per ciascun VFO della radio (se ne ha due). Tuttavia, molte radio permettono di assegnare le zone a ciascun VFO individualmente. In questi casi, QDMR dividerà la zona in due (A &amp;amp; B) e le programmerà singolarmente sulla radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nota:&lt;/span&gt; le zone sono raccolte di canali generalmente valide per una specifica regione. Cioè, una raccolta di canali per ripetitori all’interno di una certa area.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR gestisce le zone permettendo due elenchi di canali indipendenti per ciascun VFO della radio (se ne ha due). Tuttavia, molte radio permettono di assegnare le zone a ciascun VFO individualmente. In questi casi, QDMR dividerà la zona in due (A e B) e le programmerà singolarmente sulla radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="54"/>

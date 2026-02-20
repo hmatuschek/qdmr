@@ -1,7 +1,6 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
-#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -357,8 +356,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     break;
   case 12:
     if (DMRChannel *dmr = channel->as<DMRChannel>()) {
-      if (dmr->groupListObj()) {
-        return dmr->groupListObj()->name();
+      if (dmr->groupList()) {
+        return dmr->groupList()->name();
       } else {
         return QString("-");
       }

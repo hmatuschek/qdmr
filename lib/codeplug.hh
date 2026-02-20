@@ -100,9 +100,14 @@ public:
         inline T limit(const T &value) const {
           return std::min(max, std::max(min, value));
         }
-        /// Checks if value is in range
+        /** Checks if value is in range. */
         inline bool in(const T &value) const {
           return (value <= max) && (value >= min);
+        }
+        /** Maps a value from this range to the given range. */
+        inline T mapTo(const Range<T> &other, const T &value) const {
+          T myD = max-min, oD = other.max-other.min;
+          return ((limit(value)-min)*oD)/myD + other.min;
         }
       };
     };
@@ -276,6 +281,46 @@ public:
     size_t _size;
   };
 
+  /** Represents the base class for bitmaps in codeplugs. */
+  class BitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    BitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+
+  /** Represents the base class for inverted bitmaps in codeplugs. */
+  class InvertedBitmapElement: public Element
+  {
+  protected:
+    /** Hidden constructor. */
+    InvertedBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Clears the bitmap, disables all channels. */
+    void clear();
+
+    /** Returns @c true if the given index is valid. */
+    virtual bool isEncoded(unsigned int idx) const ;
+    /** Enables/disables the specified index. */
+    virtual void setEncoded(unsigned int idx, bool enable);
+    /** Enables the first n elements. */
+    virtual void enableFirst(unsigned int n);
+  };
+
+
   /** Base class for all codeplug contexts.
    * Each device specific codeplug may extend this class to allow for device specific elements to
    * be indexed in a separate index. By default tables for @c DigitalContact, @c RXGroupList,
@@ -307,6 +352,8 @@ public:
     bool addTable(const QMetaObject *obj);
     /** Returns @c true if a table is defined for the given type. */
     bool hasTable(const QMetaObject *obj) const;
+    /** Deletes a table. */
+    bool remTable(const QMetaObject *obj);
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -323,7 +370,9 @@ public:
     /** Returns the number of elements for the specified type. */
     template <class T>
     unsigned int count() {
-      return this->getTable(&T::staticMetaObject).indices.size();
+      if (! hasTable(&T::staticMetaObject))
+        return 0;
+      return getTable(&T::staticMetaObject).indices.size();
     }
 
   protected:

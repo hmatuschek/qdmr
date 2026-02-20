@@ -640,8 +640,8 @@ OpenRTXCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, 
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dmr = c->as<DMRChannel>();
     setMode(Mode_DMR);
-    if (! dmr->groupList()->isNull())
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (! dmr->groupListRef()->isNull())
+      setGroupListIndex(ctx.index(dmr->groupList()));
     setTXColorCode(dmr->colorCode());
     setRXColorCode(dmr->colorCode());
     setTimeslot(dmr->timeSlot());
