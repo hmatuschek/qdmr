@@ -984,15 +984,20 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
  * ******************************************************************************************** */
 QVector<QTimeZone>
 D878UVCodeplug::GeneralSettingsElement::TimeZone::_timeZones = {
-  QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400),
-  QTimeZone(-28800), QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000),
-  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone(- 7200),
-  QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600), QTimeZone(  7200),
-  QTimeZone( 10800), QTimeZone( 12600), QTimeZone(-28800), QTimeZone( 14400),
-  QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700),
-  QTimeZone( 21600), QTimeZone( 25200), QTimeZone( 28600), QTimeZone( 30600),
-  QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600), QTimeZone( 43200),
-  QTimeZone( 46800) };
+  QTimeZone(-43200), QTimeZone(-41400), QTimeZone(-39600), QTimeZone(-37800),
+  QTimeZone(-36000), QTimeZone(-34200), QTimeZone(-32400), QTimeZone(-30600),
+  QTimeZone(-28800), QTimeZone(-27000), QTimeZone(-25200), QTimeZone(-23400),
+  QTimeZone(-21600), QTimeZone(-19800), QTimeZone(-18000), QTimeZone(-16200),
+  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone( -9000),
+  QTimeZone( -7200), QTimeZone( -5400), QTimeZone( -3600), QTimeZone( -1800),
+  QTimeZone(     0), QTimeZone(  1800), QTimeZone(  3600), QTimeZone(  5400),
+  QTimeZone(  7200), QTimeZone(  9000), QTimeZone( 10800), QTimeZone( 12600),
+  QTimeZone( 14400), QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800),
+  QTimeZone( 21600), QTimeZone( 23400), QTimeZone( 25200), QTimeZone( 27000),
+  QTimeZone( 28800), QTimeZone( 30600), QTimeZone( 32400), QTimeZone( 34200),
+  QTimeZone( 36000), QTimeZone( 37800), QTimeZone( 39600), QTimeZone( 41400),
+  QTimeZone( 43200), QTimeZone( 45000), QTimeZone( 46800)
+};
 
 QTimeZone
 D878UVCodeplug::GeneralSettingsElement::TimeZone::decode(uint8_t code) {
