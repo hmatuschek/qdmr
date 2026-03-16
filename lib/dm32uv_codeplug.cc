@@ -4234,6 +4234,7 @@ DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
   // Allocate index
   if (! isAllocated(Offset::contactIndex()))
     image(0).addElement(Offset::contactIndex(), ContactIndexElement::size());
+
   // Allocate blocks
   auto numBlocks = Limit::contactBanks().limit(
     ctx.count<DMRContact>()/ContactBankElement::Limit::contactsPerBlock()
