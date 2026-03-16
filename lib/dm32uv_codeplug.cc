@@ -619,6 +619,92 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of DM32UVCodeplug::ChannelExtensionElement
+ * ******************************************************************************************** */
+DM32UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+DM32UVCodeplug::ChannelExtensionElement::clear() {
+  setUInt16_le(0x0000, 0x0001);
+  clearContactIndex();
+}
+
+
+bool
+DM32UVCodeplug::ChannelExtensionElement::hasContactIndex() const {
+  unsigned int contactIndex = (((unsigned int)getUInt4(Offset::indexMSN()))<<8)
+      | (unsigned int) getUInt8(Offset::indexLSB());
+  return 0x0000 != contactIndex;
+}
+
+unsigned int
+DM32UVCodeplug::ChannelExtensionElement::contactIndex() const {
+  unsigned int contactIndex = (((unsigned int)getUInt4(Offset::indexMSN()))<<8)
+      | (unsigned int) getUInt8(Offset::indexLSB());
+  return contactIndex - 1;
+}
+
+void
+DM32UVCodeplug::ChannelExtensionElement::setContactIndex(unsigned int idx) {
+  idx = std::min(ContactBankElement::Limit::contacts(), idx+1);
+  uint8_t msn = (idx >> 8), lsb = (idx & 0xff);
+  setUInt4(Offset::indexMSN(), msn);
+  setUInt8(Offset::indexLSB(), lsb);
+}
+
+void
+DM32UVCodeplug::ChannelExtensionElement::clearContactIndex() {
+  setUInt4(Offset::indexMSN(), 0);
+  setUInt8(Offset::indexLSB(), 0);
+}
+
+
+bool
+DM32UVCodeplug::ChannelExtensionElement::decode(Channel *ch, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ch); Q_UNUSED(ctx); Q_UNUSED(err);
+  return true;
+}
+
+bool
+DM32UVCodeplug::ChannelExtensionElement::link(Channel *ch, Context &ctx, const ErrorStack &err) const {
+  if (!ch->is<DMRChannel>() || !hasContactIndex())
+    return true;
+
+  if (! ctx.has<DMRContact>(contactIndex())) {
+    errMsg(err) << "Cannot resolve contact index " << contactIndex() << ".";
+    return false;
+  }
+
+  ch->as<DMRChannel>()->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::ChannelExtensionElement::encode(const Channel *ch, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  clear();
+
+  if (! ch->is<DMRChannel>())
+    return true;
+
+  auto dch = ch->as<DMRChannel>();
+  if (dch->contact()->isNull())
+    clearContactIndex();
+  else
+    setContactIndex(ctx.index(dch->txContactObj()));
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::ContactElement
  * ******************************************************************************************** */
 DM32UVCodeplug::ContactElement::ContactElement(uint8_t *data, size_t size)
@@ -4010,6 +4096,19 @@ DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
     ctx.add(ch, i);
   }
 
+  // Link channel extensions
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+    unsigned int blockNumber  = i / ChannelExtensionBankElement::Limit::count();
+    unsigned int indexInBlock = i % ChannelExtensionBankElement::Limit::count();
+    uint32_t addr = Offset::channelExtensionBanks()
+        + blockNumber * ChannelExtensionBankElement::Offset::betweenBanks()
+        + indexInBlock * ChannelExtensionElement::size();
+    if (! ChannelExtensionElement(data(addr)).decode(ctx.get<Channel>(i), ctx, err)) {
+      errMsg(err) << "Cannot decode channel extension at index " << i << ".";
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -4029,6 +4128,19 @@ DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     // link channel
     if (! ChannelElement(data(addr)).link(ch, ctx, err)) {
       errMsg(err) << "Cannot link channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  // Link channel extensions
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+    unsigned int blockNumber  = i / ChannelExtensionBankElement::Limit::count();
+    unsigned int indexInBlock = i % ChannelExtensionBankElement::Limit::count();
+    uint32_t addr = Offset::channelExtensionBanks()
+        + blockNumber * ChannelExtensionBankElement::Offset::betweenBanks()
+        + indexInBlock * ChannelExtensionElement::size();
+    if (! ChannelExtensionElement(data(addr)).link(ctx.get<Channel>(i), ctx, err)) {
+      errMsg(err) << "Cannot link channel extension at index " << i << ".";
       return false;
     }
   }
@@ -4063,6 +4175,27 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
     // Create channel
     if (! ChannelElement(data(addr)).encode(ctx.get<Channel>(i), ctx, err)) {
       errMsg(err) << "Cannot encode channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  // Allocate blocks for extensions
+  auto numExtBlocks = (ctx.count<Channel>()>ChannelExtensionBankElement::Limit::count()) ? 2u : 1u;
+  for (unsigned int i=0; i<numExtBlocks; i++) {
+    unsigned int addr = Offset::channelExtensionBanks() + i*Limit::blockSize();
+    if (! isAllocated(addr))
+      image(0).addElement(addr, Limit::blockSize());
+  }
+
+  // Encode channel extensions
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+    unsigned int blockNumber  = i / ChannelExtensionBankElement::Limit::count();
+    unsigned int indexInBlock = i % ChannelExtensionBankElement::Limit::count();
+    uint32_t addr = Offset::channelExtensionBanks()
+        + blockNumber * ChannelExtensionBankElement::Offset::betweenBanks()
+        + indexInBlock * ChannelExtensionElement::size();
+    if (! ChannelExtensionElement(data(addr)).encode(ctx.get<Channel>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode channel extension at index " << i << ".";
       return false;
     }
   }

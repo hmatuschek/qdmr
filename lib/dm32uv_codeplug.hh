@@ -295,7 +295,7 @@ public:
       /** Maximum number of channels. */
       static constexpr unsigned int channels() { return 4000; }
       /** Maximum number of channels per block. */
-      static constexpr unsigned int channelsPerBlock() { return 85; }
+      static constexpr unsigned int channelsPerBlock() { return 84; }
     };
 
     /** Some internal offsets. */
@@ -307,6 +307,67 @@ public:
         return DM32UVCodeplug::Limit::blockSize();
       }
       /// @endcond
+    };
+  };
+
+
+  /** Implements an extended settings field for each channel.
+   * This is obviously a bug fix by a very unexperienced FW engineer. They hot-fixed the missing
+   * transmit contact via these extended settings although there are enough unused bits available
+   * within the channel element. Moveover, the encoding is a wild mix of little and big endian. */
+  class ChannelExtensionElement: public Element
+  {
+  public:
+    /** Constructor. */
+    ChannelExtensionElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0002; }
+
+    /** Resets the element. */
+    void clear() override;
+
+    /** Returns @c true if a TX contact index is set. */
+    virtual bool hasContactIndex() const;
+    /** Returns the TX contact index. */
+    virtual unsigned int contactIndex() const;
+    /** Sets the contact index. */
+    virtual void setContactIndex(unsigned int index);
+    /** Resets the contact index. */
+    virtual void clearContactIndex();
+
+    /** Encodes the extended settings from the given channel. */
+    virtual bool encode(const Channel *ch, Context &ctx, const ErrorStack &err);
+    /** Updates the given channel. */
+    virtual bool decode(Channel *ch, Context &ctx, const ErrorStack &err) const;
+    /** Links the given channel. */
+    virtual bool link(Channel *ch, Context &ctx, const ErrorStack &err) const;
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit indexMSN() { return { 0x0000, 4}; }
+      static constexpr unsigned int indexLSB() { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+
+  /** Encodes a bank of channel extension settings. */
+  class ChannelExtensionBankElement: public Element
+  {
+  public:
+    /** Some limits. */
+    struct Limit : Element::Limit {
+      /** The number of elements within each bank. */
+      static constexpr unsigned int count() { return 2047; }
+    };
+
+    /** Some offsets. */
+    struct Offset: Element::Offset {
+      /** Offset betwenn banks. */
+      static constexpr unsigned int betweenBanks(){ return DM32UVCodeplug::Limit::blockSize(); }
     };
   };
 
@@ -2341,19 +2402,20 @@ protected:
   /** Some internal offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int generalSettings()     { return 0x00004000; }
-    static constexpr unsigned int aprsSettings()        { return 0x00004300; }
-    static constexpr unsigned int contactIndex()        { return 0x0000b000; }
-    static constexpr unsigned int groupListBank()       { return 0x0000f000; }
-    static constexpr unsigned int extendedSettings()    { return 0x00010000; }
-    static constexpr unsigned int encryptionKeys()      { return 0x00010300; }
-    static constexpr unsigned int scanListBank()        { return 0x00011000; }
-    static constexpr unsigned int channelBanks()        { return 0x00012000; }
-    static constexpr unsigned int contactBanks()        { return 0x00044000; }
-    static constexpr unsigned int zoneBanks()           { return 0x0005c000; }
-    static constexpr unsigned int roamingZoneBank()     { return 0x00065000; }
-    static constexpr unsigned int roamingChannelBank()  { return 0x00066000; }
-    static constexpr unsigned int radioIdBank()         { return 0x00067000; }
+    static constexpr unsigned int generalSettings()       { return 0x00004000; }
+    static constexpr unsigned int aprsSettings()          { return 0x00004300; }
+    static constexpr unsigned int contactIndex()          { return 0x0000b000; }
+    static constexpr unsigned int groupListBank()         { return 0x0000f000; }
+    static constexpr unsigned int extendedSettings()      { return 0x00010000; }
+    static constexpr unsigned int encryptionKeys()        { return 0x00010300; }
+    static constexpr unsigned int scanListBank()          { return 0x00011000; }
+    static constexpr unsigned int channelBanks()          { return 0x00012000; }
+    static constexpr unsigned int channelExtensionBanks() { return 0x00042000; }
+    static constexpr unsigned int contactBanks()          { return 0x00044000; }
+    static constexpr unsigned int zoneBanks()             { return 0x0005c000; }
+    static constexpr unsigned int roamingZoneBank()       { return 0x00065000; }
+    static constexpr unsigned int roamingChannelBank()    { return 0x00066000; }
+    static constexpr unsigned int radioIdBank()           { return 0x00067000; }
     /// @endcond
   };
 };
