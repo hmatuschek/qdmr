@@ -619,6 +619,7 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
 
 
 /* ******************************************************************************************** *
+<<<<<<< HEAD
  * Implementation of DM32UVCodeplug::ChannelExtensionElement
  * ******************************************************************************************** */
 DM32UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
@@ -705,6 +706,8 @@ DM32UVCodeplug::ChannelExtensionElement::encode(const Channel *ch, Context &ctx,
 
 
 /* ******************************************************************************************** *
+=======
+>>>>>>> devel
  * Implementation of DM32UVCodeplug::ContactElement
  * ******************************************************************************************** */
 DM32UVCodeplug::ContactElement::ContactElement(uint8_t *data, size_t size)
