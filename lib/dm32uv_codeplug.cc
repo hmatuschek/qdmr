@@ -447,7 +447,7 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
   if (voxEnabled())
     ch->setVOXDefault();
   else
-    ch->setVOX(0);
+    ch->disableVOX();
 
   return ch;
 }
@@ -511,7 +511,10 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
   setChannelType(channel->is<DMRChannel>() ? ChannelType::DMR : ChannelType::FM);
   setPower(channel->power());
   enableRXOnly(channel->rxOnly());
-  enableVOX(! channel->voxDisabled());
+  if (channel->defaultVOX())
+    enableVOX(! ctx.config()->settings()->voxDisabled());
+  else
+    enableVOX(! channel->voxDisabled());
 
   if (! channel->scanListRef()->isNull())
     setScanListIndex(ctx.index(channel->scanList()));
@@ -3259,7 +3262,10 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   setBootMessage1(ctx.config()->settings()->introLine1());
   setBootMessage2(ctx.config()->settings()->introLine2());
   enableVoicePrompt(ctx.config()->settings()->speech());
-  setVOXLevel(ctx.config()->settings()->vox());
+  if (ctx.config()->settings()->voxDisabled())
+    setVOXLevel(0);
+  else
+    setVOXLevel(ctx.config()->settings()->vox());
   if (ctx.config()->settings()->totDisabled()) setTransmitTimeout(Interval::infinity());
   else setTransmitTimeout(Interval::fromSeconds(ctx.config()->settings()->tot()));
   setFMMicLevel(ctx.config()->settings()->micLevel());
