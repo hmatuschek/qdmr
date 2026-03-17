@@ -492,7 +492,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
       }
       dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
     }
-  }
+  }    
 
   return true;
 }

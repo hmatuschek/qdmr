@@ -41,13 +41,13 @@ class Channel: public ConfigObject
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
-  Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout SCRIPTABLE false)
+  Q_PROPERTY(unsigned int timeout READ timeout WRITE setTimeout SCRIPTABLE false)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
   /** The VOX setting. */
-  Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  Q_PROPERTY(unsigned int vox READ vox WRITE setVOX SCRIPTABLE false)
   /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
@@ -366,9 +366,9 @@ public:
   /** Returns @c true if the squelch is disabled. */
   bool squelchDisabled() const;
   /** Returns the squelch level [0,10]. */
-        unsigned squelch() const;
+  unsigned squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-        bool setSquelch(unsigned squelch);
+  bool setSquelch(unsigned squelch);
   /** Disables the quelch. */
   void disableSquelch();
   /** Sets the squelch to the global default value. */

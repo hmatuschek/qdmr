@@ -290,7 +290,10 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
 
   // Serialize freuqencies in MHz
   node["rxFrequency"] = _rxFreq;
-  node["txFrequency"] = _txFreq;
+  if (_txFreq.isZero())
+    node["txFrequency"] = YAML::Null;
+  else
+    node["txFrequency"] = _txFreq;
 
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
@@ -337,12 +340,10 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
   setRXFrequency(ch["rxFrequency"].as<Frequency>());
 
-  if (ch["txFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No txFrequency specified.";
-    return false;
-  }
-  setTXFrequency(ch["txFrequency"].as<Frequency>());
+  if (ch["txFrequency"].IsNull())
+    setTXFrequency(Frequency());
+  else
+    setTXFrequency(ch["txFrequency"].as<Frequency>());
 
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
@@ -357,7 +358,7 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     setTimeout(ch["timeout"].as<unsigned>());
   }
 
-  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
+  if ((! ch["vox"]) || ("!default" == ch["vox"].Tag())) {
     setVOXDefault();
   } else if (ch["vox"] && ch["vox"].IsScalar()) {
     setVOX(ch["vox"].as<unsigned>());
@@ -1131,6 +1132,8 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
     return new DMRChannel();
   } else if (("analog" == type) || ("fm"==type)) {
     return new FMChannel();
+  } else if ("am" == type) {
+    return new AMChannel();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

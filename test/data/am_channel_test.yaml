@@ -1,0 +1,60 @@
+---
+version: 0.14.0
+settings:
+  introLine1: ""
+  introLine2: ""
+  micLevel: 3
+  speech: false
+  power: High
+  squelch: 3
+  vox: 0
+  tot: 0
+  defaultID: id1
+radioIDs:
+  - dmr: {id: id1, name: Test, number: 12345}
+contacts:
+  - dmr: {id: cont1, name: Test Contact, ring: false, type: PrivateCall, number: 123456}
+groupLists:
+  []
+channels:
+  - am:
+      id: ch1
+      name: AM Channel
+      rxOnly: true
+      admit: Always
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      rxFrequency: 121.13 MHz
+      txFrequency: ~
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: ~
+      squelch: !<!default> ""
+  - fm:
+      id: ch2
+      name: 2m Mobil
+      rxOnly: false
+      admit: Always
+      rxTone: ~
+      txTone: ~
+      bandwidth: Narrow
+      rxFrequency: 145.5 MHz
+      txFrequency: 145.5 MHz
+      power: !<!default> ""
+      timeout: !<!default> ""
+      vox: ~
+      squelch: !<!default> ""
+zones:
+  - id: zone1
+    name: Local
+    A: [ch1, ch2]
+    B: []
+commercial:
+  encryptionKeys:
+    []
+sms:
+  format: DMR
+  templates:
+    []
+...
