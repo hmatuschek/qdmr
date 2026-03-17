@@ -268,6 +268,8 @@ DM32UV::download(const ErrorStack &err) {
     auto progress = (100*++blockCount)/addressMap.mappedPhysical().count();
     emit downloadProgress(progress);
     uint32_t virtualBlockAddress = addressMap.toVirtual(physicalBlockAddress);
+    if (! codeplugMemoryRange.contains(virtualBlockAddress))
+      continue;
     if (! _dev->read(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot read codeplug block from "
                   << Qt::hex << physicalBlockAddress << "h (virt. "
@@ -311,6 +313,8 @@ DM32UV::upload(const ErrorStack &err) {
   foreach (uint32_t physicalBlockAddress, addressMap.mappedPhysical()) {
     emit uploadProgress((50*++blockCount)/addressMap.mappedPhysical().count());
     uint32_t virtualBlockAddress = addressMap.toVirtual(physicalBlockAddress);
+    if (! codeplugMemoryRange.contains(virtualBlockAddress))
+      continue;
     if (! _dev->read(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot read codeplug block from "
                   << Qt::hex << physicalBlockAddress << "h (virt. "
