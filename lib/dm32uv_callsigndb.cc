@@ -159,8 +159,8 @@ DM32UVCallsignDB::encode(UserDatabase *db, const Flags &selection, const ErrorSt
     count = std::min(count, (unsigned int)selection.countLimit());
 
   // Allocate first block
-  if (! isAllocated(Offset::block0()))
-    image(0).addElement(Offset::block0(), Offset::betweenBlocks());
+  if (! isAllocated(Offset::count()))
+    image(0).addElement(Offset::count(), Offset::betweenBlocks());
 
   // Store count
   HeaderElement(data(Offset::count())).setCount(count);

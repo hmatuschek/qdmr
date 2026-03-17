@@ -376,10 +376,10 @@ DM32UV::uploadCallsigns(const ErrorStack &err) {
   // Now mark all blocks with their virtual address
   // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
   for (unsigned int blk=0; blk<(unsigned int)_callsigns.image(0).numElements(); blk++) {
-    emit uploadProgress(50 + 50*blk/_callsigns.image(0).numElements());
+    emit uploadProgress(100*blk/_callsigns.image(0).numElements());
     auto element = _callsigns.image(0).element(blk);
     auto blockAddress = element.address();
-    if (! _dev->write(0, blockAddress, _codeplug.data(blockAddress), Offset::blockSize())) {
+    if (! _dev->write(0, blockAddress, _callsigns.data(blockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot write codeplug block to "
                   << Qt::hex << blockAddress << "h.";
       return false;
