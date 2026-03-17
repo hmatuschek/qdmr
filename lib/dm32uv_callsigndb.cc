@@ -73,13 +73,13 @@ DM32UVCallsignDB::EntryElement::setId(unsigned int id) {
 
 
 QString
-DM32UVCallsignDB::EntryElement::repeater() const {
-  return readASCII(Offset::repeater(), Limit::repeater(), 0xff);
+DM32UVCallsignDB::EntryElement::callsign() const {
+  return readASCII(Offset::callsign(), Limit::callsign(), 0xff);
 }
 
 void
-DM32UVCallsignDB::EntryElement::setRepeater(const QString &rep) {
-  writeASCII(Offset::repeater(), rep, Limit::repeater(), 0xff);
+DM32UVCallsignDB::EntryElement::setCallsign(const QString &cal) {
+  writeASCII(Offset::callsign(), cal, Limit::callsign(), 0xff);
 }
 
 
@@ -131,7 +131,8 @@ bool
 DM32UVCallsignDB::EntryElement::encode(const UserDatabase::User &user, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  setName(user.call + " " + user.name);
+  setName(user.name);
+  setCallsign(user.call);
   setId(user.id);
   setCity(user.city);
   setCountry(user.country);
