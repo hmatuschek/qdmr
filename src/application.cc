@@ -237,7 +237,7 @@ Application::loadCodeplug(const QString &filename, const ErrorStack &err) {
   QFileInfo info(filename);
   Settings().setLastDirectoryDir(info.absoluteDir());
 
-  if ("yaml" == info.suffix()){
+  if (("yaml" == info.suffix()) || ("yml" == info.suffix())) {
     ErrorStack err;
     if (! _config->readYAML(filename, err)) {
       _config->clear();
