@@ -2205,6 +2205,10 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   }
   // Then create all referenced GPS systems
   DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
+  if (! gps.updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot update config from DMR-APRS settings.";
+    return false;
+  }
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
     gps.createGPSSystem(*idx, ctx);
   return true;

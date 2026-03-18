@@ -1,10 +1,12 @@
 #include "radiosettings.hh"
 #include "radioid.hh"
+#include "gnsssettings.hh"
+
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
   _squelch(1), _power(Channel::Power::High), _vox(Level::null()), _transmitTimeOut(Interval::infinity()),
-  _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
+  _defaultId(new DMRRadioIDReference(this)), _gnss(new GNSSSettings(this)), _tytExtension(nullptr),
   _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
   // pass
@@ -173,6 +175,11 @@ RadioSettings::setDefaultId(DMRRadioID *id) {
   _defaultId->set(id);
 }
 
+
+GNSSSettings *
+RadioSettings::gnss() const {
+  return _gnss;
+}
 
 TyTSettingsExtension *
 RadioSettings::tytExtension() const {

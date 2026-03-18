@@ -1,10 +1,12 @@
 #include "propertydelegate.hh"
 #include "extensionwrapper.hh"
 
+#include <QListWidget>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QDoubleValidator>
+#include "flageditdialog.hh"
 #include "configreference.hh"
 #include "extensionwrapper.hh"
 #include "config.hh"
@@ -13,7 +15,7 @@
 
 
 PropertyDelegate::PropertyDelegate(QObject *parent)
-  : QItemDelegate(parent), _config(nullptr)
+  : QStyledItemDelegate(parent), _config(nullptr)
 {
   // pass...
 }
@@ -41,7 +43,9 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return nullptr;
 
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    return new FlagEditDialog(prop.enumerator(), parent);
+  } if (prop.isEnumType()) {
     return new QComboBox(parent);
   } else if (QMetaType::Bool == prop.typeId()) {
     return new QComboBox(parent);
@@ -65,6 +69,8 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return new QLineEdit(parent);
   } else if (QString("Interval") == prop.typeName()) {
     return new QLineEdit(parent);
+  } else if (QString("QGeoCoordinate") == prop.typeName()) {
+    return new QLineEdit(parent);
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     return new QComboBox(parent);
   } else if (propIsInstance<ConfigItem>(prop)) {
@@ -83,7 +89,10 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
     return;
 
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    auto box = dynamic_cast<FlagEditDialog *>(editor);
+    box->setValue(prop.read(obj).toInt());
+  } else if (prop.isEnumType()) {
     QComboBox *box = dynamic_cast<QComboBox *>(editor);
     QMetaEnum etype = prop.enumerator();
     for (int i=0; i<etype.keyCount(); i++) {
@@ -135,8 +144,12 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
   QMetaProperty prop = model->propertyAt(index);
   if (! prop.isValid())
     return;
+
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    auto edit = dynamic_cast<FlagEditDialog *>(editor);
+    prop.write(obj, edit->value());
+  } else if (prop.isEnumType()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());
   } else if (QMetaType::Bool == prop.typeId()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());

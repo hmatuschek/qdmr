@@ -189,9 +189,9 @@ public:
     virtual void enableATPC(bool enable);
 
     /** Returns enabled GNSSs */
-    virtual AnytoneGPSSettingsExtension::GPSMode gnss() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets enabled GNSSs */
-    virtual void setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss);
+    virtual void setGNSS(GNSSSettings::Systems gnss);
 
     /** Returns the channel index display mode. */
     virtual ChannelIndexDisplay channelIndexDisplay() const;

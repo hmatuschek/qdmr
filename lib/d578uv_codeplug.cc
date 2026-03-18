@@ -1867,7 +1867,7 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
     return false;
 
   // Set measurement system based on system locale (0x00==Metric)
-  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
@@ -1940,7 +1940,6 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -1970,6 +1969,9 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
 
   // Handle D578UV specific extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -2027,8 +2029,6 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
@@ -2197,33 +2197,24 @@ D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(AnytoneAudioSetting
 }
 
 
-AnytoneGPSSettingsExtension::GPSMode
-D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+GNSSSettings::Systems
+D578UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GPSMode)getUInt8(Offset::gpsMode())) {
-  case GPSMode::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
-  case GPSMode::Beidou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
-  case GPSMode::GPS_Beidou: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  case GPSMode::GPS: return GNSSSettings::System::GPS;
+  case GPSMode::Beidou: return GNSSSettings::System::Beidou;
+  case GPSMode::GPS_Beidou: return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
   }
-  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  return GNSSSettings::System::GPS;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
-  switch (mode) {
-  case AnytoneGPSSettingsExtension::GPSMode::GPS:
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
-  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
+D578UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
+  if (mode.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+  if (mode.testFlag(GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::Beidou);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::All:
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS_Beidou);
-    break;
-  }
 }
 
 
@@ -2952,6 +2943,9 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
     return true;
   }
 
+  // Encode GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
@@ -2997,9 +2991,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableShowChannelType(ext->displaySettings()->showChannelType());
   setDateFormat(ext->displaySettings()->dateFormat());
 
-  // Encode GPS settings
-  setGPSMode(ext->gpsSettings()->mode());
-
   // Encode roaming settings
   enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
 
@@ -3043,6 +3034,9 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
+
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -3092,9 +3086,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->dmrSettings()->setManualGroupCallHangTime(this->manDialGroupCallHangTime());
   ext->dmrSettings()->setManualPrivateCallHangTime(this->manDialPrivateCallHangTime());
   ext->dmrSettings()->setEncryption(this->encryption());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(this->gpsMode());
 
   // Store roaming settings
   ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());

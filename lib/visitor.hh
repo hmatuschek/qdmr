@@ -37,6 +37,11 @@ public:
    * property. Do not override this method unless you need to handle all properties differently. */
   virtual bool processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
 
+  /** Handles a flag typed property.
+   * @param item Specifies the config item holding this property.
+   * @param prop Specifies the property.
+   * @param err Specifies the error stack to pass on. */
+  virtual bool processFlags(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
   /** Handles an enum typed property.
    * @param item Specifies the config item holding this property.
    * @param prop Specifies the property.
@@ -87,6 +92,11 @@ public:
    * @param prop Specifies the property.
    * @param err Specifies the error stack to pass on. */
   virtual bool processSelectiveCall(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
+  /** Handles a @c QGeoCoordinate typed property.
+   * @param item Specifies the config item holding this property.
+   * @param prop Specifies the property.
+   * @param err Specifies the error stack to pass on. */
+  virtual bool processGeoCoordinate(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err=ErrorStack());
   /** Handles a property of unknown type.
    * Returns always @c false.
    * @param item Specifies the config item holding this property.

@@ -11,6 +11,7 @@
 #include "ranges.hh"
 #include "roamingchannel.hh"
 #include "smsextension.hh"
+#include "gnsssettings.hh"
 
 // forward declaration
 class Zone;
@@ -1425,7 +1426,7 @@ public:
 
     /** GNSS modes. */
     enum class GNSSMode {
-      GPS = 0, Baidou = 1, Both = 0
+      GPS = 0, Beidou = 1, Both = 2
     };
 
     /** Possible recording modes. */
@@ -1646,9 +1647,9 @@ public:
     virtual void setPositionFormat(PositionFormat format);
 
     /** Returns the GNSS mode. */
-    virtual GNSSMode gnssMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GNSS mode. */
-    virtual void setGNSSMode(GNSSMode mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns @c true if GNSS is enabled. */
     virtual bool gnssEnabled() const;
@@ -2047,14 +2048,14 @@ public:
     /** Sets the update interval. */
     virtual void setUpdatePeriod(Interval interval);
 
-    /** Returns @c true if the fixed location is set. */
-    virtual bool fixedLocationValid() const;
+    /** Returns @c true if the fixed location is used. */
+    virtual bool fixedLocationEnabled() const;
     /** Returns the fixed location. */
     virtual QGeoCoordinate fixedLocation() const;
     /** Sets the fixed location. */
     virtual void setFixedLocation(const QGeoCoordinate &coordinate);
-    /** Clears the fixed location. */
-    virtual void clearFixedLocation();
+    /** Enabled fixed location. */
+    virtual void enableFixedLocation(bool enable);
 
     /** Returns @c true if the n-th revert channel is set. */
     virtual bool revertChannelIsCurrent(unsigned int n);

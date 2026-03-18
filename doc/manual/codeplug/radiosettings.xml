@@ -26,6 +26,11 @@
   squelch: 1
   vox: 0
   power: High
+  gnss:
+    fixedLocationEnabled: false
+    fixedLocation: JO62jl45
+    systems: [GPS, Beidou]
+    units: Metric
 ]]></programlisting>
 </example>
 
@@ -103,6 +108,40 @@
   </varlistentry>
 </variablelist>
 
+
+<section>
+  <info><title>GNSS settings</title></info>         
+
+<para>
+  This section collects some global GNSS settings that many radio support. Epsecially, it allows to
+  specify a fixed location that can be used by the radio, if it does not support GPS.
+</para>
+
+<variablelist>
+  <title>Radio-wide GNSS Setting Fields</title>
+  <varlistentry>
+    <term><token>fixedLocationEnabled</token>, <token>fixedLocation</token></term>
+    <listitem>
+      <para>Specifies and enables a fixed location. This location can be used instead of a GNSS 
+        position. The location is specified in terms of a locator.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>systems</token></term>
+    <listitem>
+      <para>Specifies the GNSSs to use in terms of a list of <term>GPS</term>, 
+        <term>Glonass</term>, <term>Galileo</term>, <term>Beidou</term>. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>units</token></term>
+    <listitem>
+      <para>Specifies the units to use to show distances and speeds. Must be one of 
+        <token>Metric</token> or <token>Archaic</token>. </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 </section>
 
   

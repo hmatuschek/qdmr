@@ -3033,55 +3033,55 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
     return false;
   }
   // General config
-  if (! this->encodeGeneralSettings(ctx.config(), flags, ctx)) {
+  if (! this->encodeGeneralSettings(flags, ctx)) {
     errMsg(err) << "Cannot encode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->encodeContacts(ctx.config(), flags, ctx)) {
+  if (! this->encodeContacts(flags, ctx)) {
     errMsg(err) << "Cannot encode contacts.";
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->encodeGroupLists(ctx.config(), flags, ctx)) {
+  if (! this->encodeGroupLists(flags, ctx)) {
     errMsg(err) << "Cannot encode group lists.";
     return false;
   }
 
   // Define encryption keys
-  if (! this->encodePrivacyKeys(ctx.config(), flags, ctx)) {
+  if (! this->encodePrivacyKeys(flags, ctx)) {
     errMsg(err) << "Cannot encode encryption keys.";
     return false;
   }
 
   // Define Channels
-  if (! this->encodeChannels(ctx.config(), flags, ctx)) {
+  if (! this->encodeChannels(flags, ctx)) {
     errMsg(err) << "Cannot encode channels.";
     return false;
   }
 
   // Define Zones
-  if (! this->encodeZones(ctx.config(), flags, ctx)) {
+  if (! this->encodeZones(flags, ctx)) {
     errMsg(err) << "Cannot encode zones.";
     return false;
   }
 
   // Define Scanlists
-  if (! this->encodeScanLists(ctx.config(), flags, ctx)) {
+  if (! this->encodeScanLists(flags, ctx)) {
     errMsg(err) << "Cannot encode scan lists.";
     return false;
   }
 
   // Define GPS systems
-  if (! this->encodePositioningSystems(ctx.config(), flags, ctx)) {
+  if (! this->encodePositioningSystems(flags, ctx)) {
     errMsg(err) << "Cannot encode positioning systems.";
     return false;
   }
 
   // Encode button settings
-  if (! this->encodeButtonSettings(ctx.config(), flags, ctx)) {
+  if (! this->encodeButtonSettings(flags, ctx)) {
     errMsg(err) << "Cannot encode button settings.";
     return false;
   }
@@ -3098,49 +3098,49 @@ TyTCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &
 bool
 TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   // General config
-  if (! this->decodeGeneralSettings(ctx.config(), err)) {
+  if (! this->decodeGeneralSettings(ctx, err)) {
     errMsg(err) << "Cannot decode general settings.";
     return false;
   }
 
   // Define Contacts
-  if (! this->createContacts(ctx.config(), ctx, err)) {
+  if (! this->createContacts(ctx, err)) {
     errMsg(err) << "Cannot create contacts.";
     return false;
   }
 
   // Define RX GroupLists
-  if (! this->createGroupLists(ctx.config(), ctx, err)) {
+  if (! this->createGroupLists(ctx, err)) {
     errMsg(err) << "Cannot create group lists.";
     return false;
   }
 
   // Define Channels
-  if (! this->createChannels(ctx.config(), ctx, err)) {
+  if (! this->createChannels(ctx, err)) {
     errMsg(err) << "Cannot create channels.";
     return false;
   }
 
   // Define Zones
-  if (! this->createZones(ctx.config(), ctx, err)) {
+  if (! this->createZones(ctx, err)) {
     errMsg(err) << "Cannot create zones.";
     return false;
   }
 
   // Define Scanlists
-  if (! this->createScanLists(ctx.config(), ctx, err)) {
+  if (! this->createScanLists(ctx, err)) {
     errMsg(err) << "Cannot create scan lists.";
     return false;
   }
 
   // Define GPS systems
-  if (! this->createPositioningSystems(ctx.config(), ctx, err)) {
+  if (! this->createPositioningSystems(ctx, err)) {
     errMsg(err) << "Cannot create positioning systems.";
     return false;
   }
 
   // Decode button settings
-  if (! this->decodeButtonSetttings(ctx.config(), err)) {
+  if (! this->decodeButtonSetttings(ctx, err)) {
     errMsg(err) << "Cannot decode button settings.";
     return false;
   }
@@ -3152,7 +3152,7 @@ TyTCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
   }
 
   // Decode encryption settings
-  if (! this->decodePrivacyKeys(ctx.config(), ctx, err)) {
+  if (! this->decodePrivacyKeys(ctx, err)) {
     errMsg(err) << "Cannot decode encryption settings.";
     return false;
   }

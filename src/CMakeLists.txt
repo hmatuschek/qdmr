@@ -59,7 +59,9 @@ qt6_add_executable(qdmr WIN32
   selectivecallbox.cc selectivecallbox.hh
   transponderfrequencydelegate.cc transponderfrequencydelegate.hh
   mainwindow.cc mainwindow.hh mainwindow.ui
-  ${qdmr_RCC_SOURCES})
+  flageditdialog.hh flageditdialog.cc flageditdialog.ui
+  ${qdmr_RCC_SOURCES}
+)
 
 #
 # Translations

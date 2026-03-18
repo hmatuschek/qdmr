@@ -1532,6 +1532,8 @@ public:
 
     /** Updates the GPS settings from the given config. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Updates the global config. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Creates GPS system from this GPS settings. */
     virtual bool createGPSSystem(uint8_t i, Context &ctx);
     /** Links GPS system from this GPS settings. */

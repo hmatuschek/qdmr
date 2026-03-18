@@ -41,7 +41,13 @@ Visitor::processItem(ConfigItem *item, const ErrorStack &err) {
 
 bool
 Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    if (! this->processFlags(item, prop, err)) {
+      errMsg(err) << "While processing flags '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
+  } else if (prop.isEnumType()) {
     if (! this->processEnum(item, prop, err)) {
       errMsg(err) << "While processing enum '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
@@ -97,7 +103,13 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
     }
   } else if (QString("SelectiveCall") == prop.typeName()) {
     if (! this->processSelectiveCall(item, prop, err)) {
-      errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
+      errMsg(err) << "While processing selective call '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
+  } else if (QString("QGeoCoordinate") == prop.typeName()) {
+    if (! this->processGeoCoordinate(item, prop, err)) {
+      errMsg(err) << "While processing geo coordinate '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
@@ -144,6 +156,13 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
 
 bool
 Visitor::processBool(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processFlags(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
   Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
   // Does nothing, return true;
   return true;
@@ -207,6 +226,13 @@ Visitor::processLevel(ConfigItem *parent, const QMetaProperty &prop, const Error
 
 bool
 Visitor::processSelectiveCall(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processGeoCoordinate(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
   Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
   // Does nothing, return true;
   return true;
