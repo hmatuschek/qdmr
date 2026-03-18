@@ -13,7 +13,7 @@ class Config;
 class DMRContact;
 class RXGroupList;
 class Zone;
-class PositioningSystem;
+class PositionReportingSystem;
 class ScanList;
 class RoamingZone;
 
@@ -308,7 +308,7 @@ protected:
   /** Index <-> Zone map. */
   QMap<int, Zone *> _zones;
   /** Index <-> GPS System map. */
-  QMap<int, PositioningSystem *> _posSystems;
+  QMap<int, PositionReportingSystem *> _posSystems;
   /** Index <-> Scan list map. */
   QMap<int, ScanList *> _scanlists;
   /** Index <-> RoamingZone map */

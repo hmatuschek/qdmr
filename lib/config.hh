@@ -85,7 +85,7 @@ class Config : public ConfigItem
   /** The list of scan lists. */
   Q_PROPERTY(ScanLists* scanLists READ scanlists SCRIPTABLE false)
   /** The list of positioning systems. */
-  Q_PROPERTY(PositioningSystems* positioning READ posSystems SCRIPTABLE false)
+  Q_PROPERTY(PositionReportingSystems* positioning READ posSystems SCRIPTABLE false)
   /** The list of roaming channels. */
   Q_PROPERTY(RoamingChannelList* roamingChannels READ roamingChannels SCRIPTABLE false)
   /** The list of roaming zones. */
@@ -125,7 +125,7 @@ public:
   /** Returns the list of scanlists. */
   ScanLists *scanlists() const;
   /** Returns the list of positioning systems. */
-  PositioningSystems *posSystems() const;
+  PositionReportingSystems *posSystems() const;
   /** Returns the list of roaming channels. */
   RoamingChannelList *roamingChannels() const;
   /** Returns the list of roaming zones. */
@@ -194,7 +194,7 @@ protected:
   /** The list of scan lists. */
   ScanLists *_scanlists;
   /** The list of GPS Systems. */
-  PositioningSystems *_gpsSystems;
+  PositionReportingSystems *_gpsSystems;
   /** The list of roaming channels. */
   RoamingChannelList *_roamingChannels;
   /** The list of roaming zones. */

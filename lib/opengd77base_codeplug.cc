@@ -215,7 +215,7 @@ OpenGD77BaseCodeplug::ChannelElement::transmitTimeout() const {
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setTransmitTimeout(const Interval &interval) {
-  if (interval.isInfinite())
+  if (! interval.isFinite())
     setUInt8(Offset::txTimeout(), 0);
   else {
     unsigned s = interval.seconds()/15;
@@ -588,7 +588,7 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   if (transmitTimeout().isInfinite())
     ch->disableTimeout();
   else
-    ch->setTimeout(transmitTimeout().seconds());
+    ch->setTimeout(transmitTimeout());
 
   ch->setOpenGD77ChannelExtension(new OpenGD77ChannelExtension());
   ch->openGD77ChannelExtension()->enableScanZoneSkip(skipZoneScan());
@@ -617,9 +617,9 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
     // Link DMR channel
     DMRChannel *dc = c->as<DMRChannel>();
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
-      dc->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasTXContact() && ctx.has<DMRContact>(txContactIndex()))
-      dc->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+      dc->setContact(ctx.get<DMRContact>(txContactIndex()));
     // Testing dmrId() == 0 fixes a bug in the OpenGD77 firmware. May change in future.
     if (hasDMRId() && (0 != dmrId())) {
       logDebug() << "Channel '" << c->name() << "' overrides default DMR id with "
@@ -630,16 +630,16 @@ OpenGD77BaseCodeplug::ChannelElement::link(Channel *c, Context &ctx, const Error
         id = new DMRRadioID(QString("Unknown ID"), dmrId());
         ctx.config()->radioIDs()->add(id);
       }
-      dc->setRadioIdObj(id);
+      dc->setRadioId(id);
     }
   } else if (c->is<FMChannel>()) {
     // Link FM channel
     auto fm = c->as<FMChannel>();
     if (hasAPRSIndex()) {
-      if (! ctx.has<APRSSystem>(aprsIndex())) {
+      if (! ctx.has<FMAPRSSystem>(aprsIndex())) {
         logWarn() << "Cannot link APRS system index " << aprsIndex() << ": Unknown index. (ignored)";
       } else {
-        fm->setAPRSSystem(ctx.get<APRSSystem>(aprsIndex()));
+        fm->setAPRS(ctx.get<FMAPRSSystem>(aprsIndex()));
       }
     }
   }
@@ -663,10 +663,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());
-  if (c->timeoutDisabled())
-    setTransmitTimeout(Interval::infinity());
-  else
-    setTransmitTimeout(Interval::fromSeconds(c->timeout()));
+  setTransmitTimeout(c->timeout());
 
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
@@ -680,20 +677,20 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // no per channel squelch setting
-    if (ac->aprsSystem() && (0<=ctx.index(ac->aprsSystem())))
-      setAPRSIndex(ctx.index(ac->aprsSystem()));
+    if (ac->aprs() && (0<=ctx.index(ac->aprs())))
+      setAPRSIndex(ctx.index(ac->aprs()));
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
     setTimeSlot(dc->timeSlot());
     setColorCode(dc->colorCode());
     // OpenGD77 does not allow for both TX contact and group list, select one, prefer group list
-    if (dc->groupListObj())
-      setGroupListIndex(ctx.index(dc->groupListObj()));
-    else if (dc->txContactObj())
-      setTXContactIndex(ctx.index(dc->txContactObj()));
-    if (dc->radioIdObj() != ctx.config()->settings()->defaultId())
-      setDMRId(dc->radioIdObj()->number());
+    if (dc->groupList())
+      setGroupListIndex(ctx.index(dc->groupList()));
+    else if (dc->contact())
+      setTXContactIndex(ctx.index(dc->contact()));
+    if (dc->radioId() != ctx.config()->settings()->defaultId())
+      setDMRId(dc->radioId()->number());
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
                 << "': Not supported by the radio.";
@@ -1116,14 +1113,14 @@ OpenGD77BaseCodeplug::APRSSettingsElement::clearVia2() {
 }
 
 
-APRSSystem::Icon
+FMAPRSSystem::Icon
 OpenGD77BaseCodeplug::APRSSettingsElement::icon() const {
-  return (APRSSystem::Icon)getUInt8(Offset::iconIndex());
+  return (FMAPRSSystem::Icon)getUInt8(Offset::iconIndex());
 }
 void
-OpenGD77BaseCodeplug::APRSSettingsElement::setIcon(APRSSystem::Icon icon) {
-  setUInt8(Offset::iconTable(), (APRSSystem::SECONDARY_TABLE & (unsigned int)icon) ? 1 : 0);
-  setUInt8(Offset::iconIndex(), APRSSystem::ICON_MASK & (unsigned int)icon);
+OpenGD77BaseCodeplug::APRSSettingsElement::setIcon(FMAPRSSystem::Icon icon) {
+  setUInt8(Offset::iconTable(), (FMAPRSSystem::SECONDARY_TABLE & (unsigned int)icon) ? 1 : 0);
+  setUInt8(Offset::iconIndex(), FMAPRSSystem::ICON_MASK & (unsigned int)icon);
 }
 
 QString
@@ -1156,7 +1153,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setFMFrequency(Frequency f) {
 }
 
 bool
-OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
+OpenGD77BaseCodeplug::APRSSettingsElement::encode(const FMAPRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
   clear();
 
@@ -1200,7 +1197,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const APRSSystem *sys, const C
 }
 
 
-APRSSystem *
+FMAPRSSystem *
 OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx); Q_UNUSED(err);
 
@@ -1209,7 +1206,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
     return nullptr;
   }
 
-  APRSSystem *sys = new APRSSystem();
+  FMAPRSSystem *sys = new FMAPRSSystem();
   sys->setName(name());
   sys->setDestination("APN000", 0);
   sys->setSrcSSID(sourceSSID());
@@ -1231,7 +1228,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
 }
 
 bool
-OpenGD77BaseCodeplug::APRSSettingsElement::link(APRSSystem *sys, const Context &ctx, const ErrorStack &err) {
+OpenGD77BaseCodeplug::APRSSettingsElement::link(FMAPRSSystem *sys, const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
   if(fmFrequency().inHz() == 0) {
@@ -1293,9 +1290,9 @@ OpenGD77BaseCodeplug::APRSSettingsBankElement::system(unsigned int idx) const {
 bool
 OpenGD77BaseCodeplug::APRSSettingsBankElement::encode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::systems(); i++) {
-    if (ctx.has<APRSSystem>(i)) {
-      if (! system(i).encode(ctx.get<APRSSystem>(i), ctx, err)) {
-        errMsg(err) << "Cannot encode APRS system '" << ctx.get<APRSSystem>(i)->name()
+    if (ctx.has<FMAPRSSystem>(i)) {
+      if (! system(i).encode(ctx.get<FMAPRSSystem>(i), ctx, err)) {
+        errMsg(err) << "Cannot encode APRS system '" << ctx.get<FMAPRSSystem>(i)->name()
                     << " at index " << i << ".";
         return false;
       }
@@ -1312,7 +1309,7 @@ bool
 OpenGD77BaseCodeplug::APRSSettingsBankElement::decode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::systems(); i++) {
     if (system(i).isValid()) {
-      APRSSystem *sys = system(i).decode(ctx, err);
+      FMAPRSSystem *sys = system(i).decode(ctx, err);
       if (nullptr == sys) {
         errMsg(err) << "Cannot decode APRS system at index " << i << ".";
         return false;
@@ -1329,12 +1326,12 @@ bool
 OpenGD77BaseCodeplug::APRSSettingsBankElement::link(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::systems(); i++) {
     if (system(i).isValid()) {
-      if (! ctx.has<APRSSystem>(i)) {
+      if (! ctx.has<FMAPRSSystem>(i)) {
         errMsg(err) << "Cannot link APRS system at index " << i << ": Not found in context.";
         return false;
       }
-      if (! system(i).link(ctx.get<APRSSystem>(i), ctx, err)) {
-        errMsg(err) << "Cannot link APRS system '" << ctx.get<APRSSystem>(i)->name()
+      if (! system(i).link(ctx.get<FMAPRSSystem>(i), ctx, err)) {
+        errMsg(err) << "Cannot link APRS system '" << ctx.get<FMAPRSSystem>(i)->name()
                     << "' at index " << i << ".";
         return false;
       }
@@ -2611,8 +2608,10 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
   Q_UNUSED(err)
 
   // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i+1);
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    if (config->radioIDs()->get(i)->is<DMRContact>())
+      ctx.add(config->radioIDs()->get(i)->as<DMRContact>(), i+1);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
@@ -2637,8 +2636,8 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
 
   // Map FM APRS systems
   for (int i=0,a=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a); a++;
+    if (config->posSystems()->system(i)->is<FMAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<FMAPRSSystem>(), a); a++;
     }
   }
 
@@ -2650,6 +2649,14 @@ OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *intermediate = Codeplug::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot pre-process OpenGD77 codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
     return nullptr;
   }
 

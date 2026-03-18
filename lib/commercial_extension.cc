@@ -52,14 +52,6 @@ CommercialChannelExtension::encryptionKeyRef() {
   return &_encryptionKey;
 }
 
-void
-CommercialChannelExtension::setEncryptionKeyRef(EncryptionKeyReference *ref) {
-  if (nullptr == ref)
-    setEncryptionKey(nullptr);
-  else
-    setEncryptionKey(ref->as<EncryptionKey>());
-}
-
 EncryptionKey *
 CommercialChannelExtension::encryptionKey() {
   return _encryptionKey.as<EncryptionKey>();

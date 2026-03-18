@@ -56,6 +56,7 @@ public:
 public slots:
   void newCodeplug();
   void loadCodeplug();
+  bool loadCodeplug(const QString &filename, const ErrorStack &err);
   void saveCodeplug();
   void exportCodeplugToChirp();
   void importCodeplug();
@@ -78,6 +79,7 @@ private slots:
   void onCodeplugDownloadError(Radio *radio);
   void onCodeplugDownloaded(Radio *radio, Codeplug *codeplug);
 
+  void onProgress(int val);
   void onCodeplugUploadError(Radio *radio);
   void onCodeplugUploaded(Radio *radio);
 

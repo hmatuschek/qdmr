@@ -32,8 +32,8 @@ CopyTest::testChannelClone() {
 
   {
     ch->setPower(Channel::Power::Min);
-    ch->setTimeout(60);
-    ch->setVOX(3);
+    ch->setTimeout(Interval::fromSeconds(60));
+    ch->setVOX(Level::fromValue(3));
 
     if (! cloner.processItem(ch, err))
       QFAIL(err.format().toLocal8Bit().constData());
@@ -42,8 +42,8 @@ CopyTest::testChannelClone() {
     QVERIFY(item);
     QVERIFY(item->is<Channel>());
     QCOMPARE(item->as<Channel>()->power(), Channel::Power::Min);
-    QCOMPARE(item->as<Channel>()->timeout(), 60);
-    QCOMPARE(item->as<Channel>()->vox(), 3);
+    QCOMPARE(item->as<Channel>()->timeout(), Interval::fromSeconds(60));
+    QCOMPARE(item->as<Channel>()->vox(), Level::fromValue(3));
     delete item;
   }
 
@@ -134,11 +134,11 @@ CopyTest::testAPRSSystemCopy() {
 
   QCOMPARE(config.posSystems()->count(), 1);
   QCOMPARE(comp_config->posSystems()->count(), config.posSystems()->count());
-  QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
-  QVERIFY(comp_config->posSystems()->get(0)->is<APRSSystem>());
+  QVERIFY(config.posSystems()->get(0)->is<FMAPRSSystem>());
+  QVERIFY(comp_config->posSystems()->get(0)->is<FMAPRSSystem>());
 
-  APRSSystem *aprs = config.posSystems()->get(0)->as<APRSSystem>(),
-      *comp_aprs = comp_config->posSystems()->get(0)->as<APRSSystem>();
+  FMAPRSSystem *aprs = config.posSystems()->get(0)->as<FMAPRSSystem>(),
+      *comp_aprs = comp_config->posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(comp_aprs->name(), aprs->name());
   QCOMPARE(comp_aprs->period(), aprs->period());
   QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());

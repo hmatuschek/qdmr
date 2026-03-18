@@ -35,8 +35,8 @@ ConfigMergeVisitor::processItem(ConfigItem *item, const ErrorStack &err) {
     return processZone(item->as<Zone>(), err);
   else if (item->is<ScanList>())
     return processScanList(item->as<ScanList>(), err);
-  else if (item->is<PositioningSystem>())
-    return processPositioningSystem(item->as<PositioningSystem>(), err);
+  else if (item->is<PositionReportingSystem>())
+    return processPositioningSystem(item->as<PositionReportingSystem>(), err);
   else if (item->is<RoamingChannel>())
     return processRoamingChannel(item->as<RoamingChannel>(), err);
   else if (item->is<RoamingZone>())
@@ -110,12 +110,12 @@ ConfigMergeVisitor::processContact(Contact *item, const ErrorStack &err) {
 
 
 bool
-ConfigMergeVisitor::processPositioningSystem(PositioningSystem *item, const ErrorStack &err) {
+ConfigMergeVisitor::processPositioningSystem(PositionReportingSystem *item, const ErrorStack &err) {
   if (0 == _destination->posSystems()->findItemsByName(item->name()).count())
     return addObject(_destination->posSystems(), nullptr, item, err);
 
-  PositioningSystem *present = _destination->posSystems()->findItemsByName(item->name())
-      .first()->as<PositioningSystem>();
+  PositionReportingSystem *present = _destination->posSystems()->findItemsByName(item->name())
+      .first()->as<PositionReportingSystem>();
 
   if (ItemStrategy::Ignore == _itemStrategy)
     return ignoreObject(_destination->posSystems(), present, item, err);

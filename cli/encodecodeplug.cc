@@ -24,7 +24,8 @@
 #include "dmr6x2uv_codeplug.hh"
 #include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
-#include "crc32.hh"
+#include "dm32uv_codeplug.hh"
+
 
 
 template <class T>
@@ -102,7 +103,7 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot parse CSV codeplug '" << infile.fileName() << "': " << errorMessage;
       return -1;
     }
-  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
+  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix()) || ("yml" == fileinfo.suffix())) {
     if (! config.readYAML(fileinfo.canonicalFilePath(), err)) {
       logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName()
                  << "':\n" << err.format(" ");
@@ -180,6 +181,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::DR1801UV:
     if (! encode<DR1801UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::DM32UV:
+    if (! encode<DM32UVCodeplug>(config, flags, parser))
       return -1;
     break;
   default:

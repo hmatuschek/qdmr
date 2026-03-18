@@ -823,10 +823,10 @@ public:
 
     /** Returns the VOX sensitivity [0,10].
      * 0 means VOX off. */
-    virtual unsigned int voxSensitivity() const;
+    virtual Level voxSensitivity() const;
     /** Sets the VOX sensitivity [0,10].
      * 0 means VOX off. */
-    virtual void setVOXSensitivity(unsigned int sens);
+    virtual void setVOXSensitivity(Level sens);
     /** Returns the VOX delay in ms. */
     virtual unsigned int voxDelay() const;
     /** Sets the VOX delay in ms. */
@@ -1049,7 +1049,7 @@ public:
 
   public:
     /** Some limits. */
-    struct Limit {
+    struct Limit: Element::Limit {
       /** Maximum radio name length. */
       static constexpr unsigned int radioNameLength()     { return 16; }
       /** Maximum boot-text lines length. */
@@ -1058,6 +1058,8 @@ public:
       static constexpr unsigned int bootPasswordLength()  { return 6; }
       /** Maximum programming password length. */
       static constexpr unsigned int progPasswordLength()  { return 6; }
+      /** VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1, 3}; }
     };
   };
 

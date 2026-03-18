@@ -58,10 +58,12 @@ UserDatabase::UserDatabase(bool parallel, unsigned updatePeriodDays, QObject *pa
   if ((! exists()) || (updatePeriodDays < dbAge()))
     download();
   else {
-    if (parallel)
-      _parsing = QtConcurrent::run([this]() { return this->load(); });
-    else
+    if (parallel) {
+      _parsing = QtConcurrent::run([this]() { QList<User> users; this->parse(users); return users;})
+                   .then(this, [this](const QList<User> &users){ return this->load(users); });
+    } else {
       load();
+    }
   }
 }
 
@@ -95,6 +97,40 @@ UserDatabase::user(int idx) const {
 
 bool
 UserDatabase::load(const QString &filename) {
+  QList<User> users;
+  if (! parse(filename, users))
+    return false;
+
+  auto res =  load(users);
+  logDebug() << "Loaded user database with " << _user.size() << " entries from " << filename << ".";
+  return res;
+}
+
+bool
+UserDatabase::load(const QList<User> &users) {
+  beginResetModel();
+  _user.clear(); emit readyChanged(false);
+  _user.reserve(users.size());
+  for (auto user: users)
+    _user.append(user);
+  endResetModel();
+
+  if (ready())
+    emit readyChanged(ready());
+  emit loaded();
+  return true;
+}
+
+
+bool
+UserDatabase::parse(QList<User> &users) {
+  QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+  return parse(path+"/user.json", users);
+}
+
+bool
+UserDatabase::parse(const QString &filename, QList<User> &users)
+{
   QFile file(filename);
   if (! file.open(QIODevice::ReadOnly)) {
     QString msg = QString("Cannot open user list '%1': %2").arg(filename).arg(file.errorString());
@@ -133,26 +169,17 @@ UserDatabase::load(const QString &filename) {
     return false;
   }
 
-  beginResetModel();
-  _user.clear(); emit readyChanged(false);
-
+  users.clear();
   QJsonArray array = doc.object()["users"].toArray();
-  _user.reserve(array.size());
+  users.reserve(array.size());
   for (int i=0; i<array.size(); i++) {
     User user(array.at(i).toObject());
     if (user.isValid())
-      _user.append(user);
+      users.append(user);
   }
   // Sort repeater w.r.t. their IDs
   std::stable_sort(_user.begin(), _user.end(), [](const User &a, const User &b){ return a.id < b.id; });
-  // Done.
-  endResetModel();
 
-  logDebug() << "Loaded user database with " << _user.size() << " entries from " << filename << ".";
-
-  if (ready())
-    emit readyChanged(ready());
-  emit loaded();
   return true;
 }
 

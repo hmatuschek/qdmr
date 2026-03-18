@@ -29,12 +29,12 @@ MergeTest::testMergeRadioIds() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->radioIDs()->count(), 3);
-  QCOMPARE(merged->radioIDs()->getId(0)->name(), "ID 0");
-  QCOMPARE(merged->radioIDs()->getId(0)->as<DMRRadioID>()->number(), 1234);
-  QCOMPARE(merged->radioIDs()->getId(1)->name(), "ID 1");
-  QCOMPARE(merged->radioIDs()->getId(1)->as<DMRRadioID>()->number(), 1234);
-  QCOMPARE(merged->radioIDs()->getId(2)->name(), "ID 2");
-  QCOMPARE(merged->radioIDs()->getId(2)->as<DMRRadioID>()->number(), 2345);
+  QCOMPARE(merged->radioIDs()->get(0)->name(), "ID 0");
+  QCOMPARE(merged->radioIDs()->get(0)->as<DMRRadioID>()->number(), 1234);
+  QCOMPARE(merged->radioIDs()->get(1)->name(), "ID 1");
+  QCOMPARE(merged->radioIDs()->get(1)->as<DMRRadioID>()->number(), 1234);
+  QCOMPARE(merged->radioIDs()->get(2)->name(), "ID 2");
+  QCOMPARE(merged->radioIDs()->get(2)->as<DMRRadioID>()->number(), 2345);
 
 
   merged = ConfigMerge::merge(base, merging,
@@ -44,12 +44,12 @@ MergeTest::testMergeRadioIds() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->radioIDs()->count(), 3);
-  QCOMPARE(merged->radioIDs()->getId(0)->name(), "ID 0");
-  QCOMPARE(merged->radioIDs()->getId(0)->as<DMRRadioID>()->number(), 1234);
-  QCOMPARE(merged->radioIDs()->getId(1)->name(), "ID 1");
-  QCOMPARE(merged->radioIDs()->getId(1)->as<DMRRadioID>()->number(), 2345);
-  QCOMPARE(merged->radioIDs()->getId(2)->name(), "ID 2");
-  QCOMPARE(merged->radioIDs()->getId(2)->as<DMRRadioID>()->number(), 2345);
+  QCOMPARE(merged->radioIDs()->get(0)->name(), "ID 0");
+  QCOMPARE(merged->radioIDs()->get(0)->as<DMRRadioID>()->number(), 1234);
+  QCOMPARE(merged->radioIDs()->get(1)->name(), "ID 1");
+  QCOMPARE(merged->radioIDs()->get(1)->as<DMRRadioID>()->number(), 2345);
+  QCOMPARE(merged->radioIDs()->get(2)->name(), "ID 2");
+  QCOMPARE(merged->radioIDs()->get(2)->as<DMRRadioID>()->number(), 2345);
 
 
   merged = ConfigMerge::merge(base, merging,
@@ -59,14 +59,14 @@ MergeTest::testMergeRadioIds() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->radioIDs()->count(), 4);
-  QCOMPARE(merged->radioIDs()->getId(0)->name(), "ID 0");
-  QCOMPARE(merged->radioIDs()->getId(0)->as<DMRRadioID>()->number(), 1234);
-  QCOMPARE(merged->radioIDs()->getId(1)->name(), "ID 1");
-  QCOMPARE(merged->radioIDs()->getId(1)->as<DMRRadioID>()->number(), 1234);
-  QCOMPARE(merged->radioIDs()->getId(2)->name(), "ID 1 (copy)");
-  QCOMPARE(merged->radioIDs()->getId(2)->as<DMRRadioID>()->number(), 2345);
-  QCOMPARE(merged->radioIDs()->getId(3)->name(), "ID 2");
-  QCOMPARE(merged->radioIDs()->getId(3)->as<DMRRadioID>()->number(), 2345);
+  QCOMPARE(merged->radioIDs()->get(0)->name(), "ID 0");
+  QCOMPARE(merged->radioIDs()->get(0)->as<DMRRadioID>()->number(), 1234);
+  QCOMPARE(merged->radioIDs()->get(1)->name(), "ID 1");
+  QCOMPARE(merged->radioIDs()->get(1)->as<DMRRadioID>()->number(), 1234);
+  QCOMPARE(merged->radioIDs()->get(2)->name(), "ID 1 (copy)");
+  QCOMPARE(merged->radioIDs()->get(2)->as<DMRRadioID>()->number(), 2345);
+  QCOMPARE(merged->radioIDs()->get(3)->name(), "ID 2");
+  QCOMPARE(merged->radioIDs()->get(3)->as<DMRRadioID>()->number(), 2345);
 }
 
 
@@ -88,11 +88,11 @@ MergeTest::testMergeContacts() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->contacts()->count(), 3);
-  QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->name(), "ID 0");
+  QCOMPARE(merged->contacts()->get(0)->name(), "ID 0");
   QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->number(), 1234);
-  QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->name(), "ID 1");
+  QCOMPARE(merged->contacts()->get(1)->name(), "ID 1");
   QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->number(), 1234);
-  QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->name(), "ID 2");
+  QCOMPARE(merged->contacts()->get(2)->name(), "ID 2");
   QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->number(), 2345);
 
   merged = ConfigMerge::merge(base, merging,
@@ -102,11 +102,11 @@ MergeTest::testMergeContacts() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->contacts()->count(), 3);
-  QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->name(), "ID 0");
+  QCOMPARE(merged->contacts()->get(0)->name(), "ID 0");
   QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->number(), 1234);
-  QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->name(), "ID 1");
+  QCOMPARE(merged->contacts()->get(1)->name(), "ID 1");
   QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->number(), 2345);
-  QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->name(), "ID 2");
+  QCOMPARE(merged->contacts()->get(2)->name(), "ID 2");
   QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->number(), 2345);
 
   merged = ConfigMerge::merge(base, merging,
@@ -116,13 +116,13 @@ MergeTest::testMergeContacts() {
     QFAIL(err.format().toLocal8Bit().constData());
 
   QCOMPARE(merged->contacts()->count(), 4);
-  QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->name(), "ID 0");
+  QCOMPARE(merged->contacts()->get(0)->name(), "ID 0");
   QCOMPARE(merged->contacts()->get(0)->as<DMRContact>()->number(), 1234);
-  QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->name(), "ID 1");
+  QCOMPARE(merged->contacts()->get(1)->name(), "ID 1");
   QCOMPARE(merged->contacts()->get(1)->as<DMRContact>()->number(), 1234);
-  QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->name(), "ID 1 (copy)");
+  QCOMPARE(merged->contacts()->get(2)->name(), "ID 1 (copy)");
   QCOMPARE(merged->contacts()->get(2)->as<DMRContact>()->number(), 2345);
-  QCOMPARE(merged->contacts()->get(3)->as<DMRContact>()->name(), "ID 2");
+  QCOMPARE(merged->contacts()->get(3)->name(), "ID 2");
   QCOMPARE(merged->contacts()->get(3)->as<DMRContact>()->number(), 2345);
 }
 
@@ -241,8 +241,8 @@ MergeTest::testMergeChannels() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
-    dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setContact(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupList(lst);
     base->channelList()->add(dch);
   }
 
@@ -264,8 +264,8 @@ MergeTest::testMergeChannels() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
-    dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setContact(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupList(lst);
     merging->channelList()->add(dch);
   }
 
@@ -286,8 +286,8 @@ MergeTest::testMergeChannels() {
 
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 144.0);
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->contact(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 
 
   merged = ConfigMerge::merge(base, merging,
@@ -305,8 +305,8 @@ MergeTest::testMergeChannels() {
 
   QVERIFY(merged->channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(merged->channelList()->channel(1)->rxFrequency().inMHz(), 145.0);
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->txContactObj(), merged->contacts()->contact(0)->as<DMRContact>());
-  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupListObj(), merged->rxGroupLists()->list(0));
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->contact(), merged->contacts()->contact(0)->as<DMRContact>());
+  QCOMPARE(merged->channelList()->channel(1)->as<DMRChannel>()->groupList(), merged->rxGroupLists()->list(0));
 }
 
 
@@ -331,8 +331,8 @@ MergeTest::testMergeZones() {
     dch->setName("DMR 0");
     dch->setRXFrequency(Frequency::fromMHz(144.0));
     dch->setTXFrequency(Frequency::fromMHz(144.0));
-    dch->setTXContactObj(base->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setContact(base->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupList(lst);
     base->channelList()->add(dch);
 
     Zone *zone = new Zone("Zone 0");
@@ -359,8 +359,8 @@ MergeTest::testMergeZones() {
     dch->setName("DMR 1");
     dch->setRXFrequency(Frequency::fromMHz(145.0));
     dch->setTXFrequency(Frequency::fromMHz(145.0));
-    dch->setTXContactObj(merging->contacts()->contact(0)->as<DMRContact>());
-    dch->setGroupListObj(lst);
+    dch->setContact(merging->contacts()->contact(0)->as<DMRContact>());
+    dch->setGroupList(lst);
     merging->channelList()->add(dch);
 
     Zone *zone = new Zone("Zone 0");

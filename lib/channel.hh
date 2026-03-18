@@ -7,6 +7,8 @@
 #include "configobject.hh"
 #include "configreference.hh"
 #include "signaling.hh"
+#include "interval.hh"
+#include "level.hh"
 
 #include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
@@ -18,8 +20,8 @@ class Config;
 class RXGroupList;
 class DMRContact;
 class ScanList;
-class APRSSystem;
-class PositioningSystem;
+class FMAPRSSystem;
+class PositionReportingSystem;
 class RoamingZone;
 class DMRRadioID;
 
@@ -35,19 +37,19 @@ class Channel: public ConfigObject
   Q_OBJECT
 
   /** The receive frequency of the channel in Hz. */
-  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency rxFrequency READ rxFrequency WRITE setRXFrequency)
   /** The transmit frequency of the channel in Hz. */
-  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency SCRIPTABLE false)
+  Q_PROPERTY(Frequency txFrequency READ txFrequency WRITE setTXFrequency)
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
-  Q_PROPERTY(unsigned timeout READ timeout WRITE setTimeout SCRIPTABLE false)
+  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout SCRIPTABLE false)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
   Q_PROPERTY(ScanListReference* scanListRef READ scanListRef)
   /** The VOX setting. */
-  Q_PROPERTY(unsigned vox READ vox WRITE setVOX SCRIPTABLE false)
+  Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The OpenGD77 channel extension. */
   Q_PROPERTY(OpenGD77ChannelExtension* openGD77 READ openGD77ChannelExtension WRITE setOpenGD77ChannelExtension)
   /** The TyT channel extension. */
@@ -112,9 +114,9 @@ public:
   /** Returns @c true if the transmit timeout is disabled. */
   bool timeoutDisabled() const;
   /** Returns the TX timeout (TOT) in seconds. */
-  unsigned timeout() const;
+  Interval timeout() const;
   /** (Re-)Sets the TX timeout (TOT) in seconds. */
-  bool setTimeout(unsigned dur);
+  bool setTimeout(const Interval &dur);
   /** Disables the transmit timeout. */
   void disableTimeout();
   /** Sets the timeout to the global default timeout. */
@@ -130,9 +132,9 @@ public:
   /** Returns @c true if the VOX is specified by the global default value. */
   bool defaultVOX() const;
   /** Returns the VOX level [0-10]. */
-  unsigned vox() const;
+  Level vox() const;
   /** Sets the VOX level [0-10]. */
-  void setVOX(unsigned level);
+  void setVOX(Level level);
   /** Sets the VOX level to the default value. */
   void setVOXDefault();
   /** Disables the VOX. */
@@ -179,12 +181,13 @@ protected:
   bool _defaultPower;
   /** The transmit power setting. */
   Power _power;
-  /** Transmit timeout in seconds. */
-  unsigned _txTimeOut;
+  /** Transmit timeout. If set to null, the global/default ToT interval is used. If set to
+   * infinity, ToT is disabled. */
+  Interval _txTimeOut;
   /** RX only flag. */
   bool _rxOnly;
   /** Holds the VOX level. */
-  unsigned _vox;
+  Level _vox;
   /** Default scan list of the channel. */
   ScanListReference _scanlist;
   /** Owns the OpenGD77 channel extension object. */
@@ -192,6 +195,7 @@ protected:
   /** Owns the TyT channel extension object. */
   TyTChannelExtension *_tytChannelExtension;
 };
+
 
 
 /** Base class for all analog channels.
@@ -209,6 +213,7 @@ public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
 };
+
 
 
 /** Extension to the @c AnalogChannel class to implement an analog FM channel.
@@ -232,7 +237,7 @@ class FMChannel: public AnalogChannel
   /** The band width of the channel. */
   Q_PROPERTY(Bandwidth bandwidth READ bandwidth WRITE setBandwidth)
   /** The APRS system. */
-  Q_PROPERTY(APRSSystemReference* aprs READ aprs WRITE setAPRS)
+  Q_PROPERTY(FMAPRSSystemReference* aprs READ aprsRef)
 
   /** The AnyTone FM channel extension. */
   Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
@@ -295,15 +300,13 @@ public:
   bool setBandwidth(Bandwidth bw);
 
   /** Returns the reference to the APRS system. */
-  const APRSSystemReference *aprs() const;
+  const FMAPRSSystemReference *aprsRef() const;
   /** Returns the reference to the APRS system. */
-  APRSSystemReference *aprs();
-  /** Sets the APRS system reference. */
-  void setAPRS(APRSSystemReference *ref);
+  FMAPRSSystemReference *aprsRef();
   /** Returns the APRS system used for this channel or @c nullptr if disabled. */
-  APRSSystem *aprsSystem() const;
+  FMAPRSSystem *aprs() const;
   /** Sets the APRS system. */
-  void setAPRSSystem(APRSSystem *sys);
+  void setAPRS(FMAPRSSystem *sys);
 
   /** Returns the FM channel extension for AnyTone devices.
    * If this extension is not set, returns @c nullptr. */
@@ -330,11 +333,60 @@ protected:
   /** The channel bandwidth. */
 	Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
-  APRSSystemReference _aprsSystem;
+  FMAPRSSystemReference _aprsSystem;
 
   /** Owns the AnyTone FM channel extension. */
   AnytoneFMChannelExtension *_anytoneExtension;
 };
+
+
+
+/** Extension to the @c AnalogChannel class to implement an analog AM channel.
+ *
+ * This class implements all the properties specific to an AM channel. These channels are usually
+ * used to represent air-band channels. So there are not that many settings.
+ *
+ * @ingroup conf */
+class AMChannel: public AnalogChannel
+{
+  Q_OBJECT
+
+  /** The squelch level of the channel [1-10]. */
+  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
+
+public:
+  /** Constructs a new empty AM channel. */
+  Q_INVOKABLE explicit AMChannel(QObject *parent=nullptr);
+
+  bool copy(const ConfigItem &other) override;
+  ConfigItem *clone() const override;
+  void clear() override;
+
+  /** Returns @c true if the global default squelch level is used. */
+  bool defaultSquelch() const;
+  /** Returns @c true if the squelch is disabled. */
+  bool squelchDisabled() const;
+  /** Returns the squelch level [0,10]. */
+  unsigned squelch() const;
+  /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
+  bool setSquelch(unsigned squelch);
+  /** Disables the quelch. */
+  void disableSquelch();
+  /** Sets the squelch to the global default value. */
+  void setSquelchDefault();
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack()) override;
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+
+protected:
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack()) override;
+
+protected:
+  /** Holds the squelch level [0,10]. */
+  unsigned _squelch;
+};
+
 
 
 /** Base class of all digital channels.
@@ -354,6 +406,7 @@ public:
 };
 
 
+
 /** Extension to the @c DigitalChannel class to implement an DMR channel.
  *
  * That is, the admit criterion, color code, time slot, RX group list and TX contact.
@@ -370,15 +423,15 @@ class DMRChannel: public DigitalChannel
   /** The time slot of the channel. */
   Q_PROPERTY(TimeSlot timeSlot READ timeSlot WRITE setTimeSlot)
   /** The radio ID. */
-  Q_PROPERTY(DMRRadioIDReference* radioId READ radioId WRITE setRadioId)
+  Q_PROPERTY(DMRRadioIDReference* radioId READ radioIdRef)
   /** The rx group list. */
-  Q_PROPERTY(GroupListReference* groupList READ groupList WRITE setGroupList)
+  Q_PROPERTY(GroupListReference* groupList READ groupListRef)
   /** The tx contact. */
-  Q_PROPERTY(DMRContactReference* contact READ contact WRITE setContact)
+  Q_PROPERTY(DMRContactReference* contact READ contactRef)
   /** The positioning system. */
-  Q_PROPERTY(PositioningSystemReference* aprs READ aprs WRITE setAPRS)
+  Q_PROPERTY(PositioningSystemReference* aprs READ aprsRef)
   /** The roaming zone. */
-  Q_PROPERTY(RoamingZoneReference* roaming READ roaming WRITE setRoaming)
+  Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef)
 
   /** The commercial channel extension. */
   Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
@@ -424,59 +477,49 @@ public:
 	bool setTimeSlot(TimeSlot ts);
 
   /** Returns a reference to the group list. */
-  const GroupListReference *groupList() const;
+  const GroupListReference *groupListRef() const;
   /** Returns a reference to the group list. */
-  GroupListReference *groupList();
-  /** Sets the reference to the group list. */
-  void setGroupList(GroupListReference *ref);
+  GroupListReference *groupListRef();
   /** Returns the RX group list for the channel. */
-  RXGroupList *groupListObj() const;
+  RXGroupList *groupList() const;
   /** (Re-)Sets the RX group list for the channel. */
-  bool setGroupListObj(RXGroupList *rxg);
+  bool setGroupList(RXGroupList *rxg);
 
-  /** Returns a reference to the transmit contact. */
-  const DMRContactReference *contact() const;
-  /** Returns a reference to the transmit contact. */
-  DMRContactReference *contact();
-  /** Sets the reference to the transmit contact. */
-  void setContact(DMRContactReference *ref);
+  /** Returns a reference to the transmit contactRef. */
+  const DMRContactReference *contactRef() const;
+  /** Returns a reference to the transmit contactRef. */
+  DMRContactReference *contactRef();
   /** Returns the default TX contact to call on this channel. */
-  DMRContact *txContactObj() const;
+  DMRContact *contact() const;
   /** (Re-) Sets the default TX contact for this channel. */
-  bool setTXContactObj(DMRContact *c);
+  bool setContact(DMRContact *c);
 
   /** Returns a reference to the positioning system. */
-  const PositioningSystemReference *aprs() const;
+  const PositioningSystemReference *aprsRef() const;
   /** Returns a reference to the positioning system. */
-  PositioningSystemReference *aprs();
-  /** Sets the reference to the positioning system. */
-  void setAPRS(PositioningSystemReference *ref);
+  PositioningSystemReference *aprsRef();
   /** Returns the GPS system associated with this channel or @c nullptr if not set. */
-  PositioningSystem *aprsObj() const;
+  PositionReportingSystem *aprs() const;
   /** Associates the GPS System with this channel. */
-  bool setAPRSObj(PositioningSystem *sys);
+  bool setAPRS(PositionReportingSystem *sys);
 
-  /** Returns a reference to the roaming zone. */
-  const RoamingZoneReference *roaming() const;
-  /** Returns a reference to the roaming zone. */
-  RoamingZoneReference *roaming();
-  /** Sets the reference to the roaming zone. */
-  void setRoaming(RoamingZoneReference *ref);
+  /** Returns a reference to the roamingRef zone. */
+  const RoamingZoneReference *roamingRef() const;
+  /** Returns a reference to the roamingRef zone. */
+  RoamingZoneReference *roamingRef();
   /** Returns the roaming zone associated with this channel or @c nullptr if not set. */
-  RoamingZone *roamingZone() const;
+  RoamingZone *roaming() const;
   /** Associates the given roaming zone with this channel. */
-  bool setRoamingZone(RoamingZone *zone);
+  bool setRoaming(RoamingZone *zone);
 
   /** Returns the reference to the radio ID. */
-  const DMRRadioIDReference *radioId() const;
+  const DMRRadioIDReference *radioIdRef() const;
   /** Returns the reference to the radio ID. */
-  DMRRadioIDReference *radioId();
-  /** Sets the reference to the radio ID. */
-  void setRadioId(DMRRadioIDReference *ref);
+  DMRRadioIDReference *radioIdRef();
   /** Returns the radio ID associated with this channel. */
-  DMRRadioID *radioIdObj() const;
+  DMRRadioID *radioId() const;
   /** Associates the given radio ID with this channel. */
-  bool setRadioIdObj(DMRRadioID *id);
+  bool setRadioId(DMRRadioID *id);
 
   /** Returns the extension for commercial features. */
   CommercialChannelExtension *commercialExtension() const;
@@ -494,11 +537,11 @@ public:
 
 protected:
   /** The admit criterion. */
-	Admit _admit;
+  Admit _admit;
   /** The channel color code. */
-	unsigned _colorCode;
+  unsigned _colorCode;
   /** The time slot for the channel. */
-	TimeSlot _timeSlot;
+  TimeSlot _timeSlot;
   /** The RX group list for this channel. */
   GroupListReference _rxGroup;
   /** The default TX contact. */
@@ -515,6 +558,7 @@ protected:
   /** Owns the AnyTone DMR channel extension. */
   AnytoneDMRChannelExtension *_anytoneExtension;
 };
+
 
 
 /** Internal singleton class representing the "currently selected" channel.
@@ -542,6 +586,7 @@ protected:
   /** Holds the channel singleton instance. */
   static SelectedChannel *_instance;
 };
+
 
 
 /** Container class holding all channels (analog and digital) for a specific configuration

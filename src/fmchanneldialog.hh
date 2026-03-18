@@ -1,18 +1,18 @@
-#ifndef ANALOGCHANNELDIALOG_HH
-#define ANALOGCHANNELDIALOG_HH
+#ifndef FMCHANNELDIALOG_H
+#define FMCHANNELDIALOG_H
 
 #include <QDialog>
 #include "config.hh"
 
-#include "ui_analogchanneldialog.h"
+#include "ui_fmchanneldialog.h"
 
-class AnalogChannelDialog: public QDialog, private Ui::AnalogChannelDialog
+class FMChannelDialog: public QDialog, private Ui::AnalogChannelDialog
 {
   Q_OBJECT
 
 public:
-  AnalogChannelDialog(Config *config, QWidget *parent=nullptr);
-  AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
+  FMChannelDialog(Config *config, QWidget *parent=nullptr);
+  FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
 
   FMChannel *channel();
 
@@ -44,4 +44,4 @@ protected:
 };
 
 
-#endif // ANALOGCHANNELDIALOG_HH
+#endif // FMCHANNELDIALOG_H

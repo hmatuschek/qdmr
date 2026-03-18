@@ -16,12 +16,12 @@ class ScanList : public ConfigObject
   Q_OBJECT
   Q_CLASSINFO("IdPrefix", "scan")
 
-  /** The primary channel. */
-  Q_PROPERTY(ChannelReference* primary READ primary)
+  /** The primaryRef channel. */
+  Q_PROPERTY(ChannelReference* primary READ primaryChannelRef)
   /** The secondary channel. */
-  Q_PROPERTY(ChannelReference* secondary READ secondary)
+  Q_PROPERTY(ChannelReference* secondary READ secondaryChannelRef)
   /** The revert channel. */
-  Q_PROPERTY(ChannelReference* revert READ revert)
+  Q_PROPERTY(ChannelReference* revert READ revertChannelRef)
   /** The list of channels. */
   Q_PROPERTY(ChannelRefList * channels READ channels)
 
@@ -60,27 +60,27 @@ public:
   ChannelRefList *channels();
 
   /** Returns the primary channel reference. */
-  const ChannelReference *primary() const;
+  const ChannelReference *primaryChannelRef() const;
   /** Returns the primary channel reference. */
-  ChannelReference *primary();
+  ChannelReference *primaryChannelRef();
   /** Returns the priority channel. */
   Channel *primaryChannel() const;
   /** Sets the priority channel. */
   void setPrimaryChannel(Channel *channel);
 
   /** Returns the secondary channel reference. */
-  const ChannelReference *secondary() const;
+  const ChannelReference *secondaryChannelRef() const;
   /** Returns the secondary channel reference. */
-  ChannelReference *secondary();
+  ChannelReference *secondaryChannelRef();
   /** Returns the secondary priority channel. */
   Channel *secondaryChannel() const;
   /** Sets the secondary priority channel. */
   void setSecondaryChannel(Channel *channel);
 
   /** Returns the revert channel reference. */
-  const ChannelReference *revert() const;
+  const ChannelReference *revertChannelRef() const;
   /** Returns the revert channel reference. */
-  ChannelReference *revert();
+  ChannelReference *revertChannelRef();
   /** Returns the TX channel. */
   Channel *revertChannel() const;
   /** Sets the TX channel. */

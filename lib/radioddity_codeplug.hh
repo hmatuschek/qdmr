@@ -87,9 +87,9 @@ public:
     virtual void setMode(Mode mode);
 
     /** Returns the TX timeout in seconds. A value of 0 means disabled. */
-    virtual unsigned txTimeOut() const;
+    virtual Interval txTimeOut() const;
     /** Sets the TX timeout in seconds. Setting it to 0 disables the timeout. */
-    virtual void setTXTimeOut(unsigned tot);
+    virtual void setTXTimeOut(const Interval &tot);
     /** Returns the transmit time-out re-key delay in seconds. */
     virtual unsigned txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */
@@ -1000,9 +1000,9 @@ public:
     virtual void setMonitorType(MonitorType type);
 
     /** Returns the VOX sensitivity [1-10], 0=disabled. */
-    virtual unsigned voxSensitivity() const;
+    virtual Level voxSensitivity() const;
     /** Sets the VOX sensitivity. */
-    virtual void setVOXSensitivity(unsigned value);
+    virtual void setVOXSensitivity(Level value);
 
     /** Returns the low-battery warn interval in seconds. */
     virtual unsigned lowBatteryWarnInterval() const;
@@ -1130,6 +1130,13 @@ public:
     virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Updates the given config from this settings. */
     virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // VOX sensitivity settings.
+      static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
   };
 
   /** Implements the base class of button settings for all Radioddity codeplugs.

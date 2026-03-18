@@ -34,8 +34,8 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "vox", new RadioLimitLevel() },
+        { "tot", new RadioLimitInterval() }
       });
 
   /* Define limits for radio IDs. */
@@ -82,9 +82,9 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
               {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
@@ -96,7 +96,7 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRef(APRSSystem::staticMetaObject)},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
             } },
@@ -106,9 +106,9 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
               {"rxFrequency", new RadioLimitFrequencies(rxFreqRanges, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
@@ -121,7 +121,7 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
               {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
               {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false)},
-              {"aprs", new RadioLimitObjRef(PositioningSystem::staticMetaObject, true)},
+              {"aprs", new RadioLimitObjRef(PositionReportingSystem::staticMetaObject, true)},
               {"roaming", new RadioLimitObjRef(RoamingZone::staticMetaObject, true) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
@@ -151,12 +151,12 @@ DMR6X2UV2Limits::DMR6X2UV2Limits(const std::initializer_list<std::pair<Frequency
 
   /* Handle positioning systems. */
   add("positioning", new RadioLimitList{
-        { GPSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
+        { DMRAPRSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
             { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
-        { APRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
+        { FMAPRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
             { "period", new RadioLimitUInt(0, 7650) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },

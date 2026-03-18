@@ -594,7 +594,7 @@ OpenRTXCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const 
                     << " for channel '" << c->name() << "': Index not found.";
         return false;
       }
-      dmr->setTXContactObj(ctx.get<DMRContact>(dmrContactIndex()));
+      dmr->setContact(ctx.get<DMRContact>(dmrContactIndex()));
     }
   }
 
@@ -640,13 +640,13 @@ OpenRTXCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, 
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dmr = c->as<DMRChannel>();
     setMode(Mode_DMR);
-    if (! dmr->groupList()->isNull())
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (! dmr->groupListRef()->isNull())
+      setGroupListIndex(ctx.index(dmr->groupList()));
     setTXColorCode(dmr->colorCode());
     setRXColorCode(dmr->colorCode());
     setTimeslot(dmr->timeSlot());
-    if (! dmr->contact()->isNull())
-      setDMRContactIndex(ctx.index(dmr->txContactObj()));
+    if (! dmr->contactRef()->isNull())
+      setDMRContactIndex(ctx.index(dmr->contact()));
   }
 
   return true;

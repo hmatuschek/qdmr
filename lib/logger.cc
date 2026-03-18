@@ -66,7 +66,7 @@ LogHandler::~LogHandler() {
 Logger *Logger::_instance = nullptr;
 
 Logger::Logger()
-  : QObject(nullptr), _handler()
+  : QObject(nullptr), _handler(), _lock()
 {
   // pass...
 }
@@ -77,9 +77,11 @@ Logger::~Logger() {
 
 void
 Logger::log(const LogMessage &msg) {
+  _lock.lock();
   foreach (LogHandler *handler, _handler) {
     handler->handle(msg);
   }
+  _lock.unlock();
 }
 
 void

@@ -3,9 +3,9 @@
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-    _squelch(1), _power(Channel::Power::High), _vox(0), _transmitTimeOut(0),
-    _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
-    _radioddityExtension(nullptr), _anytoneExtension(nullptr)
+  _squelch(1), _power(Channel::Power::High), _vox(Level::null()), _transmitTimeOut(Interval::infinity()),
+  _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
+  _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
   // pass
 }
@@ -115,39 +115,48 @@ RadioSettings::setPower(Channel::Power power) {
 
 bool
 RadioSettings::voxDisabled() const {
-  return 0 == vox();
+  return _vox.isNull();
 }
-unsigned
+Level
 RadioSettings::vox() const {
   return _vox;
 }
 void
-RadioSettings::setVOX(unsigned level) {
+RadioSettings::setVOX(Level level) {
+  if (_vox == level)
+    return;
   _vox = level;
   emit modified(this);
 }
 void
 RadioSettings::disableVOX() {
-  setVOX(0);
+  setVOX(Level::null());
 }
+
 
 bool
 RadioSettings::totDisabled() const {
-  return 0==tot();
+  return _transmitTimeOut.isInfinite() || _transmitTimeOut.isNull();
 }
-unsigned
+
+Interval
 RadioSettings::tot() const {
   return _transmitTimeOut;
 }
+
 void
-RadioSettings::setTOT(unsigned sec) {
+RadioSettings::setTOT(const Interval &sec) {
+  if (_transmitTimeOut == sec)
+    return;
   _transmitTimeOut = sec;
   emit modified(this);
 }
+
 void
 RadioSettings::disableTOT() {
-  setTOT(0);
+  setTOT(Interval::infinity());
 }
+
 
 DMRRadioIDReference *
 RadioSettings::defaultIdRef() const {
@@ -228,4 +237,41 @@ RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
 void
 RadioSettings::onExtensionModified() {
   emit modified(this);
+}
+
+
+bool
+RadioSettings::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  if (! node)
+    return false;
+
+  if (! node.IsMap()) {
+    errMsg(err) << node.Mark().line << ":" << node.Mark().column
+                << ": Cannot parse radio settings: Expected object.";
+    return false;
+  }
+
+  if (! node["tot"]) {
+    disableTOT();
+  } else if (node["tot"] && node["tot"].IsScalar()) {
+    Interval to;
+    if (! to.parse(QString::fromStdString(node["tot"].as<std::string>()), Interval::Format::Seconds))
+      disableTOT();
+    else
+      setTOT(to);
+  }
+
+  return ConfigItem::parse(node, ctx, err);
+}
+
+
+bool
+RadioSettings::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
+  if (! ConfigItem::populate(node, context, err))
+    return false;
+
+  if (! totDisabled())
+    node["tot"] = tot().format().toStdString();
+
+  return true;
 }
