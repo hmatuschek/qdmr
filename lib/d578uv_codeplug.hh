@@ -981,9 +981,9 @@ public:
     virtual void setMicSpeakerSource(AnytoneAudioSettingsExtension::HandsetSpeakerSource source);
 
     /** Returns the GPS mode. */
-    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
+    virtual GNSSSettings::Systems gpsMode() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+    virtual void setGPSMode(GNSSSettings::Systems mode);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;

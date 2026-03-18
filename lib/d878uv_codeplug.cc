@@ -2033,8 +2033,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  // Set measurement system based on system locale (0x00==Metric)
-  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
@@ -2104,7 +2104,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -2137,6 +2136,10 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -2200,9 +2203,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(
-        this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                   AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
 
@@ -2404,13 +2404,25 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
   setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
-AnytoneGPSSettingsExtension::GPSMode
+GNSSSettings::Systems
 D878UVCodeplug::ExtendedSettingsElement::gpsMode() const {
-  return (AnytoneGPSSettingsExtension::GPSMode)getUInt8(Offset::gpsMode());
+  switch ((GNSS)getUInt8(Offset::gpsMode())) {
+  case GNSS::GPS: return GNSSSettings::System::GPS;
+  case GNSS::Beidou: return GNSSSettings::System::Beidou;
+  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
+  }
+  return GNSSSettings::System::GPS;
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
-  setUInt8(Offset::gpsMode(), (unsigned)mode);
+D878UVCodeplug::ExtendedSettingsElement::setGPSMode(GNSSSettings::Systems mode) {
+  int value = 0;
+  if (mode.testFlag(GNSSSettings::System::GPS))
+    value = (int)GNSS::GPS;
+  if (mode.testFlag(GNSSSettings::System::Beidou))
+    value = (int)GNSS::Beidou;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
+    value = (int)GNSS::Both;
+  setUInt8(Offset::gpsMode(), value);
 }
 
 Interval
@@ -2651,6 +2663,9 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode GPS settings
+  setGPSMode(ctx.config()->settings()->gnss()->systems());
+
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
     setFMMicGain(ctx.config()->settings()->micLevel());
@@ -2714,9 +2729,6 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
             ext->autoRepeaterSettings()->uhf2Ref()->as<AnytoneAutoRepeaterOffset>()));
   }
 
-  // Encode GPS settings
-  setGPSMode(ext->gpsSettings()->mode());
-
   // Encode roaming settings
   enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
 
@@ -2733,6 +2745,9 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
+
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(this->gpsMode());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -2780,9 +2795,6 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->autoRepeaterSettings()->setVHF2Max(this->autoRepeaterVHF2MaxFrequency());
   ext->autoRepeaterSettings()->setUHF2Min(this->autoRepeaterUHF2MinFrequency());
   ext->autoRepeaterSettings()->setUHF2Max(this->autoRepeaterUHF2MaxFrequency());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(this->gpsMode());
 
   // Store roaming settings
   ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());
@@ -2947,7 +2959,7 @@ D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
   return QGeoCoordinate(latitude, longitude, height_ft/3.281);
 }
 void
-D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
+D878UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &loc) {
   double latitude = loc.latitude();
   bool south = (0 > latitude); latitude = std::abs(latitude);
   unsigned lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
@@ -2968,12 +2980,10 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
   setUInt8(Offset::fixedLonSec(), lon_sec);
   setUInt8(Offset::fixedLonWest(), (west ? 0x01 : 0x00));
   setUInt16_le(Offset::fixedHeight(), height_ft);
-  // enable fixed location.
-  setUInt8(Offset::fixedLocation(), 0x01);
 }
 void
-D878UVCodeplug::APRSSettingsElement::disableFixedLocation() {
-  setUInt8(Offset::fixedLocation(), 0x00);
+D878UVCodeplug::APRSSettingsElement::enableFixedLocation(bool enable) {
+  setUInt8(Offset::fixedLocation(), enable ? 0x01 : 0x00);
 }
 
 QString
@@ -3280,6 +3290,36 @@ D878UVCodeplug::APRSSettingsElement::clearFMFrequency(unsigned int n) {
   n = std::min(Limit::fmFrequencies()-1, n);
   setBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies(), 0);
 }
+
+
+bool
+D878UVCodeplug::APRSSettingsElement::fromConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Encode fixed location if valid
+  if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
+    setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
+    // Enable if there are no GNSS enabled
+    enableFixedLocation(
+          ctx.config()->settings()->gnss()->systems().testFlag(GNSSSettings::System::Fixed));
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (fixedLocation().isValid()) {
+    ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
+    if (fixedLocationEnabled())
+      ctx.config()->settings()->gnss()->setSystems(GNSSSettings::System::Fixed);
+  }
+
+  return true;
+}
+
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
@@ -4171,6 +4211,11 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
   FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
 
+  if (! aprs.fromConfig(ctx, err)) {
+    errMsg(err) << "Cannot encode global APRS settings.";
+    return false;
+  }
+
   // Encode APRS system (there can only be one)
   if (0 < ctx.count<FMAPRSSystem>()) {
     aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, aprsNames, err);
@@ -4203,6 +4248,11 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
                                           data(Offset::fmAPRSFrequencyNames()):
                                           nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
+
+  if (! aprs.updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot update global APRS settings.";
+    return false;
+  }
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {

@@ -5,11 +5,11 @@
 #include <QGeoCoordinate>
 
 
-class GNSSSettings : public ConfigItem
+class GNSSSettings : public ConfigExtension
 {
   Q_OBJECT
 
-  Q_PROPERTY(QGeoCoordinate fixedPosition READ fixedPosition WRITE setFixedPosition FINAL)
+  Q_PROPERTY(QString fixedPosition READ fixedPositionLocator WRITE setFixedPositionLocator FINAL)
   Q_PROPERTY(Systems systems READ systems WRITE setSystems FINAL)
   Q_PROPERTY(Units units READ units WRITE setUnits FINAL)
 
@@ -29,8 +29,12 @@ public:
 public:
   explicit GNSSSettings(QObject *parent = nullptr);
 
+  ConfigItem *clone() const override;
+
   const QGeoCoordinate &fixedPosition() const;
   void setFixedPosition(const QGeoCoordinate &pos);
+  QString fixedPositionLocator() const;
+  void setFixedPositionLocator(const QString &locator);
 
   Systems systems() const;
   void setSystems(Systems systems);
@@ -46,5 +50,44 @@ protected:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(GNSSSettings::Systems)
 
+namespace YAML
+{
+  /** Implements the conversion to and from YAML::Node. */
+  template<>
+  struct convert<QGeoCoordinate>
+  {
+    /** Serializes the frequency. */
+    static Node encode(const QGeoCoordinate& rhs) {
+      if (! rhs.isValid())
+        return Node(YAML::Null);
+
+      Node list;
+      list["longitude"] = rhs.longitude();
+      list["latitude"]  = rhs.latitude();
+      if (std::isfinite(rhs.altitude()))
+        list["altitude"]  = rhs.altitude();
+      return list;
+    }
+
+    /** Parses the frequency. */
+    static bool decode(const Node& node, QGeoCoordinate& rhs) {
+      if (node.IsNull()) {
+        rhs = QGeoCoordinate();
+        return true;
+      }
+      if (! node.IsMap())
+        return false;
+      if ((!node["longitude"]) || (!node["longitude"].IsScalar()))
+        return false;
+      if ((!node["latitude"]) || (!node["latitude"].IsScalar()))
+        return false;
+      rhs.setLongitude(node["longitude"].as<double>(std::numeric_limits<double>::quiet_NaN()));
+      rhs.setLatitude(node["latitude"].as<double>(std::numeric_limits<double>::quiet_NaN()));
+      if (node["altitude"] && node["altitude"].IsScalar())
+        rhs.setAltitude(node["altitude"].as<double>(std::numeric_limits<double>::quiet_NaN()));
+      return true;
+    }
+  };
+}
 
 #endif // GNSSSETTINGS_HH

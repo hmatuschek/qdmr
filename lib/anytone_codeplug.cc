@@ -1614,6 +1614,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setSquelchLevelB(ctx.config()->settings()->squelch()/2);
   }
 
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
   // Handle extensions
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
     setAutoShutdownDelay(ext->powerSaveSettings()->autoShutdown());
@@ -1728,7 +1730,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
     // Encode GPS Settings
     setGPSTimeZone(ext->gpsSettings()->timeZone());
-    enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
 
     // Encode other settings
     enableKeepLastCaller(ext->keepLastCallerEnabled());
@@ -1747,6 +1748,10 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
 
   // Set extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1832,8 +1837,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Store GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(gpsTimeZone());
 
   // Other settings
@@ -2361,6 +2364,14 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
 
+  // Encode fixed location if valid
+  if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
+    setLocation(ctx.config()->settings()->gnss()->fixedPosition());
+    // Enable if there are no GNSS enabled
+    enableFixedLocation(
+          ctx.config()->settings()->gnss()->systems().testFlag(GNSSSettings::System::Fixed));
+  }
+
   if (1 < ctx.count<DMRAPRSSystem>()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
   } else if (0 == ctx.count<DMRAPRSSystem>()) {
@@ -2382,6 +2393,18 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   }
   return true;
 }
+
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (location().isValid()) {
+    ctx.config()->settings()->gnss()->setFixedPosition(location());
+    if (fixedLocation())
+      ctx.config()->settings()->gnss()->setSystems(GNSSSettings::System::Fixed);
+  }
+  return true;
+}
+
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx) {

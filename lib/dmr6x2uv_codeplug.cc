@@ -1015,6 +1015,8 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
   // apply DMR-6X2UV specific settings.
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1067,7 +1069,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings.
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -1093,6 +1094,10 @@ bool
 DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1140,8 +1145,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());

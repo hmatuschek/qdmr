@@ -5,9 +5,11 @@
 #include "interval.hh"
 #include "level.hh"
 #include "signaling.hh"
+#include "gnsssettings.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
+
 
 // Helper function to extract key names for a QMetaEnum
 inline QStringList enumKeys(const QMetaEnum &e) {
@@ -163,13 +165,15 @@ ConfigItem::copy(const ConfigItem &other) {
     }
 
     // true if the property is a basic type
-    bool isBasicType = ( prop.isEnumType() || (QMetaType::Bool==prop.typeId()) ||
+    bool isBasicType = ( prop.isEnumType() || prop.isFlagType() ||
+                         (QMetaType::Bool==prop.typeId()) ||
                          (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
                          (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
                          (QString("Frequency")==prop.typeName()) ||
                          (QString("Interval")==prop.typeName()) ||
-                        (QString("Level")==prop.typeName()) ||
-                        (QString("SelectiveCall")==prop.typeName()));
+                         (QString("Level")==prop.typeName()) ||
+                         (QString("SelectiveCall")==prop.typeName()) ||
+                         (QString("QGeoCoordinate")==prop.typeName()));
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
@@ -256,7 +260,8 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
 
     // Handle comparison of basic types
-    if ((prop.isEnumType()) || (QMetaType::Bool == prop.typeId()) || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
+    if (prop.isEnumType() || prop.isFlagType() || (QMetaType::Bool == prop.typeId()) ||
+        (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
       int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
       if (a<b)
         return -1;
@@ -409,12 +414,17 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
-    if (! prop.isScriptable()) {
-      /*logDebug() << "Do not serialize property '"
-                 << prop.name() << "': Marked as not scriptable.";*/
+    if (! prop.isScriptable())
       continue;
-    }
-    if (prop.isEnumType()) {
+
+    if (prop.isFlagType()) {
+      QMetaEnum e = prop.enumerator();
+      QStringList keys = QString::fromLatin1(e.valueToKeys(prop.read(this).toInt())).split("|");
+      YAML::Node list;
+      for(auto key: keys)
+        list.push_back(key.toStdString());
+      node[prop.name()] = list;
+    } else if (prop.isEnumType()) {
       QMetaEnum e = prop.enumerator();
       QVariant value = prop.read(this);
       const char *key = e.valueToKey(value.toInt());
@@ -445,6 +455,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).value<Level>();
     } else if (QString("SelectiveCall") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
+    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<QGeoCoordinate>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
@@ -551,10 +563,39 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
     if (! prop.isScriptable())
       continue;
 
-    /// @todo With Qt 5.15, we can use the REQUIRED flag to check for mandatory properties.
-    /// However, Ubuntu 20.04 (Focal) comes with Qt 5.12.
+    if (prop.isRequired() && !node[prop.name()]) {
+      errMsg(err) << "Required property '" << prop.name() << "' not set!";
+      return false;
+    }
 
-    if (prop.isEnumType()) {
+    if (prop.isFlagType()) {
+      // If property is not set -> skip
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
+        continue;
+      // parse & check enum key
+      if (! node[prop.name()].IsSequence()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected list of enum key.";
+        return false;
+      }
+      QMetaEnum e = prop.enumerator();
+      QByteArray keys;
+      for (auto i: node[prop.name()]) {
+        if (!keys.isEmpty())
+          keys.append("|");
+        keys.append(i.as<std::string>());
+      }
+      bool ok=true; int value = e.keysToValue(keys.constData(), &ok);
+      if (! ok) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Unknown key-combination '" << keys << "' for enum '" << prop.name()
+                    << "'. Expected one of " << enumKeys(e).join(", ") << ".";
+        return false;
+      }
+      // finally set property
+      prop.write(this, value);
+    } else if (prop.isEnumType()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
@@ -687,6 +728,22 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
+    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+      // If property is not set -> skip
+      if ((! node[prop.name()]) || (node[prop.name()].IsNull())) {
+        prop.write(this, QVariant::fromValue(QGeoCoordinate()));
+        continue;
+      }
+      // parse & check type
+      if ((! node[prop.name()].IsMap()) || (2 > node[prop.name()].size())) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected geo coordinate.";
+        return false;
+      }
+      QGeoCoordinate value = node[prop.name()].as<QGeoCoordinate>(QGeoCoordinate());
+      qDebug() << "Write to property" << prop.name() << "value" << value;
+      prop.write(this, QVariant::fromValue(value));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;

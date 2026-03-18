@@ -4,6 +4,7 @@
 #include "configobject.hh"
 #include "channel.hh"
 
+#include "gnsssettings.hh"
 #include "radioddity_extensions.hh"
 #include "anytone_settingsextension.hh"
 #include "tyt_extensions.hh"
@@ -32,6 +33,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
+  /** The GNSS settings. */
+  Q_PROPERTY(GNSSSettings *gnss READ gnss);
   /** The settings extension for TyT devices. */
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
   /** The settings extension for Radioddity devices. */
@@ -104,6 +107,9 @@ public:
   /** Sets the default DMR ID. */
   void setDefaultId(DMRRadioID *id);
 
+  /** Returns the GNSS settings. */
+  GNSSSettings *gnss() const;
+
   /** Returns the TyT device specific radio settings. */
   TyTSettingsExtension *tytExtension() const;
   /** Sets the TyT device specific radio settings. */
@@ -147,6 +153,8 @@ protected:
   Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */
   DMRRadioIDReference *_defaultId;
+  /** The GNSS settings. */
+  GNSSSettings *_gnss;
   /** Device specific settings extension for TyT devices. */
   TyTSettingsExtension *_tytExtension;
   /** Device specific settings extension for Radioddity devices. */

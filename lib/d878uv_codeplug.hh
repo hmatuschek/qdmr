@@ -6,6 +6,7 @@
 #include "d868uv_codeplug.hh"
 #include "signaling.hh"
 #include "gpssystem.hh"
+#include "gnsssettings.hh"
 
 class Channel;
 class DMRContact;
@@ -892,6 +893,12 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
+    /** Encoding of possible GNSSs. */
+    enum class GNSS {
+      GPS=0, Beidou=1, Both = 2
+    };
+
+  protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
@@ -970,9 +977,9 @@ public:
     virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
-    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
+    virtual GNSSSettings::Systems gpsMode() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+    virtual void setGPSMode(GNSSSettings::Systems mode);
 
     /** Returns the STE (squelch tail elimination) duration. */
     virtual Interval steDuration() const;
@@ -1215,9 +1222,9 @@ public:
     /** Returns the fixed location send. */
     virtual QGeoCoordinate fixedLocation() const;
     /** Sets the fixed location to send. */
-    virtual void setFixedLocation(QGeoCoordinate &loc);
+    virtual void setFixedLocation(const QGeoCoordinate& loc);
     /** Disables sending a fixed location. */
-    virtual void disableFixedLocation();
+    virtual void enableFixedLocation(bool enable);
 
     /** Returns the destination call. */
     virtual QString destination() const;
@@ -1354,6 +1361,11 @@ public:
     virtual bool reportOther() const;
     /** Enables/disables report other flag. */
     virtual void enableReportOther(bool enable);
+
+    /** Encodes global APRS settings. */
+    virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Updates global APRS settings. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,

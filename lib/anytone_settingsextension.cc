@@ -228,8 +228,8 @@ AnytoneDMRSettingsExtension::setEncryption(EncryptionType type) {
  * Implementation of AnytoneGPSSettingsExtension
  * ********************************************************************************************* */
 AnytoneGPSSettingsExtension::AnytoneGPSSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _gpsUnits(Units::Metric), _timeZone(QTimeZone::utc()),
-    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300)), _mode(GPSMode::GPS)
+  : ConfigItem(parent), _timeZone(QTimeZone::utc()),
+    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300))
 {
   // pass...
 }
@@ -244,26 +244,17 @@ AnytoneGPSSettingsExtension::clone() const {
   return ext;
 }
 
-AnytoneGPSSettingsExtension::Units
-AnytoneGPSSettingsExtension::units() const {
-  return _gpsUnits;
-}
-void
-AnytoneGPSSettingsExtension::setUnits(Units units) {
-  if (_gpsUnits == units)
-    return;
-  _gpsUnits = units;
-  emit modified(this);
-}
 
 QTimeZone
 AnytoneGPSSettingsExtension::timeZone() const {
   return _timeZone;
 }
+
 QString
 AnytoneGPSSettingsExtension::ianaTimeZone() const {
   return QString::fromLocal8Bit(_timeZone.id());
 }
+
 void
 AnytoneGPSSettingsExtension::setTimeZone(const QTimeZone &zone) {
   if (_timeZone == zone)
@@ -271,15 +262,18 @@ AnytoneGPSSettingsExtension::setTimeZone(const QTimeZone &zone) {
   _timeZone = zone;
   emit modified(this);
 }
+
 void
 AnytoneGPSSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
+
 bool
 AnytoneGPSSettingsExtension::positionReportingEnabled() const {
   return _gpsRangeReporting;
 }
+
 void
 AnytoneGPSSettingsExtension::enablePositionReporting(bool enable) {
   if (_gpsRangeReporting == enable)
@@ -288,10 +282,12 @@ AnytoneGPSSettingsExtension::enablePositionReporting(bool enable) {
   emit modified(this);
 }
 
+
 Interval
 AnytoneGPSSettingsExtension::updatePeriod() const {
   return _gpsRangingInterval;
 }
+
 void
 AnytoneGPSSettingsExtension::setUpdatePeriod(Interval sec) {
   if (_gpsRangingInterval == sec)
@@ -300,17 +296,6 @@ AnytoneGPSSettingsExtension::setUpdatePeriod(Interval sec) {
   emit modified(this);
 }
 
-AnytoneGPSSettingsExtension::GPSMode
-AnytoneGPSSettingsExtension::mode() const {
-  return _mode;
-}
-void
-AnytoneGPSSettingsExtension::setMode(GPSMode mode) {
-  if (mode == _mode)
-    return;
-  _mode = mode;
-  emit modified(this);
-}
 
 
 /* ********************************************************************************************* *

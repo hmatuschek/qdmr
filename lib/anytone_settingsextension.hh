@@ -1494,10 +1494,6 @@ class AnytoneGPSSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  Q_CLASSINFO("unitsDescription", "Specifies the GPS units.")
-  /** The GPS units used. */
-  Q_PROPERTY(Units units READ units WRITE setUnits)
-
   Q_CLASSINFO("timeZoneDescription", "Specifies the GPS time-zone (IANA name).")
   /** The time-zone IANA Id. */
   Q_PROPERTY(QString timeZone READ ianaTimeZone WRITE setIANATimeZone)
@@ -1510,32 +1506,11 @@ class AnytoneGPSSettingsExtension: public ConfigItem
   /** GPS ranging interval in seconds. */
   Q_PROPERTY(Interval updatePeriod READ updatePeriod WRITE setUpdatePeriod)
 
-  /** The GPS mode. */
-  Q_PROPERTY(GPSMode mode READ mode WRITE setMode)
-
-public:
-  /** Possible unit systems. */
-  enum class Units {
-    Metric = 0, Archaic = 1
-  };
-  Q_ENUM(Units)
-
-  /** Possible GPS modes. */
-  enum class GPSMode {
-    GPS=0, Beidou=1, GPS_Beidou=2, Glonass=3, GPS_Glonas=4, Beidou_Glonass=5, All=6
-  };
-  Q_ENUM(GPSMode)
-
 public:
   /** Constructor. */
   explicit AnytoneGPSSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns the GPS units used. */
-  Units units() const;
-  /** Sets the GPS units. */
-  void setUnits(Units units);
 
   /** Returns the IANA ID of the time zone. */
   QString ianaTimeZone() const;
@@ -1556,17 +1531,10 @@ public:
   /** Sets the GPS ranging interval in seconds. */
   void setUpdatePeriod(Interval sec);
 
-  /** returns the GPS mode. */
-  GPSMode mode() const;
-  /** Sets the GPS mode. */
-  void setMode(GPSMode mode);
-
 protected:
-  Units _gpsUnits;                             ///< The GPS units.
   QTimeZone _timeZone;                         ///< The time zone.
   bool _gpsRangeReporting;                     ///< Enables GPS range reporting.
   Interval _gpsRangingInterval;                ///< The GPS ranging interval in seconds.
-  GPSMode _mode;                               ///< The GPS mode (GPS, Baidu, both).
 };
 
 

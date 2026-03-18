@@ -1,9 +1,22 @@
 #include "gnsssettings.hh"
+#include "utils.hh"
+
 
 GNSSSettings::GNSSSettings(QObject *parent)
-  : ConfigItem{parent}, _fixedPosition(), _systems(System::GPS), _units(Units::Metric)
+  : ConfigExtension{parent}, _fixedPosition(), _systems(System::GPS), _units(Units::Metric)
 {
   // pass...
+}
+
+
+ConfigItem *
+GNSSSettings::clone() const {
+  auto obj = new GNSSSettings();
+  if (! obj->copy(*this)) {
+    delete obj;
+    return nullptr;
+  }
+  return obj;
 }
 
 
@@ -18,6 +31,17 @@ GNSSSettings::setFixedPosition(const QGeoCoordinate &pos) {
     return;
   _fixedPosition = pos;
   emit modified(this);
+}
+
+
+QString
+GNSSSettings::fixedPositionLocator() const {
+  return deg2loc(fixedPosition(), 8);
+}
+
+void
+GNSSSettings::setFixedPositionLocator(const QString &locator) {
+  setFixedPosition(loc2deg(locator));
 }
 
 

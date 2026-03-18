@@ -1,5 +1,6 @@
 #include "configtest.hh"
 #include "config.hh"
+#include "gnsssettings.hh"
 #include "errorstack.hh"
 #include "melody.hh"
 #include <iostream>
@@ -147,6 +148,32 @@ ConfigTest::testMelodyDecoding() {
   QCOMPARE(melody.toLilypond(), lilypond);
   // infer() should also infer a BPM of 100
   QCOMPARE(melody.bpm(), 100);
+}
+
+
+void
+ConfigTest::testGNSSSettings() {
+  Config config; config.readYAML(":/data/config_test.yaml");
+  config.settings()->gnss()->setFixedPosition(QGeoCoordinate(52.4083544, 12.9763644));
+  config.settings()->gnss()->setSystems(GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
+
+  QString buffer;
+  QTextStream stream(&buffer);
+  ErrorStack err;
+  if (! config.toYAML(stream, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  qDebug() << buffer;
+
+  Config testConfig;
+  Config::Context ctx;
+  YAML::Node doc = YAML::Load(buffer.toStdString());
+  if (! testConfig.parse(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  if (! testConfig.link(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QCOMPARE(testConfig.settings()->gnss()->fixedPosition(), QGeoCoordinate(52.4083544, 12.9763644));
+  QCOMPARE(testConfig.settings()->gnss()->systems(), GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 }
 
 
