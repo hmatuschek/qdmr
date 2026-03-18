@@ -305,13 +305,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     node["timeout"] = timeout();
   }
 
-  if (defaultVOX()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["vox"] = def;
-  } else {
-    node["vox"] = vox();
-  }
-
   return true;
 }
 

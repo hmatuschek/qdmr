@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QMetaType>
-#include <algorithm>
 #include <limits>
 #include <yaml-cpp/yaml.h>
 #include "codeplug.hh"
@@ -96,6 +95,11 @@ struct convert<Level>
 {
   /** Serializes the interval. */
   static Node encode(const Level& rhs) {
+    if (rhs.isInvalid()) {
+      YAML::Node def = YAML::Node(YAML::NodeType::Scalar);
+      def.SetTag("!default");
+      return def;
+    }
     return Node(rhs.format().toStdString());
   }
 
