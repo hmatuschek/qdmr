@@ -2405,7 +2405,7 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
 }
 
 GNSSSettings::Systems
-D878UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+D878UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GNSS)getUInt8(Offset::gpsMode())) {
   case GNSS::GPS: return GNSSSettings::System::GPS;
   case GNSS::Beidou: return GNSSSettings::System::Beidou;
@@ -2414,7 +2414,7 @@ D878UVCodeplug::ExtendedSettingsElement::gpsMode() const {
   return GNSSSettings::System::GPS;
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setGPSMode(GNSSSettings::Systems mode) {
+D878UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
   int value = 0;
   if (mode.testFlag(GNSSSettings::System::GPS))
     value = (int)GNSS::GPS;
@@ -2664,7 +2664,7 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
     return false;
 
   // Encode GPS settings
-  setGPSMode(ctx.config()->settings()->gnss()->systems());
+  setGNSS(ctx.config()->settings()->gnss()->systems());
 
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
@@ -2747,7 +2747,7 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
     return false;
 
   // Store GPS settings
-  ctx.config()->settings()->gnss()->setSystems(this->gpsMode());
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -3300,8 +3300,7 @@ D878UVCodeplug::APRSSettingsElement::fromConfig(Context &ctx, const ErrorStack &
   if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
     setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
     // Enable if there are no GNSS enabled
-    enableFixedLocation(
-          ctx.config()->settings()->gnss()->systems().testFlag(GNSSSettings::System::Fixed));
+    enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
 
   return true;
@@ -3313,8 +3312,7 @@ D878UVCodeplug::APRSSettingsElement::updateConfig(Context &ctx, const ErrorStack
 
   if (fixedLocation().isValid()) {
     ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
-    if (fixedLocationEnabled())
-      ctx.config()->settings()->gnss()->setSystems(GNSSSettings::System::Fixed);
+    ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
   }
 
   return true;

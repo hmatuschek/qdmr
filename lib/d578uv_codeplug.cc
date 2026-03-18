@@ -2198,7 +2198,7 @@ D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(AnytoneAudioSetting
 
 
 GNSSSettings::Systems
-D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+D578UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GPSMode)getUInt8(Offset::gpsMode())) {
   case GPSMode::GPS: return GNSSSettings::System::GPS;
   case GPSMode::Beidou: return GNSSSettings::System::Beidou;
@@ -2208,7 +2208,7 @@ D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setGPSMode(GNSSSettings::Systems mode) {
+D578UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
   if (mode.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS);
   if (mode.testFlag(GNSSSettings::System::Beidou))
@@ -2944,7 +2944,7 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   }
 
   // Encode GPS settings
-  setGPSMode(ctx.config()->settings()->gnss()->systems());
+  setGNSS(ctx.config()->settings()->gnss()->systems());
 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -3036,7 +3036,7 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
     return false;
 
   // Store GPS settings
-  ctx.config()->settings()->gnss()->setSystems(this->gpsMode());
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();

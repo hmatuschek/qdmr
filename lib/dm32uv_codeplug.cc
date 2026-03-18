@@ -2608,14 +2608,24 @@ DM32UVCodeplug::GeneralSettingsElement::setPositionFormat(PositionFormat format)
 }
 
 
-DM32UVCodeplug::GeneralSettingsElement::GNSSMode
-DM32UVCodeplug::GeneralSettingsElement::gnssMode() const {
-  return (GNSSMode)getUInt2(Offset::gnssMode());
+GNSSSettings::Systems
+DM32UVCodeplug::GeneralSettingsElement::gnss() const {
+  switch ((GNSSMode)getUInt2(Offset::gnssMode())) {
+  case GNSSMode::GPS: return GNSSSettings::System::GPS;
+  case GNSSMode::Beidou: return GNSSSettings::System::Beidou;
+  case GNSSMode::Both: return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
+  }
+  return GNSSSettings::System::GPS;
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setGNSSMode(GNSSMode mode) {
-  setUInt2(Offset::gnssMode(), (unsigned int )mode);
+DM32UVCodeplug::GeneralSettingsElement::setGNSS(GNSSSettings::Systems mode) {
+  if (mode.testFlag(GNSSSettings::System::GPS))
+    setUInt2(Offset::gnssMode(), (unsigned int)GNSSMode::GPS);
+  if (mode.testFlag(GNSSSettings::System::Beidou))
+    setUInt2(Offset::gnssMode(), (unsigned int)GNSSMode::Beidou);
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
+    setUInt2(Offset::gnssMode(), (unsigned int)GNSSMode::Both);
 }
 
 
@@ -3240,6 +3250,7 @@ DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(unsigned int level) {
 bool
 DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
   ctx.config()->settings()->setIntroLine1(bootMessage1());
   ctx.config()->settings()->setIntroLine2(bootMessage2());
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
@@ -3250,6 +3261,8 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
     ctx.config()->settings()->setTOT(transmitTimeout());
   ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
   ctx.config()->smsExtension()->setFormat(smsFormat());
+
+  ctx.config()->settings()->gnss()->setSystems(gnss());
 
   return true;
 }
@@ -3273,6 +3286,8 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   setDMRMicLevel(ctx.config()->settings()->micLevel());
   if (ctx.config()->smsExtension())
     setSMSFormat(ctx.config()->smsExtension()->format());
+
+  setGNSS(ctx.config()->settings()->gnss()->systems());
 
   return true;
 }
@@ -3307,7 +3322,7 @@ DM32UVCodeplug::APRSSettingsElement::setUpdatePeriod(Interval interval) {
 
 
 bool
-DM32UVCodeplug::APRSSettingsElement::fixedLocationValid() const {
+DM32UVCodeplug::APRSSettingsElement::fixedLocationEnabled() const {
   return 0 != getUInt8(Offset::enableFixedLocation());
 }
 
@@ -3338,14 +3353,13 @@ DM32UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &coor
   QString latString, lonString;
   latString.asprintf("%02.6f%c",std::abs(coordinate.latitude()), coordinate.latitude()<0 ? 'S' : 'N');
   lonString.asprintf("%03.5f%c",std::abs(coordinate.longitude()), coordinate.longitude()<0 ? 'W' : 'E');
-  setUInt8(Offset::enableFixedLocation(), 1);
   writeASCII(Offset::fixedLocationLatitude(), latString, 10);
   writeASCII(Offset::fixedLocationLongitude(), lonString, 10);
 }
 
 void
-DM32UVCodeplug::APRSSettingsElement::clearFixedLocation() {
-  setUInt8(Offset::enableFixedLocation(), 0);
+DM32UVCodeplug::APRSSettingsElement::enableFixedLocation(bool enable) {
+  setUInt8(Offset::enableFixedLocation(), enable ? 0x01 : 0x02);
 }
 
 
@@ -3423,6 +3437,10 @@ bool
 DM32UVCodeplug::APRSSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  // GNSS settings
+  ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
+  ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
+
   if (0 == destinationId())
     return true;
 
@@ -3477,6 +3495,15 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
 bool
 DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  // GNSS settings
+  if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
+    setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
+    enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
+  }
+
+  ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
+  ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
 
   if (0 == ctx.count<DMRAPRSSystem>()) {
     setDestinationId(0);

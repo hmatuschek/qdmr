@@ -65,6 +65,21 @@ OpenGD77ChannelExtension::enablePowerSave(bool enable) {
   _powerSave = enable;
 }
 
+
+bool
+OpenGD77ChannelExtension::locationEnabled() const {
+  return _locationEnabled;
+}
+
+void
+OpenGD77ChannelExtension::enableLocation(bool enable) {
+  if (_locationEnabled == enable)
+    return;
+  _locationEnabled = enable;
+  emit modified(this);
+}
+
+
 const QGeoCoordinate &
 OpenGD77ChannelExtension::location() const {
   return _location;
@@ -77,9 +92,7 @@ OpenGD77ChannelExtension::setLocation(const QGeoCoordinate &loc) {
 
 QString
 OpenGD77ChannelExtension::locator() const {
-  if (_location.isValid())
-    return deg2loc(location(), 8);
-  return "";
+  return deg2loc(location(), 8);
 }
 
 void
@@ -138,48 +151,3 @@ void
 OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
   _timeSlotOverride = ts;
 }
-
-
-/* ******************************************************************************************** *
- * Implementation of OpenGD77APRSSystemExtension
- * ******************************************************************************************** */
-OpenGD77APRSSystemExtension::OpenGD77APRSSystemExtension(QObject *parent)
-  : ConfigExtension(parent), _location()
-{
-  // pass...
-}
-
-
-ConfigItem *
-OpenGD77APRSSystemExtension::clone() const {
-  auto ex = new OpenGD77APRSSystemExtension();
-  if (! ex->copy(*this)) {
-    ex->deleteLater();
-    return nullptr;
-  }
-  return ex;
-}
-
-
-const QGeoCoordinate &
-OpenGD77APRSSystemExtension::location() const {
-  return _location;
-}
-
-void
-OpenGD77APRSSystemExtension::setLocation(const QGeoCoordinate &loc) {
-  _location = loc;
-}
-
-QString
-OpenGD77APRSSystemExtension::locator() const {
-  if (_location.isValid())
-    return deg2loc(location(), 8);
-  return "";
-}
-
-void
-OpenGD77APRSSystemExtension::setLocator(const QString &loc) {
-  _location = loc2deg(loc);
-}
-

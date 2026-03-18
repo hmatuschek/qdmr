@@ -221,7 +221,7 @@ DMRAPRSSystem::serialize(const Context &context, const ErrorStack &err) {
 FMAPRSSystem::FMAPRSSystem(QObject *parent)
   : PositionReportingSystem(parent), _channel(), _destination(), _destSSID(0),
     _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
-    _anytone(nullptr), _openGD77(nullptr)
+    _anytone(nullptr)
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
@@ -239,7 +239,7 @@ FMAPRSSystem::FMAPRSSystem(const QString &name, FMChannel *channel, const QStrin
                        const Interval &period, QObject *parent)
   : PositionReportingSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
-    _anytone(nullptr), _openGD77(nullptr)
+    _anytone(nullptr)
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
@@ -412,22 +412,6 @@ FMAPRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
   }
 }
 
-OpenGD77APRSSystemExtension *
-FMAPRSSystem::openGD77Extension() const {
-  return _openGD77;
-}
-void
-FMAPRSSystem::setOpenGD77Extension(OpenGD77APRSSystemExtension *ext) {
-  if (_openGD77) {
-    _openGD77->deleteLater();
-    _openGD77 = nullptr;
-  }
-  if (ext) {
-    _openGD77 = ext;
-    ext->setParent(this);
-    connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
-  }
-}
 
 YAML::Node
 FMAPRSSystem::serialize(const Context &context, const ErrorStack &err) {

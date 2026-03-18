@@ -154,7 +154,7 @@ ConfigTest::testMelodyDecoding() {
 void
 ConfigTest::testGNSSSettings() {
   Config config; config.readYAML(":/data/config_test.yaml");
-  config.settings()->gnss()->setFixedPosition(QGeoCoordinate(52.4083544, 12.9763644));
+  config.settings()->gnss()->setFixedPositionLocator("JO62jl45");
   config.settings()->gnss()->setSystems(GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 
   QString buffer;
@@ -172,7 +172,7 @@ ConfigTest::testGNSSSettings() {
   if (! testConfig.link(doc, ctx, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
-  QCOMPARE(testConfig.settings()->gnss()->fixedPosition(), QGeoCoordinate(52.4083544, 12.9763644));
+  QCOMPARE(testConfig.settings()->gnss()->fixedPositionLocator(), "JO62jl45");
   QCOMPARE(testConfig.settings()->gnss()->systems(), GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 }
 

@@ -4,13 +4,23 @@
 #include "configobject.hh"
 #include <QGeoCoordinate>
 
-
+/** Some common global GNSS settings. */
 class GNSSSettings : public ConfigExtension
 {
   Q_OBJECT
 
+  Q_CLASSINFO("description", "Some common global GNSS settings.");
+
+  Q_CLASSINFO("fixedPositionEnabledDescription", "If enabled, the fixed position is used instead of the GNSS position.")
+  Q_PROPERTY(bool fixedPositionEnabled READ fixedPositionEnabled WRITE enableFixedPosition FINAL)
+
+  Q_CLASSINFO("fixedPositionDescription", "Some fixed position (locator).")
   Q_PROPERTY(QString fixedPosition READ fixedPositionLocator WRITE setFixedPositionLocator FINAL)
+
+  Q_CLASSINFO("systemsDescription", "Enabled GNSSs.")
   Q_PROPERTY(Systems systems READ systems WRITE setSystems FINAL)
+
+  Q_CLASSINFO("unitsDescrption", "Specifies unit system.")
   Q_PROPERTY(Units units READ units WRITE setUnits FINAL)
 
 public:
@@ -31,6 +41,9 @@ public:
 
   ConfigItem *clone() const override;
 
+  bool fixedPositionEnabled() const;
+  void enableFixedPosition(bool use);
+
   const QGeoCoordinate &fixedPosition() const;
   void setFixedPosition(const QGeoCoordinate &pos);
   QString fixedPositionLocator() const;
@@ -43,6 +56,7 @@ public:
   void setUnits(Units units);
 
 protected:
+  bool _fixedPositionEnabled;
   QGeoCoordinate _fixedPosition;
   Systems _systems;
   Units _units;

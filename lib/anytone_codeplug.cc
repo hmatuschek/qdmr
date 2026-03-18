@@ -2364,12 +2364,11 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
 
-  // Encode fixed location if valid
+  // Encode fixed location if valid and enabled
   if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
     setLocation(ctx.config()->settings()->gnss()->fixedPosition());
     // Enable if there are no GNSS enabled
-    enableFixedLocation(
-          ctx.config()->settings()->gnss()->systems().testFlag(GNSSSettings::System::Fixed));
+    enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
 
   if (1 < ctx.count<DMRAPRSSystem>()) {
@@ -2397,11 +2396,13 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
 
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   if (location().isValid()) {
     ctx.config()->settings()->gnss()->setFixedPosition(location());
-    if (fixedLocation())
-      ctx.config()->settings()->gnss()->setSystems(GNSSSettings::System::Fixed);
+    ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocation());
   }
+
   return true;
 }
 

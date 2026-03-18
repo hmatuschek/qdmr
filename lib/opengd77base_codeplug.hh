@@ -104,13 +104,13 @@ public:
     virtual void setTransmitTimeout(const Interval &interval);
 
     /** Returns @c true, if a fixed position is set for the channel. */
-    virtual bool hasFixedPosition() const;
+    virtual bool fixedPositionEnabled() const;
     /** Returns the fixed position. */
     virtual QGeoCoordinate fixedPosition() const;
     /** Sets the fixed position for this channel. */
     virtual void setFixedPosition(const QGeoCoordinate &coordinate);
     /** Resets the fixed position. */
-    virtual void clearFixedPosition();
+    virtual void enableFixedPosition(bool enable);
 
     /** Returns the RX subtone. */
     virtual SelectiveCall rxTone() const;
@@ -514,13 +514,13 @@ public:
     virtual void setSourceSSID(unsigned int ssid);
 
     /** Returns @c true, if a fixed position is send. */
-    virtual bool hasFixedPosition() const;
+    virtual bool fixedPositionEnabled() const;
     /** Returns the fixed position. */
     virtual QGeoCoordinate fixedPosition() const;
     /** Sets the fixed position. */
     virtual void setFixedPosition(const QGeoCoordinate &coor);
     /** Resets the fixed position. */
-    virtual void clearFixedPosition();
+    virtual void enableFixedPosition(bool enable);
 
     /** Returns the posiiton reporting precision. */
     virtual PositionPrecision positionPrecision() const;

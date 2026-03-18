@@ -99,45 +99,45 @@ public:
   bool encodeTimestamp();
 
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack());
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodePositioningSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
+  bool encodeButtonSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSetttings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPrivacyKeys();
-  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
-  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodePrivacyKeys(const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearTextMessages();
   bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err);

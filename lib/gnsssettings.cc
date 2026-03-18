@@ -20,6 +20,20 @@ GNSSSettings::clone() const {
 }
 
 
+bool
+GNSSSettings::fixedPositionEnabled() const {
+  return _fixedPosition.isValid() && (_fixedPositionEnabled || _systems.testFlag(System::Fixed));
+}
+
+void
+GNSSSettings::enableFixedPosition(bool use) {
+  if (_fixedPositionEnabled == use)
+    return;
+  _fixedPositionEnabled = use;
+  emit modified(this);
+}
+
+
 const QGeoCoordinate &
 GNSSSettings::fixedPosition() const {
   return _fixedPosition;

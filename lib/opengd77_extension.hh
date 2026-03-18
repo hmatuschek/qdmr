@@ -70,6 +70,10 @@ public:
   /** Enables power save for this channel. */
   void enablePowerSave(bool enable);
 
+  /** Returns @c true if the fixed location is enabled. */
+  bool locationEnabled() const;
+  /** Enables the fixed location. */
+  void enableLocation(bool enable);
   /** Returns the fixed location for this channel. */
   const QGeoCoordinate &location() const;
   /** Returns the fixed location for this channel. */
@@ -98,6 +102,8 @@ protected:
   bool _beep;
   /** Holds the power-save flag. */
   bool _powerSave;
+  /** If @c true, fixed location is used. */
+  bool _locationEnabled;
   /** Holds the fixed location. */
   QGeoCoordinate _location;
   /** Holds the talker alias setting for timeslot 1. */
@@ -153,34 +159,5 @@ protected:
   TimeSlotOverride _timeSlotOverride;
 };
 
-
-class OpenGD77APRSSystemExtension: public ConfigExtension
-{
-  Q_OBJECT
-
-  Q_CLASSINFO("description", "OpenGD77 specific APRS settings.")
-
-  /** Sets a fixed location for the APRS report. */
-  Q_PROPERTY(QString location READ locator WRITE setLocator)
-  Q_CLASSINFO("locationDescription", "Allows to set a fixed location being transmitted.")
-
-public:
-  Q_INVOKABLE explicit OpenGD77APRSSystemExtension(QObject *parent=nullptr);
-
-  ConfigItem *clone() const;
-
-  /** Returns the fixed location for this APRS system. */
-  const QGeoCoordinate &location() const;
-  /** Returns the fixed location for this system. */
-  QString locator() const;
-  /** Sets the fixed location for this system. */
-  void setLocation(const QGeoCoordinate &loc);
-  /** Sets the fixed location for this system. */
-  void setLocator(const QString &locator);
-
-protected:
-  /** Holds the fixed location, if set. */
-  QGeoCoordinate _location;
-};
 
 #endif // OPENGD77EXTENSION_HH

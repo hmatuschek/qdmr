@@ -977,9 +977,9 @@ public:
     virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
-    virtual GNSSSettings::Systems gpsMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(GNSSSettings::Systems mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns the STE (squelch tail elimination) duration. */
     virtual Interval steDuration() const;
