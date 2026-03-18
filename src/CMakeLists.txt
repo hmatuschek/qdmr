@@ -9,8 +9,9 @@ qt6_add_executable(qdmr WIN32
   dmrcontactdialog.cc dmrcontactdialog.hh dmrcontactdialog.ui
   dtmfcontactdialog.cc dtmfcontactdialog.hh dtmfcontactdialog.ui
   rxgrouplistdialog.cc rxgrouplistdialog.hh rxgrouplistdialog.ui
-  analogchanneldialog.cc analogchanneldialog.hh analogchanneldialog.ui
-  digitalchanneldialog.cc digitalchanneldialog.hh digitalchanneldialog.ui
+  fmchanneldialog.cc fmchanneldialog.hh fmchanneldialog.ui
+  amchanneldialog.hh amchanneldialog.cc amchanneldialog.ui
+  dmrchanneldialog.cc dmrchanneldialog.hh dmrchanneldialog.ui
   channelvalidator.cc channelvalidator.hh
   channelcombobox.cc channelcombobox.hh
   channelselectiondialog.cc channelselectiondialog.hh

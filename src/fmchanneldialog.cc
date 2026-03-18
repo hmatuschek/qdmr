@@ -1,22 +1,21 @@
-#include "analogchanneldialog.hh"
+#include "fmchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
-#include "utils.hh"
 #include "settings.hh"
 #include "repeatercompleter.hh"
 #include "repeaterdatabase.hh"
 
 
 /* ********************************************************************************************* *
- * Implementation of AnalogChannelDialog
+ * Implementation of FMChannelDialog
  * ********************************************************************************************* */
-AnalogChannelDialog::AnalogChannelDialog(Config *config, QWidget *parent)
+FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new FMChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-AnalogChannelDialog::AnalogChannelDialog(Config *config, FMChannel *channel, QWidget *parent)
+FMChannelDialog::FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (nullptr == _channel)
@@ -29,7 +28,7 @@ AnalogChannelDialog::AnalogChannelDialog(Config *config, FMChannel *channel, QWi
 }
 
 void
-AnalogChannelDialog::construct() {
+FMChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
@@ -73,12 +72,14 @@ AnalogChannelDialog::construct() {
   }
   bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
-  aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
+  aprsList->addItem(tr("[None]"), QVariant::fromValue((FMAPRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
-  for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
-    APRSSystem *sys = _config->posSystems()->aprsSystem(i);
-    aprsList->addItem(sys->name(),QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprsSystem() == sys))
+  for (int i=0; i<_config->posSystems()->count(); i++) {
+    if (! _config->posSystems()->get(i)->is<FMAPRSSystem>())
+      continue;
+    FMAPRSSystem *sys = _config->posSystems()->get(i)->as<FMAPRSSystem>();
+    aprsList->addItem(sys->name(), QVariant::fromValue(sys));
+    if (_myChannel && (_myChannel->aprs() == sys))
       aprsList->setCurrentIndex(i+1);
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
@@ -106,10 +107,14 @@ AnalogChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_myChannel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_myChannel->timeout().seconds());
   }
+
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
   case FMChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
@@ -126,7 +131,7 @@ AnalogChannelDialog::construct() {
     bandwidth->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_myChannel->vox());
+    voxValue->setValue(_myChannel->vox().value());
   }
 
   if (! settings.showExtensions())
@@ -143,14 +148,14 @@ AnalogChannelDialog::construct() {
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  connect(txFrequency, &QLineEdit::editingFinished, this, &AnalogChannelDialog::onTxFrequencyEdited);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &AnalogChannelDialog::onRxFrequencyEdited);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &AnalogChannelDialog::onOffsetFrequencyEdited);
-  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &AnalogChannelDialog::onOffsetDirectionChanged);
+  connect(txFrequency, &QLineEdit::editingFinished, this, &FMChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &FMChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &FMChannelDialog::onOffsetFrequencyEdited);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &FMChannelDialog::onOffsetDirectionChanged);
 }
 
 FMChannel *
-AnalogChannelDialog::channel()
+FMChannelDialog::channel()
 {
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
@@ -162,8 +167,10 @@ AnalogChannelDialog::channel()
   }
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setAdmit(FMChannel::Admit(txAdmit->currentData().toUInt()));
   if (squelchDefault->isChecked())
@@ -174,11 +181,11 @@ AnalogChannelDialog::channel()
   _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
-  _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
+  _myChannel->setAPRS(aprsList->currentData().value<FMAPRSSystem *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   FMChannel *channel = _myChannel;
   if (nullptr == _channel) {
@@ -193,7 +200,7 @@ AnalogChannelDialog::channel()
 }
 
 void
-AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
+FMChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
@@ -213,27 +220,27 @@ AnalogChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 void
-AnalogChannelDialog::onPowerDefaultToggled(bool checked) {
+FMChannelDialog::onPowerDefaultToggled(bool checked) {
   powerValue->setEnabled(!checked);
 }
 
 void
-AnalogChannelDialog::onTimeoutDefaultToggled(bool checked) {
+FMChannelDialog::onTimeoutDefaultToggled(bool checked) {
   totValue->setEnabled(!checked);
 }
 
 void
-AnalogChannelDialog::onSquelchDefaultToggled(bool checked) {
+FMChannelDialog::onSquelchDefaultToggled(bool checked) {
   squelchValue->setEnabled(! checked);
 }
 
 void
-AnalogChannelDialog::onVOXDefaultToggled(bool checked) {
+FMChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 
 void
-AnalogChannelDialog::onHideChannelHint() {
+FMChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
@@ -242,14 +249,14 @@ AnalogChannelDialog::onHideChannelHint() {
 }
 
 void
-AnalogChannelDialog::onTxFrequencyEdited() {
+FMChannelDialog::onTxFrequencyEdited() {
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
   txFrequency->setText(_myChannel->txFrequency().format());
   updateOffsetFrequency();
 }
 
 void
-AnalogChannelDialog::onRxFrequencyEdited() {
+FMChannelDialog::onRxFrequencyEdited() {
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   rxFrequency->setText(_myChannel->rxFrequency().format());
 
@@ -262,7 +269,7 @@ AnalogChannelDialog::onRxFrequencyEdited() {
 }
 
 void
-AnalogChannelDialog::onOffsetFrequencyEdited() {
+FMChannelDialog::onOffsetFrequencyEdited() {
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
   Frequency txFreq = _myChannel->rxFrequency();
 
@@ -278,7 +285,7 @@ AnalogChannelDialog::onOffsetFrequencyEdited() {
 }
 
 void
-AnalogChannelDialog::onOffsetDirectionChanged(int index) {
+FMChannelDialog::onOffsetDirectionChanged(int index) {
   Frequency txFreq = _myChannel->rxFrequency();
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
@@ -302,7 +309,7 @@ AnalogChannelDialog::onOffsetDirectionChanged(int index) {
 }
 
 void
-AnalogChannelDialog::updateOffsetFrequency() {
+FMChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
   // Show absolute value
   offsetLineEdit->setText(offsetFrequency.abs().format());
@@ -311,7 +318,7 @@ AnalogChannelDialog::updateOffsetFrequency() {
 }
 
 void
-AnalogChannelDialog::updateComboBox() {
+FMChannelDialog::updateComboBox() {
   switch (_myChannel->offsetShift()) {
   case Channel::OffsetShift::None:
     offsetComboBox->setCurrentIndex(0);

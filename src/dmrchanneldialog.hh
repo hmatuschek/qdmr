@@ -1,18 +1,18 @@
-#ifndef DIGITALCHANNELDIALOG_HH
-#define DIGITALCHANNELDIALOG_HH
+#ifndef DMRCHANNELDIALOG_H
+#define DMRCHANNELDIALOG_H
 
 #include <QDialog>
 #include "config.hh"
 
-#include "ui_digitalchanneldialog.h"
+#include "ui_dmrchanneldialog.h"
 
-class DigitalChannelDialog: public QDialog, private Ui::DigitalChannelDialog
+class DMRChannelDialog: public QDialog, private Ui::DigitalChannelDialog
 {
   Q_OBJECT
 
 public:
-  DigitalChannelDialog(Config *config, QWidget *parent=nullptr);
-  DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
+  DMRChannelDialog(Config *config, QWidget *parent=nullptr);
+  DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
 
   DMRChannel *channel();
 
@@ -42,4 +42,4 @@ protected:
   DMRChannel *_channel;
 };
 
-#endif // DIGITALCHANNELDIALOG_HH
+#endif // DMRCHANNELDIALOG_H

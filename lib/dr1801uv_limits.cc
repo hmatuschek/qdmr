@@ -33,8 +33,8 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::High) } },
         { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "vox", new RadioLimitLevel() },
+        { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
 
@@ -81,14 +81,14 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
               {"name", new RadioLimitString(
                1, DR1801UVCodeplug::ChannelBankElement::Limit::channelNameLength(),
                RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, RadioLimitIssue::Severity::Critical)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                                 {Frequency::fromHz(400.), Frequency::fromHz(480.)}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -109,17 +109,17 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
               {"name", new RadioLimitString(
                1, DR1801UVCodeplug::ChannelBankElement::Limit::channelNameLength(),
                RadioLimitString::ASCII)},
-              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                         {Frequency::fromHz(400.), Frequency::fromHz(480.)}}, RadioLimitIssue::Severity::Critical)},
-              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromHz(136.), Frequency::fromHz(174.)},
-                                                                 {Frequency::fromHz(400.), Frequency::fromHz(480.)}})},
+              {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                         {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
+              {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
+                                                                 {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
                  unsigned(Channel::Power::High),
                }},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitLevel()},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

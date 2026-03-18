@@ -12,17 +12,17 @@ class GPSSystemDialog : public QDialog, private Ui::GPSSystemDialog
 
 public:
   GPSSystemDialog(Config *config, QWidget *parent=nullptr);
-  GPSSystemDialog(Config *config, GPSSystem *gps, QWidget *parent=nullptr);
+  GPSSystemDialog(Config *config, DMRAPRSSystem *gps, QWidget *parent=nullptr);
 
-  GPSSystem *gpsSystem();
+  DMRAPRSSystem *gpsSystem();
 
 protected:
   void construct();
 
 protected:
   Config *_config;
-  GPSSystem *_myGPSSystem;
-  GPSSystem *_gpsSystem;
+  DMRAPRSSystem *_myGPSSystem;
+  DMRAPRSSystem *_gpsSystem;
 };
 
 #endif // GPSSYSTEMDIALOG_HH

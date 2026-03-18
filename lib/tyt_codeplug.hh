@@ -13,7 +13,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 class SMSExtension;
 class SMSTemplate;
 
@@ -580,9 +580,9 @@ public:
     /** Sets the private call hang time. */
     virtual void setPrivateCallHangTime(unsigned ms);
     /** Returns the VOX sensitivity. */
-    virtual unsigned voxSesitivity() const;
+    virtual Level voxSesitivity() const;
     /** Sets the group call hang time. */
-    virtual void setVOXSesitivity(unsigned ms);
+    virtual void setVOXSesitivity(Level level);
     /** Returns the low-battery warning interval. */
     virtual unsigned lowBatteryInterval() const;
     /** Sets the low-battery warning interval. */
@@ -664,6 +664,13 @@ public:
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // Valid VOX sensitivity range.
+      static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
   };
 
   /** Codeplug representation of programming time-stamp and CPS version.
@@ -724,9 +731,9 @@ public:
     /** Returns @c true if the repeat interval is disabled. */
     virtual bool repeatIntervalDisabled() const;
     /** Returns the repeat interval. */
-    virtual unsigned repeatInterval() const;
+    virtual Interval repeatInterval() const;
     /** Sets the repeat interval in seconds. */
-    virtual void setRepeatInterval(unsigned sec);
+    virtual void setRepeatInterval(const Interval &sec);
     /** Disables the GPS repeat interval. */
     virtual void disableRepeatInterval();
 
@@ -740,11 +747,11 @@ public:
     virtual void disableDestinationContact();
 
     /** Encodes the given GPS system. */
-    virtual bool fromGPSSystemObj(GPSSystem *sys, Context &ctx);
+    virtual bool fromGPSSystemObj(DMRAPRSSystem *sys, Context &ctx);
     /** Constructs a GPS system. */
-    virtual GPSSystem *toGPSSystemObj();
+    virtual DMRAPRSSystem *toGPSSystemObj();
     /** Links the given GPS system. */
-    virtual bool linkGPSSystemObj(GPSSystem *sys, Context &ctx);
+    virtual bool linkGPSSystemObj(DMRAPRSSystem *sys, Context &ctx);
   };
 
   /** Represents all menu settings within the codeplug on the radio.
@@ -1259,6 +1266,8 @@ public:
   virtual void clear();
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
 
   /** Decodes the binary codeplug and stores its content in the given generic configuration. */
   bool decode(Config *config, const ErrorStack &err=ErrorStack());

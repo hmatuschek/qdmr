@@ -521,14 +521,14 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "DMR contact with index " << transmitContactIndex() << " not known.";
         return false;
       }
-      dmr->setTXContactObj(ctx.get<DMRContact>(transmitContactIndex()));
+      dmr->setContact(ctx.get<DMRContact>(transmitContactIndex()));
     }
     if (hasGroupList()) {
       if (! ctx.has<RXGroupList>(groupListIndex())) {
         errMsg(err) << "Group list with index " << groupListIndex() << " not known.";
         return false;
       }
-      dmr->setGroupListObj(ctx.get<RXGroupList>(groupListIndex()));
+      dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
   }
 
@@ -564,8 +564,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
     DMRChannel *dmr = channel->as<DMRChannel>();
     setChannelType(Type::DMR);
     setBandwidth(FMChannel::Bandwidth::Narrow);
-    if (dmr->txContactObj())
-      setTransmitContactIndex(ctx.index(dmr->txContactObj()));
+    if (dmr->contact())
+      setTransmitContactIndex(ctx.index(dmr->contact()));
     else
       clearTransmitContactIndex();
     switch (dmr->admit()) {
@@ -579,8 +579,8 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       setEncryptionKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
     else
       clearEncryptionKeyIndex();
-    if (dmr->groupListObj())
-      setGroupListIndex(ctx.index(dmr->groupListObj()));
+    if (dmr->groupList())
+      setGroupListIndex(ctx.index(dmr->groupList()));
     else
       clearGroupListIndex();
   }
@@ -1262,20 +1262,20 @@ DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
   setUInt8(Offset::powerSaveMode(), (uint8_t) mode);
 }
 
-unsigned int
+Level
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   if (0x00 == getUInt8(Offset::voxEnabled())) {
-    return 0;
+    return Level::null();
   }
-  return getUInt8(Offset::voxSensitivity())*10/3;
+  return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox());
 }
 void
-DR1801UVCodeplug::SettingsElement::setVOXSensitivity(unsigned int sens) {
-  if (0 == sens) {
+DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
+  if (sens.isNull()) {
     setUInt8(Offset::voxEnabled(), 0x00);
   } else {
     setUInt8(Offset::voxEnabled(), 0x01);
-    setUInt8(Offset::voxSensitivity(), 1+sens*2/10);
+    setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox()));
   }
 }
 unsigned int
@@ -1602,8 +1602,8 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   Q_UNUSED(err);
 
   // Store radio ID
-  config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
-  config->settings()->setDefaultId(config->radioIDs()->getId(0));
+  auto idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
+  config->settings()->setDefaultId(config->radioIDs()->get(idx)->as<DMRRadioID>());
 
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
@@ -3232,6 +3232,14 @@ DR1801UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(copy, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete copy;
+    return nullptr;
+  }
+
   // Split dual-zones into two.
   ZoneSplitVisitor splitter;
   if (! splitter.process(copy, err)) {
@@ -3274,8 +3282,10 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   }
 
   // Map radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
-    ctx.add(ctx.config()->radioIDs()->getId(i), i);
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    if (ctx.config()->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(ctx.config()->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {

@@ -36,7 +36,7 @@ class CommercialChannelExtension: public ConfigExtension
   Q_OBJECT
 
   /** Holds a reference to the associated encryption key. */
-  Q_PROPERTY(EncryptionKeyReference* encryptionKey READ encryptionKeyRef WRITE setEncryptionKeyRef)
+  Q_PROPERTY(EncryptionKeyReference* encryptionKey READ encryptionKeyRef)
 
 public:
   /** Empty constructor. */
@@ -46,9 +46,6 @@ public:
 
   /** Returns the reference to the encryption key. */
   EncryptionKeyReference *encryptionKeyRef();
-  /** Sets the reference to the encryption key. */
-  void setEncryptionKeyRef(EncryptionKeyReference *ref);
-
   /** Returns the referenced encryption key. */
   EncryptionKey *encryptionKey();
   /** References the given encryption key. */

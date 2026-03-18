@@ -71,12 +71,12 @@ bool validDMRNumber(const QString &text);
 /** Validates a DTMF number. */
 bool validDTMFNumber(const QString &text);
 
-QString aprsicon2config(APRSSystem::Icon icon);
-QString aprsicon2name(APRSSystem::Icon icon);
-APRSSystem::Icon name2aprsicon(const QString &name);
-char aprsicon2iconcode(APRSSystem::Icon icon);
-char aprsicon2tablecode(APRSSystem::Icon icon);
-APRSSystem::Icon code2aprsicon(char table, char icon);
+QString aprsicon2config(FMAPRSSystem::Icon icon);
+QString aprsicon2name(FMAPRSSystem::Icon icon);
+FMAPRSSystem::Icon name2aprsicon(const QString &name);
+char aprsicon2iconcode(FMAPRSSystem::Icon icon);
+char aprsicon2tablecode(FMAPRSSystem::Icon icon);
+FMAPRSSystem::Icon code2aprsicon(char table, char icon);
 
 /** Implements the Levenshtein distance between two strings.
  * That is, the number of edits (insert, delete or replace operations) needed to turn source

@@ -685,6 +685,87 @@ Codeplug::Element::writeUnicode(unsigned offset, const QString &txt, unsigned ma
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of Codeplug::BitmapElement
+ * ********************************************************************************************* */
+Codeplug::BitmapElement::BitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+Codeplug::BitmapElement::clear() {
+  memset(_data, 0, _size);
+}
+
+bool
+Codeplug::BitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return (_data[byte] & (1 << bit));
+}
+
+void
+Codeplug::BitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] |= (1 << bit);
+  else
+    _data[byte] &= ~(1 << bit);
+}
+
+void
+Codeplug::BitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0xff, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] |= (1<<i);
+  }
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of Codeplug::InvertedBitmapElement
+ * ********************************************************************************************* */
+Codeplug::InvertedBitmapElement::InvertedBitmapElement(uint8_t *ptr, size_t size)
+  : Element(ptr, size)
+{
+  // pass...
+}
+
+void
+Codeplug::InvertedBitmapElement::clear() {
+  memset(_data, 0xff, _size);
+}
+
+bool
+Codeplug::InvertedBitmapElement::isEncoded(unsigned int idx) const {
+  unsigned int byte = idx/8, bit = idx%8;
+  return 0 == (_data[byte] & (1 << bit));
+}
+
+void
+Codeplug::InvertedBitmapElement::setEncoded(unsigned int idx, bool enable) {
+  unsigned int byte = idx/8, bit = idx%8;
+  if (enable)
+    _data[byte] &= ~(1 << bit);
+  else
+    _data[byte] |= (1 << bit);
+}
+
+void
+Codeplug::InvertedBitmapElement::enableFirst(unsigned int n) {
+  unsigned int byte = n/8, bit=n%8;
+  memset(_data, 0x00, byte);
+  for (unsigned int i=0; i<bit; i++) {
+    _data[byte] &= ~(1<<i);
+  }
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of CodePlug::Context
  * ********************************************************************************************* */
@@ -699,8 +780,8 @@ Codeplug::Context::Context(Config *config)
   addTable(&Channel::staticMetaObject);
   addTable(&Zone::staticMetaObject);
   addTable(&ScanList::staticMetaObject);
-  addTable(&GPSSystem::staticMetaObject);
-  addTable(&APRSSystem::staticMetaObject);
+  addTable(&DMRAPRSSystem::staticMetaObject);
+  addTable(&FMAPRSSystem::staticMetaObject);
   addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
   addTable(&SMSTemplate::staticMetaObject);
@@ -718,6 +799,7 @@ SatelliteDatabase *
 Codeplug::Context::satellites() const {
   return _satellites;
 }
+
 
 bool
 Codeplug::Context::hasTable(const QMetaObject *obj) const {
@@ -743,6 +825,16 @@ Codeplug::Context::addTable(const QMetaObject *obj) {
   _tables.insert(obj->className(), Table());
   return true;
 }
+
+bool
+Codeplug::Context::remTable(const QMetaObject *obj) {
+  if (! hasTable(obj))
+    return false;
+  if (_tables.contains(obj->className()))
+    return _tables.remove(obj->className());
+  return remTable(obj->superClass());
+}
+
 
 ConfigItem *
 Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {

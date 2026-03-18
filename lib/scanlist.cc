@@ -99,12 +99,12 @@ ScanList::remChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::primary() const {
+ScanList::primaryChannelRef() const {
   return &_primary;
 }
 
 ChannelReference *
-ScanList::primary() {
+ScanList::primaryChannelRef() {
   return &_primary;
 }
 
@@ -121,12 +121,12 @@ ScanList::setPrimaryChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::secondary() const {
+ScanList::secondaryChannelRef() const {
   return &_secondary;
 }
 
 ChannelReference *
-ScanList::secondary() {
+ScanList::secondaryChannelRef() {
   return &_secondary;
 }
 
@@ -143,12 +143,12 @@ ScanList::setSecondaryChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::revert() const {
+ScanList::revertChannelRef() const {
   return &_revert;
 }
 
 ChannelReference *
-ScanList::revert() {
+ScanList::revertChannelRef() {
   return &_revert;
 }
 

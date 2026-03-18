@@ -1,11 +1,13 @@
 #include "channellistview.hh"
 #include "ui_channellistview.h"
 
-#include "analogchanneldialog.hh"
-#include "digitalchanneldialog.hh"
+#include "fmchanneldialog.hh"
+#include "amchanneldialog.hh"
+#include "dmrchanneldialog.hh"
 #include "config.hh"
 #include "settings.hh"
 
+#include <QMenu>
 #include <QHeaderView>
 #include <QMessageBox>
 
@@ -22,8 +24,15 @@ ChannelListView::ChannelListView(Config *config, QWidget *parent)
 
   ui->channelTableView->setModel(new ChannelListWrapper(_config->channelList(), ui->channelTableView));
 
-  connect(ui->addAnalogChannel, SIGNAL(clicked()), this, SLOT(onAddAnalogChannel()));
-  connect(ui->addDigitalChannel, SIGNAL(clicked()), this, SLOT(onAddDigitalChannel()));
+  auto menu = new QMenu();
+  menu->addAction(ui->actionAddDMRChannel);
+  menu->addAction(ui->actionAddFMChannel);
+  menu->addAction(ui->actionAddAMChannel);
+  ui->addChannel->setMenu(menu);
+
+  connect(ui->actionAddFMChannel, &QAction::triggered, this, &ChannelListView::onAddFMChannel);
+  connect(ui->actionAddAMChannel, &QAction::triggered, this, &ChannelListView::onAddAMChannel);
+  connect(ui->actionAddDMRChannel, &QAction::triggered, this, &ChannelListView::onAddDMRChannel);
   connect(ui->cloneChannel, SIGNAL(clicked()), this, SLOT(onCloneChannel()));
   connect(ui->remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
   connect(ui->channelTableView, SIGNAL(doubleClicked(unsigned)), this, SLOT(onEditChannel(unsigned)));
@@ -35,8 +44,8 @@ ChannelListView::~ChannelListView() {
 
 
 void
-ChannelListView::onAddAnalogChannel() {
-  AnalogChannelDialog dialog(_config, parentWidget());
+ChannelListView::onAddFMChannel() {
+  FMChannelDialog dialog(_config, parentWidget());
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -47,8 +56,20 @@ ChannelListView::onAddAnalogChannel() {
 }
 
 void
-ChannelListView::onAddDigitalChannel() {
-  DigitalChannelDialog dialog(_config, parentWidget());
+ChannelListView::onAddAMChannel() {
+  AMChannelDialog dialog(_config, parentWidget());
+  if (QDialog::Accepted != dialog.exec())
+    return;
+
+  int row=-1;
+  if (ui->channelTableView->hasSelection())
+    row = ui->channelTableView->selection().second+1;
+  _config->channelList()->add(dialog.channel(), row);
+}
+
+void
+ChannelListView::onAddDMRChannel() {
+  DMRChannelDialog dialog(_config, parentWidget());
   if (QDialog::Accepted != dialog.exec())
     return;
 
@@ -79,7 +100,7 @@ ChannelListView::onCloneChannel() {
     // clone channel
     FMChannel *clone = channel->clone()->as<FMChannel>();
     // open editor
-    AnalogChannelDialog dialog(_config, clone);
+    FMChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
       // if rejected -> destroy clone
       clone->deleteLater();
@@ -89,11 +110,25 @@ ChannelListView::onCloneChannel() {
     dialog.channel();
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
-  } else {
+  } else if (channel->is<AMChannel>()) {
+    // clone channel
+    auto clone = channel->clone()->as<AMChannel>();
+    // open editor
+    AMChannelDialog dialog(_config, clone);
+    if (QDialog::Accepted != dialog.exec()) {
+      // if rejected -> destroy clone
+      clone->deleteLater();
+      return;
+    }
+    // update channel
+    dialog.channel();
+    // add to list (below selected one)
+    _config->channelList()->add(clone, row+1);
+  } else if (channel->is<DMRChannel>()) {
     // clone channel
     DMRChannel *clone = channel->clone()->as<DMRChannel>();
     // open editor
-    DigitalChannelDialog dialog(_config, clone);
+    DMRChannelDialog dialog(_config, clone);
     if (QDialog::Accepted != dialog.exec()) {
       clone->deleteLater();
       return;
@@ -144,12 +179,17 @@ ChannelListView::onEditChannel(unsigned row) {
   if (! channel)
     return;
   if (channel->is<FMChannel>()) {
-    AnalogChannelDialog dialog(_config, channel->as<FMChannel>());
+    FMChannelDialog dialog(_config, channel->as<FMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();
-  } else {
-    DigitalChannelDialog dialog(_config, channel->as<DMRChannel>());
+  } else if (channel->is<DMRChannel>()) {
+    DMRChannelDialog dialog(_config, channel->as<DMRChannel>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+    dialog.channel();
+  } else if (channel->is<AMChannel>()) {
+    AMChannelDialog dialog(_config, channel->as<AMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.channel();

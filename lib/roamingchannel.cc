@@ -1,5 +1,5 @@
 #include "roamingchannel.hh"
-#include "utils.hh"
+
 
 /* ********************************************************************************************* *
  * Implementation of RoamingChannel
