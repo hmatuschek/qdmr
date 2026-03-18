@@ -529,8 +529,10 @@ bool
 ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
-  if (! node)
+  if (! node) {
+    errMsg(err) << "YAML node is null!";
     return false;
+  }
 
   if (! node.IsMap()) {
     errMsg(err) << node.Mark().line << ":" << node.Mark().column
@@ -554,7 +556,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
 
     if (prop.isEnumType()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check enum key
       if (! node[prop.name()].IsScalar()) {
@@ -576,7 +578,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, value);
     } else if (QString("bool") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -588,7 +590,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<bool>());
     } else if (QString("int") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -600,7 +602,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<int>());
     } else if (QString("uint") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -612,7 +614,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<unsigned>());
     } else if (QString("double") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -624,7 +626,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<double>());
     } else if (QString("QString") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ( (!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -636,7 +638,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
     } else if (QString("Frequency") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -649,7 +651,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QVariant::fromValue(f));
     } else if (QString("Interval") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -661,7 +663,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
     } else if (QString("Level") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -692,7 +694,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       // reference lists are linked later
       continue;
     } else if (propIsInstance<ConfigItem>(prop)) {
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsMap()) {
@@ -732,7 +734,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
     } else if (prop.read(this).value<ConfigObjectList *>()) {
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsSequence()) {
@@ -809,12 +811,10 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       //logDebug() << "Do not link property '" << prop.name() << "': Marked as not scriptable.";
       continue;
     }
-    if ((prop.isEnumType()) || (QString("bool") == prop.typeName()) || (QString("int") == prop.typeName()) ||
-        (QString("uint") == prop.typeName()) || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName()) ) {
-      continue;
-    } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+
+    if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsScalar()) {
@@ -852,7 +852,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
                  << " '" << ctx.getObj(id)->name() << "'.";*/
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsSequence()) {
@@ -893,10 +893,9 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
           return false;
         }
       }
-
     } else if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull())
         continue;
 
       // check type
@@ -914,7 +913,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       }
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull())
         continue;
 
       // check type
@@ -1105,7 +1104,7 @@ ConfigObject::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     }
   }
 
-  return ConfigItem::parse(node, ctx);
+  return ConfigItem::parse(node, ctx, err);
 }
 
 bool

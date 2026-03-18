@@ -310,8 +310,10 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
 
 bool
 Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
-  if (! node)
+  if (! node) {
+    errMsg(err) << "YAML node is null!";
     return false;
+  }
 
   if ((! node.IsMap()) || (1 != node.size())) {
     errMsg(err) << node.Mark().line << ":" << node.Mark().column
@@ -330,13 +332,13 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   if ((! ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
     setDefaultTimeout();
   } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    Interval to;
-    if (! to.parse(QString::fromStdString(ch["timeout"].as<std::string>()), Interval::Format::Seconds))
-      setDefaultTimeout();
-    else if (to.isFinite())
-      setTimeout(to);
-    else
-      disableTimeout();
+    setTimeout(ch["timeout"].as<Interval>());
+  }
+
+  if ((! ch["vox"]) || ("!default" == ch["vox"].Tag())) {
+    setVOXDefault();
+  } else if (ch["vox"] && ch["vox"].IsScalar()) {
+    setVOX(ch["vox"].as<Level>());
   }
 
   return ConfigObject::parse(ch, ctx, err);
@@ -1060,6 +1062,8 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
     return new DMRChannel();
   } else if (("analog" == type) || ("fm"==type)) {
     return new FMChannel();
+  } else if ("am" == type) {
+    return new AMChannel();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

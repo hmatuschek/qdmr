@@ -274,10 +274,14 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   switch (index.column()) {
   case 0:
-    if (channel->is<FMChannel>())
-      return tr("FM");
-    else
+    if (channel->is<DMRChannel>())
       return tr("DMR");
+    else if (channel->is<FMChannel>())
+      return tr("FM");
+    else if (channel->is<AMChannel>())
+      return tr("AM");
+    else
+      return channel->metaObject()->className();
   case 1:
     return channel->name();
   case 2:
@@ -316,6 +320,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       case FMChannel::Admit::Free: return tr("Free"); break;
       case FMChannel::Admit::Tone: return tr("Tone"); break;
       }
+    } else {
+      return tr("[None]");
     }
     break;
   case 8:
@@ -343,7 +349,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 11:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
       return (DMRChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
@@ -354,7 +360,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       } else {
         return QString("-");
       }
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
@@ -364,7 +370,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return digi->contact()->name();
       else
         return QString("-");
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
@@ -373,7 +379,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if ((nullptr == digi->radioId()) || (DefaultRadioID::get() == digi->radioId()))
         return tr("[Default]");
       return digi->radioId()->name();
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
@@ -388,6 +394,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
         return analog->aprs()->name();
       else
         return QString("-");
+    } else {
+      return QString("-");
     }
     break;
   case 16:
@@ -397,38 +405,45 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       else if (DefaultRoamingZone::get() == digi->roaming())
         return tr("[Default]");
       return digi->roaming()->name();
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
   case 17:
     if (channel->is<DMRChannel>()) {
       return tr("[None]");
-    } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (analog->defaultSquelch())
+    } else if (FMChannel *fm = channel->as<FMChannel>()) {
+      if (fm->defaultSquelch())
         return tr("[Default]");
-      if (analog->squelchDisabled())
+      if (fm->squelchDisabled())
         return tr("Open");
       else
-        return analog->squelch();
+        return fm->squelch();
+    } else if (AMChannel *am = channel->as<AMChannel>()) {
+      if (am->defaultSquelch())
+        return tr("[Default]");
+      if (am->squelchDisabled())
+        return tr("Open");
+      else
+        return am->squelch();
     }
     break;
   case 18:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       return analog->rxTone().format();
     }
     break;
   case 19:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       return analog->txTone().format();
     }
     break;
   case 20:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (FMChannel::Bandwidth::Wide == analog->bandwidth()) {

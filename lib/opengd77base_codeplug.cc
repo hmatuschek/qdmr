@@ -215,7 +215,7 @@ OpenGD77BaseCodeplug::ChannelElement::transmitTimeout() const {
 
 void
 OpenGD77BaseCodeplug::ChannelElement::setTransmitTimeout(const Interval &interval) {
-  if (interval.isInfinite())
+  if (! interval.isFinite())
     setUInt8(Offset::txTimeout(), 0);
   else {
     unsigned s = interval.seconds()/15;
@@ -663,10 +663,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
     setPower(c->power());
 
   enableRXOnly(c->rxOnly());
-  if (c->timeoutDisabled())
-    setTransmitTimeout(Interval::infinity());
-  else
-    setTransmitTimeout(c->timeout());
+  setTransmitTimeout(c->timeout());
 
   // Enable vox
   bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));

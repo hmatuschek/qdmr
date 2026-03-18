@@ -14,7 +14,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
 {
   // Define limits for call-sign DB
   _hasCallSignDB          = true;
-  _callSignDBImplemented  = false;
+  _callSignDBImplemented  = true;
   _numCallSignDBEntries   = 0;
 
   // Define limits for satellite config

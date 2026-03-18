@@ -88,6 +88,37 @@ DM32UVTest::testProstProcessingOfEmptyCodeplug() {
 }
 
 
+void
+DM32UVTest::testAMChannelReencoding() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/am_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  DM32UVCodeplug codeplug;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.channelList()->count(), config.channelList()->count());
+  QVERIFY(testConfig.channelList()->channel(0)->is<AMChannel>());
+  QCOMPARE(testConfig.channelList()->channel(0)->rxFrequency(), Frequency::fromMHz(121.13));
+  QVERIFY(testConfig.channelList()->channel(0)->txFrequency().isZero());
+}
+
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

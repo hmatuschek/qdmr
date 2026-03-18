@@ -1,4 +1,4 @@
-#include "digitalchanneldialog.hh"
+#include "dmrchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
@@ -12,15 +12,15 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of DigitalChannelDialog
+ * Implementation of DMRChannelDialog
  * ********************************************************************************************* */
-DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new DMRChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (_channel) {
@@ -31,7 +31,7 @@ DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, 
 }
 
 void
-DigitalChannelDialog::construct() {
+DMRChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
@@ -169,14 +169,14 @@ DigitalChannelDialog::construct() {
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
   connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 
-  connect(txFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onTxFrequencyEdited);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onRxFrequencyEdited);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onOffsetFrequencyEdited);
-  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DigitalChannelDialog::onOffsetCurrentIndexChanged);
+  connect(txFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DMRChannelDialog::onOffsetFrequencyEdited);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DMRChannelDialog::onOffsetCurrentIndexChanged);
 }
 
 DMRChannel *
-DigitalChannelDialog::channel()
+DMRChannelDialog::channel()
 {
   _myChannel->setRadioId(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
@@ -219,7 +219,7 @@ DigitalChannelDialog::channel()
 }
 
 void
-DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
+DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
@@ -238,22 +238,22 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 void
-DigitalChannelDialog::onPowerDefaultToggled(bool checked) {
+DMRChannelDialog::onPowerDefaultToggled(bool checked) {
   powerValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onTimeoutDefaultToggled(bool checked) {
+DMRChannelDialog::onTimeoutDefaultToggled(bool checked) {
   totValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onVOXDefaultToggled(bool checked) {
+DMRChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 
 void
-DigitalChannelDialog::onHideChannelHint() {
+DMRChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
@@ -262,14 +262,14 @@ DigitalChannelDialog::onHideChannelHint() {
 }
 
 void
-DigitalChannelDialog::onTxFrequencyEdited() {
+DMRChannelDialog::onTxFrequencyEdited() {
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
   txFrequency->setText(_myChannel->txFrequency().format());
   updateOffsetFrequency();
 }
 
 void
-DigitalChannelDialog::onRxFrequencyEdited() {
+DMRChannelDialog::onRxFrequencyEdited() {
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   rxFrequency->setText(_myChannel->rxFrequency().format());
 
@@ -283,7 +283,7 @@ DigitalChannelDialog::onRxFrequencyEdited() {
 }
 
 void
-DigitalChannelDialog::onOffsetFrequencyEdited() {
+DMRChannelDialog::onOffsetFrequencyEdited() {
   Frequency txFreq = _myChannel->rxFrequency();
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
@@ -299,7 +299,7 @@ DigitalChannelDialog::onOffsetFrequencyEdited() {
 }
 
 void
-DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
+DMRChannelDialog::onOffsetCurrentIndexChanged(int index) {
   Frequency txFreq = _myChannel->rxFrequency();
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
@@ -324,7 +324,7 @@ DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
 
 
 void
-DigitalChannelDialog::updateOffsetFrequency() {
+DMRChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
   // Show absolute value
   offsetLineEdit->setText(offsetFrequency.abs().format());
@@ -333,7 +333,7 @@ DigitalChannelDialog::updateOffsetFrequency() {
 }
 
 void
-DigitalChannelDialog::updateComboBox() {
+DMRChannelDialog::updateComboBox() {
   switch (_myChannel->offsetShift()) {
   case Channel::OffsetShift::None:
     offsetComboBox->setCurrentIndex(0);
