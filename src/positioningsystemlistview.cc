@@ -90,25 +90,25 @@ PositioningSystemListView::onRemGPS() {
 
   // collect all selected systems
   // need to collect them first as rows change when deleting systems
-  QList<PositioningSystem *> systems; systems.reserve(rowcount);
+  QList<PositionReportingSystem *> systems; systems.reserve(rowcount);
   for(int row=rows.first; row<=rows.second; row++)
     systems.push_back(_config->posSystems()->system(row));
   // remove systems
-  foreach (PositioningSystem *system, systems)
+  foreach (PositionReportingSystem *system, systems)
     _config->posSystems()->del(system);
 }
 
 void
 PositioningSystemListView::onEditGPS(unsigned row) {
-  PositioningSystem *sys = _config->posSystems()->system(row);
+  PositionReportingSystem *sys = _config->posSystems()->system(row);
 
-  if (sys->is<GPSSystem>()) {
-    GPSSystemDialog dialog(_config, sys->as<GPSSystem>());
+  if (sys->is<DMRAPRSSystem>()) {
+    GPSSystemDialog dialog(_config, sys->as<DMRAPRSSystem>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.gpsSystem();
-  } else if (sys->is<APRSSystem>()) {
-    APRSSystemDialog dialog(_config, sys->as<APRSSystem>());
+  } else if (sys->is<FMAPRSSystem>()) {
+    APRSSystemDialog dialog(_config, sys->as<FMAPRSSystem>());
     if (QDialog::Accepted != dialog.exec())
       return;
     dialog.aprsSystem();

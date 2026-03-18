@@ -4,7 +4,6 @@
 #include "channel.hh"
 #include "gpssystem.hh"
 #include "smsextension.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
 #include "utils.hh"
@@ -189,10 +188,10 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if ((APRSType::Off != txAPRSType())  && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+    if ((APRSType::Off != txAPRSType())  && (! ctx.has<DMRAPRSSystem>(digitalAPRSSystemIndex())))
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    else if (ctx.has<DMRAPRSSystem>(digitalAPRSSystemIndex()))
+      dc->setAPRS(ctx.get<DMRAPRSSystem>(digitalAPRSSystemIndex()));
     // Link to encryption key (only basic implemented)
     if (hasDMREncryptionKeyIndex() && (DMREncryptionType::Basic == dmrEncryptionType())) {
       if (ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
@@ -218,8 +217,8 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     // Set GPS system index
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+    if (dc->aprs() && dc->aprs()->is<DMRAPRSSystem>()) {
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprs()->as<DMRAPRSSystem>()));
       setTXAPRSType(APRSType::DMR);
       enableRXAPRS(false);
     } else {
@@ -387,13 +386,13 @@ D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytonePowerSaveSettingsExt
   setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
-  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
-  setUInt8(Offset::voxLevel(), level/3);
+D868UVCodeplug::GeneralSettingsElement::setVOXLevel(Level level) {
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
 Interval
@@ -1715,11 +1714,11 @@ D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
     uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
     uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));
-    DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
+    DMRContact *contact = ctx.get<DMRContact>(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
     ((uint32_t *)data(Offset::contactIndex()))[i] = qToLittleEndian(i);
@@ -1783,7 +1782,7 @@ D868UVCodeplug::encodeAnalogContacts(const Flags &flags, Context &ctx, const Err
   memset(idxlst, 0xff, 1*Limit::numDTMFContacts());
   for (unsigned int i=0; i<ctx.count<DTMFContact>(); i++) {
     DTMFContactElement cont(data(Offset::dtmfContacts() + i*DTMFContactElement::size()));
-    cont.fromContact(ctx.config()->contacts()->dtmfContact(i));
+    cont.fromContact(ctx.get<DTMFContact>(i));
     idxlst[i] = i;
   }
   return true;
@@ -1831,8 +1830,8 @@ D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack
 
   // Encode radio IDs
   for (unsigned int i=0; i<ctx.count<DMRRadioID>(); i++) {
-    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size())).fromRadioID(
-          ctx.config()->radioIDs()->getId(i));
+    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size()))
+      .fromRadioID(ctx.get<DMRRadioID>(i));
   }
   return true;
 }
@@ -2218,7 +2217,7 @@ D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
   // Then link all referenced GPS systems
   for (uint8_t i=0; i<Limit::dmrAPRSSystems(); i++) {
-    if (! ctx.has<GPSSystem>(i))
+    if (! ctx.has<DMRAPRSSystem>(i))
       continue;
     gps.linkGPSSystem(i, ctx);
   }

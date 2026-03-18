@@ -541,13 +541,13 @@ D578UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
 }
 
-unsigned
+Interval
 D578UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
-  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+  return Interval::fromSeconds((unsigned)getUInt8(Offset::transmitTimeout())*30);
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
-  setUInt8(Offset::transmitTimeout(), tot/30);
+D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(const Interval &tot) {
+  setUInt8(Offset::transmitTimeout(), tot.seconds()/30);
 }
 
 AnytoneDisplaySettingsExtension::Language
@@ -3334,11 +3334,11 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (int i=0; i<ctx.config()->contacts()->digitalCount(); i++) {
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
     uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
     uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));
-    DMRContact *contact = ctx.config()->contacts()->digitalContact(i);
+    DMRContact *contact = ctx.get<DMRContact>(i);
     if(! con.fromContactObj(contact, ctx))
       return false;
     ((uint32_t *)data(Offset::contactIndex()))[i] = qToLittleEndian(i);

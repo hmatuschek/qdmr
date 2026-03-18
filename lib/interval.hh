@@ -83,7 +83,7 @@ public:
   /** Format the frequency. */
   QString format(Format f=Format::Automatic) const;
   /** Parses a frequency. */
-  bool parse(const QString &value);
+  bool parse(const QString &value, Format defaultFormat=Format::Milliseconds);
 
 public:
   /** Constructs a null interval. */

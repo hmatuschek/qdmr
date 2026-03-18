@@ -490,7 +490,7 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
   ch->setName(name());
   ch->setRXFrequency(rxFrequency());
   ch->setTXFrequency(txFrequency());
-  ch->setTimeout(txTimeOut().seconds());
+  ch->setTimeout(txTimeOut());
   ch->setRXOnly(rxOnly());
   // Power setting must be overridden by specialized class
   ch->setDefaultPower();
@@ -528,13 +528,13 @@ TyTCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, const Erro
   } else if ((MODE_DIGITAL == mode()) && (c->is<DMRChannel>())){
     DMRChannel *dc = c->as<DMRChannel>();
     if (contactIndex() && ctx.has<DMRContact>(contactIndex())) {
-      dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
+      dc->setContact(ctx.get<DMRContact>(contactIndex()));
     }
     if (groupListIndex() && ctx.has<RXGroupList>(groupListIndex())) {
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
-    if (positioningSystemIndex() && ctx.has<GPSSystem>(positioningSystemIndex())) {
-      dc->setAPRSObj(ctx.get<GPSSystem>(positioningSystemIndex()));
+    if (positioningSystemIndex() && ctx.has<DMRAPRSSystem>(positioningSystemIndex())) {
+      dc->setAPRS(ctx.get<DMRAPRSSystem>(positioningSystemIndex()));
     }
 
     // Link encryption key if defined
@@ -579,9 +579,9 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   setTXFrequency(chan->txFrequency());
   enableRXOnly(chan->rxOnly());
   if (chan->defaultTimeout())
-    setTXTimeOut(Interval::fromSeconds(ctx.config()->settings()->tot()));
+    setTXTimeOut(ctx.config()->settings()->tot());
   else
-    setTXTimeOut(Interval::fromSeconds(chan->timeout()));
+    setTXTimeOut(chan->timeout());
   if (chan->scanList())
     setScanListIndex(ctx.index(chan->scanList()));
   else
@@ -606,13 +606,13 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
       setGroupListIndex(ctx.index(dchan->groupList()));
     else
       setGroupListIndex(0);
-    if (dchan->txContactObj())
-      setContactIndex(ctx.index(dchan->txContactObj()));
+    if (dchan->contact())
+      setContactIndex(ctx.index(dchan->contact()));
     setBandwidth(FMChannel::Bandwidth::Narrow);
     setRXSignaling(SelectiveCall());
     setTXSignaling(SelectiveCall());
-    if (dchan->aprsObj() && dchan->aprsObj()->is<GPSSystem>()) {
-      setPositioningSystemIndex(ctx.index(dchan->aprsObj()->as<GPSSystem>()));
+    if (dchan->aprs() && dchan->aprs()->is<DMRAPRSSystem>()) {
+      setPositioningSystemIndex(ctx.index(dchan->aprs()->as<DMRAPRSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);
     }
     if (chan->tytChannelExtension()) {
@@ -1231,7 +1231,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   setTXPreambleDuration(600);
   setGroupCallHangTime(3000);
   setPrivateCallHangTime(4000);
-  setVOXSesitivity(3);
+  setVOXSesitivity(Level::fromValue(3));
   setUInt8(0x4c, 0x00); setUInt8(0x4d, 0x00);
   setLowBatteryInterval(120);
   setCallAlertToneDuration(0);
@@ -1402,14 +1402,13 @@ TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned dur) {
   setUInt8(0x4a, dur/100);
 }
 
-unsigned
+Level
 TyTCodeplug::GeneralSettingsElement::voxSesitivity() const {
-  return getUInt8(0x4b);
+  return Level::fromValue(getUInt8(0x4b));
 }
 void
-TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(unsigned level) {
-  level = std::min(10U, std::max(1U, level));
-  setUInt8(0x4b, level);
+TyTCodeplug::GeneralSettingsElement::setVOXSesitivity(Level level) {
+  setUInt8(0x4b, level.mapTo(Limit::vox()));
 }
 
 unsigned
@@ -1624,10 +1623,10 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
 bool
 TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
-  int idx = config->radioIDs()->addId(radioName(),dmrId());
+  int idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrId()));
   if (0 <= idx) {
-    logDebug() << "Explicitly set default ID to index=" << idx << ".";
-    config->settings()->defaultIdRef()->set(config->radioIDs()->getId(idx));
+    config->settings()->defaultIdRef()->set(
+      config->radioIDs()->get(idx)->as<DMRRadioID>());
   } else {
     logError() << "Cannot add radio DMR ID & cannot set default ID.";
     return false;
@@ -1783,22 +1782,29 @@ TyTCodeplug::GPSSystemElement::setRevertChannelSelected() {
   setUInt16_le(0x00, 0);
 }
 
+
 bool
 TyTCodeplug::GPSSystemElement::repeatIntervalDisabled() const {
   return 0 == getUInt8(0x02);
 }
-unsigned
-TyTCodeplug::GPSSystemElement::repeatInterval() const {
-  return unsigned(getUInt8(0x02))*30;
+
+Interval TyTCodeplug::GPSSystemElement::repeatInterval() const {
+  return Interval::fromSeconds(unsigned(getUInt8(0x02))*30);
 }
+
 void
-TyTCodeplug::GPSSystemElement::setRepeatInterval(unsigned dur) {
-  setUInt8(0x02, dur/30);
+TyTCodeplug::GPSSystemElement::setRepeatInterval(const Interval &dur) {
+  if (! dur.isFinite())
+    disableRepeatInterval();
+  else
+    setUInt8(0x02, dur.seconds()/30);
 }
+
 void
 TyTCodeplug::GPSSystemElement::disableRepeatInterval() {
   setUInt8(0x02, 0);
 }
+
 
 bool
 TyTCodeplug::GPSSystemElement::destinationContactDisabled() const {
@@ -1818,10 +1824,10 @@ TyTCodeplug::GPSSystemElement::disableDestinationContact() {
 }
 
 bool
-TyTCodeplug::GPSSystemElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
+TyTCodeplug::GPSSystemElement::fromGPSSystemObj(DMRAPRSSystem *sys, Context &ctx) {
   clear();
   if (sys->hasContact())
-    setDestinationContactIndex(ctx.index(sys->contactObj()));
+    setDestinationContactIndex(ctx.index(sys->contact()));
   if (sys->hasRevertChannel())
     setRevertChannelIndex(ctx.index(sys->revertChannel()));
   else
@@ -1830,18 +1836,18 @@ TyTCodeplug::GPSSystemElement::fromGPSSystemObj(GPSSystem *sys, Context &ctx) {
   return true;
 }
 
-GPSSystem *
+DMRAPRSSystem *
 TyTCodeplug::GPSSystemElement::toGPSSystemObj() {
-  return new GPSSystem("GPS System", nullptr, nullptr, repeatInterval());
+  return new DMRAPRSSystem("GPS System", nullptr, nullptr, repeatInterval());
 }
 
 bool
-TyTCodeplug::GPSSystemElement::linkGPSSystemObj(GPSSystem *sys, Context &ctx) {
+TyTCodeplug::GPSSystemElement::linkGPSSystemObj(DMRAPRSSystem *sys, Context &ctx) {
   if (! isValid())
     return false;
 
   if ((! destinationContactDisabled()) && (ctx.has<DMRContact>(destinationContactIndex())))
-    sys->setContactObj(ctx.get<DMRContact>(destinationContactIndex()));
+    sys->setContact(ctx.get<DMRContact>(destinationContactIndex()));
 
   if (revertChannelIsSelected())
     sys->resetRevertChannel();
@@ -2880,8 +2886,10 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i+1);
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    if (config->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(config->radioIDs()->get(i)->as<DMRRadioID>(), i+1);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
@@ -2910,10 +2918,10 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
 
   // Map DMR APRS systems
   for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<GPSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d+1); d++;
-    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a+1); a++;
+    if (config->posSystems()->system(i)->is<DMRAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<DMRAPRSSystem>(), d+1); d++;
+    } else if (config->posSystems()->system(i)->is<FMAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<FMAPRSSystem>(), a+1); a++;
     }
   }
 

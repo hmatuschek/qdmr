@@ -17,8 +17,8 @@
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
-    _defaultPower(true), _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()),
-    _rxOnly(false), _vox(std::numeric_limits<unsigned>::max()), _scanlist(),
+    _defaultPower(true), _power(Power::Low), _txTimeOut(Interval::null()),
+    _rxOnly(false), _vox(), _scanlist(),
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
@@ -149,21 +149,21 @@ Channel::setDefaultPower() {
 
 bool
 Channel::defaultTimeout() const {
-  return std::numeric_limits<unsigned>::max() == timeout();
+  return timeout().isNull();
 }
 
 bool
 Channel::timeoutDisabled() const {
-  return 0 == timeout();
+  return timeout().isInfinite();
 }
 
-unsigned
+Interval
 Channel::timeout() const {
   return _txTimeOut;
 }
 
 bool
-Channel::setTimeout(unsigned dur) {
+Channel::setTimeout(const Interval& dur) {
   if (dur == _txTimeOut)
     return true;
 
@@ -178,13 +178,13 @@ Channel::setDefaultTimeout() {
   if (defaultTimeout())
     return;
 
-  setTimeout(std::numeric_limits<unsigned>::max());
+  setTimeout(Interval::null());
   emit modified(this);
 }
 
 void
 Channel::disableTimeout() {
-  setTimeout(0);
+  setTimeout(Interval::infinity());
 }
 
 
@@ -201,28 +201,30 @@ Channel::setRXOnly(bool enable) {
 
 bool
 Channel::voxDisabled() const {
-  return 0==vox();
+  return _vox.isNull();
 }
 bool
 Channel::defaultVOX() const {
-  return std::numeric_limits<unsigned>::max() == vox();
+  return _vox.isInvalid();
 }
-unsigned
+Level
 Channel::vox() const {
   return _vox;
 }
 void
-Channel::setVOX(unsigned level) {
+Channel::setVOX(Level level) {
+  if (_vox == level)
+    return;
   _vox = level;
   emit modified(this);
 }
 void
 Channel::setVOXDefault() {
-  setVOX(std::numeric_limits<unsigned>::max());
+  setVOX(Level::invalid());
 }
 void
 Channel::disableVOX() {
-  setVOX(0);
+  setVOX(Level::null());
 }
 
 const ScanListReference *
@@ -288,13 +290,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
-  // Serialize freuqencies in MHz
-  node["rxFrequency"] = _rxFreq;
-  if (_txFreq.isZero())
-    node["txFrequency"] = YAML::Null;
-  else
-    node["txFrequency"] = _txFreq;
-
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -310,20 +305,15 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     node["timeout"] = timeout();
   }
 
-  if (defaultVOX()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["vox"] = def;
-  } else {
-    node["vox"] = vox();
-  }
-
   return true;
 }
 
 bool
 Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
-  if (! node)
+  if (! node) {
+    errMsg(err) << "YAML node is null!";
     return false;
+  }
 
   if ((! node.IsMap()) || (1 != node.size())) {
     errMsg(err) << node.Mark().line << ":" << node.Mark().column
@@ -332,19 +322,6 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
-  // Parse frequencies
-  if (ch["rxFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No rxFreuqency specified.";
-    return false;
-  }
-  setRXFrequency(ch["rxFrequency"].as<Frequency>());
-
-  if (ch["txFrequency"].IsNull())
-    setTXFrequency(Frequency());
-  else
-    setTXFrequency(ch["txFrequency"].as<Frequency>());
-
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {
@@ -352,16 +329,16 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
   }
 
-  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
+  if ((! ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
     setDefaultTimeout();
   } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<unsigned>());
+    setTimeout(ch["timeout"].as<Interval>());
   }
 
   if ((! ch["vox"]) || ("!default" == ch["vox"].Tag())) {
     setVOXDefault();
   } else if (ch["vox"] && ch["vox"].IsScalar()) {
-    setVOX(ch["vox"].as<unsigned>());
+    setVOX(ch["vox"].as<Level>());
   }
 
   return ConfigObject::parse(ch, ctx, err);
@@ -442,7 +419,7 @@ FMChannel::clear() {
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
   setBandwidth(Bandwidth::Narrow);
-  setAPRSSystem(nullptr);
+  setAPRS(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
 
@@ -516,29 +493,22 @@ FMChannel::setBandwidth(Bandwidth bw) {
   return true;
 }
 
-const APRSSystemReference *
+const FMAPRSSystemReference *
+FMChannel::aprsRef() const {
+  return &_aprsSystem;
+}
+
+FMAPRSSystemReference *
+FMChannel::aprsRef() {
+  return &_aprsSystem;
+}
+
+FMAPRSSystem *
 FMChannel::aprs() const {
-  return &_aprsSystem;
-}
-
-APRSSystemReference *
-FMChannel::aprs() {
-  return &_aprsSystem;
-}
-
-void
-FMChannel::setAPRS(APRSSystemReference *ref) {
-  if (nullptr == ref)
-    return _aprsSystem.clear();
-  _aprsSystem.copy(ref);
-}
-
-APRSSystem *
-FMChannel::aprsSystem() const {
-  return _aprsSystem.as<APRSSystem>();
+  return _aprsSystem.as<FMAPRSSystem>();
 }
 void
-FMChannel::setAPRSSystem(APRSSystem *sys) {
+FMChannel::setAPRS(FMAPRSSystem *sys) {
   _aprsSystem.set(sys);
 }
 
@@ -774,10 +744,10 @@ DMRChannel::clear() {
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupList(nullptr);
-  setTXContactObj(nullptr);
-  setAPRSObj(nullptr);
-  setRoamingZone(nullptr);
-  setRadioIdObj(DefaultRadioID::get());
+  setContact(nullptr);
+  setAPRS(nullptr);
+  setRoaming(nullptr);
+  setRadioId(DefaultRadioID::get());
   setCommercialExtension(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
@@ -838,14 +808,6 @@ DMRChannel::groupListRef() {
   return &_rxGroup;
 }
 
-void
-DMRChannel::setGroupListRef(GroupListReference *ref) {
-  if (nullptr == ref)
-    _rxGroup.clear();
-  else
-    _rxGroup.copy(ref);
-}
-
 RXGroupList *
 DMRChannel::groupList() const {
   return _rxGroup.as<RXGroupList>();
@@ -860,30 +822,22 @@ DMRChannel::setGroupList(RXGroupList *g) {
 }
 
 const DMRContactReference *
-DMRChannel::contact() const {
+DMRChannel::contactRef() const {
   return &_txContact;
 }
 
 DMRContactReference *
-DMRChannel::contact() {
+DMRChannel::contactRef() {
   return &_txContact;
 }
 
-void
-DMRChannel::setContact(DMRContactReference *ref) {
-  if (nullptr == ref)
-    _txContact.clear();
-  else
-    _txContact.copy(ref);
-}
-
 DMRContact *
-DMRChannel::txContactObj() const {
+DMRChannel::contact() const {
   return _txContact.as<DMRContact>();
 }
 
 bool
-DMRChannel::setTXContactObj(DMRContact *c) {
+DMRChannel::setContact(DMRContact *c) {
   if(! _txContact.set(c))
     return false;
   emit modified(this);
@@ -891,30 +845,22 @@ DMRChannel::setTXContactObj(DMRContact *c) {
 }
 
 const PositioningSystemReference *
-DMRChannel::aprs() const {
+DMRChannel::aprsRef() const {
   return &_posSystem;
 }
 
 PositioningSystemReference *
-DMRChannel::aprs() {
+DMRChannel::aprsRef() {
   return &_posSystem;
 }
 
-void
-DMRChannel::setAPRS(PositioningSystemReference *ref) {
-  if (nullptr == ref)
-    _posSystem.clear();
-  else
-    _posSystem.copy(ref);
-}
-
-PositioningSystem *
-DMRChannel::aprsObj() const {
-  return _posSystem.as<PositioningSystem>();
+PositionReportingSystem *
+DMRChannel::aprs() const {
+  return _posSystem.as<PositionReportingSystem>();
 }
 
 bool
-DMRChannel::setAPRSObj(PositioningSystem *sys) {
+DMRChannel::setAPRS(PositionReportingSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);
@@ -922,60 +868,44 @@ DMRChannel::setAPRSObj(PositioningSystem *sys) {
 }
 
 const RoamingZoneReference *
-DMRChannel::roaming() const {
+DMRChannel::roamingRef() const {
   return &_roaming;
 }
 
 RoamingZoneReference *
-DMRChannel::roaming() {
+DMRChannel::roamingRef() {
   return &_roaming;
 }
 
-void
-DMRChannel::setRoaming(RoamingZoneReference *ref) {
-  if (nullptr == ref)
-    _roaming.clear();
-  else
-    _roaming.copy(ref);
-}
-
 RoamingZone *
-DMRChannel::roamingZone() const {
+DMRChannel::roaming() const {
   return _roaming.as<RoamingZone>();
 }
 
 bool
-DMRChannel::setRoamingZone(RoamingZone *zone) {
+DMRChannel::setRoaming(RoamingZone *zone) {
   _roaming.set(zone);
   emit modified(this);
   return true;
 }
 
 const DMRRadioIDReference *
-DMRChannel::radioId() const {
+DMRChannel::radioIdRef() const {
   return &_radioId;
 }
 
 DMRRadioIDReference *
-DMRChannel::radioId() {
+DMRChannel::radioIdRef() {
   return &_radioId;
 }
 
-void
-DMRChannel::setRadioId(DMRRadioIDReference *ref) {
-  if (nullptr == ref)
-    _radioId.clear();
-  else
-    _radioId.copy(ref);
-}
-
 DMRRadioID *
-DMRChannel::radioIdObj() const {
+DMRChannel::radioId() const {
   return _radioId.as<DMRRadioID>();
 }
 
 bool
-DMRChannel::setRadioIdObj(DMRRadioID *id) {
+DMRChannel::setRadioId(DMRRadioID *id) {
   if (! _radioId.set(id))
     return false;
   emit modified(this);

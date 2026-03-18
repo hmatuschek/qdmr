@@ -10,7 +10,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 
 
 /** Represents the device specific binary codeplug for Anytone AT-D578UV radios.
@@ -260,9 +260,9 @@ public:
     void enableKeyTone(bool enable) override;
 
     /** Returns the transmit timeout in seconds. */
-    virtual unsigned transmitTimeout() const;
+    virtual Interval transmitTimeout() const;
     /** Sets the transmit timeout in seconds. */
-    virtual void setTransmitTimeout(unsigned tot);
+    virtual void setTransmitTimeout(const Interval &tot);
 
     /** Returns the UI language. */
     virtual AnytoneDisplaySettingsExtension::Language language() const;

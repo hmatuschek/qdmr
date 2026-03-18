@@ -299,10 +299,10 @@ bool
 MD390Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
-  for (int i=0; i<NUM_CONTACTS; i++) {
+  for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < config->contacts()->digitalCount())
-      cont.fromContactObj(config->contacts()->digitalContact(i));
+    if (i < ctx.count<DMRContact>())
+      cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();
   }
@@ -506,12 +506,12 @@ MD390Codeplug::clearPositioningSystems() {
 bool
 MD390Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
-  for (int i=0; i<NUM_GPSSYSTEMS; i++) {
+  for (unsigned int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
-    if (i < config->posSystems()->gpsCount()) {
+    if (i < ctx.count<DMRAPRSSystem>()) {
       logDebug() << "Encode GPS system #" << i << " '" <<
-                    config->posSystems()->gpsSystem(i)->name() << "'.";
-      gps.fromGPSSystemObj(config->posSystems()->gpsSystem(i), ctx);
+                    ctx.get<DMRAPRSSystem>(i+1)->name() << "'.";
+      gps.fromGPSSystemObj(ctx.get<DMRAPRSSystem>(i+1), ctx);
     } else {
       gps.clear();
     }
@@ -525,7 +525,7 @@ MD390Codeplug::createPositioningSystems(Config *config, Context &ctx, const Erro
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       continue;
-    if (GPSSystem *obj = gps.toGPSSystemObj()) {
+    if (DMRAPRSSystem *obj = gps.toGPSSystemObj()) {
       config->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid GPS system at index " << i << ".";
@@ -542,7 +542,7 @@ MD390Codeplug::linkPositioningSystems(Context &ctx, const ErrorStack &err) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       continue;
-    if (! gps.linkGPSSystemObj(ctx.get<GPSSystem>(i+1), ctx)) {
+    if (! gps.linkGPSSystemObj(ctx.get<DMRAPRSSystem>(i+1), ctx)) {
       errMsg(err) << "Cannot link GPS system at index " << i << ".";
       return false;
     }

@@ -780,8 +780,8 @@ Codeplug::Context::Context(Config *config)
   addTable(&Channel::staticMetaObject);
   addTable(&Zone::staticMetaObject);
   addTable(&ScanList::staticMetaObject);
-  addTable(&GPSSystem::staticMetaObject);
-  addTable(&APRSSystem::staticMetaObject);
+  addTable(&DMRAPRSSystem::staticMetaObject);
+  addTable(&FMAPRSSystem::staticMetaObject);
   addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
   addTable(&SMSTemplate::staticMetaObject);

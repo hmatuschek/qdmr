@@ -80,7 +80,7 @@ AMChannelDialog::construct() {
   }
   if (! _myChannel->defaultTimeout()) {
     ui->totDefault->setChecked(false); ui->totValue->setEnabled(true);
-    ui->totValue->setValue(_myChannel->timeout());
+    ui->totValue->setValue(_myChannel->timeout().seconds());
   }
   ui->rxOnly->setChecked(_myChannel->rxOnly());
   if (! _myChannel->defaultSquelch()) {
@@ -89,7 +89,7 @@ AMChannelDialog::construct() {
   }
   if (! _myChannel->defaultVOX()) {
     ui->voxDefault->setChecked(false); ui->voxValue->setEnabled(true);
-    ui->voxValue->setValue(_myChannel->vox());
+    ui->voxValue->setValue(_myChannel->vox().value());
   }
 
   if (! settings.showExtensions())
@@ -126,7 +126,7 @@ AMChannelDialog::channel()
   if (ui->totDefault->isChecked())
     _myChannel->setDefaultTimeout();
   else
-    _myChannel->setTimeout(ui->totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(ui->totValue->value()));
   _myChannel->setRXOnly(ui->rxOnly->isChecked());
   if (ui->squelchDefault->isChecked())
     _myChannel->setSquelchDefault();
@@ -136,7 +136,7 @@ AMChannelDialog::channel()
   if (ui->voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(ui->voxValue->value());
+    _myChannel->setVOX(Level::fromValue(ui->voxValue->value()));
 
   auto channel = _myChannel;
   if (nullptr == _channel) {

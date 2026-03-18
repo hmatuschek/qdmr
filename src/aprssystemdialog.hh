@@ -15,20 +15,20 @@ class APRSSystemDialog : public QDialog
 
 public:
   explicit APRSSystemDialog(Config *config, QWidget *parent = nullptr);
-  explicit APRSSystemDialog(Config *config, APRSSystem *aprs, QWidget *parent = nullptr);
+  explicit APRSSystemDialog(Config *config, FMAPRSSystem *aprs, QWidget *parent = nullptr);
 
   virtual ~APRSSystemDialog();
 
-  APRSSystem *aprsSystem();
+  FMAPRSSystem *aprsSystem();
 
 protected:
   void construct();
-  QIcon aprsIcon(APRSSystem::Icon icon);
+  QIcon aprsIcon(FMAPRSSystem::Icon icon);
 
 protected:
   Config *_config;
-  APRSSystem *_myAPRS;
-  APRSSystem *_aprs;
+  FMAPRSSystem *_myAPRS;
+  FMAPRSSystem *_aprs;
 
 private:
   Ui::aprssystemdialog *ui;

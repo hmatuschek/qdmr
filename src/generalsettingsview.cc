@@ -32,8 +32,11 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   }
 
   ui->squelchValue->setValue(_config->settings()->squelch());
-  ui->totValue->setValue(_config->settings()->tot());
-  ui->voxValue->setValue(_config->settings()->vox());
+  if (_config->settings()->totDisabled())
+    ui->totValue->setValue(0);
+  else
+    ui->totValue->setValue(_config->settings()->tot().seconds());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 
   ui->extensionView->setObjectName("radioSettingsExtension");
   ui->extensionView->setObject(_config->settings(), _config);
@@ -86,8 +89,11 @@ GeneralSettingsView::onConfigModified() {
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
   ui->squelchValue->setValue(_config->settings()->squelch());
-  ui->totValue->setValue(_config->settings()->tot());
-  ui->voxValue->setValue(_config->settings()->vox());
+  if (_config->settings()->totDisabled())
+    ui->totValue->setValue(0);
+  else
+    ui->totValue->setValue(_config->settings()->tot().seconds());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 }
 
 void
@@ -146,9 +152,12 @@ GeneralSettingsView::onSquelchChanged() {
 }
 void
 GeneralSettingsView::onTOTChanged() {
-  _config->settings()->setTOT(ui->totValue->value());
+  if (0 == ui->totValue->value())
+    _config->settings()->disableTOT();
+  else
+    _config->settings()->setTOT(Interval::fromSeconds(ui->totValue->value()));
 }
 void
 GeneralSettingsView::onVOXChanged() {
-  _config->settings()->setVOX(ui->voxValue->value());
+  _config->settings()->setVOX(Level::fromValue(ui->voxValue->value()));
 }

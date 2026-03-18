@@ -7,8 +7,8 @@ settings:
   speech: false
   power: High
   squelch: 3
-  vox: 0
-  tot: 0
+  vox: off
+  tot: infinite
   defaultID: id1
 radioIDs:
   - dmr: {id: id1, name: Test, number: 12345}
