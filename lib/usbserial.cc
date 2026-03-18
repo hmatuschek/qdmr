@@ -132,7 +132,6 @@ USBSerial::detect(uint16_t vid, uint16_t pid, bool isSave) {
 QList<USBDeviceDescriptor>
 USBSerial::detect() {
   QList<USBDeviceDescriptor> interfaces;
-  // Find matching serial port by VID/PID.
   logDebug() << "Search for serial ports.";
   QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
   foreach (QSerialPortInfo port, ports) {

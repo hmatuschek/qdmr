@@ -401,6 +401,44 @@ public:
 };
 
 
+/** Represents a limit on intervals.
+ * @ingroup limits */
+class RadioLimitInterval: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RadioLimitInterval(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                              QObject *parent=nullptr);
+  /** Constructor from range. */
+  RadioLimitInterval(const Range<Interval> &range,
+                     RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                     QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  /** Holds the duration ranges for the interval. */
+  Range<Interval> _durations;
+};
+
+
+/** Represents a limit on levels.
+ * @ingroup limits */
+class RadioLimitLevel: public RadioLimitValue
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RadioLimitLevel(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                           QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+};
+
+
 /** Represents the limits for a @c ConfigItem instance.
  *
  * That is, it holds the limits for every property of the @c ConfigItem instance. This class

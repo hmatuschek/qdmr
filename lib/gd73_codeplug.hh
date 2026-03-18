@@ -228,9 +228,9 @@ public:
     void setLanguage(Language lang);
 
     /** Returns the VOX level [0,10]. */
-    unsigned int vox() const;
+    Level vox() const;
     /** Sets the VOX level [0,10]. */
-    void setVOX(unsigned int level);
+    void setVOX(Level level);
 
     /** Returns the squelch level [0,10]. */
     unsigned int squelch() const;
@@ -361,9 +361,11 @@ public:
 
   public:
     /** Some limits of the settings. */
-    struct Limit {
+    struct Limit: Element::Limit {
       /** Maximum name length. */
       static constexpr unsigned int name() { return 16; }
+      /** Valid VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1, 4}; }
       /** Transmit time-out range. */
       static constexpr TimeRange tot() {
         return TimeRange{Interval::fromSeconds(20), Interval::fromSeconds(500)};

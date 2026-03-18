@@ -33,6 +33,26 @@ public:
 };
 
 
+/** Implements a set of possibly overlapping ranges. */
+template <class T>
+class Ranges
+{
+public:
+  /** Checks, if the given value lays within the range. */
+  inline bool contains(const T &n) const {
+    for (auto range: ranges) {
+      if (range.contains(n))
+        return true;
+    }
+    return false;
+  }
+
+public:
+  /** The set of ranges. */
+  QSet<Range<T>> ranges;
+};
+
+
 /** An integer range. */
 typedef Range<unsigned int> IntRange;
 /** A time range. */

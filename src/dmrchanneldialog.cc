@@ -1,4 +1,4 @@
-#include "digitalchanneldialog.hh"
+#include "dmrchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
@@ -12,15 +12,15 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of DigitalChannelDialog
+ * Implementation of DMRChannelDialog
  * ********************************************************************************************* */
-DigitalChannelDialog::DigitalChannelDialog(Config *config, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new DMRChannel(this)), _channel(nullptr)
 {
   construct();
 }
 
-DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
+DMRChannelDialog::DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
 {
   if (_channel) {
@@ -31,7 +31,7 @@ DigitalChannelDialog::DigitalChannelDialog(Config *config, DMRChannel *channel, 
 }
 
 void
-DigitalChannelDialog::construct() {
+DMRChannelDialog::construct() {
   setupUi(this);
   Settings settings;
 
@@ -71,39 +71,41 @@ DigitalChannelDialog::construct() {
   timeSlot->setItemData(0, unsigned(DMRChannel::TimeSlot::TS1));
   timeSlot->setItemData(1, unsigned(DMRChannel::TimeSlot::TS2));
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
-                         (nullptr != _myChannel ? _myChannel->groupListObj() : nullptr));
+                         (nullptr != _myChannel ? _myChannel->groupList() : nullptr));
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  if (_myChannel && (nullptr == _myChannel->txContactObj()))
+  if (_myChannel && (nullptr == _myChannel->contact()))
     txContact->setCurrentIndex(0);
   for (int i=0; i<_config->contacts()->count(); i++) {
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_myChannel && (_myChannel->txContactObj() == _config->contacts()->contact(i)) )
+    if (_myChannel && (_myChannel->contact() == _config->contacts()->contact(i)) )
       txContact->setCurrentIndex(i+1);
   }
-  gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
+  gpsSystem->addItem(tr("[None]"), QVariant::fromValue((DMRAPRSSystem *)nullptr));
   for (int i=0; i<_config->posSystems()->count(); i++) {
-    PositioningSystem *sys = _config->posSystems()->system(i);
+    PositionReportingSystem *sys = _config->posSystems()->system(i);
     gpsSystem->addItem(sys->name(), QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprsObj() == sys))
+    if (_myChannel && (_myChannel->aprs() == sys))
       gpsSystem->setCurrentIndex(i+1);
   }
   roaming->addItem(tr("[None]"), QVariant::fromValue((RoamingZone *)nullptr));
   roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
-  if (_myChannel && (_myChannel->roamingZone() == DefaultRoamingZone::get()))
+  if (_myChannel && (_myChannel->roaming() == DefaultRoamingZone::get()))
     roaming->setCurrentIndex(1);
   for (int i=0; i<_config->roamingZones()->count(); i++) {
     RoamingZone *zone = _config->roamingZones()->zone(i);
     roaming->addItem(zone->name(), QVariant::fromValue(zone));
-    if (_myChannel && (_myChannel->roamingZone() == zone))
+    if (_myChannel && (_myChannel->roaming() == zone))
       roaming->setCurrentIndex(i+2);
   }
   dmrID->addItem(tr("[Default]"), QVariant::fromValue(DefaultRadioID::get()));
   dmrID->setCurrentIndex(0);
   for (int i=0; i<_config->radioIDs()->count(); i++) {
-    dmrID->addItem(_config->radioIDs()->getId(i)->name(),
-                   QVariant::fromValue(_config->radioIDs()->getId(i)));
-    if (_myChannel && (_config->radioIDs()->getId(i) == _myChannel->radioIdObj())) {
+    if (! _config->radioIDs()->get(i)->is<DMRRadioID>())
+      continue;
+    auto id = _config->radioIDs()->get(i)->as<DMRRadioID>();
+    dmrID->addItem(id->name(), QVariant::fromValue(id));
+    if (_myChannel && (id == _myChannel->radioId())) {
       dmrID->setCurrentIndex(i+1);
     }
   }
@@ -133,9 +135,12 @@ DigitalChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_channel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_channel->timeout().seconds());
   }
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
@@ -150,7 +155,7 @@ DigitalChannelDialog::construct() {
     timeSlot->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_channel->vox());
+    voxValue->setValue(_channel->vox().value());
   }
 
   extensionView->setObjectName("digitalChannelExtension");
@@ -164,16 +169,16 @@ DigitalChannelDialog::construct() {
   connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
   connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 
-  connect(txFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onTxFrequencyEdited);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onRxFrequencyEdited);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DigitalChannelDialog::onOffsetFrequencyEdited);
-  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DigitalChannelDialog::onOffsetCurrentIndexChanged);
+  connect(txFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DMRChannelDialog::onOffsetFrequencyEdited);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DMRChannelDialog::onOffsetCurrentIndexChanged);
 }
 
 DMRChannel *
-DigitalChannelDialog::channel()
+DMRChannelDialog::channel()
 {
-  _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
+  _myChannel->setRadioId(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
@@ -183,21 +188,23 @@ DigitalChannelDialog::channel()
     _myChannel->setPower(Channel::Power(powerValue->currentData().toUInt()));
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAdmit(DMRChannel::Admit(txAdmit->currentData().toUInt()));
   _myChannel->setColorCode(colorCode->value());
   _myChannel->setTimeSlot(DMRChannel::TimeSlot(timeSlot->currentData().toUInt()));
-  _myChannel->setGroupListObj(rxGroupList->currentData().value<RXGroupList *>());
-  _myChannel->setTXContactObj(txContact->currentData().value<DMRContact *>());
-  _myChannel->setAPRSObj(gpsSystem->currentData().value<PositioningSystem *>());
-  _myChannel->setRoamingZone(roaming->currentData().value<RoamingZone *>());
+  _myChannel->setGroupList(rxGroupList->currentData().value<RXGroupList *>());
+  _myChannel->setContact(txContact->currentData().value<DMRContact *>());
+  _myChannel->setAPRS(gpsSystem->currentData().value<PositionReportingSystem *>());
+  _myChannel->setRoaming(roaming->currentData().value<RoamingZone *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   DMRChannel *channel = _myChannel;
   if (nullptr == _channel) {
@@ -212,7 +219,7 @@ DigitalChannelDialog::channel()
 }
 
 void
-DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
+DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
@@ -231,22 +238,22 @@ DigitalChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 void
-DigitalChannelDialog::onPowerDefaultToggled(bool checked) {
+DMRChannelDialog::onPowerDefaultToggled(bool checked) {
   powerValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onTimeoutDefaultToggled(bool checked) {
+DMRChannelDialog::onTimeoutDefaultToggled(bool checked) {
   totValue->setEnabled(!checked);
 }
 
 void
-DigitalChannelDialog::onVOXDefaultToggled(bool checked) {
+DMRChannelDialog::onVOXDefaultToggled(bool checked) {
   voxValue->setEnabled(! checked);
 }
 
 void
-DigitalChannelDialog::onHideChannelHint() {
+DMRChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
   hintLabel->setVisible(false);
@@ -255,14 +262,14 @@ DigitalChannelDialog::onHideChannelHint() {
 }
 
 void
-DigitalChannelDialog::onTxFrequencyEdited() {
+DMRChannelDialog::onTxFrequencyEdited() {
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
   txFrequency->setText(_myChannel->txFrequency().format());
   updateOffsetFrequency();
 }
 
 void
-DigitalChannelDialog::onRxFrequencyEdited() {
+DMRChannelDialog::onRxFrequencyEdited() {
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   rxFrequency->setText(_myChannel->rxFrequency().format());
 
@@ -276,7 +283,7 @@ DigitalChannelDialog::onRxFrequencyEdited() {
 }
 
 void
-DigitalChannelDialog::onOffsetFrequencyEdited() {
+DMRChannelDialog::onOffsetFrequencyEdited() {
   Frequency txFreq = _myChannel->rxFrequency();
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
@@ -292,7 +299,7 @@ DigitalChannelDialog::onOffsetFrequencyEdited() {
 }
 
 void
-DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
+DMRChannelDialog::onOffsetCurrentIndexChanged(int index) {
   Frequency txFreq = _myChannel->rxFrequency();
   FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
 
@@ -317,7 +324,7 @@ DigitalChannelDialog::onOffsetCurrentIndexChanged(int index) {
 
 
 void
-DigitalChannelDialog::updateOffsetFrequency() {
+DMRChannelDialog::updateOffsetFrequency() {
   FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
   // Show absolute value
   offsetLineEdit->setText(offsetFrequency.abs().format());
@@ -326,7 +333,7 @@ DigitalChannelDialog::updateOffsetFrequency() {
 }
 
 void
-DigitalChannelDialog::updateComboBox() {
+DMRChannelDialog::updateComboBox() {
   switch (_myChannel->offsetShift()) {
   case Channel::OffsetShift::None:
     offsetComboBox->setCurrentIndex(0);

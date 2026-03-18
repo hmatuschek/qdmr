@@ -28,7 +28,7 @@ Interval::format(Format f) const {
 }
 
 bool
-Interval::parse(const QString &value) {
+Interval::parse(const QString &value, Format format) {
   if (value.toLower().startsWith("inf")) {
     _duration = std::numeric_limits<unsigned long long>::max();
     return true;
@@ -43,9 +43,9 @@ Interval::parse(const QString &value) {
   QString unit = match.captured(2);
   QString dur = match.captured(1);
 
-  if (hasUnit && ("s"==unit))
+  if ((hasUnit && ("s"==unit)) || (!hasUnit && (Format::Seconds == format)))
     _duration = dur.toULongLong()*1000ULL;
-  else if (hasUnit && ("min"==unit))
+  else if ((hasUnit && ("min"==unit)) || (!hasUnit && (Format::Minutes == format)))
     _duration = dur.toULongLong()*60000ULL;
   else
     _duration = dur.toULongLong();

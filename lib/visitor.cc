@@ -85,7 +85,13 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
     }
   } else if (QString("Interval") == prop.typeName()) {
     if (! this->processInterval(item, prop, err)) {
-      errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
+      errMsg(err) << "While processing interval '" << prop.name() << "' of '"
+                  << item->metaObject()->className() << "'.";
+      return false;
+    }
+  } else if (QString("Level") == prop.typeName()) {
+    if (! this->processLevel(item, prop, err)) {
+      errMsg(err) << "While processing level '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
@@ -187,6 +193,13 @@ Visitor::processFrequency(ConfigItem *parent, const QMetaProperty &prop, const E
 
 bool
 Visitor::processInterval(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
+  Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
+  // Does nothing, return true;
+  return true;
+}
+
+bool
+Visitor::processLevel(ConfigItem *parent, const QMetaProperty &prop, const ErrorStack &err) {
   Q_UNUSED(parent); Q_UNUSED(prop); Q_UNUSED(err)
   // Does nothing, return true;
   return true;

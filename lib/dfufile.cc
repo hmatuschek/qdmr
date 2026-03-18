@@ -558,6 +558,17 @@ DFUFile::Image::isAligned(unsigned blocksize) const {
   return true;
 }
 
+DFUFile::Image::iterator
+DFUFile::Image::begin() {
+  return _elements.begin();
+}
+
+DFUFile::Image::iterator
+DFUFile::Image::end() {
+  return _elements.end();
+}
+
+
 bool
 DFUFile::Image::read(QFile &file, CRC32 &crc, QString &errorMessage)
 {
@@ -655,6 +666,8 @@ DFUFile::Image::dump(QTextStream &stream) const {
 
 bool
 DFUFile::Image::isAllocated(uint32_t offset) const {
+  if (_elements.isEmpty())
+    return false;
   return 0 <= _addressmap.find(offset);
 }
 
