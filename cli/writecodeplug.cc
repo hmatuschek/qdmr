@@ -26,7 +26,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       logError() << "Cannot read CSV file '" << filename << "': " << errorMessage;
       return -1;
     }
-  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix())) {
+  } else if (parser.isSet("yaml") || ("yaml" == fileinfo.suffix()) || ("yml" == fileinfo.suffix())) {
     ErrorStack err;
     if (! config.readYAML(fileinfo.canonicalFilePath(), err)) {
       logError() << "Cannot parse YAML codeplug '" << fileinfo.fileName() << "': " << err.format();
