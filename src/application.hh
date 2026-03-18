@@ -56,6 +56,7 @@ public:
 public slots:
   void newCodeplug();
   void loadCodeplug();
+  bool loadCodeplug(const QString &filename, const ErrorStack &err);
   void saveCodeplug();
   void exportCodeplugToChirp();
   void importCodeplug();
