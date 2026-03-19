@@ -828,27 +828,27 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
 }
 
 
-DMRSettings::SMSFormat
+SMSExtension::Format
 DMR6X2UVCodeplug::GeneralSettingsElement::smsFormat() const {
   switch ((SMSFormat) getUInt8(Offset::smsFormat())) {
-  case SMSFormat::Motorola: return DMRSettings::SMSFormat::Motorola;
-  case SMSFormat::Hytera: return DMRSettings::SMSFormat::Hytera;
-  case SMSFormat::DMR: return DMRSettings::SMSFormat::DMR;
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
   }
 
-  return DMRSettings::SMSFormat::Motorola;
+  return SMSExtension::Format::Motorola;
 }
 
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(DMRSettings::SMSFormat format) {
+DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format format) {
   switch (format) {
-  case DMRSettings::SMSFormat::Motorola:
+  case SMSExtension::Format::Motorola:
     setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Motorola);
     break;
-  case DMRSettings::SMSFormat::Hytera:
+  case SMSExtension::Format::Hytera:
     setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Hytera);
     break;
-  case DMRSettings::SMSFormat::DMR:
+  case SMSExtension::Format::DMR:
     setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::DMR);
     break;
   }
@@ -1038,7 +1038,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
-  setSMSFormat(ctx.config()->settings()->dmr()->smsFormat());
+  setSMSFormat(ctx.config()->smsExtension()->format());
 
   // apply DMR-6X2UV specific settings.
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -1121,7 +1121,7 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
   ctx.config()->settings()->dmr()->setPreamble(this->preWaveDelay());
-  ctx.config()->settings()->dmr()->setSMSFormat(this->smsFormat());
+  ctx.config()->smsExtension()->setFormat(this->smsFormat());
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;

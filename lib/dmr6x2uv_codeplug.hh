@@ -365,9 +365,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual DMRSettings::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(DMRSettings::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     bool gpsUnitsImperial() const override;
     void enableGPSUnitsImperial(bool enable) override;

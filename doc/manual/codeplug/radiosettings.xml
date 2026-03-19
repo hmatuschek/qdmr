@@ -198,14 +198,6 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>smsFormat</token></term>
-    <listitem>
-      <para>Specifies the format of all SMS. This must match the network and must be one of 
-        <token>Motorola</token>, <token>Hytera</token> or <token>DMR</token>. For example, the 
-        Brandmeister network requires this setting to be <token>Motorola</token>. </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>preamble</token></term>
     <listitem>
       <para>Specifies the duration of the DMR transmit preamble. The duration must be specified 

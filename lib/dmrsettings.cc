@@ -5,7 +5,7 @@ DMRSettings::DMRSettings(QObject *parent)
   : ConfigExtension{parent}, _privateCallMatch(true), _groupCallMatch(true),
     _privateCallHangTime(Interval::fromSeconds(5)), _groupCallHangTime(Interval::fromSeconds(3)),
     _sendTalkerAlias(false), _talkerAliasEncoding(TalkerAliasEncoding::Iso8),
-    _smsFormat(SMSFormat::DMR), _preamble(Interval::fromMilliseconds(100))
+    _preamble(Interval::fromMilliseconds(100))
 {
   // pass...
 }
@@ -21,7 +21,6 @@ DMRSettings::clear() {
   _groupCallHangTime = Interval::fromSeconds(3);
   _sendTalkerAlias = false;
   _talkerAliasEncoding = TalkerAliasEncoding::Iso8;
-  _smsFormat = SMSFormat::DMR;
 }
 
 
@@ -115,20 +114,6 @@ DMRSettings::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
   if (_talkerAliasEncoding == encoding)
     return;
   _talkerAliasEncoding = encoding;
-  emit modified(this);
-}
-
-
-DMRSettings::SMSFormat
-DMRSettings::smsFormat() const {
-  return _smsFormat;
-}
-
-void
-DMRSettings::setSMSFormat(SMSFormat format) {
-  if (_smsFormat == format)
-    return;
-  _smsFormat = format;
   emit modified(this);
 }
 

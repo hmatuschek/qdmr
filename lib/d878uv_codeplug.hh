@@ -8,6 +8,7 @@
 #include "gpssystem.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
+#include "smsextension.hh"
 
 class Channel;
 class DMRContact;
@@ -660,9 +661,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual DMRSettings::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(DMRSettings::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
     virtual Frequency autoRepeaterMinFrequencyVHF() const override;

@@ -27,8 +27,6 @@ class DMRSettings : public ConfigExtension
   Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAliasEnabled WRITE enableSendTalkerAlias FINAL)
   Q_CLASSINFO("talkerAliasEncodingDescription", "Specifies the encoding of the talker alias.")
   Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding FINAL)
-  Q_CLASSINFO("smsFormatDescription", "Specifies the SMS format.")
-  Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat FINAL)
   Q_CLASSINFO("preambleDescription", "Specifies preamble duration. Usually 100ms.")
   Q_PROPERTY(Interval preamble READ preamble WRITE setPreamble FINAL)
 
@@ -38,12 +36,6 @@ public:
     Iso7, Iso8, Unicode
   };
   Q_ENUM(TalkerAliasEncoding)
-
-  /** Possible SMS formats. */
-  enum class SMSFormat {
-    Motorola, Hytera, DMR
-  };
-  Q_ENUM(SMSFormat)
 
 public:
   /** Default constructor. */
@@ -82,11 +74,6 @@ public:
   /** Sets the talker alias encoding. */
   void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
 
-  /** Returns the SMS format. */
-  SMSFormat smsFormat() const;
-  /** Sets the SMS format. */
-  void setSMSFormat(SMSFormat format);
-
   /** Returns the preamble duration. */
   Interval preamble() const;
   /** Sets the preamble duration. */
@@ -105,8 +92,6 @@ protected:
   bool _sendTalkerAlias;
   /** The talker alias encoding. */
   TalkerAliasEncoding _talkerAliasEncoding;
-  /** Specifies the sms format. */
-  SMSFormat _smsFormat;
   /** The preamble duration. */
   Interval _preamble;
 };
