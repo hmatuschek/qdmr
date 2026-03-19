@@ -31,6 +31,15 @@
     fixedLocation: JO62jl45
     systems: [GPS, Beidou]
     units: Metric
+  dmr:
+    privateCallMatch: true
+    groupCallMatch: true
+    privateCallHangTime: 5s
+    groupCallHangTime: 3s
+    sendTalkerAlias: false
+    talkerAliasEncoding: Iso8
+    smsFormat: DMR
+    preamble: 100ms
 ]]></programlisting>
 </example>
 
