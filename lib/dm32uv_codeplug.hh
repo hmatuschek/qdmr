@@ -12,6 +12,7 @@
 #include "roamingchannel.hh"
 #include "smsextension.hh"
 #include "gnsssettings.hh"
+#include "dmrsettings.hh"
 
 // forward declaration
 class Zone;
@@ -1747,9 +1748,9 @@ public:
     virtual void setDMRRemoteMonitorDuration(Interval duration);
 
     /** Returns the talker alias format. */
-    virtual TalkerAliasFormat talkerAliasFormat() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias format. */
-    virtual void setTalkerAliasFormat(TalkerAliasFormat format);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding format);
 
     /** Returns @c true, if transmission of talker alias is enabled. */
     virtual bool txTalkerAliasEnabled() const;
