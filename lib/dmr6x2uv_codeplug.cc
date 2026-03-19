@@ -827,14 +827,33 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
+
+DMRSettings::SMSFormat
 DMR6X2UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
+  switch ((SMSFormat) getUInt8(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return DMRSettings::SMSFormat::Motorola;
+  case SMSFormat::Hytera: return DMRSettings::SMSFormat::Hytera;
+  case SMSFormat::DMR: return DMRSettings::SMSFormat::DMR;
+  }
+
+  return DMRSettings::SMSFormat::Motorola;
 }
+
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format) {
-  setUInt8(Offset::smsFormat(), (unsigned int)format);
+DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(DMRSettings::SMSFormat format) {
+  switch (format) {
+  case DMRSettings::SMSFormat::Motorola:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Motorola);
+    break;
+  case DMRSettings::SMSFormat::Hytera:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Hytera);
+    break;
+  case DMRSettings::SMSFormat::DMR:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::DMR);
+    break;
+  }
 }
+
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
@@ -1016,6 +1035,10 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
     return false;
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
+  setSMSFormat(ctx.config()->settings()->dmr()->smsFormat());
 
   // apply DMR-6X2UV specific settings.
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -1057,16 +1080,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
   // Encode DMR settings
-  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
-  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
   enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
   enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-  setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings.
   setGPSTimeZone(ext->gpsSettings()->timeZone());
@@ -1098,6 +1117,11 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
+
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
+  ctx.config()->settings()->dmr()->setPreamble(this->preWaveDelay());
+  ctx.config()->settings()->dmr()->setSMSFormat(this->smsFormat());
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1133,16 +1157,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Encode dmr settings
-  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
-  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
-  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
   ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
   ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
-  ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
@@ -1205,14 +1225,33 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettin
   setUInt8(Offset::talkerAliasDisplay(), (uint8_t)source);
 }
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
+
+DMRSettings::TalkerAliasEncoding
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding());
+  switch ((TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding())) {
+  case TalkerAliasEncoding::ISO7: return DMRSettings::TalkerAliasEncoding::Iso7;
+  case TalkerAliasEncoding::ISO8: return DMRSettings::TalkerAliasEncoding::Iso8;
+  case TalkerAliasEncoding::Unicode: return DMRSettings::TalkerAliasEncoding::Unicode;
+  }
+
+  return DMRSettings::TalkerAliasEncoding::Iso8;
 }
+
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) {
-  setUInt8(Offset::talkerAliasEncoding(), (uint8_t)encoding);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding) {
+  switch (encoding) {
+  case DMRSettings::TalkerAliasEncoding::Iso7:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::ISO7);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Iso8:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::ISO8);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Unicode:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::Unicode);
+    break;
+  }
 }
+
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
@@ -1399,15 +1438,16 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
   // By default, use strong encryption
   setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType::AES);
 
+  enableSendTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
     return true;
 
   // Encode DMR settings
-  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
 
   // Encode audio settings
   setMuteTimer(ext->audioSettings()->muteDelay());
@@ -1445,6 +1485,9 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
     return false;
   }
 
+  ctx.config()->settings()->dmr()->enableSendTalkerAlias(sendTalkerAlias());
+  ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
@@ -1452,9 +1495,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
   }
 
   // Store DMR settings
-  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
   ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Decode audio settings
   ext->audioSettings()->setMuteDelay(this->muteTimer());

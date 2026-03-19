@@ -139,10 +139,9 @@ D878UVTest::testHangTime() {
 
   // Check config
   QVERIFY2(config.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
-  AnytoneDMRSettingsExtension *ext = config.settings()->anytoneExtension()->dmrSettings();
 
-  QCOMPARE(ext->privateCallHangTime().seconds(), 4ULL);
-  QCOMPARE(ext->groupCallHangTime().seconds(), 5ULL);
+  QCOMPARE(config.settings()->dmr()->privateCallHangTime().seconds(), 4ULL);
+  QCOMPARE(config.settings()->dmr()->groupCallHangTime().seconds(), 5ULL);
 
   // Encode
   D878UVCodeplug codeplug;
@@ -169,11 +168,9 @@ D878UVTest::testHangTime() {
 
   // Check config
   QVERIFY2(comp_config.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
-  ext = comp_config.settings()->anytoneExtension()->dmrSettings();
 
-  QCOMPARE(ext->privateCallHangTime().seconds(), 4ULL);
-  QCOMPARE(ext->groupCallHangTime().seconds(), 5ULL);
-
+  QCOMPARE(config.settings()->dmr()->privateCallHangTime().seconds(), 4ULL);
+  QCOMPARE(config.settings()->dmr()->groupCallHangTime().seconds(), 5ULL);
 }
 
 void

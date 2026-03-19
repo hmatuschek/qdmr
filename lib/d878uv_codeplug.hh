@@ -7,6 +7,7 @@
 #include "signaling.hh"
 #include "gpssystem.hh"
 #include "gnsssettings.hh"
+#include "dmrsettings.hh"
 
 class Channel;
 class DMRContact;
@@ -392,6 +393,11 @@ public:
       _3min = 9, _4min = 10, _5min = 11, _15min = 12, _30min = 13, _45min = 14, _1h = 15
     };
 
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -654,9 +660,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual DMRSettings::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(DMRSettings::SMSFormat fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
     virtual Frequency autoRepeaterMinFrequencyVHF() const override;
@@ -898,6 +904,11 @@ public:
       GPS=0, Beidou=1, Both = 2
     };
 
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -923,9 +934,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;

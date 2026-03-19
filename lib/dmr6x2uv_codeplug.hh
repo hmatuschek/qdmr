@@ -129,6 +129,11 @@ public:
       TS1 = 0, TS2 = 1, Channel = 2
     };
 
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
   protected:
     /** Hidden Constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -360,9 +365,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual DMRSettings::SMSFormat smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(DMRSettings::SMSFormat fmt);
 
     bool gpsUnitsImperial() const override;
     void enableGPSUnitsImperial(bool enable) override;
@@ -505,6 +510,12 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
+  protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
@@ -529,9 +540,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns the font color. */
     virtual AnytoneDisplaySettingsExtension::Color fontColor() const;

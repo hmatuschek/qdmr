@@ -1299,21 +1299,10 @@ class AnytoneDMRSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  Q_CLASSINFO("groupCallHangTimeDescription", "Specifies the hang- or hold-time for group calls.")
-  /** Group-call hang-time in seconds. */
-  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
   /** Manual dialed group-call hang-time in seconds. */
   Q_PROPERTY(Interval manualGroupCallHangTime READ manualGroupCallHangTime WRITE setManualGroupCallHangTime)
-
-  Q_CLASSINFO("privateCallHangTimeDescription", "Specifies the hang- or hold-time for private calls.")
-  /** Private-call hang-time in seconds. */
-  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
   /** Manual dialed private-call hang-time in seconds. */
   Q_PROPERTY(Interval manualPrivateCallHangTime READ manualPrivateCallHangTime WRITE setManualPrivateCallHangTime)
-
-  Q_CLASSINFO("preWaveDelay", "Sets the pre-wave delay in ms. Should be set to 100ms.")
-  /** Pre-wave delay in ms. */
-  Q_PROPERTY(Interval preWaveDelay READ preWaveDelay WRITE setPreWaveDelay)
 
   Q_CLASSINFO("wakeHeadPeriod", "Sets the wake head-period in ms. Should be set to 100ms.")
   /** Wake head-period in ms. */
@@ -1340,17 +1329,8 @@ class AnytoneDMRSettingsExtension: public ConfigItem
   /** The DMR monitor holds the time-slot. */
   Q_PROPERTY(bool monitorTimeSlotHold READ monitorTimeSlotHoldEnabled WRITE enableMonitorTimeSlotHold)
 
-  Q_CLASSINFO("smsFormatDescription", "Specifies the SMS format, select Motorola here.")
-  /** The SMS format. */
-  Q_PROPERTY(SMSFormat smsFormat READ smsFormat WRITE setSMSFormat)
-
-  Q_CLASSINFO("sendTalkerAliasDescription", "Sends the radio name as talker alias over the air.")
-  /** If @c true, the talker alias (name) is sent. */
-  Q_PROPERTY(bool sendTalkerAlias READ sendTalkerAlias WRITE enableSendTalkerAlias)
   /** Specifies the talker alias source. */
   Q_PROPERTY(TalkerAliasSource talkerAliasSource READ talkerAliasSource WRITE setTalkerAliasSource)
-  /** Specifies the talker alias encoding. */
-  Q_PROPERTY(TalkerAliasEncoding talkerAliasEncoding READ talkerAliasEncoding WRITE setTalkerAliasEncoding)
 
   /** The encryption type to be used. */
   Q_PROPERTY(EncryptionType encryption READ encryption WRITE setEncryption)
@@ -1363,23 +1343,11 @@ public:
   };
   Q_ENUM(SlotMatch)
 
-  /** Possible SMS formats. */
-  enum class SMSFormat {
-    Motorola = 0, Hytera = 1, DMR = 2
-  };
-  Q_ENUM(SMSFormat)
-
   /** Talker alias display preference. */
   enum class TalkerAliasSource {
     Off = 0, UserDB = 1, Air = 2
   };
   Q_ENUM(TalkerAliasSource)
-
-  /** Talker alias encoding. */
-  enum class TalkerAliasEncoding {
-    ISO8 = 0, ISO7 = 1, Unicode = 2,
-  };
-  Q_ENUM(TalkerAliasEncoding)
 
   /** Possible encryption types. */
   enum class EncryptionType {
@@ -1393,27 +1361,15 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Returns the group-call hang-time in seconds. */
-  Interval groupCallHangTime() const;
-  /** Sets the group-call hang-time in seconds. */
-  void setGroupCallHangTime(Interval sec);
   /** Returns the manual dialed group-call hang-time in seconds. */
   Interval manualGroupCallHangTime() const;
   /** Sets the manual dialed group-call hang-time in seconds. */
   void setManualGroupCallHangTime(Interval sec);
-  /** Returns the private-call hang-time in seconds. */
-  Interval privateCallHangTime() const;
-  /** Sets the private-call hang-time in seconds. */
-  void setPrivateCallHangTime(Interval sec);
   /** Returns the manual dialed private-call hang-time in seconds. */
   Interval manualPrivateCallHangTime() const;
   /** Sets the manual dialed private-call hang-time in seconds. */
   void setManualPrivateCallHangTime(Interval sec);
 
-  /** Returns the pre-wave delay in ms. */
-  Interval preWaveDelay() const;
-  /** Sets the pre-wave delay in ms. */
-  void setPreWaveDelay(Interval ms);
   /** Returns the wake head-period in ms. */
   Interval wakeHeadPeriod() const;
   /** Sets the wake head-period in ms. */
@@ -1441,25 +1397,10 @@ public:
   /** Enables/disables the time-slot hold for the DMR monitor. */
   void enableMonitorTimeSlotHold(bool enable);
 
-  /** Returns the SMS format. */
-  SMSFormat smsFormat() const;
-  /** Sets the SMS format. */
-  void setSMSFormat(SMSFormat format);
-
-  /** Returns @c true if the talker alias is sent. */
-  bool sendTalkerAlias() const;
-  /** Enables/disables sending talker alias. */
-  void enableSendTalkerAlias(bool enable);
-
   /** Returns the talker alias source. */
   TalkerAliasSource talkerAliasSource() const;
   /** Sets the talker alias source. */
   void setTalkerAliasSource(TalkerAliasSource mode);
-
-  /** Returns the talker alias encoding. */
-  TalkerAliasEncoding talkerAliasEncoding() const ;
-  /** Sets the talker alias encoding. */
-  void setTalkerAliasEncoding(TalkerAliasEncoding encoding);
 
   /** Returns the encryption type. */
   EncryptionType encryption() const;
@@ -1467,21 +1408,15 @@ public:
   void setEncryption(EncryptionType type);
 
 protected:
-  Interval _groupCallHangTime;          ///< Hang-time for group-calls in seconds.
   Interval _manualGroupCallHangTime;    ///< Hang-time for manual dialed group-calls in seconds.
-  Interval _privateCallHangTime;        ///< Hang-time for private-calls in seconds.
   Interval _manualPrivateCallHangTime;  ///< Hang-time for manual dialed private-calls in seconds.
-  Interval _preWaveDelay;               ///< Pre-wave time in ms, should be 100ms.
   Interval _wakeHeadPeriod;             ///< Wake head-period in ms, should be 100ms.
   bool _filterOwnID;                    ///< If enabled, the own ID is not shown in call lists.
   SlotMatch _monitorSlotMatch;          ///< Slot-match mode for DMR monitor.
   bool _monitorColorCodeMatch;          ///< Enables CC match for DMR monitor.
   bool _monitorIDMatch;                 ///< Enables ID match for DMR monitor.
   bool _monitorTimeSlotHold;            ///< Enables the time-slot hold for the DMR monitor.
-  SMSFormat _smsFormat;                 ///< Sets the SMS format.
-  bool _sendTalkerAlias;                ///< Enables sending talker alias.
   TalkerAliasSource _talkerAliasSource; ///< Source for the talker alias.
-  TalkerAliasEncoding _talkerAliasEncoding; ///< Encoding for the talker alias.
   EncryptionType _encryption;           ///< DMR encryption type.
 };
 
