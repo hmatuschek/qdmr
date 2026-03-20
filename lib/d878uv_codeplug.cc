@@ -448,6 +448,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
       ch_ext = ext;
+      enableDataACK(dc->anytoneChannelExtension()->dataACK());
       /// Handles bug in AnyTone firmware.
       /// @todo Remove once fixed by AnyTone.
       enableRXAPRS(! ext->sms());
@@ -1983,11 +1984,12 @@ D878UVCodeplug::GeneralSettingsElement::setMuteDelay(Interval min) {
 
 unsigned
 D878UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
-  return getUInt8(Offset::repCheckNumNotify());
+  return getUInt8(Offset::repCheckNumNotify())+1;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned num) {
-  setUInt8(Offset::repCheckNumNotify(), num);
+  num = Limit::repeaterOORNotificationCount().limit(num);
+  setUInt8(Offset::repCheckNumNotify(), num-1);
 }
 
 bool

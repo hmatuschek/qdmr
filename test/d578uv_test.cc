@@ -128,7 +128,7 @@ D578UVTest::testSettingsDisplayVolumeChangePrompt() {
             .arg(err.format()).toStdString().c_str());
   }
 
-  QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), true);
+  QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
 }
 
 void
@@ -187,6 +187,42 @@ D578UVTest::testSettingsRoamingNotificationCount() {
   }
 
   QCOMPARE(testConfig.settings()->anytoneExtension()->roamingSettings()->notificationCount(), 1);
+}
+
+
+void
+D578UVTest::testARC4Encryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/arc4_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+            .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  D578UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existence of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("1122334455"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
 }
 
 

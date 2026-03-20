@@ -520,13 +520,13 @@ D878UVTest::testChannelDataACK() {
   D878UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
+    QFAIL(QString("Cannot encode codeplug for AnyTone D878UV: %1")
             .arg(err.format()).toStdString().c_str());
   }
 
   Config testConfig;
   if (! codeplug.decode(&testConfig, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
+    QFAIL(QString("Cannot decode codeplug for AnyTone D878UV: %1")
             .arg(err.format()).toStdString().c_str());
   }
 
@@ -536,6 +536,35 @@ D878UVTest::testChannelDataACK() {
              ->anytoneChannelExtension()->dataACK(), true);
 }
 
+
+void
+D878UVTest::testSettingsDisplayVolumeChangePrompt() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/anytone_settings_display.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
+
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  D878UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
+}
 
 
 QTEST_GUILESS_MAIN(D878UVTest)
