@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/amchanneldialog.ui" line="14"/>
         <source>Edit AM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>AM Kanal bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="24"/>
@@ -85,7 +85,7 @@
     <message>
         <location filename="../src/amchanneldialog.ui" line="211"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX Level</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="245"/>
@@ -115,7 +115,7 @@
     <message>
         <location filename="../src/amchanneldialog.cc" line="47"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="63"/>
@@ -653,7 +653,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal hinzufügen ...</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -678,12 +678,12 @@
     <message>
         <location filename="../src/channellistview.ui" line="64"/>
         <source>Add FM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>FM Kanal hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="67"/>
         <source>Adds a new FM channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt einen neuen FM Kanal hinzu</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="75"/>
@@ -693,17 +693,17 @@
     <message>
         <location filename="../src/channellistview.ui" line="78"/>
         <source>Adds a new DMR channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt einen neuen DMR Kanal hinzu.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="86"/>
         <source>Add AM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>AM Kanal hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="89"/>
         <source>Adds a new AM channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt einen neuen AM Kanal hinzu.</translation>
     </message>
 </context>
 <context>
@@ -721,7 +721,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="282"/>
         <source>AM</source>
-        <translation type="unfinished"></translation>
+        <translation>AM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
@@ -1317,7 +1317,7 @@
         <location filename="../src/dmrchanneldialog.cc" line="84"/>
         <location filename="../src/dmrchanneldialog.cc" line="91"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="92"/>
@@ -1706,7 +1706,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -2150,7 +2150,7 @@
         <location filename="../src/fmchanneldialog.cc" line="57"/>
         <location filename="../src/fmchanneldialog.cc" line="75"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="92"/>
@@ -2903,7 +2903,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="838"/>
         <source>Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Periode</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="839"/>
@@ -4089,12 +4089,12 @@
     <message>
         <location filename="../src/main.cc" line="25"/>
         <source>Codeplug file to load.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu ladende Codeplugdatei.</translation>
     </message>
     <message>
         <location filename="../src/main.cc" line="26"/>
         <source>Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legt das Log-level der Standardausgabe fest. Muss `debug`, `info`, `warning`, `error` oder `fatal` sein.</translation>
     </message>
 </context>
 </TS>
