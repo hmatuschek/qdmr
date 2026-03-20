@@ -1228,9 +1228,9 @@ TyTCodeplug::GeneralSettingsElement::clear() {
 
   setDMRId(0); setUInt8(0x47,0);
 
-  setTXPreambleDuration(600);
-  setGroupCallHangTime(3000);
-  setPrivateCallHangTime(4000);
+  setTXPreambleDuration(Interval::fromMilliseconds(600));
+  setGroupCallHangTime(Interval::fromMilliseconds(3000));
+  setPrivateCallHangTime(Interval::fromMilliseconds(4000));
   setVOXSesitivity(Level::fromValue(3));
   setUInt8(0x4c, 0x00); setUInt8(0x4d, 0x00);
   setLowBatteryInterval(120);
@@ -1372,34 +1372,34 @@ TyTCodeplug::GeneralSettingsElement::setDMRId(uint32_t id) {
   setUInt24_le(0x44, id);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::txPreambleDuration() const {
-  return unsigned(getUInt8(0x48))*60;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x48))*60);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(unsigned dur) {
-  dur = std::min(8640U, dur);
-  setUInt8(0x48, dur/60);
+TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(const Interval &dur) {
+  auto ms = std::min(8640ULL, dur.milliseconds());
+  setUInt8(0x48, ms/60);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return unsigned(getUInt8(0x49))*100;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x49))*100);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned dur) {
-  dur = std::min(7000U, dur);
-  setUInt8(0x49, dur/100);
+TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(const Interval &dur) {
+  auto ms = std::min(7000ULL, dur.milliseconds());
+  setUInt8(0x49, ms/100);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return unsigned(getUInt8(0x4a))*100;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x4a))*100);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned dur) {
-  dur = std::min(7000U, dur);
-  setUInt8(0x4a, dur/100);
+TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(const Interval &dur) {
+  auto ms = std::min(7000ULL, dur.milliseconds());
+  setUInt8(0x4a, ms/100);
 }
 
 Level
@@ -1576,6 +1576,10 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
 
+  setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
+  setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
+  setTXPreambleDuration(config->settings()->dmr()->preamble());
+
   if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
     setMonitorType(ex->monitorType());
     disableAllLEDs(ex->allLEDsDisabled());
@@ -1587,9 +1591,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
     enableIntroPicture(ex->bootPicture());
-    setTXPreambleDuration(ex->txPreambleDuration());
-    setGroupCallHangTime(ex->groupCallHangTime());
-    setPrivateCallHangTime(ex->privateCallHangTime());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
     if (ex->callAlertToneContinuous())
       setCallAlertToneContinuous();
@@ -1635,6 +1636,10 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
 
+  config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
+  config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
+  config->settings()->dmr()->setPreamble(txPreambleDuration());
+
   // apply extension
   TyTSettingsExtension *ex = new TyTSettingsExtension();
   config->settings()->setTyTExtension(ex);
@@ -1649,9 +1654,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
   ex->enableBootPicture(introPicture());
-  ex->setTXPreambleDuration(txPreambleDuration());
-  ex->setGroupCallHangTime(groupCallHangTime());
-  ex->setPrivateCallHangTime(privateCallHangTime());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());
   ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
   if (! callAlertToneIsContinuous())

@@ -286,13 +286,14 @@ DM1701Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
   setTimeZone(QTimeZone::systemTimeZone());
 
+  enablePrivateCallMatch(config->settings()->dmr()->privateCallMatchEnabled());
+  enableGroupCallMatch(config->settings()->dmr()->groupCallMatchEnabled());
+
   // apply extension
   if (TyTSettingsExtension *ex  = config->settings()->tytExtension()) {
     enableChannelMode(ex->channelMode());
     enableChannelModeA(ex->channelModeA());
     enableChannelModeB(ex->channelModeB());
-    enableGroupCallMatch(ex->groupCallMatch());
-    enablePrivateCallMatch(ex->privateCallMatch());
     setChannelHangTime(ex->channelHangTime());
   }
 
@@ -304,13 +305,14 @@ DM1701Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
   if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
     return false;
 
+  config->settings()->dmr()->enablePrivateCallMatch(privateCallMatch());
+  config->settings()->dmr()->enableGroupCallMatch(groupCallMatch());
+
   // Update extension if set.
   if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
     ex->enableChannelMode(channelMode());
     ex->enableChannelModeA(channelModeA());
     ex->enableChannelModeB(channelModeB());
-    ex->enableGroupCallMatch(groupCallMatch());
-    ex->enablePrivateCallMatch(privateCallMatch());
     ex->setChannelHangTime(channelHangTime());
   }
 

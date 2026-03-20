@@ -568,17 +568,17 @@ public:
     virtual void setDMRId(uint32_t id);
 
     /** Returns the TX preamble duration. */
-    virtual unsigned txPreambleDuration() const;
+    virtual Interval txPreambleDuration () const;
     /** Sets the TX preamble duration. */
-    virtual void setTXPreambleDuration(unsigned ms);
+    virtual void setTXPreambleDuration(const Interval &ms);
     /** Returns the group call hang time. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time. */
-    virtual void setGroupCallHangTime(unsigned ms);
+    virtual void setGroupCallHangTime(const Interval &ms);
     /** Returns the private call hang time. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time. */
-    virtual void setPrivateCallHangTime(unsigned ms);
+    virtual void setPrivateCallHangTime(const Interval &ms);
     /** Returns the VOX sensitivity. */
     virtual Level voxSesitivity() const;
     /** Sets the group call hang time. */

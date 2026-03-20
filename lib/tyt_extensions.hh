@@ -710,12 +710,6 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool channelModeA READ channelModeA WRITE enableChannelModeA)
   /** If @c true or channelMode is true, the VFO B is in channel mode. */
   Q_PROPERTY(bool channelModeB READ channelModeB WRITE enableChannelModeB)
-  /** The transmit preamble duration in ms. */
-  Q_PROPERTY(unsigned txPreambleDuration READ txPreambleDuration WRITE setTXPreambleDuration)
-  /** The group hang time in ms. */
-  Q_PROPERTY(unsigned groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
-  /** The private hang time in ms. */
-  Q_PROPERTY(unsigned privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
   /** The low battery warn interval in seconds. */
   Q_PROPERTY(unsigned lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
   /** If @c true, the call alert-tone is continuous. */
@@ -748,10 +742,6 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(unsigned radioProgPassword READ radioProgPassword WRITE setRadioProgPassword)
   /** Specifies the PC programming password. */
   Q_PROPERTY(QString pcProgPassword READ pcProgPassword WRITE setPCProgPassword)
-  /** If @c true, the private call IDs must match. */
-  Q_PROPERTY(bool privateCallMatch READ privateCallMatch WRITE enablePrivateCallMatch)
-  /** If @c true, the group call IDs must match. */
-  Q_PROPERTY(bool groupCallMatch READ groupCallMatch WRITE enableGroupCallMatch)
   /** Holds the channel hang time in ms. */
   Q_PROPERTY(unsigned channelHangTime READ channelHangTime WRITE setChannelHangTime)
 
@@ -836,21 +826,6 @@ public:
   /** Enables/disables channel mode for the VFO B. */
   void enableChannelModeB(bool enable);
 
-  /** Returns the TX preamble duration in ms. */
-  unsigned txPreambleDuration() const;
-  /** Sets the TX preamble duration in ms. */
-  void setTXPreambleDuration(unsigned ms);
-
-  /** Returns the group call hang time in ms. */
-  unsigned groupCallHangTime() const;
-  /** Sets the group-call hang time in ms. */
-  void setGroupCallHangTime(unsigned ms);
-
-  /** Returns the private call hang time in ms. */
-  unsigned privateCallHangTime() const;
-  /** Sets the private-call hang time in ms. */
-  void setPrivateCallHangTime(unsigned ms);
-
   /** Returns the low-battery warn interval in seconds. */
   unsigned lowBatteryWarnInterval() const;
   /** Sets the low-battery warn interval in seconds. */
@@ -925,15 +900,6 @@ public:
   const QString &pcProgPassword() const;
   /** Sets PC programming password. */
   void setPCProgPassword(const QString &passwd);
-
-  /** Returns @c true if the private call IDs must match. */
-  bool privateCallMatch() const;
-  /** Enables/disables private call match. */
-  void enablePrivateCallMatch(bool enable);
-  /** Returns @c true if the group call IDs must match. */
-  bool groupCallMatch() const;
-  /** Enables/disables group call match. */
-  void enableGroupCallMatch(bool enable);
 
   /** Returns the channel hang time in ms. */
   unsigned channelHangTime() const;
